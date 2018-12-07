@@ -546,5 +546,27 @@ export default {
                 break;
         }
         return objList;
+    },
+    getRouteByTag(curTag,data){
+        console.log(data);
+        let temp=[];
+        if(data.length!=0){
+            data.forEach(item=>{
+                if(item.tag==curTag){
+                    temp.push(item);
+                }
+            })
+        }
+        return temp;
+    },
+    getCityList(storeList){
+        let cityList=[];
+        storeList.forEach(item=>{
+            let province=item.province;
+            if(cityList.indexOf(province)==-1){
+                cityList.push(province);
+            }
+        })
     }
+   
 }

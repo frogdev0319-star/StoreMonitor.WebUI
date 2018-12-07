@@ -18,6 +18,19 @@ import RateDetail from '@/views/event/details/RateDetail'
 import StatisticalAnaly from '@/views/statistical/StatisticalAnaly'
 import DataCenter from '@/views/datacenter/DataCenter'
 import SystemSetting from '@/views/setting/SystemSetting'
+
+//巡检配置
+import RouteInspection from '@/views/setting/routeInspection/RouteInspection'
+import AddRuteInspect from '@/views/setting/routeInspection/AddRuteInspect'
+import BindRuteInspect from '@/views/setting/routeInspection/BindRuteInspect'
+
+//设备管理
+import DeviceSetMge from '@/views/setting/device/DeviceSetMge'
+
+//门店管理
+import StoreManage from '@/views/setting/store/StoreManage'
+import EditStoreVue from '@/views/setting/store/EditStoreVue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -28,6 +41,7 @@ export default new Router({
       redirect:'/allscan',
       component: Home,
       iconCls:'iconfont icon-zonglan',
+      styles:'font-size:25px',
       leaf:true, //没有子节点
       children:[
         {
@@ -53,7 +67,8 @@ export default new Router({
       path:'/',
       name:'巡店管理',
       component:Home,
-      iconCls:'iconfont icon-zonglan',
+      iconCls:'iconfont icon-menu-xundian',
+      styles:'font-size:22px',
       leaf:false,  //多个子节点
       children:[
         {
@@ -72,7 +87,8 @@ export default new Router({
       path:'/',
       name:'事件管理',
       component:Home,
-      iconCls:'icon iconfont icon-yichangshijianliebiaocopy',
+      iconCls:'iconfont icon-shijian',
+      styles:'font-size:22px',
       leaf:true,
       children:[
         {
@@ -111,6 +127,7 @@ export default new Router({
       name:'统计分析',
       component:Home,
       iconCls:'iconfont icon-tongjifenxi',
+      styles:'font-size:25px',
       leaf:true,
       children:[
         {
@@ -124,7 +141,8 @@ export default new Router({
       path:'/',
       name:'数据中心',
       component:Home,
-      iconCls:'iconfont icon-tongjifenxi',
+      iconCls:'iconfont icon-menu-shujuzhongxin',
+      styles:'font-size:20px',
       leaf:true,
       children:[
         {
@@ -137,25 +155,58 @@ export default new Router({
     {
       path:'/',
       name:'系统设定',
-      iconCls:'iconfont icon-tongjifenxi',
+      iconCls:'iconfont icon-button',
+      styles:'font-size:24px',
       component:Home,
       leaf:false,
       children:[
         {
-          path:'/system1',
-          name:'门店管理'
+          path:'/routeinspection',
+          name:'巡检配置',
+          component:RouteInspection,
+          hidden:false,
         },
         {
-          path:'/system2',
-          name:'设备管理'
+          path:'/routeinspection',
+          name:'巡检配置',
+          component:AddRuteInspect,
+          hidden:true,
+          children:[
+            {
+              path:'/addroute',
+              name:'巡检项设置',
+              component:AddRuteInspect
+            }
+          ]
         },
         {
-          path:'/system3',
-          name:'巡检配置'
+          path:'/routeinspection',
+          name:'巡检配置',
+          component:BindRuteInspect,
+          hidden:true,
+          children:[
+            {
+              path:'/bindroute',
+              name:'门店绑定',
+              component:BindRuteInspect
+            }
+          ]
+        },
+        {
+          path:'/device',
+          name:'设备管理',
+          component:DeviceSetMge
+        },
+        {
+          path:'/storemanage',
+          name:'门店管理',
+          component:StoreManage,
+          hidden:false
         },
         {
           path:'/system4',
-          name:'排程配置'
+          name:'排程配置',
+          component:AddRuteInspect
         },
         {
           path:'/other',

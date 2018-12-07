@@ -1,3 +1,4 @@
+var webpack=require('webpack')
 'use strict'
 const path = require('path')
 const utils = require('./utils')
@@ -22,11 +23,19 @@ module.exports = {
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath
   },
+  plugins: [ 
+    new webpack.ProvidePlugin({ 
+          $:'jquery', 
+          jQuery:'jquery', 
+         'windows.jQuery':'jquery'
+    }) 
+  ],
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      'excel': path.resolve(__dirname, '../src/excel'),//新增加一行
     }
   },
   module: {

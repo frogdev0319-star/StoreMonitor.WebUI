@@ -1,100 +1,95 @@
 import axios from 'axios'
 import qs from 'qs'
 
-let base="https://api-sserver-wise-paas.wise-paas.com.cn/api/v1.0/";
-const base_dev1="https://api-sserver-wise-paas-testnew.wise-paas.com.cn";
-let itempath='/api/v1.0'
-let base1="/api/api/v1.0/"
-const API_PROXY = 'https://bird.ioliu.cn/v1/?url='
+import Nape from '@/api/ApiPath'
+
+let base="http://172.21.81.160:8085/storemonitor/";
+let itempath='api/v1.0/'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 // get the device list
 export const getDeviceList=params=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/device/list`,params); 
+    return axios.post(`${base}${itempath}/device/list`,params); 
 };
-//get the group list.
-export const getCategorys=()=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/group/list`);
+
+
+export const getNapeList=()=>{
+    return axios.get(Nape.getNapeList,{},(res)=>{
+        console.log('接收到数据了吗?');
+        console.log(res);
+    })
+}
+export const getGroupList=()=>{
+    return axios.get(Nape.getNapeList).then(res=>res.data);
+}
+export const getStoreList1=()=>{
+    return axios.get(Nape.getStoreList).then(res=>res.data);
+}
+
+//巡检项模块api
+export const getInspectGroupList=params=>{
+    return axios.get(`${base}${itempath}/inspect/group/list`,params); 
 };
-//获取二级分类
-export const getSubCategory=(params)=>{
-    console.log("get2cate");
-    console.log(params);
-    // return axios.get(`${base}/`,{params:params}).then(res=>res.data);
+export const getInspectItemList=params=>{
+    return axios.get(`${base}${itempath}/inspect/item/list`,params); 
 }
-//根据分类筛选设备
-export const getDeviceListByCategory=(params)=>{
-    console.log("sel");
-    console.log(params);
-    //return axios.get(`${base}/`,{params:params}).then(res=>res.data);
+export const getInspectBindList=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/bind/list`,params); 
 }
-//根据关键字查找
-export const getDeviceListByKeywords=(params)=>{
-    console.log("key");
-    console.log(params);
-     return axios.post(`${process.env.API_HOST}${itempath}/device/list`,params);
+export const addInspectGroup=params=>{
+    return axios.post(`${base}${itempath}/inspect/group/add`,params); 
 }
-//获取电源状态范围
-export const getPowerscope=(params)=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/power/scope`,{params:params}).then(res=>res.data);
+export const addInspectItem=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/add`,params); 
 }
-//设置设备电源状态
-export const doAction=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/power/action`,params).then(res=>res.data);
+export const applyItemInspectItem=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/apply`,params);
 }
-//获取外设信息
-export const getExpandsInfo=(params)=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/data/realtime`,{params:params}).then(res=>res.data);
+export const bindInspectItem=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/bind`,params);
+} 
+export const checkOutInspectItem=params=>{
+    return axios.get(`${base}${itempath}/inspect/checkout`,params);
 }
-// 获取历史数据
-export const getHistoryData=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/data/history`,params).then(res=>res.data);
+export const deleteInspectGroup=params=>{
+    return axios.post(`${base}${itempath}/inspect/group/delete`,params);
 }
-//获取未分配设备数量
-export const getUnassignDevice=()=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/device/unassign`).then(res=>res.data);
+export const deleteInspectItem=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/delete`,params);
 }
-//获取异常设备信息
-export const getExceptDeviceInfo=(params)=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/stats/realtime`,{params:params}).then(res=>res.data);
+export const submitInspectItem=params=>{
+    return axios.get(`${base}${itempath}/inspect/submit`,params);
 }
-//get the event type list
-export const getEventTypeList=()=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/event/type/list`).then(res=>res.data);
+export const unbindInspectItem=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/ubind`,params);
 }
-//get the event list
-export const getEventList=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/event/list`,params).then(res=>res.data);
+export const updateInspectGroup=params=>{
+    return axios.post(`${base}${itempath}/inspect/group/update`,params);
 }
-//get the state
-export const getState=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/event/comment/list`,params).then(res=>res.data);
-}
-export const addComment=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/event/comment/add`,params).then(res=>res.data);
+export const updateInspectItem=params=>{
+    return axios.post(`${base}${itempath}/inspect/item/update`,params);
 }
 
-//start report
+//门店管理模块api
 
-export const startReport=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/data/start_report`,params).then(res=>res.data);
+export const getStoreList=params=>{
+    return axios.post(`${base}${itempath}/store/list`,params);
 }
 
-//profile
-export const getProFileList=()=>{
-    return axios.get(`${process.env.API_HOST}${itempath}/profile/list`).then(res=>res.data);
+//设备管理模块api
+
+export const getDashServerInfo=()=>{
+    return axios.get(`${base}${itempath}/device/dash/info`);
 }
-export const addProFile=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/profile/add`,params).then(res=>res.data);
+export const addDashServer=params=>{
+    return axios.post(`${base}${itempath}/device/dash/add`,params);
 }
-export const editProFile=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/profile/edit`,params).then(res=>res.data);
+
+export const upateDashServer=params=>{
+    return axios.post(`${base}${itempath}/device/dash/update`,params);
 }
-export const deleteProFile=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/profile/delete`,params).then(res=>res.data);
+export const getNVRList=params=>{
+    return axios.post(`${base}${itempath}/device/nvr/list`,params);
 }
-export const applyProFile=(params)=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/profile/apply`,params).then(res=>res.data);
-}
-export const getBindingList=()=>{
-    return axios.post(`${process.env.API_HOST}${itempath}/profile/binding`).then(res=>res.data);
+export const addNVR=params=>{
+    return axios.post(`${base}${itempath}/device/nvr/add`,params);
 }
