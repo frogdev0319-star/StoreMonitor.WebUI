@@ -224,10 +224,22 @@ export default {
         },
         change(item){
             let self=this;
+            let arr=[];
             console.log(item);
             item.itemData.forEach(_item=>{
                 _item.checked=item.checked;
             })
+            self.routeData.forEach(_item=>{
+                if(_item.checked){
+                    arr.push(_item);
+                }
+            })
+            if(self.routeData.length==arr.length){
+                self.allchecked=true;
+            }
+            else{
+                self.allchecked=false;
+            }
         },
         selectRow(tableIndex,item,index,row){
             let arr=[];
@@ -240,9 +252,28 @@ export default {
             console.log(arr.length);
             if(item.itemData.length==arr.length){  //列表中的值全部勾选
                 item.checked=true;    //最上方的全选为勾选状态
+                //self.allchecked=true;
             }
             else{
-                item.checked=false;   
+                item.checked=false;
+                //self.allchecked=false;   
+            }
+            let arrCheckedItem=[];
+            let count=0;
+            self.routeData.forEach(_item=>{
+                count+=_item.itemData.length;
+                _item.itemData.forEach(itemS=>{
+                    if(itemS.checked){
+                        
+                        arrCheckedItem.push(itemS);
+                    }
+                })
+            })
+            if(count==arrCheckedItem.length){
+                self.allchecked=true;
+            }
+            else{
+                self.allchecked=false;
             }
         },
         getNapeList(){
@@ -664,23 +695,23 @@ export default {
 <style>
 .el-tabs__active-bar{
         height: 4px !important;
-        background-color: #FB505F;
+        background-color: #FB505F !important;
     }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB505F;
+    color: #FB505F !important;
 }
 .el-tabs__item:hover{
-    color: #FB505F;
+    color: #FB505F !important;
 }
 
 .el-checkbox__inner:hover{
-    border-color: #FB505F;
+    border-color: #FB505F !important;
 }
 .el-checkbox.is-bordered.is-checked{border-color:#FB505F}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F;
-    border-color:#FB505F
+    background-color: #FB505F !important;
+    border-color:#FB505F !important;
 }
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
     background-color: #FEE7E4;
@@ -696,19 +727,19 @@ export default {
     padding: 0px;
 }
 .el-radio-button__inner{
-    background-color: #E9ECF1;
+    background-color: #E9ECF1 !important;
     width: 86px;
     border-radius: 5px !important;
     border: 0px;
 }
 .el-radio-button__inner:hover{
-    color: #FB505F;
+    color: #FB505F !important;
 }
 .el-radio-button__orig-radio:checked+.el-radio-button__inner{
-    background-color: #FB505F;
+    background-color: #FB505F !important;
     border: 0px;
-    box-shadow:-1px 0 0 0 #FB505F;
-    -webkit-box-shadow:-1px 0 0 0 #FB505F;
+    box-shadow:-1px 0 0 0 #FB505F !important;
+    -webkit-box-shadow:-1px 0 0 0 #FB505F !important;
 }
 </style>
 

@@ -859,21 +859,21 @@ $itemHeight:50px;
 </style>
 <style>
 .input-details .el-input__inner{
-    border:1px solid #FB505F;
-    border-radius: 0px;
+    border:1px solid #FB505F !important;
+    border-radius: 0px !important;
 }
 .el-checkbox__inner:hover{
-    border-color: #FB505F;
+    border-color: #FB505F !important;
 }
-.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox.is-bordered.is-checked{border-color:#FB505F !important;}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F;
-    border-color:#FB505F
+    background-color: #FB505F !important;
+    border-color:#FB505F !important;
 }
 .el-dialog{
-    margin-left:85vh;
+    margin-left:85vh !important;
 }
 .el-dialog__body{
-    padding: 0px;
+    padding: 0px !important;
 }
 </style>

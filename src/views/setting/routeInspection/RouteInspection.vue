@@ -379,9 +379,6 @@ export default {
                 }
             })
         },
-        confirmExport(){
-
-        },
         exportItem(){
             let self=this;
             self.export2Excel();
@@ -592,16 +589,13 @@ export default {
                     width: 120px;
                     border-radius: 0px;
                     margin-right: 15px;
-                    // &:hover{
-                    //     background-color: #FEE4E7;
-                    // }
                 }
                 .el-handle-btn{
-                    margin-left: 0px;
+                    margin-left: 0px !important;
                     border-color: $mainColor;
                     color: $mainColor;
                     border-radius: 0px;
-                    padding: 3px 10px;
+                    padding: 3px 10px !important;
                     position: relative;
                     top: 3px;
                     span{
@@ -651,7 +645,6 @@ export default {
         }
     }
     .el-dropbtn{
-        // width: 140px;
         position: relative;
         bottom: 2px;
         border: 1px solid $mainColor;
@@ -672,6 +665,6 @@ export default {
 </style>
 <style>
 .el-dialog__title{
-    font-size: 16px;
+    font-size: 16px !important;
 }
 </style>

@@ -31,6 +31,8 @@ import DeviceSetMge from '@/views/setting/device/DeviceSetMge'
 import StoreManage from '@/views/setting/store/StoreManage'
 import EditStoreVue from '@/views/setting/store/EditStoreVue'
 
+//排程管理
+import ScheduleManage from '@/views/setting/schedule/ScheduleManage'
 Vue.use(Router)
 
 export default new Router({
@@ -204,9 +206,23 @@ export default new Router({
           hidden:false
         },
         {
-          path:'/system4',
+          path:'/storemanage',
+          name:'门店管理',
+          component:EditStoreVue,
+          hidden:true,
+          children:[
+            {
+              path:'/storedetail',
+              name:'门店详情',
+              component:EditStoreVue
+            }
+          ]
+        },
+        {
+          path:'/schedule',
           name:'排程配置',
-          component:AddRuteInspect
+          component:ScheduleManage,
+          hidden:false
         },
         {
           path:'/other',

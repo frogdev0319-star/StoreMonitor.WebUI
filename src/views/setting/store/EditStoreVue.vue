@@ -21,7 +21,6 @@
             <div class="store-handle">
                 <span style="font-size:14px;font-weight:bold;">关联巡检表</span>
                 <span>远程巡检</span>
-                <span>解除关联</span>
             </div>
         </el-col>
         <el-col :span="24" class="storeEdit-content">

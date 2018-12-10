@@ -7,10 +7,6 @@ let base="http://172.21.81.160:8085/storemonitor/";
 let itempath='api/v1.0/'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 // get the device list
-export const getDeviceList=params=>{
-    return axios.post(`${base}${itempath}/device/list`,params); 
-};
-
 
 export const getNapeList=()=>{
     return axios.get(Nape.getNapeList,{},(res)=>{
@@ -92,4 +88,32 @@ export const getNVRList=params=>{
 }
 export const addNVR=params=>{
     return axios.post(`${base}${itempath}/device/nvr/add`,params);
+}
+export const deleteNVR=params=>{
+    return axios.post(`${base}${itempath}/device/nvr/delete`,params);
+}
+
+export const getDeviceList=()=>{
+    return axios.get(`${base}${itempath}/device/list`);
+}
+export const addDevice=params=>{
+    return axios.post(`${base}${itempath}/device/add`,params);
+}
+export const deleteDevice=params=>{
+    return axios.post(`${base}${itempath}/device/delete`,params);
+}
+export const updateDevice=params=>{
+    return axios.post(`${base}${itempath}/device/update`,params);
+}
+export const deleteNVRandChannel=(params1,params2)=>{
+    return axios.all([
+        axios.post(`${base}${itempath}/device/delete`,params1),
+        axios.post(`${base}${itempath}/device/nvr/delete`,params2)
+    ]);
+}
+export const addNVRandChannel=(params1,params2)=>{
+    return axios.all([
+        axios.post(`${base}${itempath}/device/nvr/add`,params1),
+        axios.post(`${base}${itempath}/device/add`,params2)
+    ]);
 }

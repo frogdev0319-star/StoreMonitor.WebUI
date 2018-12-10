@@ -156,13 +156,27 @@ export default {
             })
         },
         choiceAllGroup(item){
+            let self=this;
             console.log(item);
             let obj=item;
             item.itemData.forEach(item=>{
                 item.checked=obj.checked;
             })
+            let arr=[];
+            self.storeList.forEach(_item=>{
+                if(_item.checked){
+                    arr.push(_item);
+                }
+            })
+            if(self.storeList.length==arr.length){
+                self.allData=true;
+            }
+            else{
+                self.allData=false;
+            }
         },
         choiceAllDevice(index,item){
+            let self=this;
             console.log(index);
             let count=0;
             item.itemData.forEach(itemS=>{
@@ -175,6 +189,21 @@ export default {
             }
             else{
                 item.checked=false;
+            }
+            let length=0, countItem=0;
+            self.storeList.forEach(_item=>{
+                length+=_item.itemData.length;
+                _item.itemData.forEach(itemS=>{
+                    if(itemS.checked){
+                        countItem++;
+                    }
+                })
+            })
+            if(length==countItem){
+                self.allData=true;
+            }
+            else{
+                self.allData=false;
             }
         },
         getStoreData(){
@@ -330,7 +359,6 @@ export default {
                     }
                 })
             })
-            
         },
         InitData(){
             let self=this;
@@ -519,19 +547,19 @@ export default {
 </style>
 <style>
 .el-button--mini, .el-button--mini.is-round{
-    padding:7px 15px;
+    padding:7px 15px !important;
 }
 .el-checkbox__inner:hover{
-    border-color: #FB505F;
+    border-color: #FB505F !important;
 }
 .el-checkbox.is-bordered.is-checked{border-color:#FB505F}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F;
-    border-color:#FB505F
+    background-color: #FB505F !important;
+    border-color:#FB505F !important;
 }
 .el-province .el-input__inner{
-    border-radius: 0px;
-    background-color: #F4F5F9;
+    border-radius: 0px !important;
+    background-color: #F4F5F9 !important;
 }
 #elCity{
     border-radius: 0px;
@@ -541,12 +569,12 @@ export default {
     padding: 0 20px !important;
 }
 .el-select-dropdown__item.hover{
-    background-color:#FEE4E7;
+    background-color:#FEE4E7 !important;
 }
 .el-select .el-input.is-focus .el-input__inner{
-    border-color: #FEE4E7;
+    border-color: #FEE4E7 !important;
 }
 .el-select-dropdown__item.selected{
-    color:#FB505F;
+    color:#FB505F !important;
 }
 </style>
