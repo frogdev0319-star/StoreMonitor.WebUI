@@ -4,7 +4,7 @@
             <el-col class="header">
                 <el-col :span="10" class="logo-content" :class="collapsed?'logo-collapse-width':'logo-width'">
                     <!-- <img :src="imgSrc" alt="logo"> -->
-                    <span class="sys-name" v-if="!collapsed">{{sysName}}</span>
+                    <span class="sys-name" v-if="!collapsed">{{appName}}</span>
                 </el-col>
                 <el-col :span="1" class="el-traggle-content">
                     <i class="iconfont icon-shouqi icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
@@ -48,7 +48,9 @@
                     </el-dropdown>
                 </el-col>
             </el-col>
-            <el-col class="main" :span="24">
+            <el-col class="main" :span="24" 
+            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event')?
+            {'height':(varyWindowHeight-80)+'px'}:{'height':'100%'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <el-menu :default-active="$route.path"
                         class="el-menu-vertical-demo" 
@@ -73,12 +75,13 @@
                             <i :class="item.iconCls" :style="item.styles" class="navIcon">
                             </i>{{item.name}}
                             </template>
-                            <el-menu-item class="submenu-item" v-for="child in item.children" :index="child.path"
+                            <el-menu-item id="childSubItem" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                             v-for="child in item.children" :index="child.path"
                             :key="child.path" v-if="!child.hidden" style="padding-left: 30px;">
                                 <template>
                                     <div style="width: 10px;height: 10px;background-color:white;border-radius: 50%;-moz-border-radius: 50%;
-                                    -webkit-border-radius: 50%;float:left;margin-top:18px;"></div>
-                                    <span style="margin-left:25%;">{{collapsed?'':child.name}}</span>
+                                    -webkit-border-radius: 50%;float:left;margin-top:18px;margin-right:40px;"></div>
+                                    <span >{{collapsed?'':child.name}}</span>
                                 </template>
                             </el-menu-item>
                         </el-submenu>
@@ -86,7 +89,8 @@
                     </el-menu> 
                 </aside>
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
-                    <el-col :class="($route.path!='/routeinspection')?'content-wrapper-all':'content-wrapper'">
+                    <el-col :class="($route.path!='/routeinspection'&&$route.path!='/storedetail'&&$route.path!='/rate')
+                    ?'content-wrapper-all':'content-wrapper'">
                         <router-view></router-view>
                     </el-col>
                     <el-col :sapn='24' class="footercontent">
@@ -108,11 +112,12 @@ export default {
     data(){
         return{
             imgSrc:'./static/img/logo.png',
-            sysName:'看门店管理系统',
             userName:'Admin',
             headUrl:'',
             breadList:[],
-            collapsed:false
+            collapsed:false,
+            varyWindowWidth:window.innerWidth,
+            varyWindowHeight:window.innerHeight
         }
     },
     methods:{
@@ -223,16 +228,15 @@ export default {
             height: 60px;
             z-index:999;
             position:fixed;
-            // background:url('../../../static/img/menu_choose.jpg')no-repeat;
             background-color:#fff;
             line-height: 60px;
-            // color: #fff;
             border-bottom: 0.5px solid #ebebeb;
             .logo-width{
                 width:16.9%;
             }
             .logo-collapse-width{
                 width:$collapseWidth;
+                width: 4.5%;
                 max-width: 65px;
             }
             .logo-content{
@@ -264,30 +268,6 @@ export default {
                     cursor: pointer;
                     color: #99A7B2;
                 }
-                // cursor: pointer;
-                // .traggle-content{
-                //     width: 28px;
-                //     height: 28px;
-                //     position: absolute;
-                //     top: 14px;
-                //     left: 14px;
-                //     .traggle{
-                //         width: 28px;
-                //         height: 4px;
-                //         background-color: #9FACB6;
-                //         margin-top: 4.5px;
-                //     }
-                //     .traggle-left{
-                //         display:block;
-                //         width:0;
-                //         height:0;
-                //         border-width:5px 5px 5px 0;
-                //         border-style:solid;
-                //         border-color:transparent #9FACB6 transparent transparent;
-                //         position:absolute;
-                //         margin-top: 1px;
-                //     }
-                //}
             }
             .breadcrumb-inner{
                 float:left;
@@ -359,22 +339,22 @@ export default {
             top:60px;
             bottom:0px;
             background-color: #f6f9fe;
-            height:100%;
+            
             aside{
                 height:100%;
                 float:left;
                 position: fixed;
                 .el-submenu{
                     position: relative;
-                    @include borderColor;
+                    // @include borderColor;
                     &:hover{
                         background-color:#FB505F !important;
                     }
                 }
-                .submenu-item{
+                #childSubItem.submenu-item{
                     position: relative;
-                   
-                    @include borderColor;
+                    min-width: auto !important;
+                    // @include borderColor;
                 }
             }
             .content-wrapper-all{

@@ -107,8 +107,8 @@ export default {
         let years=t.getFullYear();
         let month=t.getMonth()+1;
         let day=t.getDate();
-        let hour=t.getHours();
-        let min=t.getMinutes();
+        let hour=t.getHours()<10?'0'+t.getHours():t.getHours();
+        let min=t.getMinutes()<10?'0'+t.getMinutes():t.getMinutes();
         result=years+'/'+month+'/'+day+' '+hour+':'+min;
         return result;
     },
@@ -567,6 +567,19 @@ export default {
                 cityList.push(province);
             }
         })
+    },
+    getDateCurMonth(year,month){
+        let nowdate=new Date(''+year+','+month+',01');
+        let weekday=nowdate.getDay();
+        return weekday;
+    },
+    getDayNum(year,month){
+        let nowdate=new Date(''+year+','+month+',01');
+        month=nowdate.getMonth()+1;
+        nowdate.setMonth(month);
+        nowdate.setDate(0);
+        let dayNum=nowdate.getDate();
+        return dayNum;
     }
    
 }

@@ -16,12 +16,12 @@
        <el-col :span="7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
-                   <span><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
+                   <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
                    <div class="btn-content">
                        <el-button class="rute-btn" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span>添加巡检类别</span></el-button>
                    </div>
                </div>
-               <div class="group-items">
+               <div class="group-items group-title">
                    <div v-for="(item,index) in groupList" 
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
@@ -61,14 +61,14 @@
        <el-col :span="17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
-                   <span v-if="groupList.length!=0"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
+                   <span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
                     <div class="btn-content" v-if="groupList.length!=0">
                         <el-button class="rute-btn" size="mini" @click="addNape"><i class="el-icon-plus"></i><span>新增巡检项</span></el-button>
                         <el-button class="rute-btn" size="mini" @click="deleteNape"><i class="el-icon-close"></i><span>删除巡检项</span></el-button>
                     </div>
                </div>
                <div class="nape-items">
-                   <div class="nape-items-title" v-if="napeList.length!=0">
+                   <div class="nape-items-title tabTitle" v-if="napeList.length!=0">
                        <div class="nape-name-title">
                            <span>巡检名称</span>
                        </div>
@@ -79,7 +79,7 @@
                            <span>操作</span>
                        </div>
                    </div>
-                   <div class="nape-items-data" 
+                   <div class="nape-items-data noraml-text" 
                    v-for="(item,index) in napeList" 
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
                        <div class="nape-name-data">
@@ -143,7 +143,7 @@
                             <el-button class="file-confirm-btn" @click="confirmDeleteGroup" size="mini" style="color:#fff">确 认</el-button>
                         </div>
                     </el-dialog>
-                    <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
+                    <div class="nape-items-data noraml-text" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
                             <el-input size="mini" v-model="newNapeName" class="nape-input input-details" placeholder="输入巡检项名称" ></el-input>
@@ -623,6 +623,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
+@import '../../../assets/css/textstyle.css';
 $mainColor:#FB505F;
 $itemHeight:50px;
 .nape-input{
@@ -737,8 +738,8 @@ $itemHeight:50px;
                         float: left;
                         margin-left: 25px;
                         line-height: 50px;
-                        font-size: 14px;
-                        font-weight: bold;
+                        // font-size: 14px;
+                        // font-weight: bold;
                     }
                 }
             }
@@ -768,7 +769,7 @@ $itemHeight:50px;
                 
             }
             .nape-dep-title{
-                width: 52%;
+                width: 50%;
                 display: inline-block;
                 span{
                     position: relative;
@@ -776,7 +777,7 @@ $itemHeight:50px;
                 }
             }
             .nape-handle-title{
-                width: 8%;
+                width: 10%;
                 display: inline-block;
                 span{
                     position: relative;
@@ -786,7 +787,7 @@ $itemHeight:50px;
             .nape-items-title{
                 height: $itemHeight;
                 line-height: $itemHeight;
-                font-size: 12px;
+                // font-size: 12px;
                 text-align: left;
                 
             }
@@ -802,9 +803,6 @@ $itemHeight:50px;
                     float: left;
                     margin-left: 10px;
                     line-height: 50px;
-                }
-                span{
-                    font-size: 12px;
                 }
                 .nape-name-data{
                     width: 36%;
@@ -839,7 +837,7 @@ $itemHeight:50px;
                     }
                 }
                 .nape-items-handle{
-                    width: 8%;
+                    width: 10%;
                     display: inline-block;
                     line-height: 50px;
 

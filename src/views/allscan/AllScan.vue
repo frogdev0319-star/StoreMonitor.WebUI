@@ -1,33 +1,35 @@
 <template>
-    <div>
+    <div id="sample">
+        <!--accept定义接收的文件类型,这里只接受图片-->
+        <!-- <input id="fileinput" @change="uploading($event)" type="file" accept="image/*">
+        <button  @click="submit($event)">点击上传</button> -->
         <span>总览</span>
-        <el-upload
-        class="upload-demo"
-        action="https://jsonplaceholder.typicode.com/posts/"
-        :on-change="handleChange"
-        :file-list="fileList3">
-        <el-button size="small" type="primary">点击上传</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
-    </div>
+     </div>
+
 </template>
 <script>
   export default {
     data() {
       return {
-        fileList3: [{
-          name: 'food.jpeg',
-          url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-        }, {
-          name: 'food2.jpeg',
-          url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-        }]
+         file:'',
+         src:''
       };
     },
     methods: {
-      handleChange(file, fileList) {
-        this.fileList3 = fileList.slice(-3);
-      }
+       uploading(event){
+            this.file=event.target.files[0]; //获取文件
+            var windowURL=window.URL||window.webkitURL;
+            this.file = event.target.files[0];
+            //创建图片文件的url
+            this.src = windowURL.createObjectURL(event.target.files[0]);
+       },
+       submit(){
+           event.preventDefault(); //取消默认行为
+           let formdata=new FormData();
+           formdata.append('file',this.file);
+           formdata.append('filename','001.png');
+           console.log(formdata);
+       }
     }
   }
 </script>

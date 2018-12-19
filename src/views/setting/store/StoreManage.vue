@@ -1,7 +1,7 @@
 <template>
     <div class="el-event-content">
        <div class="seacrh-content">
-            <span class="select-title">按省份选择</span>
+            <span class="select-title noraml-text">按省份选择</span>
              <el-select v-model="curProvince" placeholder="省份" size="mini" class="el-province" @change="changePro">
                     <el-option
                     v-for="item in provinceList"
@@ -14,15 +14,15 @@
                 <div class="input-arrow-panel"></div>
                     <el-input v-model="citys" size="mini" id="elCity" placeholder="城市" :readonly=true></el-input>
                     <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+            </div>
+            <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
+            <div class="city-panel" v-if="showCityContent"> 
+                <p :style="isChecked?{}:{'color':'#FB505F'}">全部</p>
+                <div class="city-details" v-for="(item,index) in cityList" :key="index">
+                    <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
+                    <span>{{item.cityName}}</span>
                 </div>
-
-                <div class="city-panel" v-if="showCityContent"> 
-                    <p :style="isChecked?{}:{'color':'#FB505F'}">全部</p>
-                    <div class="city-details" v-for="(item,index) in cityList" :key="index">
-                        <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
-                        <span>{{item.cityName}}</span>
-                    </div>
-                </div>
+            </div>
             <el-input
                 size="small"
                 class="el-search-input"
@@ -36,16 +36,16 @@
             :highlight-current-row="true"
             empty-text='没有异常数据'
             align='left'
-            height="470px"
+            :height="windowHeight*(windowHeight>1000?0.76:0.65)"
             @sort-change='sortChange'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                 <el-table-column
-                    width=""
+                    width="120"
                     header-align="center"
                     align="center">
                         <template slot-scope="scope" >
-                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#FEA316;" v-if="scope.row.device.length==0" >未关联</span>
-                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#6097F4;" v-else>已关联</span>       
+                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#6097F4;" v-if="scope.row.bindDevice" >已关联</span>
+                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#FEA316;" v-else>未关联</span>       
                     </template>
                 </el-table-column>
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
@@ -67,12 +67,13 @@
                 </div> 
             </div>
         </el-table>
-            <div class="toolbar pagination" style="width:100%; margin:10 15px;height:12%;margin-bottom:0px;">
+            <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">
               <el-pagination background small 
                 :page-sizes="[10, 20, 50, 100]"
                 @size-change="sizeChange"
                 @current-change="currentChange"
-              layout="jumper,total, prev, pager, next,sizes"  :page-size="sizeNum" :total="total" style="float:right;">
+              layout="jumper,total, prev, pager, next,sizes"  
+              :page-size="sizeNum" :total="total" style="float:right;margin-top:10px;">
               </el-pagination>
             </div>
         </div>
@@ -85,6 +86,7 @@ import api from '@/api/index'
         name: "StoreManage",
         data(){
             return{
+                citys:'',
                 tableInfoData:[
                      {
                         "prop":"storename",
@@ -121,9 +123,15 @@ import api from '@/api/index'
                 curProvince:'',
                 showDrap:false,
                 showCityContent:false,
-                multeCityList:[]
+                multeCityList:[],
+                tagList:[],
+                windowHeight:window.innerHeight,
+                params:{},
+                total:0,
+                sizeNum:10,
+                page:0,
+                serachVale:''
             }
-
         },
         methods:{
             changePro(val){
@@ -142,6 +150,44 @@ import api from '@/api/index'
                 self.showCityContent=!self.showCityContent;
                 self.showDrap=!self.showDrap;
             },
+            changeCityItem(item){
+                console.log(item);
+                let self=this;
+                let str='';
+                let flag=false;
+                let temp=[];
+                self.cityList.forEach(_item=>{
+                    if(_item.checked){
+                        str=str+_item.cityName+';';
+                        temp.push(_item.cityName);
+                    }
+                    flag=flag||_item.checked;
+                })
+                self.isChecked=flag;
+                self.citys=str;
+                self.multeCityList=temp;
+            },
+            searchStore(){
+                let self=this;
+                self.showCityContent=false;
+                self.params.clause={
+                   	'province':self.curProvince
+                };
+                if(self.multeCityList.length!=0){
+                    self.params.clause.city=self.multeCityList;
+                }
+                self.getStoreList(self.params);
+            },
+            sizeChange(val){
+                let self=this;
+                self.sizeNum=val;
+                self.getStoreList(self.params);
+            },
+            currentChange(val){
+                let self=this;
+                self.page=val-1;
+                self.getStoreList(self.params);
+            },
             getCityByProvince(province){
                 let self=this;
                 let temp=[];
@@ -150,7 +196,9 @@ import api from '@/api/index'
                         let obj={};
                         obj.cityName=item.city;
                         obj.checked=false;
-                        temp.push(obj);
+                        if(temp.map(x=>x.cityName).indexOf(obj.cityName)==-1){
+                            temp.push(obj);
+                        }
                     }
                 })
                 self.cityList=temp;
@@ -159,10 +207,10 @@ import api from '@/api/index'
                 let self=this;
                 let params={};
                 let data=await self.getStoreData(params);
-                self.tempStoreData=data;
+                self.tempStoreData=data.content;
                 let temp=[];
-                if(data!=undefined&&data.length!=0){
-                    data.forEach(item=>{
+                if(self.tempStoreData!=undefined&&self.tempStoreData.length!=0){
+                    self.tempStoreData.forEach(item=>{
                         let province=item.province;
                         if(temp.map(x=>x.label).indexOf(province)==-1){
                             let obj={
@@ -176,17 +224,48 @@ import api from '@/api/index'
                 }
                 self.provinceList=temp;
             },
-            async getInitList(){
+            getCheckOutData(row){
                 let self=this;
                 let params={
-                    "filter": {
-                        "page": 0,
-                        "size": 100
-                    }
+                    storeId:row.storeId,
+                    mode:0
                 };
+                api.checkOutInspectItem(params).then(res=>{
+                    console.log(res);
+                    let data=res.data.data;
+                    let count=0;
+                    let countAll=0;
+                    if(data.length!=0){
+                        data.forEach(item=>{
+                            countAll+=item.items.length;
+                            for(const _item of item.items){
+                                if(_item.deviceId!=-1){
+                                    count++;
+                                }
+                            }
+                        })
+                    }
+                    if(countAll==count){
+                        row.bindDevice=true;
+                    }
+                    else{
+                        row.bindDevice=false;
+                    }
+                })
+            },
+            getInitData(){
+                let self=this;
+                self.params.filter={
+                    'page':self.page,
+                    'size':self.sizeNum
+                };
+                self.getStoreList(self.params);
+            },
+            async getStoreList(params){
+                let self=this;
                 self.storeData=await self.getStoreData(params);
                 let temp=[];
-                self.storeData.forEach(item=>{
+                self.storeData.content.forEach(item=>{
                     let obj={};
                     obj.storeId=item.storeId;
                     obj.storename=item.name;
@@ -198,23 +277,46 @@ import api from '@/api/index'
                     temp.push(obj);
                 })
                 self.tableData=temp;
-            },
-            selectChange(){
-
-            },
-            searchNape(){
-
+                self.total=self.storeData.totalElements;
             },
             searchEventList(){
-
+                let self=this;
+                self.params.clause={};
+                self.params.like={
+                    "storeId": self.serachVale,
+                    "name": self.serachVale,
+                    "city": self.serachVale,
+                    "province": self.serachVale,
+                    "country": self.serachVale,
+                    "userId": self.serachVale
+                };
+                self.getStoreList(self.params);
             },
             sortChange(){
+
+            },
+            getINspectItemResult(){
 
             },
             toEventDetail(row){
                 let self=this;
                 console.log(row);
-                self.$router.push({name:'门店详情',params:row});
+                let params={
+                    storeId:row.storeId,
+                    mode:0
+                };
+                api.checkOutInspectItem(params).then(res=>{
+                    let data=res.data.data;
+                    if(res.data.errMsg=='Success'&&data.length!=0){
+                        sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
+                        self.$router.push({name:'门店详情',params:row});
+                    }
+                    else{
+                        self.notify('当前门店未绑定巡检项，请先绑定巡检项！','warning',3000);
+                        return false;
+                    }
+                })
+                
             },
             getStoreData(params){
                 let self=this;
@@ -222,11 +324,60 @@ import api from '@/api/index'
                     api.getStoreList(params).then(res=>{
                         let errMsg=res.data.errMsg;
                         if(errMsg!=undefined&&errMsg=='Success'){
-                            let data=res.data.data.content;
+                            let data=res.data.data;
                             resolve(data);
                         }
                     })
                 })
+            },
+            getNapeList(){
+                return new Promise((resolve,reject)=>{
+                    api.getInspectItemList().then(res=>{
+                        let code=res.data.errMsg;
+                        let data=res.data.data;
+                        if(code!=null&&code=='Success'){
+                            console.log(res.data);
+                        }
+                        resolve(data);
+                    })
+                })
+            },
+            getStoreByTag(tag){
+                return new Promise((resolve,reject)=>{
+                    let params={
+                        tagName:tag
+                    };
+                    api.getInspectBindList(params).then(res=>{
+                        console.log(res);
+                        resolve(res.data.data);
+                    })
+                })
+            },
+            async getBindInfo(){
+                let self=this;
+                let data=await self.getNapeList();
+                let temp=[];
+                let tagList=[];
+                if(data.length!=0){
+                    data.forEach(item=>{
+                        let tag=item.tag;
+                        if(tagList.indexOf(tag)==-1){
+                            tagList.push(tag);
+                        }
+                    })
+                   for(const item of tagList){
+                        let data=await self.getStoreByTag(item);
+                        let obj={
+                            tag:item,
+                            data:data
+                        };
+                        temp.push(obj);
+                    }
+                    self.tagList=temp;
+                }
+                else{
+                    console.log('当前没有巡检表信息');
+                }
             },
             notify(msg,type,time) {
                 this.$message({
@@ -239,8 +390,14 @@ import api from '@/api/index'
         },
         mounted(){
             let self=this;
+            let windowHeight=window.innerHeight;
+            if(windowHeight>800){
+                this.tableHeight=770+'px';
+            }
+            console.log(this.tableHeight);
+            self.getBindInfo();
             self.getProvinceList();
-            self.getInitList();
+            self.getInitData();
             // if(!this.timeid){
             //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
             // }
@@ -255,6 +412,7 @@ import api from '@/api/index'
 </script>
 
 <style lang="scss" scoped>
+@import '../../../assets/css/textStyle.css'; 
 .el-event-content{
     width: 100%;
     position: relative;
@@ -269,11 +427,24 @@ import api from '@/api/index'
             margin-right: 20px;
             margin-left: 15px;
         }
+        .el-search-btn{
+            width: 90px;
+            text-align: center;
+            margin-left: 15px;
+            background-color: #FB505F;
+            color: #fff;
+        }
         .city-content{
             display: inline-block;
             position: relative;
             cursor: pointer;
+            
             #elCity{
+                width: 160px;
+                border-radius: 0px;
+                background-color: #f0f5f8;
+            }
+            .el-input{
                 width: 160px;
             }
             .input-arrow-panel{
@@ -293,8 +464,7 @@ import api from '@/api/index'
         .city-panel{
             position: absolute;
             margin-top: 3px;
-            margin-left: 3px;
-            left: 27%;
+            left: 315px;
             width: 55%;
             height: auto;
             padding: 10px 0px 30px 15px;
@@ -339,12 +509,11 @@ import api from '@/api/index'
         color: red;
     }
     .el-select >>> .el-input__inner{
-        background: #f0f5f8 !important;
+        background: #F4F5F9 !important;
         border-radius: 0px !important;
-        border: 0px !important;
     }
     .el-input--small >>>.el-input__inner{
-        background: #f0f5f8 !important;
+        background: #F4F5F9 !important;
         border-radius: 15px !important;
     }
 </style>
@@ -356,8 +525,24 @@ import api from '@/api/index'
     }
     #elCity{
         border-radius: 0px;
-        background-color: #f0f5f8;
-        border-width:0px;
+        background-color: #F4F5F9;
+    }
+    .el-checkbox__inner:hover{
+        border-color: #FB505F !important;
+    }
+    .el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+    .el-checkbox__input.is-checked .el-checkbox__inner{
+        background-color: #FB505F !important;
+        border-color:#FB505F !important;
+    }
+    .el-select-dropdown__item.hover{
+        background-color:#FEE4E7;
+    }
+    .el-select .el-input.is-focus .el-input__inner{
+        border-color: #FEE4E7;
+    }
+    .el-select-dropdown__item.selected{
+        color:#FB505F;
     }
 </style>
 

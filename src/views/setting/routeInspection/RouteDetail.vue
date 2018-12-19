@@ -3,19 +3,19 @@
         <el-row>
             <el-col :span="24" class="detail-title">
                
-                <span class="title-title" v-if="routeData.length!=0">{{tabName}}一共{{typeNum}}大类，{{itemNum}}个巡检项目</span>
+                <span class="title-title level1" v-if="routeData.length!=0">{{tabName}}一共{{typeNum}}大类，{{itemNum}}个巡检项目</span>
                 <div class="route-btns">
                      <el-button
                     class="el-delete-btn" 
                     @click="deleteNapes"
-                    size="mini">
+                    size="mini" :disabled="routeData.length==0">
                         <i style="margin-right:8px;" class="iconfont icon-shanchu"></i>
                         <span>删除巡检项</span>
                     </el-button>
                      <el-button
                     class="el-set-btn" 
                     @click="setItem"
-                    size="mini">
+                    size="mini" :disabled="routeData.length==0">
                         <i style="margin-right:8px;" class="iconfont icon-button"></i>
                         <span>巡检项设置</span>
                     </el-button>
@@ -63,7 +63,7 @@
             </el-col>
             <el-col :span="24">
                 <div v-for="(item,index) in routeData" :key="index" class="data-content" v-if="routeData.length!=0">
-                    <div class="header-content" v-if="index==0">
+                    <div class="header-content tabTitle" v-if="index==0">
                         <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
                         <span class="name-title">巡检名称</span>
                         <span class="description-title">巡检项要求描述</span>
@@ -73,7 +73,7 @@
                    
                     <div style="float:left;margin-bottom:10px;margin-left:27px;">
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
-                        <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
+                        <span class="table-title level3">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
                      <div v-if="item.itemData.length!=0">
                         <el-table
@@ -140,7 +140,6 @@
     </div>
 </template>
 <script>
-// import Blob from 'blob.js'
 import api from '@/api/index'
 export default {
     name:'RouteDetail',
@@ -167,10 +166,6 @@ export default {
                     'value':'2',
                     'label':'现场巡检'
                 },
-                // {
-                //     'value':'3',
-                //     'label':'新增巡检表'
-                // }
             ],
             checkValue:'',
             tabNameInput:'',
@@ -252,11 +247,9 @@ export default {
             console.log(arr.length);
             if(item.itemData.length==arr.length){  //列表中的值全部勾选
                 item.checked=true;    //最上方的全选为勾选状态
-                //self.allchecked=true;
             }
             else{
-                item.checked=false;
-                //self.allchecked=false;   
+                item.checked=false; 
             }
             let arrCheckedItem=[];
             let count=0;
@@ -358,7 +351,6 @@ export default {
                 if(code!=undefined&&code=='Success'){
                     self.notify('当前巡检项已删除成功!','success',3000);
                     self.showDeleteContent=false;
-                    //self.refreshData();
                     self.$emit('refreshList');
                 }
                 else{
@@ -547,13 +539,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
+@import '../../../assets/css/textstyle.css';
     $mainColor:#FB505F;
     .detail-title{
         overflow: hidden;
         .title-title{
             display: block;
-            font-size: 16px;
-            font-weight: bold;
+            // font-size: 16px;
+            // font-weight: bold;
             margin-top: 10px;
             margin-left: 0px;
             margin-bottom: 15px;
@@ -562,6 +555,10 @@ export default {
         .route-btns{
             float: right;
             margin-right: 15px;
+            .noAllow{
+                cursor:not-allowed;
+                opacity: 0.6;
+            }
             .el-delete-btn{
                 background-color: #fff; 
                 border-color:  $mainColor;
@@ -569,6 +566,9 @@ export default {
                 width: 120px;
                 border-radius: 0px;
                 margin-right:8px;
+                &:disabled{
+                    opacity: 0.6;
+                }
             }
             .el-set-btn{
                 background-color: $mainColor; 
@@ -576,31 +576,9 @@ export default {
                 color: #fff;
                 width: 120px;
                 border-radius: 0px;
-            }
-        }
-        .cond-list{
-            width: 116px;
-            height: 90px;
-            position: absolute;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            right: 14px;
-            top: 34px;
-            z-index: 980;
-            text-align: left;
-            .item{
-                width: 100%;
-                height: 29px;
-                font-size: 14px;
-                &:hover{
-                    background-color: rgb(217, 239, 253);
-                    border: 1px solid #fff;
-                    cursor: pointer;
+                &:disabled{
+                    opacity: .6;
                 }
-            }
-            span{
-                margin-left: 15px;
-                line-height: 30px;
             }
         }
     }
@@ -614,7 +592,7 @@ export default {
             margin-bottom: 10px;
             float: left;
             overflow: hidden;
-            font-size: 14px;
+            // font-size: 14px;
             text-align: left;
             padding-left: 27px;
             padding-bottom: 10px;
@@ -644,9 +622,9 @@ export default {
             }
         }
         .table-title{
-            margin-left: 15px;
-            font-weight: bold;
-            font-size: 15px;
+            margin-left: 30px;
+            // font-weight: bold;
+            // font-size: 15px;
         }
     }
     .el-dropbtn1{

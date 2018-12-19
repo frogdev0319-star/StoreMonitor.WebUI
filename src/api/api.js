@@ -1,13 +1,13 @@
 import axios from 'axios'
 import qs from 'qs'
-
+import axiosFile from 'axios'
 import Nape from '@/api/ApiPath'
 
 let base="http://172.21.81.160:8085/storemonitor/";
-let itempath='api/v1.0/'
+let itempath='api/v1.0'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 // get the device list
-
+axiosFile.defaults.headers.post['Content-Type']='multipart/form-data';
 export const getNapeList=()=>{
     return axios.get(Nape.getNapeList,{},(res)=>{
         console.log('接收到数据了吗?');
@@ -44,7 +44,7 @@ export const bindInspectItem=params=>{
     return axios.post(`${base}${itempath}/inspect/item/bind`,params);
 } 
 export const checkOutInspectItem=params=>{
-    return axios.get(`${base}${itempath}/inspect/checkout`,params);
+    return axios.get(`${base}${itempath}/inspect/checkout`,{params,params});
 }
 export const deleteInspectGroup=params=>{
     return axios.post(`${base}${itempath}/inspect/group/delete`,params);
@@ -96,6 +96,9 @@ export const deleteNVR=params=>{
 export const getDeviceList=()=>{
     return axios.get(`${base}${itempath}/device/list`);
 }
+export const getDeviceByStore=params=>{
+    return axios.get(`${base}${itempath}/device/list`,{'params': params});
+}
 export const addDevice=params=>{
     return axios.post(`${base}${itempath}/device/add`,params);
 }
@@ -116,4 +119,20 @@ export const addNVRandChannel=(params1,params2)=>{
         axios.post(`${base}${itempath}/device/nvr/add`,params1),
         axios.post(`${base}${itempath}/device/add`,params2)
     ]);
+}
+export const importExcel=(params)=>{
+    return axiosFile.post(`${base}${itempath}/device/add`,params);
+}
+
+export const getEventList=(params)=>{
+    return axiosFile.post(`${base}${itempath}/event/list`,params);
+}
+export const addEvent=params=>{
+    return axios.post(`${base}${itempath}/event/add`,params);
+}
+export const addComment=params=>{
+    return axios.post(`${base}${itempath}/event/comment/add`,params);
+}
+export const getCommentList=params=>{
+    return axios.post(`${base}${itempath}/event/comment/list`,params);
 }

@@ -133,7 +133,7 @@ export default {
                 })
             }
             else{
-                if(province.length!=0){  //只选择身份，不选城市
+                if(province.length!=0){  //只选择省份，不选城市
                     temp.forEach(item=>{
                         if(item.province==province){
                             tempArray.push(item);
@@ -393,6 +393,7 @@ export default {
     margin:0;
     text-align: left;
     font-family: 'Microsoft YaHei';
+    font-size: 14px;
 }
 .el-bind-device{
     .seacrh-content{
@@ -419,6 +420,9 @@ export default {
                 cursor: pointer;
                 z-index: 100;
             }
+            .el-input{
+                width: 160px;
+            }
         }
         .el-search-btn{
             width: 90px;
@@ -435,8 +439,7 @@ export default {
         .city-panel{
             position:absolute;
             margin-top: 3px;
-            margin-left: 3px;
-            left: 25%;
+            left: 275px;
             width: 60%;
             height: auto;
             padding:10px 0px 30px 15px;
@@ -508,7 +511,8 @@ export default {
                 margin-left: 40px;
                 overflow: hidden;
                 .device-detail{
-                    width: 160px;
+                    width: auto;
+                    min-width: 160px;
                     margin-left: 10px;
                     margin-top: 10px;
                     float: left;
@@ -564,6 +568,7 @@ export default {
 #elCity{
     border-radius: 0px;
     background-color: #F4F5F9;
+    border: 1px solid #dcdfe6;
 }
 .el-select-dropdown__item{
     padding: 0 20px !important;

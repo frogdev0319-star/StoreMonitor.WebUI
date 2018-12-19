@@ -1,40 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 
 import Home from '@/views/home/Home'
-
-import TestOne from '@/views/allscan/TestOne'
-import TestTwo from '@/views/allscan/TestTwo'
-import AllScan from '@/views/allscan/AllScan'
-
-import StoreMonitor from '@/views/patrolShop/StoreMonitor'
-import ReInspection from '@/views/patrolShop/ReInspection'
-
-import EventManage from '@/views/event/EventManage'
-import RateManage from '@/views/event/details/RateManage'
-import RateDetail from '@/views/event/details/RateDetail'
-
-import StatisticalAnaly from '@/views/statistical/StatisticalAnaly'
-import DataCenter from '@/views/datacenter/DataCenter'
-import SystemSetting from '@/views/setting/SystemSetting'
-
-//巡检配置
-import RouteInspection from '@/views/setting/routeInspection/RouteInspection'
-import AddRuteInspect from '@/views/setting/routeInspection/AddRuteInspect'
-import BindRuteInspect from '@/views/setting/routeInspection/BindRuteInspect'
-
-//设备管理
-import DeviceSetMge from '@/views/setting/device/DeviceSetMge'
-
-//门店管理
-import StoreManage from '@/views/setting/store/StoreManage'
-import EditStoreVue from '@/views/setting/store/EditStoreVue'
-
-//排程管理
-import ScheduleManage from '@/views/setting/schedule/ScheduleManage'
 Vue.use(Router)
-
 export default new Router({
   routes: [
     {
@@ -49,19 +17,7 @@ export default new Router({
         {
           path:'/allscan',
           name:'总览',
-          component:AllScan,
-          children:[
-             {
-                path:'/one',
-                name:'页面一',
-                component:TestOne
-             },
-             {
-              path:'/two',
-              name:'页面二',
-              component:TestTwo
-           }
-          ]
+          component:resolve=>require(['@/views/allscan/AllScan'],resolve),
         }
       ]
     },
@@ -76,12 +32,12 @@ export default new Router({
         {
           path:'/stroemonitor',
           name:'门店监控',
-          component:StoreMonitor
+          component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
         },
         {
           path:'/reinspection',
           name:'远程巡检',
-          component:ReInspection
+          component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
         }
       ]
     },
@@ -96,29 +52,29 @@ export default new Router({
         {
           path:'/event',
           name:'事件管理',
-          component:EventManage,
+          component:resolve=>require(['@/views/event/EventManage'],resolve),
         },
         {
           path:'/event',
           name:'事件管理',
-          component:RateManage,
+          component:resolve=>require(['@/views/event/details/RateManage'],resolve),
           children:[
             {
               path:'/rate',
               name:'新增事件管理',
-              component:RateManage
+              component:resolve=>require(['@/views/event/details/RateManage'],resolve)
             }
           ]
         },
         {
           path:'/rate',
           name:'异常进度',
-          component:RateDetail,
+          component:resolve=>require(['@/views/event/details/RateDetail'],resolve),
           children:[
             {
               path:'/details',
               name:'异常进度',
-              component:RateDetail
+              component:resolve=>require(['@/views/event/details/RateDetail'],resolve)
             }
           ]
         }
@@ -135,7 +91,7 @@ export default new Router({
         {
           path:'/statistical',
           name:'统计分析',
-          component:StatisticalAnaly
+          component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve)
         }
       ]
     },
@@ -150,7 +106,7 @@ export default new Router({
         {
           path:'/datacenter',
           name:'数据中心',
-          component:DataCenter
+          component:resolve=>require(['@/views/datacenter/DataCenter'],resolve)
         }
       ]
     },
@@ -165,63 +121,63 @@ export default new Router({
         {
           path:'/routeinspection',
           name:'巡检配置',
-          component:RouteInspection,
+          component:resolve=>require(['@/views/setting/routeInspection/RouteInspection'],resolve),
           hidden:false,
         },
         {
           path:'/routeinspection',
           name:'巡检配置',
-          component:AddRuteInspect,
+          component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve),
           hidden:true,
           children:[
             {
               path:'/addroute',
               name:'巡检项设置',
-              component:AddRuteInspect
+              component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve)
             }
           ]
         },
         {
           path:'/routeinspection',
           name:'巡检配置',
-          component:BindRuteInspect,
+          component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve),
           hidden:true,
           children:[
             {
               path:'/bindroute',
               name:'门店绑定',
-              component:BindRuteInspect
+              component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve)
             }
           ]
         },
         {
           path:'/device',
           name:'设备管理',
-          component:DeviceSetMge
+          component:resolve=>require(['@/views/setting/device/DeviceSetMge'],resolve)
         },
         {
           path:'/storemanage',
           name:'门店管理',
-          component:StoreManage,
+          component:resolve=>require(['@/views/setting/store/StoreManage'],resolve),
           hidden:false
         },
         {
           path:'/storemanage',
           name:'门店管理',
-          component:EditStoreVue,
+          component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve),
           hidden:true,
           children:[
             {
               path:'/storedetail',
               name:'门店详情',
-              component:EditStoreVue
+              component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve)
             }
           ]
         },
         {
           path:'/schedule',
           name:'排程配置',
-          component:ScheduleManage,
+          component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false
         },
         {

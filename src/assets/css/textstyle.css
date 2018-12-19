@@ -1,0 +1,29 @@
+.level1{
+    font-size: 18px;
+    font-weight: bold;
+    color: #424151;
+}
+.level2{
+    font-size: 16px;
+    font-weight: bold;
+    color: #424151;
+}
+.level3{
+    font-size: 15px;
+    font-weight: bold;
+    color: #424151;
+}
+.tabTitle{
+    font-size: 14px;
+    font-weight: bold;
+    color: #909399;
+}
+.noraml-text{
+    font-size: 14px;
+    color: #424151;
+}
+.group-title{
+    font-size: 14px;
+    font-weight: bold;
+    color: #424151;
+}

@@ -3,7 +3,7 @@
         <el-col :span="24" class="el-btns">
             <div style="display:inline-block;" v-if="activeName=='dash'">
                 <el-button @click="connectServer"  size="mini" class="btns">
-                    连接 Dash Server
+                    提交
                 </el-button>
             </div>
             <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-else>
@@ -22,22 +22,22 @@
         </el-col>
         <el-col :span="24" class="el-tabPanels">
             <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="Dash Server" name="dash">
-                    <el-col :span="10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
+                <el-tab-pane label="流媒体服务" name="dash">
+                    <el-col :span="varWindowWidth<1366?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
                         <div class="details">
-                            <span class="dash-label">Dash Server IP</span>
+                            <span class="dash-label">服务器IP</span>
                             <el-input class="dash-input" v-model="dash.url" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label">CMD Port（http）</span>
+                            <span class="dash-label">命令端口（http）</span>
                             <el-input class="dash-input" v-model="dash.httpCmdPort" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label">CMD Port（https）</span>
+                            <span class="dash-label">命令端口（https）</span>
                             <el-input class="dash-input" v-model="dash.httpsCmdPort" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label">Data Port</span>
+                            <span class="dash-label">数据端口</span>
                             <el-input class="dash-input" v-model="dash.dataPort" size="mini"></el-input>
                         </div>
                         <el-dialog title='导入'
@@ -62,8 +62,8 @@
                     </el-col>
                 </el-tab-pane>
                 <el-tab-pane label="视频管理" name="video">
-                    <el-col :span="8" class="lisde" :style="{'min-height':contentHeight+'px'}">
-                        <div class="nvr-title">
+                    <el-col :span="8" class="lisde" :style="{'min-height':varyWindowHeight*(varyWindowHeight>1000?0.78:0.70)+'px'}">
+                        <div class="nvr-title tabTitle">
                             <div class="name-title titles">
                                 <span>NVR名称</span>
                             </div>
@@ -74,7 +74,7 @@
                                 <span>通道数</span>
                             </div>
                         </div>
-                        <div class="nvr-data"
+                        <div class="nvr-data group-title"
                         v-for="(item,index) in nvrData" 
                         :key="index"  :class="!item.isClick?'noraml-color':'active-color'" @click="clickNVR(index,item)">
                             <div class="name-data titles">
@@ -99,7 +99,7 @@
                         </div>
                     </el-col>
                     <el-col :span="16" class="risde">
-                        <div class="nape-items-title">
+                        <div class="nape-items-title tabTitle">
                             <div class="nape-name-title titles">
                                 <span>通道名称</span>
                             </div>
@@ -148,10 +148,9 @@ export default {
         return{
             dash:{},
             activeName:'dash',
-            total:10,
+            total:0,
             page:0,
             sizeNum:10,
-
             nvrData:[],
             showImportContent:false,
             channelList:[],
@@ -182,7 +181,7 @@ export default {
                 }
             ],
             varWindowWidth:1440, 
-            varyWindowHeight:window.screen.height,
+            varyWindowHeight:window.innerHeight,
             contentHeight:window.screen.height,
         }
     },
@@ -279,11 +278,11 @@ export default {
             this.getNVRList();
         },
         deleteChannel(channelList){
-            let parmas={
+            let params={
                 deviceIds:channelList
             };
             return new Promise((resolve,reject)=>{
-                api.deleteChannel(params).then(res=>{
+                api.deleteDevice(params).then(res=>{
                     resolve(res.data);
                 })
             })
@@ -325,7 +324,7 @@ export default {
                 return false;
             }
             else if(channelList.length==0&&nvrList.length!=0){
-               await self.deleteNVR(nvrList);
+                await self.deleteNVR(nvrList);
             }
             else if(channelList.length!=0&&nvrList.length==0){
                 await self.deleteChannel(channelList);
@@ -633,15 +632,22 @@ export default {
 </style>
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css'; 
+@import '../../../assets/css/textstyle.css';
 $mainColor:#FB505F;
 @mixin titleStyle{
     height: 48px;
     line-height: 48px;
-    color: #909399;
-    font-weight:bold;
-    font-size: 12px;
+    // color: #909399;
+    // font-weight:bold;
+    // font-size: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+}
+//@mixin 超出显示省略号
+@mixin txtEllipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 *{
     font-family: Microsoft YaHei;
@@ -660,9 +666,9 @@ $mainColor:#FB505F;
     margin-right:20px;
 }
 .el-handle-btn{
-    margin-left: 0px;
-    border-color: $mainColor;
-    color: $mainColor;
+    margin-left: 0px !important;
+    border-color: $mainColor !important;
+    color: $mainColor !important;
     border-radius: 0px;
     padding: 3px 10px !important;
     position: relative;
@@ -684,7 +690,7 @@ $mainColor:#FB505F;
         background-color: #FEE4E7;
     }
 }     
-.el-device{
+.el-device{ 
     .el-btns{
         padding-top: 10px;
         padding-right: 20px;
@@ -694,7 +700,7 @@ $mainColor:#FB505F;
             position: absolute;
             right: 25px;
             z-index: 979;
-            width: 120px;
+            width: 90px;
             background-color: #FB505F;
             color: #fff;
             border-color: #FB505F;
@@ -741,10 +747,10 @@ $mainColor:#FB505F;
                    width: 30%;
                 }
                 .store-title{
-                    width: 30%;
+                    width: 45%;
                 }
                 .count-title{
-                    width: 30%;
+                    width: 15%;
                 }
             }
             .nvr-data{
@@ -754,10 +760,10 @@ $mainColor:#FB505F;
                     width: 30%;
                 }
                 .store-data{
-                    width: 30%;
+                    width: 45%;
                 }
                 .count-data{
-                    width: 30%;
+                    width: 15%;
                 }
             }
         }

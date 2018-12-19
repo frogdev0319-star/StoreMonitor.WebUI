@@ -3,7 +3,8 @@
         <el-col :span="24" class="el-route-header">
             <el-col :span="7" class="el-route-btns">
                 <span style="margin-right:15px;color:#A2AEBC">已绑定{{storeNum}}家门店</span>
-                <el-button size="mini" @click="bindStore" class="el-bind-btn">
+                <el-button size="mini" @click="bindStore" class="el-bind-btn" 
+                :disabled="elTableData[Number(activeName)].routeData.length==0">
                     <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
                     <span>巡检表绑定</span>
                 </el-button>
@@ -50,7 +51,7 @@
 
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" :closable="index!=0&&index!=1?true:false">
+                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" :closable="index!=0&&index!=1?true:false" >
                         <div v-if="item.routeData">
                             <route-detail :ref="curIndex" :route-data="item.routeData"
                              :tab-name="item.label" @refreshList="getTagList"></route-detail>
@@ -71,7 +72,7 @@ export default {
     },
     data(){
         return{
-            elTableData:[],
+            elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
             radioList:[
                 {
                     'value':'1',
@@ -141,6 +142,7 @@ export default {
         },
         getNapeList(){
             let self=this;
+            
             return new Promise((resolve,reject)=>{
                 api.getInspectItemList().then(res=>{
                     let code=res.data.errMsg;
@@ -149,12 +151,14 @@ export default {
                         self.allData=data;
                         console.log(res.data);
                     }
-                    else{
-                        self.elTableData=[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}];
-                    }
                     resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                    self.notify('服务器异常!','error',3000);
                 })
+                        
             })
+           
         },
         async getTagList(){
             let self=this;
@@ -310,6 +314,10 @@ export default {
         bindStore(){
             let self=this;
             let arr=[];
+            if(self.elTableData[Number(self.activeName)].routeData.length==0){
+                self.notify('当前巡检表为空，请新增巡检项后进行操作！','warning',3000);
+                return false;
+            }
             self.elTableData[Number(self.activeName)].routeData.forEach(item=>{
                 item.itemData.forEach(_item=>{
                     arr.push(_item.id);
@@ -355,8 +363,6 @@ export default {
         },
         checkBeforeImport(){
             let self=this;
-            let data=self.elTableData[Number(self.activeName)];
-            //if(data.length==0)
             if(self.checkValue=='新增巡检表'&&(self.tabNameInput==null||self.tabNameInput.trim().length==0)){
                 self.hideUpload=true;
                 self.notify('请输入自定义巡检表名称!','warning',3000);
@@ -589,11 +595,14 @@ export default {
                     width: 120px;
                     border-radius: 0px;
                     margin-right: 15px;
+                    &:disabled{
+                        opacity: 0.6;
+                    }
                 }
                 .el-handle-btn{
                     margin-left: 0px !important;
-                    border-color: $mainColor;
-                    color: $mainColor;
+                    border-color: $mainColor !important;
+                    color: $mainColor !important;
                     border-radius: 0px;
                     padding: 3px 10px !important;
                     position: relative;

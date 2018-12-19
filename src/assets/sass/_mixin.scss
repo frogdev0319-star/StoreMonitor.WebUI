@@ -1,0 +1,32 @@
+@charset "UTF-8";
+//rem(val)
+@function rem($val){
+    @return $val+em;
+}
+@function checkEm($val){
+    @if $val==auto{@return auto;}
+    @else if $val==0{@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkEm($val);
+}
+
+//colors
+$red:#fb4c5d;
+$orange:#FCBA3F;
+$fff:#fff;
+$fontBack:#424151;
+$titlefont_Back:#94a4b4;
+$content_Back:#f4f5f9;
+$icon:#c2c8d4;
+$border:#e3e9f4;
+$checkBox_border:#9ca1b2;
+$cancel_Back:#eaedf2;
+$cancel-Fore:#adb1c0;
+$group_BackColor:#fafafb;
+
+//font-size
+$title_level1:1.125em;   //18px 一级标题
+$title_level2:1em;       //16px 二级标题
+$noraml-text:0.875em;    //14px 正常文本

@@ -1,49 +1,36 @@
 <template>
     <div class="el-rate-container">
-       <span>事件详情页面</span>
+       <div v-for="(item,index) in commentList" :key="index">
+            <div class="circle-content" :style="item.showContent?{'background-color':'#FEC0C7'}:{'background-color':'#FB505F'}">
+                <div class="circle"></div>
+            </div>
+           <div class="lside">
+               <span v-if="item.showLabel" :class="item.spanStyle">{{item.process}}</span>
+           </div>
+           <div class="rside">
+               <span>{{item.createOr}}</span>
+               <div class="speech-content">
+                    <div class="speech-info">
+                        <i class="el-icon-phone-outline icon-speech"></i>
+                    </div>
+                    <span class="often-text">{{item.audio.audioOften}}</span>
+                </div>
+                <div class="source-content">
+                    <div class=""
+                </div>
+           </div>
+       </div>
     </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
 export default {
     name:'RateDetail',
+    props:{
+        commentList:Object
+    },
     data(){
         return{
-            eventType:'',
-            eventInfo:{},
-            deviceIcon:'./static/img/设备状态_normal.png',
-            state:0,
-            admin:'admin',
-            varyWindowHeight:window.innerHeight,
-            // eventDetail:{
 
-            // },
-            eventDetail:[
-                // {
-                //     "state":0,
-                //     "stateTitle":"未处理",
-                //     "date":"2018/10/18",
-                //     "time":"13:36",
-                //     "iconClass":"icon-jinggao1"
-                // },
-                // {
-                //     "state":1,
-                //     "stateTitle":"处理中",
-                //     "date":"2018/11/18",
-                //     "time":"13:36",
-                //     "iconClass":"icon-chulizhong"
-                // },
-                // {
-                //     "state":2,
-                //     "stateTitle":"已处理",
-                //     "date":"2018/12/18",
-                //     "time":"13:36",
-                //     "iconClass":"icon-zhengque"
-                // }
-            ],
-            showDes:false,
-            showPart:"",
-            showMoreDes:false,
         }
     },
     methods:{
@@ -63,17 +50,17 @@ export default {
                         obj.state=item.status;
                         switch(item.status){
                             case 0: 
-                                obj.stateTitle="未处理";
+                                obj.stateTitle="已处理";
                                 obj.iconClass="icon-jinggao1";
                                 obj.fontColor={'color':'#ff5f5f'};
                             break;
                             case 1: 
-                                obj.stateTitle="处理中";
+                                obj.stateTitle="已结案";
                                 obj.iconClass="icon-chulizhong";
                                 obj.fontColor={'color':'orange'};
                             break;
                             case 2: 
-                                obj.stateTitle="已处理";
+                                obj.stateTitle="评论追加";
                                 obj.iconClass="icon-zhengque";
                                 obj.fontColor={'color':'#46E299'};
                             break;

@@ -1,14 +1,14 @@
 <template>
     <el-row class="el-storeEdit-content">
         <el-col :span="24" class="storeEdit-header">
-            <div class="store-title">
+            <div class="store-title level1">
                 <span>{{storeTitle}}</span>
                 <el-button @click="submitData" class="sub-btn" size="mini">提交</el-button>
             </div>
             <div class="store-info">
-                <span><strong style="margin-right:15px;">负责人：</strong>{{storeLinder}}</span>
-                <span><strong style="margin-right:15px;">联系方式：</strong>{{phone}}</span>
-                <span style="margin-right:10px;"><strong>巡检排程</strong></span>
+                <span><strong style="margin-right:20px;">负责人</strong>{{storeLinder}}</span>
+                <span><strong style="margin-right:20px;">联系方式</strong>{{phone}}</span>
+                <span style="margin-right:20px;"><strong>巡检排程</strong></span>
                 <el-select v-model="schedule" placeholder="请选择" size="mini" class="el-schedule">
                     <el-option
                     v-for="item in scheduleList"
@@ -20,24 +20,25 @@
             </div>
             <div class="store-handle">
                 <span style="font-size:14px;font-weight:bold;">关联巡检表</span>
-                <span>远程巡检</span>
+                <span style="font-size:14px;">{{curTag}}</span>
             </div>
         </el-col>
         <el-col :span="24" class="storeEdit-content">
-            <div class="el-table-title">
+            <div class="el-table-title tabTitle">
                 <span class="name-title">巡检名称</span>
                 <span class="schedule-title">关联通道</span>
             </div>
             <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index">
-                <span class="group-title">
+                <span class="grouptitle level3">
                     {{item.napeName}}（{{item.napeNum}}）
                 </span>
                 <div class="schedule-data">
-                    <div v-for="(_item,_index) in item.itemData" :key="_index" class="schedule-detials" style="overflow:hidden;">
+                    <div v-for="(_item,_index) in item.itemData" :key="_index" :class="!_item.isClick?'noraml-color':'active-color'"
+                    class="schedule-detials" style="overflow:hidden;" @click="clickItem(_item,_index)">
                         <span class="nape-title">
-                            {{_item.name}}
+                            {{`${_index+1}. ${_item.subject}`}}
                         </span>
-                        <el-select v-model="_item.value" class="nape-value" size="mini">
+                        <el-select v-model="_item.channelvalue" class="nape-value" size="mini"  @focus="clickItem(_item,_index)">
                             <el-option
                             v-for="item in alleList"
                             :key="item.name"
@@ -51,12 +52,16 @@
         </el-col>
     </el-row>
 </template>
+
 <script>
+import api from '@/api/index'
 export default {
     name:'EditStoreVue',
     data(){
         return{
-            storeTitle:'西安5店',
+            curTag:'远程巡检',
+            storeTitle:'',
+            store:{},
             storeLinder:'王三洋',
             phone:'17686840503',
             schedule:'',
@@ -72,110 +77,152 @@ export default {
                     value:'排程二'
                 },
             ],
-            scheduleData:[
-                {
-                    id:0,
-                    napeName:'门店形象',
-                    napeNum:2,
-                    itemData:[
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                         {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                        
-                    ]
-                },
-                {
-                    id:1,
-                    napeName:'员工形象',
-                    napeNum:4,
-                     itemData:[
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                         {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象3eqweqew',
-                            value:0
-                        },
-                        
-                    ]
-                },
-                {
-                    id:2,
-                    napeName:'服务',
-                    napeNum:1,
-                     itemData:[
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                        
-                    ]
-                    
-                },
-                {
-                    id:3,
-                    napeName:'商品',
-                    napeNum:2,
-                    itemData:[
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                        {
-                            id:0,
-                            name:'店外整洁，无乱堆乱放现象',
-                            value:0
-                        },
-                    ]
-                }
-            ],
-            alleList:[
-                {
-                    id:0,
-                    name:'水吧'
-                },
-                {
-                    id:1,
-                    name:'收银台'
-                },
-                {
-                    id:2,
-                    name:'物料成列'
-                }
-            ]
+            scheduleData:[],
+            alleList:[]
         }
     },
+    mounted(){
+        let self=this;
+        
+        self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
+        let storeId=self.store.storeId;
+        self.storeTitle=self.store.storename;
+        self.getNapeByStore(storeId);
+        self.getChannelByStore(storeId);
+    },
     methods:{
+        getChannelByStore(storeId){
+            let self=this;
+            let params={storeId:storeId};
+            api.getDeviceByStore(params).then(res=>{
+                console.log(res);
+                let data=res.data.data;
+                let temp=[];
+                if(data.length!=0){
+                    data.forEach(item=>{
+                        let obj={};
+                        obj.id=item.id;
+                        obj.name=item.name;
+                        obj.ivsId=item.ivsId;
+                        temp.push(obj);
+                    })
+                    self.alleList=temp;
+                }
+            })
+        },
+        clickItem(item,index){
+            let self=this;
+            item.isClick=true;
+            self.scheduleData.forEach((_item,index)=>{
+                _item.itemData.forEach((itemS,indexS)=>{
+                    if(item.id!=itemS.id){
+                        itemS.isClick=false;
+                    }
+                })
+            })
+        },
+        getDeviceList(deviceId){
+            let params={
+                storeId:self.store.storeId
+            }
+            api.getDeviceByStore(params).then(res=>{
+                console.log(res);
+            })
+        },
+        getNapeByStore(storeId){
+            let self=this;
+            let params={
+                storeId:storeId,
+                mode:0
+            }
+            api.checkOutInspectItem(params).then(res=>{
+                console.log(res);
+                let data=res.data.data;
+                let temp=[];
+                if(data.length!=0){
+                    
+                    data.forEach(item=>{
+                        let obj={};
+                        obj.id=item.groupId;
+                        obj.napeName=item.groupName;
+                        obj.napeNum=item.items.length;
+                        let _temp=[];
+                        for(const _item of item.items){
+                            let _obj={};
+                            _obj.id=_item.id;
+                            _obj.subject=_item.subject;
+                            _obj.channelvalue=_item.deviceId==-1?'':self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
+                            _obj.isClick=false,
+                            _temp.push(_obj);
+                        }
+                        obj.itemData=_temp;
+                        temp.push(obj);
+                    })
+
+                }
+                self.scheduleData=temp;
+            })
+        },
         submitData(){
-            
-        }
+            let self=this;
+            console.log(self.scheduleData);
+            let count=0;
+            let countChannel=0;
+            let temp=[];
+            self.scheduleData.forEach(item=>{
+                count+=item.itemData.length;
+                
+                item.itemData.forEach(_item=>{
+                    let obj={};
+                    if(_item.channelvalue.length!=0){
+                        countChannel++;
+                        obj.inspectItemId=_item.id;
+                        obj.storeId=self.store.storeId;
+                        obj.deviceId=self.alleList[self.alleList.map(x=>x.name).indexOf(_item.channelvalue)].id;
+                        temp.push(obj);
+                    }
+                })
+            })
+            if((count!=0&&(count!=countChannel))||countChannel==0){
+                self.notify('请选择全部通道后提交！','warning',3000);
+                return false;
+            }
+            let params={
+                items:temp
+            };
+            api.bindInspectItem(params).then(res=>{
+                console.log(res);
+                if(res.data.errMsg=='Success'){
+                    self.notify('通道绑定成功！','success',3000);
+                }
+                else{
+                    self.notify('通道绑定失败！','warning',3000);
+                    return false;
+                }
+            })
+
+        },
+        notify(msg,type,time) {
+            this.$message({
+                message: msg,
+                type: type,
+                duration:time
+            });
+        },
     }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../../assets/css/textstyle.css';
+    .noraml-color{
+            background-color: #F6F7FB;
+            cursor: pointer;
+        }
+        .active-color{
+            background-color: #FEE4E7;
+            cursor: pointer;
+        }
     .el-storeEdit-content{
         padding-left: 30px;
         padding-top: 20px;
@@ -183,11 +230,7 @@ export default {
         .storeEdit-header{
             .store-title{
                 overflow: hidden;
-                span{
-                    float: left;
-                    font-size: 18px;
-                    font-weight: bold;
-                }
+                text-align: left;
                 .sub-btn{
                     float: right;
                     margin-right: 20px;
@@ -206,9 +249,8 @@ export default {
                     margin-right: 6%;
                 }
                 .el-schedule{
-                    width: 160px;
+                    width: 140px;
                 }
-               
             }
             .store-handle{
                 margin-top: 20px;
@@ -220,6 +262,7 @@ export default {
         }
         .storeEdit-content{
             margin-top: 20px;
+            margin-bottom: 20px;
             background-color: #F6F7FB;
             .el-table-title{
                 height: 50px;
@@ -231,8 +274,9 @@ export default {
                 font-size: 14px;
                 font-weight: bold;
                 .name-title{
-                    width: 20%;
-                    margin-right: 36%;
+                    width: 40%;
+                    display: inline-block;
+                    margin-right: 2%;
                     margin-left: 2%;
                 }
                 .schedule-title{
@@ -243,15 +287,13 @@ export default {
                 padding-left: 10px;
                 padding-right: 10px;
                 text-align: left;
-                .group-title{
+                .grouptitle{
                     margin-left: 2%;
-                    font-size: 18px;
-                    font-weight: bold;
                     display: inline-block;
                     margin-top: 10px;
                 }
                 .schedule-data{
-                    
+                    margin-top: 5px;
                     .schedule-detials{
                         text-align: left;
                         height: 50px;
@@ -277,7 +319,12 @@ export default {
     }
 </style>
 <style>
-.el-input__inner{
+.el-schedule .el-input__inner{
+    background: #f0f5f8 !important;
+    border-radius: 0px !important;
+    border: 0px !important;
+}
+.nape-value .el-input__inner{
     border-radius: 0px;
     background-color: #fff;
 }
@@ -292,5 +339,13 @@ export default {
 }
 .el-select-dropdown__item.selected{
     color:#FB505F;
+}
+.el-checkbox__inner:hover{
+    border-color: #FB505F !important;
+}
+.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox__input.is-checked .el-checkbox__inner{
+    background-color: #FB505F !important;
+    border-color:#FB505F !important;
 }
 </style>
