@@ -3,8 +3,39 @@
         <el-col :span="24" class="title-content">
             <span class="event-title level1">{{event.eventTitle}}</span>
             <span class="event-score">得分：{{event.score==null?6:event.score}}分</span>
-            <el-button size="mini" class="el-submit" @click="windUp">结案</el-button>
+            <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
         </el-col>
+        <el-dialog :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=380px top=15%>
+                <div class="video-dialog-content" style="overflow:hidden;">
+                    <video  height=83% width=90% id="previewVideo" prload autoplay controls
+                        class="video-js vjs-fill" style="postion:absoulte;top:10px;">
+                    </video>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">暂 停</el-button>
+                    <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
+                </div>
+            </el-dialog>
+        <el-dialog title='结案'
+        :visible.sync="showWindContent" v-if="showWindContent"
+        :append-to-body='true'
+        :close-on-click-modal="false"
+        width="28%"
+        top="35vh"
+        left="40vh">
+            <div class="dialog-content" style="overflow:hidden;">
+                <hr style="border: 0.5px solid #FFC1C8;"/>
+                
+               <div class="tabName-input-content">
+                    <el-input type="text" size="small" v-model="winpDes" class="tabName-input" style=""  
+                    placeholder="请输入结案评论"></el-input>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button class="file-cancel-btn" @click="showWindContent = false" size="mini" style="">取 消</el-button>
+                <el-button class="file-confirm-btn" @click="confirmWind" size="mini" style="color:#fff">确 认</el-button>
+            </div>
+        </el-dialog>
         <el-col :span="24" class="storeInfo-content noraml-text">
             <strong>门店</strong><span>{{event.storeName}}</span>
             <strong>提报人</strong><span>{{event.createor}}</span>
@@ -14,31 +45,34 @@
             <strong>事件详情</strong>
             <div class="speech-content">
                <div class="speech-info" @click="startSpeech"> 
-                   <i class="icon-speech" :class="speech?'el-icon-phone':'el-icon-phone-outline'"></i>
+                   <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
                </div>
-               <audio :ref="audioRef" id="audio"  loop="loop" autoplay="autoplay" >
+               <audio :ref="audioRef" id="audio">
                     <source :src="audioSrc" type="audio/mpeg" />
                 </audio> 
-               <span class="often-text">{{audioOften}}</span>
+               <span class="often-text">{{audioOftenText}}</span>
             </div>
             <div class="photo-content">
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                     <div v-if="item.type=='1'" class="img-content">
                         <!--图片资源-->
-                        <img  :src="item.imgSrc" :alt="item.alt" height="160px"/>
+                        <img  :src="item.imgSrc" :alt="item.alt" height="156px"/>
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
                         <video-player class="video-player vjs-custom-skin " 
-                        :ref="item.ref" :options="item.playerOptions" style="width:300px;height:150px;">
+                            :ref="item.ref" :options="item.playerOptions" 
+                            style="width:280px;height:140px;"
+                            @play="onPlayerPlay($event)"
+                            @pause="onPlayerPause($event)">
                         </video-player>
                     </div>
                 </div>
             </div>
             <div class="viedo-info">
                 <span>{{event.createDate}}</span>
-                <img :src="startSrc" class="startIcon"/>
-                <span class="ahref" @click="checkVideo">水吧区域</span>
+                <i class="iconfont icon-bofang icon-video"></i>
+                <span class="ahref" @click="checkVideo">{{curChannel}}</span>
             </div>
             <span class="sub-time"></span> 
             <div class="start-video-content"></div>
@@ -65,7 +99,7 @@
                             <span class="creator">{{item.createOr}}</span>
                             <div class="speech-content deal-speech">
                                 <div class="speech-info" v-if="item.audio!=null">
-                                    <i class="el-icon-phone-outline icon-speech"></i>
+                                    <i class="iconfont icon-yuyin icon-speech"></i>
                                 </div>
                                 <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOften}}</span>
                             </div>
@@ -86,7 +120,7 @@
                             </div>
                             <div class="viedo-info">
                                 <span>{{item.createDate}}</span>
-                                <img :src="startSrc" class="startIcon"/>
+                                <i class="iconfont icon-bofang icon-video"></i>
                                 <span class="ahref" @click="checkVideo">水吧区域</span>
                             </div>
                         </div>
@@ -99,23 +133,31 @@
 <script>
 import api  from '../../../api/index';
 import util from '../../../common/util';
+import dashAPI from '@/api/dash'
+import videojs from '../../../../static/video.js'
+import 'videojs-contrib-hls';
+const isProduction = process.env.NODE_ENV === 'production'
 export default {
     name:"RateManage",
     data(){
         return{
             event:{},
+            showWindContent:false,
+            dialogFormVisible:false,
+            showWinpBtn:true,
             description:'',
-            audioOften:6+'"',
-            startSrc:"../../../static/img/videostartIcon.png",
+            audioOften:0,
             speech:false,
             audioRef:'audioRef',
             isPlaying:false,
-            audioSrc:'../../../static/img/aduio_test.mp3',
+            audioSrc:'./static/img/aduio_test.mp3',
+            videoSrc:"",
+            curChannel:"水吧区域",
             sourceList:[
                 {
                     type:1,
                     ref:'img0',
-                    imgSrc:"../../../static/img/imgTest.jpg",
+                    imgSrc:"./static/img/imgTest.jpg",
                     alt:'门店截图'
                 },
                 {
@@ -140,105 +182,105 @@ export default {
                 },
                 
             ],
-            commentList:[
+            commentList:[],
+            protocal:'DASH',
+            selGID:0,
+            mpdurl:'',
+            playerOptions: {
+                overNative: true,
+                autoplay: false,
+                controls: true,
+                techOrder: ['flash', 'html5'],
+                sourceOrder: true,
+                flash: {
+                hls: { withCredentials: false },
+                swf: isProduction ? '/vue-videojs-demo/static/media/video-js.swf' : '/static/media/video-js.swf'
+                },
+                html5: { hls: { withCredentials: false } },
+                sources: [
                 {
-                    showContent:true,
-                    showLabel:true,
-                    spanStyle:{'background-color':'#6097F4'},
-                    status:2,
-                    process:'已结案',
-                    createOr:'李刚',
-                    createDate:'2018年11月 11:10',
-                    audio:{
-                        audioOften:6+'"',
-                    },
-                    sourceList:[
-                        {
-                            type:'1',
-                            imgSrc:'../../../static/img/imgTest.jpg',
-                            alt:'门店截图'
-                        },
-                        {
-                            type:'2',
-                            ref:'video0',
-                            playerOptions: {
-                                controls: true,
-                                // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
-                                autoplay: false, //如果true,浏览器准备好时开始回放。
-                                // muted: false, // 默认情况下将会消除任何音频。
-                                loop: false, // 导致视频一结束就重新开始。
-                                preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
-                                language: 'zh-CN',
-                                aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
-                                fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-                                notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-                                sources: [{
-                                type: "video/mp4",
-                                src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
-                                }]
-                            }
-                        }
-                    ]
-
+                    type: 'rtmp/mp4',
+                    src: 'rtmp://184.72.239.149/vod/&mp4:BigBuckBunny_115k.mov'
                 },
                 {
-                    showContent:false,
-                    showLabel:true,
-                    spanStyle:{'background-color':'#434B5E'},
-                    status:1,
-                    process:'已处理',
-                    createOr:'李刚',
-                    createDate:'2018年11月 11:10',
-                    audio:{
-                        audioOften:6+'"',
-                    },
-                    sourceList:[
-                        {
-                            type:'1',
-                            imgSrc:'../../../static/img/imgTest.jpg',
-                            alt:'门店截图'
-                        },
-                        {
-                            type:'2',
-                            ref:'video0',
-                            playerOptions: {
-                                controls: true,
-                                // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
-                                autoplay: false, //如果true,浏览器准备好时开始回放。
-                                // muted: false, // 默认情况下将会消除任何音频。
-                                loop: false, // 导致视频一结束就重新开始。
-                                preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
-                                language: 'zh-CN',
-                                aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
-                                fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-                                notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-                                sources: [{
-                                type: "video/mp4",
-                                src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
-                                }]
-                            }
-                        }
-                    ]
-
-                },
-                {
-                    showContent:false,
-                    status:0,
-                    process:'待处理',
-                    showLabel:false,
-                    description:'水吧部分已经处理',
-                    spanStyle:{'background-color':'#FCB83B'},
-                    process:'',
-                    createOr:'李刚',
-                    createDate:'2018年11月 11:10',
+                    withCredentials: false,
+                    type: 'application/x-mpegURL',
+                    src: 'http://playertest.longtailvideo.com/adaptive/bipbop/gear4/prog_index.m3u8'
                 }
-            ]
+                ],
+                poster: isProduction ? '/vue-videojs-demo/static/images/logo.png' : '/static/images/logo.png'
+            },
+            initialized: false,
+            previewplayer:'',
+            winpDes:'',
+            timeid:0
+        }
+    },
+    computed: {
+        player() {
+            return this.$refs.videoPlayer.player
+        },
+        currentStream() {
+            return this.currentTech === 'Flash' ? 'RTMP' : 'HLS'
+        },
+        audioOftenText(){
+            return this.audioOften+'"';
         }
     },
     methods:{
+        onPlayerPlay(player){
+            console.log(player);
+            
+
+        },
+        onPlayerPause(player){
+            console.log(player);
+        },
+        onPlayerReadied() {
+            if (!this.initialized) {
+                this.initialized = true
+                this.currentTech = this.player.techName_;
+                
+            }
+        },
+        // record current time
+        onTimeupdate(e) {
+            console.log('currentTime', e.cache_.currentTime)
+        },
+        async playVideo(url) {
+            console.log('playvideo enter!');
+            var video = document.getElementById("previewVideo");
+            this.previewplayer = videojs(video);
+            this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
+            this.previewplayer.play();
+        },
+        async realTime(){
+            let self=this;
+            console.log('实时播放');
+            let sessionId= await dashAPI.Online();
+            console.log(sessionId);
+            let result=await dashAPI.Enum(sessionId);
+            let ivsID=result.IVSPlatform[0].ID;
+            const data = {
+                request: { 
+                  method: 'connection',
+                  sessionID: sessionId,
+                  streamingProtocol:this.protocal,
+                  IVSID:ivsID,
+                  channel:JSON.stringify(this.selGID+1)
+                }
+            };
+            self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
+            console.log(self.mpdurl);
+            if (self.mpdurl != "" ) {
+                console.log(self.mpdurl);
+                self.playVideo(self.mpdurl);
+            }
+        },
         myfun(){  
             var div1=document.getElementsByClassName("lside");  
             var div2=document.getElementsByClassName("rside");
+            debugger;
             for(var i=0;i<div1.length;i++){
                 var h1=div1[i].offsetHeight;  
                 var h2=div2[i].offsetHeight; 
@@ -267,9 +309,13 @@ export default {
             self.event=obj;
             console.log(self.event);
         },
+        getProcess(){
+            let self=this;
+            self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
+        },
         startSpeech(){
             let self=this;
-            //self.audioOften=self.$refs.audioRef.duration;
+            
             if(!self.isPlaying){
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
@@ -282,7 +328,7 @@ export default {
             }
         },
         checkVideo(){
-
+            this.dialogFormVisible=true;
         },
         getCommentList(){
             let self=this;
@@ -313,6 +359,9 @@ export default {
                             case 2: obj.showLabel=true;obj.spanStyle={'background-color':'#6097F4'};
                                 obj.process='已完结'; break;
                         }
+                        if(item.status==2){
+                            self.showWinpBtn=false;
+                        }
                         if(index==0){
                             obj.showContent=true;
                         }
@@ -320,27 +369,25 @@ export default {
                             obj.showContent=false;
                         }
                         if(item.attachment.length!=0){
-                            item.attachment.forEach((_item,_index)=>{
-                                // if(_item.mediaType)
-                            })
+                            //obj.audio.audioOften=self.audioOften;
+                            obj.sourceList=self.sourceList; 
                         }
                         temp.push(obj);
 
                     })
-                   //self.commentList=temp;
-                    
+                   self.commentList=temp;
                 }
             })
         },
-        addComment(){
+        addComment(status,description){
             let self=this;
             let eventIds=[];
             eventIds.push(self.event.id);
             let comments={
                 ts:new Date().getTime(),
-                description:self.description,
+                description:description,
                 account:self.event.createor,
-                status:1
+                status:status
             };
             let params={
                 eventIds:eventIds,
@@ -351,6 +398,10 @@ export default {
                 let errMsg=res.data.errMsg;
                 if(errMsg=='Success'){
                     self.notify('提交成功！','success',3000);
+                    self.getCommentList();
+                    if(status==2){
+                        self.showWindContent=false;
+                    }
                 }
                 else{
                     self.notify('提交失败！','warning',3000);
@@ -360,10 +411,19 @@ export default {
         },
         submit(){
             let self=this;
-            self.addComment();
+            let status=1;
+            let description=self.description;
+            self.addComment(status,description);
         },
         windUp(){
-
+            let self=this;
+            self.showWindContent=true;
+        },
+        confirmWind(){
+            let self=this;
+            let status=2;
+            let description=self.winpDes;
+            self.addComment(status,description);
         },
         notify(msg,type,time) {
             this.$message({
@@ -401,19 +461,22 @@ export default {
         self.getSessionData();  //获取session中存储的event信息
         self.getCommentList();  //获取comment信息
         self.myfun();
-       // self.createBeforeunloadHandler();
+        self.timeid=setInterval(function(){
+            self.getProcess()
+        },1000);
+        //self.realTime();
     },
     update(){ 
-        this.$route.matched[1].name=this.eventInfo.eventType;
+
     }, 
     beforeDestroy(){
-        this.$route.matched[1].name=this.eventInfo.eventType;
-        //this.destroyedBeforeunloadHandler();
+        window.clearInterval(this.timeid);
     } 
 }
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/css/textstyle.css';
+@import '../../../assets/css/importfile.css'; 
 .el-rate-container{
     padding: 20px;
     padding-right: 30px;
@@ -441,6 +504,15 @@ export default {
             background-color: #FB505F;
             color: #fff;
         }
+    }
+    .video-dialog-content{
+        width:98%;
+        height:98%;
+        margin: auto;
+    }
+    #previewVideo{
+        min-width: 500px;
+        min-height: 320px;
     }
     .storeInfo-content{
         text-align: left;
@@ -492,10 +564,10 @@ export default {
                 font-size: 14px;
                 color: #94a4b4;
             }
-            .startIcon{
+            .icon-video{
                 margin-left: 20px;
-                position: relative;
-                top: 5px;
+                color: #FB505F;
+                font-size: 20px;
             }
             .ahref{
                 text-decoration: underline;
@@ -517,7 +589,7 @@ export default {
             margin-top: 20px;
             width: 100%;
             height: auto;
-            min-height: 300px;
+            min-height: 100px;
             background-color: #FAFAFA;
             border: 1px solid #ddd;
             .deal-detal-content{
@@ -564,6 +636,8 @@ export default {
             .rside{
                 width: auto;
                 height: 100%;
+                min-height: 100px;
+                border-left: 1px solid #FB505F;
                 float: left;
                 padding-top: 5px;
                 .creator{
@@ -582,11 +656,32 @@ export default {
                     }
                 }
                 .viedo-info{
-                    margin-left: 40px;
+                    margin-left: 20px;
+                    color: #FB505F;
+                    font-size: 20px;
+                    margin-top: 8px;
                 }
             }
         }
     }
 }
 </style>
+<style>
+    .tabName-input .el-input__inner{
+        border-radius: 0px !important;
+        border-left: 0px;
+        border-top: 0px;
+        border-right: 0px;
+        border-bottom: 1px  solid #FB505F;
+        font-size: 14px;
+    }
+</style>
 
+<style>
+.el-dialog__title{
+    font-size: 16px !important;
+}
+.el-dialog__body{
+    padding: 0 0 !important;
+}
+</style>

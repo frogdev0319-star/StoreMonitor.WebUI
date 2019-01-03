@@ -12,14 +12,14 @@
     color: #EAEDF2 !important;
 }
 .file-cancel-btn{
-    width: 76px;
-    background-color: #EAEDF2;
-    color: 	#708090;
+    width: 76px !important;
+    background-color: #EAEDF2 !important;
+    color: 	#708090 !important;
 }
 .file-confirm-btn{
     width: 76px;
-    background-color: #FB505F;
-    border-color: #FB505F;
+    background-color: #FB505F !important;
+    border-color: #FB505F !important;
 }
 input:disabled{
     background-color: 	#F5F5F5 !important;

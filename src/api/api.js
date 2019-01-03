@@ -3,9 +3,15 @@ import qs from 'qs'
 import axiosFile from 'axios'
 import Nape from '@/api/ApiPath'
 
-let base="http://172.21.81.160:8085/storemonitor/";
-let itempath='api/v1.0'
+//let base='http://'+window.location.host;
+let base ="http://172.21.81.160:8085";
+//let base ='http://172.21.81.206:8085';
+let itempath='/storemonitor/api/v1.0'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
+export const getBaseURL=()=>{
+    let baseUrl='http://'+window.location.host;
+    return baseUrl;
+}
 // get the device list
 axiosFile.defaults.headers.post['Content-Type']='multipart/form-data';
 export const getNapeList=()=>{
@@ -52,6 +58,12 @@ export const deleteInspectGroup=params=>{
 export const deleteInspectItem=params=>{
     return axios.post(`${base}${itempath}/inspect/item/delete`,params);
 }
+export const deleteInspect=async (params1,params2)=>{
+    const item=await axios.post(`${base}${itempath}/inspect/item/delete`,params1);
+    const group=await axios.post(`${base}${itempath}/inspect/group/delete`,params2);
+    return [item,group]
+}
+
 export const submitInspectItem=params=>{
     return axios.get(`${base}${itempath}/inspect/submit`,params);
 }
@@ -64,7 +76,9 @@ export const updateInspectGroup=params=>{
 export const updateInspectItem=params=>{
     return axios.post(`${base}${itempath}/inspect/item/update`,params);
 }
-
+export const getTemplate=()=>{
+    return axios.get(`${base}${itempath}/inspect/template`);
+}
 //门店管理模块api
 
 export const getStoreList=params=>{
@@ -135,4 +149,9 @@ export const addComment=params=>{
 }
 export const getCommentList=params=>{
     return axios.post(`${base}${itempath}/event/comment/list`,params);
+}
+
+
+export const loginByUser=params=>{
+    return axios.post(`${base}${itempath}/login`,params);
 }

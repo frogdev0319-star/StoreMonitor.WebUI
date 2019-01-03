@@ -3,7 +3,8 @@
         <div class="el-bind-header">
             <div class="seacrh-content">
                 <span>按省份选择</span>
-                  <el-select v-model="curProvince" placeholder="省份" size="mini" class="el-province" @change="changePro">
+                  <el-select v-model="curProvince" placeholder="省份" clearable size="mini" class="el-province" 
+                  @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
                     :key="item.value"
@@ -88,6 +89,10 @@ export default {
             console.log(val);
             self.getCityByProvince(val);
             self.citys='';
+            self.multeCityList.length=0;
+        },
+         clearCitys(){
+            let self=this;
             self.multeCityList.length=0;
         },
         choiceCity(){
@@ -288,28 +293,39 @@ export default {
                 let groupObj={};
                 groupObj.province=item.province;
                 groupObj.cityName=item.city;
-                groupObj.checked=false;
+                //groupObj.checked=false;
                 let _temp=[];
+                let _tempCount=0;
                 item.store.forEach(_item=>{
                     let _obj={};
-                    // _obj.checked=false;
                     if(bindStoreId.indexOf(_item.storeId)==-1){
                         _obj.checked=false;
                     }
                     else{
                         _obj.checked=true;
+                        _tempCount++;
                     }
                     _obj.storeId=_item.storeId;
                     _obj.name=_item.storeName;
-
                     _temp.push(_obj);
                 })
+                if(_tempCount==item.store.length){
+                    groupObj.checked=true;
+                }
                 groupObj.itemData=_temp;
                 groupTemp.push(groupObj);
             })
-
             self.storeList=groupTemp;
             self.tempStoreList=groupTemp;
+            let count=0;
+            self.storeList.forEach(item=>{
+                if(item.checked){
+                    count++;
+                }
+            })
+            if(count==self.storeList.length){
+                self.allData=true;
+            }
         },
         applyNape(){
             let self=this;
@@ -370,6 +386,7 @@ export default {
             }
             self.tabName= name;
             self.getProvinceList();
+            
         },
         notify(msg,type,time) {
             this.$message({
@@ -381,9 +398,9 @@ export default {
     },
     mounted(){
         let self=this;
-        
         self.InitData();
         self.getStoreByCity();
+
     }
 }
 </script>

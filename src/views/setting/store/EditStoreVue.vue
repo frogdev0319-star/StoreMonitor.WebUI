@@ -151,7 +151,8 @@ export default {
                             let _obj={};
                             _obj.id=_item.id;
                             _obj.subject=_item.subject;
-                            _obj.channelvalue=_item.deviceId==-1?'':self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
+                            _obj.channelvalue=_item.deviceId==-1?'':
+                                    self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
                             _obj.isClick=false,
                             _temp.push(_obj);
                         }

@@ -1,7 +1,7 @@
 @charset "UTF-8";
 //rem(val)
 @function rem($val){
-    @return $val+em;
+    @return $val/16+em;
 }
 @function checkEm($val){
     @if $val==auto{@return auto;}
@@ -9,7 +9,7 @@
     @else{@return rem($val);}
 }
 @mixin point($poi,$val){
-    #{$poi}:checkEm($val);
+    #{$poi}:rem($val);
 }
 
 //colors
@@ -27,6 +27,4 @@ $cancel-Fore:#adb1c0;
 $group_BackColor:#fafafb;
 
 //font-size
-$title_level1:1.125em;   //18px 一级标题
-$title_level2:1em;       //16px 二级标题
-$noraml-text:0.875em;    //14px 正常文本
+

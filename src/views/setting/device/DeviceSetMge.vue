@@ -14,7 +14,7 @@
                     <i @click="searchNVRList"  slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:7px;left:6px;"></i>
                 </el-input>
                  <el-button v-for="(item,index) in btnList" 
-                :key="index" size="mini" @click="handleNVR(index,item)" class="el-handle-btn">
+                :key="index" size="mini" @click="handleNVR(index,item)" class="el-handle-btn" :disabled="index==2">
                     <i :class="item.iconClass" style="font-size:20px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
@@ -43,6 +43,7 @@
                         <el-dialog title='导入'
                         id="importId"
                         :visible.sync="showImportContent" v-if="showImportContent"
+                        :close-on-click-modal="false"
                         :append-to-body='true'
                         width="28%"
                         top="35vh"
@@ -142,6 +143,7 @@
 <script>
 import api from '@/api/index'
 import axios from 'axios'
+import {validateInput} from '@/common/validate'
 export default {
     name:'DeviceSetMge',
     data(){
@@ -211,10 +213,8 @@ export default {
             return new Promise((resolve,reject)=>{
                 api.getDashServerInfo().then(res=>{
                     console.log(res.data.errMsg);
-                    if(res.data.errMsg!=undefined&&res.data.errMsg=='Success'){
-                        let data=res.data.data;
-                        resolve(data);
-                    }
+                    let data=res.data;
+                    resolve(data);
                 })
             })
         },
@@ -222,9 +222,32 @@ export default {
             let self=this;
             console.log('checkbeforeImport');
         },
+        checkDashInfo(){
+            let self=this;
+            let msg='';
+            if(self.dash.url.toString().trim().length==0||self.dash.httpCmdPort.toString().trim().length==0
+            ||self.dash.httpsCmdPort.toString().trim().length==0||self.dash.dataPort.toString().trim().length==0){
+                msg='当前配置项均为必填项！';
+            }
+            else if(validateInput(self.dash.url)||validateInput(self.dash.httpCmdPort)
+            ||validateInput(self.dash.httpsCmdPort)||validateInput(self.dash.dataPort)){
+                msg='当前配置项中含有非法字符，请检查！';
+            }
+            return msg;
+        },
         async connectServer(){
             let self=this;
             let data=await self.getDashServerInfo();
+            let msg=self.checkDashInfo();
+            if(msg.length!=0){
+                self.notify(msg,'warning',3000);
+                setTimeout(function(){
+                    if(data.errCode!=null&&data.errMsg=='Success'){
+                        self.dash=data.data;
+                    }
+                },1000)
+                return false;
+            }
             let params={
                 "url": self.dash.url,
                 "httpCmdPort": self.dash.httpCmdPort,
@@ -233,8 +256,8 @@ export default {
                 "loginId": "admin",
                 "password": "admin"
             };
-            if(data!=null&&data!=undefined){ //新增dash
-                api.upateDashServer(params).then(res=>{
+            if(data.errCode!=null&&data.errCode==500){ //Dash Server does not exsit!
+                api.addDashServer(params).then(res=>{
                     let errMsg=res.data.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
                         self.notify('连接成功!','success',3000);
@@ -245,14 +268,17 @@ export default {
                     }
                 })
             }
-            else{                           //update dash
-                api.addDashServer(params).then(res=>{
+            else{                          
+                api.upateDashServer(params).then(res=>{
                     let errMsg=res.data.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
                         self.notify('连接成功!','success',3000);
                     }
                     else{
                         self.notify('连接失败!','warning',3000);
+                        setTimeout(function(){
+                            self.dash=data.data;
+                        },1000)
                         return false;
                     }
                 })
@@ -596,7 +622,9 @@ export default {
             self.activeName=sessionStorage.getItem('DevicePage_TabName')==undefined||
                     sessionStorage.getItem('DevicePage_TabName').length==0?'dash':sessionStorage.getItem('DevicePage_TabName');
             let data=await self.getDashServerInfo();
-            self.dash=data;
+            if(data.errMsg=='Success'&&data.data!=null){
+                self.dash=data.data;
+            }
             self.channelData=await self.getChannelData();   //获取channel信息
             self.getNVRList();       //获取NVR 数据信息
             

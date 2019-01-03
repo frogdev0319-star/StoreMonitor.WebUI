@@ -14,10 +14,11 @@
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
-                
+                <a :href="downLoadSrc" download class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i>下载</a>
                 <el-dialog title='导入'
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
+                :close-on-click-modal="false"
                 width="28%"
                 top="35vh"
                 left="40vh">
@@ -87,6 +88,7 @@ export default {
                 //     'label':'新增巡检表'
                 // }
             ],
+            downLoadSrc:'',
             curIndex:'id0',
             showBtnContent:false,
             storeNum:0,
@@ -110,13 +112,13 @@ export default {
                     btnTitle:'导出',
                     enabled:true,
                 },
-                {
-                    id:0,
-                    iconClass:'iconfont icon-xiazai',
-                    name:'download',
-                    btnTitle:'下载',
-                    enabled:true,
-                }
+                // {
+                //     id:0,
+                //     iconClass:'iconfont icon-xiazai',
+                //     name:'download',
+                //     btnTitle:'下载',
+                //     enabled:true,
+                // }
             ],
 
             allData:[],
@@ -126,6 +128,7 @@ export default {
     },
     mounted(){
         let self=this;
+        self.getDownLoadURL();
         self.getTagList();
         self.initData();
         let tabIndex=sessionStorage.getItem('TabIndex');
@@ -140,9 +143,12 @@ export default {
                 default:self.changeValue='新增巡检表';break;
             }
         },
+        getDownLoadURL(){
+            let self=this;
+            self.downLoadSrc=api.getBaseURL();
+        },
         getNapeList(){
             let self=this;
-            
             return new Promise((resolve,reject)=>{
                 api.getInspectItemList().then(res=>{
                     let code=res.data.errMsg;
@@ -228,14 +234,11 @@ export default {
             }
             return new Promise((resolve,reject)=>{
                 let params={
-                    "itemIDs":itemIds
+                    "itemIds":itemIds
                 }
                 api.deleteInspectItem(params).then(res=>{
                     let code=res.data.errMsg;
                     let data=res.data.data;
-                    if(code!=null&&code=='Success'){
-                        console.log(res.data);
-                    }
                     resolve(data);
                 })
             })
@@ -247,21 +250,42 @@ export default {
             }
             return new Promise((resolve,reject)=>{
                 let params={
-                    "groupIDs":groupIds
+                    "groupIds":groupIds
                 }
                 api.deleteInspectGroup(params).then(res=>{
                     let code=res.data.errMsg;
                     let data=res.data.data;
-                    if(code!=null&&code=='Success'){
-                        console.log(res.data);
-                    }
                     resolve(data);
+                })
+            })
+        },
+        deleteAllData(itemIdList,groupIdList){
+            let params1={
+                itemIds:itemIdList
+            };
+            let params2={
+                groupIds:groupIdList
+            };
+            return new Promise((resolve,reject)=>{
+                api.deleteInspect(params1,params2).then((res)=>{
+                    console.log(res);
+                    resolve(res);
                 })
             })
         },
         async RemoveAllTags(){
             let self=this;
-            let data=self.elTableData[Number(self.activeName)];
+            let index=0;
+            if(self.checkValue=='远程巡检'){
+                index=0;
+            }
+            else if(self.checkValue=='现场巡检'){ 
+                index=1;
+            }
+            else{
+                index=2;
+            }
+            let data=self.elTableData[index];
             console.log(data);
             console.log(data.label);
             let groupIdList=[];
@@ -272,9 +296,7 @@ export default {
                     itemIdList.push(_item.id);
                 })
             })
-            let retItem=await self.deleteItems(itemIdList);
-            console.log(retItem);
-            let retGroup=await self.deleteGroups(groupIdList);
+            let retItem=await self.deleteAllData(itemIdList,groupIdList);
         },
         addGroup(groupObj){
             let self=this;
@@ -359,7 +381,23 @@ export default {
             }
         },
         importItem(){
-            this.showImportContent=true;
+            let self=this;
+            if(self.elTableData[Number(self.activeName)].routeData.length!=0){
+                self.$confirm('此操作将清空当前页面巡检项, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    center: true
+                }).then(() => {
+                    self.showImportContent=true;
+                }).catch(() => {
+                    self.showImportContent=false;
+                });
+            }
+            else{
+                self.showBtnContent=true;
+            }
+           
         },
         checkBeforeImport(){
             let self=this;
@@ -388,9 +426,6 @@ export default {
         exportItem(){
             let self=this;
             self.export2Excel();
-        },
-        downItem(){
-            this.RemoveAllTags();
         },
         async importfxx(obj) {
             let _this = this;
@@ -426,6 +461,7 @@ export default {
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
                     let arr=outdata;
+                    console.log(arr);
                     let indexArry=[];
                     let typeName=[];
                     arr.forEach((item,index)=>{
@@ -466,7 +502,7 @@ export default {
                                 item.forEach((_item,_index)=>{
                                     let _obj={};
                                     _obj.subject=_item['检查项目名称'];
-                                    _obj.description=_item["检查项目详细说明"];
+                                    _obj.description=_item["检查项目详细说明（选填，不填为空）"];
                                     _obj.itemScore=10;
                                     temp.push(_obj);
                                 })
@@ -529,25 +565,35 @@ export default {
             var that = this;
             require.ensure([], () => {
                 const { export_json_to_excel } = require('@/excel/Export2Excel'); 
-                const tHeader = ['检查分类','检查项目名称', '检查项目详细说明',]; // 导出的表头名
-                const filterVal = ['gourpname','napename','napedep',]; // 导出的表头字段名
+                const tHeader = ['检查分类','检查项目名称','项目分值', "检查项目详细说明（选填，不填为空）",]; // 导出的表头名
+                const filterVal = ['gourpname','napename','score','napedep',]; // 导出的表头字段名
                 console.log(that.activeName);
                 let curData=that.elTableData[Number(that.activeName)].routeData;
                 let excelData=[];
-                
                 curData.forEach((item,index)=>{
-                    item.itemData.forEach((_item,_index)=>{
+                    if(item.itemData.length==0){
                         let obj={};
-                        if(_index==0){
-                            obj.gourpname=item.groupName;
-                        }
-                        else{
-                            obj.gourpname='';
-                        }
-                        obj.napename=_item.name;
-                        obj.napedep=_item.description=='---'?'':_item.description;
+                        obj.gourpname=item.groupName;
+                        obj.napename='';
+                        obj.score='';
+                        obj.napedep='';
                         excelData.push(obj);
-                    })
+                    }
+                    else{
+                        item.itemData.forEach((_item,_index)=>{
+                            let obj={};
+                            if(_index==0){
+                                obj.gourpname=item.groupName;
+                            }
+                            else{
+                                obj.gourpname='';
+                            }
+                            obj.napename=_item.name;
+                            obj.score=_item.score;
+                            obj.napedep=_item.description=='---'?'':_item.description;
+                            excelData.push(obj);
+                        })
+                    }
                 })
                 const list = excelData;
                 const data = that.formatJson(filterVal, list);
@@ -599,6 +645,28 @@ export default {
                         opacity: 0.6;
                     }
                 }
+                .downLoad-btn{
+                    margin-left: 0px !important;
+                    border-color: $mainColor !important;
+                    color: $mainColor !important;
+                    border-radius: 0px;
+                    padding: 2px 10px !important;
+                    position: relative;
+                    top: 3px;
+                    display: inline-block;
+                    text-decoration: none;
+                    font-size: 14px;
+                    border: 1px solid;
+                    border-left-width: 0px;
+                    right: 5px;
+                    cursor: pointer;
+                    &:hover{
+                        background-color: #FEE4E7;
+                    }
+                    &:focus{
+                        background-color: #FEE4E7;
+                    }
+                }
                 .el-handle-btn{
                     margin-left: 0px !important;
                     border-color: $mainColor !important;
@@ -612,9 +680,6 @@ export default {
                         bottom: 3px;
                     }
                     &:nth-child(4){
-                        border-left-width: 0px;
-                    }
-                    &:last-child{
                         border-left-width: 0px;
                     }
                     &:hover{

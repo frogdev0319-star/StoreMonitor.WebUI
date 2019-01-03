@@ -34,8 +34,10 @@
                 <div slot="content">*最长搜索时间为一个月</div>
                 <i class="iconfont icon-bangzhu" style="margin-left:10px;font-size:20px;position:relative;top:2px;color:#FB505F"></i>
             </el-tooltip>
-            <span class="date-title noraml-text" style="margin-left:30px;margin-right:20px;">处理状态</span>
-            <el-select v-model="value" placeholder="请选择" class="el-select-content" size="small" @change="selectChange">
+            <span class="date-title noraml-text" 
+            style="margin-left:30px;margin-right:20px;" v-if="activeName!='0'">处理状态</span>
+            <el-select v-model="value" placeholder="请选择" 
+            class="el-select-content" size="small" @change="selectChange" v-if="activeName!='0'">
                 <el-option
                 v-for="(item) in states" 
                 :key="item.value"
@@ -46,18 +48,22 @@
             <el-input
                 size="small"
                 class="el-search"
+                clearable
                 v-model="serachVale" @keyup.enter.native="searchEventList">
                 <i @click="searchEventList" slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
             </el-input>
        </div>
-       <el-dialog title="" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" width=450px top=15%>
-            <div class="fileNameContent" style="overflow:hidden;">
-                <span>文件名称：</span>
-                <el-input v-model="fileName" placeholder="请输入文件名称" style="width:300px;" size="mini"></el-input>
-                <div slot="footer" class="dialog-footer">
-                    <el-button class="file-content-btn" @click="dialogFormVisible = false" size="mini" style="">取 消</el-button>
-                    <el-button class="file-content-btn" type="primary" @click="exportCSV" size="mini">确 定</el-button>
+       <el-dialog title="导出" :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=450px top=15%>
+            <div class="dialog-content" style="overflow:hidden;">
+                <hr style="border: 0.5px solid #FFC1C8;"/>
+                <div class="tabName-input-content">
+                    <el-input type="text" size="small" v-model="fileName" class="tabName-input" placeholder="请输入文件名称">
+                    </el-input>
                 </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">取 消</el-button>
+                <el-button class="file-confirm-btn" type="primary" @click="exportCSV" size="mini">确 定</el-button>
             </div>
         </el-dialog>
         <div class="el-table-content">
@@ -66,7 +72,8 @@
                 </i>导出报表
             </el-button>
             <el-tabs v-model="activeName" @tab-click="handleClick" id="tabs-content">
-                <el-tab-pane v-for="(item,index) in tableDataList" :key="index" :label="`${item.label} （${item.eventCount}）`">
+                <el-tab-pane v-for="(item,index) in tableDataList" 
+                :key="index" :label="`${item.label} （${item.eventCount}）`">
                     <div class="el-table-panel">
                         <el-table 
                             :data="item.tableData" 
@@ -81,13 +88,13 @@
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
-                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#FAD934;" v-if="scope.row.status=='0'" >待处理</span>
-                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:orange;" v-else-if="scope.row.rank=='1'" >已处理</span>
-                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#fd446d;" v-else>已结案</span>       
+                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#FDBA40;" v-if="scope.row.status==0" >待处理</span>
+                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#434C5E;" v-else-if="scope.row.status==1" >已处理</span>
+                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#6097F3;" v-else>已结案</span>       
                                     </template>
                                 </el-table-column>
-                            <el-table-column v-for="(item,index) in tableInfoData" :key="index"
-                                :prop="item.prop" :label="item.label" :sortable="item.sortable" :width="item.width">
+                            <el-table-column v-for="(_item,_index) in tableInfoData" :key="_index"
+                                :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :width="_item.width">
                             </el-table-column>
                             <el-table-column
                                 prop="option"
@@ -151,60 +158,43 @@
                 {
                     value: 1,
                     label: '全部'
-                }, 
-                {
-                    value: 2,
-                    label: '未处理',
-                    disabled: true
-                }, 
-                {
-                    value: 3,
-                    label: '处理中'
-                }, 
-                {
-                    value: 4,
-                    label: '已处理'
                 }],
                 curState:'',
                 value:1,
                 serachVale:'',
-                activeName:'',
-                //0 表示未处理 1 表示处理中  2 已处理
                 tableDataList:[
                     {
-                        label:'待处理',
-                        eventCount:10,
-                        tableData:[
-                            // {
-                            //     'eventName':'001',
-                            // }
-                        ],
+                        label:'待处理事件',
+                        eventCount:0,
+                        tableData:[],
+                        total:0,
+                        sizeNum:10,
+                        page:0
                     },
                     {
-                        label:'我创建',
-                        eventCount:30,
-                        tableData:[
-                            // {
-                            //     'eventName':'001',
-                            // }
-                        ]
+                        label:'我创建事件',
+                        eventCount:0,
+                        tableData:[],
+                        total:0,
+                        sizeNum:10,
+                        page:0
                     },
                     {
                         label:'全部事件',
-                        eventCount:300,
-                        tableData:[
-                            // {
-                            //     'eventName':'001',
-                            // }
-                        ]
+                        eventCount:0,
+                        tableData:[],
+                        total:0,
+                        sizeNum:10,
+                        page:0
                     }
                 ],
+                activeName:'0',
                 tableInfoData:[
                     {
                         "prop":"subject",
                         "label":"事件名称",
-                        "sortable":false,
-                         "width":180
+                        "sortable":'custom',
+                        "width":180
                     },
                     {
                         "prop":"storeId",
@@ -215,12 +205,12 @@
                     {
                         "prop":"assigner",
                         "label":"提报人",
-                        "sortable":false
+                        "sortable":'custom',
                     },
                     {
                         "prop":"ts",
                         "label":"提报时间",
-                        "sortable":false
+                        "sortable":'custom',
                     }
                 ],
                 event,
@@ -231,7 +221,7 @@
                 fileName:'数据详情'+'.csv',
                 dialogFormVisible:false,
                 exportDataList:[],  //需要导出的数据
-                exportDataHeader:['异常类型名称','设备名称','设备型号','发报时间'], //需要导出数据的表头
+                exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
                 timeid:0,
                 windowHeight:window.innerHeight
             }
@@ -243,6 +233,7 @@
                 let self=this;
                 self.params.beginTs=self.startDate.getTime();
                 self.params.endTs=self.endDate.getTime();
+                self.getEventParamsByIndex(Number(self.activeName));
                 self.getEventList(self.params);
             },
             endDateChange(val){
@@ -250,11 +241,35 @@
                 let self=this;
                 self.params.beginTs=self.startDate.getTime();
                 self.params.endTs=self.endDate.getTime();
+                self.getEventParamsByIndex(Number(self.activeName));
                 self.getEventList(self.params);
 
             },
+            getEventParamsByIndex(index){
+                let self=this;
+                switch(index){
+                    case 0: 
+                        self.params.clause={"status":0};break;
+                    case 1: 
+                        self.params.clause={"assigner":""};break;
+                    case 2:
+                        self.params.clause={}; break;
+                }
+            },
             handleClick(val){
-
+                let self=this;
+                console.log(val.index);
+                switch(Number(val.index)){
+                    case 0: self.states=[{value: 1,label: '全部'}];  
+                            self.params.clause={"status":0};break;
+                    case 1: self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
+                                        {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
+                            self.params.clause={"assigner":""};break;
+                    case 2:self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
+                                        {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
+                            self.params.clause={}; break;
+                }
+                this.getEventList(this.params);
             },
             selectChange(val){
                 console.log(val);
@@ -279,8 +294,8 @@
             searchEventList(){
                 let self=this;
                 if(self.serachVale!=undefined&&self.serachVale.length!=0){
-                    self.params.like={eventType:this.serachVale,deviceName:this.serachVale,
-                    deviceType:this.serachVale,agentId:this.serachVale,description:this.serachVale};
+                    self.params.like={subject:this.serachVale,assigner:this.serachVale,
+                    assignee:this.serachVale,storeId:this.serachVale};
                 }
                 else{
                     self.params.like={};
@@ -303,13 +318,13 @@
                 if(order=="ascending"){
                     self.params.order={
                         "direction":"asc",
-                        "property": "deviceName"
+                        "property":col.column.property
                     }
                 }
                 else if(order=="descending"){
                      self.params.order={
                         "direction":"desc",
-                        "property": "deviceName"
+                        "property": col.column.property
                     }
                 }
                 else{
@@ -319,11 +334,12 @@
             },
             getEventList(params){
                 let self=this;
-                params.filter={page:this.page,size:this.sizeNum};
+                let tabIndx=Number(self.activeName);
+                console.log(self.activeName);
+                params.filter={page:this.tableDataList[tabIndx].page,size:this.tableDataList[tabIndx].sizeNum};
                 api.getEventList(params).then((res)=>{
                     console.log(res);
                     let data=res.data.data.content;
-                    self.total=res.data.data.totalElements;
                     let temp=[];
                     data.forEach(item=>{
                         let obj={
@@ -338,17 +354,23 @@
                         }
                        temp.push(obj);
                     })
-                    self.tableDataList[0].tableData=temp;
+                    self.tableDataList[tabIndx].tableData=temp;
+                    self.tableDataList[tabIndx].total=res.data.data.totalElements;
+                    self.tableDataList[tabIndx].eventCount=res.data.data.totalElements;
                 }).catch(err=>{
                     console.log("Error:"+err);
                 });
             },
             sizeChange(val){
-                this.sizeNum=val;
-                this.getEventList(this.params);
+                let self=this;
+                let tabIndx=Number(self.activeName);
+                self.tableDataList[tabIndx].sizeNum=val;
+                self.getEventList(this.params);
             },
             currentChange(val){
-                this.page=val-1;
+                let self=this;
+                let tabIndx=Number(self.activeName);
+                this.tableDataList[tabIndx].page=val-1;
                 this.getEventList(this.params);
             },
             getInitList(){
@@ -357,14 +379,17 @@
                 let end=new Date().getTime();
                 self.params.beginTs=start;
                 self.params.endTs=end;
+                self.getEventParamsByIndex(Number(self.activeName)); //初始获取数据
                 self.getEventList(self.params);
             },
             exportData(){
-                if(this.tableData.length==0){
+                let self=this;
+                let tabIndx=Number(self.activeName);
+                if(self.tableDataList[tabIndx].tableData.length==0){
                     return false;
                 }
-                this.dialogFormVisible=true;
-                this.getExportData();
+                self.dialogFormVisible=true;
+                self.getExportData();
             },
             getExportDataSize(){
                 let self=this;
@@ -372,7 +397,7 @@
                 return new Promise((resolve,reject)=>{
                     api.getEventList(self.params).then((res)=>{
                         console.log(res);
-                        let size=res.data.totalElements;
+                        let size=res.data.data.totalElements;
                         resolve(size);
                     }) 
                     .catch((error) => {
@@ -390,14 +415,13 @@
                 };
                 api.getEventList(self.params).then((res)=>{
                     console.log(res);
-                    let data=res.data.content;
+                    let data=res.data.data.content;
                     let temp=[];
                     data.forEach(item=>{
                         let obj={};
-                        obj.eventType=item.eventType;
-                        obj.deviceName=item.deviceName;
-                        obj.deviceType=item.deviceType;
-                        //obj.group=item.group;
+                        obj.subject=item.subject;
+                        obj.storeId=item.storeId;
+                        obj.assigner=item.assigner;
                         obj.ts=util.getDateTime(item.ts);
                         temp.push(obj);
                     })
@@ -438,12 +462,18 @@
 
 <style lang="scss" scoped>
 @import '../../assets/css/textstyle.css';
+@import '../../assets/css/importfile.css'; 
 .el-event-content{
     width: 100%;
     position: relative;
+    .tabName-input-content{
+        background: #fff;
+        height: 73px;
+        width: 100%;
+    }
     .el-date{
-        height: 80px;
-        line-height: 80px;
+        height: 5em;
+        line-height: 5em;
         text-align: left;
         border-bottom: 1px solid #ddd;
         position: relative;
@@ -481,6 +511,7 @@
             background-color: #FB505F;
             border-color: #FB505F;
             border-radius: 0px;
+            z-index: 990;
         }
     }
     
@@ -503,12 +534,12 @@
         border-radius: 0px;
         border: 0px;
     }
-    .el-input--small >>>.el-input__inner{
+</style>
+<style>
+    .el-search .el-input__inner{
         background: #f0f5f8 !important;
         border-radius: 15px !important;
     }
-</style>
-<style>
     .el-tooltip__popper.is-light{
         background: #FEE4E7 !important;
         color: #FB505F !important;
@@ -527,6 +558,21 @@
     }
     .el-tabs__item:hover{
         color: #FB505F !important;
+    }
+    .el-dialog__body{
+        padding: 0px;
+    }
+    .tabName-input .el-input__inner{
+        border-radius: 0px !important;
+        border-left: 0px;
+        border-top: 0px;
+        border-right: 0px;
+        border-bottom: 1px  solid #FB505F;
+        font-size: 14px;
+    }
+    .el-pagination.is-background .el-pager li:not(.disabled).active{
+        background-color:#FB505F !important;
+        color:#fff !important;
     }
 </style>
 

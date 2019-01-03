@@ -2,27 +2,39 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Home from '@/views/home/Home'
+import Login from '@/views/login/Login'
 Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path:'/login',
+      name:'Login',
+      component:Login,
+      meta:{
+        requireAuth: false,
+      }
+    },
+    {
       path: '/',
       name: '总览',
-      redirect:'/allscan',
+      redirect:'allscan',
       component: Home,
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',
       leaf:true, //没有子节点
       children:[
         {
-          path:'/allscan',
+          path:'allscan',
           name:'总览',
           component:resolve=>require(['@/views/allscan/AllScan'],resolve),
+          meta:{
+            requireAuth: true,
+          }
         }
       ]
     },
     {
-      path:'/',
+      path: '/',
       name:'巡店管理',
       component:Home,
       iconCls:'iconfont icon-menu-xundian',
@@ -30,19 +42,25 @@ export default new Router({
       leaf:false,  //多个子节点
       children:[
         {
-          path:'/stroemonitor',
-          name:'门店监控',
-          component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
-        },
-        {
           path:'/reinspection',
           name:'远程巡检',
           component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
+          meta:{
+            requireAuth: true,
+          }
+        },
+        {
+          path:'/stroemonitor',
+          name:'门店监控',
+          component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
+          meta:{
+            requireAuth: true,
+          }
         }
       ]
     },
     {
-      path:'/',
+      path: '/',
       name:'事件管理',
       component:Home,
       iconCls:'iconfont icon-shijian',
@@ -53,35 +71,32 @@ export default new Router({
           path:'/event',
           name:'事件管理',
           component:resolve=>require(['@/views/event/EventManage'],resolve),
+          meta:{
+            keepAlive:true,  //the component is't to be cache.
+            requireAuth: true,
+          }
         },
         {
           path:'/event',
           name:'事件管理',
           component:resolve=>require(['@/views/event/details/RateManage'],resolve),
+          meta:{
+            requireAuth: true,
+          },
           children:[
             {
               path:'/rate',
               name:'新增事件管理',
-              component:resolve=>require(['@/views/event/details/RateManage'],resolve)
+              component:resolve=>require(['@/views/event/details/RateManage'],resolve),
+              
             }
           ]
         },
-        {
-          path:'/rate',
-          name:'异常进度',
-          component:resolve=>require(['@/views/event/details/RateDetail'],resolve),
-          children:[
-            {
-              path:'/details',
-              name:'异常进度',
-              component:resolve=>require(['@/views/event/details/RateDetail'],resolve)
-            }
-          ]
-        }
+       
       ]
     },
     {
-      path:'/',
+      path: '/',
       name:'统计分析',
       component:Home,
       iconCls:'iconfont icon-tongjifenxi',
@@ -91,12 +106,15 @@ export default new Router({
         {
           path:'/statistical',
           name:'统计分析',
-          component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve)
+          component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve),
+          meta:{
+            requireAuth: true,
+          }
         }
       ]
     },
     {
-      path:'/',
+      path: '/',
       name:'数据中心',
       component:Home,
       iconCls:'iconfont icon-menu-shujuzhongxin',
@@ -106,12 +124,15 @@ export default new Router({
         {
           path:'/datacenter',
           name:'数据中心',
-          component:resolve=>require(['@/views/datacenter/DataCenter'],resolve)
+          component:resolve=>require(['@/views/datacenter/DataCenter'],resolve),
+          meta:{
+            requireAuth: true,
+          }
         }
       ]
     },
     {
-      path:'/',
+      path: '/',
       name:'系统设定',
       iconCls:'iconfont icon-button',
       styles:'font-size:24px',
@@ -123,12 +144,18 @@ export default new Router({
           name:'巡检配置',
           component:resolve=>require(['@/views/setting/routeInspection/RouteInspection'],resolve),
           hidden:false,
+          meta:{
+            requireAuth: true,
+          }
         },
         {
           path:'/routeinspection',
           name:'巡检配置',
           component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve),
           hidden:true,
+          meta:{
+            requireAuth: true,
+          },
           children:[
             {
               path:'/addroute',
@@ -142,6 +169,9 @@ export default new Router({
           name:'巡检配置',
           component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve),
           hidden:true,
+          meta:{
+            requireAuth: true,
+          },
           children:[
             {
               path:'/bindroute',
@@ -153,19 +183,29 @@ export default new Router({
         {
           path:'/device',
           name:'设备管理',
-          component:resolve=>require(['@/views/setting/device/DeviceSetMge'],resolve)
+          component:resolve=>require(['@/views/setting/device/DeviceSetMge'],resolve),
+          meta:{
+            requireAuth: true,
+          },
         },
         {
           path:'/storemanage',
           name:'门店管理',
           component:resolve=>require(['@/views/setting/store/StoreManage'],resolve),
-          hidden:false
+          hidden:false,
+          meta:{
+            keepAlive:true,  //the component is't to be cache.
+            requireAuth:true
+          }
         },
         {
           path:'/storemanage',
           name:'门店管理',
           component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve),
           hidden:true,
+          meta:{
+            requireAuth:true
+          },
           children:[
             {
               path:'/storedetail',
@@ -178,7 +218,10 @@ export default new Router({
           path:'/schedule',
           name:'排程配置',
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
-          hidden:false
+          hidden:false,
+          meta:{
+            requireAuth:true
+          },
         },
         {
           path:'/other',

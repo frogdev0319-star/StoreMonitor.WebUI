@@ -23,6 +23,7 @@
                 <el-dialog title='确认删除'
                 :visible.sync="showDeleteContent" v-if="showDeleteContent"
                 :append-to-body='true'
+                :close-on-click-modal="false"
                 width="28%"
                 top="35vh"
                 left="40vh">
@@ -43,6 +44,7 @@
                 <el-dialog title='确认删除'
                 :visible.sync="showSingleDeleteContent" v-if="showSingleDeleteContent"
                 :append-to-body='true'
+                :close-on-click-modal="false"
                 width="28%"
                 top="35vh"
                 left="40vh">
@@ -107,6 +109,7 @@
                 <el-dialog title='导入'
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
+                :close-on-click-modal="false"
                 width="28%"
                 top="35vh"
                 left="40vh">
@@ -141,6 +144,7 @@
 </template>
 <script>
 import api from '@/api/index'
+
 export default {
     name:'RouteDetail',
     props:{
@@ -191,6 +195,7 @@ export default {
         self.getNum();
     },
     methods:{
+        
         getNum(){
             let self=this;
             if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
@@ -318,7 +323,11 @@ export default {
         deleteNapes(){
             let self=this;
             let arr=[];
+            let countGroup=0;
             self.routeData.forEach(item=>{
+                if(item.checked){
+                    countGroup++;
+                }
                 item.itemData.forEach(_item=>{
                     if(_item.checked){
                         arr.push(_item.id);
@@ -326,32 +335,52 @@ export default {
                 });
             });
             console.log(arr);
-            if(arr.length==0){
-                self.notify('请勾选要删除的巡检项!','warning',3000);
+            if(arr.length==0&&countGroup==0){
+                self.notify('请勾选要删除的巡检项类别或巡检项!','warning',3000);
                 return false;
             }
             self.showDeleteContent=true;
         },
+        afterDeleteNape(){
+            let self=this;
+            self.notify('当前巡检项已删除成功!','success',3000);
+            self.showDeleteContent=false;
+            self.$emit('refreshList');
+        },
         confirmDelete(){
             let self=this;
-            let arr=[];
+            let arrGroup=[];
+            let arrItem=[];
             self.routeData.forEach(item=>{
+                if(item.checked){
+                    arrGroup.push(item.id);
+                }
                 item.itemData.forEach(_item=>{
                     if(_item.checked){
-                        arr.push(_item.id);
+                        arrItem.push(_item.id);
                     }
                 });
             });
             let params={
-                "itemIDs":arr
+                "itemIds":arrItem
             };
+            let paramsGroup={
+                "groupIds":arrGroup
+            }
             api.deleteInspectItem(params).then(res=>{
                 console.log(res.data)
                 let code=res.data.errMsg;
                 if(code!=undefined&&code=='Success'){
-                    self.notify('当前巡检项已删除成功!','success',3000);
-                    self.showDeleteContent=false;
-                    self.$emit('refreshList');
+                    if(arrGroup.length!=0){
+                        api.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                            if(resGroup.data.errMsg=='Success'){
+                                self.afterDeleteNape();
+                            }
+                        })
+                    }
+                    else{
+                        self.afterDeleteNape();
+                    }
                 }
                 else{
                     self.notify('当前巡检项删除失败!','warning',3000);
@@ -371,7 +400,7 @@ export default {
         confirmDeleteSingle(){
             let self=this;
             let params={
-                "itemIDs":self.curDeleteId
+                "itemIds":self.curDeleteId
             };
             api.deleteInspectItem(params).then(res=>{
                 console.log(res.data)
@@ -400,7 +429,10 @@ export default {
         },
 
         downLoadModel(){
-
+            let self=this;
+            let url='http://'+window.location.host+'/storemonitor/api/v1.0/inspect/template';
+            console.log(url);
+            window.open(url);
         },
 
         emptyImport(){
@@ -486,7 +518,7 @@ export default {
                                 item.forEach((_item,_index)=>{
                                     let _obj={};
                                     _obj.subject=_item['检查项目名称'];
-                                    _obj.description=_item["检查项目详细说明"];
+                                    _obj.description=_item["检查项目详细说明（选填，不填为空）"];
                                     _obj.itemScore=10;
                                     temp.push(_obj);
                                 })
@@ -698,9 +730,9 @@ export default {
 .current-row > td {
   background: #FEE7E4 !important;
 }
-.el-dialog{
+/* .el-dialog{
     margin-left:85vh;
-}
+} */
 .el-dialog__body{
     padding: 0px;
 }

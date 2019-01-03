@@ -2,7 +2,8 @@
     <div class="el-event-content">
        <div class="seacrh-content">
             <span class="select-title noraml-text">按省份选择</span>
-             <el-select v-model="curProvince" placeholder="省份" size="mini" class="el-province" @change="changePro">
+             <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
+             class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
                     :key="item.value"
@@ -106,7 +107,7 @@ import api from '@/api/index'
                     },
                     {
                         "prop":"napeTable",
-                        "label":"关联巡检表",
+                        "label":"绑定巡检表",
                         "sortable":false
                     },
                      {
@@ -130,7 +131,8 @@ import api from '@/api/index'
                 total:0,
                 sizeNum:10,
                 page:0,
-                serachVale:''
+                serachVale:'',
+                timeid:0
             }
         },
         methods:{
@@ -139,6 +141,11 @@ import api from '@/api/index'
                 console.log(val);
                 self.getCityByProvince(val);
                 self.citys='';
+                self.multeCityList.length=0;
+            },
+            clearCitys(){
+                let self=this;
+                self.cityList=[];
                 self.multeCityList.length=0;
             },
             choiceCity(){
@@ -263,6 +270,7 @@ import api from '@/api/index'
             },
             async getStoreList(params){
                 let self=this;
+                params.filter={page:this.page,size:this.sizeNum};
                 self.storeData=await self.getStoreData(params);
                 let temp=[];
                 self.storeData.content.forEach(item=>{
@@ -285,9 +293,9 @@ import api from '@/api/index'
                 self.params.like={
                     "storeId": self.serachVale,
                     "name": self.serachVale,
-                    "city": self.serachVale,
-                    "province": self.serachVale,
-                    "country": self.serachVale,
+                    // "city": self.serachVale,
+                    // "province": self.serachVale,
+                    // "country": self.serachVale,
                     "userId": self.serachVale
                 };
                 self.getStoreList(self.params);
@@ -393,44 +401,56 @@ import api from '@/api/index'
             let windowHeight=window.innerHeight;
             if(windowHeight>800){
                 this.tableHeight=770+'px';
+                this.sizeNum=20;
             }
             console.log(this.tableHeight);
             self.getBindInfo();
             self.getProvinceList();
             self.getInitData();
-            // if(!this.timeid){
-            //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
-            // }
+            if(!this.timeid){
+                this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
+            }
         },
-        // beforeDestroy(){
-        //    window.clearInterval(this.timeid);
-        // },
-        // activated(){
-        //     this.getEventList(this.params);
-        // }
+        beforeDestroy(){
+           window.clearInterval(this.timeid);
+        },
+        activated(){
+            this.getStoreList(this.params);
+        }
     }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../assets/css/textStyle.css'; 
+@function rem($val){
+    @return $val/16+rem;
+}
+@function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+}
 .el-event-content{
     width: 100%;
     position: relative;
     .seacrh-content{
-        padding-left: 30px;
-        margin-top: 30px;
-        margin-bottom: 20px;
+        @include point(padding-left,30);
+        @include point(margin-top,30);
+        @include point(margin-bottom,20);
         position: relative;
         text-align: left;
         .el-province{
-            width: 160px;
-            margin-right: 20px;
-            margin-left: 15px;
+            @include point(width,160);
+            @include point(margin-right,20);
+            @include point(margin-left,15);
         }
         .el-search-btn{
-            width: 90px;
+            @include point(width,90);
             text-align: center;
-            margin-left: 15px;
+            @include point(margin-left,15);
             background-color: #FB505F;
             color: #fff;
         }
@@ -438,18 +458,14 @@ import api from '@/api/index'
             display: inline-block;
             position: relative;
             cursor: pointer;
-            
             #elCity{
-                width: 160px;
+                @include point(width,160);
                 border-radius: 0px;
                 background-color: #f0f5f8;
             }
-            .el-input{
-                width: 160px;
-            }
             .input-arrow-panel{
-                width: 160px;
-                height: 28px;
+                @include point(width,160);
+                @include point(height,28);
                 position: absolute;
                 background-color: transparent;
                 cursor: pointer;
@@ -457,36 +473,35 @@ import api from '@/api/index'
             }
             .icon-input{
                 position: absolute;
-                right: 10px;
-                top: 6px;
+                @include point(right,10);
+                @include point(top,6);
             }
         }
         .city-panel{
             position: absolute;
-            margin-top: 3px;
-            left: 315px;
+            @include point(margin-top,3);
+            @include point(left,305);
             width: 55%;
-            height: auto;
+            @include point(height,auto);
             padding: 10px 0px 30px 15px;
             z-index: 980;
             background-color: #fff;
             border: 1px solid #ddd;
+            @include point(font-size,14);
             p{
-                font-size: 14px;
                 font-weight: bold;
             }
             .city-details{
                 width: auto;
                 min-width: 12.5%;
                 display: inline-block;
-                margin-right: 15px;
-                margin-top: 10px;
-                font-size: 14px;
+                @include point(margin-right,14);
+                @include point(margin-top,10);
             }
         }
         .el-search-input{
-            width:180px;
-            margin-right:20px;
+            @include point(width,180);
+            @include point(margin-right,20);
             position:absolute;
             right: 0px;
         }
@@ -543,6 +558,10 @@ import api from '@/api/index'
     }
     .el-select-dropdown__item.selected{
         color:#FB505F;
+    }
+    .el-pagination.is-background .el-pager li:not(.disabled).active{
+        background-color:#FB505F !important;
+        color:#fff !important;
     }
 </style>
 

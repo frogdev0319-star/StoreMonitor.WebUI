@@ -5,32 +5,47 @@
         </el-col>
         <el-col :span="24" class="el-content">
             <el-col :span="8" class="schedule-group">
-                <div class="group-title">
+                <div class="title-content">
                     <i class="iconfont icon-wenjian icontitle"></i><span class="level2">排程名称</span>
                     <el-button size="mini" @click="addSchedule" class="title-btn"><i class="el-icon-plus"></i><span>添加排程</span></el-button>
                 </div>
-                <div class="group-details group-title" v-for="(item,index) in groupList" 
-                :key="index" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
+                <div class="group-items group-title">
+                   <div v-for="(item,index) in groupList" 
+                   :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
-                    <div class="proper-flag" v-if="item.isClick"></div>
-                    <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB505F'}:{}">{{item.groupName}}</span>
-                    <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
-                    <div class="iconcontent" v-if="item.showEdit">
+                        <div class="proper-flag" v-if="item.isClick"></div>
+                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB505F'}:{}">{{item.groupName}}</span>
+                        <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
+                        <div class="iconcontent" v-if="item.showEdit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
-                            <i class="iconfont icon-bianji" 
-                            style="font-size: 20px;cursor:pointer;margin-right:10px;" 
-                                @click="editGroup(index,item)"></i>
-                            <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
-                                @click="deleteGroup(index, item)"></i>
+                                <i class="iconfont icon-bianji" 
+                                style="font-size: 20px;cursor:pointer;margin-right:10px;" 
+                                 @click="editGroup(index,item)"></i>
+                                <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
+                                  @click="deleteGroup(index, item)"></i>
+                            </div>
                         </div>
-                        <div class="iconlised" style="background-color:#FB505F" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
+                        <div class="iconcontent">
+                            <div class="iconlised" style="background-color:#FB505F" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
+                                <i class="el-icon-check"></i>
+                            </div>
+                            <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
+                                <i class="el-icon-close"></i>
+                            </div>
+                        </div>
+                    </div>
+               </div>
+               <div class="group-add" v-if="showAddGroup">
+                   <el-input size="mini" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
+                    <div class="iconcontent">
+                        <div class="iconlised" style="background-color:#FB505F" @click="confirmAddGroup">
                             <i class="el-icon-check"></i>
                         </div>
-                        <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
+                        <div class="iconrised" @click="cancelAddGroup">
                             <i class="el-icon-close"></i>
                         </div>
                     </div>
-                </div>
+               </div>
             </el-col>
             <el-col :span="16" class="schedule-content">
                 <div class="schedule-title">
@@ -43,14 +58,15 @@
                         <el-radio v-model="radioDate" label="2">按时间设置</el-radio>
                     </div>
                     <div v-if="radioDate=='1'" class="radio-date">
-                        <span class="normal-text" style="margin-right:15px;">选择月份</span>
+                        <span class="noraml-text" style="margin-right:15px;">选择月份</span>
                         <el-date-picker
                         class="el-date"
-                        v-model="modeYear" size="mini"
+                        v-model="modeMonth" size="mini"
                         type="month"
-                        placeholder="选择月">
+                        :clearable=false
+                        placeholder="选择月" @change="changeMonth">
                         </el-date-picker>
-                        <span style="margin-left:30px;margin-right:20px;">日期</span>
+                        <span class="noraml-text" style="margin-left:30px;margin-right:20px;">日期</span>
                         <el-input size="mini" style="width:200px;" v-model="modeDate"></el-input>
                         <div class="date-content">
                             <div class="date-header">
@@ -102,9 +118,9 @@
                                 size="mini"
                                 :picker-options="{
                                     format: 'HH:mm'
-                                }"
-                                placeholder="">
+                                }">
                             </el-time-picker>
+                            <span style="margin-left:10px;">时</span>
                         </div>
                         <div class="rside-deatil">
                             <span>结束时间</span>
@@ -115,9 +131,9 @@
                                 size="mini"
                                 :picker-options="{
                                     format: 'HH:mm'
-                                }"
-                                placeholder="">
+                                }">
                             </el-time-picker>
+                            <span style="margin-left:10px;">时</span>
                         </div>
                     </div>
                 </div>
@@ -135,25 +151,30 @@ export default {
                 {
                     groupName:'排程一',
                     isClick:false,
-                    isEdit:false
+                    isEdit:false,
+                    showEdit:false
                 },
                 {
                     groupName:'排程二',
                     isClick:false,
-                    isEdit:false
+                    isEdit:false,
+                    showEdit:false
                 },
                 {
                     groupName:'排程三',
                     isClick:false,
-                    isEdit:false
+                    isEdit:false,
+                    showEdit:false
                 }
             ],
             napeTitle:'',
             radioDate:'1',
-            modeYear:'',
+            modeMonth:new Date(),
             modeDate:'',
-            curYear:2018,
-            curMonth:12,
+            showAddGroup:false,
+            curYear:new Date().getFullYear(),
+            curMonth:new Date().getMonth()+1,
+            curDay:new Date().getDate(),
             weekTitles:[
                 '日','一','二','三','四','五','六'
             ],
@@ -201,14 +222,25 @@ export default {
             showWeekContent:false,
             startTime:'',
             endTime:'',
+            groupIndex:0,
         }
     },
     methods:{
         addSchedule(){
-
+            this.showAddGroup=true;
         },
         clickGroupItem(index,item){
-
+            let self=this;
+            item.isClick=true;
+            self.groupIndex=index;
+            self.curGroup=item;
+            self.napeTitle=`${item.groupName}`;
+            self.groupList.forEach((_item,_index)=>{
+                if(index!=_index){
+                    _item.isClick=false;
+                }
+            })
+            self.getNapeList(index,item);
         },
         forWard(){
             let self=this;
@@ -240,7 +272,33 @@ export default {
             self.showWeekContent=!self.showWeekContent;
         },
         changeWeekItem(item){
-
+            let self=this;
+            console.log(item);
+            let dateStr="";
+            let count=0;
+            self.weekList.forEach(item=>{
+                if(item.checked){
+                    dateStr=dateStr+item.name+',';
+                    count++;
+                }
+            })
+            console.log(dateStr);
+            if(dateStr.length!=0){
+                self.weekValue=dateStr;
+                if(count==self.weekList.length){
+                    self.weekValue='每天';
+                }
+            }
+        },
+        changeMonth(val){
+            console.log(val);
+            let self=this;
+            console.log(self.modeMonth);
+            let year=val.getFullYear();
+            let month=val.getMonth()+1;
+            self.curYear=year;
+            self.curMonth=month;
+            self.getWeekDay();
         },
         getWeekDay(){
             let self=this;
@@ -314,6 +372,26 @@ export default {
                 }
             })
         },
+        editGroup(index,item){
+            let self=this;
+            item.isEdit=true;
+            item.showEdit=false;
+            self.groupList.forEach((_item,_index)=>{
+                if(index!=_index){
+                    _item.isEdit=false;
+                }
+            })
+        },
+         cancelEditGroup(index,item){
+            item.isEdit=false;
+        },
+        confirmAddGroup(){
+
+        },
+        cancelAddGroup(){
+            let self=this;
+            self.showAddGroup=false;
+        },
     },
     mounted(){
         this.getWeekDay();
@@ -323,6 +401,26 @@ export default {
 <style lang="scss" scoped>
     @import '../../../assets/css/textstyle.css';
     $mainColor:#FB505F;
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==auto){@return auto;}
+        @else if($val==0){@return 0;}
+        @else{@return rem($val);}
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
+    .today{
+        color: lightskyblue;
+    }
+    .nape-input{
+        @include point(width,220);
+        float: left;
+        @include point(margin-left,10);
+        @include point(line-height,50);
+    }
     .opColor{
         background-color: #FB505F !important;
         color: #fff !important;
@@ -330,81 +428,159 @@ export default {
     .noramlColor{
         background-color: #fff;
     }
+    .icontitle{
+        @include point(margin-right,10);
+        font-weight: normal;
+        @include point(font-size,20);
+        @include point(margin-left,15);
+    }
+    .title-btn{
+        position: absolute;
+        @include point(right,15);
+        @include point(top,16);
+        background-color: $mainColor;
+        color: #fff;
+        @include point(width,120);
+        @include point(font-size,14);
+        span{
+            @include point( margin-left,15);
+        }
+    }
+    .iconcontent{
+        position: absolute;
+        right: 10px;
+        margin-top: 13px;
+        margin-right: 15px;
+        .iconlised{
+            float: left;
+            position: relative;
+            background-color: orange;
+            padding: 1px 6px;
+            color: #fff;
+            border-width: 1px 1px 1px 1px;
+            border-style: solid;
+            border-color: #ddd;
+            cursor: pointer;
+        }
+        .iconrised{
+            float: left;
+            position: relative;
+            padding: 1px 6px;
+            border-width: 1px 1px 1px 0px;
+            border-style: solid;
+            border-color: #ddd;
+            background-color: #fff;
+            cursor: pointer;
+        }
+    }
     .el-schedule-container{
         .el-header{
-            height: 60px;
-            line-height: 60px;
-            font-size: 18px;
+            @include point(height,60);
+            @include point(line-height,60);
+            @include point(font-size,18);
             font-weight: bold;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-        .title-btn{
-            position: absolute;
-            right: 15px;
-            margin-top: 16px;
-            background-color: $mainColor;
-            color: #fff;
-            width: 120px;
-            font-size: 14px;
-            span{
-                margin-left: 15px;
-            }
-        }
         .el-content{
             height: auto;
-            .icontitle{
-                margin-right: 10px;
-                font-weight: normal;
-                font-size: 20px;
-                margin-left: 15px;
-            }
+            @include point(min-height,650);
             .schedule-group{
                 text-align: left;
                 position: relative;
-                .group-title{
-                    height: 60px;
-                    line-height: 60px;
-                    border-bottom: 1px solid #ddd;
-                }
-                .group-details{
-                    height: 50px;
-                    line-height: 50px;
+                .title-content{
+                    @include point(height,60);
+                    @include point(line-height,60);
+                    text-align: left;
+                    position: relative;
+                    overflow: hidden;
                     border-bottom: 1px solid #ddd;
                     span{
-                        margin-left: 45px;
-                        font-size: 14px;
+                        @include point(margin-left,10);
+                        font-weight: bold;
+                    }
+                }
+                .group-items{
+                    .groupItem{
+                        @include point(height,50);
+                        position: relative;
+                        overflow: hidden;
+                        border-bottom: 1px solid #ddd;
+                        cursor: pointer;
+                        .proper-flag{
+                            height: 70%;
+                            width: 4px;
+                            position:absolute;
+                            top: 15%;
+                            background-color: $mainColor;
+                        }
+                        span{
+                            float: left;
+                            @include point(margin-left,25);
+                            @include point(line-height,50);
+                        }
+                    }
+                }
+                .group-add{
+                    @include point(margin-top,15);
+                    position: relative;
+                    overflow: hidden;
+                    @include point(height,50);
+                    .groupName-input{
+                        width: 60%;
+                        float: left;
+                        @include point(margin-left,25);
+                        @include point(line-height,50);
+                    }
+                }
+                .noraml-color{
+                    background-color: #fff;
+                }
+                .noraml-groupColor{
+                    background-color: #FAFAFA;
+                }
+                .group-add{
+                    @include point(margin-top,15);
+                    position: relative;
+                    overflow: hidden;
+                    @include point(height,50);
+                    .groupName-input{
+                        width: 60%;
+                        float: left;
+                        @include point(margin-left,25);
+                        @include point(line-height,50);
                     }
                 }
             }
+            
             .schedule-content{
                 position: relative;
                 .schedule-title{
-                    height: 60px;
-                    line-height: 60px;
+                    @include point(height,60);
+                    @include point(line-height,60);
                     text-align: left;
                     position: relative;
-                    font-size: 16px;
+                    @include point(font-size,16);
                     border-bottom: 1px solid #ddd;
                     font-weight: bold;
                     .icontitle{
-                        margin-left: 25px;
+                        @include point(margin-left,25);
                     }
                 }
                 .scheule-info{
                     .scheule-choice{
-                        height: 50px;
-                        line-height: 60px;
+                        @include point(height,50);
+                        @include point(line-height,60);
                         text-align: left;
-                        margin-left: 30px;
+                        @include point(margin-left,30);
                     }
                     .radio-date{
-                        height: 50px;
-                        line-height: 50px;
+                        @include point(height,50);
+                        @include point(line-height,50);
                         text-align: left;
-                        margin-left: 30px;
+                        @include point(margin-left,30);
                         .el-date{
-                            width: 200px;
+                            @include point(width,200);
                         }
                         .date-content{
                             width: 90%;
@@ -413,16 +589,16 @@ export default {
                             padding-right: 10%;
                             .date-header{
                                 .icon-arrow{
-                                    font-size: 30px;
+                                    @include point(font-size,30);
                                     opacity: 0.4;
                                     position: relative;
                                     top: 4px;
                                     cursor: pointer;
                                 }
                                 span{
-                                    font-size: 14px;
+                                    @include point(font-size,14);
                                     font-weight: bold;
-                                    margin: 25px;
+                                    @include point(margin,25);
                                 }
                             }
                             .date-data{
@@ -432,7 +608,7 @@ export default {
                                     display: inline-block;
                                     width: 14%;
                                     position: relative;
-                                    left: 10px;
+                                    @include point(left,10);
                                 }
                                 .date-details{
                                     .data{
@@ -441,12 +617,13 @@ export default {
                                     }
                                     span{
                                         display: block;
-                                        width: 40px;
-                                        height: 40px;
+                                        @include point(width,36);
+                                        @include point(height,36);
                                         background-color: #fff;
-                                        line-height: 40px;
+                                        @include point(line-height,36);
                                         text-align: center;
-                                        border-radius: 20px;
+                                        @include point(font-size,14);
+                                        @include point(border-radius,18);
                                     }
                                 }
                                 .schedule-tag{
@@ -472,7 +649,6 @@ export default {
                     .rside-content{
                         position: relative;
                         text-align: left;
-                          
                         .city-content{
                             display: inline-block;
                             position: relative;
@@ -502,8 +678,8 @@ export default {
                         .week-panel{
                             position: absolute;
                             margin-top: 3px;
-                            left: 104px;
-                            width: 147px;
+                            left: 102px;
+                            width: 188px;
                             height: auto;
                             z-index: 980;
                             background-color: #fff;
@@ -562,6 +738,14 @@ export default {
 }
 .el-input .el-input__inner:focus{
     border-color: #FB505F;
+}
+.el-checkbox__inner:hover{
+    border-color: #FB505F !important;
+}
+.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox__input.is-checked .el-checkbox__inner{
+    background-color: #FB505F !important;
+    border-color:#FB505F !important;
 }
 .el-time-panel__btn.confirm{
     background-color: #FB505F;

@@ -43,15 +43,16 @@
                         <el-dropdown-menu slot="dropdown" class="dropdown">
                             <el-dropdown-item style="width:120px;padding-left:20px">我的消息</el-dropdown-item>
                             <el-dropdown-item style="width:120px;padding-left:20px">设置</el-dropdown-item>
-                            <el-dropdown-item style="width:120px;padding-left:20px" @click.native="logout">退出登录</el-dropdown-item>
+                            <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-col>
             </el-col>
             <el-col class="main" :span="24" 
-            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event')?
-            {'height':(varyWindowHeight-80)+'px'}:{'height':'100%'}">
+            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path||'/bindroute')?
+            {'height':(varyWindowHeight-80)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
+                    <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <el-menu :default-active="$route.path"
                         class="el-menu-vertical-demo" 
                         text-color="#eee"
@@ -59,8 +60,8 @@
                         @open="handleopen" @close="handleclose" @select="handleselect" 
                         router :collapse="collapsed"
                     id="nav-menu"
-                    :collapse-transition="false" style="border:0px">
-                        <template v-for="(item,index) in $router.options.routes">
+                    :collapse-transition="false" style="border:0px;min-height:800px;">
+                        <template v-for="(item,index) in routerList">
                             <!--只有一个节点-->
                             <el-menu-item  v-if="item.leaf&&item.children.length>0" class="submenu-item"
                                 :key="index"  :index="item.children[0].path" 
@@ -81,17 +82,25 @@
                                 <template>
                                     <div style="width: 10px;height: 10px;background-color:white;border-radius: 50%;-moz-border-radius: 50%;
                                     -webkit-border-radius: 50%;float:left;margin-top:18px;margin-right:40px;"></div>
-                                    <span >{{collapsed?'':child.name}}</span>
+                                    <span >{{child.name}}</span>
+                                    <!--collapsed?'':-->
                                 </template>
                             </el-menu-item>
                         </el-submenu>
                         </template>
+                        
                     </el-menu> 
+                    </el-scrollbar>
                 </aside>
+            
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
-                    <el-col :class="($route.path!='/routeinspection'&&$route.path!='/storedetail'&&$route.path!='/rate')
+                    <el-col :class="($route.path!='/routeinspection'
+                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&$route.path!='/bindroute'&&$route.path!='/schedule')
                     ?'content-wrapper-all':'content-wrapper'">
-                        <router-view></router-view>
+                    <keep-alive>
+                        <router-view v-if="$route.meta.keepAlive"></router-view>
+                    </keep-alive>
+                        <router-view v-if="!$route.meta.keepAlive"></router-view>
                     </el-col>
                     <el-col :sapn='24' class="footercontent">
                         <footer class="footerInfo">
@@ -117,7 +126,8 @@ export default {
             breadList:[],
             collapsed:false,
             varyWindowWidth:window.innerWidth,
-            varyWindowHeight:window.innerHeight
+            varyWindowHeight:window.innerHeight,
+            routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length)
         }
     },
     methods:{
@@ -151,6 +161,9 @@ export default {
            let url="../../../static/webapp/index.html";
            window.open(url, '_blank');
         },
+        getRequireAuthRoute(routeList){
+
+        },
         getBread(){
             this.breadList=[];
             //this.breadList=this.$route.matched;
@@ -158,23 +171,41 @@ export default {
             const first=matched[1];
             this.breadList=matched;
         },
-        ...mapMutations({
-            setAge:'SET_AGE',
-            setName:'SET_NAME'
-        }),
-        // ...mapActions([
-        //     nameAsyn
-        // ])
+        getWindowSize(){
+            let docEl=document.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                recalc = function() {
+                    //设置根字体大小
+                    docEl.style.fontSize = (docEl.clientWidth/320)*20+'px';
+                };
+            //绑定浏览器缩放与加载时间
+            window.addEventListener(resizeEvt, recalc, false);
+            document.addEventListener('DOMContentLoaded', recalc, false);
+        },
+        fedlogout(){
+            let self=this;
+            self.$store.dispatch('FedLogOut').then(()=>{
+                self.$router.push('/login');
+            })
+        },
+        logOut(){
+            let self=this;
+            self.$store.dispatch('logout').then(()=>{
+
+            })
+        }
+
     },
     computed:{
         ...mapGetters([
-            'age',
+            'token',
             'name'
         ])
     },
     created(){
         this.headUrl='./static/img/admin.png';
         console.log(this.$route.matched);
+        //this.getWindowSize();
         this.getBread();
     },
     mounted(){
@@ -189,6 +220,18 @@ export default {
 </script>
 <style lang="scss" scoped>
     $collapseWidth:5.5%;
+    //rem(val)
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==auto){@return auto;}
+        @else if($val==0){@return 0;}
+        @else{@return rem($val);}
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
     @mixin borderColor{
         &{
             :after{
@@ -212,8 +255,8 @@ export default {
     }
     .navIcon{
         display:inline-block;
-        width:60px;
-        font-size:25px;
+        @include point(width,60);
+        @include point(font-size,25);
         color:#fff;
     }
     .container{
@@ -225,7 +268,7 @@ export default {
         padding:0;
         .header{
             width: 100%;
-            height: 60px;
+            @include point(height,60);
             z-index:999;
             position:fixed;
             background-color:#fff;
@@ -237,23 +280,23 @@ export default {
             .logo-collapse-width{
                 width:$collapseWidth;
                 width: 4.5%;
-                max-width: 65px;
+                @include point(max-width,65);
             }
             .logo-content{
                 height: 100%;
-                font-size: 20px;
+                @include point(font-size,20);
                 background-color:#232730;
-                padding-top: 10px;
+                @include point(padding-top,10);
                 position: relative;
                 @include borderColor;
                 .img-logo{
                     display:inline-block;
-                    margin-top: 8px;
+                   @include point(margin-top,8);
                 }
                 .sys-name{
                     position: relative;
-                    bottom: 10px;
-                    margin-left: 10px;
+                    @include point(bottom,10);
+                    @include point(margin-left,10);
                     font-weight: bold;
                     color: #f6f9fe;
                 }
@@ -264,7 +307,7 @@ export default {
                 border-color: rgba(238,241,146,0.3);
                 position: relative;
                 .icon-collapse{
-                    font-size: 32px;
+                    @include point(font-size,32);
                     cursor: pointer;
                     color: #99A7B2;
                 }
@@ -273,8 +316,8 @@ export default {
                 float:left;
                 .breadcrumb-item{
                     padding:20px 0px 20px 10px;
-                    font-size:16px;
-                    line-height:20px;
+                    @include point(font-size,16);
+                    @include point(line-height,20);
                     color:#4b5262 !important;
                     span{
                         color:#4b5262 !important;
@@ -284,8 +327,8 @@ export default {
             .user-content{
                 float:right;
                 .bell-content{
-                    width:60px;
-                    height:60px;
+                    @include point(width,60);
+                    @include point(height,60);
                     float:left;
                     text-align:center;
                     border-left:1px solid rgba(255,255,255,0.2);
@@ -294,24 +337,25 @@ export default {
                     top:0;
                     right:160px;
                     .el-icon-bell{
-                        font-size:1.6em;
+                        @include point(font-size,25);
                         vertical-align:middle;
                         color:#4b5262;
                     }
                     .item{
                         position:absolute;
-                        top:-5px;
-                        left:35px;
+                        @include point(top,-5);
+                        @include point(left,35);
+
                     }
                 }
                 .badoc-content{
-                    width: 60px;
-                    height: 60px;
+                    @include point(width,60);
+                    @include point(height,60);
                     text-align:center;
                     border-right:1px solid rgba(255,255,255,0.2);
                     position: absolute;
                     top:0;
-                    right:182px;
+                    @include point(right,182);
                     color:#4b5262;
                 }
             }
@@ -327,8 +371,8 @@ export default {
                 }
                 .headImg{
                     position: relative;
-                    top: 10px;
-                    margin-left: 10px;
+                    @include point(top,10);
+                    @include point(margin-left,10);
                 }
             }
         }
@@ -336,7 +380,7 @@ export default {
         .main{
             display: flex;
             position: absolute;
-            top:60px;
+            @include point(top,60);
             bottom:0px;
             background-color: #f6f9fe;
             
@@ -346,7 +390,6 @@ export default {
                 position: fixed;
                 .el-submenu{
                     position: relative;
-                    // @include borderColor;
                     &:hover{
                         background-color:#FB505F !important;
                     }
@@ -354,32 +397,30 @@ export default {
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
-                    // @include borderColor;
                 }
             }
             .content-wrapper-all{
                 height: 93%;
-                margin: 15px;
+                @include point(margin,15);
                 border:0.5px solid #e3e9f4;
                 width: 97.5%;
                 background: #fff;
             }
             .content-wrapper{
                 height: auto;
-                margin: 15px;
+                @include point(margin,15);
                 border:0.5px solid #e3e9f4;
                 width: 97.5%;
                 background: #fff;
             }
             .footercontent{
-                // height:13%;
                 padding:0px 0 10px 60px;
                 color:#777;
-                font-size:14px;
+                @include point(font-size,14);
             }
         }
         .el-submenu:hover{
-             background-color:#FB505F !important;
+            background-color:#FB505F !important;
         }
         .el-menu-item:hover{
             background-color:#FB505F !important;
@@ -400,7 +441,7 @@ export default {
         }
         .aside-collapse-width{
             width:$collapseWidth;
-            max-width: 65px;
+           @include point(max-width,65);
             width: 4.5%;
             overflow: hidden !important;
             background-color: #232730;
@@ -414,4 +455,10 @@ export default {
             width:83.1%;
         }
     }
+</style>
+<style>
+
+#el-menuscrollbar .el-scrollbar__wrap {
+  overflow-x: hidden;
+}
 </style>

@@ -21,21 +21,24 @@
                        <el-button class="rute-btn" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span>添加巡检类别</span></el-button>
                    </div>
                </div>
-               <div class="group-items group-title">
+               <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+               <div class="group-items group-title" :style="{'max-height':varyWindowHeight*0.62+'px'}">
                    <div v-for="(item,index) in groupList" 
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
-                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB505F'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
-                        <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
+                            <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB505F'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
+                        <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input input-details" v-if="item.isEdit"></el-input>
                         <div class="iconcontent" v-if="item.showEdit">
-                             <div class="nape-items-handle" v-if="!item.isEdit">
+                            <div class="nape-items-handle" v-if="!item.isEdit">
                                 <i class="iconfont icon-bianji" 
                                 style="font-size: 20px;cursor:pointer;margin-right:10px;" 
                                  @click="editGroup(index,item)"></i>
                                 <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
                                   @click="deleteGroup(index, item)"></i>
                             </div>
+                        </div>
+                        <div class="iconcontent">
                             <div class="iconlised" style="background-color:#FB505F" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
                                 <i class="el-icon-check"></i>
                             </div>
@@ -45,8 +48,9 @@
                         </div>
                     </div>
                </div>
+               </el-scrollbar>
                <div class="group-add" v-if="showAddGroup">
-                   <el-input size="mini" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
+                   <el-input  size="mini" maxlength="10" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
                     <div class="iconcontent">
                         <div class="iconlised" style="background-color:#FB505F" @click="confirmAddGroup">
                             <i class="el-icon-check"></i>
@@ -61,13 +65,14 @@
        <el-col :span="17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
-                   <span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
+                    <span  v-if="groupList.length!=0" class="item-title level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
                     <div class="btn-content" v-if="groupList.length!=0">
                         <el-button class="rute-btn" size="mini" @click="addNape"><i class="el-icon-plus"></i><span>新增巡检项</span></el-button>
                         <el-button class="rute-btn" size="mini" @click="deleteNape"><i class="el-icon-close"></i><span>删除巡检项</span></el-button>
                     </div>
                </div>
-               <div class="nape-items">
+               <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+               <div class="nape-items" :style="{'max-height':varyWindowHeight*0.62+'px'}">
                    <div class="nape-items-title tabTitle" v-if="napeList.length!=0">
                        <div class="nape-name-title">
                            <span>巡检名称</span>
@@ -85,11 +90,11 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input size="mini" v-model="item.napeName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                            <el-input  size="mini" v-model="item.napeName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input size="mini" v-model="item.napeDep" class="nape-input input-details" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
+                           <el-input  size="mini" v-model="item.napeDep" class="nape-input input-details" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#FB505F" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -107,6 +112,7 @@
                     <el-dialog title='确认删除'
                     :visible.sync="showDeleteItem" v-if="showDeleteItem"
                     :append-to-body='true'
+                    :close-on-click-modal="false"
                     width="28%"
                     top="35vh"
                     left="40vh">
@@ -127,6 +133,7 @@
                      <el-dialog title='确认删除'
                     :visible.sync="showDeleteGroup" v-if="showDeleteGroup"
                     :append-to-body='true'
+                    :close-on-click-modal="false"
                     width="28%"
                     top="35vh"
                     left="40vh">
@@ -160,8 +167,8 @@
                             </div>
                        </div>
                    </div>
-
                </div>
+               </el-scrollbar>
            </div>
        </el-col>
     </el-row>
@@ -170,6 +177,7 @@
 <script>
 import api from '@/api/index'
 import util from '@/common/util'
+import {validateInput} from '@/common/validate'
 export default {
     name:'AddRuteInspect',
     data(){
@@ -177,10 +185,12 @@ export default {
             groupTitle:'巡检类别',
             tabName:'',
             groupList:[],
+            groupNameTemp:'',  //临时存放
             groupNameInput:'',
             napeTitle:'',
             showEditTab:false,
             napeList:[],
+            napeDepTemp:'', //临时存放
             showAddGroup:false,
             showAddNape:false,
             newNapeChecked:false,
@@ -191,11 +201,17 @@ export default {
             showDeleteItem:false,
             showDeleteGroup:false,
             deleteItemFlag:'',
-
             curItemId:'',
+            varyWindowHeight:window.innerHeight
         }
     },
     methods:{
+        // check(strVal){
+        //     console.log(strVal);
+        //     if(validateInput(strVal)){
+        //         alert('含有非法字符！');
+        //     }
+        // },
         editTabName(){
             let self=this;
             self.showEditTab=true;
@@ -225,6 +241,14 @@ export default {
         confirmEditGroup(index,item){
             let self=this;
             let temp=[];
+            if(item.groupName==null||item.groupName.length==0){
+                self.notify('类别名称不能为空！','warning',3000);
+                return false;
+            }
+            if(validateInput(item.groupName)){
+                self.notify('当前输入含有非法字符！','warning',3000);
+                return false;
+            }
             let obj={
                 id:item.id,
                 name:item.groupName,
@@ -248,7 +272,9 @@ export default {
             })
         },
         cancelEditGroup(index,item){
+            let self=this;
             item.isEdit=false;
+            item.groupName=self.groupNameTemp;
         },
         /**
          * Add group functions
@@ -264,6 +290,14 @@ export default {
         confirmAddGroup(){
             let self=this;
             let temp=[];
+            if(self.groupNameInput.trim().length==0){
+                self.notify('类别名称不能为空！','warning',3000);
+                return false;
+            }
+            if(validateInput(self.groupNameInput)){
+                self.notify('当前输入含有非法字符！','warning',3000);
+                return false;
+            }
             let obj={
                 name:self.groupNameInput,
                 mode:0,
@@ -316,6 +350,7 @@ export default {
             let self=this;
             item.isEdit=true;
             item.showEdit=false;
+            self.groupNameTemp=item.groupName;
             self.groupList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isEdit=false;
@@ -324,7 +359,7 @@ export default {
         },
         deleteItemData(idArr){
             let self=this;
-            let params={"itemIDs":idArr};
+            let params={"itemIds":idArr};
             return new Promise((resolve,reject)=>{
                 api.deleteInspectItem(params).then(res=>{
                     let errMsg=res.data.errMsg;
@@ -335,7 +370,7 @@ export default {
         },
         deleteGroupData(idArr){
             let self=this;
-            let params={"groupIDs":idArr};
+            let params={"groupIds":idArr};
             return new Promise((resolve,reject)=>{
                 api.deleteInspectGroup(params).then(res=>{
                     let errMsg=res.data.errMsg;
@@ -454,6 +489,14 @@ export default {
         confirmeditNape(index,item){
             let self=this;
             let temp=[];
+            if(item.napeName.trim().length==0){
+                self.notify('巡检项名称不能为空！','warning',3000);
+                return false;
+            }
+            if(validateInput(item.napeName)||validateInput(item.napeDep)){
+                self.notify('当前输入含有非法字符！','warning',3000);
+                return false;
+            }
             let obj={
                 id:item.id,
                 subject:item.napeName,
@@ -479,11 +522,21 @@ export default {
             })
         },
         cancelEditNape(index,item){
+            let self=this;
             item.isClick=false;
+            item.napeDep=self.napeDepTemp;
         },
         confirmaddNape(){
             let self=this;
             let temp=[];
+            if(self.newNapeName.trim().length==0){
+                self.notify('巡检项名称不能为空！','warning',3000);
+                return false;
+            }
+            if(validateInput(self.newNapeName)||validateInput(newNapeDep)){
+                self.notify('当前输入含有非法字符！','warning',3000);
+                return false;
+            }
             let objItem={
                 subject:self.newNapeName.trim(),
                 description:self.newNapeDep.trim(),
@@ -504,7 +557,6 @@ export default {
                 let codeMsg=res.data.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     let obj={
-                        // id:res.data.data[0],
                         napeName:self.newNapeName,
                         napeNameShow:`${self.napeList.length+1}，${self.newNapeName}`,
                         napeDep:self.newNapeDep,
@@ -530,6 +582,7 @@ export default {
         },
         handleEdit(index,item){
             let self=this;
+            self.napeDepTemp=item.napeDep;
             item.isClick=true;
             self.showAddNape=false;
             self.napeList.forEach((_item,_index)=>{
@@ -656,7 +709,6 @@ $itemHeight:50px;
                 width: 220px;
                 float: left;
                 margin-left: 5px;
-                line-height: 60px;
             }
         }
         .rute-btn{
@@ -697,17 +749,26 @@ $itemHeight:50px;
             text-align: left;
             position: relative;
             overflow: hidden;
-            padding-left: 15px;
-            padding-top: 4px;
             border-bottom: 1px solid #ddd;
             span{
                 margin-left: 10px;
                 font-weight: bold;
+                
+            }
+            .item-title{
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                display: inline-block;
+                word-wrap: break-word;
+                width: 60%;
+                cursor: pointer;
             }
             .icontitle{
-                margin-right: 15px;
+                margin-right: 10px;
                 font-weight: normal;
                 font-size: 20px;
+                margin-left: 15px;
             }
             .btn-content{
                 width: auto;
@@ -721,12 +782,14 @@ $itemHeight:50px;
             min-height: 90%;
             background-color: #FAFAFA;
             .group-items{
+                // max-height: 500px;
                 .groupItem{
                     height: $itemHeight;
                     position: relative;
                     overflow: hidden;
                     border-bottom: 1px solid #ddd;
                     cursor: pointer;
+                    text-align: left;
                     .proper-flag{
                         height: 70%;
                         width: 4px;
@@ -734,17 +797,28 @@ $itemHeight:50px;
                         top: 15%;
                         background-color: $mainColor;
                     }
+                    .group-input{
+                        max-width: 60%;
+                        float: left;
+                        margin-left: 20px;
+                        line-height: 50px;
+                    }
                     span{
                         float: left;
                         margin-left: 25px;
                         line-height: 50px;
-                        // font-size: 14px;
-                        // font-weight: bold;
+                        width: 70%;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        white-space: nowrap;
+                    }
+                    &:last-child{
+                        margin-bottom: 15px;
                     }
                 }
             }
             .group-add{
-                margin-top: 15px;
+                 margin-top: 5px;
                 position: relative;
                 overflow: hidden;
                 height: 50px;
@@ -798,6 +872,9 @@ $itemHeight:50px;
                 margin: 0 0 0 3%;
                 padding-left: 1%;
                 cursor: pointer;
+                &:last-child{
+                    margin-bottom: 15px;
+                }
                 .nape-input{
                     width: 220px;
                     float: left;
@@ -868,10 +945,13 @@ $itemHeight:50px;
     background-color: #FB505F !important;
     border-color:#FB505F !important;
 }
-.el-dialog{
+/* .el-dialog{
     margin-left:85vh !important;
-}
+} */
 .el-dialog__body{
     padding: 0px !important;
+}
+#el-menuscrollbar .el-scrollbar__wrap {
+  overflow-x: hidden;
 }
 </style>
