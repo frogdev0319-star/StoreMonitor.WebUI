@@ -41,7 +41,6 @@
                        
                         <a href="javascript:;" class="a-upload" @click="checkBeforeImport">选择文件
                             <!-- <div class="file-sliver"  v-if="hideUpload"> -->
-                            
                                 <input  id="upload" type="file" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                             <!-- </div> -->
                         </a>
@@ -66,6 +65,7 @@
 <script>
 import RouteDetail from '@/views/setting/routeInspection/RouteDetail'
 import api from '@/api/index'
+import {inpectRESTful} from '@/api/index'
 export default {
     name:'RouteInspection',
     components:{
@@ -145,14 +145,14 @@ export default {
         },
         getDownLoadURL(){
             let self=this;
-            self.downLoadSrc=api.getBaseURL();
+            self.downLoadSrc=inpectRESTful.getTemplate();
         },
         getNapeList(){
             let self=this;
             return new Promise((resolve,reject)=>{
-                api.getInspectItemList().then(res=>{
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
+                inpectRESTful.getInspectItemList().then(res=>{
+                    let code=res.errMsg;
+                    let data=res.data;
                     if(code!=null&&code=='Success'){
                         self.allData=data;
                         console.log(res.data);
@@ -160,11 +160,10 @@ export default {
                     resolve(data);
                 }).catch(err => {
                     console.log(err.message);
-                    self.notify('服务器异常!','error',3000);
+                    // self.notify('服务器异常!','error',3000);
                 })
                         
             })
-           
         },
         async getTagList(){
             let self=this;
@@ -227,35 +226,25 @@ export default {
             }
             self.getBindStoreList();
         },
-        deleteItems(itemIds){
-            let self=this;
-            if(itemIds.length==0){
-                return false;
-            }
+        deleteItem(itemIdList){
+            let params={
+                itemIds:itemIdList
+            };
             return new Promise((resolve,reject)=>{
-                let params={
-                    "itemIds":itemIds
-                }
-                api.deleteInspectItem(params).then(res=>{
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
-                    resolve(data);
+                inpectRESTful.deleteInspectItem(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
                 })
             })
         },
-        deleteGroups(groupIds){
-            let self=this;
-            if(groupIds.length==0){
-                return false;
-            }
+        deleteGroup(groupIdList){
+            let params={
+                groupIds:groupIdList
+            };
             return new Promise((resolve,reject)=>{
-                let params={
-                    "groupIds":groupIds
-                }
-                api.deleteInspectGroup(params).then(res=>{
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
-                    resolve(data);
+                inpectRESTful.deleteInspectGroup(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
                 })
             })
         },
@@ -267,7 +256,7 @@ export default {
                 groupIds:groupIdList
             };
             return new Promise((resolve,reject)=>{
-                api.deleteInspect(params1,params2).then((res)=>{
+                inpectRESTful.deleteInspect(params1,params2).then((res)=>{
                     console.log(res);
                     resolve(res);
                 })
@@ -296,39 +285,8 @@ export default {
                     itemIdList.push(_item.id);
                 })
             })
-            let retItem=await self.deleteAllData(itemIdList,groupIdList);
-        },
-        addGroup(groupObj){
-            let self=this;
-            let params={
-                "groups": groupObj
-            };
-            return new Promise((resolve,reject)=>{
-                api.addInspectGroup(params).then(res=>{
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
-                    if(code!=null&&code=='Success'){
-                        console.log(res.data);
-                    }
-                    resolve(data);
-                })
-            })
-        },
-        addItem(itemObj){
-            let self=this;
-            let params={
-                "request": itemObj
-            }
-            return new Promise((resolve,reject)=>{
-                api.addInspectItem(params).then(res=>{
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
-                    if(code!=null&&code=='Success'){
-                        console.log(res.data);
-                    }
-                    resolve(data);
-                })
-            })
+            //let retItem=await self.deleteAllData(itemIdList,groupIdList);
+
         },
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
@@ -415,10 +373,10 @@ export default {
             let self=this;
             let tagName=self.elTableData[Number(self.activeName)].label;
             let params={tagName:tagName};
-            api.getInspectBindList(params).then(res=>{
+            inpectRESTful.getInspectBindList(params).then(res=>{
                 console.log(res.data.errMsg);
-                if(res.data.errMsg!=undefined&&res.data.errMsg=='Success'){
-                    let data=res.data.data;
+                if(res.errMsg!=undefined&&res.errMsg=='Success'){
+                    let data=res.data;
                     self.storeNum=data.length;
                 }
             })
@@ -490,9 +448,9 @@ export default {
                     let params={
                         "groups": tempGroups
                     };
-                    api.addInspectGroup(params).then(res=>{
-                        let code=res.data.errMsg;
-                        let data=res.data.data;
+                    inpectRESTful.addInspectGroup(params).then(res=>{
+                        let code=res.errMsg;
+                        let data=res.data;
                         if(code!=null&&code=='Success'){
                             console.log(res.data);
                             let tempItems=[];
@@ -513,9 +471,9 @@ export default {
                             let params={
                                 "request": tempItems
                             };
-                            api.addInspectItem(params).then(res=>{
-                                let code=res.data.errMsg;
-                                let data=res.data.data;
+                            inpectRESTful.addInspectItem(params).then(res=>{
+                                let code=res.errMsg;
+                                let data=res.data;
                                 if(code!=null&&code=='Success'){
                                     console.log(res.data);
                                     _this.notify('模板导入成功!','success',3000);

@@ -1,4 +1,4 @@
-let valid_map=['admin','jingbin','changzhu.wu@advantech.com.cn'];
+let valid_map=['admin','jingbin','changzhu.wu@advantech.com.cn','axazhang.bo@advantech.com.cn'];
 export function isvalidUsername(str){
     return valid_map.indexOf(str.trim())>=0;
 }

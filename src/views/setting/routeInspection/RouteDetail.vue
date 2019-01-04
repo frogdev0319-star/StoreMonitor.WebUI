@@ -144,7 +144,7 @@
 </template>
 <script>
 import api from '@/api/index'
-
+import {inpectRESTful} from '@/api/index'
 export default {
     name:'RouteDetail',
     props:{
@@ -277,9 +277,9 @@ export default {
         getNapeList(){
             let self=this;
             return new Promise((resolve,reject)=>{
-                api.getInspectItemList().then(res=>{
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
+                inpectRESTful.getInspectItemList().then(res=>{
+                    let code=res.errMsg;
+                    let data=res.data;
                     if(code!=null&&code=='Success'){
                         self.allData=data;
                         console.log(res.data);
@@ -367,26 +367,39 @@ export default {
             let paramsGroup={
                 "groupIds":arrGroup
             }
-            api.deleteInspectItem(params).then(res=>{
-                console.log(res.data)
-                let code=res.data.errMsg;
-                if(code!=undefined&&code=='Success'){
-                    if(arrGroup.length!=0){
-                        api.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                            if(resGroup.data.errMsg=='Success'){
-                                self.afterDeleteNape();
-                            }
-                        })
+            if(arrItem.length!=0){
+                inpectRESTful.deleteInspectItem(params).then(res=>{
+                    console.log(res.data)
+                    let code=res.errMsg;
+                    if(code!=undefined&&code=='Success'){
+                        if(arrGroup.length!=0){
+                            inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                                if(resGroup.errMsg=='Success'){
+                                    self.afterDeleteNape();
+                                }
+                            })
+                        }
+                        else{
+                            self.afterDeleteNape();
+                        }
                     }
                     else{
+                        self.notify('当前巡检项删除失败!','warning',3000);
+                        return false;
+                    }
+                })
+            }
+            else{
+                inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                    if(resGroup.errMsg=='Success'){
                         self.afterDeleteNape();
                     }
-                }
-                else{
-                    self.notify('当前巡检项删除失败!','warning',3000);
-                    return false;
-                }
-            })
+                    else{
+                        self.notify('当前巡检项删除失败!','warning',3000);
+                        return false;
+                    }
+                })
+            }
         },
         handleDelete(index,row){
             console.log(index);
@@ -402,9 +415,9 @@ export default {
             let params={
                 "itemIds":self.curDeleteId
             };
-            api.deleteInspectItem(params).then(res=>{
+            inpectRESTful.deleteInspectItem(params).then(res=>{
                 console.log(res.data)
-                let code=res.data.errMsg;
+                let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
                     self.notify('当前巡检项已删除成功!','success',3000);
                     self.showSingleDeleteContent=false;
@@ -506,9 +519,9 @@ export default {
                     let params={
                         "groups": tempGroups
                     };
-                    api.addInspectGroup(params).then(res=>{
-                        let code=res.data.errMsg;
-                        let data=res.data.data;
+                    inpectRESTful.addInspectGroup(params).then(res=>{
+                        let code=res.errMsg;
+                        let data=res.data;
                         if(code!=null&&code=='Success'){
                             console.log(res.data);
                             let tempItems=[];
@@ -529,9 +542,9 @@ export default {
                             let params={
                                 "request": tempItems
                             };
-                            api.addInspectItem(params).then(res=>{
-                                let code=res.data.errMsg;
-                                let data=res.data.data;
+                            inpectRESTful.addInspectItem(params).then(res=>{
+                                let code=res.errMsg;
+                                let data=res.data;
                                 if(code!=null&&code=='Success'){
                                     console.log(res.data);
                                     _this.notify('模板导入成功!','success',3000);

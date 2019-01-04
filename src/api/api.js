@@ -4,8 +4,8 @@ import axiosFile from 'axios'
 import Nape from '@/api/ApiPath'
 
 //let base='http://'+window.location.host;
-let base ="http://172.21.81.160:8085";
-//let base ='http://172.21.81.206:8085';
+//let base ="http://172.21.84.62:8085";
+let base ='http://172.21.81.206:8085';
 let itempath='/storemonitor/api/v1.0'
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 export const getBaseURL=()=>{
@@ -122,24 +122,21 @@ export const deleteDevice=params=>{
 export const updateDevice=params=>{
     return axios.post(`${base}${itempath}/device/update`,params);
 }
-export const deleteNVRandChannel=(params1,params2)=>{
-    return axios.all([
-        axios.post(`${base}${itempath}/device/delete`,params1),
-        axios.post(`${base}${itempath}/device/nvr/delete`,params2)
-    ]);
+export const deleteNVRandChannel=async (params1,params2)=>{
+    const item=await axios.post(`${base}${itempath}/device/delete`,params1);
+    const group=await axios.post(`${base}${itempath}/device/nvr/delete`,params2);
+    return [item,group]
 }
+
 export const addNVRandChannel=(params1,params2)=>{
     return axios.all([
         axios.post(`${base}${itempath}/device/nvr/add`,params1),
         axios.post(`${base}${itempath}/device/add`,params2)
     ]);
 }
-export const importExcel=(params)=>{
-    return axiosFile.post(`${base}${itempath}/device/add`,params);
-}
 
 export const getEventList=(params)=>{
-    return axiosFile.post(`${base}${itempath}/event/list`,params);
+    return axios.post(`${base}${itempath}/event/list`,params);
 }
 export const addEvent=params=>{
     return axios.post(`${base}${itempath}/event/add`,params);

@@ -1,5 +1,6 @@
 import request from '@/common/request'
 
+//account RESTful 
 export function loginByUsername(data){
     return request({
         url:'/login',
@@ -15,10 +16,9 @@ export function logout(){
     })
 }
 
-export function getUserInfo(token){
+export function getUserInfo(){
     return request({
-        url:'/user/info',
-        method:'get',
-        params:{token}
+        url:'/user/list',
+        method:'get'
     })
 }

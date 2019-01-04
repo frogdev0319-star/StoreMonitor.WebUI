@@ -69,8 +69,8 @@ export default {
                 loginBtnTitle:'Login',
             },
             loginForm:{
-                username:'changzhu.wu@advantech.com.cn',
-                password:'lwcBONKK0ewH'
+                username:'axazhang.bo@advantech.com.cn',
+                password:'abc123'
             },
             loginRules:{
                 username:[{required:true,trigger:'blur',validator:validateUsername}],

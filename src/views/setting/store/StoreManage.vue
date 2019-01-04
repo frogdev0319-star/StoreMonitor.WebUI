@@ -83,6 +83,7 @@
 
 <script>
 import api from '@/api/index'
+import {checkOutInspectItem} from '@/api/inspect'
     export default {
         name: "StoreManage",
         data(){
@@ -237,7 +238,7 @@ import api from '@/api/index'
                     storeId:row.storeId,
                     mode:0
                 };
-                api.checkOutInspectItem(params).then(res=>{
+                checkOutInspectItem(params).then(res=>{
                     console.log(res);
                     let data=res.data.data;
                     let count=0;
@@ -313,7 +314,7 @@ import api from '@/api/index'
                     storeId:row.storeId,
                     mode:0
                 };
-                api.checkOutInspectItem(params).then(res=>{
+                checkOutInspectItem(params).then(res=>{
                     let data=res.data.data;
                     if(res.data.errMsg=='Success'&&data.length!=0){
                         sessionStorage.setItem('STORE_ROW',JSON.stringify(row));

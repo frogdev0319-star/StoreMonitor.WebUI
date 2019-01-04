@@ -28,10 +28,19 @@
                         <span>{{item.cityName}}</span>
                     </div>
                 </div>
+                <el-input
+                    size="small"
+                    class="el-search-input"
+                    placeholder="请输入关键词搜索门店"
+                    v-model="serachVale" @keyup.enter.native="searchStoreInput">
+                    <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo" 
+                    style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                </el-input>
             </div>
+             <hr class="el-header-hr"/>
             <p class="el-header-title">请选择{{tabName}}表，需要关联的门店</p>
             <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>当前账户共有{{storeCount}}家门店</p>
-            <hr class="el-header-hr"/>
+           
         </div>
         <div class="el-bind-content" :style="{'min-height':varyWindowWidth*0.60+'px'}">
             <div class="el-all-checkbox">
@@ -60,6 +69,8 @@
 </template>
 <script>
 import api from '@/api/index'
+import {getStoreList} from '@/api/store'
+import {applyItemInspectItem,getInspectBindList} from '@/api/inspect'
 export default {
     name:'BindRuteInspect',
     data(){
@@ -79,7 +90,8 @@ export default {
             showCityContent:false,
             showDrap:true,
             storeData:[],
-            napeIdList:[]
+            napeIdList:[],
+            serachVale:''
         }
     },
     methods:{
@@ -120,6 +132,10 @@ export default {
             self.isChecked=flag;
             self.citys=str;
             self.multeCityList=temp;
+        },
+        searchStoreInput(){
+            let self=this;
+
         },
         searchStore(){
             let self=this;
@@ -214,11 +230,16 @@ export default {
         getStoreData(){
             let self=this;
             let params={};
+            params.like={
+                'name':self.serachVale,
+                'city':self.serachVale,
+                'province':self.serachVale
+            };
             return new Promise((resolve,reject)=>{
-                api.getStoreList().then(res=>{
+                getStoreList(params).then(res=>{
                     console.log(res);
-                    let errMsg=res.data.errMsg;
-                    let data=res.data.data.content;
+                    let errMsg=res.errMsg;
+                    let data=res.data.content;
                     console.log(data);
                     resolve(data);
                 })
@@ -350,9 +371,9 @@ export default {
             let params={
                 storeList:temp
             }
-            api.applyItemInspectItem(params).then(res=>{
+            applyItemInspectItem(params).then(res=>{
                 console.log(res);
-                let errMsg=res.data.errMsg;
+                let errMsg=res.errMsg;
                 if(errMsg!=undefined&&errMsg=='Success'){
                     self.notify('当前门店项成功绑定！','success',3000);
                 }
@@ -367,10 +388,10 @@ export default {
             let tagName=self.tabName;
             let params={tagName:tagName};
             return new Promise((resolve,reject)=>{
-                api.getInspectBindList(params).then(res=>{
-                    console.log(res.data.errMsg);
-                    if(res.data.errMsg!=undefined&&res.data.errMsg=='Success'){
-                        let data=res.data.data;
+                getInspectBindList(params).then(res=>{
+                    console.log(res.errMsg);
+                    if(res.errMsg!=undefined&&res.errMsg=='Success'){
+                        let data=res.data;
                         resolve(data);
                     }
                 })
@@ -411,6 +432,12 @@ export default {
     text-align: left;
     font-family: 'Microsoft YaHei';
     font-size: 14px;
+}
+.el-search-input{
+    width: 200px;
+    margin-right: 20px;
+    position:absolute;
+    right: 0px;
 }
 .el-bind-device{
     .seacrh-content{
@@ -480,10 +507,10 @@ export default {
     .el-header-title{
         font-size: 18px;
         font-weight: bold;
-        margin-top: 30px;
         margin-left: 30px;
         position: relative;
         top: 5px;
+        display: inline;
     }
     .el-header-hr{
         margin-left: 30px;
@@ -498,6 +525,10 @@ export default {
         margin-right: 30px;
         font-size: 13px;
         color: #4b5262;
+        display: inline;
+        position: absolute;
+        right: 10px;
+        margin-top: 10px;
     }
     .el-bind-content{
         margin-left: 30px;
@@ -598,5 +629,11 @@ export default {
 }
 .el-select-dropdown__item.selected{
     color:#FB505F !important;
+}
+</style>
+<style scoped>
+.el-input--small >>>.el-input__inner{
+    background: #F4F5F9 !important;
+    border-radius: 15px !important;
 }
 </style>
