@@ -14,7 +14,8 @@ const user={
         roles:[],
         setting:{
             articlePlatform:[]
-        }
+        },
+        changeColor:false
     },
     mutations:{
         SET_CODE: (state, code) => {

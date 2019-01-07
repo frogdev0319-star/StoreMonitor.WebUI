@@ -6,8 +6,16 @@
                 <el-button @click="submitData" class="sub-btn" size="mini">提交</el-button>
             </div>
             <div class="store-info">
-                <span><strong style="margin-right:20px;">负责人</strong>{{storeLinder}}</span>
-                <span><strong style="margin-right:20px;">联系方式</strong>{{phone}}</span>
+                <span style="margin-right:20px;"><strong>负责人</strong></span>
+                <el-select v-model="curPerson" placeholder="请选择" size="mini" class="el-schedule" @change="changePerson">
+                    <el-option
+                    v-for="item in personList"
+                    :key="item.userId"
+                    :label="item.userName"
+                    :value="item.userId">
+                    </el-option>
+                </el-select>
+                <strong style="margin-right:20px;">联系方式</strong><span style="min-width:120px;">{{phone}}</span>
                 <span style="margin-right:20px;"><strong>巡检排程</strong></span>
                 <el-select v-model="schedule" placeholder="请选择" size="mini" class="el-schedule">
                     <el-option
@@ -55,6 +63,9 @@
 
 <script>
 import api from '@/api/index'
+import {getUserInfo} from '@/api/login'
+import {getDeviceList} from '@/api/device'
+import {checkOutInspectItem,bindInspectItem} from '@/api/inspect'
 export default {
     name:'EditStoreVue',
     data(){
@@ -63,7 +74,7 @@ export default {
             storeTitle:'',
             store:{},
             storeLinder:'王三洋',
-            phone:'17686840503',
+            phone:'',
             schedule:'',
             scheduleList:[
                 {
@@ -77,6 +88,8 @@ export default {
                     value:'排程二'
                 },
             ],
+            personList:[],
+            curPerson:'',
             scheduleData:[],
             alleList:[]
         }
@@ -89,14 +102,15 @@ export default {
         self.storeTitle=self.store.storename;
         self.getNapeByStore(storeId);
         self.getChannelByStore(storeId);
+        self.getUserList();
     },
     methods:{
         getChannelByStore(storeId){
             let self=this;
             let params={storeId:storeId};
-            api.getDeviceByStore(params).then(res=>{
+            getDeviceList(params).then(res=>{
                 console.log(res);
-                let data=res.data.data;
+                let data=res.data;
                 let temp=[];
                 if(data.length!=0){
                     data.forEach(item=>{
@@ -121,26 +135,17 @@ export default {
                 })
             })
         },
-        getDeviceList(deviceId){
-            let params={
-                storeId:self.store.storeId
-            }
-            api.getDeviceByStore(params).then(res=>{
-                console.log(res);
-            })
-        },
         getNapeByStore(storeId){
             let self=this;
             let params={
                 storeId:storeId,
                 mode:0
             }
-            api.checkOutInspectItem(params).then(res=>{
+            checkOutInspectItem(params).then(res=>{
                 console.log(res);
-                let data=res.data.data;
+                let data=res.data;
                 let temp=[];
                 if(data.length!=0){
-                    
                     data.forEach(item=>{
                         let obj={};
                         obj.id=item.groupId;
@@ -162,6 +167,20 @@ export default {
 
                 }
                 self.scheduleData=temp;
+            })
+        },
+        changePerson(val){
+            console.log(val);
+            let self=this;
+            self.phone=val.phoneNumber;
+        },
+        getUserList(){
+            let self=this;
+            getUserInfo().then(res=>{
+                console.log(res);
+                self.personList=res.data;
+                self.curPerson=self.personList[0].userName;
+                self.phone=self.personList[0].phoneNumber;
             })
         },
         submitData(){
@@ -191,9 +210,9 @@ export default {
             let params={
                 items:temp
             };
-            api.bindInspectItem(params).then(res=>{
+            bindInspectItem(params).then(res=>{
                 console.log(res);
-                if(res.data.errMsg=='Success'){
+                if(res.errMsg=='Success'){
                     self.notify('通道绑定成功！','success',3000);
                 }
                 else{
@@ -251,6 +270,7 @@ export default {
                 }
                 .el-schedule{
                     width: 140px;
+                    margin-right: 25px;
                 }
             }
             .store-handle{

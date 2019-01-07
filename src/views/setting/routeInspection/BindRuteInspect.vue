@@ -21,8 +21,11 @@
                  <i :class="showDrap?'el-icon-arrow-down':'el-icon-arrow-up'" class='icon-input'></i>
                 </div>
                 <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
-                <div class="city-panel" v-if="showCityContent"> 
-                    <p :style="isChecked?{}:{'color':'#FB505F'}">全部</p>
+                <div class="city-panel" v-if="showCityContent">
+                    
+                    <p :style="isChecked?{}:{'color':'#FB505F'}">
+                        <el-checkbox v-model="allCityChecked" @change="choiceAllCity"
+                        style="margin-right:5px;"></el-checkbox>全部</p>
                     <div class="city-details" v-for="(item,index) in cityList" :key="index">
                         <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
                         <span>{{item.cityName}}</span>
@@ -31,6 +34,7 @@
                 <el-input
                     size="small"
                     class="el-search-input"
+                    :clearable=true
                     placeholder="请输入关键词搜索门店"
                     v-model="serachVale" @keyup.enter.native="searchStoreInput">
                     <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo" 
@@ -39,11 +43,11 @@
             </div>
              <hr class="el-header-hr"/>
             <p class="el-header-title">请选择{{tabName}}表，需要关联的门店</p>
-            <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>当前账户共有{{storeCount}}家门店</p>
+            <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}表已绑定{{storeCount}}家门店</p>
            
         </div>
         <div class="el-bind-content" :style="{'min-height':varyWindowWidth*0.60+'px'}">
-            <div class="el-all-checkbox">
+            <div class="el-all-checkbox" v-if="storeList.length!=0">
                 <el-checkbox  v-model="allData" @change="choiceAll"></el-checkbox>
                 <span class="all-device-title">关联至所有门店</span>
             </div>
@@ -62,7 +66,7 @@
         </div>
         <div class="el-bind-footer">
             <div class="el-btn-content">
-                <el-button class="btn" size="mini"  @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>确认绑定</el-button>
+                <el-button :disabled="storeList.length==0" class="btn" size="mini"  @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>确认绑定</el-button>
             </div>
         </div>
     </div>
@@ -70,7 +74,7 @@
 <script>
 import api from '@/api/index'
 import {getStoreList} from '@/api/store'
-import {applyItemInspectItem,getInspectBindList} from '@/api/inspect'
+import {applyItemInspectItem,UnapplyInspectItem,getInspectBindList} from '@/api/inspect'
 export default {
     name:'BindRuteInspect',
     data(){
@@ -86,6 +90,7 @@ export default {
             multeCityList:[],
             citys:'',
             isChecked:false,
+            allCityChecked:false,
             cityList:[],
             showCityContent:false,
             showDrap:true,
@@ -102,6 +107,8 @@ export default {
             self.getCityByProvince(val);
             self.citys='';
             self.multeCityList.length=0;
+            self.serachVale='';
+            self.allCityChecked=false;
         },
          clearCitys(){
             let self=this;
@@ -115,6 +122,12 @@ export default {
             }
             self.showCityContent=!self.showCityContent;
             self.showDrap=!self.showDrap;
+        },
+        choiceAllCity(val){
+            let self=this;
+            self.cityList.forEach(item=>{
+                item.checked=val;
+            })
         },
         changeCityItem(item){
             console.log(item);
@@ -130,12 +143,20 @@ export default {
                 flag=flag||_item.checked;
             })
             self.isChecked=flag;
-            self.citys=str;
+            self.citys=str.substring(0,str.length-1);
+            if(temp.length==self.cityList.length){
+                self.allCityChecked=true;
+            }
+            else{
+                self.allCityChecked=false;
+            }
             self.multeCityList=temp;
         },
         searchStoreInput(){
             let self=this;
-
+            self.curProvince='';
+            self.citys='';
+            self.getStoreByCity();
         },
         searchStore(){
             let self=this;
@@ -231,9 +252,7 @@ export default {
             let self=this;
             let params={};
             params.like={
-                'name':self.serachVale,
-                'city':self.serachVale,
-                'province':self.serachVale
+                'name':self.serachVale
             };
             return new Promise((resolve,reject)=>{
                 getStoreList(params).then(res=>{
@@ -249,7 +268,7 @@ export default {
         async getProvinceList(){
             let self=this;
             self.storeData=await self.getStoreData();
-            self.storeCount=self.storeData.length;
+            //self.storeCount=self.storeData.length;
             let temp=[];
             if(self.storeData!=undefined&&self.storeData.length!=0){
                 self.storeData.forEach(item=>{
@@ -283,6 +302,7 @@ export default {
             let self=this;
             let data=await self.getStoreData();
             let bindStoreId=await self.getBindStoreList();
+            self.storeCount=bindStoreId.length;
             console.log(data);
             let cityList=[];
             data.forEach(item=>{
@@ -348,40 +368,90 @@ export default {
                 self.allData=true;
             }
         },
-        applyNape(){
+        bindNapeToStore(params){
+            return new Promise((resolve,reject)=>{
+                applyItemInspectItem(params).then(res=>{
+                    resolve(res);
+                })
+            })
+        },
+        UnbindNapeToStore(params){
+            return new Promise((resolve,reject)=>{
+                UnapplyInspectItem(params).then(res=>{
+                    resolve(res);
+                })
+            })
+        },
+        async applyNape(){
             let self=this;
-            let storeId=[];
+            let storeIdChecked=[];
+            let storeIdUnchecked=[];
+            let count=0;
             let napeId=JSON.parse(sessionStorage.getItem('NapeId'));
             self.storeList.forEach(item=>{
+                count+=item.itemData.length;
                 item.itemData.forEach(_item=>{
                     if(_item.checked){
-                        storeId.push(_item.storeId);
+                        storeIdChecked.push(_item.storeId);
+                    }
+                    else{
+                        storeIdUnchecked.push(_item.storeId);
                     }
                 })
             })
-            console.log(storeId);
-            let temp=[];
-            storeId.forEach(item=>{
+            let tempchecked=[];
+            storeIdChecked.forEach(item=>{
                 let obj={
                     storeId:item,
                     itemIds:napeId
                 };
-                temp.push(obj);
+                tempchecked.push(obj);
             })
-            let params={
-                storeList:temp
+            let paramsBind={
+                storeList:tempchecked
+            };
+            let tempUnchecked=[];
+            storeIdUnchecked.forEach(item=>{
+                let obj={
+                    storeId:item,
+                    itemIds:napeId
+                };
+                tempUnchecked.push(obj);
+            })
+            let paramsUnBind={
+                storeList:tempUnchecked
+            };
+            let flag=false;
+            if(storeIdChecked.length==count){  //全部勾选，只有绑定操作
+                let resBind=await self.bindNapeToStore(paramsBind);
+                console.log(resBind);
+                if(resBind.errMsg=='Success'&&resBind.errCode=='0'){
+                    flag=true;
+                }
             }
-            applyItemInspectItem(params).then(res=>{
-                console.log(res);
-                let errMsg=res.errMsg;
-                if(errMsg!=undefined&&errMsg=='Success'){
-                    self.notify('当前门店项成功绑定！','success',3000);
+            else if(storeIdUnchecked.length==count){ //全部取消勾选，只有解绑操作
+                let resUnBind=await self.UnbindNapeToStore(paramsUnBind);
+                console.log(resUnBind);
+                 if(resUnBind.errMsg=='Success'&&resUnBind.errCode=='0'){
+                    flag=true;
                 }
-                else{
-                    self.notify('绑定失败!','warning',3000);
-                    return false;
+            }
+            else{
+                let resBind=await self.bindNapeToStore(paramsBind);
+                let resUnBind=await self.UnbindNapeToStore(paramsUnBind);
+                if(resBind.errMsg=='Success'&&resUnBind.errMsg=='Success'){
+                    flag=true;
                 }
-            })
+            }
+            if(flag){
+                let bindIdList=await self.getBindStoreList();
+                self.storeCount=bindIdList.length;
+                self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
+            }
+            else{
+                self.notify('绑定失败!','warning',3000);
+                return false;
+            }
         },
         getBindStoreList(){
             let self=this;

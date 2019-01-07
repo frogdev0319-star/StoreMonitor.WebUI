@@ -178,6 +178,7 @@
 import api from '@/api/index'
 import util from '@/common/util'
 import {validateInput} from '@/common/validate'
+import {inpectRESTful} from '@/api/index'
 export default {
     name:'AddRuteInspect',
     data(){
@@ -258,9 +259,9 @@ export default {
             let params={
                 "groups":temp
             };
-            api.updateInspectGroup(params).then(res=>{
+            inpectRESTful.updateInspectGroup(params).then(res=>{
                 console.log(res);
-                let codeMsg=res.data.errMsg;
+                let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     self.notify('修改成功!','success',3000);
                     item.isEdit=false;
@@ -307,11 +308,11 @@ export default {
             let params={
                 "groups":temp
             };
-            api.addInspectGroup(params).then(res=>{
-                let codeMsg=res.data.errMsg;
+            inpectRESTful.addInspectGroup(params).then(res=>{
+                let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     let obj={
-                        id:res.data.data[0],
+                        id:res.data[0],
                         groupName:self.groupNameInput,
                         groupNum:0,
                         isClick:false,
@@ -361,8 +362,8 @@ export default {
             let self=this;
             let params={"itemIds":idArr};
             return new Promise((resolve,reject)=>{
-                api.deleteInspectItem(params).then(res=>{
-                    let errMsg=res.data.errMsg;
+                inpectRESTful.deleteInspectItem(params).then(res=>{
+                    let errMsg=res.errMsg;
                     console.log(errMsg);
                     resolve(errMsg);
                 })
@@ -372,8 +373,8 @@ export default {
             let self=this;
             let params={"groupIds":idArr};
             return new Promise((resolve,reject)=>{
-                api.deleteInspectGroup(params).then(res=>{
-                    let errMsg=res.data.errMsg;
+                inpectRESTful.deleteInspectGroup(params).then(res=>{
+                    let errMsg=res.errMsg;
                     console.log(errMsg);
                     resolve(errMsg);
                 })
@@ -507,9 +508,9 @@ export default {
             let params={
                 "items":temp
             };
-            api.updateInspectItem(params).then(res=>{
+            inpectRESTful.updateInspectItem(params).then(res=>{
                 console.log(res);
-                let codeMsg=res.data.errMsg;
+                let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     self.notify('修改成功!','success',3000);
                     item.isClick=false;
@@ -533,7 +534,7 @@ export default {
                 self.notify('巡检项名称不能为空！','warning',3000);
                 return false;
             }
-            if(validateInput(self.newNapeName)||validateInput(newNapeDep)){
+            if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
                 self.notify('当前输入含有非法字符！','warning',3000);
                 return false;
             }
@@ -553,8 +554,8 @@ export default {
             let params={
                 "request":tempParam
             };
-            api.addInspectItem(params).then(res=>{
-                let codeMsg=res.data.errMsg;
+            inpectRESTful.addInspectItem(params).then(res=>{
+                let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     let obj={
                         napeName:self.newNapeName,
@@ -601,10 +602,10 @@ export default {
 
         getAllData(){
             return new Promise((resolve,reject)=>{
-                api.getInspectItemList().then(res=>{
+                inpectRESTful.getInspectItemList().then(res=>{
                     console.log(res);
-                    let code=res.data.errMsg;
-                    let data=res.data.data;
+                    let code=res.errMsg;
+                    let data=res.data;
                     if(code!=null&&code=='Success'){
                         console.log(res.data);
                     }
@@ -818,7 +819,7 @@ $itemHeight:50px;
                 }
             }
             .group-add{
-                 margin-top: 5px;
+                margin-top: 5px;
                 position: relative;
                 overflow: hidden;
                 height: 50px;

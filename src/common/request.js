@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {Message,MessageBox} from 'element-ui'
+import {Message,MessageBox,} from 'element-ui'
 import store from '@/store'
 import router from '@/router'
 import {getToken} from '@/common/auth.js'
@@ -70,6 +70,11 @@ service.interceptors.response.use(
             }).then(()=>{
                 store.dispatch('FedLogOut').then(()=>{
                     router.push('/login');
+                    Message({
+                        message:err.response.data.errMsg,
+                        type:'error',
+                        duration:5*1000
+                    })
                 })
             })
         }

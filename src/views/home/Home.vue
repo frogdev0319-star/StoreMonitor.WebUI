@@ -83,6 +83,8 @@
                                     <div style="width: 10px;height: 10px;background-color:white;border-radius: 50%;-moz-border-radius: 50%;
                                     -webkit-border-radius: 50%;float:left;margin-top:18px;margin-right:40px;"></div>
                                     <span >{{child.name}}</span>
+                                    <div v-if="child.name=='门店管理'" 
+                                    style="display:inline-block; width:8px;height:8px;background-color:red;border-radius:50%;margin-left:10px;"></div>
                                     <!--collapsed?'':-->
                                 </template>
                             </el-menu-item>

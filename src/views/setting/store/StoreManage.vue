@@ -18,7 +18,8 @@
             </div>
             <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
             <div class="city-panel" v-if="showCityContent"> 
-                <p :style="isChecked?{}:{'color':'#FB505F'}">全部</p>
+                <p :style="isChecked?{}:{'color':'#FB505F'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
+                        style="margin-right:5px;"></el-checkbox>全部</p>
                 <div class="city-details" v-for="(item,index) in cityList" :key="index">
                     <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
                     <span>{{item.cityName}}</span>
@@ -35,7 +36,7 @@
             <el-table 
             :data="tableData" 
             :highlight-current-row="true"
-            empty-text='没有异常数据'
+            empty-text='没有门店信息'
             align='left'
             :height="windowHeight*(windowHeight>1000?0.76:0.65)"
             @sort-change='sortChange'
@@ -53,6 +54,35 @@
                 :prop="item.prop" :label="item.label" :sortable="item.sortable" :width="item.width">
             </el-table-column>
             <el-table-column
+                prop="napeTable"
+                label="关联巡检表"
+                width="180"
+                align="left">
+                <template slot-scope="scope">
+                    <el-popover
+                    v-if="scope.row.napeTable.length!=0&&scope.row.napeTable!='--'"
+                        placement="top-start"
+                        width="200"
+                        trigger="hover">
+                        <span v-for="(_item,_index) in scope.row.napeTable.split('，')"
+                        :key="_index">
+                            {{_item}}
+                        </span>
+                        <!-- :style="_item=='远程巡检'?{'color':'red','font-weight':'bold'}:{}" -->
+                        <span class="napeTable-prp" slot="reference">{{scope.row.napeTable}}</span>
+                    </el-popover>
+                    <span v-else>
+                        {{scope.row.napeTable}}
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="schedue"
+                label="巡检排程"
+                width="120"
+                align="left">
+
+            </el-table-column>
+            <el-table-column
                 prop="option"
                 label="操作"
                 width="80"
@@ -64,7 +94,7 @@
             <div slot="empty">
                 <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无异常数据</span>
+                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无门店数据</span>
                 </div> 
             </div>
         </el-table>
@@ -83,7 +113,8 @@
 
 <script>
 import api from '@/api/index'
-import {checkOutInspectItem} from '@/api/inspect'
+import {checkOutInspectItem,getInspectItemList,getInspectBindList} from '@/api/inspect'
+import {getStoreList} from '@/api/store'
     export default {
         name: "StoreManage",
         data(){
@@ -106,17 +137,18 @@ import {checkOutInspectItem} from '@/api/inspect'
                         "label":"联系方式",
                         "sortable":false
                     },
-                    {
-                        "prop":"napeTable",
-                        "label":"绑定巡检表",
-                        "sortable":false
-                    },
-                     {
-                        "prop":"schedue",
-                        "label":"巡检排程",
-                        "sortable":false
-                    }
+                    // {
+                    //     "prop":"napeTable",
+                    //     "label":"绑定巡检表",
+                    //     "sortable":false
+                    // },
+                    //  {
+                    //     "prop":"schedue",
+                    //     "label":"巡检排程",
+                    //     "sortable":false
+                    // }
                 ],
+                allCityChecked:false,
                 storeData:[],
                 tempStoreData:[],
                 tableData:[],
@@ -143,6 +175,7 @@ import {checkOutInspectItem} from '@/api/inspect'
                 self.getCityByProvince(val);
                 self.citys='';
                 self.multeCityList.length=0;
+                self.allCityChecked=false;
             },
             clearCitys(){
                 let self=this;
@@ -158,6 +191,12 @@ import {checkOutInspectItem} from '@/api/inspect'
                 self.showCityContent=!self.showCityContent;
                 self.showDrap=!self.showDrap;
             },
+            choiceAllCity(val){
+                let self=this;
+                self.cityList.forEach(item=>{
+                    item.checked=val;
+                })
+            },
             changeCityItem(item){
                 console.log(item);
                 let self=this;
@@ -172,7 +211,13 @@ import {checkOutInspectItem} from '@/api/inspect'
                     flag=flag||_item.checked;
                 })
                 self.isChecked=flag;
-                self.citys=str;
+                self.citys=str.substring(0,str.length-1);
+                if(temp.length==self.cityList.length){
+                    self.allCityChecked=true;
+                }
+                else{
+                    self.allCityChecked=false;
+                }
                 self.multeCityList=temp;
             },
             searchStore(){
@@ -240,7 +285,7 @@ import {checkOutInspectItem} from '@/api/inspect'
                 };
                 checkOutInspectItem(params).then(res=>{
                     console.log(res);
-                    let data=res.data.data;
+                    let data=res.data;
                     let count=0;
                     let countAll=0;
                     if(data.length!=0){
@@ -278,9 +323,9 @@ import {checkOutInspectItem} from '@/api/inspect'
                     let obj={};
                     obj.storeId=item.storeId;
                     obj.storename=item.name;
-                    obj.leading='刘三强',
-                    obj.phone='1733351233',
-                    obj.napeTable='远程巡检',
+                    obj.leading=item.userName;
+                    obj.phone=item.phoneNumber;
+                    obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
                     obj.schedue='排程一',
                     obj.device=item.device;
                     temp.push(obj);
@@ -310,30 +355,17 @@ import {checkOutInspectItem} from '@/api/inspect'
             toEventDetail(row){
                 let self=this;
                 console.log(row);
-                let params={
-                    storeId:row.storeId,
-                    mode:0
-                };
-                checkOutInspectItem(params).then(res=>{
-                    let data=res.data.data;
-                    if(res.data.errMsg=='Success'&&data.length!=0){
-                        sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
-                        self.$router.push({name:'门店详情',params:row});
-                    }
-                    else{
-                        self.notify('当前门店未绑定巡检项，请先绑定巡检项！','warning',3000);
-                        return false;
-                    }
-                })
+                sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
+                self.$router.push({name:'门店详情',params:row});
                 
             },
             getStoreData(params){
                 let self=this;
                 return new Promise((resolve,reject)=>{
-                    api.getStoreList(params).then(res=>{
-                        let errMsg=res.data.errMsg;
+                    getStoreList(params).then(res=>{
+                        let errMsg=res.errMsg;
                         if(errMsg!=undefined&&errMsg=='Success'){
-                            let data=res.data.data;
+                            let data=res.data;
                             resolve(data);
                         }
                     })
@@ -341,9 +373,9 @@ import {checkOutInspectItem} from '@/api/inspect'
             },
             getNapeList(){
                 return new Promise((resolve,reject)=>{
-                    api.getInspectItemList().then(res=>{
-                        let code=res.data.errMsg;
-                        let data=res.data.data;
+                    getInspectItemList().then(res=>{
+                        let code=res.errMsg;
+                        let data=res.data;
                         if(code!=null&&code=='Success'){
                             console.log(res.data);
                         }
@@ -356,9 +388,9 @@ import {checkOutInspectItem} from '@/api/inspect'
                     let params={
                         tagName:tag
                     };
-                    api.getInspectBindList(params).then(res=>{
+                    getInspectBindList(params).then(res=>{
                         console.log(res);
-                        resolve(res.data.data);
+                        resolve(res.data);
                     })
                 })
             },
@@ -511,6 +543,13 @@ import {checkOutInspectItem} from '@/api/inspect'
         width: 97.46%;
         float: left;
         background-color: #fff;
+        .napeTable-prp{
+            width: 70%;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+        }
     }
     
 }

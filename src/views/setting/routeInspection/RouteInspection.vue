@@ -46,7 +46,26 @@
                         </a>
                     </div>
                 </el-dialog>
-
+                <el-dialog title='提示'
+                :visible.sync="showConfirmImport" v-if="showConfirmImport"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="28%"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;">
+                        <hr style="border: 0.5px solid #FB505F;"/>
+                        
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
+                            <span>此操作将会清空当前页面已有巡检项，是否继续?</span>
+                        </p>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">取 消</el-button>
+                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" style="color:#fff">确 认</el-button>
+                    </div>
+                </el-dialog>
             </el-col>
 
             <el-col :span="18" class="el-route-tabs">
@@ -94,6 +113,7 @@ export default {
             storeNum:0,
             activeName:'',
             showImportContent:false,
+            showConfirmImport:false,
             checkValue:'',
             tabNameInput:'',
             hideUpload:false,
@@ -248,21 +268,23 @@ export default {
                 })
             })
         },
-        deleteAllData(itemIdList,groupIdList){
-            let params1={
-                itemIds:itemIdList
-            };
-            let params2={
-                groupIds:groupIdList
-            };
+        addGroup(params){
             return new Promise((resolve,reject)=>{
-                inpectRESTful.deleteInspect(params1,params2).then((res)=>{
+                inpectRESTful.addInspectGroup(params).then(res=>{
                     console.log(res);
                     resolve(res);
                 })
             })
         },
-        async RemoveAllTags(){
+        addItem(params){
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.addInspectItem(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
+            })
+        },
+        async addAllData(dataArry){
             let self=this;
             let index=0;
             if(self.checkValue=='远程巡检'){
@@ -285,8 +307,59 @@ export default {
                     itemIdList.push(_item.id);
                 })
             })
-            //let retItem=await self.deleteAllData(itemIdList,groupIdList);
-
+            if(itemIdList.length!=0){
+                let res1= await self.deleteItem(itemIdList);
+            }
+            if(groupIdList.length!=0){
+                let res2= await self.deleteGroup(groupIdList);
+            }
+            let tempGroups=[];
+            dataArry.forEach((item,index)=>{
+                let obj={};
+                obj.name=item[0]['检查分类'];
+                obj.mode=0;
+                obj.tag=self.checkValue;
+                tempGroups.push(obj);
+            })
+            let paramsGroup={
+                "groups": tempGroups
+            };
+            let resGroup=await self.addGroup(paramsGroup);
+            let codeGroup=resGroup.errMsg;
+            let dataGroup=resGroup.data;
+            if(codeGroup!=null&&codeGroup=='Success'){
+                let tempItems=[];
+                dataArry.forEach((item,index)=>{
+                    let obj={};
+                    let temp=[];
+                    item.forEach((_item,_index)=>{
+                        let _obj={};
+                        _obj.subject=_item['检查项目名称'];
+                        _obj.description=_item["检查项目详细说明（选填，不填为空）"];
+                        _obj.itemScore=10;
+                        temp.push(_obj);
+                    })
+                    obj.groupId=dataGroup[index];
+                    obj.items=temp;
+                    tempItems.push(obj);
+                })
+                let paramsItem={
+                    "request": tempItems
+                };
+                let resItem=await self.addItem(paramsItem);
+                let codeItem=resItem.errMsg;
+                if(codeItem!=null&&codeItem=='Success'){
+                    self.notify('模板导入成功!','success',3000);
+                }
+                else{
+                    self.notify('模板导入失败!','warning',3000);
+                }
+            }
+            else{
+                self.notify('模板导入失败!','warning',3000);
+            }
+            self.showImportContent=false;
+            self.getTagList();
         },
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
@@ -341,21 +414,11 @@ export default {
         importItem(){
             let self=this;
             if(self.elTableData[Number(self.activeName)].routeData.length!=0){
-                self.$confirm('此操作将清空当前页面巡检项, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning',
-                    center: true
-                }).then(() => {
-                    self.showImportContent=true;
-                }).catch(() => {
-                    self.showImportContent=false;
-                });
+               self.showConfirmImport=true;
             }
             else{
-                self.showBtnContent=true;
+                self.showImportContent=true;
             }
-           
         },
         checkBeforeImport(){
             let self=this;
@@ -387,7 +450,7 @@ export default {
         },
         async importfxx(obj) {
             let _this = this;
-            _this.RemoveAllTags();
+            
             let inputDOM = this.$refs.inputer;
             // 通过DOM取文件数据
             this.file = event.currentTarget.files[0];
@@ -437,60 +500,8 @@ export default {
                             dataArry[i]=outdata.slice(indexArry[length-1],indexArry.length);
                         }
                     }
-                    let tempGroups=[];
-                    dataArry.forEach((item,index)=>{
-                        let obj={};
-                        obj.name=item[0]['检查分类'];
-                        obj.mode=0;
-                        obj.tag=_this.checkValue;
-                        tempGroups.push(obj);
-                    })
-                    let params={
-                        "groups": tempGroups
-                    };
-                    inpectRESTful.addInspectGroup(params).then(res=>{
-                        let code=res.errMsg;
-                        let data=res.data;
-                        if(code!=null&&code=='Success'){
-                            console.log(res.data);
-                            let tempItems=[];
-                            dataArry.forEach((item,index)=>{
-                                let obj={};
-                                let temp=[];
-                                item.forEach((_item,_index)=>{
-                                    let _obj={};
-                                    _obj.subject=_item['检查项目名称'];
-                                    _obj.description=_item["检查项目详细说明（选填，不填为空）"];
-                                    _obj.itemScore=10;
-                                    temp.push(_obj);
-                                })
-                                obj.groupId=data[index];
-                                obj.items=temp;
-                                tempItems.push(obj);
-                            })
-                            let params={
-                                "request": tempItems
-                            };
-                            inpectRESTful.addInspectItem(params).then(res=>{
-                                let code=res.errMsg;
-                                let data=res.data;
-                                if(code!=null&&code=='Success'){
-                                    console.log(res.data);
-                                    _this.notify('模板导入成功!','success',3000);
-                                    _this.showImportContent=false;
-                                    _this.getTagList();
-                                }
-                                else{
-                                    _this.notify('模板导入失败!','warning',3000);
-                                    return false;
-                                }
-                            })
-                        }
-                        else{
-                            _this.notify('模板导入失败!','warning',3000);
-                            return false;
-                        }
-                    })
+                    _this.addAllData(dataArry);
+                    
                 }
                 reader.readAsArrayBuffer(f);
             }

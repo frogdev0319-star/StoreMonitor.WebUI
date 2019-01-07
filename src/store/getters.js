@@ -5,7 +5,8 @@ const getters={
     introduction:state=>state.user.introduction,
     status:state=>state.user.status,
     roles:state=>state.user.roles,
-    setting:state=>state.user.setting
+    setting:state=>state.user.setting,
+    changeColor:state=>state.changeColor
 }
 
 export default getters

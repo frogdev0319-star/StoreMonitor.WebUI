@@ -135,6 +135,7 @@ export const addNVRandChannel=(params1,params2)=>{
     ]);
 }
 
+//事件管理api
 export const getEventList=(params)=>{
     return axios.post(`${base}${itempath}/event/list`,params);
 }

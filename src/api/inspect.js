@@ -44,6 +44,14 @@ export const applyItemInspectItem=data=>{
         data
     })
 }
+export const UnapplyInspectItem=data=>{
+    return request({
+        url:'/inspect/item/unapply',
+        method:'post',
+        data
+    })
+}
+
 export const bindInspectItem=data=>{
     return request({
         url:'/inspect/item/bind',
@@ -51,11 +59,11 @@ export const bindInspectItem=data=>{
         data
     })
 } 
-export const checkOutInspectItem=data=>{
+export const checkOutInspectItem=params=>{
     return request({
         url:'/inspect/checkout',
-        method:'post',
-        data
+        method:'get',
+        params
     })
 }
 export const deleteInspectGroup=data=>{

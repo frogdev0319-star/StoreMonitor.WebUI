@@ -25,19 +25,19 @@
                 <el-tab-pane label="流媒体服务" name="dash">
                     <el-col :span="varWindowWidth<1366?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
                         <div class="details">
-                            <span class="dash-label">服务器IP</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>服务器IP</span>
                             <el-input class="dash-input" v-model="dash.url" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label">命令端口（http）</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>命令端口（http）</span>
                             <el-input class="dash-input" v-model="dash.httpCmdPort" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label">命令端口（https）</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>命令端口（https）</span>
                             <el-input class="dash-input" v-model="dash.httpsCmdPort" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label">数据端口</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>数据端口</span>
                             <el-input class="dash-input" v-model="dash.dataPort" size="mini"></el-input>
                         </div>
                         <el-dialog title='导入'
@@ -67,9 +67,13 @@
                         <div class="nvr-title tabTitle">
                             <div class="name-title titles">
                                 <span>NVR名称</span>
+                                <i class="icon-filter" 
+                                :class="{'el-icon-arrow-down':nvrFilter,'el-icon-arrow-up':!nvrFilter}" @click="filterNVR"></i>
                             </div>
-                            <div class="store-title titles">
+                            <div class="store-title titles" >
                                 <span>所属门店</span>
+                                <i class="icon-filter"
+                                :class="{'el-icon-arrow-down':storeFilter,'el-icon-arrow-up':!storeFilter}" @click="filterStore"></i>
                             </div>
                             <div class="count-title titles">
                                 <span>通道数</span>
@@ -103,9 +107,13 @@
                         <div class="nape-items-title tabTitle">
                             <div class="nape-name-title titles">
                                 <span>通道名称</span>
+                                <!-- <i class="icon-filter" 
+                                :class="{'el-icon-arrow-down':channelFilter,'el-icon-arrow-up':!channelFilter}" @click="filterChannel"></i> -->
                             </div>
                             <div class="nape-dep-title titles">
                                 <span>NVR通道号</span>
+                                <!-- <i class="icon-filter" 
+                                :class="{'el-icon-arrow-down':channelNumFilter,'el-icon-arrow-up':!channelNumFilter}" @click="filterChannelNum"></i> -->
                             </div>
                             <div class="nape-handle-title titles">
                                 <span>操作</span>
@@ -144,6 +152,7 @@
 import api from '@/api/index'
 import axios from 'axios'
 import {validateInput} from '@/common/validate'
+import {deviceRESTful} from '@/api/index'
 export default {
     name:'DeviceSetMge',
     data(){
@@ -154,6 +163,12 @@ export default {
             page:0,
             sizeNum:10,
             nvrData:[],
+            //the filter flag
+            nvrFilter:true,
+            storeFilter:true,
+            channelFilter:true,
+            channelNumFilter:true,
+
             showImportContent:false,
             channelList:[],
             channelData:[],
@@ -211,10 +226,9 @@ export default {
         getDashServerInfo(){
             let self=this;
             return new Promise((resolve,reject)=>{
-                api.getDashServerInfo().then(res=>{
-                    console.log(res.data.errMsg);
-                    let data=res.data;
-                    resolve(data);
+                deviceRESTful.getDashServerInfo().then(res=>{
+                    console.log(res.errMsg);
+                    resolve(res);
                 })
             })
         },
@@ -257,8 +271,8 @@ export default {
                 "password": "admin"
             };
             if(data.errCode!=null&&data.errCode==500){ //Dash Server does not exsit!
-                api.addDashServer(params).then(res=>{
-                    let errMsg=res.data.errMsg;
+                deviceRESTful.addDashServer(params).then(res=>{
+                    let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
                         self.notify('连接成功!','success',3000);
                     }
@@ -269,8 +283,8 @@ export default {
                 })
             }
             else{                          
-                api.upateDashServer(params).then(res=>{
-                    let errMsg=res.data.errMsg;
+                deviceRESTful.upateDashServer(params).then(res=>{
+                    let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
                         self.notify('连接成功!','success',3000);
                     }
@@ -296,20 +310,80 @@ export default {
             self.export2Excel();
         },
         sizeChange(val){
-                this.sizeNum=val;
-                this.getNVRList();
+            let self=this;
+            self.sizeNum=val;
+            let params={
+                "filter": {
+                    "page": self.page,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": "asc",
+                    "property": "name"
+                }
+            };
+            this.getNVRList(params);
         },
         currentChange(val){
-            this.page=val-1;
-            this.getNVRList();
+            let self=this;
+            self.page=val-1;
+            let params={
+                "filter": {
+                    "page": self.page,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": "asc",
+                    "property": "name"
+                }
+            };
+            self.getNVRList(params);
+        },
+        //nvr list filter
+        filterNVR(){
+            let self=this;
+            self.nvrFilter=!self.nvrFilter;
+            console.log(self.nvrFilter);
+            let params={
+                "filter": {
+                    "page": self.page,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": self.nvrFilter?"asc":"desc",
+                    "property": "name"
+                }
+            };
+            self.getNVRList(params);
+        },
+        filterStore(){
+            let self=this;
+            self.storeFilter=!self.storeFilter;
+            console.log(self.storeFilter);
+            let params={
+                "filter": {
+                    "page": self.page,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": self.storeFilter?"asc":"desc",
+                    "property": "storeName"
+                }
+            };
+        },
+        filterChannel(){
+            let self=this;
+        },
+        filterChannelNum(){
+            let self=this;
         },
         deleteChannel(channelList){
             let params={
                 deviceIds:channelList
             };
             return new Promise((resolve,reject)=>{
-                api.deleteDevice(params).then(res=>{
-                    resolve(res.data);
+                deviceRESTful.deleteDevice(params).then(res=>{
+                    resolve(res);
                 })
             })
         },
@@ -318,26 +392,26 @@ export default {
                 ivsIds:nvrList
             }
             return new Promise((resolve,reject)=>{
-                api.deleteNVR(params).then(res=>{
-                    resolve(res.data);
-                })
-            })
-        },
-        deleteAllData(channelList,nvrList){
-            let params1={
-                deviceIds:channelList
-            };
-            let params2={
-                ivsIds:nvrList
-            };
-            return new Promise((resolve,reject)=>{
-                api.deleteNVRandChannel(params1,params2).then((res)=>{
-                    console.log(res);
+                deviceRESTful.deleteNVR(params).then(res=>{
                     resolve(res);
                 })
             })
         },
-        async RemoveAllTags(){
+        addNVR(params){
+            return new Promise((resolve,reject)=>{
+                deviceRESTful.addNVR(params).then(res=>{
+                    resolve(res);
+                })
+            })
+        },
+        addDevice(params){
+            return new Promise((resolve,reject)=>{
+                deviceRESTful.addDevice(params).then(resDevice=>{
+                    resolve(resDevice);
+                })
+            })
+        },
+        async addAllData(paramsNVR,paramsDevice){
             let self=this;
             let data=self.nvrData;
             console.log(data);
@@ -347,7 +421,7 @@ export default {
                nvrList.push(item.ivsId);
             })
             if(channelList.length==0&&nvrList.length==0){
-                return false;
+                console.log('当前页面为空！');
             }
             else if(channelList.length==0&&nvrList.length!=0){
                 await self.deleteNVR(nvrList);
@@ -356,8 +430,30 @@ export default {
                 await self.deleteChannel(channelList);
             }
             else{
-                await self.deleteAllData(channelList,nvrList);
+                await self.deleteChannel(channelList);
+                await self.deleteNVR(nvrList);
             }
+            let res1= await self.addNVR(paramsNVR);
+            let res2= await self.addDevice(paramsDevice);
+            if(res1.errMsg=='Success'&&res2.errMsg=='Success'){
+                self.notify('模板导入成功!','success',3000);
+                self.showImportContent=false;
+            }
+            else{
+                self.notify('模板导入失败!','warning',3000);
+                self.showImportContent=false;
+            }
+            let params={
+                "filter": {
+                    "page": self.page,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": "asc",
+                    "property": "name"
+                }
+            };
+            self.getNVRList(params);
         },
         downItem(){
             this.RemoveAllTags();
@@ -367,7 +463,6 @@ export default {
         },
         importfxx(obj) {
             let _this = this;
-            _this.RemoveAllTags();
             let inputDOM = this.$refs.inputer;
             // 通过DOM取文件数据
             this.file = event.currentTarget.files[0];
@@ -381,7 +476,7 @@ export default {
                 var wb; //读取完成的数据
                 var outdata;
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
                     var bytes = new Uint8Array(reader.result);
                     var length = bytes.byteLength;
                     for(var i = 0; i < length; i++) {
@@ -426,21 +521,7 @@ export default {
                     let params2={
                         "device": channelDataTemp
                     };
-                    api.addNVRandChannel(params1,params2).then(res=>{
-                        console.log(res);
-                        let errMsgNVR=res[0].data.errMsg;
-                        let errMsgChannel=res[1].data.errMsg;
-                        if(errMsgNVR=='Success'&&errMsgChannel=='Success'){
-                            _this.notify('模板导入成功!','success',3000);
-                            _this.showImportContent=false;
-                            _this.getNVRList();
-                        }
-                        else{
-                            _this.notify('模板导入失败!','warning',3000);
-                            _this.showImportContent=false;
-                            return false;
-                        }
-                    })
+                    _this.addAllData(params1,params2);
                 }
                 reader.readAsArrayBuffer(f);
             }
@@ -517,9 +598,9 @@ export default {
             obj.id=self.curChannelItem.id;
             obj.name=self.curChannelItem.name;
             let params=obj;
-            api.updateDevice(params).then(res=>{
+            deviceRESTful.updateDevice(params).then(res=>{
                 console.log(res.data);
-                let errMsg=res.data.errMsg;
+                let errMsg=res.errMsg;
                 if(errMsg!=undefined&&errMsg=='Success'){
                     self.notify('修改成功！','success',3000);
                     self.curChannelItem.isClick=false;
@@ -532,23 +613,13 @@ export default {
                 self.channelData=await self.getChannelData();  //修改后更新数据源
             })
         },
-        getNVRList(){
+        getNVRList(params){
             let self=this;
-            let params={
-                "filter": {
-                    "page": self.page,
-                    "size": self.sizeNum
-                },
-                "order": {
-                    "direction": "asc",
-                    "property": "name"
-                }
-            };
-            api.getNVRList(params).then(res=>{
-                let errMsg=res.data.errMsg;
+            deviceRESTful.getNVRList(params).then(res=>{
+                let errMsg=res.errMsg;
                 let temp=[];
                 if(errMsg!=undefined&&errMsg=='Success'){
-                    let data=res.data.data.content;
+                    let data=res.data.content;
                     data.forEach((item,index)=>{
                         let obj={};
                         obj.ivsId=item.ivsId;
@@ -565,7 +636,7 @@ export default {
                         temp.push(obj);
                     })
                     self.nvrData=temp;
-                    self.total=res.data.data.totalElements;
+                    self.total=res.data.totalElements;
                     
                 }
             })
@@ -583,12 +654,12 @@ export default {
         getChannelData(){
             let self=this;
             return new Promise((resolve,reject)=>{
-                api.getDeviceList().then(res=>{
-                    let errMsg=res.data.errMsg;
+                deviceRESTful.getDeviceList().then(res=>{
+                    let errMsg=res.errMsg;
                     console.log(res);
                     if(errMsg!=undefined&&errMsg=='Success'){
-                        let data=res.data.data;
-                        resolve(res.data.data);
+                        let data=res.data;
+                        resolve(res.data);
                     }
                 })
             })
@@ -626,7 +697,18 @@ export default {
                 self.dash=data.data;
             }
             self.channelData=await self.getChannelData();   //获取channel信息
-            self.getNVRList();       //获取NVR 数据信息
+
+            let params={
+                "filter": {
+                    "page": self.page,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": "asc",
+                    "property": "name"
+                }
+            };
+            self.getNVRList(params);       //获取NVR 数据信息
             
         },
         notify(msg,type,time) {
@@ -769,6 +851,11 @@ $mainColor:#FB505F;
             background-color: #FAFAFA;
             height: auto;
             position: relative;
+            .icon-filter{
+                position: relative;
+                left: 20%;
+                cursor: pointer;
+            }
             .nvr-title{
                 @include titleStyle;
                 .name-title{
