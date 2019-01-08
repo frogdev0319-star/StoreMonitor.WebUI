@@ -481,6 +481,10 @@ export default {
                         });
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
+                    if(!outdata[0].hasOwnProperty('检查分类')){
+                        _this.notify('当前模板错误，请更换模板重新导入！','warning',3000);
+                        return false;
+                    }
                     let arr=outdata;
                     console.log(arr);
                     let indexArry=[];
