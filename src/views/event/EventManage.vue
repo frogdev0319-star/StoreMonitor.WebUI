@@ -132,6 +132,7 @@
     import api  from '../../api/index';
     import util from '../../common/util.js'
     import CsvExportor from 'csv-exportor'
+    import eventRESTful from '@/api/index'
     export default {
         name: "ExceptEvent",
         data(){
@@ -337,7 +338,7 @@
                 let tabIndx=Number(self.activeName);
                 console.log(self.activeName);
                 params.filter={page:this.tableDataList[tabIndx].page,size:this.tableDataList[tabIndx].sizeNum};
-                api.getEventList(params).then((res)=>{
+                eventRESTful.getEventList(params).then((res)=>{
                     console.log(res);
                     let data=res.data.data.content;
                     let temp=[];
@@ -395,9 +396,9 @@
                 let self=this;
                 self.params.filter={};
                 return new Promise((resolve,reject)=>{
-                    api.getEventList(self.params).then((res)=>{
+                    eventRESTful.getEventList(self.params).then((res)=>{
                         console.log(res);
-                        let size=res.data.data.totalElements;
+                        let size=res.data.totalElements;
                         resolve(size);
                     }) 
                     .catch((error) => {
@@ -413,7 +414,7 @@
                     "page": 0,
                     "size": size
                 };
-                api.getEventList(self.params).then((res)=>{
+                eventRESTful.getEventList(self.params).then((res)=>{
                     console.log(res);
                     let data=res.data.data.content;
                     let temp=[];
