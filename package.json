@@ -17,6 +17,7 @@
     "element-ui": "^2.4.11",
     "file-saver": "^2.0.0",
     "js-cookie": "^2.2.0",
+    "pubsub-js": "^1.7.0",
     "video.js": "^7.3.0",
     "videojs-contrib-hls": "^5.15.0",
     "videojs-flash": "^2.1.2",

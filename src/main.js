@@ -12,13 +12,13 @@ import 'video.js/dist/video-js.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'videojs-flash'
 
+
 require('@/assets/css/myVideoCss.css');
 
 import store from './store/index.js';
 import $ from 'jquery';
 import jquery from 'jquery';
 Vue.config.productionTip = false
-
 import VideoPlayer from 'vue-video-player'
 Vue.use(VideoPlayer);
 

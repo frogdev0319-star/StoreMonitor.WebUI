@@ -85,6 +85,7 @@
 import RouteDetail from '@/views/setting/routeInspection/RouteDetail'
 import api from '@/api/index'
 import {inpectRESTful} from '@/api/index'
+import {validateInput,validateInspectGroup} from '@/common/validate'
 export default {
     name:'RouteInspection',
     components:{
@@ -489,12 +490,53 @@ export default {
                     console.log(arr);
                     let indexArry=[];
                     let typeName=[];
+                    let flaggroupLength=false,flaggroupRex=false;
+                    let flagItemName=false,flagItemRex=false,flagItemLength=false;
                     arr.forEach((item,index)=>{
                         if(item['检查分类']!=undefined&&item["检查分类"].length!=0){
                             indexArry.push(index);
                             typeName.push(item['检查分类']);
+                            if(item['检查分类'].toString().trim().length>10){
+                                flaggroupLength=true;
+                            }
+                            if(validateInput(item['检查分类'])){
+                                flaggroupRex=true;
+                            }
+                        }
+                        if(item['检查项目名称']==undefined){
+                            flagItemName=true;
+                        }
+                        else{
+                            if(item['检查项目名称'].toString().trim().length>25){
+                                flagItemLength=true;
+                            }
+                            if(validateInput(item['检查项目名称'])){
+                                flagItemRex=true;
+                            }
                         }
                     })
+
+                    if(flaggroupLength){
+                        _this.notify('excel中检查类别列中文本长度不能超过10个字，请检查！','warning',3000);
+                        return false;
+                    }
+                    if(flaggroupRex){
+                        _this.notify('excel中检查类别列中不能含有非法字符，请检查！','warning',3000);
+                        return false;
+                    }
+                    if(flagItemName){
+                        _this.notify('excel中检查项目名称列不能为空，请检查！','warning',3000);
+                        return false;
+                    }
+                    if(flagItemLength){
+                        _this.notify('excel中检查项目名称不能超过25个字，请检查！','warning',3000);
+                        return false;
+                    }
+                    if(flagItemRex){
+                        _this.notify('excel中检查项目名称中不能含有非法字符，请检查！','warning',3000);
+                        return false;
+                    }
+
                     let dataArry=[];
                     for(var i=0;i<indexArry.length;i++){
                         if(i<indexArry.length){

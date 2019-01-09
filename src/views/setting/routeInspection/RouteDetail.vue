@@ -145,6 +145,7 @@
 <script>
 import api from '@/api/index'
 import {inpectRESTful} from '@/api/index'
+import {validateInput,validateInspectGroup} from '@/common/validate'
 export default {
     name:'RouteDetail',
     props:{
@@ -497,6 +498,7 @@ export default {
                     let arr=outdata;
                     let indexArry=[];
                     let typeName=[];
+                    let flagItemName=false,flagItemRex=false,flagItemLength=false;
                     arr.forEach((item,index)=>{
                         if(item['检查分类']!=undefined&&item['检查分类'].length!=0){
                             indexArry.push(index);

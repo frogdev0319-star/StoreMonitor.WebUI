@@ -113,7 +113,7 @@
 
 <script>
 import api from '@/api/index'
-import {checkOutInspectItem,getInspectItemList,getInspectBindList} from '@/api/inspect'
+import {getInspectItemList} from '@/api/inspect'
 import {getStoreList} from '@/api/store'
     export default {
         name: "StoreManage",
@@ -137,16 +137,6 @@ import {getStoreList} from '@/api/store'
                         "label":"联系方式",
                         "sortable":false
                     },
-                    // {
-                    //     "prop":"napeTable",
-                    //     "label":"绑定巡检表",
-                    //     "sortable":false
-                    // },
-                    //  {
-                    //     "prop":"schedue",
-                    //     "label":"巡检排程",
-                    //     "sortable":false
-                    // }
                 ],
                 allCityChecked:false,
                 storeData:[],
@@ -277,35 +267,6 @@ import {getStoreList} from '@/api/store'
                 }
                 self.provinceList=temp;
             },
-            getCheckOutData(row){
-                let self=this;
-                let params={
-                    storeId:row.storeId,
-                    mode:0
-                };
-                checkOutInspectItem(params).then(res=>{
-                    console.log(res);
-                    let data=res.data;
-                    let count=0;
-                    let countAll=0;
-                    if(data.length!=0){
-                        data.forEach(item=>{
-                            countAll+=item.items.length;
-                            for(const _item of item.items){
-                                if(_item.deviceId!=-1){
-                                    count++;
-                                }
-                            }
-                        })
-                    }
-                    if(countAll==count){
-                        row.bindDevice=true;
-                    }
-                    else{
-                        row.bindDevice=false;
-                    }
-                })
-            },
             getInitData(){
                 let self=this;
                 self.params.filter={
@@ -383,43 +344,6 @@ import {getStoreList} from '@/api/store'
                     })
                 })
             },
-            getStoreByTag(tag){
-                return new Promise((resolve,reject)=>{
-                    let params={
-                        tagName:tag
-                    };
-                    getInspectBindList(params).then(res=>{
-                        console.log(res);
-                        resolve(res.data);
-                    })
-                })
-            },
-            async getBindInfo(){
-                let self=this;
-                let data=await self.getNapeList();
-                let temp=[];
-                let tagList=[];
-                if(data.length!=0){
-                    data.forEach(item=>{
-                        let tag=item.tag;
-                        if(tagList.indexOf(tag)==-1){
-                            tagList.push(tag);
-                        }
-                    })
-                   for(const item of tagList){
-                        let data=await self.getStoreByTag(item);
-                        let obj={
-                            tag:item,
-                            data:data
-                        };
-                        temp.push(obj);
-                    }
-                    self.tagList=temp;
-                }
-                else{
-                    console.log('当前没有巡检表信息');
-                }
-            },
             notify(msg,type,time) {
                 this.$message({
                     message: msg,
@@ -437,7 +361,6 @@ import {getStoreList} from '@/api/store'
                 this.sizeNum=20;
             }
             console.log(this.tableHeight);
-            self.getBindInfo();
             self.getProvinceList();
             self.getInitData();
             if(!this.timeid){
@@ -449,7 +372,7 @@ import {getStoreList} from '@/api/store'
         },
         activated(){
             this.getStoreList(this.params);
-        }
+        },
     }
 </script>
 

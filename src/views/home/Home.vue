@@ -83,7 +83,7 @@
                                     <div style="width: 10px;height: 10px;background-color:white;border-radius: 50%;-moz-border-radius: 50%;
                                     -webkit-border-radius: 50%;float:left;margin-top:18px;margin-right:40px;"></div>
                                     <span >{{child.name}}</span>
-                                    <div v-if="child.name=='门店管理'" 
+                                    <div v-if="child.name=='门店管理'&&showTag" 
                                     style="display:inline-block; width:8px;height:8px;background-color:red;border-radius:50%;margin-left:10px;"></div>
                                     <!--collapsed?'':-->
                                 </template>
@@ -117,11 +117,13 @@
 <script>
 import RateManage from '../event/details/RateManage'
 import {mapGetters,mapMutations,mapActions} from 'vuex';
+import PubSub from 'pubsub-js';
 export default {
    
     name:"Home",
     data(){
         return{
+            showTag:false,
             imgSrc:'./static/img/logo.png',
             userName:'Admin',
             headUrl:'',
@@ -205,10 +207,14 @@ export default {
         ])
     },
     created(){
+        let self=this;
         this.headUrl='./static/img/admin.png';
         console.log(this.$route.matched);
         //this.getWindowSize();
         this.getBread();
+        PubSub.subscribe('change-color',(event,data)=>{
+            self.showTag=data.showTag;
+        })
     },
     mounted(){
 

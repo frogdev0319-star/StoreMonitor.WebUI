@@ -77,6 +77,7 @@ service.interceptors.response.use(
                     })
                 })
             })
+            return false;
         }
     }
 )

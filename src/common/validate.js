@@ -33,3 +33,24 @@ export function validateIp(ip){
     var pat=/^((25[0-5]|2[0-4]\\d|[1]{1}\\d{1}\\d{1}|[1-9]{1}\\d{1}|\\d{1})($|(?!\\.$)\\.)){4}$/;
     return pat.test(ip);
 }
+
+export function validateInspectGroup(str){
+    let retMsg='';
+    if(validateInput(str)){
+        retMsg='当前导入模板中巡检项类别名称中含有非法字符！';
+    }
+    if(str.trim().length==0){
+        retMsg='检查分类列至少含有一项';
+    }
+    return retMsg;
+}
+export function validateInspectItem(str){
+    let retMsg='';
+    if(validateInput(str)){
+        retMsg='当前导入模板中巡检项名称中含有非法字符';
+    }
+    if(str.trim().length>25){
+        retMsg='当前导入模板中巡检项名称不能超过25个字';
+    }
+    return retMsg;
+}

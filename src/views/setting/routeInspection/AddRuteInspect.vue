@@ -90,11 +90,11 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input  size="mini" v-model="item.napeName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input  size="mini" v-model="item.napeDep" class="nape-input input-details" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
+                           <el-input maxlength="75" size="mini" v-model="item.napeDep" class="nape-input input-details" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#FB505F" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -153,10 +153,10 @@
                     <div class="nape-items-data noraml-text" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <el-input size="mini" v-model="newNapeName" class="nape-input input-details" placeholder="输入巡检项名称" ></el-input>
+                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input input-details" placeholder="输入巡检项名称" ></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input size="mini" v-model="newNapeDep" class="nape-input input-details" placeholder="输入巡检项描述"></el-input>
+                           <el-input maxlength="75" size="mini" v-model="newNapeDep" class="nape-input input-details" placeholder="输入巡检项描述"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#FB505F" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -179,6 +179,7 @@ import api from '@/api/index'
 import util from '@/common/util'
 import {validateInput} from '@/common/validate'
 import {inpectRESTful} from '@/api/index'
+import PubSub from 'pubsub-js'
 export default {
     name:'AddRuteInspect',
     data(){
@@ -325,6 +326,10 @@ export default {
                     self.showAddGroup=false;
                     self.refreshData(self.groupList.length-1);
                     self.notify('添加成功!','success',3000);
+                    setTimeout(function(){
+                        PubSub.publish('change-color',{showTag:true});
+                    },1000)
+                   
                 }
                 else{
                     self.notify('添加失败!','warning',3000);
@@ -571,6 +576,9 @@ export default {
                     self.refreshData(self.groupIndex);
                     self.groupList[self.groupIndex].groupNum++;
                     self.notify('添加成功!','success',3000);
+                    setTimeout(function(){
+                        PubSub.publish('change-color',{showTag:true});
+                    },1000)
                 }
                 else{
                     self.notify('添加失败!','warning',3000);
@@ -672,6 +680,13 @@ export default {
     mounted(){
         let self=this;
         self.initData();
+    },
+    beforeRouteLeave (to, from, next) {
+        console.log(to.path);
+        next();
+        if(to.path=='/storemanage'){
+            PubSub.publish('change-color',{showTag:false});
+        }
     }
 }
 </script>

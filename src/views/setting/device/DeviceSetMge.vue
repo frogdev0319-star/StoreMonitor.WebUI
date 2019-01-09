@@ -151,7 +151,7 @@
 <script>
 import api from '@/api/index'
 import axios from 'axios'
-import {validateInput} from '@/common/validate'
+import {validateInput,validateURL} from '@/common/validate'
 import {deviceRESTful} from '@/api/index'
 export default {
     name:'DeviceSetMge',
@@ -243,7 +243,10 @@ export default {
             ||self.dash.httpsCmdPort.toString().trim().length==0||self.dash.dataPort.toString().trim().length==0){
                 msg='当前配置项均为必填项！';
             }
-            else if(validateInput(self.dash.url)||validateInput(self.dash.httpCmdPort)
+            if(!validateURL(self.dash.url)){
+                msg='当前配置项中IP格式错误！';
+            }
+            if(validateInput(self.dash.httpCmdPort)
             ||validateInput(self.dash.httpsCmdPort)||validateInput(self.dash.dataPort)){
                 msg='当前配置项中含有非法字符，请检查！';
             }
@@ -667,7 +670,6 @@ export default {
                     }
                 })
             })
-            
         },
         getChannelListByNVR(ivsId){
             let self=this;
@@ -697,6 +699,9 @@ export default {
             self.activeName=sessionStorage.getItem('DevicePage_TabName')==undefined||
                     sessionStorage.getItem('DevicePage_TabName').length==0?'dash':sessionStorage.getItem('DevicePage_TabName');
             let data=await self.getDashServerInfo();
+            if(!data){
+                return false;
+            }
             if(data.errMsg=='Success'&&data.data!=null){
                 self.dash=data.data;
             }
@@ -713,7 +718,6 @@ export default {
                 }
             };
             self.getNVRList(params);       //获取NVR 数据信息
-            
         },
         notify(msg,type,time) {
             this.$message({
