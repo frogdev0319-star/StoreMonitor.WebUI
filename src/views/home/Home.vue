@@ -97,7 +97,8 @@
             
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="($route.path!='/routeinspection'
-                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&$route.path!='/bindroute'&&$route.path!='/schedule')
+                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&
+                    $route.path!='/bindroute'&&$route.path!='/schedule'&&$route.path!='/reinspection')
                     ?'content-wrapper-all':'content-wrapper'">
                     <keep-alive>
                         <router-view v-if="$route.meta.keepAlive"></router-view>
@@ -180,7 +181,7 @@ export default {
             resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
                 recalc = function() {
                     //设置根字体大小
-                    docEl.style.fontSize = (docEl.clientWidth/320)*20+'px';
+                    docEl.style.fontSize = (docEl.clientWidth/90)+'px';
                 };
             //绑定浏览器缩放与加载时间
             window.addEventListener(resizeEvt, recalc, false);
@@ -210,7 +211,7 @@ export default {
         let self=this;
         this.headUrl='./static/img/admin.png';
         console.log(this.$route.matched);
-        //this.getWindowSize();
+        this.getWindowSize();
         this.getBread();
         PubSub.subscribe('change-color',(event,data)=>{
             self.showTag=data.showTag;
@@ -467,6 +468,6 @@ export default {
 <style>
 
 #el-menuscrollbar .el-scrollbar__wrap {
-  overflow-x: hidden;
+  overflow-x: hidden !important;
 }
 </style>

@@ -6,3 +6,11 @@ export const getStoreList=data=>{
         data
     })
 }
+
+export const updateStoreInfo=data=>{
+    return request({
+        url:'/store/update',
+        method:'post',
+        data
+    })
+}

@@ -115,6 +115,7 @@
 import api from '@/api/index'
 import {getInspectItemList} from '@/api/inspect'
 import {getStoreList} from '@/api/store'
+
     export default {
         name: "StoreManage",
         data(){
@@ -122,20 +123,20 @@ import {getStoreList} from '@/api/store'
                 citys:'',
                 tableInfoData:[
                      {
-                        "prop":"storename",
+                        "prop":"name",
                         "label":"门店名称",
-                        "sortable":false,
+                        "sortable":'custom',
 
                     },
                     {
-                        "prop":"leading",
+                        "prop":"userName",
                         "label":"负责人",
-                        "sortable":false,
+                        "sortable":'custom',
                     },
                     {
-                        "prop":"phone",
+                        "prop":"phoneNumber",
                         "label":"联系方式",
-                        "sortable":false
+                        "sortable":'custom'
                     },
                 ],
                 allCityChecked:false,
@@ -155,7 +156,7 @@ import {getStoreList} from '@/api/store'
                 sizeNum:10,
                 page:0,
                 serachVale:'',
-                timeid:0
+                timeid:0,
             }
         },
         methods:{
@@ -170,6 +171,7 @@ import {getStoreList} from '@/api/store'
             clearCitys(){
                 let self=this;
                 self.cityList=[];
+                
                 self.multeCityList.length=0;
             },
             choiceCity(){
@@ -213,9 +215,15 @@ import {getStoreList} from '@/api/store'
             searchStore(){
                 let self=this;
                 self.showCityContent=false;
-                self.params.clause={
-                   	'province':self.curProvince
-                };
+                self.params.like={};
+                if(self.curProvince.length!=0){
+                    self.params.clause={
+                        'province':self.curProvince
+                    };
+                }
+                else{
+                    self.params.clause={};
+                }
                 if(self.multeCityList.length!=0){
                     self.params.clause.city=self.multeCityList;
                 }
@@ -283,9 +291,11 @@ import {getStoreList} from '@/api/store'
                 self.storeData.content.forEach(item=>{
                     let obj={};
                     obj.storeId=item.storeId;
-                    obj.storename=item.name;
-                    obj.leading=item.userName;
+                    obj.name=item.name;
+                    obj.userName=item.userName;
+                    obj.userId=item.userId;
                     obj.phone=item.phoneNumber;
+                    obj.favorite=item.favorite;
                     obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
                     obj.schedue='排程一',
                     obj.device=item.device;
@@ -300,15 +310,18 @@ import {getStoreList} from '@/api/store'
                 self.params.like={
                     "storeId": self.serachVale,
                     "name": self.serachVale,
-                    // "city": self.serachVale,
-                    // "province": self.serachVale,
-                    // "country": self.serachVale,
                     "userId": self.serachVale
                 };
                 self.getStoreList(self.params);
             },
-            sortChange(){
-
+            sortChange(column){
+                console.log(column);
+                let self=this;
+                self.params.order={
+                    direction:column.order=='ascending'?'asc':'desc',
+                    property:column.prop
+                };
+                self.getStoreList(self.params);
             },
             getINspectItemResult(){
 
@@ -363,6 +376,7 @@ import {getStoreList} from '@/api/store'
             console.log(this.tableHeight);
             self.getProvinceList();
             self.getInitData();
+            
             if(!this.timeid){
                 this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
             }

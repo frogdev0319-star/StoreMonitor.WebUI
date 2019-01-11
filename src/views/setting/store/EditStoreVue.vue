@@ -66,6 +66,7 @@ import api from '@/api/index'
 import {getUserInfo} from '@/api/login'
 import {getDeviceList} from '@/api/device'
 import {checkOutInspectItem,bindInspectItem} from '@/api/inspect'
+import {updateStoreInfo} from '@/api/store'
 export default {
     name:'EditStoreVue',
     data(){
@@ -91,7 +92,8 @@ export default {
             personList:[],
             curPerson:'',
             scheduleData:[],
-            alleList:[]
+            alleList:[],
+            userId:''
         }
     },
     mounted(){
@@ -100,6 +102,7 @@ export default {
         self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
         let storeId=self.store.storeId;
         self.storeTitle=self.store.storename;
+        self.userId=self.store.userId;
         self.getNapeByStore(storeId);
         self.getChannelByStore(storeId);
         self.getUserList();
@@ -172,18 +175,26 @@ export default {
         changePerson(val){
             console.log(val);
             let self=this;
-            self.phone=val.phoneNumber;
+            self.personList.forEach(item=>{
+                if(item.userId==val){
+                    self.phone=item.phoneNumber;
+                }
+            })
         },
         getUserList(){
             let self=this;
             getUserInfo().then(res=>{
                 console.log(res);
                 self.personList=res.data;
-                self.curPerson=self.personList[0].userName;
-                self.phone=self.personList[0].phoneNumber;
+                self.curPerson=self.userId;
+                res.data.forEach(item=>{
+                    if(item.userId==self.userId){
+                        self.phone=item.phoneNumber;
+                    }
+                })
             })
         },
-        submitData(){
+        async submitData(){
             let self=this;
             console.log(self.scheduleData);
             let count=0;
@@ -191,7 +202,6 @@ export default {
             let temp=[];
             self.scheduleData.forEach(item=>{
                 count+=item.itemData.length;
-                
                 item.itemData.forEach(_item=>{
                     let obj={};
                     if(_item.channelvalue.length!=0){
@@ -207,20 +217,46 @@ export default {
                 self.notify('请选择全部通道后提交！','warning',3000);
                 return false;
             }
-            let params={
+            let paramsInspec={
                 items:temp
             };
-            bindInspectItem(params).then(res=>{
-                console.log(res);
-                if(res.errMsg=='Success'){
-                    self.notify('通道绑定成功！','success',3000);
-                }
-                else{
-                    self.notify('通道绑定失败！','warning',3000);
-                    return false;
-                }
+            let paramsUpdateStore={
+                "store": [
+                    {
+                        "storeId": self.store.storeId,
+                        "userId": self.curPerson
+                    }
+                ]
+            };
+            let resUpdateStore=null,resBindInspect=null;
+            if(self.userId!=self.curPerson){  //如果没有修改负责人不执行
+                resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
+            }
+            resBindInspect=await self.bindInspectItem(paramsInspec);
+            if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
+            ||(resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
+                self.notify('提交成功！','success',3000);
+            }
+            else{
+                self.notify('提交失败！','warning',3000);
+                return false;
+            }
+        },
+        bindInspectItem(params){
+            return new Promise((resolve,reject)=>{
+                bindInspectItem(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
             })
-
+        },
+        updateStoreInfo(params){
+            return new Promise((resolve,reject)=>{
+                updateStoreInfo(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
+            })
         },
         notify(msg,type,time) {
             this.$message({

@@ -132,7 +132,8 @@
     import api  from '../../api/index';
     import util from '../../common/util.js'
     import CsvExportor from 'csv-exportor'
-    import eventRESTful from '@/api/index'
+    import {eventRESTful} from '@/api/index'
+    import {getUserInfo} from '@/api/login'
     export default {
         name: "ExceptEvent",
         data(){
@@ -198,7 +199,7 @@
                         "width":180
                     },
                     {
-                        "prop":"storeId",
+                        "prop":"storeName",
                         "label":"所属门店",
                         "sortable":'custom',
                         "width":180
@@ -224,7 +225,8 @@
                 exportDataList:[],  //需要导出的数据
                 exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
                 timeid:0,
-                windowHeight:window.innerHeight
+                windowHeight:window.innerHeight,
+                userId:''
             }
 
         },
@@ -265,7 +267,7 @@
                             self.params.clause={"status":0};break;
                     case 1: self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
                                         {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
-                            self.params.clause={"assigner":""};break;
+                            self.params.clause={"assigner":self.userId};break;
                     case 2:self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
                                         {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
                             self.params.clause={}; break;
@@ -333,6 +335,29 @@
                 }
                 self.getEventList(self.params);
             },
+            getUserList(){
+                let self=this;
+                return new Promise((resolve,reject)=>{
+                    getUserInfo().then(res=>{
+                        resolve(res.data);
+                    })
+                })
+                
+            },
+            async getUserId(){
+                let self=this;
+                let userList=await self.getUserList();
+                console.log(userList);
+                let userId='';
+                let email=sessionStorage.getItem('UserEmail');
+                userList.forEach(item=>{
+                    if(item.email==email){
+                        userId=item.userId;
+                    }
+                })
+                self.userId=userId;
+                self.getEventCount();
+            },
             getEventList(params){
                 let self=this;
                 let tabIndx=Number(self.activeName);
@@ -340,24 +365,24 @@
                 params.filter={page:this.tableDataList[tabIndx].page,size:this.tableDataList[tabIndx].sizeNum};
                 eventRESTful.getEventList(params).then((res)=>{
                     console.log(res);
-                    let data=res.data.data.content;
+                    let data=res.data.content;
                     let temp=[];
                     data.forEach(item=>{
                         let obj={
                             id:item.id,
                             ts:util.getDateTime(item.ts),
                             assignee:item.assignee,
-                            assigner:item.assigner,
+                            assigner:item.assignerName,
                             deviceId:item.deviceId,
                             status:item.status,
                             storeId:item.storeId,
+                            storeName:item.storeName,
                             subject:item.subject
                         }
                        temp.push(obj);
                     })
                     self.tableDataList[tabIndx].tableData=temp;
-                    self.tableDataList[tabIndx].total=res.data.data.totalElements;
-                    self.tableDataList[tabIndx].eventCount=res.data.data.totalElements;
+                    self.tableDataList[tabIndx].total=res.data.totalElements;
                 }).catch(err=>{
                     console.log("Error:"+err);
                 });
@@ -382,6 +407,7 @@
                 self.params.endTs=end;
                 self.getEventParamsByIndex(Number(self.activeName)); //初始获取数据
                 self.getEventList(self.params);
+                
             },
             exportData(){
                 let self=this;
@@ -392,13 +418,39 @@
                 self.dialogFormVisible=true;
                 self.getExportData();
             },
+            getEventCount(){
+                let self=this;
+                let start=new Date().getTime()-1000*3600*24;
+                let end=new Date().getTime();
+
+                let params={
+                    beginTs:start,
+                    endTs:end,
+                    "cases": [
+                        1,
+                        2,
+                        3
+                    ],
+                    clause:{
+                        "assigned":self.userId
+                    }
+                };
+                eventRESTful.getEventCount(params).then(res=>{
+                    let data=res.data;
+                    let errMsg=res.errMsg;
+                    console.log(errMsg);
+                    self.tableDataList[0].eventCount=data.assigned;
+                    self.tableDataList[1].eventCount=data.reported;
+                    self.tableDataList[2].eventCount=data.total;
+                })
+            },
             getExportDataSize(){
                 let self=this;
                 self.params.filter={};
                 return new Promise((resolve,reject)=>{
                     eventRESTful.getEventList(self.params).then((res)=>{
                         console.log(res);
-                        let size=res.data.totalElements;
+                        let size=res.totalElements;
                         resolve(size);
                     }) 
                     .catch((error) => {
@@ -416,13 +468,13 @@
                 };
                 eventRESTful.getEventList(self.params).then((res)=>{
                     console.log(res);
-                    let data=res.data.data.content;
+                    let data=res.data.content;
                     let temp=[];
                     data.forEach(item=>{
                         let obj={};
                         obj.subject=item.subject;
-                        obj.storeId=item.storeId;
-                        obj.assigner=item.assigner;
+                        obj.storeName=item.storeName;
+                        obj.assigner=item.assignerName;
                         obj.ts=util.getDateTime(item.ts);
                         temp.push(obj);
                     })
@@ -442,21 +494,25 @@
             },
         },
         mounted(){
-            this.getInitList();
+            let self=this;
             let windowHeight=window.innerHeight;
             if(windowHeight>800){
-                this.tableHeight=770+'px';
+                self.tableHeight=770+'px';
             }
-            console.log(this.tableHeight);
-            if(!this.timeid){
-                this.timeid=window.setInterval(this.getEventList(this.params),60*1000);
+            console.log(self.tableHeight);
+            self.email= sessionStorage.getItem('UserEmail');
+            self.getInitList();
+            self.getUserId();
+            if(!self.timeid){
+                self.timeid=window.setInterval(self.getEventList(self.params),60*1000);
             }
         },
         beforeDestroy(){
-           window.clearInterval(this.timeid);
+           window.clearInterval(self.timeid);
         },
         activated(){
-            this.getEventList(this.params);
+            let self=this;
+            self.getEventList(self.params);
         }
     }
 </script>

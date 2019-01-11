@@ -382,6 +382,10 @@ export default {
                 }
             })
         },
+        getTheTodayColor(){
+            let self=this;
+            let today=new Date().getDate();
+        },
          cancelEditGroup(index,item){
             item.isEdit=false;
         },
@@ -588,6 +592,9 @@ export default {
                             margin-top: 0px;
                             padding-right: 10%;
                             .date-header{
+                                user-select: none;
+                                -webkit-user-select: none;
+                                -moz-user-select: none;
                                 .icon-arrow{
                                     @include point(font-size,30);
                                     opacity: 0.4;

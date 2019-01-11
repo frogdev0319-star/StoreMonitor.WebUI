@@ -136,6 +136,7 @@ import util from '../../../common/util';
 import dashAPI from '@/api/dash'
 import videojs from '../../../../static/video.js'
 import 'videojs-contrib-hls';
+import {eventRESTful} from '@/api/index'
 const isProduction = process.env.NODE_ENV === 'production'
 export default {
     name:"RateManage",
@@ -337,9 +338,9 @@ export default {
             let params={
                 "eventIds":eventIds
             };
-            api.getCommentList(params).then(res=>{
-                let errMsg=res.data.errMsg;
-                let data=res.data.data;
+            eventRESTful.getCommentList(params).then(res=>{
+                let errMsg=res.errMsg;
+                let data=res.data;
                 if(errMsg=='Success'){
                     let comments=data[0];
                     console.log(comments);
@@ -393,9 +394,9 @@ export default {
                 eventIds:eventIds,
                 comment:comments
             };
-            api.addComment(params).then(res=>{
+            eventRESTful.addComment(params).then(res=>{
                 console.log(res);
-                let errMsg=res.data.errMsg;
+                let errMsg=res.errMsg;
                 if(errMsg=='Success'){
                     self.notify('提交成功！','success',3000);
                     self.getCommentList();

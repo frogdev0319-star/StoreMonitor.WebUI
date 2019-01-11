@@ -3,13 +3,14 @@ import Router from 'vue-router'
 
 import Home from '@/views/home/Home'
 import Login from '@/views/login/Login'
+import LoginForm from '@/views/login/LoginForm'
 Vue.use(Router)
 export default new Router({
   routes: [
     {
       path:'/login',
       name:'Login',
-      component:Login,
+      component:LoginForm,
       meta:{
         requireAuth: false,
       }

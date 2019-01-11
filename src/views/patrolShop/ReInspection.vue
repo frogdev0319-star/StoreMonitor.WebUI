@@ -5,13 +5,10 @@
                 <span class="lside-title">
                     {{store.storeTitle}}
                 </span>
-                <div class="storeUp-content" v-if="store.storeUp">
-                    
+                <div class="storeUp-content" :class="store.storeUp?'nocoll':'coll'">
+                    <i class="iconfont icon-shoucang11" :class="store.storeUp?'nocoll-icon':'coll-icon'"></i>
+                    <span :class="store.storeUp?'nocoll-font':'coll-font'">{{store.storeUptitle}}</span>
                 </div>
-                <div class="storeUp-content" v-else>
-
-                </div>
-                
                 <el-button class="el-submit" size="mini" @click="submit">
                     提交
                 </el-button> 
@@ -77,17 +74,23 @@
                 <el-row class="inspect-content">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" id="el-menuscrollbar">
-                            <div v-for="(item,index) in inspectList" :key="index" class="inspect-details">
-                                <span>{{`${item.name}（0/${item.num}）`}}</span>
+                            <div :style="{'max-height':varyWindowHeight*0.62+'px'}">
+                                <div v-for="(item,index) in inspectList" :key="index" class="inspect-details">
+                                    <span>{{`${item.name}（0/${item.num}）`}}</span>
+                                </div>
+                            </div>
+                         </el-scrollbar>
+                    </el-col>
+                    
+                    <el-col :span="16">
+                        <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                            <div :style="{'max-height':varyWindowHeight*0.62+'px'}">
+                                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
+                                    <span>{{`${index+1}. ${item.name}`}}</span>
+                                    <div class="item-score"><span>{{`评分：${item.score}分`}}</span><i class=" iconscore el-icon-arrow-down"></i></div>
+                                </div>
                             </div>
                         </el-scrollbar>
-                    </el-col>
-                    <el-col :span="16">
-                        <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
-                            <span>{{`${index+1}. ${item.name}`}}</span>
-                            <span class="item-score">{{`评分：${item.score}分`}}<i class="iconfont iconscore"></i></span>
-                            
-                        </div>
                     </el-col>
                 </el-row>
             </div>
@@ -124,14 +127,15 @@ export default {
             store:{
                 storeName:'西安5店',
                 storeTitle:'西安5店远程巡检',
-                storeUp:'',
-                storeUptitle:'未收藏'
+                storeUp:false,
+                storeUptitle:'点击收藏'
             },
             popperClass:'select-popClass',
             showModelContent:true,
             playState:true,
             activeIndex:'',
             serachVale:'',
+            varyWindowHeight:window.innerHeight,
             speedList:[
                 {
                     value:0,
@@ -409,8 +413,35 @@ export default {
                     color: #424151;
                     @include point(font-size,16);
                 }
+                .coll{
+                    border:1px solid orange;
+                }
+                .nocoll{
+                    border:1px solid #DBDBDB;
+                }
+                .coll-icon{
+                    color: orange;
+                }
+                .nocoll-icon{
+                    color: #DBDBDB;
+                }
+                .coll-font{
+                    color: orange;
+                }
+                .nocoll-font{
+                    color: #DBDBDB;
+                }
                 .storeUp-content{
                     display: inline-block;
+                    margin-left: 20px;
+                    padding: 0px 10px;
+                    height: 24px;
+                    line-height: 24px;
+                    min-width: 60px;
+                    span{
+                        font-size: 12px;
+                        font-weight: bold;
+                    }
                 }
                 .el-submit{
                     position: absolute;
@@ -527,8 +558,8 @@ export default {
                     }
                     .item-details{
                         text-align: left;
-                        min-height: 60px;
-                        padding-top: 20px;
+                        height: 60px;
+                        line-height: 60px;
                         padding-left: 15px;
                         font-size: 14px;
                         font-weight: bold;
@@ -536,10 +567,18 @@ export default {
                         .item-score{
                             position: absolute;
                             right: 0;
+                            top: 12px;
                             margin-right: 20px;
-                            width: 90px;
-                            padding: 3px 20px;
+                            width: 100px;
+                            height: 26px;
                             padding-left: 10px;
+                            background-color: orange;
+                            line-height: 26px;
+                            color: #fff;
+                            border-radius: 13px;
+                            .iconscore{
+                                margin-left: 10px;
+                            }
                         }
                     }
                 }

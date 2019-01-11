@@ -27,3 +27,10 @@ export const getCommentList=data=>{
         data
     })
 }
+export const getEventCount=data=>{
+    return request({
+        url:'/event/count',
+        method:'post',
+        data
+    })
+}

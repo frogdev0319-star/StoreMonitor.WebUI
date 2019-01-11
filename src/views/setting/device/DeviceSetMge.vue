@@ -82,6 +82,7 @@
                         <div class="nvr-data group-title"
                         v-for="(item,index) in nvrData" 
                         :key="index"  :class="!item.isClick?'noraml-color':'active-color'" @click="clickNVR(index,item)">
+                            <div class="proper-flag" v-if="item.isClick"></div>
                             <div class="name-data titles">
                                 <span>{{item.name}}</span>
                             </div>
@@ -878,7 +879,14 @@ $mainColor:#FB505F;
             }
             .nvr-data{
                 @include titleStyle;
-
+                position: relative;
+                .proper-flag{
+                    height: 70%;
+                    width: 4px;
+                    position:absolute;
+                    top: 15%;
+                    background-color: $mainColor;
+                }
                 .name-data{
                     width: 30%;
                 }
