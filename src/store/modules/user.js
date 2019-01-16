@@ -8,6 +8,7 @@ const user={
         status:'',
         code:'',
         token:getToken(),
+        cancel:null,
         name:'',
         avatar:'',
         introduction:'',
@@ -56,7 +57,7 @@ const user={
                     const data=res.data;
                     commit('SET_TOKEN',data.token);
                     setToken(data.token);
-                    resolve();
+                    resolve(data);
                 }).catch(error=>{
                     reject(error);
                 })

@@ -96,7 +96,7 @@ export default {
     name:'Login',
      data(){
         const validateUsername=(rule,value,callback)=>{
-            if(!isvalidUsername(value)){
+            if(value.length<6){
                 callback(new Error('Please enter the correct user name'));
             }
             else{
@@ -177,8 +177,10 @@ export default {
                
             rememberUserName:false,
             loginForm:{
-                username:'axazhang.bo@advantech.com.cn',
-                password:'abc123'
+                // username:'axazhang.bo@advantech.com.cn',
+                // password:'abc123'
+                username:'',
+                password:''
             },
             loginRules:{
                 username:[{required:true,trigger:'blur',validator:validateUsername}],
@@ -219,10 +221,11 @@ export default {
             this.$refs.loginForm.validate(valid=>{
                 if(valid){
                     self.loading=true;
-                    self.$store.dispatch('LoginByUser',this.loginForm).then(()=>{
+                    self.$store.dispatch('LoginByUser',this.loginForm).then((res)=>{
                         self.loading=false;
                         self.$router.push({path:self.redirect||'/'});
-                        sessionStorage.setItem('UserEmail',self.loginForm.username)
+                        console.log(res);
+                        sessionStorage.setItem('UserId',res.userId);
                     }).catch(()=>{
                         self.loading=false;
                         Message({
@@ -482,8 +485,8 @@ $red:#fb4c5d;
         background-color:$red; 
         position: relative;
         .login-title-content{
-            width: 30%;
-            height: 30%;
+            width: 28%;
+            height: 28%;
             @include point(min-height,180);
             @include point(margin-top,20);
             background-color: #EE626E;
@@ -497,7 +500,7 @@ $red:#fb4c5d;
             }
         }
         .login-form{
-            @include point(margin-top,30);
+            @include point(margin-top,20);
             width: 90%;
             .icons{
                 @include point(font-size,22);
@@ -541,7 +544,7 @@ $red:#fb4c5d;
                 }
             }
             .el-il8{
-                @include point(margin-top,40);
+                @include point(margin-top,30);
                 .el-il8List{
                     width: 80%;
                     margin-left: 12%;
@@ -550,7 +553,7 @@ $red:#fb4c5d;
             .login-btn{
                 width:80%;
                 margin-left: 12%;
-                @include point(margin-top,35);
+                @include point(margin-top,30);
                 background-color: $fff;
                 color: $red;
                 border: 1px solid $red;
@@ -564,8 +567,9 @@ $red:#fb4c5d;
             @include point(bottom,40);
             left: 30%;
             img{
-                @include point(margin-right,30);
+                @include point(margin-right,40);
                 cursor: pointer;
+                @include point(width,65);
             }
         }
             

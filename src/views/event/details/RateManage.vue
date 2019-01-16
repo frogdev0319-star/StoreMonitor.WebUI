@@ -1,8 +1,8 @@
 <template>
     <el-row class="el-rate-container">
         <el-col :span="24" class="title-content">
-            <span class="event-title level1">{{event.eventTitle}}</span>
-            <span class="event-score">得分：{{event.score==null?6:event.score}}分</span>
+            <span class="event-title">{{event.eventTitle}}</span>
+            <span class="event-score">得分：{{event.score==null?'---':event.score}}分</span>
             <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
         </el-col>
         <el-dialog :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=380px top=15%>
@@ -36,14 +36,14 @@
                 <el-button class="file-confirm-btn" @click="confirmWind" size="mini" style="color:#fff">确 认</el-button>
             </div>
         </el-dialog>
-        <el-col :span="24" class="storeInfo-content noraml-text">
+        <el-col :span="24" class="storeInfo-content">
             <strong>门店</strong><span>{{event.storeName}}</span>
             <strong>提报人</strong><span>{{event.createor}}</span>
             <strong>提报时间</strong><span>{{event.createDate}}</span>
         </el-col>
-        <el-col :span="24" class="eventInfo-content">
+        <el-col :span="24" class="eventInfo-content" :style="{'min-height':divHeight+'px'}">
             <strong>事件详情</strong>
-            <div class="speech-content">
+            <div class="speech-content" v-if="false">
                <div class="speech-info" @click="startSpeech"> 
                    <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
                </div>
@@ -54,7 +54,7 @@
             </div>
             <div class="photo-content">
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
-                    <div v-if="item.type=='1'" class="img-content">
+                    <div v-if="item.type=='0'" class="img-content">
                         <!--图片资源-->
                         <img  :src="item.imgSrc" :alt="item.alt" height="156px"/>
                     </div>
@@ -105,18 +105,16 @@
                             </div>
                             <span v-if="item.description!=null">{{item.description}}</span>
                             <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
-                                <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                                    <div v-if="_item.type=='1'" class="img-content">
-                                        <!--图片资源-->
+                                <!-- <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                                    <div v-if="_item.type=='0'" class="img-content">
                                         <img  :src="_item.imgSrc" :alt="_item.alt" height="160px"/>
                                     </div>
-                                        <!--视频资源-->
                                     <div  v-else class="video-content">
                                         <video-player class="video-player vjs-custom-skin " 
                                         :ref="_item.ref" :options="_item.playerOptions" style="width:300px;height:150px;">
                                         </video-player>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="viedo-info">
                                 <span>{{item.createDate}}</span>
@@ -155,32 +153,32 @@ export default {
             videoSrc:"",
             curChannel:"水吧区域",
             sourceList:[
-                {
-                    type:1,
-                    ref:'img0',
-                    imgSrc:"./static/img/imgTest.jpg",
-                    alt:'门店截图'
-                },
-                {
-                    type:2,
-                    ref:'video0',
-                    playerOptions: {
-                        controls: true,
-                        // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
-                        autoplay: false, //如果true,浏览器准备好时开始回放。
-                        // muted: false, // 默认情况下将会消除任何音频。
-                        loop: false, // 导致视频一结束就重新开始。
-                        preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
-                        language: 'zh-CN',
-                        aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
-                        fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-                        notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-                        sources: [{
-                        type: "video/mp4",
-                        src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
-                        }]
-                    }
-                },
+                // {
+                //     type:1,
+                //     ref:'img0',
+                //     imgSrc:"./static/img/imgTest.jpg",
+                //     alt:'门店截图'
+                // },
+                // {
+                //     type:2,
+                //     ref:'video0',
+                //     playerOptions: {
+                //         controls: true,
+                //         // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
+                //         autoplay: false, //如果true,浏览器准备好时开始回放。
+                //         // muted: false, // 默认情况下将会消除任何音频。
+                //         loop: false, // 导致视频一结束就重新开始。
+                //         preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+                //         language: 'zh-CN',
+                //         aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+                //         fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                //         notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+                //         sources: [{
+                //         type: "video/mp4",
+                //         src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
+                //         }]
+                //     }
+                //},
                 
             ],
             commentList:[],
@@ -214,7 +212,8 @@ export default {
             initialized: false,
             previewplayer:'',
             winpDes:'',
-            timeid:0
+            timeid:0,
+            windowHeight:window.innerHeight
         }
     },
     computed: {
@@ -226,6 +225,17 @@ export default {
         },
         audioOftenText(){
             return this.audioOften+'"';
+        },
+        divHeight(){
+            if(this.windowHeight>800){
+                return this.windowHeight*0.749;
+            }
+            else if(this.windowHeight>700){
+                return this.windowHeight*0.659;
+            }
+            else{
+                return this.windowHeight*0.609;
+            }
         }
     },
     methods:{
@@ -301,8 +311,8 @@ export default {
             let obj={
                 id:event.id,
                 eventTitle:event.subject,
-                storeName: event.storeId,
-                createor:event.assigner,
+                storeName: event.storeName,
+                createor:event.assignerName,
                 createDate:util.getDateTime(event.ts),
                 deviceId:event.deviceId,
                 status:event.status
@@ -312,7 +322,7 @@ export default {
         },
         getProcess(){
             let self=this;
-            self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
+            //self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
         },
         startSpeech(){
             let self=this;
@@ -348,7 +358,7 @@ export default {
                     let temp=[];
                     dataComments.forEach((item,index)=>{
                         let obj={};
-                        obj.createOr=item.account;
+                        obj.createOr=item.accountName;
                         obj.createDate=util.getDateTime(item.ts);
                         obj.status=item.status;
                         obj.description=item.description;
@@ -358,7 +368,7 @@ export default {
                             case 1: obj.showLabel=true;obj.spanStyle={'background-color':'#434B5E'};
                                 obj.process='已处理'; break;
                             case 2: obj.showLabel=true;obj.spanStyle={'background-color':'#6097F4'};
-                                obj.process='已完结'; break;
+                                obj.process='已结案'; break;
                         }
                         if(item.status==2){
                             self.showWinpBtn=false;
@@ -371,12 +381,63 @@ export default {
                         }
                         if(item.attachment.length!=0){
                             //obj.audio.audioOften=self.audioOften;
-                            obj.sourceList=self.sourceList; 
+                            //obj.sourceList=self.sourceList; 
+                            let _temp=[];
+                            item.attachment.forEach((item,index)=>{
+                                let _obj={};
+                                switch(item.mediaType){
+                                    case 0:
+                                        // _obj.type=0;
+                                        // _obj.ref='img'+index;
+                                        // _obj.imgSrc=item.url;
+                                        // _obj.alt='截图'+index;
+                                        break;
+                                    case 1:
+                                        //_obj.type=2;
+                                       // _obj.ref='video'+index;
+                                        // _obj.playerOptions={
+                                        //     controls: true,
+                                        //     autoplay: false, //如果true,浏览器准备好时开始回放。
+                                        //     loop: false, // 导致视频一结束就重新开始。
+                                        //     preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+                                        //     language: 'zh-CN',
+                                        //     aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+                                        //     fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                                        //     notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+                                        //     sources: [{
+                                        //         type: "video/mp4",
+                                        //         src: item.url
+                                        //     }]
+                                        // }
+                                        break;
+                                    case 2:
+                                        //_obj.type=2;
+                                        //_obj.ref='video'+index;
+                                        // _obj.playerOptions={
+                                        //     controls: true,
+                                        //     autoplay: false, //如果true,浏览器准备好时开始回放。
+                                        //     loop: false, // 导致视频一结束就重新开始。
+                                        //     preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+                                        //     language: 'zh-CN',
+                                        //     aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+                                        //     fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                                        //     notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+                                        //     sources: [{
+                                        //         type: "video/mp4",
+                                        //         src: item.url
+                                        //     }]
+                                        //}
+                                        break;
+                                }
+                                _temp.push(_obj);
+                            })
+                            obj.sourceList=_temp;
                         }
                         temp.push(obj);
 
                     })
                    self.commentList=temp;
+                   //self.sourceList=self.commentList[0].sourceList;
                 }
             })
         },
@@ -478,30 +539,44 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/textstyle.css';
 @import '../../../assets/css/importfile.css'; 
+@function rem($val){
+    @return $val/16+rem;
+}
+@function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+}
 .el-rate-container{
-    padding: 20px;
-    padding-right: 30px;
+    @include point(padding,20);
+    @include point(padding-right,30);
     .title-content{
         text-align: left;
-        margin: 10px;
+        @include point(margin,10);
         position: relative;
         .event-title{
-            margin-right: 20px;
+            @include point(padding-right,20);
+            @include point(font-size,18);
+            font-weight: bold;
+            color: #424151;
         }
         .event-score{
             display: inline-block;
             background-color: #FCBA3F;
             padding:4px 12px;
             color: #fff;
-            font-size: 14px;
+            @include point(font-size,14);
             font-weight: bold;
             border-radius: 12px;
         }
         .el-submit{
             position: absolute;
             right: 0px;
-            margin-right: 20px;
-            width: 90px;
+            @include point(margin-right,20);
+            @include point(width,90);
             background-color: #FB505F;
             color: #fff;
         }
@@ -512,63 +587,65 @@ export default {
         margin: auto;
     }
     #previewVideo{
-        min-width: 500px;
-        min-height: 320px;
+        @include point(min-width,500);
+        @include point(min-height,320);
     }
     .storeInfo-content{
         text-align: left;
-        padding-left: 10px;
-        margin-top: 15px;
+        @include point(padding-left,10);
+        @include point(padding-top,15);
+        color: #424151;
+        @include point(font-size,14);
         strong{
-            margin-right: 25px;
+            @include point(margin-right,25);
         }
         span{
-            margin-right: 60px;
+            @include point(margin-right,60);
         }
     }
     .eventInfo-content{
         text-align: left;
-        margin-top: 15px;
-        padding-left: 10px;
-        font-size: 14px;
+        @include point(margin-top,15);
+        @include point(padding-left,10);
+        @include point(font-size,14);
         .speech-content{
             margin: 20px auto;
             .speech-info{
-                width: 120px;
-                height: 30px;
+                @include point(width,120);
+                @include point(height,30);
                 background-color: #FFEDED;
                 color: #FB505F;
                 border: 1px solid #FEC0C7;
-                border-radius: 15px;
+                @include point(border-radius,15);
                 display: inline-block;
                 cursor: pointer;
                 .icon-speech{
-                    font-size: 22px;
-                    line-height: 30px;
-                    margin-left: 15px;
+                    @include point(font-size,22);
+                    @include point(line-height,30);
+                    @include point(margin-left,15);
                 }
             }
             .often-text{
-                margin-left: 20px;
+                @include point(margin-left,20);
             }
         }
         .photo-content{
             overflow: hidden;
-            margin-bottom: 15px;
+            @include point(margin-bottom,15);
             .source-content{
                 float: left;
-                margin: 5px;
+                @include point(margin,5);
             }
         }
         .viedo-info{
             span{
-                font-size: 14px;
+                @include point(font-size,14);
                 color: #94a4b4;
             }
             .icon-video{
-                margin-left: 20px;
+                @include point(margin-left,20);
                 color: #FB505F;
-                font-size: 20px;
+                @include point(font-size,20);
             }
             .ahref{
                 text-decoration: underline;
@@ -580,14 +657,14 @@ export default {
             border: 1px solid #ddd;
         }
         .el-submit{
-            width: 90px;
+            @include point(width,90);
             background-color: #FB505F;
             color: #fff;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            @include point(margin-top,10);
+            @include point(margin-bottom,20);
         }
         .deal-info{
-            margin-top: 20px;
+            @include point(margin-top,20);
             width: 100%;
             height: auto;
             min-height: 100px;
@@ -601,11 +678,11 @@ export default {
             .circle-content{
                 background-color: #FBC7CC;
                 border-radius: 50%;
-                width: 22px;
-                height: 22px;
+                @include point(width,22);
+                @include point(height,22);
                 position: absolute;
-                left: 110px;
-                top: 30px;
+                @include point(left,110);
+                @include point(top,30);
             }
             .circle{
                 width: 14px;
@@ -614,22 +691,20 @@ export default {
                 -moz-border-radius: 50%;      
                 -webkit-border-radius: 50%;
                 position: relative;
-                top: 4px;
-                left: 4px;
+                @include point(top,4);
+                @include point(left,4);
                 background-color: #FB505F;
             }
             .lside{
-                height: 100px;
-                width: 120px;
+                @include point(width,120);
+                @include point(height,100);
                 position: relative;
                 float: left;
-                // border-right: 1px solid #FB505F;
                 span{
                     display: inline-block;
                     position: relative;
-                    left: 20px;
-                    top: 30px;
-                    // background-color: #FB505F;
+                    @include point(left,20);
+                    @include point(top,30);
                     padding: 2px 10px;
                     color: #fff;
                 }
@@ -637,30 +712,31 @@ export default {
             .rside{
                 width: auto;
                 height: 100%;
-                min-height: 100px;
+                @include point(min-height,100);
                 border-left: 1px solid #FB505F;
                 float: left;
-                padding-top: 5px;
+                @include point(padding-top,5);
                 .creator{
-                    margin-left: 20px;
+                    @include point(margin-left,20);
                 }
                 .deal-speech{
                     display: inline-block;
-                    margin-left: 20px;
+                    @include point(margin-left,20);
                 }
                 .source-content{
-                    margin-left: 40px;
+                    @include point(margin-left,40);
                     overflow: hidden;
                     .source-details{
                         float: left;
-                        margin: 5px;
+                        @include point(margin,5);
                     }
                 }
                 .viedo-info{
-                    margin-left: 20px;
+                    @include point(margin-left,20);
                     color: #FB505F;
-                    font-size: 20px;
+                    @include point(font-size,20);
                     margin-top: 8px;
+                    @include point(margin-top,8);
                 }
             }
         }

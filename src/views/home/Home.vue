@@ -9,14 +9,8 @@
                 <el-col :span="1" class="el-traggle-content">
                     <i class="iconfont icon-shouqi icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
                     <i class="iconfont icon-zhankai icon-collapse" @click="clickCollapse" v-else></i>
-                    <!-- <div class="traggle-content" @click="clickCollapse">
-                        <div class="traggle"></div>
-                        <div class="traggle-left"></div>
-                        <div class="traggle" style="width:22px;margin-left:6px;"></div>
-                        <div class="traggle"></div>
-                    </div> -->
                 </el-col>
-                <el-col :span="13">
+                <el-col :span="10">
                     <el-breadcrumb separator="|" class="breadcrumb-inner">
                         <el-breadcrumb-item 
                         v-for="(item,index) in breadList" 
@@ -26,7 +20,7 @@
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
-                <el-col :span="2" class="user-content">
+                <el-col :span="8" class="user-content">
                     <div class="bell-content">
                         <i class="el-icon-bell"></i>
                         <el-badge is-dot class="item"></el-badge>
@@ -40,16 +34,16 @@
                         <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right" 
                         style="margin-left:6px;cursor:pointer;"></i></span>
                         <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
-                        <el-dropdown-menu slot="dropdown" class="dropdown">
-                            <el-dropdown-item style="width:120px;padding-left:20px">我的消息</el-dropdown-item>
-                            <el-dropdown-item style="width:120px;padding-left:20px">设置</el-dropdown-item>
+                        <el-dropdown-menu slot="dropdown" class="dropdown" style="margin-top:0px;">
+                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>我的消息</el-dropdown-item>
+                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>设置</el-dropdown-item>
                             <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-col>
             </el-col>
             <el-col class="main" :span="24" 
-            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path||'/bindroute')?
+            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event')?
             {'height':(varyWindowHeight-80)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -65,26 +59,26 @@
                             <!--只有一个节点-->
                             <el-menu-item  v-if="item.leaf&&item.children.length>0" class="submenu-item"
                                 :key="index"  :index="item.children[0].path" 
+                                :disabled="item.isReadOnly"
                                 style="text-align:left;">
                                 <i :class="item.iconCls" :style="item.styles" class="navIcon"></i>
                                 <span>{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点-->
-                        <el-submenu class="el-submenu" :key="index" :index="index+''" 
+                        <el-submenu class="el-submenu" :key="index" :index="index+''" :disabled="item.name=='巡店管理'"
                         v-if="!item.leaf" style="text-align:left;">
                             <template slot="title">
                             <i :class="item.iconCls" :style="item.styles" class="navIcon">
                             </i>{{item.name}}
                             </template>
                             <el-menu-item id="childSubItem" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                             v-for="child in item.children" :index="child.path"
+                             v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
                             :key="child.path" v-if="!child.hidden" style="padding-left: 30px;">
                                 <template>
-                                    <div style="width: 10px;height: 10px;background-color:white;border-radius: 50%;-moz-border-radius: 50%;
-                                    -webkit-border-radius: 50%;float:left;margin-top:18px;margin-right:40px;"></div>
+                                    <div class="tag-icon"></div>
                                     <span >{{child.name}}</span>
                                     <div v-if="child.name=='门店管理'&&showTag" 
-                                    style="display:inline-block; width:8px;height:8px;background-color:red;border-radius:50%;margin-left:10px;"></div>
+                                    style="display:inline-block; width:8px;height:8px;background-color:#FB505F;border-radius:50%;margin-left:10px;"></div>
                                     <!--collapsed?'':-->
                                 </template>
                             </el-menu-item>
@@ -98,7 +92,7 @@
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="($route.path!='/routeinspection'
                     &&$route.path!='/storedetail'&&$route.path!='/rate'&&
-                    $route.path!='/bindroute'&&$route.path!='/schedule'&&$route.path!='/reinspection')
+                    $route.path!='/schedule'&&$route.path!='/reinspection'&&$route.path!='/bindroute')
                     ?'content-wrapper-all':'content-wrapper'">
                     <keep-alive>
                         <router-view v-if="$route.meta.keepAlive"></router-view>
@@ -118,6 +112,7 @@
 <script>
 import RateManage from '../event/details/RateManage'
 import {mapGetters,mapMutations,mapActions} from 'vuex';
+import {getUserInfo} from '@/api/login'
 import PubSub from 'pubsub-js';
 export default {
    
@@ -198,6 +193,19 @@ export default {
             self.$store.dispatch('logout').then(()=>{
 
             })
+        },
+        getUserName(){
+            let self=this;
+            let userId=sessionStorage.getItem('UserId');
+            getUserInfo().then(res=>{
+                console.log(res);
+                self.personList=res.data;
+                res.data.forEach(item=>{
+                    if(item.userId==userId){
+                        self.userName=item.userName;
+                    }
+                })
+            }) 
         }
 
     },
@@ -218,8 +226,9 @@ export default {
         })
     },
     mounted(){
-
+        this.getUserName();
     },
+    
     watch:{
         $route(){
             this.getBread();
@@ -392,7 +401,17 @@ export default {
             @include point(top,60);
             bottom:0px;
             background-color: #f6f9fe;
-            
+            .tag-icon{
+                width: 10px;
+                height: 10px;
+                background-color:white;
+                border-radius: 50%;
+                -moz-border-radius: 50%;
+                -webkit-border-radius: 50%;
+                float:left;
+                @include point(margin-right,40);
+                @include point(margin-top,18);
+            }
             aside{
                 height:100%;
                 float:left;
@@ -425,7 +444,7 @@ export default {
             .footercontent{
                 padding:0px 0 10px 60px;
                 color:#777;
-                @include point(font-size,14);
+                @include point(font-size,12);
             }
         }
         .el-submenu:hover{

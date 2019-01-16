@@ -22,7 +22,7 @@
                    </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
-               <div class="group-items group-title" :style="{'max-height':varyWindowHeight*0.62+'px'}">
+               <div class="group-items group-title" :style="{'max-height':varyDivHeight+'px'}">
                    <div v-for="(item,index) in groupList" 
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
@@ -47,19 +47,20 @@
                             </div>
                         </div>
                     </div>
-               </div>
-               </el-scrollbar>
-               <div class="group-add" v-if="showAddGroup">
-                   <el-input  size="mini" maxlength="10" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
-                    <div class="iconcontent">
-                        <div class="iconlised" style="background-color:#FB505F" @click="confirmAddGroup">
-                            <i class="el-icon-check"></i>
-                        </div>
-                        <div class="iconrised" @click="cancelAddGroup">
-                            <i class="el-icon-close"></i>
-                        </div>
+                    <div class="group-add" v-if="showAddGroup">
+                        <el-input  size="mini" maxlength="10" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
+                            <div class="iconcontent">
+                                <div class="iconlised" style="background-color:#FB505F" @click="confirmAddGroup">
+                                    <i class="el-icon-check"></i>
+                                </div>
+                                <div class="iconrised" @click="cancelAddGroup">
+                                    <i class="el-icon-close"></i>
+                                </div>
+                            </div>
                     </div>
                </div>
+               </el-scrollbar>
+        
            </div>
        </el-col>
        <el-col :span="17" class="el-rute-nape">
@@ -68,11 +69,11 @@
                     <span  v-if="groupList.length!=0" class="item-title level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
                     <div class="btn-content" v-if="groupList.length!=0">
                         <el-button class="rute-btn" size="mini" @click="addNape"><i class="el-icon-plus"></i><span>新增巡检项</span></el-button>
-                        <el-button class="rute-btn" size="mini" @click="deleteNape"><i class="el-icon-close"></i><span>删除巡检项</span></el-button>
+                        <el-button class="rute-btn" size="mini" @click="deleteNape"><i class="iconfont icon-shanchu"></i><span>删除巡检项</span></el-button>
                     </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
-               <div class="nape-items" :style="{'max-height':varyWindowHeight*0.62+'px'}">
+               <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="nape-items-title tabTitle" v-if="napeList.length!=0">
                        <div class="nape-name-title">
                            <span>巡检名称</span>
@@ -84,7 +85,7 @@
                            <span>操作</span>
                        </div>
                    </div>
-                   <div class="nape-items-data noraml-text" 
+                   <div class="nape-items-data" 
                    v-for="(item,index) in napeList" 
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
                        <div class="nape-name-data">
@@ -150,7 +151,7 @@
                             <el-button class="file-confirm-btn" @click="confirmDeleteGroup" size="mini" style="color:#fff">确 认</el-button>
                         </div>
                     </el-dialog>
-                    <div class="nape-items-data noraml-text" v-if="showAddNape"  :class="'active-color'">
+                    <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
                             <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input input-details" placeholder="输入巡检项名称" ></el-input>
@@ -204,7 +205,21 @@ export default {
             showDeleteGroup:false,
             deleteItemFlag:'',
             curItemId:'',
-            varyWindowHeight:window.innerHeight
+            varyWindowHeight:window.innerHeight,
+            bindStoreList:[]
+        }
+    },
+    computed:{
+        varyDivHeight:function(){
+            if(this.varyWindowHeight>800){
+                return this.varyWindowHeight*0.7;
+            }
+            else if(this.varyWindowHeight>700){
+                return this.varyWindowHeight*0.65;
+            }
+            else{
+                return this.varyWindowHeight*0.6;
+            }
         }
     },
     methods:{
@@ -300,9 +315,19 @@ export default {
                 self.notify('当前输入含有非法字符！','warning',3000);
                 return false;
             }
+            let mode=0;
+            if(self.tabName=='远程巡检'){
+                mode=0;
+            }
+            else if(self.tabName=='现场巡检'){
+                mode=1;
+            }
+            else{
+                mode=0;
+            }
             let obj={
                 name:self.groupNameInput,
-                mode:0,
+                mode:mode,
                 tag:self.tabName
             }
             temp.push(obj);
@@ -326,9 +351,9 @@ export default {
                     self.showAddGroup=false;
                     self.refreshData(self.groupList.length-1);
                     self.notify('添加成功!','success',3000);
-                    setTimeout(function(){
-                        PubSub.publish('change-color',{showTag:true});
-                    },1000)
+                    // setTimeout(function(){
+                    //     PubSub.publish('change-color',{showTag:true});
+                    // },1000)
                    
                 }
                 else{
@@ -559,7 +584,7 @@ export default {
             let params={
                 "request":tempParam
             };
-            inpectRESTful.addInspectItem(params).then(res=>{
+            inpectRESTful.addInspectItem(params).then((res)=>{
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     let obj={
@@ -575,6 +600,24 @@ export default {
                     self.showAddNape=false;
                     self.refreshData(self.groupIndex);
                     self.groupList[self.groupIndex].groupNum++;
+
+                    let data=res.data;
+                    let storeList=self.bindStoreList;
+                    let tempParams=[];
+                    storeList.forEach(item=>{
+                        let obj={
+                            storeId:item,
+                            itemIds:data,
+                        }
+                        tempParams.push(obj);
+                    })
+                    let paramsApply={
+                        storeList:tempParams
+                    };
+                    inpectRESTful.applyItemInspectItem(paramsApply).then(resApply=>{
+                        let res=resApply;
+                        console.log(res);
+                    })
                     self.notify('添加成功!','success',3000);
                     setTimeout(function(){
                         PubSub.publish('change-color',{showTag:true});
@@ -619,6 +662,18 @@ export default {
                     }
                     resolve(data);
                 })
+            })
+        },
+        getBindStoreList(){
+            let self=this;
+            let tagName=self.tabName;
+            let params={tagName:tagName};
+            inpectRESTful.getInspectBindList(params).then(res=>{
+                console.log(res.errMsg);
+                if(res.errMsg!=undefined&&res.errMsg=='Success'){
+                    let data=res.data;
+                    self.bindStoreList=data;
+                }
             })
         },
         async refreshData(index){
@@ -668,6 +723,7 @@ export default {
             let self=this;
             self.tabName=sessionStorage.getItem('GroupName');
             self.refreshData(0);
+            self.getBindStoreList();
         },
         notify(msg,type,time) {
             this.$message({
@@ -693,49 +749,65 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
-$mainColor:#FB505F;
-$itemHeight:50px;
-.nape-input{
-    width: 220px;
-    float: left;
-    margin-left: 10px;
-    line-height: 50px;
-}
+    $mainColor:#FB505F;
+    $itemHeight:50px;
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==auto){@return auto;}
+        @else if($val==0){@return 0;}
+        @else{@return rem($val);}
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
+    .nape-input{
+        @include point(width,220);
+        float: left;
+        @include point(margin-left,10);
+        @include point(line-height,50);
+    }
     .el-addrute{
         width: 100%;
         height: 100%;
         .el-rute-title{
             width: 100%;
-            height: 60px;
-            padding-left: 15px;
+            @include point(height,60);
+            @include point(padding-left,15);
             border-bottom: 1px solid #ddd;
             .tab-name{
                 text-align: left ;
-                margin-left: 10px;
-                font-size: 18px;
+                @include point(margin-left,10);
+                @include point(font-size,18);
                 font-weight: bold;
             }
             .icon-tabname{
-                margin-left: 20px;
-                font-size: 18px;
+                @include point(margin-left,20);
+                @include point(font-size,18);
                 color: #ddd;
                 cursor: pointer;
             }
             .tabName-input{
-                width: 220px;
+                @include point(width,220);
                 float: left;
-                margin-left: 5px;
+                @include point(margin-left,5);
             }
         }
         .rute-btn{
             background-color: $mainColor;
             color: #fff;
-            width: 120px;
+            @include point(font-size,12);
+            @include point(width,120);
+            .el-icon-plus{
+                @include point(font-size,16);
+            }
         }
         .iconcontent{
             position: absolute;
-            right: 10px;
-            margin-top: 13px;
+            @include point(right,10);
+            @include point(margin-top,13);
+            @include point(margin-right,15);
             margin-right: 15px;
             .iconlised{
                 float: left;
@@ -760,16 +832,17 @@ $itemHeight:50px;
             }
         }
         .title-content{
-            height: 60px;
-            line-height: 60px;
+            @include point(height,60);
+            @include point(line-height,60);
             text-align: left;
             position: relative;
             overflow: hidden;
             border-bottom: 1px solid #ddd;
             span{
-                margin-left: 10px;
-                font-weight: bold;
-                
+                @include point(margin-left,10);
+            }
+            .level2{
+                @include point(font-size,16);
             }
             .item-title{
                 text-overflow: ellipsis;
@@ -781,24 +854,27 @@ $itemHeight:50px;
                 cursor: pointer;
             }
             .icontitle{
-                margin-right: 10px;
+                @include point(margin-right,10);
                 font-weight: normal;
-                font-size: 20px;
-                margin-left: 15px;
+                @include point(font-size,20);
+                @include point(margin-left,15);
             }
             .btn-content{
                 width: auto;
                 height: auto;
                 float: right;
-                margin-right: 15px;
+                @include point(margin-right,15);
             }
         }
         .el-rute-group{
             height: auto;
-            min-height: 90%;
+            //min-height: 90%;
+            min-height:calc(100%-60px);
+            min-height: -webkit-calc(100%-60px);
+            min-height: -moz-calc(100%-60px);
             background-color: #FAFAFA;
             .group-items{
-                // max-height: 500px;
+                @include point(font-size,14);
                 .groupItem{
                     height: $itemHeight;
                     position: relative;
@@ -816,33 +892,34 @@ $itemHeight:50px;
                     .group-input{
                         max-width: 60%;
                         float: left;
-                        margin-left: 20px;
-                        line-height: 50px;
+                        @include point(margin-left,20);
+                        @include point(line-height,50);
                     }
                     span{
                         float: left;
-                        margin-left: 25px;
-                        line-height: 50px;
+                        @include point(margin-left,25);
+                        @include point(line-height,50);
                         width: 70%;
                         text-overflow: ellipsis;
                         overflow: hidden;
                         white-space: nowrap;
                     }
                     &:last-child{
-                        margin-bottom: 15px;
+                        @include point(margin-bottom,15);
                     }
                 }
             }
             .group-add{
-                margin-top: 5px;
+                @include point(margin-top,5);
                 position: relative;
                 overflow: hidden;
-                height: 50px;
+                @include point(height,50);
+                @include point(margin-bottom,20);
                 .groupName-input{
                     width: 60%;
                     float: left;
-                    margin-left: 25px;
-                    line-height: 50px;
+                    @include point(margin-left,25);
+                    @include point(line-height,50);
                 }
             }
         }
@@ -879,7 +956,7 @@ $itemHeight:50px;
                 line-height: $itemHeight;
                 // font-size: 12px;
                 text-align: left;
-                
+                @include point(font-size,14);
             }
             .nape-items-data{
                 overflow: hidden;
@@ -888,31 +965,32 @@ $itemHeight:50px;
                 margin: 0 0 0 3%;
                 padding-left: 1%;
                 cursor: pointer;
+                @include point(font-size,14);
+                color: #424151;
                 &:last-child{
-                    margin-bottom: 15px;
+                    @include point(margin-bottom,15);
                 }
                 .nape-input{
-                    width: 220px;
+                    @include point(width,220);
                     float: left;
-                    margin-left: 10px;
-                    line-height: 50px;
+                    @include point(margin-left,10);
+                    @include point(line-height,50);
                 }
                 .nape-name-data{
                     width: 36%;
                     display: inline-block;
                     position: relative;
                     float: left;
+                    @include point(line-height,50);
                     .item-checkbox{
-                        margin-top: 20px;
                         float: left;
                     }
                     span{
                         float: left;
-                        margin-left: 20px;
+                        @include point(margin-left,20);
                         text-align: left;
                         width: 80%;
-                        margin-top: 15px;
-                        line-height: 2.5em;
+                        @include point(font-size,14);
                     }
                 }
                 .nape-dep-data{
@@ -920,19 +998,23 @@ $itemHeight:50px;
                     display: inline-block;
                     position: relative;
                     float: left;
+                    @include point(line-height,25);
+                    // @include point(margin-top,10);
                     overflow: hidden;
                     span{
                         float: left;
-                        margin-left: 25px;
+                        @include point(margin-left,25);
+                        @include point(margin-top,10);
                         text-align: left;
-                        margin-top: 10px;
-                        line-height: 2.5em;
+                    }
+                    .nape-input{
+                        @include point(line-height,50);
                     }
                 }
                 .nape-items-handle{
                     width: 10%;
                     display: inline-block;
-                    line-height: 50px;
+                    @include point(line-height,50);
 
                 }
             }

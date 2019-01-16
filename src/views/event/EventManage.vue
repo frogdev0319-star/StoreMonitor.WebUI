@@ -1,7 +1,7 @@
 <template>
     <div class="el-event-content">
        <div class="el-date">
-            <span class="date-title noraml-text">起始时间</span>
+            <span class="date-title">起始时间</span>
             <el-date-picker
                 class="date-picker"
                 v-model="startDate"
@@ -15,7 +15,7 @@
                 :picker-options='startDateOpt'
                 @change="startDateChange">
             </el-date-picker>
-            <span class="date-title noraml-text" style="margin-left:30px;margin-right:20px;">截止时间</span>
+            <span class="date-title" style="margin-left:30px;margin-right:20px;">截止时间</span>
             <el-date-picker
                 class="date-picker"
                 v-model="endDate"
@@ -34,7 +34,7 @@
                 <div slot="content">*最长搜索时间为一个月</div>
                 <i class="iconfont icon-bangzhu" style="margin-left:10px;font-size:20px;position:relative;top:2px;color:#FB505F"></i>
             </el-tooltip>
-            <span class="date-title noraml-text" 
+            <span class="date-title" 
             style="margin-left:30px;margin-right:20px;" v-if="activeName!='0'">处理状态</span>
             <el-select v-model="value" placeholder="请选择" 
             class="el-select-content" size="small" @change="selectChange" v-if="activeName!='0'">
@@ -80,7 +80,7 @@
                             :highlight-current-row="true"
                             empty-text='没有异常数据'
                             align='left'
-                            :height="windowHeight*(windowHeight>1000?0.68:0.55)"
+                            :height="tableHieght"
                             @sort-change='sortChange'
                             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                                 <el-table-column
@@ -108,19 +108,19 @@
                             <div slot="empty">
                                 <div>
                                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无异常数据</span>
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无事件数据</span>
                                 </div> 
                             </div>
                         </el-table>
-                        <div class="toolbar pagination" style="width:100%; margin:10 15px;height:12%;margin-bottom:0px;">
-                            <el-pagination background small 
-                                :page-sizes="[10, 20, 50, 100]"
-                                @size-change="sizeChange"
-                                @current-change="currentChange"
-                            layout="jumper,total, prev, pager, next,sizes"  
-                            :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;">
-                            </el-pagination>
-                        </div>
+                    </div>
+                    <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:13%;margin-bottom:0px;">
+                        <el-pagination background small 
+                            :page-sizes="[10, 20, 50, 100]"
+                            @size-change="sizeChange"
+                            @current-change="currentChange"
+                        layout="jumper,total, prev, pager, next,sizes"  
+                        :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;">
+                        </el-pagination>
                     </div>
                 </el-tab-pane>
             </el-tabs>
@@ -133,7 +133,7 @@
     import util from '../../common/util.js'
     import CsvExportor from 'csv-exportor'
     import {eventRESTful} from '@/api/index'
-    import {getUserInfo} from '@/api/login'
+   // import {getUserInfo,isLoginIn} from '@/api/login'
     export default {
         name: "ExceptEvent",
         data(){
@@ -146,13 +146,13 @@
                         console.log(time);
                         let date=this.startDate;
                         console.log(date);
-                        return (time.getTime() > Date.now() - 8.64e6)||time.getTime()<date;
+                        return (time.getTime() > Date.now())||time.getTime()<date.getTime();
                     }
                 },
                 startDateOpt:{
                     disabledDate:(time)=>{
                         let date=this.endDate;
-                        return (time.getTime() > Date.now() - 8.64e6)||time.getTime()>date.getTime();
+                        return (time.getTime() < date.getTime() -31*8.64e7)||time.getTime()>date.getTime();
                     }
                 },
                 toolTipClass: 'page-login-toolTipClass',
@@ -205,7 +205,7 @@
                         "width":180
                     },
                     {
-                        "prop":"assigner",
+                        "prop":"assignerName",
                         "label":"提报人",
                         "sortable":'custom',
                     },
@@ -230,41 +230,47 @@
             }
 
         },
+        computed:{
+            tableHieght(){
+                if(this.windowHeight>800){
+                    return this.windowHeight*0.6;
+                }
+                else if(this.windowHeight>700){
+                    return this.windowHeight*0.56;
+                }
+                else{
+                    return this.windowHeight*0.48;
+                }
+            }
+        },
         methods:{
             startDateChange(val){
                 console.log(val);
                 let self=this;
                 self.params.beginTs=self.startDate.getTime();
                 self.params.endTs=self.endDate.getTime();
-                self.getEventParamsByIndex(Number(self.activeName));
                 self.getEventList(self.params);
+                let start=self.startDate.getTime();
+                let end=self.endDate.getTime();
+                self.getEventCount(start,end);  //切换初试时间
+                
             },
             endDateChange(val){
                 console.log(val);
                 let self=this;
                 self.params.beginTs=self.startDate.getTime();
                 self.params.endTs=self.endDate.getTime();
-                self.getEventParamsByIndex(Number(self.activeName));
                 self.getEventList(self.params);
-
-            },
-            getEventParamsByIndex(index){
-                let self=this;
-                switch(index){
-                    case 0: 
-                        self.params.clause={"status":0};break;
-                    case 1: 
-                        self.params.clause={"assigner":""};break;
-                    case 2:
-                        self.params.clause={}; break;
-                }
+                let start=self.startDate.getTime();
+                let end=self.endDate.getTime();
+                self.getEventCount(start,end);  //切换结束时间
             },
             handleClick(val){
                 let self=this;
                 console.log(val.index);
                 switch(Number(val.index)){
                     case 0: self.states=[{value: 1,label: '全部'}];  
-                            self.params.clause={"status":0};break;
+                            self.params.clause={"status":0,"assignee":self.userId};break;
                     case 1: self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
                                         {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
                             self.params.clause={"assigner":self.userId};break;
@@ -311,7 +317,7 @@
                 this.event=row;
                 sessionStorage.setItem('event',JSON.stringify(this.event));
                 sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-                this.$router.push({name:"新增事件管理",params:{event:this.event}});
+                this.$router.push({name:"事件详情",params:{event:this.event}});
             },
             sortChange(col){
                 console.log(col);
@@ -335,28 +341,12 @@
                 }
                 self.getEventList(self.params);
             },
-            getUserList(){
+             getUserId(){
                 let self=this;
-                return new Promise((resolve,reject)=>{
-                    getUserInfo().then(res=>{
-                        resolve(res.data);
-                    })
-                })
-                
-            },
-            async getUserId(){
-                let self=this;
-                let userList=await self.getUserList();
-                console.log(userList);
-                let userId='';
-                let email=sessionStorage.getItem('UserEmail');
-                userList.forEach(item=>{
-                    if(item.email==email){
-                        userId=item.userId;
-                    }
-                })
-                self.userId=userId;
-                self.getEventCount();
+                self.userId=sessionStorage.getItem('UserId');
+                let start=new Date().getTime()-1000*3600*24;
+                let end=new Date().getTime();
+                self.getEventCount(start,end);  //初始加载
             },
             getEventList(params){
                 let self=this;
@@ -372,7 +362,7 @@
                             id:item.id,
                             ts:util.getDateTime(item.ts),
                             assignee:item.assignee,
-                            assigner:item.assignerName,
+                            assignerName:item.assignerName,
                             deviceId:item.deviceId,
                             status:item.status,
                             storeId:item.storeId,
@@ -405,7 +395,7 @@
                 let end=new Date().getTime();
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.getEventParamsByIndex(Number(self.activeName)); //初始获取数据
+                self.params.clause={"status":0,"assignee":self.userId}
                 self.getEventList(self.params);
                 
             },
@@ -418,11 +408,8 @@
                 self.dialogFormVisible=true;
                 self.getExportData();
             },
-            getEventCount(){
+            getEventCount(start,end){
                 let self=this;
-                let start=new Date().getTime()-1000*3600*24;
-                let end=new Date().getTime();
-
                 let params={
                     beginTs:start,
                     endTs:end,
@@ -430,10 +417,7 @@
                         1,
                         2,
                         3
-                    ],
-                    clause:{
-                        "assigned":self.userId
-                    }
+                    ]
                 };
                 eventRESTful.getEventCount(params).then(res=>{
                     let data=res.data;
@@ -474,7 +458,7 @@
                         let obj={};
                         obj.subject=item.subject;
                         obj.storeName=item.storeName;
-                        obj.assigner=item.assignerName;
+                        obj.assignerName=item.assignerName;
                         obj.ts=util.getDateTime(item.ts);
                         temp.push(obj);
                     })
@@ -500,9 +484,8 @@
                 self.tableHeight=770+'px';
             }
             console.log(self.tableHeight);
-            self.email= sessionStorage.getItem('UserEmail');
-            self.getInitList();
             self.getUserId();
+            self.getInitList();
             if(!self.timeid){
                 self.timeid=window.setInterval(self.getEventList(self.params),60*1000);
             }
@@ -520,36 +503,51 @@
 <style lang="scss" scoped>
 @import '../../assets/css/textstyle.css';
 @import '../../assets/css/importfile.css'; 
+$red:#FB505F;
+@function rem($val){
+    @return $val/16+rem;
+}
+@function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+}
 .el-event-content{
     width: 100%;
     position: relative;
+    overflow: hidden;
     .tabName-input-content{
         background: #fff;
-        height: 73px;
+        @include point(height,73);
         width: 100%;
     }
     .el-date{
-        height: 5em;
-        line-height: 5em;
+        @include point(height,80);
+        @include point(line-height,80);
         text-align: left;
         border-bottom: 1px solid #ddd;
         position: relative;
         .date-title{
-            margin-left: 30px;
-            margin-right:20px;
+            @include point(margin-left,30);
+            @include point(margin-right,20);
+            @include point(font-size,14);
+            color: #424151;
         }
         .date-picker{
-            width:160px;
+            @include point(width,160);
         }
         .el-search{
             position:absolute;
             right: 0px;
-            margin-right: 20px;
-            width: 160px;
+            @include point(margin-right,20);
+            @include point(width,160);
         }
     }
     .dialog-footer{
-        margin-top: 20px;
+        @include point(margin-top,20);
         .file-content-btn{
             position: relative;
             left: 60%;
@@ -560,13 +558,13 @@
         float: left;
         background-color: #fff;
         position: relative;
-        padding-top: 20px;
+        @include point(padding-top,20);
         .export-btn{
             position: absolute;
             right: 0px;
             margin-right: 10px;
-            background-color: #FB505F;
-            border-color: #FB505F;
+            background-color: $red;
+            border-color: $red;
             border-radius: 0px;
             z-index: 990;
         }
@@ -574,10 +572,10 @@
     
 }
 .el-select-content{
-    width: 120px;
+    @include point(width,120);
 }
 .empty-data-icon{
-    font-size: 22px;
+    @include point(font-size,22);
     color: #53c247;
 }
 </style>
@@ -593,6 +591,9 @@
     }
 </style>
 <style>
+    .el-table::before{
+        height: 0px !important;
+    }
     .el-search .el-input__inner{
         background: #f0f5f8 !important;
         border-radius: 15px !important;
@@ -604,6 +605,9 @@
     }
     #tabs-content .el-tabs__nav-scroll{
         margin-left:40px;
+    }
+    #tabs-content .el-tabs__header{
+        margin-bottom:0px !important;
     }
     .el-tabs__active-bar{
         height: 4px !important;

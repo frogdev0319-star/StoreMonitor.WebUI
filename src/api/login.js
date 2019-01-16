@@ -22,3 +22,10 @@ export function getUserInfo(){
         method:'get'
     })
 }
+
+export function isLoginIn(){
+    return request({
+        url:'/islogin',
+        method:'post'
+    })
+}

@@ -21,7 +21,7 @@
                  <i :class="showDrap?'el-icon-arrow-down':'el-icon-arrow-up'" class='icon-input'></i>
                 </div>
                 <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
-                <div class="city-panel" v-if="showCityContent">
+                <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false">
                     
                     <p :style="isChecked?{}:{'color':'#FB505F'}">
                         <el-checkbox v-model="allCityChecked" @change="choiceAllCity"
@@ -46,23 +46,25 @@
             <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}表已绑定{{storeCount}}家门店</p>
            
         </div>
-        <div class="el-bind-content" :style="{'min-height':varyWindowWidth*0.60+'px'}">
-            <div class="el-all-checkbox" v-if="storeList.length!=0">
-                <el-checkbox  v-model="allData" @change="choiceAll"></el-checkbox>
-                <span class="all-device-title">关联至所有门店</span>
-            </div>
-            <div class="device-group" v-for="(item,index) in storeList" :key="index">
-                <div class="device-all-checkbox">
-                    <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)"></el-checkbox>
-                    <span class="group-name">{{item.cityName}}</span>
+        <div class="el-bind-content" :style="{'min-height':varyWindowWidth*0.56+'px'}">
+            <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                <div class="el-all-checkbox" v-if="storeList.length!=0">
+                    <el-checkbox  v-model="allData" @change="choiceAll"></el-checkbox>
+                    <span class="all-device-title">关联至所有门店</span>
                 </div>
-                <div class="device-content">
-                    <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
-                        <el-checkbox v-model="_item.checked" @change="choiceAllDevice(index,item,_index,_item)"></el-checkbox>
-                        <span class="device-name">{{_item.name}}</span>
+                <div class="device-group" v-for="(item,index) in storeList" :key="index">
+                    <div class="device-all-checkbox">
+                        <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)"></el-checkbox>
+                        <span class="group-name">{{item.cityName}}</span>
+                    </div>
+                    <div class="device-content">
+                        <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
+                            <el-checkbox v-model="_item.checked" @change="choiceAllDevice(index,item,_index,_item)"></el-checkbox>
+                            <span class="device-name">{{_item.name}}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </el-scrollbar>
         </div>
         <div class="el-bind-footer">
             <div class="el-btn-content">
@@ -125,9 +127,21 @@ export default {
         },
         choiceAllCity(val){
             let self=this;
+            let str='';
+            let temp=[];
+            if(!val){
+                self.citys='';
+                self.multeCityList=[];
+            }
             self.cityList.forEach(item=>{
                 item.checked=val;
+                if(val){
+                    str=str+item.cityName+';';
+                    temp.push(item.cityName);
+                }
             })
+            self.citys=str.substring(0,str.length-1);
+            self.multeCityList=temp;
         },
         changeCityItem(item){
             console.log(item);
@@ -156,14 +170,19 @@ export default {
             let self=this;
             self.curProvince='';
             self.citys='';
-            self.getStoreByCity();
+            //self.getStoreByCity();
+            self.getStoreListBYValue();
         },
         searchStore(){
             let self=this;
             self.showCityContent=false;
+            self.serachVale='';
+
+            //self.getStoreByCity();
             let temp=self.tempStoreList;
             let province=self.curProvince;
             let citys=self.multeCityList;
+            
             let tempArray=[];
             if(citys.length!=0){
                 temp.forEach(item=>{
@@ -187,6 +206,19 @@ export default {
                 }
             }
             self.storeList=tempArray;
+
+            let count=0;
+            self.storeList.forEach(item=>{
+                if(item.checked){
+                    count++;
+                }
+            })
+            if(count==self.storeList.length){
+                self.allData=true;
+            }
+            else{
+                self.allData=false;
+            }
         },
         choiceAll(val){
             let self=this;
@@ -252,6 +284,22 @@ export default {
             let self=this;
             let params={};
             params.like={
+                'name':''
+            };
+            return new Promise((resolve,reject)=>{
+                getStoreList(params).then(res=>{
+                    console.log(res);
+                    let errMsg=res.errMsg;
+                    let data=res.data.content;
+                    console.log(data);
+                    resolve(data);
+                })
+            })
+        },
+        getStoreDataByValue(){
+            let self=this;
+            let params={};
+            params.like={
                 'name':self.serachVale
             };
             return new Promise((resolve,reject)=>{
@@ -298,6 +346,78 @@ export default {
             })
             self.cityList=temp;
         },
+        async getStoreListBYValue(){
+            let self=this;
+            let data=await self.getStoreDataByValue();
+            let bindStoreId=await self.getBindStoreList();
+            self.storeCount=bindStoreId.length;
+            let cityList=[];
+            data.forEach(item=>{
+                if(cityList.indexOf(item.city)==-1){
+                    cityList.push(item.city);
+                }
+            })
+            let temp=[];
+            cityList.forEach(item=>{
+                let obj={};
+                obj.city=item;
+                let _temp=[];
+                data.forEach(_item=>{
+                    if(item==_item.city){
+                        let _obj={};
+                        obj.province=_item.province;
+                        _obj.storeName=_item.name;
+                        _obj.storeId=_item.storeId;
+                        _temp.push(_obj);
+                    }
+                })
+                obj.store=_temp;
+                temp.push(obj);
+            })
+            let groupTemp=[];
+            temp.forEach(item=>{
+                let groupObj={};
+                groupObj.province=item.province;
+                groupObj.cityName=item.city;
+                let _temp=[];
+                let _tempCount=0;
+                item.store.forEach(_item=>{
+                    let _obj={};
+                    if(bindStoreId.indexOf(_item.storeId)==-1){
+                        _obj.checked=false;
+                    }
+                    else{
+                        _obj.checked=true;
+                        _tempCount++;
+                    }
+                    _obj.storeId=_item.storeId;
+                    _obj.name=_item.storeName;
+                    _temp.push(_obj);
+                })
+                if(_tempCount==item.store.length){
+                    groupObj.checked=true;
+                }
+                else{
+                    groupObj.checked=false;
+                }
+                groupObj.itemData=_temp;
+                groupTemp.push(groupObj);
+            })
+            self.storeList=groupTemp;
+            self.tempStoreList=groupTemp;
+            let count=0;
+            self.storeList.forEach(item=>{
+                if(item.checked){
+                    count++;
+                }
+            })
+            if(count==self.storeList.length){
+                self.allData=true;
+            }
+            else{
+                self.allData=false;
+            }
+        },
         async getStoreByCity(){
             let self=this;
             let data=await self.getStoreData();
@@ -334,7 +454,6 @@ export default {
                 let groupObj={};
                 groupObj.province=item.province;
                 groupObj.cityName=item.city;
-                //groupObj.checked=false;
                 let _temp=[];
                 let _tempCount=0;
                 item.store.forEach(_item=>{
@@ -353,6 +472,9 @@ export default {
                 if(_tempCount==item.store.length){
                     groupObj.checked=true;
                 }
+                else{
+                    groupObj.checked=false;
+                }
                 groupObj.itemData=_temp;
                 groupTemp.push(groupObj);
             })
@@ -366,6 +488,9 @@ export default {
             })
             if(count==self.storeList.length){
                 self.allData=true;
+            }
+            else{
+                self.allData=false;
             }
         },
         bindNapeToStore(params){
@@ -501,165 +626,168 @@ export default {
     margin:0;
     text-align: left;
     font-family: 'Microsoft YaHei';
-    font-size: 14px;
+}
+@function rem($val){
+    @return $val/16+rem;
+}
+@function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkRem($val);
 }
 .el-search-input{
-    width: 200px;
-    margin-right: 20px;
+    @include point(width,200);
+    @include point(margin-right,20);
     position:absolute;
     right: 0px;
 }
 .el-bind-device{
     .seacrh-content{
-        margin-top: 30px;
-        margin-left: 30px;
+        @include point(margin-top,30);
+        @include point(margin-left,30);
         position: relative;
         .el-province{
-            width: 160px;
-            margin-right: 20px;
-            margin-left: 15px;
+            @include point(width,160);
+            @include point(margin-left,15);
+            @include point(margin-right,20);
         }
         #elCity{
-            width: 160px;
+            @include point(width,160);
         }
         .city-content{
             display: inline-block;
             position: relative;
             cursor: pointer;
             .input-arrow-panel{
-                width: 160px;
-                height: 28px;
+                @include point(width,160);
+                @include point(height,28);
                 position: absolute;
                 background-color: transparent;
                 cursor: pointer;
                 z-index: 100;
             }
             .el-input{
-                width: 160px;
+                @include point(width,160);
             }
         }
         .el-search-btn{
-            width: 90px;
+            @include point(width,90);
             text-align: center;
-            margin-left: 15px;
+            @include point(margin-left,15);
             background-color: #FB505F;
             color: #fff;
         }
         .icon-input{
             position: absolute;
             right: 10px;
-            top: 6px;
+            @include point(right,10);
+            @include point(top,6);
         }
         .city-panel{
             position:absolute;
             margin-top: 3px;
-            left: 275px;
+            @include point(left,275);
             width: 60%;
             height: auto;
             padding:10px 0px 30px 15px;
             z-index: 980;
             background-color: #fff;
             border:1px solid #ddd;
+            @include point(font-size,14);
             p{
-                font-size: 14px;
                 font-weight: bold;
             }
             .city-details{
                 width: auto;
                 min-width: 12.5%;
                 display: inline-block;
-                margin-right: 15px;
-                margin-top: 10px;
-                font-size: 14px;
+                @include point(margin-right,15);
+                @include point(margin-top,10);
             }
         }
     }
     .el-header-title{
-        font-size: 18px;
+        @include point(font-size,18);
         font-weight: bold;
-        margin-left: 30px;
+        @include point(margin-left,30);
         position: relative;
         top: 5px;
         display: inline;
     }
     .el-header-hr{
-        margin-left: 30px;
-        margin-top: 15px;
-        margin-bottom: 20px;
-        margin-right: 20px;
+        @include point(margin-left,30);
+        @include point(margin-top,15);
+        @include point(margin-bottom,20);
+        @include point(margin-right,20);
         border:0.5px solid #e3e9f4; 
         
     }
     .choice-device{
-        text-align: right;
-        margin-right: 30px;
-        font-size: 13px;
+        @include point(margin-right,30);
+        @include point(font-size,12);
         color: #4b5262;
         display: inline;
         position: absolute;
-        right: 10px;
-        margin-top: 10px;
+        @include point(right,10);
+        @include point(margin-top,10);
     }
     .el-bind-content{
-        margin-left: 30px;
-        margin-top: 10px;
-        margin-right: 20px;
+        @include point(margin-left,30);
+        @include point(margin-top,10);
+        @include point(margin-right,20);
         background-color: #F6F7FB;
         border:0.5px solid #e3e9f4;
         .el-all-checkbox{
             margin: 20px auto 20px 15px;
             .all-device-title{
-                margin-left: 15px;
-                font-size: 14px;
+                @include point(margin-left,15);
+                @include point(font-size,14);
             }
         }
         .device-group{
             width: 100%;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            @include point(margin-top,20);
+            @include point(margin-bottom,20);
             .device-all-checkbox{
-                margin-left: 15px;
+                @include point(margin-left,15);
                 .group-name{
-                    margin-left: 15px;
-                    font-size: 14px;
+                    @include point(margin-left,15);
+                    @include point(font-size,14);
                     font-weight: bold;
                 }
             }
             .device-content{
-                margin-left: 40px;
+                @include point(margin-left,40);
                 overflow: hidden;
                 .device-detail{
                     width: auto;
-                    min-width: 160px;
-                    margin-left: 10px;
-                    margin-top: 10px;
+                    @include point(min-width,160);
+                    @include point(margin-left,10);
+                    @include point(margin-top,10);
                     float: left;
                     .device-name{
-                        margin-left: 15px;
+                        @include point(margin-left,15);
+                        @include point(font-size,14);
                     }
                 }
             }
         }
     }
     .el-bind-footer{
-        margin-top: 15px;
-        .el-btn-title{
-            margin-left: 30px;
-            margin-top: 10px;
-            .btn-title{
-                margin-right: 100px;
-            }
-            .btn-infoS{
-                margin-left: 20px;
-                color: #fea315;
-            }
-        }
+        @include point(height,50);
+        @include point(line-height,50);
+        @include point(margin-bottom,25);
+        position: relative;
         .el-btn-content{
-            margin-left: 25px;
-            margin-top: 30px;
-            margin-bottom: 20px;
+            @include point(margin-left,25);
+            position: absolute;
+            @include point(margin-top,15);
+            @include point(margin-bottom,15);
             .btn{
-                width: 120px;
+                @include point(width,120);
                 background-color: #FB505F; 
                 color: #fff;
             }
@@ -699,6 +827,9 @@ export default {
 }
 .el-select-dropdown__item.selected{
     color:#FB505F !important;
+}
+#el-menuscrollbar .el-scrollbar__wrap {
+  overflow-x: hidden;
 }
 </style>
 <style scoped>

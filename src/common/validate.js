@@ -25,7 +25,9 @@ export function validateEmail(email) {
 export function validateInput(str){
     var pat=new RegExp("[^a-zA-Z0-9\_\u4e00-\u9fa5]","i");
     //var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥\\\\……&*（）——|{}【】‘；：”“'。，、？]") 
-    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>/?~！@#￥\\\\……&*（）——|{}【】‘；：”“']") 
+    //var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>/?~！@#￥\\\\……&*（）——|{}【】‘；：”“']") 
+    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>/?~@#￥\\\\&*——|{}【】‘”“']") 
+    var pattern=/[@#\$%\^&\*]+/g;
     return pattern.test(str);
 }
 

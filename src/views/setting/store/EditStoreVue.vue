@@ -1,7 +1,7 @@
 <template>
     <el-row class="el-storeEdit-content">
         <el-col :span="24" class="storeEdit-header">
-            <div class="store-title level1">
+            <div class="store-title ">
                 <span>{{storeTitle}}</span>
                 <el-button @click="submitData" class="sub-btn" size="mini">提交</el-button>
             </div>
@@ -17,7 +17,7 @@
                 </el-select>
                 <strong style="margin-right:20px;">联系方式</strong><span style="min-width:120px;">{{phone}}</span>
                 <span style="margin-right:20px;"><strong>巡检排程</strong></span>
-                <el-select v-model="schedule" placeholder="请选择" size="mini" class="el-schedule">
+                <el-select v-model="schedule" placeholder="请选择" size="mini" class="el-schedule" :disabled=true>
                     <el-option
                     v-for="item in scheduleList"
                     :key="item.value"
@@ -31,32 +31,36 @@
                 <span style="font-size:14px;">{{curTag}}</span>
             </div>
         </el-col>
-        <el-col :span="24" class="storeEdit-content">
+        <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
             <div class="el-table-title tabTitle">
                 <span class="name-title">巡检名称</span>
                 <span class="schedule-title">关联通道</span>
             </div>
-            <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index">
-                <span class="grouptitle level3">
-                    {{item.napeName}}（{{item.napeNum}}）
-                </span>
-                <div class="schedule-data">
-                    <div v-for="(_item,_index) in item.itemData" :key="_index" :class="!_item.isClick?'noraml-color':'active-color'"
-                    class="schedule-detials" style="overflow:hidden;" @click="clickItem(_item,_index)">
-                        <span class="nape-title">
-                            {{`${_index+1}. ${_item.subject}`}}
-                        </span>
-                        <el-select v-model="_item.channelvalue" class="nape-value" size="mini"  @focus="clickItem(_item,_index)">
-                            <el-option
-                            v-for="item in alleList"
-                            :key="item.name"
-                            :label="item.name"
-                            :value="item.name">
-                            </el-option>
-                        </el-select>
+            <!-- <div v-if="scheduleData.length!=0"> -->
+                <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index" >
+                    <span class="grouptitle">
+                        {{item.napeName}}（{{item.napeNum}}）
+                    </span>
+                    <div class="schedule-data">
+                        <div v-for="(_item,_index) in item.itemData" :key="_index" :class="!_item.isClick?'noraml-color':'active-color'"
+                        class="schedule-detials" style="overflow:hidden;" @click="clickItem(_item,_index)">
+                            <span class="nape-title">
+                                {{`${_index+1}. ${_item.subject}`}}
+                            </span>
+                            <el-select v-model="_item.channelvalue" class="nape-value" size="mini"  @focus="clickItem(_item,_index)">
+                                <el-option
+                                v-for="item in alleList"
+                                :key="item.name"
+                                :label="item.name"
+                                :value="item.name">
+                                </el-option>
+                            </el-select>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <!-- </div> -->
+            <!-- <div class="empty-text" v-else>
+            </div> -->
         </el-col>
     </el-row>
 </template>
@@ -93,7 +97,21 @@ export default {
             curPerson:'',
             scheduleData:[],
             alleList:[],
-            userId:''
+            userId:'',
+            varyWindowHeight:window.innerHeight
+        }
+    },
+    computed:{
+        emptyContentHeight(){
+            if(this.varyWindowHeight>800){
+                return this.varyWindowHeight*0.7;
+            }
+            else if(this.varyWindowHeight>700){
+                return this.varyWindowHeight*0.6;
+            }
+            else{
+                return this.varyWindowHeight*0.5;
+            }
         }
     },
     mounted(){
@@ -101,8 +119,9 @@ export default {
         
         self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
         let storeId=self.store.storeId;
-        self.storeTitle=self.store.storename;
+        self.storeTitle=self.store.name;
         self.userId=self.store.userId;
+        self.curTag=self.store.napeTable;
         self.getNapeByStore(storeId);
         self.getChannelByStore(storeId);
         self.getUserList();
@@ -213,13 +232,6 @@ export default {
                     }
                 })
             })
-            if((count!=0&&(count!=countChannel))||countChannel==0){
-                self.notify('请选择全部通道后提交！','warning',3000);
-                return false;
-            }
-            let paramsInspec={
-                items:temp
-            };
             let paramsUpdateStore={
                 "store": [
                     {
@@ -228,18 +240,37 @@ export default {
                     }
                 ]
             };
-            let resUpdateStore=null,resBindInspect=null;
-            if(self.userId!=self.curPerson){  //如果没有修改负责人不执行
-                resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
-            }
-            resBindInspect=await self.bindInspectItem(paramsInspec);
-            if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
-            ||(resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
-                self.notify('提交成功！','success',3000);
+            if(self.scheduleData.length==0){
+                let resUpdateStore=null;
+                if(self.curPerson.length!=0&&(self.userId!=self.curPerson)){  //如果没有修改负责人不执行
+                    resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
+                }
+                if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
+                     self.notify('提交成功！','success',3000);
+                }
             }
             else{
-                self.notify('提交失败！','warning',3000);
-                return false;
+                if((count!=0&&(count!=countChannel))||countChannel==0){
+                    self.notify('请选择全部通道后提交！','warning',3000);
+                    return false;
+                }
+                let paramsInspec={
+                    items:temp
+                };
+                
+                let resUpdateStore=null,resBindInspect=null;
+                if(self.curPerson.length!=0&&(self.userId!=self.curPerson)){  //如果没有修改负责人不执行
+                    resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
+                }
+                resBindInspect=await self.bindInspectItem(paramsInspec);
+                if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
+                ||(resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
+                    self.notify('提交成功！','success',3000);
+                }
+                else{
+                    self.notify('提交失败！','warning',3000);
+                    return false;
+                }
             }
         },
         bindInspectItem(params){
@@ -271,64 +302,81 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../assets/css/textstyle.css';
+    $red:#FB505F;
+    $fff:#fff;
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==auto){@return auto;}
+        @else if($val==0){@return 0;}
+        @else{@return rem($val);}
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
     .noraml-color{
-            background-color: #F6F7FB;
-            cursor: pointer;
-        }
-        .active-color{
-            background-color: #FEE4E7;
-            cursor: pointer;
-        }
+        background-color: #F6F7FB;
+        cursor: pointer;
+    }
+    .active-color{
+        background-color: #FEE4E7;
+        cursor: pointer;
+    }
     .el-storeEdit-content{
-        padding-left: 30px;
-        padding-top: 20px;
-        padding-right: 10px;
+        @include point(padding-left,30);
+        @include point(padding-top,20);
+        @include point(padding-right,10);
         .storeEdit-header{
             .store-title{
                 overflow: hidden;
                 text-align: left;
+                @include point(font-size,18);
+                font-weight: bold;
+                color: #424151;
                 .sub-btn{
                     float: right;
-                    margin-right: 20px;
-                    width: 80px;
-                    color: #fff;
-                    background-color: #FB505F;
-                    border-color: #FB505F;
+                    @include point(margin-right,20);
+                    @include point(width,80);
+                    color: $fff;
+                    background-color: $red;
+                    border-color: $red;
                 }
             }
             .store-info{
                 text-align: left;
-                margin-top: 15px;
-                font-size: 14px;
+                @include point(margin-top,15);
+                @include point(font-size,14);
                 span{
                     width:auto;
                     margin-right: 6%;
                 }
                 .el-schedule{
-                    width: 140px;
-                    margin-right: 25px;
+                    @include point(width,140);
+                    @include point(margin-right,25);
                 }
             }
             .store-handle{
-                margin-top: 20px;
+                @include point(margin-top,20);
                 text-align: left;
                 span{
-                    margin-right: 30px;
+                    @include point(margin-right,30);
                 }
             }
         }
         .storeEdit-content{
-            margin-top: 20px;
-            margin-bottom: 20px;
+            @include point(margin-top,20);
+            @include point(margin-bottom,20);
             background-color: #F6F7FB;
             .el-table-title{
-                height: 50px;
-                line-height: 50px;
+                @include point(font-size,14);
+                @include point(line-height,50);
+                @include point(height,50);
                 text-align: left;
                 border-bottom: 1px solid #ddd;
                 margin:auto 10px;
                 color: #94A4B4;
-                font-size: 14px;
+                @include point(font-size,14);
                 font-weight: bold;
                 .name-title{
                     width: 40%;
@@ -336,27 +384,27 @@ export default {
                     margin-right: 2%;
                     margin-left: 2%;
                 }
-                .schedule-title{
-
-                }
             }
             .el-table-data{
-                padding-left: 10px;
-                padding-right: 10px;
+                @include point(padding-left,10);
+                @include point(padding-right,10);
                 text-align: left;
                 .grouptitle{
                     margin-left: 2%;
                     display: inline-block;
-                    margin-top: 10px;
+                    @include point(margin-top,10);
+                    @include point(font-size,15);
+                    font-weight: bold;
+                    color: #424151;
                 }
                 .schedule-data{
                     margin-top: 5px;
                     .schedule-detials{
                         text-align: left;
-                        height: 50px;
-                        line-height: 50px;
+                        @include point(line-height,50);
+                        @include point(height,50);
                         border-bottom: 1px solid #ddd;
-                        font-size: 14px;
+                        @include point(font-size,14);
                     }
                     .nape-title{
                         margin-left: 2%;

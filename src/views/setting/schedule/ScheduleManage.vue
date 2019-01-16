@@ -58,7 +58,7 @@
                         <el-radio v-model="radioDate" label="2">按时间设置</el-radio>
                     </div>
                     <div v-if="radioDate=='1'" class="radio-date">
-                        <span class="noraml-text" style="margin-right:15px;">选择月份</span>
+                        <span style="margin-right:15px;">选择月份</span>
                         <el-date-picker
                         class="el-date"
                         v-model="modeMonth" size="mini"
@@ -66,7 +66,7 @@
                         :clearable=false
                         placeholder="选择月" @change="changeMonth">
                         </el-date-picker>
-                        <span class="noraml-text" style="margin-left:30px;margin-right:20px;">日期</span>
+                        <span style="margin-left:30px;margin-right:20px;">日期</span>
                         <el-input size="mini" style="width:200px;" v-model="modeDate"></el-input>
                         <div class="date-content">
                             <div class="date-header">
@@ -505,6 +505,7 @@ export default {
                     }
                 }
                 .group-items{
+                    @include point(font-size,14);
                     .groupItem{
                         @include point(height,50);
                         position: relative;
@@ -583,6 +584,8 @@ export default {
                         @include point(line-height,50);
                         text-align: left;
                         @include point(margin-left,30);
+                        @include point(font-size,14);
+                        color: #424151;
                         .el-date{
                             @include point(width,200);
                         }

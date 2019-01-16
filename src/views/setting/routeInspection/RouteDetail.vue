@@ -3,7 +3,7 @@
         <el-row>
             <el-col :span="24" class="detail-title">
                
-                <span class="title-title level1" v-if="routeData.length!=0">{{tabName}}一共{{typeNum}}大类，{{itemNum}}个巡检项目</span>
+                <span class="title-title " v-if="routeData.length!=0">{{tabName}}一共{{typeNum}}大类，{{itemNum}}个巡检项目</span>
                 <div class="route-btns">
                      <el-button
                     class="el-delete-btn" 
@@ -73,9 +73,9 @@
                         <span class="handle-title">操作</span>
                     </div>
                    
-                    <div style="float:left;margin-bottom:10px;margin-left:27px;">
+                    <div class="table-header-title">
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
-                        <span class="table-title level3">{{item.groupName}}（{{item.itemCount}}）</span>
+                        <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
                      <div v-if="item.itemData.length!=0">
                         <el-table
@@ -592,20 +592,33 @@ export default {
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
     $mainColor:#FB505F;
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==auto){@return auto;}
+        @else if($val==0){@return 0;}
+        @else{@return rem($val);}
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
     .detail-title{
         overflow: hidden;
         .title-title{
             display: block;
-            // font-size: 16px;
-            // font-weight: bold;
-            margin-top: 10px;
+            @include point(margin-top,10);
             margin-left: 0px;
-            margin-bottom: 15px;
+            @include point(margin-bottom,15);
             float: left;
+
+            @include point(font-size,18);
+            font-weight: bold;
+            color: #424151;
         }
         .route-btns{
             float: right;
-            margin-right: 15px;
+            @include point(margin-right,15);
             .noAllow{
                 cursor:not-allowed;
                 opacity: 0.6;
@@ -614,9 +627,10 @@ export default {
                 background-color: #fff; 
                 border-color:  $mainColor;
                 color: $mainColor;
-                width: 120px;
+                @include point(width,120);
                 border-radius: 0px;
-                margin-right:8px;
+                @include point(margin-right,8);
+                @include point(font-size,12);
                 &:disabled{
                     opacity: 0.6;
                 }
@@ -625,8 +639,9 @@ export default {
                 background-color: $mainColor; 
                 border-color:  $mainColor;
                 color: #fff;
-                width: 120px;
+                @include point(width,120);
                 border-radius: 0px;
+                @include point(font-size,12);
                 &:disabled{
                     opacity: .6;
                 }
@@ -634,20 +649,20 @@ export default {
         }
     }
     .data-content{
-        margin: 15px;
+        @include point(margin,15);
         margin-left: 0px;
         overflow: hidden;
         .header-content{
             width: 100%;
             margin-top:0px;
-            margin-bottom: 10px;
+            @include point(margin-bottom,10);
             float: left;
             overflow: hidden;
-            // font-size: 14px;
             text-align: left;
-            padding-left: 27px;
-            padding-bottom: 10px;
+            @include point(padding-left,27);
+            @include point(padding-bottom,10);
             border-bottom:1px solid #e3e9f4;
+            @include point(font-size,14);
             .allcheckBox{
                 float: left;
             }
@@ -672,16 +687,22 @@ export default {
                 margin-left: 2%;
             }
         }
+        .table-header-title{
+            float:left;
+            @include point(margin-bottom,10);
+            @include point(margin-left,27);
+        }
         .table-title{
-            margin-left: 30px;
-            // font-weight: bold;
-            // font-size: 15px;
+            @include point(margin-left,30);
+            @include point(font-size,15);
+            font-weight: bold;
+            color: #424151;
         }
     }
     .el-dropbtn1{
         position: relative;
         bottom: 2px;
-        margin-left: 10px;
+        @include point(margin-left,10);
     }
     .showNewContent{
         position: absolute;
@@ -711,13 +732,13 @@ export default {
         .export-btn{
             background-color: $mainColor;
             padding: 8px 25px;
-            font-size: 14px;
+            @include point(font-size,14);
             color: #fff;
         }
     }
     .tabName-input-content{
         background: #fff;
-        height: 73px;
+        @include point(height,73);
         width: 100%;
     }
 </style>
@@ -749,9 +770,6 @@ export default {
 .current-row > td {
   background: #FEE7E4 !important;
 }
-/* .el-dialog{
-    margin-left:85vh;
-} */
 .el-dialog__body{
     padding: 0px;
 }
@@ -760,9 +778,6 @@ export default {
     width: 86px;
     border-radius: 5px !important;
     border: 0px;
-}
-.el-radio-button__inner:hover{
-    color: #FB505F !important;
 }
 .el-radio-button__orig-radio:checked+.el-radio-button__inner{
     background-color: #FB505F !important;

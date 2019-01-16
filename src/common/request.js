@@ -6,23 +6,32 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-//let base='http://'+window.location.host;
-let base ="http://172.21.84.62:8085";
+let base='http://'+window.location.host;
+//let base ="http://172.21.84.62:8085";
+
 let itempath='/storemonitor/api/v1.0'
+
+//配置
+//const CancelToken=axios.CancelToken;
+//const source=CancelToken.source();
+//store.requestCancel=source.cancel;  //保存到全局变量，用于路由切换时调用
 axios.defaults.withCredentials = true
 const service=axios.create({
     baseURL:`${base}${itempath}`,
+    timeout:10000,
+    // cancelToken:source.token
+})
+//文件下载axios
+const serviceAxios=axios.create({
+    baseURL:`${base}${itempath}`,
     timeout:5000
 })
-
-service.interceptors.request.use(
+serviceAxios.interceptors.request.use(
     config=>{
-        //Do something before request is sent
         if(store.getters.token){
+            config.responseType='blob';
             config.headers={
-                'token':getToken(),
-                'Accept':'application/json',
-                'Content-Type':'application/json;charset=UTF-8'
+                'token':getToken()
             }
         }
         return config;
@@ -33,36 +42,15 @@ service.interceptors.request.use(
         Promise.reject(error);
     }
 )
-service.interceptors.response.use(
+serviceAxios.interceptors.response.use(
     response=>{
         const res=response.data;
-        if(res.errCode!==0){
-            Message({
-                message:res.message,
-                type:'error',
-                duration:5*1000
-            })
-            //50008 :非法token, 50012:其他客户端登陆了, 50014:token过期了
-            if(res.errCode===500&&res.errMsg=='Invalid token'){
-                MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录！','确认登出',{
-                    confirmButtonText:'重新登录',
-                    cancelButtonText:'取消',
-                    type:'warning'
-                }).then(()=>{
-                    store.dispatch('FedLogOut').then(()=>{
-                        router.push('/login');
-                    })
-                })
-            }
-            return Promise.reject('error')
-        }
-        else{
-            return response.data;
-        }
+        return res;
     },err=>{
         console.log(err);
         let errCode=err.response.data.errCode;
-        if(errCode===500){
+        let errMsg=err.response.data.errMsg;
+        if(errCode===500&&errMsg=='Invalid token'){
             MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录！','确认登出',{
                 confirmButtonText:'重新登录',
                 cancelButtonText:'取消',
@@ -77,9 +65,79 @@ service.interceptors.response.use(
                     })
                 })
             })
-            return false;
+            
+        }
+        else if(errCode===500&&errMsg=='No authority'){
+            router.push('/');
+            Message({
+                //message:err.response.data.errMsg,
+                message:'无操作权限!',
+                type:'error',
+                duration:5*1000
+            })
         }
     }
 )
 
+
+service.interceptors.request.use(
+    config=>{
+        //Do something before request is sent
+        if(store.getters.token){
+            config.headers={
+                'token':getToken(),
+                'Accept':'application/json',
+                'Content-Type':'application/json;charset=UTF-8',
+                
+            }
+        }
+        return config;
+    },
+    error=>{
+        //Do something with request error
+        console.log(error);
+        Promise.reject(error);
+    }
+)
+const CancelToken=service.CancelToken;
+const pending=[];
+service.interceptors.response.use(
+    response=>{
+        const res=response.data;
+        return response.data;
+    },err=>{
+        console.log(err);
+        let errCode=err.response.data.errCode;
+        let errMsg=err.response.data.errMsg;
+        if(errCode===500&&errMsg=='Invalid token'){
+            router.push('/login');
+            // MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录！','确认登出',{
+            //     confirmButtonText:'重新登录',
+            //     cancelButtonText:'取消',
+            //     type:'warning'
+            // }).then(()=>{
+                store.dispatch('FedLogOut').then(()=>{
+                    Message({
+                        //message:err.response.data.errMsg,
+                        message:'登录信息已失效',
+                        type:'error',
+                        duration:5*1000
+                    })
+                })
+            //})
+        }
+        else if(errCode===500&&errMsg=='No authority'){
+            router.push('/');
+            Message({
+                //message:err.response.data.errMsg,
+                message:'无操作权限!',
+                type:'error',
+                duration:5*1000
+            })
+        }
+        return Promise.reject(err);
+    }
+)
+
 export default service;
+export {serviceAxios};

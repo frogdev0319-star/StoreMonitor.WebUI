@@ -2,7 +2,7 @@
     <el-row class="el-route-container">
         <el-col :span="24" class="el-route-header">
             <el-col :span="7" class="el-route-btns">
-                <span style="margin-right:15px;color:#A2AEBC">已绑定{{storeNum}}家门店</span>
+                <span class="bind-title">已绑定{{storeNum}}家门店</span>
                 <el-button size="mini" @click="bindStore" class="el-bind-btn" 
                 :disabled="elTableData[Number(activeName)].routeData.length==0">
                     <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
@@ -14,7 +14,7 @@
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
-                <a :href="downLoadSrc" download class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i>下载</a>
+                <a :href="downLoadSrc" download class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a>
                 <el-dialog title='导入'
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
@@ -166,7 +166,15 @@ export default {
         },
         getDownLoadURL(){
             let self=this;
-            self.downLoadSrc=inpectRESTful.getTemplate();
+            //self.downLoadSrc=inpectRESTful.getTemplate();
+            inpectRESTful.downLoadTemplate().then(res=>{
+                console.log(res);
+                let blob = new Blob([res],{
+               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+            });
+            let objectUrl = URL.createObjectURL(blob);
+            self.downLoadSrc=objectUrl;
+            })
         },
         getNapeList(){
             let self=this;
@@ -181,7 +189,6 @@ export default {
                     resolve(data);
                 }).catch(err => {
                     console.log(err.message);
-                    // self.notify('服务器异常!','error',3000);
                 })
                         
             })
@@ -288,11 +295,14 @@ export default {
         async addAllData(dataArry){
             let self=this;
             let index=0;
+            let mode=0;
             if(self.checkValue=='远程巡检'){
                 index=0;
+                mode=0;  //远程巡检 mode 0
             }
             else if(self.checkValue=='现场巡检'){ 
                 index=1;
+                mode=1;  //现场巡检  mode 1
             }
             else{
                 index=2;
@@ -318,7 +328,7 @@ export default {
             dataArry.forEach((item,index)=>{
                 let obj={};
                 obj.name=item[0]['检查分类'];
-                obj.mode=0;
+                obj.mode=mode;
                 obj.tag=self.checkValue;
                 tempGroups.push(obj);
             })
@@ -378,6 +388,10 @@ export default {
                 });
             });
             console.log(arr);
+            if(arr.length==0){
+                self.notify('请新增巡检项后进行操作！','warning',3000);
+                return false;
+            }
             sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
             self.$router.push({name:'门店绑定',params:self.activeName});
@@ -503,7 +517,7 @@ export default {
                                 flaggroupRex=true;
                             }
                         }
-                        if(item['检查项目名称']==undefined){
+                        if(item['检查项目名称']==undefined||item['检查项目名称'].length==0){
                             flagItemName=true;
                         }
                         else{
@@ -635,27 +649,50 @@ export default {
     *{
         font-family: Microsoft YaHei;
     }
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==auto){@return auto;}
+        @else if($val==0){@return 0;}
+        @else{@return rem($val);}
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
+    .dialog-content{
+        span{
+            @include point(font-size,14);
+        }
+    }
     .el-route-container{
         margin: 20px 15px 15px 15px;
         .el-route-header{
-            margin-top: 10px;
+            @include point(margin-top,10);
             .el-route-tabs{
                 width: 98%;
-                margin-left: 10px;
+                @include point(margin-left,10);
             }
             .el-route-btns{
                 position: absolute;
-                right: 30px;
+                @include point(right,30);
                 z-index: 10;
                 width: auto;
+                @include point(top,5);
+                .bind-title{
+                    @include point(margin-right,15);
+                    color:#A2AEBC;
+                    @include point(font-size,12);
+                }
                 .el-bind-btn{
                     background-color: $mainColor; 
                     color: #fff;
                     border-color: $mainColor;
                     position: relative;
-                    width: 120px;
+                    @include point(width,120);
                     border-radius: 0px;
-                    margin-right: 15px;
+                    @include point(margin-right,15);
+                    @include point(font-size,12);
                     &:disabled{
                         opacity: 0.6;
                     }
@@ -665,15 +702,16 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    padding: 2px 10px !important;
+                    padding: 0.125rem 0.625rem !important;
+                    
                     position: relative;
                     top: 3px;
                     display: inline-block;
                     text-decoration: none;
-                    font-size: 14px;
+                    @include point(font-size,12);
                     border: 1px solid;
                     border-left-width: 0px;
-                    right: 5px;
+                    @include point(right,5);
                     cursor: pointer;
                     &:hover{
                         background-color: #FEE4E7;
@@ -681,18 +719,22 @@ export default {
                     &:focus{
                         background-color: #FEE4E7;
                     }
+                    span{
+                        position: relative;
+                        @include point(bottom,3);
+                    }
                 }
                 .el-handle-btn{
                     margin-left: 0px !important;
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    padding: 3px 10px !important;
+                    padding: 0.1875rem 0.625rem !important;
                     position: relative;
-                    top: 3px;
+                    @include point(top,3);
                     span{
                         position: relative;
-                        bottom: 3px;
+                        @include point(bottom,3);
                     }
                     &:nth-child(4){
                         border-left-width: 0px;
@@ -705,32 +747,6 @@ export default {
                     }
                 }     
             }
-            .cond-list{
-                width: 136px;
-                height: 90px;
-                position: absolute;
-                border: 1px solid #ddd;
-                background-color: #fff;
-                right: 16.4%;
-                top: 45px;
-                z-index: 980;
-                text-align: left;
-                .item{
-                    width: 100%;
-                    height: 29px;
-                    font-size: 14px;
-
-                    &:hover{
-                        background-color: rgb(217, 239, 253);
-                        border: 1px solid #fff;
-                        cursor: pointer;
-                    }
-                }
-                span{
-                    margin-left: 15px;
-                    line-height: 30px;
-                }
-            }
         }
     }
     .el-dropbtn{
@@ -739,8 +755,8 @@ export default {
         border: 1px solid $mainColor;
     }
     .file-sliver{
-        width: 76px;
-        height: 28px;
+        @include point(width,76);
+        @include point(height,28);
         background-color: transparent;
         position: absolute;
         top: 0px;
@@ -748,7 +764,7 @@ export default {
     }
     .tabName-input-content{
         background: #fff;
-        height: 73px;
+        @include point(height,73);
         width: 100%;
     }
 </style>

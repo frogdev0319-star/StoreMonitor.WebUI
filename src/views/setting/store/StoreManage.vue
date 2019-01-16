@@ -1,7 +1,7 @@
 <template>
     <div class="el-event-content">
        <div class="seacrh-content">
-            <span class="select-title noraml-text">按省份选择</span>
+            <span class="select-title">按省份选择</span>
              <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
              class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
@@ -13,11 +13,11 @@
             </el-select>
             <div class="city-content" @click="choiceCity">
                 <div class="input-arrow-panel"></div>
-                    <el-input v-model="citys" size="mini" id="elCity" placeholder="城市" :readonly=true></el-input>
-                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                <el-input v-model="citys" size="mini" id="elCity" placeholder="城市" :readonly=true></el-input>
+                <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
             </div>
             <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
-            <div class="city-panel" v-if="showCityContent"> 
+            <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false"> 
                 <p :style="isChecked?{}:{'color':'#FB505F'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
                         style="margin-right:5px;"></el-checkbox>全部</p>
                 <div class="city-details" v-for="(item,index) in cityList" :key="index">
@@ -38,16 +38,18 @@
             :highlight-current-row="true"
             empty-text='没有门店信息'
             align='left'
-            :height="windowHeight*(windowHeight>1000?0.76:0.65)"
+            :height="tableHieght"
             @sort-change='sortChange'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                 <el-table-column
                     width="120"
                     header-align="center"
                     align="center">
-                        <template slot-scope="scope" >
-                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#6097F4;" v-if="scope.row.bindDevice" >已关联</span>
-                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#FEA316;" v-else>未关联</span>       
+                        <template slot-scope="scope" v-if="scope.row.showTag">
+                        <span class="icon-span" style="background-color:#6097F4;" 
+                        v-if="scope.row.bindDevice" ><i class="iconfont icon-yichangshijianliebiaocopy"></i> 已关联</span>
+                        <span class="icon-span" style="background-color:#FEA316;" 
+                        v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> 未关联</span>       
                     </template>
                 </el-table-column>
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
@@ -60,7 +62,7 @@
                 align="left">
                 <template slot-scope="scope">
                     <el-popover
-                    v-if="scope.row.napeTable.length!=0&&scope.row.napeTable!='--'"
+                    v-if="scope.row.napeTable.length!=0&&(scope.row.napeTable!='--'&&scope.row.napwTable!='现场巡检')"
                         placement="top-start"
                         width="200"
                         trigger="hover">
@@ -104,7 +106,7 @@
                 @size-change="sizeChange"
                 @current-change="currentChange"
               layout="jumper,total, prev, pager, next,sizes"  
-              :page-size="sizeNum" :total="total" style="float:right;margin-top:10px;">
+              :page-size="sizeNum" :total="total" style="float:right;margin-top:15px;">
               </el-pagination>
             </div>
         </div>
@@ -113,9 +115,10 @@
 
 <script>
 import api from '@/api/index'
-import {getInspectItemList} from '@/api/inspect'
+import {getInspectBindCount} from '@/api/inspect'
 import {getStoreList} from '@/api/store'
-
+import {isLoginIn} from '@/api/login'
+import PubSub from 'pubsub-js'
     export default {
         name: "StoreManage",
         data(){
@@ -136,7 +139,7 @@ import {getStoreList} from '@/api/store'
                     {
                         "prop":"phoneNumber",
                         "label":"联系方式",
-                        "sortable":'custom'
+                        "sortable":false
                     },
                 ],
                 allCityChecked:false,
@@ -157,6 +160,19 @@ import {getStoreList} from '@/api/store'
                 page:0,
                 serachVale:'',
                 timeid:0,
+            }
+        },
+        computed:{
+            tableHieght(){
+                if(this.windowHeight>800){
+                    return this.windowHeight*0.7;
+                }
+                else if(this.windowHeight>700){
+                    return this.windowHeight*0.65;
+                }
+                else{
+                    return this.windowHeight*0.59;
+                }
             }
         },
         methods:{
@@ -185,9 +201,21 @@ import {getStoreList} from '@/api/store'
             },
             choiceAllCity(val){
                 let self=this;
+                let str='';
+                let temp=[];
+                if(!val){
+                    self.citys='';
+                    self.multeCityList=[];
+                }
                 self.cityList.forEach(item=>{
                     item.checked=val;
+                    if(val){
+                        str=str+item.cityName+';';
+                        temp.push(item.cityName);
+                    }
                 })
+                self.citys=str.substring(0,str.length-1);
+                self.multeCityList=temp;
             },
             changeCityItem(item){
                 console.log(item);
@@ -224,8 +252,14 @@ import {getStoreList} from '@/api/store'
                 else{
                     self.params.clause={};
                 }
-                if(self.multeCityList.length!=0){
-                    self.params.clause.city=self.multeCityList;
+                let temp=[];
+                self.cityList.forEach(item=>{
+                    if(item.checked){
+                        temp.push(item.cityName);
+                    }
+                })
+                if(temp.length!=0){
+                    self.params.clause.city=temp;
                 }
                 self.getStoreList(self.params);
             },
@@ -258,7 +292,10 @@ import {getStoreList} from '@/api/store'
                 let self=this;
                 let params={};
                 let data=await self.getStoreData(params);
-                self.tempStoreData=data.content;
+                if(data.response!=undefined&&data.response.status==500){
+                    return false;
+                }
+                self.tempStoreData=data.data.content;
                 let temp=[];
                 if(self.tempStoreData!=undefined&&self.tempStoreData.length!=0){
                     self.tempStoreData.forEach(item=>{
@@ -286,10 +323,22 @@ import {getStoreList} from '@/api/store'
             async getStoreList(params){
                 let self=this;
                 params.filter={page:this.page,size:this.sizeNum};
-                self.storeData=await self.getStoreData(params);
+                let data=await self.getStoreData(params);
+                if(data.response!=undefined&&data.response.status==500){
+                    return false;
+                }
+                self.storeData=data.data;
+                console.log(self.storeData);
                 let temp=[];
                 self.storeData.content.forEach(item=>{
                     let obj={};
+                    if(item.appliedInspect.indexOf('远程巡检')==-1){
+                        obj.showTag=false;
+                    }
+                    else{
+                        obj.showTag=true;
+                    }
+                    obj.bindDevice=false;
                     obj.storeId=item.storeId;
                     obj.name=item.name;
                     obj.userName=item.userName;
@@ -297,21 +346,48 @@ import {getStoreList} from '@/api/store'
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
                     obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
-                    obj.schedue='排程一',
+                    obj.schedue='---',
                     obj.device=item.device;
                     temp.push(obj);
                 })
+                let paramsGetBind={
+                    "storeIds": temp.map(x=>x.storeId)
+                };
+                let tempStoreId=temp.map(x=>x.storeId);
                 self.tableData=temp;
                 self.total=self.storeData.totalElements;
+                getInspectBindCount(paramsGetBind).then(res=>{
+                    let data=res.data;
+                    console.log(data);
+                    let tempRet=[];
+
+                    for(let i=0;i<tempStoreId.length;i++){
+                        for(let j=0;j<data.length;j++){
+                            if(tempStoreId[i]==data[j].storeId){
+                                tempRet.push(data[j]);
+                            }
+                        }
+                    }
+                    console.log(tempRet);
+                    for(let i=0;i<data.length;i++){
+                        self.tableData[i].bindDevice=(tempRet[i].unbindCount==0)?true:false;
+                    }
+                })
             },
             searchEventList(){
                 let self=this;
                 self.params.clause={};
-                self.params.like={
-                    "storeId": self.serachVale,
-                    "name": self.serachVale,
-                    "userId": self.serachVale
-                };
+                self.curProvince='';
+                if(self.serachVale.length!=0){
+                    self.params.like={
+                        "name": self.serachVale,
+                        "userName": self.serachVale
+                    };
+                }
+                else{
+                    self.params.like={};
+                }
+                
                 self.getStoreList(self.params);
             },
             sortChange(column){
@@ -340,21 +416,25 @@ import {getStoreList} from '@/api/store'
                         let errMsg=res.errMsg;
                         if(errMsg!=undefined&&errMsg=='Success'){
                             let data=res.data;
-                            resolve(data);
+                            resolve(res);
                         }
+                    }).catch(res => {
+                        console.log(res);
+                        resolve(res);
                     })
                 })
             },
-            getNapeList(){
+            isLoginIn(){
+                let self=this;
                 return new Promise((resolve,reject)=>{
-                    getInspectItemList().then(res=>{
-                        let code=res.errMsg;
-                        let data=res.data;
-                        if(code!=null&&code=='Success'){
-                            console.log(res.data);
-                        }
-                        resolve(data);
+                    isLoginIn().then(res=>{
+                        console.log(res);
+                        self.getProvinceList();
+                        self.getInitData();
+                        resolve(res);
                     })
+                }).catch(err=>{
+                    console.log(err);
                 })
             },
             notify(msg,type,time) {
@@ -366,7 +446,7 @@ import {getStoreList} from '@/api/store'
             },
            
         },
-        mounted(){
+        async  mounted(){
             let self=this;
             let windowHeight=window.innerHeight;
             if(windowHeight>800){
@@ -374,12 +454,17 @@ import {getStoreList} from '@/api/store'
                 this.sizeNum=20;
             }
             console.log(this.tableHeight);
-            self.getProvinceList();
-            self.getInitData();
-            
+            await this.isLoginIn();
             if(!this.timeid){
                 this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
             }
+        },
+        beforeRouteEnter(to, from, next){
+            console.log(to);
+            next(vm=>{
+                console.log(vm);
+                PubSub.publish('change-color',{showTag:false});
+            })
         },
         beforeDestroy(){
            window.clearInterval(this.timeid);
@@ -409,9 +494,14 @@ import {getStoreList} from '@/api/store'
     .seacrh-content{
         @include point(padding-left,30);
         @include point(margin-top,30);
-        @include point(margin-bottom,20);
+        @include point(padding-bottom,20);
         position: relative;
         text-align: left;
+        border-bottom: 0.5px solid #e3e9f4;
+        .select-title{
+            color: #424151;
+            @include point(font-size,14);
+        }
         .el-province{
             @include point(width,160);
             @include point(margin-right,20);
@@ -487,6 +577,14 @@ import {getStoreList} from '@/api/store'
             white-space: nowrap;
             cursor: pointer;
         }
+        .icon-span{
+            display:inline-block;
+            width: 72px;
+            height:22px;
+            color:white;
+            padding-left:5px;
+            padding-right:5px;
+        }
     }
     
 }
@@ -510,6 +608,9 @@ import {getStoreList} from '@/api/store'
     }
 </style>
 <style>
+    .el-table::before{
+        height: 0px !important;
+    }
     .el-tooltip__popper.is-light{
         background: #E2F3FD !important;
         color: #4b5262 !important;

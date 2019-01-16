@@ -63,7 +63,7 @@
                     </el-col>
                 </el-tab-pane>
                 <el-tab-pane label="视频管理" name="video">
-                    <el-col :span="8" class="lisde" :style="{'min-height':varyWindowHeight*(varyWindowHeight>1000?0.78:0.70)+'px'}">
+                    <el-col :span="8" class="lisde">
                         <div class="nvr-title tabTitle">
                             <div class="name-title titles">
                                 <span>NVR名称</span>
@@ -79,21 +79,26 @@
                                 <span>通道数</span>
                             </div>
                         </div>
-                        <div class="nvr-data group-title"
-                        v-for="(item,index) in nvrData" 
-                        :key="index"  :class="!item.isClick?'noraml-color':'active-color'" @click="clickNVR(index,item)">
-                            <div class="proper-flag" v-if="item.isClick"></div>
-                            <div class="name-data titles">
-                                <span>{{item.name}}</span>
+                        <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                            <div  :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
+                                <div class="nvr-data group-title"
+                                v-for="(item,index) in nvrData" 
+                                :key="index"  :class="!item.isClick?'noraml-color':'active-color'" @click="clickNVR(index,item)">
+                                    <div class="proper-flag" v-if="item.isClick"></div>
+                                    <div class="name-data titles">
+                                        <span>{{item.name}}</span>
+                                    </div>
+                                    <div class="store-data titles">
+                                        <span>{{item.store}}</span>
+                                    </div>
+                                <div class="count-data titles">
+                                        <span>{{item.channelNum}}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="store-data titles">
-                                <span>{{item.store}}</span>
-                            </div>
-                           <div class="count-data titles">
-                                <span>{{item.channelNum}}</span>
-                            </div>
-                        </div>
-                        <div class="toolbar pagination" style="width:100%; margin-top:10px;position:absolute;bottom:10px;">
+                        </el-scrollbar>
+                        
+                        <div class="toolbar pagination" style="width:100%; margin-top:10px;">
                             <el-pagination
                                 @size-change="sizeChange"
                                 @current-change="currentChange"
@@ -104,6 +109,7 @@
                             </el-pagination>
                         </div>
                     </el-col>
+                    
                     <el-col :span="16" class="risde">
                         <div class="nape-items-title tabTitle">
                             <div class="nape-name-title titles">
@@ -120,29 +126,33 @@
                                 <span>操作</span>
                             </div>
                         </div>
-                        <div class="nape-items-data" :style="item.isClick?{'background-color':'#FEE4E7'}:{}"
-                        v-for="(item,index) in channelList" 
-                        :key="index">
-                            <div class="nape-name-data">
+                        <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                            <div  :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
+                            <div class="nape-items-data" :style="item.isClick?{'background-color':'#FEE4E7'}:{}"
+                            v-for="(item,index) in channelList" 
+                            :key="index">
+                                <div class="nape-name-data">
                                     <span class="nape-name" v-if="!item.isClick">{{item.name}}</span>
                                     <el-input size="mini" v-model="item.name" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
-                            </div>
-                            <div class="nape-dep-data">
-                                <span class="nape-dep">{{item.channelId}}</span>
-                                    <div class="iconcontent" v-if="item.isClick">
-                                        <div class="iconlised"  @click="confrimEdit(index,item)">
-                                            <i class="el-icon-check"></i>
+                                </div>
+                                <div class="nape-dep-data">
+                                    <span class="nape-dep">{{item.channelId}}</span>
+                                        <div class="iconcontent" v-if="item.isClick">
+                                            <div class="iconlised"  @click="confrimEdit(index,item)">
+                                                <i class="el-icon-check"></i>
+                                            </div>
+                                            <div class="iconrised" @click="cancelEdit(index,item)">
+                                                <i class="el-icon-close"></i>
+                                            </div>
                                         </div>
-                                        <div class="iconrised" @click="cancelEdit(index,item)">
-                                            <i class="el-icon-close"></i>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div class="nape-items-handle">
+                                    <i class="iconfont icon-bianji" style="font-size: 20px;cursor:pointer;margin-right:10px;" 
+                                    @click="handleEdit(index,item)"></i>
+                                </div>
                             </div>
-                            <div class="nape-items-handle">
-                                <i class="iconfont icon-bianji" style="font-size: 20px;cursor:pointer;margin-right:10px;" 
-                                 @click="handleEdit(index,item)"></i>
                             </div>
-                        </div>
+                        </el-scrollbar>
                     </el-col>
                 </el-tab-pane>
             </el-tabs>
@@ -201,6 +211,19 @@ export default {
             varWindowWidth:1440, 
             varyWindowHeight:window.innerHeight,
             contentHeight:window.screen.height,
+        }
+    },
+    computed:{
+        varyDivHeight:function(){
+            if(this.varyWindowHeight>800){
+                return this.varyWindowHeight*0.66;
+            }
+            else if(this.varyWindowHeight>700){
+                return this.varyWindowHeight*0.60;
+            }
+            else{
+                return this.varyWindowHeight*0.497;
+            }
         }
     },
     methods:{
@@ -374,6 +397,7 @@ export default {
                     "property": "storeName"
                 }
             };
+            self.getNVRList(params);
         },
         filterChannel(){
             let self=this;
@@ -753,12 +777,20 @@ export default {
 @import '../../../assets/css/importfile.css'; 
 @import '../../../assets/css/textstyle.css';
 $mainColor:#FB505F;
+@function rem($val){
+    @return $val/16+rem;
+}
+@function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+}
 @mixin titleStyle{
-    height: 48px;
-    line-height: 48px;
-    // color: #909399;
-    // font-weight:bold;
-    // font-size: 12px;
+    @include point(height,48);
+    @include point(line-height,48);
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
@@ -777,12 +809,12 @@ $mainColor:#FB505F;
     cursor: pointer;
 }
 .active-color{
-    color: #FB505F !important;
+    color: $mainColor !important;
     background-color: #fff;
 }
 .el-search-input{
-    width:180px;
-    margin-right:20px;
+    @include point(width,180);
+    @include point(margin-right,20);
 }
 .el-handle-btn{
     margin-left: 0px !important;
@@ -811,25 +843,25 @@ $mainColor:#FB505F;
 }     
 .el-device{ 
     .el-btns{
-        padding-top: 10px;
-        padding-right: 20px;
+        @include point(padding-top,10);
+        @include point(padding-right,20);
         position: relative;
-        height: 31px;
+        @include point(height,31);
         .btns{
             position: absolute;
-            right: 25px;
+            @include point(right,25);
             z-index: 979;
-            width: 90px;
-            background-color: #FB505F;
+            @include point(width,90);
+            background-color: $mainColor;
             color: #fff;
-            border-color: #FB505F;
+            border-color: $mainColor;
         }
     }
     .el-tabPanels{
-        padding: 20px;
+        @include point(padding,20);
         height: auto;
         position: relative;
-        bottom: 20px;
+        @include point(bottom,25);
         .titles{
             display: inline-block;
             span{
@@ -842,10 +874,9 @@ $mainColor:#FB505F;
             position: relative;
             overflow: hidden;
             .details{
-                height: 50px;
-                line-height: 50px;
-                // font-size: 14px;
-                padding-left: 10px;
+                @include point(height,50);
+                @include point(line-height,50);
+                @include point(padding-left,10);
                 .dash-label{
                     width: 30%;
                     float: left;
@@ -867,6 +898,7 @@ $mainColor:#FB505F;
             }
             .nvr-title{
                 @include titleStyle;
+                @include point(font-size,14);
                 .name-title{
                    width: 30%;
                 }
@@ -880,6 +912,7 @@ $mainColor:#FB505F;
             .nvr-data{
                 @include titleStyle;
                 position: relative;
+                @include point(font-size,14);
                 .proper-flag{
                     height: 70%;
                     width: 4px;
@@ -896,27 +929,29 @@ $mainColor:#FB505F;
                 .count-data{
                     width: 15%;
                 }
+                &:last-child{
+                    margin-bottom: 20px;
+                }
             }
         }
         .risde{
             .iconcontent{
                 position: absolute;
-                margin-top: 10px;
+                @include point(margin-top,10);
                 cursor: pointer;
                 display: inline-block;
-                right: 15px;
+                @include point(right,15);
                 .iconlised{
                     float: left;
                     position: relative;
-                    background-color: #FB505F;
+                    background-color: $mainColor;
                     padding: 1px 6px;
                     color: #fff;
                     border-width: 1px 1px 1px 1px;
                     border-style: solid;
                     border-color: #ddd;
-                    line-height: 21px;
-                    height: 21px;
-                    
+                    @include point(line-height,21);
+                    @include point(height,21);          
                 }
                 .iconrised{
                     float: left;
@@ -926,13 +961,14 @@ $mainColor:#FB505F;
                     border-style: solid;
                     border-color: #ddd;
                     background-color: #fff;
-                    line-height: 21px;
-                    height: 21px;
+                    @include point(line-height,21);
+                    @include point(height,21); 
                 }
             }
              padding:0 15px;
              .nape-items-title{
                 @include titleStyle;
+                @include point(font-size,14);
                 .nape-name-title{
                     width: 36%;
                 }
@@ -948,14 +984,15 @@ $mainColor:#FB505F;
                 position: relative;
                 padding-left: 1%;
                 cursor: pointer;
-                font-size: 14px;
-                height: 49px;
-                line-height: 49px;
+                @include point(font-size,14); 
+                @include point(height,49); 
+                @include point(line-height,49);
+
                 text-align: left;
                 .nape-input{
-                    width: 220px;
+                    @include point(width,220);
                     margin-left: 13%;
-                    font-size: 14px;
+                    @include point(font-size,14);
                     position: relative;
                     bottom: 2px;
                 }
@@ -1022,6 +1059,9 @@ $mainColor:#FB505F;
 }
 #importId .el-dialog__body{
     padding-top:0px !important;
+}
+#el-menuscrollbar .el-scrollbar__wrap {
+  overflow-x: hidden;
 }
 </style>
 <style scoped>

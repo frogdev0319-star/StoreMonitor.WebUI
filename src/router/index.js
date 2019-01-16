@@ -18,11 +18,12 @@ export default new Router({
     {
       path: '/',
       name: '总览',
-      redirect:'allscan',
+      redirect:'event',
       component: Home,
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',
       leaf:true, //没有子节点
+      isReadOnly:true,
       children:[
         {
           path:'allscan',
@@ -41,6 +42,7 @@ export default new Router({
       iconCls:'iconfont icon-menu-xundian',
       styles:'font-size:22px',
       leaf:false,  //多个子节点
+      
       children:[
         {
           path:'/reinspection',
@@ -48,7 +50,8 @@ export default new Router({
           component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
           meta:{
             requireAuth: true,
-          }
+          },
+          isReadOnly:true,
         },
         {
           path:'/stroemonitor',
@@ -56,7 +59,8 @@ export default new Router({
           component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
           meta:{
             requireAuth: true,
-          }
+          },
+          isReadOnly:true,
         }
       ]
     },
@@ -67,6 +71,7 @@ export default new Router({
       iconCls:'iconfont icon-shijian',
       styles:'font-size:22px',
       leaf:true,
+      isReadOnly:false,
       children:[
         {
           path:'/event',
@@ -87,7 +92,7 @@ export default new Router({
           children:[
             {
               path:'/rate',
-              name:'新增事件管理',
+              name:'事件详情',
               component:resolve=>require(['@/views/event/details/RateManage'],resolve),
               
             }
@@ -103,6 +108,7 @@ export default new Router({
       iconCls:'iconfont icon-tongjifenxi',
       styles:'font-size:25px',
       leaf:true,
+      isReadOnly:true,
       children:[
         {
           path:'/statistical',
@@ -121,6 +127,7 @@ export default new Router({
       iconCls:'iconfont icon-menu-shujuzhongxin',
       styles:'font-size:20px',
       leaf:true,
+      isReadOnly:true,
       children:[
         {
           path:'/datacenter',
@@ -218,6 +225,7 @@ export default new Router({
         {
           path:'/schedule',
           name:'排程配置',
+          isReadOnly:true,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{
@@ -226,7 +234,8 @@ export default new Router({
         },
         {
           path:'/other',
-          name:'其他设置'
+          name:'其他设置',
+          isReadOnly:true,
         }
       ]
     }

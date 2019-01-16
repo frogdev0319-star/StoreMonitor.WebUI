@@ -15,11 +15,13 @@
     width: 76px !important;
     background-color: #EAEDF2 !important;
     color: 	#708090 !important;
+    font-size:0.75rem;
 }
 .file-confirm-btn{
     width: 76px;
     background-color: #FB505F !important;
     border-color: #FB505F !important;
+    font-size:0.75rem;
 }
 input:disabled{
     background-color: 	#F5F5F5 !important;
@@ -34,7 +36,7 @@ input:disabled{
     border-radius: 4px;
     padding: 4px 12px;
     color: #fff;
-    font-size: 12px;
+    font-size:0.75rem;
     text-decoration: none;
     text-indent: 0;
     line-height: 20px;
