@@ -356,28 +356,31 @@ import PubSub from 'pubsub-js'
                 let tempStoreId=temp.map(x=>x.storeId);
                 self.tableData=temp;
                 self.total=self.storeData.totalElements;
-                getInspectBindCount(paramsGetBind).then(res=>{
-                    let data=res.data;
-                    console.log(data);
-                    let tempRet=[];
+                if(paramsGetBind.storeIds.length!=0){
+                    getInspectBindCount(paramsGetBind).then(res=>{
+                        let data=res.data;
+                        console.log(data);
+                        let tempRet=[];
 
-                    for(let i=0;i<tempStoreId.length;i++){
-                        for(let j=0;j<data.length;j++){
-                            if(tempStoreId[i]==data[j].storeId){
-                                tempRet.push(data[j]);
+                        for(let i=0;i<tempStoreId.length;i++){
+                            for(let j=0;j<data.length;j++){
+                                if(tempStoreId[i]==data[j].storeId){
+                                    tempRet.push(data[j]);
+                                }
                             }
                         }
-                    }
-                    console.log(tempRet);
-                    for(let i=0;i<data.length;i++){
-                        self.tableData[i].bindDevice=(tempRet[i].unbindCount==0)?true:false;
-                    }
-                })
+                        console.log(tempRet);
+                        for(let i=0;i<data.length;i++){
+                            self.tableData[i].bindDevice=(tempRet[i].unbindCount==0)?true:false;
+                        }
+                    })
+                }
             },
             searchEventList(){
                 let self=this;
                 self.params.clause={};
                 self.curProvince='';
+                self.citys='';
                 if(self.serachVale.length!=0){
                     self.params.like={
                         "name": self.serachVale,

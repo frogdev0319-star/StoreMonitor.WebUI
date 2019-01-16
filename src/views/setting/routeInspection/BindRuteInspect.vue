@@ -166,46 +166,62 @@ export default {
             }
             self.multeCityList=temp;
         },
-        searchStoreInput(){
+        async searchStoreInput(){
             let self=this;
             self.curProvince='';
             self.citys='';
-            //self.getStoreByCity();
-            self.getStoreListBYValue();
+            let params={};
+            if(self.serachVale.length!=0){
+                params.like={
+                    "name": self.serachVale,
+                    "userName": self.serachVale
+                };
+            }
+            else{
+                params.like={};
+            }
+            let data=await self.getStoreData(params);
+            self.getStoreByCity(data);
+
+            let count=0;
+            self.storeList.forEach(item=>{
+                if(item.checked){
+                    count++;
+                }
+            })
+            if(count==self.storeList.length){
+                self.allData=true;
+            }
+            else{
+                self.allData=false;
+            }
         },
-        searchStore(){
+        async searchStore(){
             let self=this;
             self.showCityContent=false;
             self.serachVale='';
-
-            //self.getStoreByCity();
-            let temp=self.tempStoreList;
-            let province=self.curProvince;
-            let citys=self.multeCityList;
-            
-            let tempArray=[];
-            if(citys.length!=0){
-                temp.forEach(item=>{
-                    citys.forEach(_item=>{
-                        if(_item==item.cityName){
-                            tempArray.push(item);
-                        }
-                    })
-                })
+            let params={};
+            params.like={};
+            let temp=[];
+            self.cityList.forEach(item=>{
+                if(item.checked){
+                    temp.push(item.cityName);
+                }
+            })
+            if(temp.length!=0){
+                params.clause={'city':temp};
             }
             else{
-                if(province.length!=0){  //只选择省份，不选城市
-                    temp.forEach(item=>{
-                        if(item.province==province){
-                            tempArray.push(item);
-                        }
-                    })
-                }
-                else{
-                    tempArray=temp;
-                }
+                params.clause={};
             }
-            self.storeList=tempArray;
+            if(self.curProvince.length!=0){
+                params.clause={'province':self.curProvince};
+            }
+            else{
+                params.clause={};
+            }
+            let data=await self.getStoreData(params);
+            self.getStoreByCity(data);
 
             let count=0;
             self.storeList.forEach(item=>{
@@ -280,28 +296,8 @@ export default {
                 self.allData=false;
             }
         },
-        getStoreData(){
+        getStoreData(params){
             let self=this;
-            let params={};
-            params.like={
-                'name':''
-            };
-            return new Promise((resolve,reject)=>{
-                getStoreList(params).then(res=>{
-                    console.log(res);
-                    let errMsg=res.errMsg;
-                    let data=res.data.content;
-                    console.log(data);
-                    resolve(data);
-                })
-            })
-        },
-        getStoreDataByValue(){
-            let self=this;
-            let params={};
-            params.like={
-                'name':self.serachVale
-            };
             return new Promise((resolve,reject)=>{
                 getStoreList(params).then(res=>{
                     console.log(res);
@@ -315,8 +311,8 @@ export default {
         //获取省份信息及初始化门店列表
         async getProvinceList(){
             let self=this;
-            self.storeData=await self.getStoreData();
-            //self.storeCount=self.storeData.length;
+            let params={};
+            self.storeData=await self.getStoreData(params);
             let temp=[];
             if(self.storeData!=undefined&&self.storeData.length!=0){
                 self.storeData.forEach(item=>{
@@ -336,91 +332,22 @@ export default {
         async getCityByProvince(province){
             let self=this;
             let temp=[];
-            self.tempStoreList.forEach(item=>{
+
+            self.storeData.forEach(item=>{
                 if(item.province==province){
                     let obj={};
-                    obj.cityName=item.cityName;
+                    obj.cityName=item.city;
                     obj.checked=false;
-                    temp.push(obj);
+                    if(temp.map(x=>x.cityName).indexOf(obj.cityName)){
+                        temp.push(obj);
+                    }
+                    
                 }
             })
             self.cityList=temp;
         },
-        async getStoreListBYValue(){
+        async getStoreByCity(data){
             let self=this;
-            let data=await self.getStoreDataByValue();
-            let bindStoreId=await self.getBindStoreList();
-            self.storeCount=bindStoreId.length;
-            let cityList=[];
-            data.forEach(item=>{
-                if(cityList.indexOf(item.city)==-1){
-                    cityList.push(item.city);
-                }
-            })
-            let temp=[];
-            cityList.forEach(item=>{
-                let obj={};
-                obj.city=item;
-                let _temp=[];
-                data.forEach(_item=>{
-                    if(item==_item.city){
-                        let _obj={};
-                        obj.province=_item.province;
-                        _obj.storeName=_item.name;
-                        _obj.storeId=_item.storeId;
-                        _temp.push(_obj);
-                    }
-                })
-                obj.store=_temp;
-                temp.push(obj);
-            })
-            let groupTemp=[];
-            temp.forEach(item=>{
-                let groupObj={};
-                groupObj.province=item.province;
-                groupObj.cityName=item.city;
-                let _temp=[];
-                let _tempCount=0;
-                item.store.forEach(_item=>{
-                    let _obj={};
-                    if(bindStoreId.indexOf(_item.storeId)==-1){
-                        _obj.checked=false;
-                    }
-                    else{
-                        _obj.checked=true;
-                        _tempCount++;
-                    }
-                    _obj.storeId=_item.storeId;
-                    _obj.name=_item.storeName;
-                    _temp.push(_obj);
-                })
-                if(_tempCount==item.store.length){
-                    groupObj.checked=true;
-                }
-                else{
-                    groupObj.checked=false;
-                }
-                groupObj.itemData=_temp;
-                groupTemp.push(groupObj);
-            })
-            self.storeList=groupTemp;
-            self.tempStoreList=groupTemp;
-            let count=0;
-            self.storeList.forEach(item=>{
-                if(item.checked){
-                    count++;
-                }
-            })
-            if(count==self.storeList.length){
-                self.allData=true;
-            }
-            else{
-                self.allData=false;
-            }
-        },
-        async getStoreByCity(){
-            let self=this;
-            let data=await self.getStoreData();
             let bindStoreId=await self.getBindStoreList();
             self.storeCount=bindStoreId.length;
             console.log(data);
@@ -602,6 +529,7 @@ export default {
             }
             self.tabName= name;
             self.getProvinceList();
+            self.searchStore();
             
         },
         notify(msg,type,time) {
@@ -615,8 +543,6 @@ export default {
     mounted(){
         let self=this;
         self.InitData();
-        self.getStoreByCity();
-
     }
 }
 </script>
