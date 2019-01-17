@@ -580,6 +580,5 @@ export default {
         nowdate.setDate(0);
         let dayNum=nowdate.getDate();
         return dayNum;
-    }
-   
+    },
 }

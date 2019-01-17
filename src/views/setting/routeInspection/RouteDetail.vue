@@ -3,7 +3,7 @@
         <el-row>
             <el-col :span="24" class="detail-title">
                
-                <span class="title-title " v-if="routeData.length!=0">{{tabName}}一共{{typeNum}}大类，{{itemNum}}个巡检项目</span>
+                <span class="title-title " v-if="routeData.length!=0">{{tabName}}共分{{typeNum}}大类，{{itemNum}}个巡检项目</span>
                 <div class="route-btns">
                      <el-button
                     class="el-delete-btn" 
@@ -611,8 +611,7 @@ export default {
             margin-left: 0px;
             @include point(margin-bottom,15);
             float: left;
-
-            @include point(font-size,18);
+            font-size: 18px;
             font-weight: bold;
             color: #424151;
         }
@@ -627,10 +626,9 @@ export default {
                 background-color: #fff; 
                 border-color:  $mainColor;
                 color: $mainColor;
-                @include point(width,120);
                 border-radius: 0px;
                 @include point(margin-right,8);
-                @include point(font-size,12);
+                font-size: 12px;
                 &:disabled{
                     opacity: 0.6;
                 }
@@ -639,9 +637,8 @@ export default {
                 background-color: $mainColor; 
                 border-color:  $mainColor;
                 color: #fff;
-                @include point(width,120);
                 border-radius: 0px;
-                @include point(font-size,12);
+                font-size: 12px;
                 &:disabled{
                     opacity: .6;
                 }
@@ -662,7 +659,7 @@ export default {
             @include point(padding-left,27);
             @include point(padding-bottom,10);
             border-bottom:1px solid #e3e9f4;
-            @include point(font-size,14);
+            font-size: 14px;
             .allcheckBox{
                 float: left;
             }
@@ -694,7 +691,7 @@ export default {
         }
         .table-title{
             @include point(margin-left,30);
-            @include point(font-size,15);
+            font-size: 14px;
             font-weight: bold;
             color: #424151;
         }
@@ -728,12 +725,6 @@ export default {
                 color: $mainColor;
                 cursor: pointer;
             }
-        }
-        .export-btn{
-            background-color: $mainColor;
-            padding: 8px 25px;
-            @include point(font-size,14);
-            color: #fff;
         }
     }
     .tabName-input-content{

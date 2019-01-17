@@ -43,7 +43,7 @@
             </div>
              <hr class="el-header-hr"/>
             <p class="el-header-title">请选择{{tabName}}表，需要关联的门店</p>
-            <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}表已绑定{{storeCount}}家门店</p>
+            <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}表共有{{totalCount}}家门店,已绑定{{storeCount}}家门店</p>
            
         </div>
         <div class="el-bind-content" :style="{'min-height':varyWindowWidth*0.56+'px'}">
@@ -84,6 +84,7 @@ export default {
             allData:false,
             tabName:'',
             storeCount:0,
+            totalCount:0,
             storeList:[],
             tempStoreList:[],
             varyWindowWidth:window.innerHeight,
@@ -140,7 +141,8 @@ export default {
                     temp.push(item.cityName);
                 }
             })
-            self.citys=str.substring(0,str.length-1);
+            let cityStr=str.substring(0,str.length-1);
+            self.citys=cityStr.length>10?cityStr.substr(0,10):cityStr;
             self.multeCityList=temp;
         },
         changeCityItem(item){
@@ -157,7 +159,8 @@ export default {
                 flag=flag||_item.checked;
             })
             self.isChecked=flag;
-            self.citys=str.substring(0,str.length-1);
+            let cityStr=str.substring(0,str.length-1);
+            self.citys=cityStr.length>10?cityStr.substr(0,10):cityStr;
             if(temp.length==self.cityList.length){
                 self.allCityChecked=true;
             }
@@ -172,15 +175,27 @@ export default {
             self.citys='';
             let params={};
             if(self.serachVale.length!=0){
-                params.like={
-                    "name": self.serachVale,
-                    "userName": self.serachVale
+                params={
+                    like:{
+                        "name": self.serachVale,
+                        "userName": self.serachVale
+                    },
+                    filter:{
+                        page:0,
+                        size:1000
+                    }
                 };
             }
             else{
-                params.like={};
+                params={
+                    filter:{
+                        page:0,
+                        size:1000
+                    }
+                }
             }
-            let data=await self.getStoreData(params);
+            let resData=await self.getStoreData(params);
+            let data=resData.content;
             self.getStoreByCity(data);
 
             let count=0;
@@ -201,26 +216,47 @@ export default {
             self.showCityContent=false;
             self.serachVale='';
             let params={};
-            params.like={};
             let temp=[];
             self.cityList.forEach(item=>{
                 if(item.checked){
                     temp.push(item.cityName);
                 }
             })
-            if(temp.length!=0){
-                params.clause={'city':temp};
+            if(self.curProvince==0){
+                params={
+                    filter:{
+                        page:0,
+                        size:1000
+                    }
+                };
             }
             else{
-                params.clause={};
+                if(temp.length!=0){
+                    params={
+                        clause:{
+                            city:temp,
+                            province:self.curProvince
+                        },
+                        filter:{
+                            page:0,
+                            size:1000
+                        }
+                    };
+                }
+                else{
+                    params={
+                        clause:{
+                            province:self.curProvince
+                        },
+                        filter:{
+                            page:0,
+                            size:1000
+                        }
+                    }
+                }
             }
-            if(self.curProvince.length!=0){
-                params.clause={'province':self.curProvince};
-            }
-            else{
-                params.clause={};
-            }
-            let data=await self.getStoreData(params);
+            let resData=await self.getStoreData(params);
+            let data=resData.content;
             self.getStoreByCity(data);
 
             let count=0;
@@ -302,7 +338,7 @@ export default {
                 getStoreList(params).then(res=>{
                     console.log(res);
                     let errMsg=res.errMsg;
-                    let data=res.data.content;
+                    let data=res.data;
                     console.log(data);
                     resolve(data);
                 })
@@ -311,8 +347,15 @@ export default {
         //获取省份信息及初始化门店列表
         async getProvinceList(){
             let self=this;
-            let params={};
-            self.storeData=await self.getStoreData(params);
+            let params={
+                filter:{
+                    page:0,
+                    size:1000
+                }
+            };
+            let resStore=await self.getStoreData(params);
+            self.storeData=resStore.content;
+            self.totalCount=resStore.totalElements;
             let temp=[];
             if(self.storeData!=undefined&&self.storeData.length!=0){
                 self.storeData.forEach(item=>{
@@ -338,7 +381,7 @@ export default {
                     let obj={};
                     obj.cityName=item.city;
                     obj.checked=false;
-                    if(temp.map(x=>x.cityName).indexOf(obj.cityName)){
+                    if(temp.map(x=>x.cityName).indexOf(obj.cityName)==-1){
                         temp.push(obj);
                     }
                     
@@ -622,7 +665,7 @@ export default {
             z-index: 980;
             background-color: #fff;
             border:1px solid #ddd;
-            @include point(font-size,14);
+            font-size: 14px;
             p{
                 font-weight: bold;
             }
@@ -636,7 +679,7 @@ export default {
         }
     }
     .el-header-title{
-        @include point(font-size,18);
+        font-size: 18px;
         font-weight: bold;
         @include point(margin-left,30);
         position: relative;
@@ -653,7 +696,7 @@ export default {
     }
     .choice-device{
         @include point(margin-right,30);
-        @include point(font-size,12);
+        font-size: 12px;
         color: #4b5262;
         display: inline;
         position: absolute;
@@ -670,7 +713,7 @@ export default {
             margin: 20px auto 20px 15px;
             .all-device-title{
                 @include point(margin-left,15);
-                @include point(font-size,14);
+                font-size: 14px;
             }
         }
         .device-group{
@@ -681,7 +724,7 @@ export default {
                 @include point(margin-left,15);
                 .group-name{
                     @include point(margin-left,15);
-                    @include point(font-size,14);
+                    font-size: 14px;
                     font-weight: bold;
                 }
             }
@@ -696,7 +739,7 @@ export default {
                     float: left;
                     .device-name{
                         @include point(margin-left,15);
-                        @include point(font-size,14);
+                        font-size: 14px;
                     }
                 }
             }

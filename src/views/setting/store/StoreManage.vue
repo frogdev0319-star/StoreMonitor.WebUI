@@ -165,13 +165,13 @@ import PubSub from 'pubsub-js'
         computed:{
             tableHieght(){
                 if(this.windowHeight>800){
-                    return this.windowHeight*0.7;
+                    return this.windowHeight*0.72;
                 }
                 else if(this.windowHeight>700){
-                    return this.windowHeight*0.65;
+                    return this.windowHeight*0.66;
                 }
                 else{
-                    return this.windowHeight*0.59;
+                    return this.windowHeight*0.62;
                 }
             }
         },
@@ -243,24 +243,32 @@ import PubSub from 'pubsub-js'
             searchStore(){
                 let self=this;
                 self.showCityContent=false;
+                self.serachVale='';
                 self.params.like={};
-                if(self.curProvince.length!=0){
-                    self.params.clause={
-                        'province':self.curProvince
-                    };
-                }
-                else{
-                    self.params.clause={};
-                }
                 let temp=[];
                 self.cityList.forEach(item=>{
                     if(item.checked){
                         temp.push(item.cityName);
                     }
                 })
-                if(temp.length!=0){
-                    self.params.clause.city=temp;
+                if(self.curProvince.length!=0){
+                    if(temp.length!=0){
+                        self.params.clause={
+                            city:temp,
+                            province:self.curProvince
+                        };
+                    }
+                    else{
+                        self.params.clause={
+                            province:self.curProvince
+                        }
+                    }
                 }
+                else{
+                    self.params.clause={};
+                }
+                
+                
                 self.getStoreList(self.params);
             },
             sizeChange(val){
@@ -503,7 +511,7 @@ import PubSub from 'pubsub-js'
         border-bottom: 0.5px solid #e3e9f4;
         .select-title{
             color: #424151;
-            @include point(font-size,14);
+            font-size: 14px;
         }
         .el-province{
             @include point(width,160);
@@ -550,7 +558,7 @@ import PubSub from 'pubsub-js'
             z-index: 980;
             background-color: #fff;
             border: 1px solid #ddd;
-            @include point(font-size,14);
+            font-size: 14px;
             p{
                 font-weight: bold;
             }
@@ -558,7 +566,6 @@ import PubSub from 'pubsub-js'
                 width: auto;
                 min-width: 12.5%;
                 display: inline-block;
-                @include point(margin-right,14);
                 @include point(margin-top,10);
             }
         }
@@ -589,7 +596,6 @@ import PubSub from 'pubsub-js'
             padding-right:5px;
         }
     }
-    
 }
 .empty-data-icon{
     font-size: 22px;

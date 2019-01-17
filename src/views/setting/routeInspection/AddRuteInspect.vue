@@ -212,13 +212,13 @@ export default {
     computed:{
         varyDivHeight:function(){
             if(this.varyWindowHeight>800){
-                return this.varyWindowHeight*0.7;
+                return this.varyWindowHeight*0.72;
             }
             else if(this.varyWindowHeight>700){
-                return this.varyWindowHeight*0.65;
+                return this.varyWindowHeight*0.67;
             }
             else{
-                return this.varyWindowHeight*0.6;
+                return this.varyWindowHeight*0.65;
             }
         }
     },
@@ -779,12 +779,12 @@ export default {
             .tab-name{
                 text-align: left ;
                 @include point(margin-left,10);
-                @include point(font-size,18);
+                font-size: 18px;
                 font-weight: bold;
             }
             .icon-tabname{
                 @include point(margin-left,20);
-                @include point(font-size,18);
+                font-size: 18px;
                 color: #ddd;
                 cursor: pointer;
             }
@@ -797,10 +797,10 @@ export default {
         .rute-btn{
             background-color: $mainColor;
             color: #fff;
-            @include point(font-size,12);
-            @include point(width,120);
+            font-size: 12px;
+            width: 120px;
             .el-icon-plus{
-                @include point(font-size,16);
+                font-size:16px;
             }
         }
         .iconcontent{
@@ -841,9 +841,6 @@ export default {
             span{
                 @include point(margin-left,10);
             }
-            .level2{
-                @include point(font-size,16);
-            }
             .item-title{
                 text-overflow: ellipsis;
                 overflow: hidden;
@@ -874,7 +871,7 @@ export default {
             min-height: -moz-calc(100%-60px);
             background-color: #FAFAFA;
             .group-items{
-                @include point(font-size,14);
+                font-size: 14px;
                 .groupItem{
                     height: $itemHeight;
                     position: relative;
@@ -954,9 +951,8 @@ export default {
             .nape-items-title{
                 height: $itemHeight;
                 line-height: $itemHeight;
-                // font-size: 12px;
                 text-align: left;
-                @include point(font-size,14);
+                font-size: 14px;
             }
             .nape-items-data{
                 overflow: hidden;
@@ -965,7 +961,7 @@ export default {
                 margin: 0 0 0 3%;
                 padding-left: 1%;
                 cursor: pointer;
-                @include point(font-size,14);
+                font-size: 14px;
                 color: #424151;
                 &:last-child{
                     @include point(margin-bottom,15);
@@ -990,7 +986,6 @@ export default {
                         @include point(margin-left,20);
                         text-align: left;
                         width: 80%;
-                        @include point(font-size,14);
                     }
                 }
                 .nape-dep-data{

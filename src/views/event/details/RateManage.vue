@@ -60,12 +60,9 @@
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
-                        <video-player class="video-player vjs-custom-skin " 
-                            :ref="item.ref" :options="item.playerOptions" 
-                            style="width:280px;height:140px;"
-                            @play="onPlayerPlay($event)"
-                            @pause="onPlayerPause($event)">
-                        </video-player>
+                        <video  height=83% width=90% id="previewVideo" prload autoplay controls
+                                class="video-js vjs-fill" style="postion:absoulte;top:10px;">
+                        </video>
                     </div>
                 </div>
             </div>
@@ -241,8 +238,6 @@ export default {
     methods:{
         onPlayerPlay(player){
             console.log(player);
-            
-
         },
         onPlayerPause(player){
             console.log(player);
@@ -559,7 +554,7 @@ export default {
         position: relative;
         .event-title{
             @include point(padding-right,20);
-            @include point(font-size,18);
+            font-size: 18px;
             font-weight: bold;
             color: #424151;
         }
@@ -568,7 +563,7 @@ export default {
             background-color: #FCBA3F;
             padding:4px 12px;
             color: #fff;
-            @include point(font-size,14);
+            font-size: 14px;
             font-weight: bold;
             border-radius: 12px;
         }
@@ -595,7 +590,7 @@ export default {
         @include point(padding-left,10);
         @include point(padding-top,15);
         color: #424151;
-        @include point(font-size,14);
+        font-size: 14px;
         strong{
             @include point(margin-right,25);
         }
@@ -607,7 +602,7 @@ export default {
         text-align: left;
         @include point(margin-top,15);
         @include point(padding-left,10);
-        @include point(font-size,14);
+        font-size: 14px;
         .speech-content{
             margin: 20px auto;
             .speech-info{
@@ -635,11 +630,17 @@ export default {
             .source-content{
                 float: left;
                 @include point(margin,5);
+                .img-content{
+
+                }
+                .video-content{
+
+                }
             }
         }
         .viedo-info{
             span{
-                @include point(font-size,14);
+                font-size: 14px;
                 color: #94a4b4;
             }
             .icon-video{

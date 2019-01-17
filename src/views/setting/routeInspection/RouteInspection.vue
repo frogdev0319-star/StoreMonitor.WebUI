@@ -682,17 +682,16 @@ export default {
                 .bind-title{
                     @include point(margin-right,15);
                     color:#A2AEBC;
-                    @include point(font-size,12);
+                    font-size: 12px;
                 }
                 .el-bind-btn{
                     background-color: $mainColor; 
                     color: #fff;
                     border-color: $mainColor;
                     position: relative;
-                    @include point(width,120);
                     border-radius: 0px;
                     @include point(margin-right,15);
-                    @include point(font-size,12);
+                    font-size: 12px;
                     &:disabled{
                         opacity: 0.6;
                     }
@@ -708,7 +707,7 @@ export default {
                     top: 3px;
                     display: inline-block;
                     text-decoration: none;
-                    @include point(font-size,12);
+                    font-size: 12px;
                     border: 1px solid;
                     border-left-width: 0px;
                     @include point(right,5);
@@ -721,7 +720,7 @@ export default {
                     }
                     span{
                         position: relative;
-                        @include point(bottom,3);
+                        bottom: 3px;
                     }
                 }
                 .el-handle-btn{
@@ -729,9 +728,9 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    padding: 0.1875rem 0.625rem !important;
+                    padding: 3px 5px !important;
                     position: relative;
-                    @include point(top,3);
+                    top: 3px;
                     span{
                         position: relative;
                         @include point(bottom,3);

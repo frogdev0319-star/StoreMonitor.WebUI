@@ -7,11 +7,11 @@ import './assets/font/iconfont.css'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Cookies from 'js-cookie'
-// import {getToken} from '@/common/auth'
 import 'video.js/dist/video-js.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'videojs-flash'
 
+import rem from '@/common/rem'
 
 require('@/assets/css/myVideoCss.css');
 
@@ -36,7 +36,7 @@ new Vue({
 })
 import {getToken} from '@/common/auth'
 router.beforeEach((to,from,next)=>{
-  if(to.meta.requireAuth){ //要跳转的页面需要登陆权限
+  if(to.matched.some(r => r.meta.requireAuth)){ //要跳转的页面需要登陆权限
     if(getToken()){  //通过vuex state 获取当前的token信息
       next();
     }

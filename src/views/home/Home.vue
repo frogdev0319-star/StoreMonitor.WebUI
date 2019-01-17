@@ -20,17 +20,12 @@
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
-                <el-col :span="8" class="user-content">
+                <el-col :span="5" class="headUrl-content">
                     <div class="bell-content">
                         <i class="el-icon-bell"></i>
                         <el-badge is-dot class="item"></el-badge>
                     </div>
-                    <!-- <div class="badoc-content">
-                        <i class="iconfont icon-ziliaoshouce" style="font-size:1.5em;cursor:pointer;" @click="CheckDOC"></i>
-                    </div> -->
-                </el-col>
-                <el-col :span="3" class="headUrl-content">
-                    <el-dropdown>
+                    <el-dropdown class="el-user-drop">
                         <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right" 
                         style="margin-left:6px;cursor:pointer;"></i></span>
                         <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
@@ -44,7 +39,7 @@
             </el-col>
             <el-col class="main" :span="24" 
             :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event')?
-            {'height':(varyWindowHeight-80)+'px'}:{'height':'auto'}">
+            {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <el-menu :default-active="$route.path"
@@ -73,7 +68,7 @@
                             </template>
                             <el-menu-item id="childSubItem" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                              v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                            :key="child.path" v-if="!child.hidden" style="padding-left: 30px;">
+                            :key="child.path" v-if="!child.hidden" style="padding-left: 30px;color:#a0a4ad;">
                                 <template>
                                     <div class="tag-icon"></div>
                                     <span >{{child.name}}</span>
@@ -176,7 +171,12 @@ export default {
             resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
                 recalc = function() {
                     //设置根字体大小
-                    docEl.style.fontSize = (docEl.clientWidth/90)+'px';
+                    if(docEl.clientWidth>1450){
+                        docEl.style.fontSize =16;
+                    }
+                    else{
+                        docEl.style.fontSize = (docEl.clientWidth/90)+'px';
+                    }
                 };
             //绑定浏览器缩放与加载时间
             window.addEventListener(resizeEvt, recalc, false);
@@ -202,7 +202,7 @@ export default {
                 self.personList=res.data;
                 res.data.forEach(item=>{
                     if(item.userId==userId){
-                        self.userName=item.userName;
+                        self.userName=item.userName.length>10?item.userName.substr(0,10)+'...':item.userName;
                     }
                 })
             }) 
@@ -219,7 +219,6 @@ export default {
         let self=this;
         this.headUrl='./static/img/admin.png';
         console.log(this.$route.matched);
-        this.getWindowSize();
         this.getBread();
         PubSub.subscribe('change-color',(event,data)=>{
             self.showTag=data.showTag;
@@ -342,18 +341,18 @@ export default {
                     }
                 }
             }
-            .user-content{
-                float:right;
+            .headUrl-content{
+                float: right;
+                color: #fff;
+                position: relative;
+                overflow: hidden;
                 .bell-content{
                     @include point(width,60);
                     @include point(height,60);
-                    float:left;
-                    text-align:center;
                     border-left:1px solid rgba(255,255,255,0.2);
                     border-right:1px solid rgba(255,255,255,0.2);
-                    position: absolute;
-                    top:0;
-                    right:160px;
+                    position: relative;
+                    display: inline-block;
                     .el-icon-bell{
                         @include point(font-size,25);
                         vertical-align:middle;
@@ -366,31 +365,26 @@ export default {
 
                     }
                 }
-                .badoc-content{
-                    @include point(width,60);
-                    @include point(height,60);
-                    text-align:center;
-                    border-right:1px solid rgba(255,255,255,0.2);
-                    position: absolute;
-                    top:0;
-                    @include point(right,182);
-                    color:#4b5262;
-                }
-            }
-            .headUrl-content{
-                float: right;
-                color: #fff;
-                .username{
-                    color:#4b5262;
-                    i{
-                        color:#FB505F;
-                        font-weight: bold;
+                .el-user-drop{
+                   float: right;
+                   margin-right: 20px;
+                    .username{
+                        color:#4b5262;
+                        margin: auto 10px;
+                        @include point(max-width,90);
+                        overflow: hidden;
+                        text-overflow:ellipsis;
+                        white-space: nowrap;
+                        i{
+                            color:#FB505F;
+                            font-weight: bold;
+                        }
                     }
-                }
-                .headImg{
-                    position: relative;
-                    @include point(top,10);
-                    @include point(margin-left,10);
+                    .headImg{
+                        position: relative;
+                        @include point(top,10);
+                        @include point(margin-left,10);
+                    }
                 }
             }
         }
@@ -425,6 +419,7 @@ export default {
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
+                    
                 }
             }
             .content-wrapper-all{
@@ -444,7 +439,7 @@ export default {
             .footercontent{
                 padding:0px 0 10px 60px;
                 color:#777;
-                @include point(font-size,12);
+                font-size:12px;
             }
         }
         .el-submenu:hover{
@@ -452,10 +447,11 @@ export default {
         }
         .el-menu-item:hover{
             background-color:#FB505F !important;
+            color: #eee !important;
         }
         .el-menu-item.is-active{
             background-color:#2F2933 !important;
-            color:#FB505F;
+            color:#FB505F !important;
             div{
                 background-color: #FB505F !important;
             }

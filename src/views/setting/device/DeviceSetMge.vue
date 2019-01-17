@@ -216,13 +216,13 @@ export default {
     computed:{
         varyDivHeight:function(){
             if(this.varyWindowHeight>800){
-                return this.varyWindowHeight*0.66;
+                return this.varyWindowHeight*0.67;
             }
             else if(this.varyWindowHeight>700){
-                return this.varyWindowHeight*0.60;
+                return this.varyWindowHeight*0.62;
             }
             else{
-                return this.varyWindowHeight*0.497;
+                return this.varyWindowHeight*0.546;
             }
         }
     },
@@ -898,7 +898,7 @@ $mainColor:#FB505F;
             }
             .nvr-title{
                 @include titleStyle;
-                @include point(font-size,14);
+                font-size: 14px;
                 .name-title{
                    width: 30%;
                 }
@@ -912,7 +912,7 @@ $mainColor:#FB505F;
             .nvr-data{
                 @include titleStyle;
                 position: relative;
-                @include point(font-size,14);
+                font-size: 14px;
                 .proper-flag{
                     height: 70%;
                     width: 4px;
@@ -968,7 +968,7 @@ $mainColor:#FB505F;
              padding:0 15px;
              .nape-items-title{
                 @include titleStyle;
-                @include point(font-size,14);
+                font-size: 14px;
                 .nape-name-title{
                     width: 36%;
                 }
@@ -984,7 +984,7 @@ $mainColor:#FB505F;
                 position: relative;
                 padding-left: 1%;
                 cursor: pointer;
-                @include point(font-size,14); 
+                font-size: 14px;
                 @include point(height,49); 
                 @include point(line-height,49);
 
@@ -992,7 +992,6 @@ $mainColor:#FB505F;
                 .nape-input{
                     @include point(width,220);
                     margin-left: 13%;
-                    @include point(font-size,14);
                     position: relative;
                     bottom: 2px;
                 }

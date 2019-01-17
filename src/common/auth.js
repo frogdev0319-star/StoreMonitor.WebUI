@@ -13,3 +13,13 @@ export function setToken(token){
 export function removeToken(){
     return Cookies.remove(TokenKey);
 }
+
+export function getCookie(name){
+    return Cookies.get(name);
+}
+export function setCookie(name,value){
+    return Cookies.set(name,value,{expires:7});  //设置有效期为7天
+}
+export function removeCookie(name){
+    return Cookies.remove(name);
+}

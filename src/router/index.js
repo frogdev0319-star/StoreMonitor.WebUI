@@ -18,7 +18,7 @@ export default new Router({
     {
       path: '/',
       name: '总览',
-      redirect:'event',
+      redirect:'/event',
       component: Home,
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',

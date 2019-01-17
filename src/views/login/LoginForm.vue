@@ -92,6 +92,7 @@
 <script>
 import { isvalidUsername } from '@/common/validate'
 import {Message} from  'element-ui'
+import {getCookie,setCookie,removeCookie} from '@/common/auth'
 export default {
     name:'Login',
      data(){
@@ -226,6 +227,12 @@ export default {
                         self.$router.push({path:self.redirect||'/'});
                         console.log(res);
                         sessionStorage.setItem('UserId',res.userId);
+                        if(self.rememberUserName){  //如果勾选，保存用户名跟密码
+                            setCookie('user',JSON.stringify(self.loginForm));
+                        }
+                        else{
+                            removeCookie('user');
+                        }
                     }).catch(()=>{
                         self.loading=false;
                         Message({
@@ -348,15 +355,26 @@ export default {
         },
         stop(){
             clearTimeout(this.timer);
+        },
+        getUserInfo(){
+            let self=this;
+            console.log(getCookie('user'));
+            let data=getCookie('user');
+            if(data!=undefined||data!=null){
+                self.rememberUserName=true;
+                self.loginForm=JSON.parse(data);
+            }
         }
     },
     created(){
-        this.getWindowSize();
+        //this.getWindowSize();
     },
     mounted(){
         let self=this;
+        //self.getWindowSize();
         self.initDom();
         self.play();
+        self.getUserInfo();
     },
     destroyed(){
         this.stop();
@@ -532,7 +550,7 @@ $red:#fb4c5d;
                 span{
                     @include point(margin-left,15);
                     color: $fff;
-                    @include point(font-size,14);
+                    font-size:14px
                 }
                 .forget-pass{
                     position: absolute;

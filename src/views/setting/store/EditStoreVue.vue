@@ -331,7 +331,7 @@ export default {
             .store-title{
                 overflow: hidden;
                 text-align: left;
-                @include point(font-size,18);
+                font-size: 18px;
                 font-weight: bold;
                 color: #424151;
                 .sub-btn{
@@ -346,7 +346,7 @@ export default {
             .store-info{
                 text-align: left;
                 @include point(margin-top,15);
-                @include point(font-size,14);
+                font-size: 14px;
                 span{
                     width:auto;
                     margin-right: 6%;
@@ -369,14 +369,13 @@ export default {
             @include point(margin-bottom,20);
             background-color: #F6F7FB;
             .el-table-title{
-                @include point(font-size,14);
                 @include point(line-height,50);
                 @include point(height,50);
                 text-align: left;
                 border-bottom: 1px solid #ddd;
                 margin:auto 10px;
                 color: #94A4B4;
-                @include point(font-size,14);
+                font-size: 14px;
                 font-weight: bold;
                 .name-title{
                     width: 40%;
@@ -393,7 +392,7 @@ export default {
                     margin-left: 2%;
                     display: inline-block;
                     @include point(margin-top,10);
-                    @include point(font-size,15);
+                    font-size: 15px;
                     font-weight: bold;
                     color: #424151;
                 }
@@ -404,7 +403,7 @@ export default {
                         @include point(line-height,50);
                         @include point(height,50);
                         border-bottom: 1px solid #ddd;
-                        @include point(font-size,14);
+                        font-size: 14px;
                     }
                     .nape-title{
                         margin-left: 2%;

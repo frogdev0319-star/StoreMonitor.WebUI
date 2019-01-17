@@ -233,13 +233,13 @@
         computed:{
             tableHieght(){
                 if(this.windowHeight>800){
-                    return this.windowHeight*0.6;
+                    return this.windowHeight*0.62;
                 }
                 else if(this.windowHeight>700){
-                    return this.windowHeight*0.56;
+                    return this.windowHeight*0.58;
                 }
                 else{
-                    return this.windowHeight*0.48;
+                    return this.windowHeight*0.52;
                 }
             }
         },
@@ -303,8 +303,7 @@
             searchEventList(){
                 let self=this;
                 if(self.serachVale!=undefined&&self.serachVale.length!=0){
-                    self.params.like={subject:this.serachVale,assigner:this.serachVale,
-                    assignee:this.serachVale,storeId:this.serachVale};
+                    self.params.like={subject:this.serachVale,assignerName:this.serachVale,storeName:this.serachVale};
                 }
                 else{
                     self.params.like={};
@@ -434,7 +433,7 @@
                 return new Promise((resolve,reject)=>{
                     eventRESTful.getEventList(self.params).then((res)=>{
                         console.log(res);
-                        let size=res.totalElements;
+                        let size=res.data.totalElements;
                         resolve(size);
                     }) 
                     .catch((error) => {
@@ -533,11 +532,11 @@ $red:#FB505F;
         .date-title{
             @include point(margin-left,30);
             @include point(margin-right,20);
-            @include point(font-size,14);
+            font-size: 14px;
             color: #424151;
         }
         .date-picker{
-            @include point(width,160);
+            @include point(width,180);
         }
         .el-search{
             position:absolute;
