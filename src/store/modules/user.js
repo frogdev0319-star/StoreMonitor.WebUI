@@ -55,11 +55,13 @@ const user={
                 loginByUsername(params).then(res=>{
                     console.log(res);
                     const data=res.data;
-                    commit('SET_TOKEN',data.token);
-                    setToken(data.token);
-                    resolve(data);
-                }).catch(error=>{
-                    reject(error);
+                    if(res.data){
+                        commit('SET_TOKEN',data.token);
+                        setToken(data.token);
+                    }
+                    resolve(res);
+                }).catch(err=>{
+                    reject(err);
                 })
             })
         },

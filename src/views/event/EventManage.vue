@@ -13,6 +13,7 @@
                 :editable=false
                 :clearable=false
                 :picker-options='startDateOpt'
+                :popper-class="poperClass"
                 @change="startDateChange">
             </el-date-picker>
             <span class="date-title" style="margin-left:30px;margin-right:20px;">截止时间</span>
@@ -27,6 +28,7 @@
                 :editable=false
                 :clearable=false
                 :picker-options='endDateOpt'
+                :popper-class="poperClass"
                 @change="endDateChange">
             </el-date-picker>
             <el-tooltip :popper-class="toolTipClass" class="item" effect="light"
@@ -78,7 +80,7 @@
                         <el-table 
                             :data="item.tableData" 
                             :highlight-current-row="true"
-                            empty-text='没有异常数据'
+                            empty-text='没有事件数据'
                             align='left'
                             :height="tableHieght"
                             @sort-change='sortChange'
@@ -146,23 +148,22 @@
                         console.log(time);
                         let date=this.startDate;
                         console.log(date);
-                        return (time.getTime() > Date.now())||time.getTime()<date.getTime();
+                        date=typeof(date)=='number'?date:date.getTime();
+                        return (time.getTime() > Date.now())||time.getTime()<date-8.64e7;
                     }
                 },
                 startDateOpt:{
                     disabledDate:(time)=>{
                         let date=this.endDate;
-                        return (time.getTime() < date.getTime() -31*8.64e7)||time.getTime()>date.getTime();
+                        date=typeof(date)=='number'?date:date.getTime();
+                        return (time.getTime() < date -31*8.64e7)||time.getTime()>date;
                     }
                 },
                 toolTipClass: 'page-login-toolTipClass',
-                states: [
-                {
-                    value: 1,
-                    label: '全部'
-                }],
+                states:[{value: 0,label: '全部'},{value: 1,label: '待处理'}, 
+                        {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
                 curState:'',
-                value:1,
+                value:0,
                 serachVale:'',
                 tableDataList:[
                     {
@@ -226,7 +227,8 @@
                 exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
                 timeid:0,
                 windowHeight:window.innerHeight,
-                userId:''
+                userId:'',
+                poperClass:'date-picker-poper',
             }
 
         },
@@ -247,57 +249,59 @@
             startDateChange(val){
                 console.log(val);
                 let self=this;
-                self.params.beginTs=self.startDate.getTime();
-                self.params.endTs=self.endDate.getTime();
+                self.params.beginTs=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
+                self.params.endTs=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
+        
                 self.getEventList(self.params);
-                let start=self.startDate.getTime();
-                let end=self.endDate.getTime();
+                let start=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
+                let end=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
                 self.getEventCount(start,end);  //切换初试时间
                 
             },
             endDateChange(val){
                 console.log(val);
                 let self=this;
-                self.params.beginTs=self.startDate.getTime();
-                self.params.endTs=self.endDate.getTime();
+                self.params.beginTs=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
+                self.params.endTs=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
+
                 self.getEventList(self.params);
-                let start=self.startDate.getTime();
-                let end=self.endDate.getTime();
+                let start=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
+                let end=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
                 self.getEventCount(start,end);  //切换结束时间
             },
             handleClick(val){
                 let self=this;
                 console.log(val.index);
+                self.value=0;
+                self.serachVale='';
+                self.params={};   //切换tab 页清空搜索条件
                 switch(Number(val.index)){
-                    case 0: self.states=[{value: 1,label: '全部'}];  
-                            self.params.clause={"status":0,"assignee":self.userId};break;
-                    case 1: self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
-                                        {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
-                            self.params.clause={"assigner":self.userId};break;
-                    case 2:self.states=[{value: 1,label: '全部'},{value: 2,label: '未处理'}, 
-                                        {value: 3,label: '已处理'}, {value: 4,label: '已结案'}];
-                            self.params.clause={}; break;
+                    case 0: self.params.clause={"status":0,"assignee":self.userId};break;
+                    case 1: self.params.clause={"assigner":self.userId};break;
+                    case 2: self.params.clause={}; break;
                 }
+                self.params.beginTs=typeof(self.startDate)=='object'?self.startDate.getTime():self.startDate;
+                self.params.endTs=typeof(self.endDate)=='object'?self.endDate.getTime():self.endDate;
                 this.getEventList(this.params);
             },
             selectChange(val){
                 console.log(val);
                 let self=this;
+                self.serachVale='';
                 switch(val){
-                    case 1: self.params.clause={};break; //全部状态
-                    case 2: self.params.clause={
-                        "status":0
-                    };
-                    break;  //未处理状态
-                    case 3: self.params.clause={
-                        "status":1
-                    };
-                    break;
-                    case 4:self.params.clause={
-                        "status":2
-                    };
-                    break;
+                    // case 0: self.params={
+                    //     clause:{}
+                    // };break; //全部状态
+                    case 0: self.params.clause.status=[0,1,2];break;
+                    // default: self.params={
+                    //     clause:{
+                    //         status:val-1
+                    //     }
+                    // };
+                    default:self.params.clause.status=val-1;break;
                 }
+                self.params.beginTs=typeof(self.startDate)=='object'?self.startDate.getTime():self.startDate;
+                self.params.endTs=typeof(self.endDate)=='object'?self.endDate.getTime():self.endDate;
                 self.getEventList(self.params);
             },
             searchEventList(){
@@ -347,10 +351,29 @@
                 let end=new Date().getTime();
                 self.getEventCount(start,end);  //初始加载
             },
-            getEventList(params){
+            getSizeStatus(params){
+                return new Promise((resolve,reject)=>{
+                    eventRESTful.getEventList(params).then((res)=>{
+                        let size=res.data.totalElements;
+                        resolve(size);
+                    })
+                })
+                
+            },
+            async getEventList(params){
                 let self=this;
                 let tabIndx=Number(self.activeName);
                 console.log(self.activeName);
+
+                if(tabIndx!=0){ //点击的是后边两个tab，这个时候需要考虑状态不为全部状态的情况。
+                    if(self.value!=0){ //选择的不是全部状态 page=0
+                        params.filter={};
+                        let size=await self.getSizeStatus(params);
+                        if(size<self.tableDataList[tabIndx].sizeNum){
+                            self.tableDataList[tabIndx].page=0;
+                        }
+                    }
+                }
                 params.filter={page:this.tableDataList[tabIndx].page,size:this.tableDataList[tabIndx].sizeNum};
                 eventRESTful.getEventList(params).then((res)=>{
                     console.log(res);
@@ -366,7 +389,8 @@
                             status:item.status,
                             storeId:item.storeId,
                             storeName:item.storeName,
-                            subject:item.subject
+                            subject:item.subject,
+                            initialComment:item.initialComment
                         }
                        temp.push(obj);
                     })
@@ -590,6 +614,7 @@ $red:#FB505F;
     }
 </style>
 <style>
+ @import '../../assets/css/pagination.css';
     .el-table::before{
         height: 0px !important;
     }
@@ -630,9 +655,8 @@ $red:#FB505F;
         border-bottom: 1px  solid #FB505F;
         font-size: 14px;
     }
-    .el-pagination.is-background .el-pager li:not(.disabled).active{
-        background-color:#FB505F !important;
-        color:#fff !important;
+    .date-picker-poper .el-button--text{
+        visibility: hidden !important;
     }
 </style>
 

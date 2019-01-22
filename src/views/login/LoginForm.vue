@@ -224,23 +224,49 @@ export default {
                     self.loading=true;
                     self.$store.dispatch('LoginByUser',this.loginForm).then((res)=>{
                         self.loading=false;
-                        self.$router.push({path:self.redirect||'/'});
-                        console.log(res);
-                        sessionStorage.setItem('UserId',res.userId);
-                        if(self.rememberUserName){  //如果勾选，保存用户名跟密码
-                            setCookie('user',JSON.stringify(self.loginForm));
+                        let resData=res.data;
+                        if(resData){
+                            self.$router.push({path:self.redirect||'/'});
+                            console.log(resData);
+                            sessionStorage.setItem('UserId',resData.userId);
+                            if(self.rememberUserName){  //如果勾选，保存用户名跟密码
+                                setCookie('user',JSON.stringify(self.loginForm));
+                            }
+                            else{
+                                removeCookie('user');
+                            }
                         }
                         else{
-                            removeCookie('user');
+                            console.log(res);
+                            let code=res.errCode;
+                            let msg=res.errMsg;
+                            let msgShow='';
+                            if(code==500&&msg=="405-login fail. Please check ID and password."){
+                                msgShow='用户名或者密码错误！';
+                            }
+                            else{
+                                msgShow=msg;
+                            }
+                             Message({
+                                message:msgShow,
+                                type:'error',
+                                duration:3*1000
+                            })
                         }
-                    }).catch(()=>{
-                        self.loading=false;
-                        Message({
-                            message:'用户名或密码错误，请检查！',
-                            type:'error',
-                            duration:3*1000
-                        })
+                        
+                    }).catch((err)=>{
+                        console.log(err);
+                        if(err.request){
+                            if(err.request.readyState==4&&err.request.status==0){
+                                Message({
+                                    message:'网络连接异常，请检查！',
+                                    type:'error',
+                                    duration:3*1000
+                                })
+                            }
+                        }
                     })
+                    self.loading=false;
                 }else{
                     console.log('error.submit!!!');
                     return false;

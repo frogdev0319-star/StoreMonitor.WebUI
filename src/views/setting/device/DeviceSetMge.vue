@@ -103,9 +103,10 @@
                                 @size-change="sizeChange"
                                 @current-change="currentChange"
                                 :page-size="sizeNum" :total="total"
+                                :pager-count="3"
                                 background
                                 small
-                                layout="total,jumper,prev, pager, next">
+                                layout="jumper,prev, pager, next">
                             </el-pagination>
                         </div>
                     </el-col>
@@ -210,19 +211,18 @@ export default {
             ],
             varWindowWidth:1440, 
             varyWindowHeight:window.innerHeight,
-            contentHeight:window.screen.height,
         }
     },
     computed:{
         varyDivHeight:function(){
             if(this.varyWindowHeight>800){
-                return this.varyWindowHeight*0.67;
+                return this.varyWindowHeight*0.65;
             }
             else if(this.varyWindowHeight>700){
-                return this.varyWindowHeight*0.62;
+                return this.varyWindowHeight*0.60;
             }
             else{
-                return this.varyWindowHeight*0.546;
+                return this.varyWindowHeight*0.526;
             }
         }
     },
@@ -439,9 +439,27 @@ export default {
                 })
             })
         },
+        getAllNVRData(){
+            let params={
+                "filter": {
+                    "page": 0,
+                    "size": self.total
+                }
+            };
+            return new Promise((resolve,reject)=>{
+                deviceRESTful.getNVRList(params).then(res=>{
+                    let errMsg=res.errMsg;
+                    let data=[];
+                    if(errMsg!=undefined&&errMsg=='Success'){
+                        data=res.data.content;
+                    }
+                    resolve(data);
+                })
+            })
+        },
         async addAllData(paramsNVR,paramsDevice){
             let self=this;
-            let data=self.nvrData;
+            let data=await self.getAllNVRData();
             console.log(data);
             let nvrList=[];
             let channelList=self.channelData.map(x=>x.id);
@@ -669,7 +687,6 @@ export default {
                     })
                     self.nvrData=temp;
                     self.total=res.data.totalElements;
-                    
                 }
             })
             .then(async()=>{
@@ -713,13 +730,11 @@ export default {
         },
         async InitData(){
             let self=this;
-            if(self.varyWindowHeight>=1080){
-                self.sizeNum=25;
-                self.contentHeight=self.varyWindowHeight*0.78;
+            if(self.varyWindowHeight>=760){
+                self.sizeNum=20;
             }
             else {
                 self.sizeChange=10;
-                self.contentHeight=self.varyWindowHeight*0.65;
             }
             self.activeName=sessionStorage.getItem('DevicePage_TabName')==undefined||
                     sessionStorage.getItem('DevicePage_TabName').length==0?'dash':sessionStorage.getItem('DevicePage_TabName');
@@ -1024,6 +1039,7 @@ $mainColor:#FB505F;
 }
 </style>
 <style>
+@import '../../../assets/css/pagination.css';
 .el-input__inner{
     border-radius: 0px !important;
 }
@@ -1051,10 +1067,6 @@ $mainColor:#FB505F;
 .el-table--enable-row-hover .el-table__body tr:hover>td{
 	background-color: #fff !important;
     cursor: pointer !important;
-}
-.el-pagination.is-background .el-pager li:not(.disabled).active{
-    background-color:#FB505F !important;
-    color:#fff !important;
 }
 #importId .el-dialog__body{
     padding-top:0px !important;

@@ -8,8 +8,20 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/redirect',
+      component: Home,
+      hidden: true,
+      children: [
+        {
+          path: '/redirect/:path*',
+          component: () => import('@/views/redirect/index')
+        }
+      ]
+    },
+    {
       path:'/login',
       name:'Login',
+      hidden: true,
       component:LoginForm,
       meta:{
         requireAuth: false,
@@ -20,6 +32,7 @@ export default new Router({
       name: '总览',
       redirect:'/event',
       component: Home,
+      hidden: false,
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',
       leaf:true, //没有子节点
@@ -42,7 +55,7 @@ export default new Router({
       iconCls:'iconfont icon-menu-xundian',
       styles:'font-size:22px',
       leaf:false,  //多个子节点
-      
+      hidden: false,
       children:[
         {
           path:'/reinspection',
@@ -51,7 +64,7 @@ export default new Router({
           meta:{
             requireAuth: true,
           },
-          isReadOnly:true,
+          isReadOnly:false,
         },
         {
           path:'/stroemonitor',
@@ -60,7 +73,7 @@ export default new Router({
           meta:{
             requireAuth: true,
           },
-          isReadOnly:true,
+          isReadOnly:false,
         }
       ]
     },
@@ -72,6 +85,7 @@ export default new Router({
       styles:'font-size:22px',
       leaf:true,
       isReadOnly:false,
+      hidden: false,
       children:[
         {
           path:'/event',
@@ -109,6 +123,7 @@ export default new Router({
       styles:'font-size:25px',
       leaf:true,
       isReadOnly:true,
+      hidden: false,
       children:[
         {
           path:'/statistical',
@@ -128,6 +143,7 @@ export default new Router({
       styles:'font-size:20px',
       leaf:true,
       isReadOnly:true,
+      hidden: false,
       children:[
         {
           path:'/datacenter',
@@ -146,6 +162,7 @@ export default new Router({
       styles:'font-size:24px',
       component:Home,
       leaf:false,
+      hidden: false,
       children:[
         {
           path:'/routeinspection',

@@ -67,7 +67,6 @@
                     </div>
                 </el-dialog>
             </el-col>
-
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" :closable="index!=0&&index!=1?true:false" >

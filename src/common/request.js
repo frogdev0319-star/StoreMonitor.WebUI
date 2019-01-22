@@ -99,42 +99,49 @@ service.interceptors.request.use(
         Promise.reject(error);
     }
 )
-const CancelToken=service.CancelToken;
-const pending=[];
+
 service.interceptors.response.use(
     response=>{
         const res=response.data;
         return response.data;
     },err=>{
         console.log(err);
-        let errCode=err.response.data.errCode;
-        let errMsg=err.response.data.errMsg;
-        if(errCode===500&&errMsg=='Invalid token'){
-            router.push('/login');
-            // MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录！','确认登出',{
-            //     confirmButtonText:'重新登录',
-            //     cancelButtonText:'取消',
-            //     type:'warning'
-            // }).then(()=>{
-                store.dispatch('FedLogOut').then(()=>{
-                    Message({
-                        //message:err.response.data.errMsg,
-                        message:'登录信息已失效',
-                        type:'error',
-                        duration:5*1000
+        if(err.response){
+            let errCode=err.response.data.errCode;
+            let errMsg=err.response.data.errMsg;
+            if(errCode===500&&errMsg=='Invalid token'){
+                router.push('/login');
+                // MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录！','确认登出',{
+                //     confirmButtonText:'重新登录',
+                //     cancelButtonText:'取消',
+                //     type:'warning'
+                // }).then(()=>{
+                    store.dispatch('FedLogOut').then(()=>{
+                        Message({
+                            //message:err.response.data.errMsg,
+                            message:'登录信息已失效',
+                            type:'error',
+                            duration:5*1000
+                        })
                     })
+                //})
+            }
+            else if(errCode===500&&errMsg=='No authority'){
+                router.push('/');
+                Message({
+                    //message:err.response.data.errMsg,
+                    message:'无操作权限!',
+                    type:'error',
+                    duration:5*1000
                 })
-            //})
+            }
         }
-        else if(errCode===500&&errMsg=='No authority'){
-            router.push('/');
-            Message({
-                //message:err.response.data.errMsg,
-                message:'无操作权限!',
-                type:'error',
-                duration:5*1000
-            })
+        else if(err.request){
+            if(err.request.readyState==4&&err.request.status==0){
+                console.log(err.request);
+            }
         }
+        
         return Promise.reject(err);
     }
 )

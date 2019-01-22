@@ -356,6 +356,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import '../../assets/iconfont/iconfont.css';
+    $red:#FB505F;
+    $lightRed:#FEE4E7;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -373,8 +376,7 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
-    $red:#FB505F;
-    $lightRed:#FEE4E7;
+   
     .el-container{
         .spreadLsideClass{
             width: 98%;
@@ -681,12 +683,24 @@ export default {
     background-color:#34374A;
 }
 .select-popClass .el-select-dropdown{
-    border:0px;
+    border:0px !important;
     background-color:#34374A !important;
 }
 .select-popClass .el-select-dropdown__item.selected{
     color:#fff;
     font-weight:500 !important;
+}
+.select-popClass .el-select-dropdown__list{
+    padding:0;
+}
+.el-select-dropdown.el-popper.select-popClass{
+    border:0px;
+}
+.select-popClass.el-popper[x-placement^=bottom] .popper__arrow{
+    border-bottom-color:#34374A !important;
+}
+.select-popClass.el-popper[x-placement^=bottom] .popper__arrow::after{
+    border-bottom-color:#34374A !important;
 }
 </style>
 <style scoped>

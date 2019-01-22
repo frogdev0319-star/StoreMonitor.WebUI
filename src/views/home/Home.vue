@@ -51,6 +51,7 @@
                     id="nav-menu"
                     :collapse-transition="false" style="border:0px;min-height:800px;">
                         <template v-for="(item,index) in routerList">
+                            <template v-if="!item.hidden">
                             <!--只有一个节点-->
                             <el-menu-item  v-if="item.leaf&&item.children.length>0" class="submenu-item"
                                 :key="index"  :index="item.children[0].path" 
@@ -60,7 +61,7 @@
                                 <span>{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点-->
-                        <el-submenu class="el-submenu" :key="index" :index="index+''" :disabled="item.name=='巡店管理'"
+                        <el-submenu class="el-submenu" :key="index" :index="index+''"
                         v-if="!item.leaf" style="text-align:left;">
                             <template slot="title">
                             <i :class="item.iconCls" :style="item.styles" class="navIcon">
@@ -78,6 +79,7 @@
                                 </template>
                             </el-menu-item>
                         </el-submenu>
+                            </template>
                         </template>
                         
                     </el-menu> 

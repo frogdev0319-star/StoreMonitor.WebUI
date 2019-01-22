@@ -43,7 +43,7 @@
         </el-col>
         <el-col :span="24" class="eventInfo-content" :style="{'min-height':divHeight+'px'}">
             <strong>事件详情</strong>
-            <div class="speech-content" v-if="false">
+            <div class="speech-content" v-if="showAudio">
                <div class="speech-info" @click="startSpeech"> 
                    <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
                </div>
@@ -54,14 +54,15 @@
             </div>
             <div class="photo-content">
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
-                    <div v-if="item.type=='0'" class="img-content">
+                    <div v-if="item.mediaType==2" class="img-content">
                         <!--图片资源-->
-                        <img  :src="item.imgSrc" :alt="item.alt" height="156px"/>
+                        <img  :src="item.url" :alt="item.alt" height="160px" style="max-height:160px;"/>
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
-                        <video  height=83% width=90% id="previewVideo" prload autoplay controls
-                                class="video-js vjs-fill" style="postion:absoulte;top:10px;">
+                        <video  height=83% width=90%  prload autoplay controls
+                                class="video-js vjs-fill" style="max-height:160px;">
+                                <source :src="item.url">
                         </video>
                     </div>
                 </div>
@@ -146,38 +147,11 @@ export default {
             speech:false,
             audioRef:'audioRef',
             isPlaying:false,
-            audioSrc:'./static/img/aduio_test.mp3',
+            audioSrc:'',
+            showAudio:false,
             videoSrc:"",
             curChannel:"水吧区域",
-            sourceList:[
-                // {
-                //     type:1,
-                //     ref:'img0',
-                //     imgSrc:"./static/img/imgTest.jpg",
-                //     alt:'门店截图'
-                // },
-                // {
-                //     type:2,
-                //     ref:'video0',
-                //     playerOptions: {
-                //         controls: true,
-                //         // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
-                //         autoplay: false, //如果true,浏览器准备好时开始回放。
-                //         // muted: false, // 默认情况下将会消除任何音频。
-                //         loop: false, // 导致视频一结束就重新开始。
-                //         preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
-                //         language: 'zh-CN',
-                //         aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
-                //         fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-                //         notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-                //         sources: [{
-                //         type: "video/mp4",
-                //         src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
-                //         }]
-                //     }
-                //},
-                
-            ],
+            sourceList:[],
             commentList:[],
             protocal:'DASH',
             selGID:0,
@@ -311,13 +285,25 @@ export default {
                 createDate:util.getDateTime(event.ts),
                 deviceId:event.deviceId,
                 status:event.status
-            }
+            };
             self.event=obj;
+            let attachment=event.initialComment.attachment;
+            let temp=[];
+            attachment.forEach(item=>{
+                if(item.mediaType==0){
+                    self.audioSrc=item.url;
+                    self.showAudio=true;
+                }
+                else{
+                    temp.push(item);
+                }
+            })
+            self.sourceList=temp;
             console.log(self.event);
         },
         getProcess(){
             let self=this;
-            //self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
+            self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
         },
         startSpeech(){
             let self=this;
@@ -382,10 +368,10 @@ export default {
                                 let _obj={};
                                 switch(item.mediaType){
                                     case 0:
-                                        // _obj.type=0;
-                                        // _obj.ref='img'+index;
-                                        // _obj.imgSrc=item.url;
-                                        // _obj.alt='截图'+index;
+                                        _obj.type=2;
+                                        _obj.ref='img'+index;
+                                        _obj.imgSrc=item.url;
+                                        _obj.alt='截图'+index;
                                         break;
                                     case 1:
                                         //_obj.type=2;
@@ -518,9 +504,12 @@ export default {
         self.getSessionData();  //获取session中存储的event信息
         self.getCommentList();  //获取comment信息
         self.myfun();
-        self.timeid=setInterval(function(){
-            self.getProcess()
-        },1000);
+        if(self.showAudio){
+             self.timeid=setInterval(function(){
+                self.getProcess()
+            },1000);
+        }
+       
         //self.realTime();
     },
     update(){ 
@@ -626,15 +615,16 @@ export default {
         }
         .photo-content{
             overflow: hidden;
-            @include point(margin-bottom,15);
+            @include point(margin-top,15);
             .source-content{
                 float: left;
                 @include point(margin,5);
+                width: 25%;
                 .img-content{
 
                 }
                 .video-content{
-
+                   width: 100%;
                 }
             }
         }

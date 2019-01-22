@@ -59,7 +59,8 @@
                 prop="napeTable"
                 label="关联巡检表"
                 width="180"
-                align="left">
+                align="left"
+                sortable="true">
                 <template slot-scope="scope">
                     <el-popover
                     v-if="scope.row.napeTable.length!=0&&(scope.row.napeTable!='--'&&scope.row.napwTable!='现场巡检')"
@@ -298,7 +299,12 @@ import PubSub from 'pubsub-js'
             },
             async getProvinceList(){
                 let self=this;
-                let params={};
+                let params={
+                    "filter":{
+                        "page":0,
+                        "size":1000
+                    }
+                };
                 let data=await self.getStoreData(params);
                 if(data.response!=undefined&&data.response.status==500){
                     return false;
@@ -330,11 +336,19 @@ import PubSub from 'pubsub-js'
             },
             async getStoreList(params){
                 let self=this;
+                console.log(params);
+                if(params.clause.hasOwnProperty('province')||
+                params.clause.hasOwnProperty('city')||params.like.hasOwnProperty('name')){ //当前选择了省份或者城市信息
+                    params.filter={};
+                    let data=await self.getStoreData(params);
+                    let size=data.data.totalElements;
+                    if(size<this.sizeNum){
+                        this.page=0;
+                    }
+                }
                 params.filter={page:this.page,size:this.sizeNum};
                 let data=await self.getStoreData(params);
-                if(data.response!=undefined&&data.response.status==500){
-                    return false;
-                }
+
                 self.storeData=data.data;
                 console.log(self.storeData);
                 let temp=[];
@@ -617,6 +631,7 @@ import PubSub from 'pubsub-js'
     }
 </style>
 <style>
+@import '../../../assets/css/pagination.css';
     .el-table::before{
         height: 0px !important;
     }
@@ -645,10 +660,6 @@ import PubSub from 'pubsub-js'
     }
     .el-select-dropdown__item.selected{
         color:#FB505F;
-    }
-    .el-pagination.is-background .el-pager li:not(.disabled).active{
-        background-color:#FB505F !important;
-        color:#fff !important;
     }
 </style>
 

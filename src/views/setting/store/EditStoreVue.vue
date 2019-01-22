@@ -205,10 +205,14 @@ export default {
             getUserInfo().then(res=>{
                 console.log(res);
                 self.personList=res.data;
-                self.curPerson=self.userId;
+                //self.curPerson=self.userId;
                 res.data.forEach(item=>{
                     if(item.userId==self.userId){
                         self.phone=item.phoneNumber;
+                        self.curPerson=self.userId;
+                    }
+                    else{
+                        self.curPerson=self.store.userName;
                     }
                 })
             })
