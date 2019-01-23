@@ -253,18 +253,8 @@ export default {
                                 duration:3*1000
                             })
                         }
-                        
                     }).catch((err)=>{
                         console.log(err);
-                        if(err.request){
-                            if(err.request.readyState==4&&err.request.status==0){
-                                Message({
-                                    message:'网络连接异常，请检查！',
-                                    type:'error',
-                                    duration:3*1000
-                                })
-                            }
-                        }
                     })
                     self.loading=false;
                 }else{

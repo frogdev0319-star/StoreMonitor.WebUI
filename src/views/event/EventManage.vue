@@ -1,35 +1,21 @@
 <template>
     <div class="el-event-content">
        <div class="el-date">
-            <span class="date-title">起始时间</span>
+            <span class="date-title">时间</span>
             <el-date-picker
-                class="date-picker"
-                v-model="startDate"
-                type="datetime"
-                placeholder="选择日期时间"
-                default-time="00:00"
+                v-model="dateValue"
+                type="datetimerange"
+                range-separator="~"
                 size="mini"
-                format="yyyy/MM/dd HH:mm"
-                :editable=false
                 :clearable=false
-                :picker-options='startDateOpt'
-                :popper-class="poperClass"
-                @change="startDateChange">
-            </el-date-picker>
-            <span class="date-title" style="margin-left:30px;margin-right:20px;">截止时间</span>
-            <el-date-picker
-                class="date-picker"
-                v-model="endDate"
-                type="datetime"
-                placeholder="选择日期时间"
-                default-time="00:00"
-                size="mini"
-                format="yyyy/MM/dd HH:mm"
                 :editable=false
-                :clearable=false
-                :picker-options='endDateOpt'
+                format="yyyy/MM/dd HH:mm:ss"
+                class="date-range"
                 :popper-class="poperClass"
-                @change="endDateChange">
+                :picker-options='dateOpt'
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                @change="dateChange">
             </el-date-picker>
             <el-tooltip :popper-class="toolTipClass" class="item" effect="light"
                 placement="bottom-end">
@@ -37,9 +23,9 @@
                 <i class="iconfont icon-bangzhu" style="margin-left:10px;font-size:20px;position:relative;top:2px;color:#FB505F"></i>
             </el-tooltip>
             <span class="date-title" 
-            style="margin-left:30px;margin-right:20px;" v-if="activeName!='0'">处理状态</span>
+            style="margin-left:30px;margin-right:20px;">处理状态</span>
             <el-select v-model="value" placeholder="请选择" 
-            class="el-select-content" size="small" @change="selectChange" v-if="activeName!='0'">
+            class="el-select-content" size="small" @change="selectChange">
                 <el-option
                 v-for="(item) in states" 
                 :key="item.value"
@@ -51,8 +37,8 @@
                 size="small"
                 class="el-search"
                 clearable
-                v-model="serachVale" @keyup.enter.native="searchEventList">
-                <i @click="searchEventList" slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
+                v-model="serachVale" @clear="searchEventList" @keyup.enter.native="searchEventList">
+                <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
             </el-input>
        </div>
        <el-dialog title="导出" :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=450px top=15%>
@@ -69,7 +55,7 @@
             </div>
         </el-dialog>
         <div class="el-table-content">
-            <el-button type="primary" size="mini" class="export-btn" @click="exportData">
+            <el-button type="primary" size="mini" class="export-btn" @click="exportCSV">
                <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel">
                 </i>导出报表
             </el-button>
@@ -120,6 +106,7 @@
                             :page-sizes="[10, 20, 50, 100]"
                             @size-change="sizeChange"
                             @current-change="currentChange"
+                            :current-page="page"
                         layout="jumper,total, prev, pager, next,sizes"  
                         :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;">
                         </el-pagination>
@@ -135,28 +122,16 @@
     import util from '../../common/util.js'
     import CsvExportor from 'csv-exportor'
     import {eventRESTful} from '@/api/index'
-   // import {getUserInfo,isLoginIn} from '@/api/login'
+    import {Message} from 'element-ui'
     export default {
         name: "ExceptEvent",
         data(){
             return{
-                startDate:new Date().setTime(new Date().getTime()-3600 * 1000 * 24),
-                endDate:new Date(),
-                // defaultTime:new Date().getHours()+':'+new Date().getMinutes(),
-                endDateOpt: {
+                dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
+                dateOpt: {
                     disabledDate:(time)=>{
-                        console.log(time);
-                        let date=this.startDate;
-                        console.log(date);
-                        date=typeof(date)=='number'?date:date.getTime();
-                        return (time.getTime() > Date.now())||time.getTime()<date-8.64e7;
-                    }
-                },
-                startDateOpt:{
-                    disabledDate:(time)=>{
-                        let date=this.endDate;
-                        date=typeof(date)=='number'?date:date.getTime();
-                        return (time.getTime() < date -31*8.64e7)||time.getTime()>date;
+                        //const lastMonthTime = new Date().setMonth(new Date().getMonth() - 1)
+                        return time.getTime() > Date.now();
                     }
                 },
                 toolTipClass: 'page-login-toolTipClass',
@@ -165,6 +140,7 @@
                 curState:'',
                 value:0,
                 serachVale:'',
+                serachData:'',
                 tableDataList:[
                     {
                         label:'待处理事件',
@@ -218,14 +194,13 @@
                 ],
                 event,
                 total:0,
-                page:0,
+                page:1,
                 sizeNum:10,
                 params:{},
                 fileName:'数据详情'+'.csv',
                 dialogFormVisible:false,
                 exportDataList:[],  //需要导出的数据
                 exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
-                timeid:0,
                 windowHeight:window.innerHeight,
                 userId:'',
                 poperClass:'date-picker-poper',
@@ -246,72 +221,144 @@
             }
         },
         methods:{
-            startDateChange(val){
-                console.log(val);
+            dateChange(val){
                 let self=this;
-                self.params.beginTs=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
-                self.params.endTs=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
-        
-                self.getEventList(self.params);
-                let start=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
-                let end=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
-                self.getEventCount(start,end);  //切换初试时间
-                
-            },
-            endDateChange(val){
                 console.log(val);
-                let self=this;
-                self.params.beginTs=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
-                self.params.endTs=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
-
+                let start=typeof(val[0])==='object'?val[0].getTime():val[0];
+                let end=typeof(val[1]==='object')?val[1].getTime():val[1];
+                if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
+                    Message({
+                        message:'当前选择时间范围最大为一个月，已调整！',
+                        type:'warning',
+                        duration:3*1000
+                    })
+                    start=end-3600*24*30*1000;
+                    self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+                }
+                self.serachData='';
+                self.page=0;
+                self.params.like={};
+                self.params.beginTs=start;
+                self.params.endTs=end;
                 self.getEventList(self.params);
-                let start=typeof(self.startDate)=='number'?self.startDate:self.startDate.getTime();
-                let end=typeof(self.endDate)=='number'?self.endDate:self.endDate.getTime();
-                self.getEventCount(start,end);  //切换结束时间
+                self.getEventCount(start,end);
             },
             handleClick(val){
                 let self=this;
                 console.log(val.index);
-                self.value=0;
-                self.serachVale='';
-                self.params={};   //切换tab 页清空搜索条件
-                switch(Number(val.index)){
-                    case 0: self.params.clause={"status":0,"assignee":self.userId};break;
-                    case 1: self.params.clause={"assigner":self.userId};break;
-                    case 2: self.params.clause={}; break;
+                let selectValue=self.value;
+                let tabIndx=Number(val.index);
+                self.page=0;
+                switch(tabIndx){
+                    case 0:
+                    if(selectValue==0||selectValue==1){
+                        self.params.clause={"status":0,"assignee":self.userId};
+                    }
+                    else{
+                        self.params.clause={"status":-1,"assignee":self.userId};
+                    }
+                    break;
+                    case 1: 
+                    if(selectValue==0){
+                        self.params.clause={"status":[0,1,2],"assigner":self.userId};
+                    }
+                    else{
+                        self.params.clause={"status":selectValue-1,"assigner":self.userId};
+                    }
+                    break;
+                    case 2:
+                    if(selectValue==0){
+                        self.params.clause={"status":[0,1,2]};
+                    }
+                    else{
+                        self.params.clause={"status":selectValue-1};
+                    }
+                    break;
                 }
-                self.params.beginTs=typeof(self.startDate)=='object'?self.startDate.getTime():self.startDate;
-                self.params.endTs=typeof(self.endDate)=='object'?self.endDate.getTime():self.endDate;
-                this.getEventList(this.params);
-            },
-            selectChange(val){
-                console.log(val);
-                let self=this;
-                self.serachVale='';
-                switch(val){
-                    // case 0: self.params={
-                    //     clause:{}
-                    // };break; //全部状态
-                    case 0: self.params.clause.status=[0,1,2];break;
-                    // default: self.params={
-                    //     clause:{
-                    //         status:val-1
-                    //     }
-                    // };
-                    default:self.params.clause.status=val-1;break;
-                }
-                self.params.beginTs=typeof(self.startDate)=='object'?self.startDate.getTime():self.startDate;
-                self.params.endTs=typeof(self.endDate)=='object'?self.endDate.getTime():self.endDate;
-                self.getEventList(self.params);
-            },
-            searchEventList(){
-                let self=this;
-                if(self.serachVale!=undefined&&self.serachVale.length!=0){
-                    self.params.like={subject:this.serachVale,assignerName:this.serachVale,storeName:this.serachVale};
+                if(self.serachData!=undefined&&self.serachData.length!=0){
+                    self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
                 }
                 else{
                     self.params.like={};
                 }
+                let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+                let end=typeof(self.dateValue[1]==='object')?self.dateValue[1].getTime():self.dateValue[1];
+                self.params.beginTs=start;
+                self.params.endTs=end;
+                self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
+                this.getEventList(this.params);
+            },
+            //点击状态搜索时，总共需要时间范围，状态
+            selectChange(val){
+                console.log(val);
+                let self=this;
+                let tabIndx=Number(self.activeName);
+                switch(val){
+                    case 0:
+                        if(tabIndx==0){
+                            self.params.clause.status=0;
+                        }
+                        else{
+                            self.params.clause.status=[0,1,2];
+                        }
+                    break;
+                    case 1:
+                        self.params.clause.status=0;
+                    break;
+                    default:
+                    if(tabIndx==0){
+                        self.params.clause.status=-1;  //表示选择其他状态时为空。
+                    }
+                    else{
+                        self.params.clause.status=val-1;break;
+                    }
+                }
+                //self.serachVale='';
+                //self.serachData='';
+                self.page=0;
+                self.params.like={};
+
+                let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+                let end=typeof(self.dateValue[1]==='object')?self.dateValue[1].getTime():self.dateValue[1];
+                self.params.beginTs=start;
+                self.params.endTs=end;
+                self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
+                self.getEventList(self.params);
+            },
+            searchEventList(){
+                let self=this;
+                let tabIndx=Number(self.activeName);
+                let val=self.value;
+                self.page=0;
+                self.serachData=self.serachVale.trim();
+                switch(val){
+                    case 0:
+                        if(tabIndx==0){
+                            self.params.clause.status=0;
+                        }
+                        else{
+                            self.params.clause.status=[0,1,2];
+                        }
+                    break;
+                    case 1:
+                        self.params.clause.status=0;
+                    break;
+                    default:
+                    if(tabIndx==0){
+                        self.params.clause.status=-1;  //表示选择其他状态时为空。
+                    }
+                    else{
+                        self.params.clause.status=val-1;break;
+                    }
+                }
+                
+                if(self.serachData!=undefined&&self.serachData.length!=0){
+                    self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
+                }
+                else{
+                    self.params.like={};
+                }
+                self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
                 self.getEventList(self.params);
             },
             toEventDetail(row){
@@ -344,37 +391,16 @@
                 }
                 self.getEventList(self.params);
             },
-             getUserId(){
+            getUserId(){
                 let self=this;
                 self.userId=sessionStorage.getItem('UserId');
                 let start=new Date().getTime()-1000*3600*24;
                 let end=new Date().getTime();
                 self.getEventCount(start,end);  //初始加载
             },
-            getSizeStatus(params){
-                return new Promise((resolve,reject)=>{
-                    eventRESTful.getEventList(params).then((res)=>{
-                        let size=res.data.totalElements;
-                        resolve(size);
-                    })
-                })
-                
-            },
             async getEventList(params){
                 let self=this;
                 let tabIndx=Number(self.activeName);
-                console.log(self.activeName);
-
-                if(tabIndx!=0){ //点击的是后边两个tab，这个时候需要考虑状态不为全部状态的情况。
-                    if(self.value!=0){ //选择的不是全部状态 page=0
-                        params.filter={};
-                        let size=await self.getSizeStatus(params);
-                        if(size<self.tableDataList[tabIndx].sizeNum){
-                            self.tableDataList[tabIndx].page=0;
-                        }
-                    }
-                }
-                params.filter={page:this.tableDataList[tabIndx].page,size:this.tableDataList[tabIndx].sizeNum};
                 eventRESTful.getEventList(params).then((res)=>{
                     console.log(res);
                     let data=res.data.content;
@@ -404,12 +430,14 @@
                 let self=this;
                 let tabIndx=Number(self.activeName);
                 self.tableDataList[tabIndx].sizeNum=val;
-                self.getEventList(this.params);
+                self.params.filter={page:self.page,size:val};
+                self.getEventList(self.params);
             },
             currentChange(val){
                 let self=this;
                 let tabIndx=Number(self.activeName);
-                this.tableDataList[tabIndx].page=val-1;
+                this.page=val;
+                self.params.filter={page:val-1,size:self.tableDataList[tabIndx].sizeNum};
                 this.getEventList(this.params);
             },
             getInitList(){
@@ -420,7 +448,6 @@
                 self.params.endTs=end;
                 self.params.clause={"status":0,"assignee":self.userId}
                 self.getEventList(self.params);
-                
             },
             exportData(){
                 let self=this;
@@ -453,9 +480,10 @@
             },
             getExportDataSize(){
                 let self=this;
-                self.params.filter={};
+                let params=self.params;
+                params.filter={};
                 return new Promise((resolve,reject)=>{
-                    eventRESTful.getEventList(self.params).then((res)=>{
+                    eventRESTful.getEventList(params).then((res)=>{
                         console.log(res);
                         let size=res.data.totalElements;
                         resolve(size);
@@ -473,27 +501,37 @@
                     "page": 0,
                     "size": size
                 };
-                eventRESTful.getEventList(self.params).then((res)=>{
-                    console.log(res);
-                    let data=res.data.content;
-                    let temp=[];
-                    data.forEach(item=>{
-                        let obj={};
-                        obj.subject=item.subject;
-                        obj.storeName=item.storeName;
-                        obj.assignerName=item.assignerName;
-                        obj.ts=util.getDateTime(item.ts);
-                        temp.push(obj);
-                    })
-                    self.exportDataList=temp;
-                }).catch(err=>{
-                    console.log("Error:"+err);
-                });
+                return new Promise((resolve,reject)=>{
+                    eventRESTful.getEventList(self.params).then((res)=>{
+                        console.log(res);
+                        let data=res.data.content;
+                        let temp=[];
+                        data.forEach(item=>{
+                            let obj={};
+                            obj.subject=item.subject;
+                            obj.storeName=item.storeName;
+                            obj.assignerName=item.assignerName;
+                            obj.ts=util.getDateTime(item.ts);
+                            temp.push(obj);
+                        })
+                        resolve(temp);
+                    }).catch(err=>{
+                        console.log("Error:"+err);
+                    });
+                })
             },
-            exportCSV(){
-                if(this.fileName==null||this.fileName.length==0){
+            async exportCSV(){
+                let self=this;
+                let tabIndx=Number(self.activeName);
+                if(self.tableDataList[tabIndx].tableData.length==0){
+                    Message({
+                        message:'暂无数据！',
+                        type:'warning',
+                        duration:3*1000
+                    })
                     return false;
                 }
+                self.exportDataList=await self.getExportData();
                 CsvExportor.downloadCsv(
                 this.exportDataList, { header: this.exportDataHeader}, 
                 this.fileName);
@@ -509,12 +547,8 @@
             console.log(self.tableHeight);
             self.getUserId();
             self.getInitList();
-            if(!self.timeid){
-                self.timeid=window.setInterval(self.getEventList(self.params),60*1000);
-            }
         },
         beforeDestroy(){
-           window.clearInterval(self.timeid);
         },
         activated(){
             let self=this;
@@ -559,8 +593,8 @@ $red:#FB505F;
             font-size: 14px;
             color: #424151;
         }
-        .date-picker{
-            @include point(width,180);
+        .date-range{
+            @include point(width,320);
         }
         .el-search{
             position:absolute;
@@ -657,6 +691,10 @@ $red:#FB505F;
     }
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
+    }
+
+    .date-range.el-range-editor.is-active,.date-range .el-range-editor.is-active:hover{
+        border-color:#f0f5f8 !important;
     }
 </style>
 

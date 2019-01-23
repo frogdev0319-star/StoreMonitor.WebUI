@@ -204,17 +204,19 @@ export default {
             let self=this;
             getUserInfo().then(res=>{
                 console.log(res);
-                self.personList=res.data;
-                //self.curPerson=self.userId;
-                res.data.forEach(item=>{
-                    if(item.userId==self.userId){
-                        self.phone=item.phoneNumber;
-                        self.curPerson=self.userId;
+                let temp=res.data;
+                if(self.userId!=null&&self.userId.length==0){
+                    if(temp.map(x=>x.userId).indexOf(self.userId)==-1){
+                        let obj={
+                            userId:self.store.userId,
+                            userName:self.store.userName,
+                            phoneNumber:self.store.phone
+                        }
+                        temp.push(obj);
                     }
-                    else{
-                        self.curPerson=self.store.userName;
-                    }
-                })
+                }
+                self.personList=temp;
+                self.curPerson=self.userId;
             })
         },
         async submitData(){

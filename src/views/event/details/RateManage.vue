@@ -95,24 +95,28 @@
                         </div>
                         <div class="rside">
                             <span class="creator">{{item.createOr}}</span>
-                            <div class="speech-content deal-speech">
-                                <div class="speech-info" v-if="item.audio!=null">
+                            <div class="speech-content deal-speech" v-if="item.showAudio">
+                                <div class="speech-info" @click="startSpeechItem(item,index)">
                                     <i class="iconfont icon-yuyin icon-speech"></i>
                                 </div>
-                                <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOften}}</span>
+                                <audio :ref="item.audio.audioRef">
+                                    <source :src="item.audio.audioSrc" type="audio/mpeg" />
+                                </audio>
+                                <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOftenText}}</span>
                             </div>
                             <span v-if="item.description!=null">{{item.description}}</span>
                             <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
-                                <!-- <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                                    <div v-if="_item.type=='0'" class="img-content">
-                                        <img  :src="_item.imgSrc" :alt="_item.alt" height="160px"/>
+                                <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                                    <div v-if="_item.mediaType==2" class="img-content">
+                                        <img  :src="_item.url" :alt="_item.alt" height="160px"/>
                                     </div>
-                                    <div  v-else class="video-content">
-                                        <video-player class="video-player vjs-custom-skin " 
-                                        :ref="_item.ref" :options="_item.playerOptions" style="width:300px;height:150px;">
-                                        </video-player>
+                                   <div  v-else class="video-content">
+                                        <video  height=83% width=90%  prload autoplay controls
+                                                class="video-js vjs-fill" style="max-height:160px;">
+                                                <source :src="_item.url">
+                                        </video>
                                     </div>
-                                </div> -->
+                                </div>
                             </div>
                             <div class="viedo-info">
                                 <span>{{item.createDate}}</span>
@@ -156,30 +160,6 @@ export default {
             protocal:'DASH',
             selGID:0,
             mpdurl:'',
-            playerOptions: {
-                overNative: true,
-                autoplay: false,
-                controls: true,
-                techOrder: ['flash', 'html5'],
-                sourceOrder: true,
-                flash: {
-                hls: { withCredentials: false },
-                swf: isProduction ? '/vue-videojs-demo/static/media/video-js.swf' : '/static/media/video-js.swf'
-                },
-                html5: { hls: { withCredentials: false } },
-                sources: [
-                {
-                    type: 'rtmp/mp4',
-                    src: 'rtmp://184.72.239.149/vod/&mp4:BigBuckBunny_115k.mov'
-                },
-                {
-                    withCredentials: false,
-                    type: 'application/x-mpegURL',
-                    src: 'http://playertest.longtailvideo.com/adaptive/bipbop/gear4/prog_index.m3u8'
-                }
-                ],
-                poster: isProduction ? '/vue-videojs-demo/static/images/logo.png' : '/static/images/logo.png'
-            },
             initialized: false,
             previewplayer:'',
             winpDes:'',
@@ -304,10 +284,18 @@ export default {
         getProcess(){
             let self=this;
             self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
+            if(self.audioOften==0){
+                self.isPlaying=false;
+                self.speech=false;
+            }
+            // self.commentList.forEach((item,index)=>{
+            //     let often=self.$refs[item.audio.audioRef][0].duration-self.$refs[item.audio.audioRef][0].currentTime;
+            //     often=parseInt(often)+'"';
+            //     item.audio.audioOftenText=often;
+            // })
         },
         startSpeech(){
             let self=this;
-            
             if(!self.isPlaying){
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
@@ -318,6 +306,24 @@ export default {
                 self.isPlaying=false;
                 self.speech=false;
             }
+        },
+        startSpeechItem(item,index){
+            let self=this;
+            console.log(item);
+            if(!item.audio.isPlaying){
+                self.$refs[item.audio.audioRef][0].play();
+                item.audio.isPlaying=true;
+            }
+            else{
+                self.$refs[item.audio.audioRef][0].pause();
+                item.audio.isPlaying=false;
+            }
+            self.commentList.forEach((_item,_index)=>{
+                if(_index!=index){
+                    self.$refs[_item.audio.audioRef][0].pause();
+                    _item.audio.isPlaying=false;
+                }
+            })
         },
         checkVideo(){
             this.dialogFormVisible=true;
@@ -361,64 +367,27 @@ export default {
                             obj.showContent=false;
                         }
                         if(item.attachment.length!=0){
-                            //obj.audio.audioOften=self.audioOften;
-                            //obj.sourceList=self.sourceList; 
                             let _temp=[];
-                            item.attachment.forEach((item,index)=>{
-                                let _obj={};
-                                switch(item.mediaType){
-                                    case 0:
-                                        _obj.type=2;
-                                        _obj.ref='img'+index;
-                                        _obj.imgSrc=item.url;
-                                        _obj.alt='截图'+index;
-                                        break;
-                                    case 1:
-                                        //_obj.type=2;
-                                       // _obj.ref='video'+index;
-                                        // _obj.playerOptions={
-                                        //     controls: true,
-                                        //     autoplay: false, //如果true,浏览器准备好时开始回放。
-                                        //     loop: false, // 导致视频一结束就重新开始。
-                                        //     preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
-                                        //     language: 'zh-CN',
-                                        //     aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
-                                        //     fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-                                        //     notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-                                        //     sources: [{
-                                        //         type: "video/mp4",
-                                        //         src: item.url
-                                        //     }]
-                                        // }
-                                        break;
-                                    case 2:
-                                        //_obj.type=2;
-                                        //_obj.ref='video'+index;
-                                        // _obj.playerOptions={
-                                        //     controls: true,
-                                        //     autoplay: false, //如果true,浏览器准备好时开始回放。
-                                        //     loop: false, // 导致视频一结束就重新开始。
-                                        //     preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
-                                        //     language: 'zh-CN',
-                                        //     aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
-                                        //     fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-                                        //     notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-                                        //     sources: [{
-                                        //         type: "video/mp4",
-                                        //         src: item.url
-                                        //     }]
-                                        //}
-                                        break;
+                            let audioObj={};
+                            item.attachment.forEach((_item,_index)=>{
+                                
+                                if(_item.mediaType==0){
+                                    audioObj.audioSrc=_item.url;
+                                    audioObj.audioRef='audioRef'+index;
+                                    audioObj.isPlaying=false;
+                                    obj.showAudio=true;
                                 }
-                                _temp.push(_obj);
+                                else{
+                                    _temp.push(_item);
+                                }
                             })
+                            obj.audio=audioObj;
                             obj.sourceList=_temp;
                         }
                         temp.push(obj);
 
                     })
                    self.commentList=temp;
-                   //self.sourceList=self.commentList[0].sourceList;
                 }
             })
         },
@@ -506,14 +475,21 @@ export default {
         self.myfun();
         if(self.showAudio){
              self.timeid=setInterval(function(){
-                self.getProcess()
+                self.getProcess();
             },1000);
         }
        
         //self.realTime();
     },
-    update(){ 
-
+    created(){
+        let self=this;
+       // self.getCommentList();
+    },
+    updated(){ 
+        let self=this;
+        self.commentList.forEach((item,index)=>{
+            console.log(self.$refs);
+        })
     }, 
     beforeDestroy(){
         window.clearInterval(this.timeid);
@@ -709,6 +685,8 @@ export default {
                 @include point(padding-top,5);
                 .creator{
                     @include point(margin-left,20);
+                    float: left;
+                    @include point(margin-top,30);
                 }
                 .deal-speech{
                     display: inline-block;

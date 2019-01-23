@@ -247,6 +247,7 @@ import PubSub from 'pubsub-js'
                 self.serachVale='';
                 self.params.like={};
                 let temp=[];
+                self.page=0;
                 self.cityList.forEach(item=>{
                     if(item.checked){
                         temp.push(item.cityName);
@@ -337,15 +338,6 @@ import PubSub from 'pubsub-js'
             async getStoreList(params){
                 let self=this;
                 console.log(params);
-                if(params.clause.hasOwnProperty('province')||
-                params.clause.hasOwnProperty('city')||params.like.hasOwnProperty('name')){ //当前选择了省份或者城市信息
-                    params.filter={};
-                    let data=await self.getStoreData(params);
-                    let size=data.data.totalElements;
-                    if(size<this.sizeNum){
-                        this.page=0;
-                    }
-                }
                 params.filter={page:this.page,size:this.sizeNum};
                 let data=await self.getStoreData(params);
 
@@ -403,6 +395,7 @@ import PubSub from 'pubsub-js'
                 self.params.clause={};
                 self.curProvince='';
                 self.citys='';
+                self.page=0;
                 if(self.serachVale.length!=0){
                     self.params.like={
                         "name": self.serachVale,

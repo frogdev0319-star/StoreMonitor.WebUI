@@ -68,12 +68,12 @@
                             <div class="name-title titles">
                                 <span>NVR名称</span>
                                 <i class="icon-filter" 
-                                :class="{'el-icon-arrow-down':nvrFilter,'el-icon-arrow-up':!nvrFilter}" @click="filterNVR"></i>
+                                :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}" @click="filterNVR"></i>
                             </div>
                             <div class="store-title titles" >
                                 <span>所属门店</span>
                                 <i class="icon-filter"
-                                :class="{'el-icon-arrow-down':storeFilter,'el-icon-arrow-up':!storeFilter}" @click="filterStore"></i>
+                                :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterStore"></i>
                             </div>
                             <div class="count-title titles">
                                 <span>通道数</span>

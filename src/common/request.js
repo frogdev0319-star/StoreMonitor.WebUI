@@ -129,7 +129,6 @@ service.interceptors.response.use(
             else if(errCode===500&&errMsg=='No authority'){
                 router.push('/');
                 Message({
-                    //message:err.response.data.errMsg,
                     message:'无操作权限!',
                     type:'error',
                     duration:5*1000
@@ -139,6 +138,11 @@ service.interceptors.response.use(
         else if(err.request){
             if(err.request.readyState==4&&err.request.status==0){
                 console.log(err.request);
+                Message({
+                    message:'网络连接超时!',
+                    type:'error',
+                    duration:5*1000
+                })
             }
         }
         
