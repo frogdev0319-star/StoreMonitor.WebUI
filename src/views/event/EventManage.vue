@@ -226,7 +226,7 @@
                 let self=this;
                 console.log(val);
                 let start=typeof(val[0])==='object'?val[0].getTime():val[0];
-                let end=typeof(val[1]==='object')?val[1].getTime():val[1];
+                let end=typeof(val[1])==='object'?val[1].getTime():val[1];
                 if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
                     Message({
                         message:'当前选择时间范围最大为一个月，已调整！',
@@ -241,8 +241,14 @@
                 self.params.like={};
                 self.params.beginTs=start;
                 self.params.endTs=end;
+                let selectValue=self.value;
+                let status=[];
                 self.getEventList(self.params);
-                self.getEventCount(start,end);
+                switch(selectValue){
+                    case 0:status=[0,1,2];break;
+                    default:status=selectValue-1;break;
+                }
+                self.getEventCount(start,end,status);
             },
             handleClick(val){
                 let self=this;
@@ -283,7 +289,7 @@
                     self.params.like={};
                 }
                 let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-                let end=typeof(self.dateValue[1]==='object')?self.dateValue[1].getTime():self.dateValue[1];
+                let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
                 self.params.beginTs=start;
                 self.params.endTs=end;
                 self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
@@ -320,11 +326,20 @@
                 self.params.like={};
 
                 let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-                let end=typeof(self.dateValue[1]==='object')?self.dateValue[1].getTime():self.dateValue[1];
+                let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
                 self.params.beginTs=start;
                 self.params.endTs=end;
                 self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
                 self.getEventList(self.params);
+                let status=[];
+                if(val==0){
+                    status=[0,1,2];
+                }
+                else{
+                    status=val-1;
+                }
+                
+                self.getEventCount(start,end,status);
             },
             searchEventList(){
                 let self=this;
@@ -352,7 +367,6 @@
                         self.params.clause.status=val-1;break;
                     }
                 }
-                
                 if(self.serachData!=undefined&&self.serachData.length!=0){
                     self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
                 }
@@ -361,6 +375,17 @@
                 }
                 self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
                 self.getEventList(self.params);
+                
+                let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+                let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+                let status=[];
+                let selectValue=self.value;
+                switch(selectValue){
+                    case 0:status=[0,1,2];break;
+                    default:status=selectValue-1;break;
+                }
+                let like=self.params.like;
+                self.getEventCount(start,end,status,like);
             },
             toEventDetail(row){
                 console.log(row);
@@ -373,6 +398,7 @@
             sortChange(col){
                 console.log(col);
                 let self=this;
+                self.page=0;   //页码置为0
                 let column=col.column;
                 let order=col.order;
                 if(order=="ascending"){
@@ -382,13 +408,18 @@
                     }
                 }
                 else if(order=="descending"){
-                     self.params.order={
+                    self.params.order={
                         "direction":"desc",
                         "property": col.column.property
                     }
                 }
                 else{
                     self.params.order={};
+                }
+                let tabIndx=Number(self.activeName);
+                self.params.filter={
+                    page:0,
+                    size:self.tableDataList[tabIndx].sizeNum
                 }
                 self.getEventList(self.params);
             },
@@ -397,7 +428,8 @@
                 self.userId=sessionStorage.getItem('UserId');
                 let start=new Date().getTime()-1000*3600*24;
                 let end=new Date().getTime();
-                self.getEventCount(start,end);  //初始加载
+                let status=[0,1,2];
+                self.getEventCount(start,end,status);  //初始加载
             },
             async getEventList(params){
                 let self=this;
@@ -459,7 +491,8 @@
                 self.dialogFormVisible=true;
                 self.getExportData();
             },
-            getEventCount(start,end){
+            getEventCount(start,end,status,...value){
+                console.log(value);
                 let self=this;
                 let params={
                     beginTs:start,
@@ -468,8 +501,15 @@
                         1,
                         2,
                         3
-                    ]
+                    ],
+                    "clause":{
+                        "status":status
+                    },
+                    
                 };
+                if(value.length!=0){
+                    params.like=value[0];
+                }
                 eventRESTful.getEventCount(params).then(res=>{
                     let data=res.data;
                     let errMsg=res.errMsg;

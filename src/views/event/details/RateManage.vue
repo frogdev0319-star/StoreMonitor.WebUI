@@ -298,14 +298,14 @@ export default {
         },
         getProcess(){
             let self=this;
-            self.audioOften=parseInt(self.$refs.audioRef.duration-self.$refs.audioRef.currentTime);
-            if(self.audioOften==0){
-                self.isPlaying=false;
-                self.speech=false;
+            if(self.showAudio){
+                self.audioOften=parseInt(self.$refs.audioRef.duration);
             }
-        },
-        clickAudio(){
-
+            self.commentList.forEach((_item,_index)=>{
+                if(_item.showAudio){
+                    _item.audio.audioOftenText=parseInt(self.$refs[_item.audio.audioRef][0].duration)+'"';
+                }
+            })
         },
         startSpeech(){
             let self=this;
@@ -313,15 +313,11 @@ export default {
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
                 self.speech=true;
-                self.timeid= setInterval(function(){
-                    self.getProcess();
-                },1000)
             }
             else{
                 self.$refs.audioRef.pause();
                 self.isPlaying=false;
                 self.speech=false;
-                clearInterval(self.timeid);
             }
         },
         startSpeechItem(item,index){

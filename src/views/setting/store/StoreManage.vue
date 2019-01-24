@@ -107,7 +107,9 @@
                 @size-change="sizeChange"
                 @current-change="currentChange"
               layout="jumper,total, prev, pager, next,sizes"  
-              :page-size="sizeNum" :total="total" style="float:right;margin-top:15px;">
+              :page-size="sizeNum" :total="total" 
+              :current-page="page"
+              style="float:right;margin-top:15px;">
               </el-pagination>
             </div>
         </div>
