@@ -25,7 +25,7 @@
                         <i class="el-icon-bell"></i>
                         <el-badge is-dot class="item"></el-badge>
                     </div>
-                    <el-dropdown class="el-user-drop">
+                    <el-dropdown class="el-user-drop" >
                         <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right" 
                         style="margin-left:6px;cursor:pointer;"></i></span>
                         <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
@@ -486,5 +486,9 @@ export default {
 
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden !important;
+}
+.el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
+    color:#FB505F;
+    background-color:#FEE4E7;
 }
 </style>

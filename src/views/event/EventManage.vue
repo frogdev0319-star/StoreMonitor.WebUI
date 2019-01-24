@@ -25,7 +25,7 @@
             <span class="date-title" 
             style="margin-left:30px;margin-right:20px;">处理状态</span>
             <el-select v-model="value" placeholder="请选择" 
-            class="el-select-content" size="small" @change="selectChange">
+            class="el-select-content" size="small" @change="selectChange" :popper-class="selectpoperClass">
                 <el-option
                 v-for="(item) in states" 
                 :key="item.value"
@@ -204,6 +204,7 @@
                 windowHeight:window.innerHeight,
                 userId:'',
                 poperClass:'date-picker-poper',
+                selectpoperClass:'select-poper'
             }
 
         },
@@ -313,8 +314,8 @@
                         self.params.clause.status=val-1;break;
                     }
                 }
-                //self.serachVale='';
-                //self.serachData='';
+
+                self.serachData='';
                 self.page=0;
                 self.params.like={};
 
@@ -641,11 +642,6 @@ $red:#FB505F;
         background-color: #2992FF !important;
         color: red;
     }
-    .el-select >>> .el-input__inner{
-        background: #f0f5f8 !important;
-        border-radius: 0px;
-        border: 0px;
-    }
 </style>
 <style>
  @import '../../assets/css/pagination.css';
@@ -695,6 +691,15 @@ $red:#FB505F;
 
     .date-range.el-range-editor.is-active,.date-range .el-range-editor.is-active:hover{
         border-color:#f0f5f8 !important;
+    }
+    .select-poper .el-select-dropdown__item.hover{
+        background-color:#FEE4E7;
+    }
+    .select-poper .el-select .el-input.is-focus .el-input__inner{
+        border-color: #FEE4E7;
+    }
+    .select-poper .el-select-dropdown__item.selected{
+        color:#FB505F;
     }
 </style>
 

@@ -52,6 +52,7 @@
                 </audio> 
                <span class="often-text">{{audioOftenText}}</span>
             </div>
+            <audio-vue :audioRef="audioRef" :audioSrc="audioSrc" v-if="showAudio" @clickFunc="clickAudio"></audio-vue>
             <div class="photo-content">
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                     <div v-if="item.mediaType==2" class="img-content">
@@ -69,8 +70,10 @@
             </div>
             <div class="viedo-info">
                 <span>{{event.createDate}}</span>
-                <i class="iconfont icon-bofang icon-video"></i>
-                <span class="ahref" @click="checkVideo">{{curChannel}}</span>
+                <div v-if="event.deviceId!=-1">
+                    <i class="iconfont icon-bofang icon-video"></i>
+                    <span class="ahref" @click="checkVideo">{{curChannel}}</span>
+                </div>
             </div>
             <span class="sub-time"></span> 
             <div class="start-video-content"></div>
@@ -94,17 +97,19 @@
                             <span v-if="item.showLabel" :style="item.spanStyle">{{item.process}}</span>
                         </div>
                         <div class="rside">
-                            <span class="creator">{{item.createOr}}</span>
-                            <div class="speech-content deal-speech" v-if="item.showAudio">
-                                <div class="speech-info" @click="startSpeechItem(item,index)">
-                                    <i class="iconfont icon-yuyin icon-speech"></i>
+                            <div class="">
+                                <span class="creator">{{item.createOr}}</span>
+                                <div class="speech-content deal-speech" v-if="item.showAudio">
+                                    <div class="speech-info" @click="startSpeechItem(item,index)">
+                                        <i class="iconfont icon-yuyin icon-speech"></i>
+                                    </div>
+                                    <audio :ref="item.audio.audioRef">
+                                        <source :src="item.audio.audioSrc" type="audio/mpeg" />
+                                    </audio>
+                                    <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOftenText}}</span>
                                 </div>
-                                <audio :ref="item.audio.audioRef">
-                                    <source :src="item.audio.audioSrc" type="audio/mpeg" />
-                                </audio>
-                                <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOftenText}}</span>
                             </div>
-                            <span v-if="item.description!=null">{{item.description}}</span>
+                            <span v-if="item.description!=null" class="description">{{item.description}}</span>
                             <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
                                 <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                                     <div v-if="_item.mediaType==2" class="img-content">
@@ -120,8 +125,10 @@
                             </div>
                             <div class="viedo-info">
                                 <span>{{item.createDate}}</span>
-                                <i class="iconfont icon-bofang icon-video"></i>
-                                <span class="ahref" @click="checkVideo">水吧区域</span>
+                                <div v-if="event.deviceId!=-1">
+                                    <i class="iconfont icon-bofang icon-video"></i>
+                                    <span class="ahref" @click="checkVideo">{{curChannel}}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -137,9 +144,13 @@ import dashAPI from '@/api/dash'
 import videojs from '../../../../static/video.js'
 import 'videojs-contrib-hls';
 import {eventRESTful} from '@/api/index'
+import AudioVue from '@/components/AudioVue.vue'
 const isProduction = process.env.NODE_ENV === 'production'
 export default {
     name:"RateManage",
+    components:{
+        AudioVue
+    },
     data(){
         return{
             event:{},
@@ -150,6 +161,8 @@ export default {
             audioOften:0,
             speech:false,
             audioRef:'audioRef',
+            audio:{},
+            timeId:0,
             isPlaying:false,
             audioSrc:'',
             showAudio:false,
@@ -273,6 +286,8 @@ export default {
                 if(item.mediaType==0){
                     self.audioSrc=item.url;
                     self.showAudio=true;
+                    // self.audio.audioSrc=item.url;
+                    // self.audio.audioRef='audioRef';
                 }
                 else{
                     temp.push(item);
@@ -288,11 +303,9 @@ export default {
                 self.isPlaying=false;
                 self.speech=false;
             }
-            // self.commentList.forEach((item,index)=>{
-            //     let often=self.$refs[item.audio.audioRef][0].duration-self.$refs[item.audio.audioRef][0].currentTime;
-            //     often=parseInt(often)+'"';
-            //     item.audio.audioOftenText=often;
-            // })
+        },
+        clickAudio(){
+
         },
         startSpeech(){
             let self=this;
@@ -300,11 +313,15 @@ export default {
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
                 self.speech=true;
+                self.timeid= setInterval(function(){
+                    self.getProcess();
+                },1000)
             }
             else{
                 self.$refs.audioRef.pause();
                 self.isPlaying=false;
                 self.speech=false;
+                clearInterval(self.timeid);
             }
         },
         startSpeechItem(item,index){
@@ -473,17 +490,16 @@ export default {
         self.getSessionData();  //获取session中存储的event信息
         self.getCommentList();  //获取comment信息
         self.myfun();
-        if(self.showAudio){
-             self.timeid=setInterval(function(){
+        
+        self.$nextTick(function(){
+            setTimeout(()=>{
                 self.getProcess();
             },1000);
-        }
-       
-        //self.realTime();
+            
+        })
     },
     created(){
         let self=this;
-       // self.getCommentList();
     },
     updated(){ 
         let self=this;
@@ -569,7 +585,7 @@ export default {
         @include point(padding-left,10);
         font-size: 14px;
         .speech-content{
-            margin: 20px auto;
+            margin: 20px auto 10px auto;
             .speech-info{
                 @include point(width,120);
                 @include point(height,30);
@@ -592,10 +608,12 @@ export default {
         .photo-content{
             overflow: hidden;
             @include point(margin-top,15);
+            
             .source-content{
                 float: left;
                 @include point(margin,5);
                 width: 25%;
+                @include point(max-width,220);
                 .img-content{
 
                 }
@@ -645,10 +663,10 @@ export default {
             .circle-content{
                 background-color: #FBC7CC;
                 border-radius: 50%;
-                @include point(width,22);
-                @include point(height,22);
+                width: 22px;
+                height: 22px;
                 position: absolute;
-                @include point(left,110);
+                left: 109px;
                 @include point(top,30);
             }
             .circle{
@@ -658,12 +676,12 @@ export default {
                 -moz-border-radius: 50%;      
                 -webkit-border-radius: 50%;
                 position: relative;
-                @include point(top,4);
-                @include point(left,4);
+                top: 4px;
+                left: 4px;
                 background-color: #FB505F;
             }
             .lside{
-                @include point(width,120);
+                width: 119px;
                 @include point(height,100);
                 position: relative;
                 float: left;
@@ -677,7 +695,7 @@ export default {
                 }
             }
             .rside{
-                width: auto;
+                width:calc(100% - 120px);
                 height: 100%;
                 @include point(min-height,100);
                 border-left: 1px solid #FB505F;
@@ -691,21 +709,34 @@ export default {
                 .deal-speech{
                     display: inline-block;
                     @include point(margin-left,20);
+                    .often-text{
+                        @include point(margin-left,20);
+                        display: inline-block;
+                    }
+                }
+                .description{
+                    float: left;
+                    max-width: 90%;
+                    min-width: 90%;
+                    @include point(margin-top,30);
+                     @include point(margin-left,20);
                 }
                 .source-content{
-                    @include point(margin-left,40);
+                    @include point(margin-left,52);
                     overflow: hidden;
+                    min-width: 90%;
                     .source-details{
                         float: left;
-                        @include point(margin,5);
+                        @include point(margin-left,15);
+                        @include point(margin-right,15);
+                        @include point(max-width,220);
                     }
                 }
                 .viedo-info{
-                    @include point(margin-left,20);
+                    @include point(margin-left,70);
                     color: #FB505F;
                     @include point(font-size,20);
-                    margin-top: 8px;
-                    @include point(margin-top,8);
+                    float: left;
                 }
             }
         }
