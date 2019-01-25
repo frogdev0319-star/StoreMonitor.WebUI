@@ -488,7 +488,7 @@ export default {
   overflow-x: hidden !important;
 }
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
-    color:#FB505F;
-    background-color:#FEE4E7;
+    color:#FB505F !important;
+    background-color:#FEE4E7 !important;
 }
 </style>

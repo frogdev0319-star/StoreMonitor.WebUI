@@ -2,7 +2,7 @@
     <el-row class="el-rate-container">
         <el-col :span="24" class="title-content">
             <span class="event-title">{{event.eventTitle}}</span>
-            <span class="event-score">得分：{{event.score==null?'---':event.score}}分</span>
+            <span class="event-score">得分：{{event.score==null?'  ':event.score}}分</span>
             <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
         </el-col>
         <el-dialog :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=380px top=15%>
@@ -27,7 +27,7 @@
                 <hr style="border: 0.5px solid #FFC1C8;"/>
                 
                <div class="tabName-input-content">
-                    <el-input type="text" size="small" v-model="winpDes" class="tabName-input" style=""  
+                    <el-input type="text" size="small" v-model="winpDes" class="tabName-input" style=""  maxlength='50'
                     placeholder="请输入结案评论"></el-input>
                 </div>
             </div>
@@ -36,6 +36,13 @@
                 <el-button class="file-confirm-btn" @click="confirmWind" size="mini" style="color:#fff">确 认</el-button>
             </div>
         </el-dialog>
+        <transition name="fade">
+            <div id="outerdiv" style="" v-show="showOuter">
+                <div id="innerdiv" style="position:absolute;">
+                    <img id="bigimg" style="border:5px solid #fff;height:500px;" :src="bigImgSrc" />
+                </div>
+            </div>
+        </transition>
         <el-col :span="24" class="storeInfo-content">
             <strong>门店</strong><span>{{event.storeName}}</span>
             <strong>提报人</strong><span>{{event.createor}}</span>
@@ -52,12 +59,11 @@
                 </audio> 
                <span class="often-text">{{audioOftenText}}</span>
             </div>
-            <audio-vue :audioRef="audioRef" :audioSrc="audioSrc" v-if="showAudio" @clickFunc="clickAudio"></audio-vue>
             <div class="photo-content">
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                     <div v-if="item.mediaType==2" class="img-content">
                         <!--图片资源-->
-                        <img  :src="item.url" :alt="item.alt" height="160px" style="max-height:160px;"/>
+                        <img class="imgLittle" :src="item.url" :title="imgTitle" :alt="item.alt" height="140px" style="max-height:140px;"/>
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
@@ -78,14 +84,17 @@
             <span class="sub-time"></span> 
             <div class="start-video-content"></div>
             <hr/>
-            <span class="group-title" style="display:block;margin:15px auto;">添加处理信息</span>
-            <el-input
-                type="textarea"
-                :autosize="{ minRows: 2, maxRows: 4}"
-                placeholder="请输入处理评论文字"
-                v-model="description">
-            </el-input>
-            <el-button size="mini" class="el-submit" @click="submit">提交</el-button>
+            <div v-if="showWinpBtn">
+                <span class="group-title" style="display:block;margin:15px auto;">添加处理信息</span>
+                <el-input
+                    type="textarea"
+                    maxlength='300'
+                    :autosize="{ minRows: 2, maxRows: 4}"
+                    placeholder="请输入处理评论文字"
+                    v-model="description">
+                </el-input>
+                <el-button size="mini" class="el-submit" @click="submit">提交</el-button>
+            </div>
             <el-col :span="24" class="deal-content">
                 <span class="group-title">问题处理</span>
                 <div class="deal-info">
@@ -113,7 +122,9 @@
                             <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
                                 <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                                     <div v-if="_item.mediaType==2" class="img-content">
-                                        <img  :src="_item.url" :alt="_item.alt" height="160px"/>
+                                        <img class="imgLittle" :title="imgTitle"
+                                          :src="_item.url" :alt="_item.alt" height="160px"
+                                         @click="openOuter($event)" @mouseleave="showOuter=false"/>
                                     </div>
                                    <div  v-else class="video-content">
                                         <video  height=83% width=90%  prload autoplay controls
@@ -145,6 +156,7 @@ import videojs from '../../../../static/video.js'
 import 'videojs-contrib-hls';
 import {eventRESTful} from '@/api/index'
 import AudioVue from '@/components/AudioVue.vue'
+import $ from 'jquery';
 const isProduction = process.env.NODE_ENV === 'production'
 export default {
     name:"RateManage",
@@ -177,7 +189,10 @@ export default {
             previewplayer:'',
             winpDes:'',
             timeid:0,
-            windowHeight:window.innerHeight
+            windowHeight:window.innerHeight,
+            showOuter:false,
+            bigImgSrc:'',
+            imgTitle:''
         }
     },
     computed: {
@@ -226,6 +241,22 @@ export default {
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
+        },
+        openOuter(imgObj){
+            let self=this;
+            console.log(imgObj);
+            let target=imgObj.target;
+            if(imgObj!=null){
+                self.showOuter=true;
+                self.showOuterPhoto(target);
+            }
+        },
+        showOuterPhoto(target){
+            let self=this;
+            var winWidth=$(window).width();
+            var winHeight=$(window).height();
+            var src=target.src;
+            self.bigImgSrc=src;
         },
         async realTime(){
             let self=this;
@@ -424,6 +455,8 @@ export default {
                 if(errMsg=='Success'){
                     self.notify('提交成功！','success',3000);
                     self.getCommentList();
+                    self.description='';
+                    self.winpDes='';
                     if(status==2){
                         self.showWindContent=false;
                     }
@@ -438,6 +471,10 @@ export default {
             let self=this;
             let status=1;
             let description=self.description;
+            if(description.trim().length==0){
+                self.notify('评论信息不能为空！','warning',3000);
+                return false;
+            }
             self.addComment(status,description);
         },
         windUp(){
@@ -448,6 +485,10 @@ export default {
             let self=this;
             let status=2;
             let description=self.winpDes;
+            if(description.trim().length==0){
+                self.notify('评论信息不能为空！','warning',3000);
+                return false;
+            }
             self.addComment(status,description);
         },
         notify(msg,type,time) {
@@ -521,6 +562,20 @@ export default {
 }
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
+}
+#outerdiv{
+    position:fixed;
+    top:20%;
+    left:50%;
+    background:rgba(0,0,0,0.7);
+    z-index:2;
+    height:100%;
+}
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+}
+.fade-enter, .fade-leave-active {
+    opacity: 0
 }
 .el-rate-container{
     @include point(padding,20);
@@ -610,6 +665,7 @@ export default {
                 @include point(margin,5);
                 width: 25%;
                 @include point(max-width,220);
+               
                 .img-content{
 
                 }
@@ -623,19 +679,24 @@ export default {
                 font-size: 14px;
                 color: #94a4b4;
             }
-            .icon-video{
+            div{
                 @include point(margin-left,20);
-                color: #FB505F;
-                @include point(font-size,20);
+                display: inline-block;
+                .icon-video{
+                    color: #FB505F;
+                    @include point(font-size,20);
+                }
+                .ahref{
+                    text-decoration: underline;
+                    color: #FB505F;
+                    cursor: pointer;
+                }
             }
-            .ahref{
-                text-decoration: underline;
-                color: #FB505F;
-                cursor: pointer;
-            }
+            
         }
         hr{
             border: 1px solid #ddd;
+            margin-top: 15px;
         }
         .el-submit{
             @include point(width,90);
@@ -643,6 +704,9 @@ export default {
             color: #fff;
             @include point(margin-top,10);
             @include point(margin-bottom,20);
+        }
+        .deal-content{
+            margin-top: 15px;
         }
         .deal-info{
             @include point(margin-top,20);
@@ -721,6 +785,7 @@ export default {
                     @include point(margin-left,52);
                     overflow: hidden;
                     min-width: 90%;
+                    @include point(margin-top,25);
                     .source-details{
                         float: left;
                         @include point(margin-left,15);
@@ -733,6 +798,7 @@ export default {
                     color: #FB505F;
                     @include point(font-size,20);
                     float: left;
+                    width: 90%;
                 }
             }
         }

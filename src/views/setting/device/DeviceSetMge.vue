@@ -60,6 +60,26 @@
                                 </a>
                             </div>
                         </el-dialog>
+                        <el-dialog title='提示'
+                        :visible.sync="showConfirmImport" v-if="showConfirmImport"
+                        :append-to-body='true'
+                        :close-on-click-modal="false"
+                        width="28%"
+                        top="35vh"
+                        left="40vh">
+                            <div class="dialog-content" style="overflow:hidden;">
+                                <hr style="border: 0.5px solid #FB505F;"/>
+                                
+                                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
+                                    <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
+                                    <span>此操作将会清空当前页面已有NVR及设备，是否继续?</span>
+                                </p>
+                            </div>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">取 消</el-button>
+                                <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" style="color:#fff">确 认</el-button>
+                            </div>
+                        </el-dialog>
                     </el-col>
                 </el-tab-pane>
                 <el-tab-pane label="视频管理" name="video">
@@ -102,11 +122,13 @@
                             <el-pagination
                                 @size-change="sizeChange"
                                 @current-change="currentChange"
-                                :page-size="sizeNum" :total="total"
-                                :pager-count="3"
+                                :pager-count="paperCount"
+                                :page-size="sizeNum" 
+                                :total="total"
+                                :current-page="page"
                                 background
                                 small
-                                layout="jumper,prev, pager, next">
+                                layout="jumper,prev,pager,next">
                             </el-pagination>
                         </div>
                     </el-col>
@@ -172,7 +194,7 @@ export default {
             dash:{},
             activeName:'dash',
             total:0,
-            page:0,
+            page:1,
             sizeNum:10,
             nvrData:[],
             //the filter flag
@@ -180,8 +202,9 @@ export default {
             storeFilter:true,
             channelFilter:true,
             channelNumFilter:true,
-
+            paperCount:3,
             showImportContent:false,
+            showConfirmImport:false,
             channelList:[],
             channelData:[],
             serachVale:'',
@@ -330,7 +353,7 @@ export default {
             sessionStorage.setItem('DevicePage_TabName',tabs.name);
         },
         importItem(){
-            this.showImportContent=true;
+            this.showConfirmImport=true;
         },
         exportItem(){
             let self=this;
@@ -341,7 +364,7 @@ export default {
             self.sizeNum=val;
             let params={
                 "filter": {
-                    "page": self.page,
+                    "page": self.page-1,
                     "size": self.sizeNum
                 },
                 "order": {
@@ -353,10 +376,10 @@ export default {
         },
         currentChange(val){
             let self=this;
-            self.page=val-1;
+            self.page=val;
             let params={
                 "filter": {
-                    "page": self.page,
+                    "page": self.page-1,
                     "size": self.sizeNum
                 },
                 "order": {
@@ -371,9 +394,10 @@ export default {
             let self=this;
             self.nvrFilter=!self.nvrFilter;
             console.log(self.nvrFilter);
+            self.page=1;
             let params={
                 "filter": {
-                    "page": self.page,
+                    "page": self.page-1,
                     "size": self.sizeNum
                 },
                 "order": {
@@ -387,9 +411,10 @@ export default {
             let self=this;
             self.storeFilter=!self.storeFilter;
             console.log(self.storeFilter);
+            self.page=1;
             let params={
                 "filter": {
-                    "page": self.page,
+                    "page": self.page-1,
                     "size": self.sizeNum
                 },
                 "order": {
@@ -440,6 +465,7 @@ export default {
             })
         },
         getAllNVRData(){
+            let self=this;
             let params={
                 "filter": {
                     "page": 0,
@@ -489,9 +515,10 @@ export default {
                 self.notify('模板导入失败!','warning',3000);
                 self.showImportContent=false;
             }
+            self.page=1;
             let params={
                 "filter": {
-                    "page": self.page,
+                    "page": self.page-1,
                     "size": self.sizeNum
                 },
                 "order": {
@@ -584,12 +611,12 @@ export default {
         },
         export2Excel() {
             var that = this;
-            require.ensure([], () => {
+            require.ensure([], async() => {
                 const { export_json_to_excel } = require('@/excel/Export2Excel'); 
                 const tHeader = ['StoreID','所属门店', 'IVS ID','NVR名称','通道数','通道名称','通道序号']; // 导出的表头名
                 const filterVal = ['storeId','storeName','ivsId','nvrName','channelCount','channelName','channelNum']; // 导出的表头字段名
                 console.log(that.activeName);
-                let nvrData=that.nvrData;
+                let nvrData=await that.getAllNVRData();
                 let channelData=that.channelData;
                 let excelData=[];
                 if(nvrData.length!=0&&channelData.length!=0){
@@ -598,10 +625,10 @@ export default {
                             if(item.ivsId==_item.ivsId){
                                 let obj={};
                                 obj.storeId=item.storeId;
-                                obj.storeName=item.store;
+                                obj.storeName=item.storeName;
                                 obj.ivsId=item.ivsId;
                                 obj.nvrName=item.name;
-                                obj.channelCount=item.channelNum.substr(0,item.channelNum.length-1);
+                                obj.channelCount=item.channelCount;
                                 obj.channelName=_item.name;
                                 obj.channelNum=_item.channelId;
                                 excelData.push(obj);
@@ -749,7 +776,7 @@ export default {
 
             let params={
                 "filter": {
-                    "page": self.page,
+                    "page": self.page-1,
                     "size": self.sizeNum
                 },
                 "order": {
@@ -1073,6 +1100,9 @@ $mainColor:#FB505F;
 }
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
+}
+.el-dialog__body{
+    padding: 0px;
 }
 </style>
 <style scoped>

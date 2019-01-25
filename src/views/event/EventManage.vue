@@ -55,7 +55,7 @@
             </div>
         </el-dialog>
         <div class="el-table-content">
-            <el-button type="primary" size="mini" class="export-btn" @click="exportCSV">
+            <el-button type="primary" size="mini" class="export-btn" @click="export2Excel">
                <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel">
                 </i>导出报表
             </el-button>
@@ -72,7 +72,7 @@
                             @sort-change='sortChange'
                             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                                 <el-table-column
-                                    width=""
+                                    width="150"
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
@@ -173,7 +173,7 @@
                         "prop":"subject",
                         "label":"事件名称",
                         "sortable":'custom',
-                        "width":180
+                        "width":260
                     },
                     {
                         "prop":"storeName",
@@ -185,6 +185,7 @@
                         "prop":"assignerName",
                         "label":"提报人",
                         "sortable":'custom',
+                        "width":120
                     },
                     {
                         "prop":"ts",
@@ -197,7 +198,7 @@
                 page:1,
                 sizeNum:10,
                 params:{},
-                fileName:'数据详情'+'.csv',
+                fileName:'数据详情'+'.xlsx',
                 dialogFormVisible:false,
                 exportDataList:[],  //需要导出的数据
                 exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
@@ -225,6 +226,7 @@
             dateChange(val){
                 let self=this;
                 console.log(val);
+                let tabIndex=Number(self.activeName);
                 let start=typeof(val[0])==='object'?val[0].getTime():val[0];
                 let end=typeof(val[1])==='object'?val[1].getTime():val[1];
                 if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
@@ -237,10 +239,11 @@
                     self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
                 }
                 self.serachData='';
-                self.page=0;
+                self.page=1;
                 self.params.like={};
                 self.params.beginTs=start;
                 self.params.endTs=end;
+                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
                 let selectValue=self.value;
                 let status=[];
                 self.getEventList(self.params);
@@ -254,9 +257,9 @@
                 let self=this;
                 console.log(val.index);
                 let selectValue=self.value;
-                let tabIndx=Number(val.index);
-                self.page=0;
-                switch(tabIndx){
+                let tabIndex=Number(val.index);
+                self.page=1;
+                switch(tabIndex){
                     case 0:
                     if(selectValue==0||selectValue==1){
                         self.params.clause={"status":0,"assignee":self.userId};
@@ -292,44 +295,83 @@
                 let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
+                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
                 this.getEventList(this.params);
             },
             //点击状态搜索时，总共需要时间范围，状态
             selectChange(val){
                 console.log(val);
                 let self=this;
-                let tabIndx=Number(self.activeName);
+                let tabIndex=Number(self.activeName);
                 switch(val){
                     case 0:
-                        if(tabIndx==0){
-                            self.params.clause.status=0;
+                        if(tabIndex==0){
+                            self.params.clause={
+                                status:0,
+                                assignee:self.userId
+                            };
+                        }
+                        else if(tabIndex==1){
+                            self.params.clause={
+                                status:[0,1,2],
+                                assigner:self.userId
+                            };
                         }
                         else{
-                            self.params.clause.status=[0,1,2];
+                            self.params.clause={
+                                status:[0,1,2]
+                            };
                         }
                     break;
                     case 1:
-                        self.params.clause.status=0;
+                        if(tabIndex==0){
+                            self.params.clause={
+                                status:0,
+                                assignee:self.userId
+                            };
+                        }
+                        else if(tabIndex==1){
+                            self.params.clause={
+                                status:0,
+                                assigner:self.userId
+                            };
+                        }
+                        else{
+                            self.params.clause={
+                                status:0
+                            };
+                        }
                     break;
                     default:
-                    if(tabIndx==0){
-                        self.params.clause.status=-1;  //表示选择其他状态时为空。
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:-1,  //表示选择其他状态时为空。
+                            assignee:self.userId
+                        }
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:val-1,
+                            assigner:self.userId
+                        }
                     }
                     else{
-                        self.params.clause.status=val-1;break;
+                        self.params.clause={
+                            status:val-1
+                        }
                     }
+                    break;
                 }
 
                 self.serachData='';
-                self.page=0;
+                self.page=1;
                 self.params.like={};
 
                 let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
                 let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
+                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
                 self.getEventList(self.params);
                 let status=[];
                 if(val==0){
@@ -343,29 +385,68 @@
             },
             searchEventList(){
                 let self=this;
-                let tabIndx=Number(self.activeName);
+                let tabIndex=Number(self.activeName);
                 let val=self.value;
-                self.page=0;
+                self.page=1;
                 self.serachData=self.serachVale.trim();
                 switch(val){
                     case 0:
-                        if(tabIndx==0){
-                            self.params.clause.status=0;
+                        if(tabIndex==0){
+                            self.params.clause={
+                                status:0,
+                                assignee:self.userId
+                            }
+                        }
+                        else if(tabIndex==1){
+                            self.params.clause={
+                                status:[0,1,2],
+                                assigner:self.userId
+                            }
                         }
                         else{
-                            self.params.clause.status=[0,1,2];
+                            self.params.clause={
+                                status:[0,1,2]
+                            }
                         }
                     break;
                     case 1:
-                        self.params.clause.status=0;
+                        if(tabIndex==0){
+                            self.params.clause={
+                                status:0,
+                                assignee:self.userId
+                            }
+                        }
+                        else if(tabIndex==1){
+                            self.params.clause={
+                                status:0,
+                                assigner:self.userId
+                            }
+                        }
+                        else{
+                            self.params.clause={
+                                status:0
+                            }
+                        }
                     break;
                     default:
-                    if(tabIndx==0){
-                        self.params.clause.status=-1;  //表示选择其他状态时为空。
-                    }
-                    else{
-                        self.params.clause.status=val-1;break;
-                    }
+                        if(tabIndex==0){
+                            self.params.clause={
+                                status:-1,
+                                assignee:self.userId
+                            }
+                        }
+                        else if(tabIndex==1){
+                            self.params.clause={
+                                status:val-1,
+                                assigner:self.userId
+                            };
+                        }
+                        else{
+                            self.params.clause={
+                                status:val-1
+                            };
+                        }
+                    break;
                 }
                 if(self.serachData!=undefined&&self.serachData.length!=0){
                     self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
@@ -373,7 +454,7 @@
                 else{
                     self.params.like={};
                 }
-                self.params.filter={page:0,size:self.tableDataList[tabIndx].sizeNum};
+                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
                 self.getEventList(self.params);
                 
                 let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
@@ -398,7 +479,7 @@
             sortChange(col){
                 console.log(col);
                 let self=this;
-                self.page=0;   //页码置为0
+                self.page=1;   //页码置为1
                 let column=col.column;
                 let order=col.order;
                 if(order=="ascending"){
@@ -416,10 +497,10 @@
                 else{
                     self.params.order={};
                 }
-                let tabIndx=Number(self.activeName);
+                let tabIndex=Number(self.activeName);
                 self.params.filter={
                     page:0,
-                    size:self.tableDataList[tabIndx].sizeNum
+                    size:self.tableDataList[tabIndex].sizeNum
                 }
                 self.getEventList(self.params);
             },
@@ -433,9 +514,23 @@
             },
             async getEventList(params){
                 let self=this;
-                let tabIndx=Number(self.activeName);
+                let tabIndex=Number(self.activeName);
+                if(params.hasOwnProperty('clause')&&typeof(params.clause.status)=='object'){  //传入的是一个数组类型
+                    if(tabIndex==2){
+                        for(var key in params){
+                            if(key=='clause'){
+                                delete params["clause"]
+                            }
+                        }
+                    }
+                    if(tabIndex==1){
+                        params.clause={
+                            assigner:self.userId
+                        }
+                    }
+                }
+                
                 eventRESTful.getEventList(params).then((res)=>{
-                    console.log(res);
                     let data=res.data.content;
                     let temp=[];
                     data.forEach(item=>{
@@ -453,24 +548,25 @@
                         }
                        temp.push(obj);
                     })
-                    self.tableDataList[tabIndx].tableData=temp;
-                    self.tableDataList[tabIndx].total=res.data.totalElements;
+                    self.tableDataList[tabIndex].tableData=temp;
+                    self.tableDataList[tabIndex].total=res.data.totalElements;
                 }).catch(err=>{
                     console.log("Error:"+err);
                 });
             },
             sizeChange(val){
                 let self=this;
-                let tabIndx=Number(self.activeName);
-                self.tableDataList[tabIndx].sizeNum=val;
-                self.params.filter={page:self.page,size:val};
+                let tabIndex=Number(self.activeName);
+                self.tableDataList[tabIndex].sizeNum=val;
+                self.page=1;
+                self.params.filter={page:self.page-1,size:val};
                 self.getEventList(self.params);
             },
             currentChange(val){
                 let self=this;
-                let tabIndx=Number(self.activeName);
+                let tabIndex=Number(self.activeName);
                 this.page=val;
-                self.params.filter={page:val-1,size:self.tableDataList[tabIndx].sizeNum};
+                self.params.filter={page:val-1,size:self.tableDataList[tabIndex].sizeNum};
                 this.getEventList(this.params);
             },
             getInitList(){
@@ -479,13 +575,14 @@
                 let end=new Date().getTime();
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.params.clause={"status":0,"assignee":self.userId}
+                self.params.clause={"status":0,"assignee":self.userId};
+                self.params.order={"direction": "desc","property": "ts"};
                 self.getEventList(self.params);
             },
             exportData(){
                 let self=this;
-                let tabIndx=Number(self.activeName);
-                if(self.tableDataList[tabIndx].tableData.length==0){
+                let tabIndex=Number(self.activeName);
+                if(self.tableDataList[tabIndex].tableData.length==0){
                     return false;
                 }
                 self.dialogFormVisible=true;
@@ -507,6 +604,17 @@
                     },
                     
                 };
+                if(typeof(status)=='number'){  //只有是数值类型时才带
+                    params.clause.status=status;
+                }
+                else{
+                    for(var key in params){
+                        console.log(key)
+                        if(key=='clause'){
+                            delete params["clause"];
+                        }
+                    }
+                }
                 if(value.length!=0){
                     params.like=value[0];
                 }
@@ -563,8 +671,8 @@
             },
             async exportCSV(){
                 let self=this;
-                let tabIndx=Number(self.activeName);
-                if(self.tableDataList[tabIndx].tableData.length==0){
+                let tabIndex=Number(self.activeName);
+                if(self.tableDataList[tabIndex].tableData.length==0){
                     Message({
                         message:'暂无数据！',
                         type:'warning',
@@ -577,6 +685,45 @@
                 this.exportDataList, { header: this.exportDataHeader}, 
                 this.fileName);
                 this.dialogFormVisible=false;
+            },
+            getExportFileName(){
+                let self=this;
+                let tabIndex=Number(self.activeName);
+                console.log(tabIndex);
+                let label='';
+                switch(tabIndex){
+                    case 0: label='待处理';break;
+                    case 1: label='我创建';break;
+                    case 2: label='全部';break;
+                    default: console.error('error tab pages！');break;
+                }
+                let fileName=label+'-'+util.getCurDateStr();
+                return fileName;
+            },
+            export2Excel() {
+                var that = this;
+                let tabIndex=Number(that.activeName);
+                if(that.tableDataList[tabIndex].tableData.length==0){
+                    Message({
+                        message:'暂无数据！',
+                        type:'warning',
+                        duration:3*1000
+                    })
+                    return false;
+                }
+                require.ensure([], async() => {
+                    const { export_json_to_excel } = require('@/excel/Export2Excel'); 
+                    const tHeader = that.exportDataHeader; // 导出的表头名
+                    const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
+                    console.log(that.activeName);
+                    let curData=await that.getExportData();
+                    const data = that.formatJson(filterVal, curData);
+                    
+                    export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
+                })
+            },
+            formatJson(filterVal, jsonData) {
+                return jsonData.map(v => filterVal.map(j => v[j]))
             },
         },
         mounted(){

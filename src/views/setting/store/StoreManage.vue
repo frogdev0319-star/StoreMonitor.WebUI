@@ -3,7 +3,7 @@
        <div class="seacrh-content">
             <span class="select-title">按省份选择</span>
              <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
-             class="el-province" @change="changePro" @clear="clearCitys">
+             class="el-province" @change="changePro" @clear="clearCitys" :popper-class="popperClass">
                     <el-option
                     v-for="item in provinceList"
                     :key="item.value"
@@ -28,8 +28,9 @@
             <el-input
                 size="small"
                 class="el-search-input"
-                v-model="serachVale" @keyup.enter.native="searchEventList">
-                <i @click="searchEventList" slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                clearable
+                v-model="serachVale" @keyup.enter.native="searchEventList" @clear="searchEventList">
+                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
             </el-input>
        </div>
         <div class="el-table-content">
@@ -42,7 +43,7 @@
             @sort-change='sortChange'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                 <el-table-column
-                    width="120"
+                    width="150"
                     header-align="center"
                     align="center">
                         <template slot-scope="scope" v-if="scope.row.showTag">
@@ -58,7 +59,7 @@
             <el-table-column
                 prop="napeTable"
                 label="关联巡检表"
-                width="180"
+                width="220"
                 align="left"
                 sortable="true">
                 <template slot-scope="scope">
@@ -81,7 +82,7 @@
             </el-table-column>
             <el-table-column prop="schedue"
                 label="巡检排程"
-                width="120"
+                width="160"
                 align="left">
 
             </el-table-column>
@@ -132,7 +133,7 @@ import PubSub from 'pubsub-js'
                         "prop":"name",
                         "label":"门店名称",
                         "sortable":'custom',
-
+                        "width":180
                     },
                     {
                         "prop":"userName",
@@ -160,9 +161,11 @@ import PubSub from 'pubsub-js'
                 params:{},
                 total:0,
                 sizeNum:10,
-                page:0,
+                page:1,
                 serachVale:'',
                 timeid:0,
+                isChecked:false,
+                popperClass:'province-popper'
             }
         },
         computed:{
@@ -217,6 +220,7 @@ import PubSub from 'pubsub-js'
                         temp.push(item.cityName);
                     }
                 })
+                self.isChecked=val;
                 self.citys=str.substring(0,str.length-1);
                 self.multeCityList=temp;
             },
@@ -224,16 +228,21 @@ import PubSub from 'pubsub-js'
                 console.log(item);
                 let self=this;
                 let str='';
-                let flag=false;
+                //let flag=false;
                 let temp=[];
                 self.cityList.forEach(_item=>{
                     if(_item.checked){
                         str=str+_item.cityName+';';
                         temp.push(_item.cityName);
+                        
                     }
-                    flag=flag||_item.checked;
                 })
-                self.isChecked=flag;
+                if(temp.length!=0){
+                    self.isChecked=true;
+                }
+                else{
+                    self.isChecked=false;
+                }
                 self.citys=str.substring(0,str.length-1);
                 if(temp.length==self.cityList.length){
                     self.allCityChecked=true;
@@ -246,10 +255,10 @@ import PubSub from 'pubsub-js'
             searchStore(){
                 let self=this;
                 self.showCityContent=false;
-                self.serachVale='';
+                //self.serachVale='';
                 self.params.like={};
                 let temp=[];
-                self.page=0;
+                self.page=1;
                 self.cityList.forEach(item=>{
                     if(item.checked){
                         temp.push(item.cityName);
@@ -282,7 +291,7 @@ import PubSub from 'pubsub-js'
             },
             currentChange(val){
                 let self=this;
-                self.page=val-1;
+                self.page=val;
                 self.getStoreList(self.params);
             },
             getCityByProvince(province){
@@ -332,7 +341,7 @@ import PubSub from 'pubsub-js'
             getInitData(){
                 let self=this;
                 self.params.filter={
-                    'page':self.page,
+                    'page':self.page-1,
                     'size':self.sizeNum
                 };
                 self.getStoreList(self.params);
@@ -340,7 +349,7 @@ import PubSub from 'pubsub-js'
             async getStoreList(params){
                 let self=this;
                 console.log(params);
-                params.filter={page:this.page,size:this.sizeNum};
+                params.filter={page:this.page-1,size:this.sizeNum};
                 let data=await self.getStoreData(params);
 
                 self.storeData=data.data;
@@ -397,7 +406,7 @@ import PubSub from 'pubsub-js'
                 self.params.clause={};
                 self.curProvince='';
                 self.citys='';
-                self.page=0;
+                self.page=1;
                 if(self.serachVale.length!=0){
                     self.params.like={
                         "name": self.serachVale,
@@ -417,6 +426,7 @@ import PubSub from 'pubsub-js'
                     direction:column.order=='ascending'?'asc':'desc',
                     property:column.prop
                 };
+                self.page=1;
                 self.getStoreList(self.params);
             },
             getINspectItemResult(){
@@ -647,13 +657,13 @@ import PubSub from 'pubsub-js'
         background-color: #FB505F !important;
         border-color:#FB505F !important;
     }
-    .el-select-dropdown__item.hover{
+    .province-popper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-    .el-select .el-input.is-focus .el-input__inner{
+    .province-popper .el-select .el-input.is-focus .el-input__inner{
         border-color: #FEE4E7;
     }
-    .el-select-dropdown__item.selected{
+    .province-popper .el-select-dropdown__item.selected{
         color:#FB505F;
     }
 </style>

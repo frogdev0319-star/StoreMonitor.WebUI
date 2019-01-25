@@ -1,3 +1,4 @@
+import { format } from "url";
 
 export default {
 
@@ -581,4 +582,17 @@ export default {
         let dayNum=nowdate.getDate();
         return dayNum;
     },
+    getCurDateStr(){
+        let date=new Date();
+        let formatDate=function(datetype){
+            return datetype<10?('0'+datetype):datetype;
+        }
+        let year=date.getFullYear();
+        let month=formatDate(date.getMonth()+1);
+        let day=formatDate(date.getDate());
+        let hours=formatDate(date.getHours());
+        let minutes=formatDate(date.getMinutes());
+        let second=formatDate(date.getSeconds());
+        return `${year}${month}${day}-${hours}${minutes}${second}`;
+    }
 }

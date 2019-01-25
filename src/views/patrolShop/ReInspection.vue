@@ -22,6 +22,17 @@
                             <i class="iconfont icon-pause1 iconplay" @click="purseVideo" v-else></i>
                         </div>
                         <div class="iconrside">
+                            <span>选择时间</span>
+                            <el-time-picker
+                                id="el-time"
+                                style="width:80px;"
+                                :popper-class="timePopper"
+                                v-if="showDate"
+                                v-model="playDate"
+                                size="mini"
+                                :clearable=false
+                                placeholder="">
+                            </el-time-picker>
                             <span>倍速</span>
                             <el-select class="el-test" size="mini" v-model="testSpeed" :popper-class="popperClass">
                                 <el-option
@@ -136,6 +147,8 @@ export default {
             activeIndex:'',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
+            showDate:true, 
+            playDate:new Date(), 
             speedList:[
                 {
                     value:0,
@@ -356,7 +369,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import '../../assets/iconfont/iconfont.css';
     $red:#FB505F;
     $lightRed:#FEE4E7;
     @function rem($val){
@@ -475,7 +487,7 @@ export default {
                         overflow: hidden;
                         user-select:none;
                         .iconlside{
-                            width: 50%;
+                            width: 30%;
                             float: left;
                             text-align: left;
                             .iconplay{
@@ -484,11 +496,12 @@ export default {
                             }
                         }
                         .iconrside{
-                            width: 50%;
+                            width: 70%;
+                            max-width: 500px;
                             float: right; 
                             span{
-                                font-size: 13px;
-                                margin-right:10px;
+                                font-size: 12px;
+                                margin-right:6px;
                                 margin-left: 20px;
                             }
                             .iconscreen{
@@ -676,11 +689,11 @@ export default {
 }
 .select-popClass .el-select-dropdown__item.hover{
     color:#EA6F5A !important;
-    background-color:#34374A;
+    background-color:#34374A !important;
 }
 .select-popClass .el-select-dropdown__item:hover{
     color:#EA6F5A !important;
-    background-color:#34374A;
+    background-color:#34374A !important;
 }
 .select-popClass .el-select-dropdown{
     border:0px !important;
@@ -702,11 +715,35 @@ export default {
 .select-popClass.el-popper[x-placement^=bottom] .popper__arrow::after{
     border-bottom-color:#34374A !important;
 }
+
+.el-input__prefix{
+    visibility: hidden !important;
+}
+.el-input--prefix .el-input__inner{
+    padding-left: 10px;
+    padding-right:0px;
+    letter-spacing: 2px;
+    background-color: #34374A;
+    color: #fff;
+    border-width: 0px;
+    border-radius:0px;
+    height: 24px;
+    line-height:24px;
+
+}
 </style>
 <style scoped>
-.el-input--small >>>.el-input__inner{
+.el-search-input.el-input--small >>>.el-input__inner{
     background: #F4F5F9 !important;
     border-radius: 15px !important;
+    height: 32px !important;
+    line-height:32px !important;
+    padding-left:30px;
+    color:#425262;
+    letter-spacing: 0px;
+}
+.el-search-input >>>.el-input__prefix{
+    visibility:visible !important;
 }
 </style>
 
