@@ -2,20 +2,21 @@
     <el-row class="el-rate-container">
         <el-col :span="24" class="title-content">
             <span class="event-title">{{event.eventTitle}}</span>
-            <span class="event-score">得分：{{event.score==null?'  ':event.score}}分</span>
+            <span class="event-score">得分：{{event.score==null?'---':event.score}}分</span>
             <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
         </el-col>
         <el-dialog :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=380px top=15%>
-                <div class="video-dialog-content" style="overflow:hidden;">
-                    <video  height=83% width=90% id="previewVideo" prload autoplay controls
-                        class="video-js vjs-fill" style="postion:absoulte;top:10px;">
-                    </video>
-                </div>
-                <div slot="footer" class="dialog-footer">
-                    <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">暂 停</el-button>
-                    <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
-                </div>
-            </el-dialog>
+            <div class="video-dialog-content" style="overflow:hidden;">
+                <video  height=83% width=90% id="previewVideo" prload autoplay controls
+                    class="video-js vjs-fill" style="postion:absoulte;top:10px;">
+                </video>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button class="file-cancel-btn" @click="cutPicture" size="mini" style="">截 图</el-button>
+                <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">暂 停</el-button>
+                <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
+            </div>
+        </el-dialog>
         <el-dialog title='结案'
         :visible.sync="showWindContent" v-if="showWindContent"
         :append-to-body='true'
@@ -39,7 +40,7 @@
         <transition name="fade">
             <div id="outerdiv" style="" v-show="showOuter">
                 <div id="innerdiv" style="position:absolute;">
-                    <img id="bigimg" style="border:5px solid #fff;height:500px;" :src="bigImgSrc" />
+                    <img id="bigimg" style="border:5px solid #fff;" :src="bigImgSrc" />
                 </div>
             </div>
         </transition>
@@ -63,11 +64,12 @@
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                     <div v-if="item.mediaType==2" class="img-content">
                         <!--图片资源-->
-                        <img class="imgLittle" :src="item.url" :title="imgTitle" :alt="item.alt" height="140px" style="max-height:140px;"/>
+                        <img class="imgLittle" :src="item.url" :title="imgTitle" 
+                        :alt="item.alt" height="140px" style="max-height:140px;" @click="openOuter($event)" @mouseleave="showOuter=false"/>
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
-                        <video  height=83% width=90%  prload autoplay controls
+                        <video  height=83% width=90%  prload autoplay controls :poster="videoPoster"
                                 class="video-js vjs-fill" style="max-height:160px;">
                                 <source :src="item.url">
                         </video>
@@ -76,7 +78,7 @@
             </div>
             <div class="viedo-info">
                 <span>{{event.createDate}}</span>
-                <div v-if="event.deviceId!=-1">
+                <div v-if="showCheckVideo">
                     <i class="iconfont icon-bofang icon-video"></i>
                     <span class="ahref" @click="checkVideo">{{curChannel}}</span>
                 </div>
@@ -123,12 +125,12 @@
                                 <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                                     <div v-if="_item.mediaType==2" class="img-content">
                                         <img class="imgLittle" :title="imgTitle"
-                                          :src="_item.url" :alt="_item.alt" height="160px"
+                                          :src="_item.url" alt="截图" height="160px"
                                          @click="openOuter($event)" @mouseleave="showOuter=false"/>
                                     </div>
                                    <div  v-else class="video-content">
-                                        <video  height=83% width=90%  prload autoplay controls
-                                                class="video-js vjs-fill" style="max-height:160px;">
+                                        <video  height=83% width=90%  prload autoplay controls :poster="videoPoster"
+                                                class="video-js vjs-fill" style="min-width:198px;min-height:160px; max-height:160px;object-fit: fill;">
                                                 <source :src="_item.url">
                                         </video>
                                     </div>
@@ -136,7 +138,7 @@
                             </div>
                             <div class="viedo-info">
                                 <span>{{item.createDate}}</span>
-                                <div v-if="event.deviceId!=-1">
+                                <div v-if="showCheckVideo">
                                     <i class="iconfont icon-bofang icon-video"></i>
                                     <span class="ahref" @click="checkVideo">{{curChannel}}</span>
                                 </div>
@@ -157,6 +159,7 @@ import 'videojs-contrib-hls';
 import {eventRESTful} from '@/api/index'
 import AudioVue from '@/components/AudioVue.vue'
 import $ from 'jquery';
+import {getDeviceList} from '@/api/device'
 const isProduction = process.env.NODE_ENV === 'production'
 export default {
     name:"RateManage",
@@ -170,7 +173,7 @@ export default {
             dialogFormVisible:false,
             showWinpBtn:true,
             description:'',
-            audioOften:0,
+            audioOftenText:'',
             speech:false,
             audioRef:'audioRef',
             audio:{},
@@ -179,7 +182,7 @@ export default {
             audioSrc:'',
             showAudio:false,
             videoSrc:"",
-            curChannel:"水吧区域",
+            curChannel:"",
             sourceList:[],
             commentList:[],
             protocal:'DASH',
@@ -192,7 +195,10 @@ export default {
             windowHeight:window.innerHeight,
             showOuter:false,
             bigImgSrc:'',
-            imgTitle:''
+            imgTitle:'',
+            showCheckVideo:false,
+            showPhotoContent:false,
+            videoPoster:'./static/img/loading.gif'
         }
     },
     computed: {
@@ -202,9 +208,9 @@ export default {
         currentStream() {
             return this.currentTech === 'Flash' ? 'RTMP' : 'HLS'
         },
-        audioOftenText(){
-            return this.audioOften+'"';
-        },
+        // audioOftenText(){
+        //     return this.audioOften+'"';
+        // },
         divHeight(){
             if(this.windowHeight>800){
                 return this.windowHeight*0.749;
@@ -281,6 +287,10 @@ export default {
                 self.playVideo(self.mpdurl);
             }
         },
+        cutPicture(){
+            let self=this;
+            self.showPhotoContent=true;
+        },
         myfun(){  
             var div1=document.getElementsByClassName("lside");  
             var div2=document.getElementsByClassName("rside");
@@ -294,11 +304,21 @@ export default {
                 else{  
                     div2[i].style.borderLeft="1px solid #FB505F";  
                 }   
-            }  
-            
-                
+            }
         },
-        getSessionData(){
+        getDeviceList(){
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                getDeviceList().then(res=>{
+                    let errMsg=res.errMsg;
+                    if(errMsg!=undefined&&errMsg=='Success'){
+                        let data=res.data;
+                        resolve(res.data);
+                    }
+                })
+            })
+        },
+        async getSessionData(){
             let self=this;
             let event=JSON.parse(sessionStorage.getItem('event'));
             let obj={
@@ -311,6 +331,20 @@ export default {
                 status:event.status
             };
             self.event=obj;
+            let deviceId=self.event.deviceId;
+            let deviceList=await self.getDeviceList();
+            let flag=false;
+            if(deviceList!=undefined){
+                deviceList.forEach(item=>{
+                    if(item.id==deviceId){
+                        flag=true;
+                        self.curChannel=item.name+'区域';
+                    }
+                })
+            }
+            if(flag){
+                self.showCheckVideo=true;
+            }
             let attachment=event.initialComment.attachment;
             let temp=[];
             attachment.forEach(item=>{
@@ -330,11 +364,21 @@ export default {
         getProcess(){
             let self=this;
             if(self.showAudio){
-                self.audioOften=parseInt(self.$refs.audioRef.duration);
+                if(isNaN(self.$refs.audioRef.duration)){
+                    self.showAudio=false;
+                }
+                else{
+                    self.audioOftenText=parseInt(self.$refs.audioRef.duration)+'"';
+                }
             }
             self.commentList.forEach((_item,_index)=>{
                 if(_item.showAudio){
-                    _item.audio.audioOftenText=parseInt(self.$refs[_item.audio.audioRef][0].duration)+'"';
+                    if(isNaN(self.$refs[_item.audio.audioRef][0].duration)){
+                        _item.showAudio=false;
+                    }
+                    else{
+                        _item.audio.audioOftenText=parseInt(self.$refs[_item.audio.audioRef][0].duration)+'"';
+                    }
                 }
             })
         },
@@ -388,13 +432,15 @@ export default {
                     let dataComments=comments.comment;
                     let temp=[];
                     dataComments.forEach((item,index)=>{
+                        let description=item.description.replace(new RegExp("^\"|\"$", "gm"), "");
+                        description=description.replace(new RegExp("\\\\u003cbr\\\\u003e", "gm"), "\r\n");
                         let obj={};
                         obj.createOr=item.accountName;
                         obj.createDate=util.getDateTime(item.ts);
                         obj.status=item.status;
-                        obj.description=item.description;
+                        obj.description=description;
                         switch(item.status){
-                            case 0: obj.showLabel=false;obj.spanStyle={'background-color':'#FCB83B'};
+                            case 0: obj.showLabel=true;obj.spanStyle={'background-color':'#FCB83B'};
                                 obj.process='待处理'; break;
                             case 1: obj.showLabel=true;obj.spanStyle={'background-color':'#434B5E'};
                                 obj.process='已处理'; break;
@@ -570,6 +616,9 @@ export default {
     background:rgba(0,0,0,0.7);
     z-index:2;
     height:100%;
+    #bigimg{
+        @include point(height,500);
+    }
 }
 .fade-enter-active, .fade-leave-active {
     transition: opacity .5s

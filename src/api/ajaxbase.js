@@ -1,7 +1,7 @@
-import axios from 'axios'
-
+import axiosA from 'axios'
+axiosA.defaults.withCredentials = false
 function getAuthority(){
-    let username='Admin';
+    let username='admin';
     let password='1234';
     try{
         let uname=sessionStorage.getItem('UserName');
@@ -25,8 +25,8 @@ function getBaseURL(){
 }
 
 //let REST_BASEURL=getBaseURL()+':8085';
-let REST_BASEURL="http://172.21.84.229";
-const advAxios=axios.create({
+let REST_BASEURL="http://222.91.163.149";
+const advAxios=axiosA.create({
     baseURL:REST_BASEURL+':8085',
     headers:{
         'Authorization':getAuthority(),
@@ -35,7 +35,7 @@ const advAxios=axios.create({
     }
 });
 
-const userAxios=axios.create({
+const userAxios=axiosA.create({
     baseURL:REST_BASEURL+':8085',
     headers:{
         'Accept':'application/json',
@@ -43,8 +43,8 @@ const userAxios=axios.create({
     }
 });
 
-const newAxios=axios.create({
-    baseURL:REST_BASEURL+':8050',
+const newAxios=axiosA.create({
+    baseURL:REST_BASEURL+':18050',
 });
 
 async function ajax4dash({method,url,data}){
@@ -53,7 +53,8 @@ async function ajax4dash({method,url,data}){
         url,
         data,
         headers:{
-            'Content-Type':'application/json'
+            'Content-Type':'application/json',
+            "Accept":"application/json"
         }
     });
     return ret;

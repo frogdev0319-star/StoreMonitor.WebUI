@@ -187,6 +187,7 @@ import api from '@/api/index'
 import axios from 'axios'
 import {validateInput,validateURL} from '@/common/validate'
 import {deviceRESTful} from '@/api/index'
+import {isLoginIn} from '@/api/login'
 export default {
     name:'DeviceSetMge',
     data(){
@@ -317,8 +318,8 @@ export default {
                 "httpCmdPort": self.dash.httpCmdPort,
                 "httpsCmdPort": self.dash.httpsCmdPort,
                 "dataPort": self.dash.dataPort,
-                "loginId": "admin",
-                "password": "admin"
+                "loginId": "",
+                "password": ""
             };
             if(data.errCode!=null&&data.errCode==500){ //Dash Server does not exsit!
                 deviceRESTful.addDashServer(params).then(res=>{
@@ -786,6 +787,7 @@ export default {
             };
             self.getNVRList(params);       //获取NVR 数据信息
         },
+        
         notify(msg,type,time) {
             this.$message({
                 message: msg,

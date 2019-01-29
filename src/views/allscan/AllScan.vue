@@ -1,18 +1,36 @@
 <template>
     <div id="sample">
-        <span>总览</span>
-        <button @click="dialogFormVisible=true" class="btn">播放</button>
-            <el-dialog :visible.sync="dialogFormVisible" v-if="dialogFormVisible" width=550px height=380px top=15%>
-                <div class="dialog-content" style="overflow:hidden;">
-                    <video  height=83% width=90% id="previewVideo" prload autoplay controls
-                        class="video-js vjs-fill" style="postion:absoulte;top:10px;">
-                    </video>
+        <div style="width:530px;height:380px;margin:0 auto;">
+            <div class="dialog-content" style="overflow:hidden;">
+                <video  height=83% width=90% id="previewVideo" prload autoplay controls
+                    class="video-js vjs-fill" style="postion:absoulte;top:10px;">
+                </video>
+            </div>
+            <div  class="dialog-footer">
+                <el-button class="file-cancel-btn" @click="showCutContent" size="mini" style="">截 图</el-button>
+                <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
+            </div>
+        </div>
+        <el-dialog title='编辑截图'
+        :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=300px top=15%>
+            <div class="canvas-content" @mouseenter="showModel=true" @mouseleave="showModel=false">
+                <div class='model' v-if="showModel">
+                    <div class='icon-right'>
+                        <div class="content" v-for="(item,index) in penList" :key="index">
+                            <div :class="{colorActive:item.showContent}">
+                                
+                            </div>
+                            <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                        </div>
+                    </div>
                 </div>
-                <div slot="footer" class="dialog-footer">
-                    <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">暂 停</el-button>
-                    <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
-                </div>
-            </el-dialog>
+                <canvas id="icanvas" @click="clickTest"></canvas>
+            </div>
+            <div slot="footer">
+                <el-button class="file-cancel-btn" @click="confrimEdit" size="mini" style="">确 认</el-button>
+                <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">取 消</el-button>
+            </div>
+        </el-dialog>
      </div>
 
 </template>
@@ -26,22 +44,107 @@
         min-width: 500px;
         min-height: 320px;
     }
+    .dialog-footer{
+        margin-top: 30px;
+        
+    }
+    .model{
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        position: absolute;
+        z-index: 2;
+    }
+    .icon-right{
+        width: 100px;
+        height: 30%;
+        position: absolute;
+        right: 30px;
+        top: 15%;
+    }
+    .content{
+        width: 100%;
+        height: 30%;
+        position: relative;
+    }
+    .color{
+        width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        position: absolute;
+        margin: auto 0;
+        top: 4px;
+        left: 20%;
+        margin-left: 4px;
+        z-index: 3;
+        cursor: pointer;
+    }
+    .colorActive{
+        background-color: #ddd;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        margin: auto 0;
+        left: 20%;
+        z-index: 3;
+    }
+    #white{
+        background-color: white;
+    }   
+    #yellow{
+        background-color: yellow;
+    }
+    #red{
+        background-color: red;
+    }
+    
+</style>
+<style>
+.el-dialog__body{
+    padding: 0px;
+}
+.el-dialog__title{
+    font-size: 16px !important;
+    font-size: 16px !important;
+    float: left;
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
 </style>
 
 <script>
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
 import 'videojs-contrib-hls';
+import $ from 'jquery';
   export default {
     data() {
       return {
-          dialogFormVisible:false,
-         file:'',
-         src:'',
-        //  downLoadSrc:'http://172.21.81.160:8085/storemonitor/api/v1.0/inspect/template',
-         protocal:'DASH',
-          selGID:0,
-          mpdurl:'',
+        file:'',
+        src:'',
+        protocal:'DASH',
+        selGID:0,
+        mpdurl:'',
+        videoEl:'',
+        canvasEl:'',
+        dialogFormVisible:false,
+        penList:[
+            {
+                id:'white',
+                showContent:true
+            },
+            {
+                id:'yellow',
+                showContent:false
+            },
+            {
+                id:'red',
+                showContent:false
+            }
+        ],
+        penChecked:'',
+        showModel:true
       };
     },
     methods: {
@@ -89,6 +192,44 @@ import 'videojs-contrib-hls';
                 self.playVideo(self.mpdurl);
             }
         },
+        showCutContent(){
+            let self=this;
+            self.dialogFormVisible=true;
+            this.$nextTick(()=>{
+                self.canvasEl=document.getElementById('icanvas');
+                var ctx = self.canvasEl.getContext('2d');
+                var width=self.videoEl.videoWidth;
+                var height=self.videoEl.videoHeight;
+                self.canvasEl.width=width/4;
+                self.canvasEl.height=height/4;
+                ctx.drawImage(self.videoEl,0,0,width/4,height/4);
+                var oGrayImg=icanvas.toDataURL('image/png');
+            })
+            
+        },
+        checkPen(item,index){
+            let self=this;
+            item.showContent=true;
+            self.penList.forEach((_item,_index)=>{
+                if(index!=_index){
+                    _item.showContent=false;
+                }
+            })
+            self.penChecked=item.id;
+        },
+        confrimEdit(){
+            let self=this;
+            
+        },
+        clickTest(){
+           
+        }
+    },
+    mounted(){
+        let self=this;
+        self.videoEl=document.getElementById('previewVideo');
+        
+
     }
   }
 </script>

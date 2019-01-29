@@ -141,7 +141,7 @@ import PubSub from 'pubsub-js'
                         "sortable":'custom',
                     },
                     {
-                        "prop":"phoneNumber",
+                        "prop":"phone",
                         "label":"联系方式",
                         "sortable":false
                     },

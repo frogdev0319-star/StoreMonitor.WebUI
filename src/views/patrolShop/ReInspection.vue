@@ -22,17 +22,6 @@
                             <i class="iconfont icon-pause1 iconplay" @click="purseVideo" v-else></i>
                         </div>
                         <div class="iconrside">
-                            <span>选择时间</span>
-                            <el-time-picker
-                                id="el-time"
-                                style="width:80px;"
-                                :popper-class="timePopper"
-                                v-if="showDate"
-                                v-model="playDate"
-                                size="mini"
-                                :clearable=false
-                                placeholder="">
-                            </el-time-picker>
                             <span>倍速</span>
                             <el-select class="el-test" size="mini" v-model="testSpeed" :popper-class="popperClass">
                                 <el-option
@@ -342,9 +331,39 @@ export default {
             let self=this;
             self.showSpread=false;
         },
+        async playVideo(url) {
+            console.log('playvideo enter!');
+            var video = document.getElementById("previewVideo");
+            this.previewplayer = videojs(video);
+            this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
+            this.previewplayer.play();
+        },
+        async realTime(){
+            let self=this;
+            let sessionId= await dashAPI.Online();
+            console.log(sessionId);
+            let result=await dashAPI.Enum(sessionId);
+            let ivsID=result.IVSPlatform[0].ID;
+            const data = {
+                request: { 
+                  method: 'connection',
+                  sessionID: sessionId,
+                  streamingProtocol:this.protocal,
+                  IVSID:ivsID,
+                  channel:JSON.stringify(this.selGID+1)
+                }
+            };
+            self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
+            console.log(self.mpdurl);
+            if (self.mpdurl != "" ) {
+                console.log(self.mpdurl);
+                self.playVideo(self.mpdurl);
+            }
+        },
         playVideo(){
             let self=this;
             self.playState=false;
+            self.realTime();
         },
         purseVideo(){
             let self=this;
@@ -716,21 +735,6 @@ export default {
     border-bottom-color:#34374A !important;
 }
 
-.el-input__prefix{
-    visibility: hidden !important;
-}
-.el-input--prefix .el-input__inner{
-    padding-left: 10px;
-    padding-right:0px;
-    letter-spacing: 2px;
-    background-color: #34374A;
-    color: #fff;
-    border-width: 0px;
-    border-radius:0px;
-    height: 24px;
-    line-height:24px;
-
-}
 </style>
 <style scoped>
 .el-search-input.el-input--small >>>.el-input__inner{
@@ -741,9 +745,6 @@ export default {
     padding-left:30px;
     color:#425262;
     letter-spacing: 0px;
-}
-.el-search-input >>>.el-input__prefix{
-    visibility:visible !important;
 }
 </style>
 

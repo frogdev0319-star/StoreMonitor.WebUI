@@ -6,8 +6,8 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-let base='http://'+window.location.host;
-//let base ="http://172.21.84.62:8085";
+//let base='http://'+window.location.host;
+let base ="http://172.21.84.62:8085";
 
 let itempath='/storemonitor/api/v1.0'
 
@@ -109,27 +109,21 @@ service.interceptors.response.use(
         if(err.response){
             let errCode=err.response.data.errCode;
             let errMsg=err.response.data.errMsg;
-            if(errCode===500&&errMsg=='Invalid token'){
+            if(errCode===500&&(errMsg=='Invalid token'||errMsg=='Token does not exist'||
+                errMsg=='Fail to verify token'||errMsg=='User does not exist')){
                 router.push('/login');
-                // MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录！','确认登出',{
-                //     confirmButtonText:'重新登录',
-                //     cancelButtonText:'取消',
-                //     type:'warning'
-                // }).then(()=>{
-                    store.dispatch('FedLogOut').then(()=>{
-                        Message({
-                            //message:err.response.data.errMsg,
-                            message:'登录信息已失效',
-                            type:'error',
-                            duration:5*1000
-                        })
-                    })
-                //})
             }
             else if(errCode===500&&errMsg=='No authority'){
                 router.push('/');
                 Message({
                     message:'无操作权限!',
+                    type:'error',
+                    duration:5*1000
+                })
+            }
+            if(err.response.status!=undefined&&err.response.status==404){
+                Message({
+                    message:'服务器异常，请刷新后重试!',
                     type:'error',
                     duration:5*1000
                 })

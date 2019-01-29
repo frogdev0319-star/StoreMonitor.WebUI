@@ -1,8 +1,9 @@
 <template>
     <div class="el-event-content">
        <div class="el-date">
-            <span class="date-title">时间</span>
+            <span class="date-title">选择时间</span>
             <el-date-picker
+                ref="datePicker"
                 v-model="dateValue"
                 type="datetimerange"
                 range-separator="~"
@@ -15,7 +16,8 @@
                 :picker-options='dateOpt'
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
-                @change="dateChange">
+                @change="dateChange"
+                :default-time="defaultTime">
             </el-date-picker>
             <el-tooltip :popper-class="toolTipClass" class="item" effect="light"
                 placement="bottom-end">
@@ -106,7 +108,7 @@
                             :page-sizes="[10, 20, 50, 100]"
                             @size-change="sizeChange"
                             @current-change="currentChange"
-                            :current-page="page"
+                            :current-page="item.page"
                         layout="jumper,total, prev, pager, next,sizes"  
                         :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;">
                         </el-pagination>
@@ -123,6 +125,7 @@
     import CsvExportor from 'csv-exportor'
     import {eventRESTful} from '@/api/index'
     import {Message} from 'element-ui'
+    import {getCookie} from '@/common/auth';
     export default {
         name: "ExceptEvent",
         data(){
@@ -148,7 +151,7 @@
                         tableData:[],
                         total:0,
                         sizeNum:10,
-                        page:0
+                        page:1
                     },
                     {
                         label:'我创建事件',
@@ -156,7 +159,7 @@
                         tableData:[],
                         total:0,
                         sizeNum:10,
-                        page:0
+                        page:1
                     },
                     {
                         label:'全部事件',
@@ -164,7 +167,7 @@
                         tableData:[],
                         total:0,
                         sizeNum:10,
-                        page:0
+                        page:1
                     }
                 ],
                 activeName:'0',
@@ -205,7 +208,8 @@
                 windowHeight:window.innerHeight,
                 userId:'',
                 poperClass:'date-picker-poper',
-                selectpoperClass:'select-poper'
+                selectpoperClass:'select-poper',
+                defaultTime:[],
             }
 
         },
@@ -220,7 +224,7 @@
                 else{
                     return this.windowHeight*0.52;
                 }
-            }
+            },
         },
         methods:{
             dateChange(val){
@@ -229,21 +233,26 @@
                 let tabIndex=Number(self.activeName);
                 let start=typeof(val[0])==='object'?val[0].getTime():val[0];
                 let end=typeof(val[1])==='object'?val[1].getTime():val[1];
+               
+
                 if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
                     Message({
                         message:'当前选择时间范围最大为一个月，已调整！',
                         type:'warning',
                         duration:3*1000
                     })
+                    // self.$refs.datePicker.pickerVisible=true;
+                    // return false;
                     start=end-3600*24*30*1000;
                     self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
                 }
                 self.serachData='';
-                self.page=1;
+                self.tableDataList[tabIndex].page=1;
                 self.params.like={};
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
                 let selectValue=self.value;
                 let status=[];
                 self.getEventList(self.params);
@@ -258,7 +267,7 @@
                 console.log(val.index);
                 let selectValue=self.value;
                 let tabIndex=Number(val.index);
-                self.page=1;
+                //self.page=1;
                 switch(tabIndex){
                     case 0:
                     if(selectValue==0||selectValue==1){
@@ -295,7 +304,8 @@
                 let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                //self.params.filter={page:self.page-1,size:self.tableDataList[tabIndex].sizeNum};
+                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
                 this.getEventList(this.params);
             },
             //点击状态搜索时，总共需要时间范围，状态
@@ -364,14 +374,16 @@
                 }
 
                 self.serachData='';
-                self.page=1;
+                //self.page=1;
+                self.tableDataList[tabIndex].page=1;
                 self.params.like={};
 
                 let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
                 let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
                 self.params.beginTs=start;
                 self.params.endTs=end;
-                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
                 self.getEventList(self.params);
                 let status=[];
                 if(val==0){
@@ -387,7 +399,8 @@
                 let self=this;
                 let tabIndex=Number(self.activeName);
                 let val=self.value;
-                self.page=1;
+                //self.page=1;
+                self.tableDataList[tabIndex].page=1;
                 self.serachData=self.serachVale.trim();
                 switch(val){
                     case 0:
@@ -454,7 +467,8 @@
                 else{
                     self.params.like={};
                 }
-                self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
                 self.getEventList(self.params);
                 
                 let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
@@ -479,7 +493,9 @@
             sortChange(col){
                 console.log(col);
                 let self=this;
-                self.page=1;   //页码置为1
+                let tabIndex=Number(self.activeName);
+                //self.page=1;   //页码置为1
+                self.tableDataList[tabIndex].page=1;
                 let column=col.column;
                 let order=col.order;
                 if(order=="ascending"){
@@ -497,16 +513,15 @@
                 else{
                     self.params.order={};
                 }
-                let tabIndex=Number(self.activeName);
                 self.params.filter={
-                    page:0,
+                    page:self.tableDataList[tabIndex].page-1,
                     size:self.tableDataList[tabIndex].sizeNum
                 }
                 self.getEventList(self.params);
             },
             getUserId(){
                 let self=this;
-                self.userId=sessionStorage.getItem('UserId');
+                self.userId=getCookie('UserId');
                 let start=new Date().getTime()-1000*3600*24;
                 let end=new Date().getTime();
                 let status=[0,1,2];
@@ -558,14 +573,15 @@
                 let self=this;
                 let tabIndex=Number(self.activeName);
                 self.tableDataList[tabIndex].sizeNum=val;
-                self.page=1;
-                self.params.filter={page:self.page-1,size:val};
+                //self.page=1;
+                self.tableDataList[tabIndex].page=1;
+                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:val};
                 self.getEventList(self.params);
             },
             currentChange(val){
                 let self=this;
                 let tabIndex=Number(self.activeName);
-                this.page=val;
+                self.tableDataList[tabIndex].page=val;
                 self.params.filter={page:val-1,size:self.tableDataList[tabIndex].sizeNum};
                 this.getEventList(this.params);
             },
@@ -725,9 +741,22 @@
             formatJson(filterVal, jsonData) {
                 return jsonData.map(v => filterVal.map(j => v[j]))
             },
+            getDeafultTime(){
+                let self=this;
+                let date=new Date();
+                let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
+                let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
+                let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
+                let dateStr=hour+':'+minutes+':'+second;
+                let timeTemp=[];
+                timeTemp[0]=dateStr;
+                timeTemp[1]=dateStr;
+                self.defaultTime=timeTemp;
+            }
         },
         mounted(){
             let self=this;
+            self.getDeafultTime();
             let windowHeight=window.innerHeight;
             if(windowHeight>800){
                 self.tableHeight=770+'px';
@@ -782,7 +811,8 @@ $red:#FB505F;
             color: #424151;
         }
         .date-range{
-            @include point(width,320);
+            width:320px;
+            
         }
         .el-search{
             position:absolute;
@@ -824,12 +854,6 @@ $red:#FB505F;
     color: #53c247;
 }
 </style>
-<style scoped>
-    .page-login-toolTipClass{
-        background-color: #2992FF !important;
-        color: red;
-    }
-</style>
 <style>
  @import '../../assets/css/pagination.css';
     .el-table::before{
@@ -839,7 +863,7 @@ $red:#FB505F;
         background: #f0f5f8 !important;
         border-radius: 15px !important;
     }
-    .el-tooltip__popper.is-light{
+    .page-login-toolTipClass.el-tooltip__popper.is-light{
         background: #FEE4E7 !important;
         color: #FB505F !important;
         border: 1px solid #FB505F !important;
@@ -887,6 +911,16 @@ $red:#FB505F;
     }
     .select-poper .el-select-dropdown__item.selected{
         color:#FB505F;
+    }
+    .el-range-editor--mini .el-range-input{
+        font-size:0.75rem !important;
+    }
+    .el-date-table td.end-date span, .el-date-table td.start-date span{
+        background-color:#FB505F !important;
+    }
+    .el-button.is-plain:focus, .el-button.is-plain:hover{
+        color:#FB505F !important;
+        border-color:#FB505F !important;
     }
 </style>
 

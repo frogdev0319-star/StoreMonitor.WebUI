@@ -122,6 +122,7 @@ export default {
         self.storeTitle=self.store.name;
         self.userId=self.store.userId;
         self.curTag=self.store.napeTable;
+        self.phone=self.store.phone;
         self.getNapeByStore(storeId);
         self.getChannelByStore(storeId);
         self.getUserList();
@@ -355,7 +356,7 @@ export default {
                 font-size: 14px;
                 span{
                     width:auto;
-                    margin-right: 6%;
+                    margin-right:30px;
                 }
                 .el-schedule{
                     @include point(width,140);

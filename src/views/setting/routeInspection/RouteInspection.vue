@@ -85,6 +85,7 @@ import RouteDetail from '@/views/setting/routeInspection/RouteDetail'
 import api from '@/api/index'
 import {inpectRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
+import {isLoginIn} from '@/api/login'
 export default {
     name:'RouteInspection',
     components:{
@@ -146,11 +147,13 @@ export default {
             curData:[]
         }
     },
-    mounted(){
+    async mounted(){
         let self=this;
+        await this.isLoginIn();
         self.getDownLoadURL();
         self.getTagList();
         self.initData();
+          
         let tabIndex=sessionStorage.getItem('TabIndex');
         self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
     },
@@ -456,6 +459,17 @@ export default {
                     let data=res.data;
                     self.storeNum=data.length;
                 }
+            })
+        },
+        isLoginIn(){
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                isLoginIn().then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
+            }).catch(err=>{
+                console.log(err);
             })
         },
         exportItem(){

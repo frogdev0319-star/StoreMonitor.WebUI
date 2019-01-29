@@ -8,17 +8,6 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/redirect',
-      component: Home,
-      hidden: true,
-      children: [
-        {
-          path: '/redirect/:path*',
-          component: () => import('@/views/redirect/index')
-        }
-      ]
-    },
-    {
       path:'/login',
       name:'Login',
       hidden: true,
@@ -36,7 +25,7 @@ export default new Router({
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',
       leaf:true, //没有子节点
-      isReadOnly:true,
+      isReadOnly:false,
       children:[
         {
           path:'allscan',

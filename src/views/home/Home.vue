@@ -61,7 +61,7 @@
                                 <span>{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点-->
-                        <el-submenu class="el-submenu" :key="index" :index="index+''"
+                        <el-submenu class="el-submenu" :key="index" :index="index+''" :disabled="item.name=='巡店管理'"
                         v-if="!item.leaf" style="text-align:left;">
                             <template slot="title">
                             <i :class="item.iconCls" :style="item.styles" class="navIcon">
@@ -111,6 +111,7 @@ import RateManage from '../event/details/RateManage'
 import {mapGetters,mapMutations,mapActions} from 'vuex';
 import {getUserInfo} from '@/api/login'
 import PubSub from 'pubsub-js';
+import {getCookie} from '@/common/auth';
 export default {
    
     name:"Home",
@@ -186,7 +187,7 @@ export default {
         },
         fedlogout(){
             let self=this;
-            self.$store.dispatch('FedLogOut').then(()=>{
+            self.$store.dispatch('LogOut').then(()=>{
                 self.$router.push('/login');
             })
         },
@@ -198,7 +199,7 @@ export default {
         },
         getUserName(){
             let self=this;
-            let userId=sessionStorage.getItem('UserId');
+            let userId=getCookie('UserId');
             getUserInfo().then(res=>{
                 console.log(res);
                 self.personList=res.data;
@@ -348,32 +349,32 @@ export default {
                 color: #fff;
                 position: relative;
                 overflow: hidden;
+                width: 320px;
                 .bell-content{
-                    @include point(width,60);
-                    @include point(height,60);
+                    width: 60px;
+                    height: 60px;
                     border-left:1px solid rgba(255,255,255,0.2);
                     border-right:1px solid rgba(255,255,255,0.2);
                     position: relative;
-                    display: inline-block;
+                    float: left;
                     .el-icon-bell{
-                        @include point(font-size,25);
+                        font-size: 25px;
                         vertical-align:middle;
                         color:#4b5262;
                     }
                     .item{
                         position:absolute;
-                        @include point(top,-5);
-                        @include point(left,35);
+                        top: -5px;
+                        left: 35px;
 
                     }
                 }
                 .el-user-drop{
-                   float: right;
                    margin-right: 20px;
                     .username{
                         color:#4b5262;
                         margin: auto 10px;
-                        @include point(max-width,90);
+                        max-width: 90px;
                         overflow: hidden;
                         text-overflow:ellipsis;
                         white-space: nowrap;
@@ -384,8 +385,8 @@ export default {
                     }
                     .headImg{
                         position: relative;
-                        @include point(top,10);
-                        @include point(margin-left,10);
+                        top: 10px;
+                        margin-left: 10px;
                     }
                 }
             }

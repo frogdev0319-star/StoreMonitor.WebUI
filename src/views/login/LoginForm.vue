@@ -228,6 +228,7 @@ export default {
                         if(resData){
                             self.$router.push({path:self.redirect||'/'});
                             console.log(resData);
+                            setCookie('UserId',resData.userId);
                             sessionStorage.setItem('UserId',resData.userId);
                             if(self.rememberUserName){  //如果勾选，保存用户名跟密码
                                 setCookie('user',JSON.stringify(self.loginForm));
