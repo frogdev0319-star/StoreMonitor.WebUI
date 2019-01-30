@@ -6,8 +6,8 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-let base='http://'+window.location.host;
-//let base ="http://172.21.84.62:8085";
+//let base='http://'+window.location.host;
+let base ="http://172.21.84.62:8085";
 
 let itempath='/storemonitor/api/v1.0'
 

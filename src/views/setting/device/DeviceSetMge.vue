@@ -155,7 +155,7 @@
                             v-for="(item,index) in channelList" 
                             :key="index">
                                 <div class="nape-name-data">
-                                    <span class="nape-name" v-if="!item.isClick">{{item.name}}</span>
+                                    <span class="nape-name" v-if="!item.isClick">{{item.name.length>20?item.name.substr(0,20)+'...':item.name}}</span>
                                     <el-input size="mini" v-model="item.name" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
                                 </div>
                                 <div class="nape-dep-data">
@@ -1040,12 +1040,17 @@ $mainColor:#FB505F;
                     bottom: 2px;
                 }
                 .nape-name-data{
-                    width: 36%;
+                    width: 30%;
                     display: inline-block;
                     position: relative;
+                    margin-right: 6%;
                     span{
                         margin-left: 20%;
                         position: relative;
+                        @include point(max-width,90);
+                        overflow: hidden;
+                        text-overflow:ellipsis;
+                        white-space: nowrap;
                     }
                 }
                 .nape-dep-data{
