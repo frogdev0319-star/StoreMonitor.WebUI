@@ -6,8 +6,8 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-//let base='http://'+window.location.host;
-let base ="http://172.21.84.62:8085";
+let base='http://'+window.location.host;
+//let base ="http://172.21.84.62:8085";
 
 let itempath='/storemonitor/api/v1.0'
 
@@ -26,6 +26,38 @@ const serviceAxios=axios.create({
     baseURL:`${base}${itempath}`,
     timeout:5000
 })
+const serviceLogout=axios.create({
+    baseURL:`${base}${itempath}`,
+    timeout:10000,
+})
+
+serviceLogout.interceptors.request.use(
+    config=>{
+        if(store.getters.token){
+            config.headers={
+                'token':getToken(),
+                'Accept':'application/json',
+                'Content-Type':'application/json;charset=UTF-8',
+                
+            }
+        }
+        return config;
+    },
+    error=>{
+        console.log(error);
+        Promise.reject(error);
+    }
+)
+serviceLogout.interceptors.response.use(
+    response=>{
+        return response.data;
+    },
+    err=>{
+        return Promise.reject(err);
+    }
+)
+
+
 serviceAxios.interceptors.request.use(
     config=>{
         if(store.getters.token){
@@ -109,8 +141,16 @@ service.interceptors.response.use(
         if(err.response){
             let errCode=err.response.data.errCode;
             let errMsg=err.response.data.errMsg;
-            if(errCode===500&&(errMsg=='Invalid token'||errMsg=='Token does not exist'||
+            if(errCode===500&&(errMsg=='Invalid token'||
                 errMsg=='Fail to verify token'||errMsg=='User does not exist')){
+                router.push('/login');
+                Message({
+                    message:'登录信息异常，请重新登录!',
+                    type:'error',
+                    duration:5*1000
+                })
+            }
+            else if(errCode===500&&errMsg=='Token does not exist'){
                 router.push('/login');
             }
             else if(errCode===500&&errMsg=='No authority'){
@@ -133,7 +173,7 @@ service.interceptors.response.use(
             if(err.request.readyState==4&&err.request.status==0){
                 console.log(err.request);
                 Message({
-                    message:'网络连接超时!',
+                    message:'网络异常，请检查网络连接状况!',
                     type:'error',
                     duration:5*1000
                 })
@@ -144,5 +184,26 @@ service.interceptors.response.use(
     }
 )
 
+
+service.interceptors.request.use(
+    config=>{
+        //Do something before request is sent
+        if(store.getters.token){
+            config.headers={
+                'token':getToken(),
+                'Accept':'application/json',
+                'Content-Type':'application/json;charset=UTF-8',
+                
+            }
+        }
+        return config;
+    },
+    error=>{
+        //Do something with request error
+        console.log(error);
+        Promise.reject(error);
+    }
+)
+
 export default service;
-export {serviceAxios};
+export {serviceAxios,serviceLogout};

@@ -185,7 +185,7 @@
 <script>
 import api from '@/api/index'
 import axios from 'axios'
-import {validateInput,validateURL} from '@/common/validate'
+import {validateInput,validateURL,validatePort} from '@/common/validate'
 import {deviceRESTful} from '@/api/index'
 import {isLoginIn} from '@/api/login'
 export default {
@@ -294,9 +294,9 @@ export default {
             if(!validateURL(self.dash.url)){
                 msg='当前配置项中IP格式错误！';
             }
-            if(validateInput(self.dash.httpCmdPort)
-            ||validateInput(self.dash.httpsCmdPort)||validateInput(self.dash.dataPort)){
-                msg='当前配置项中含有非法字符，请检查！';
+            if(validatePort(self.dash.httpCmdPort)
+            ||validatePort(self.dash.httpsCmdPort)||validatePort(self.dash.dataPort)){
+                msg='当前配置项端口格式错误！';
             }
             return msg;
         },

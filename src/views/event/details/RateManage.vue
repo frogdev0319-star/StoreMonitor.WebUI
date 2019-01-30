@@ -120,7 +120,7 @@
                                     <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOftenText}}</span>
                                 </div>
                             </div>
-                            <span v-if="item.description!=null" class="description">{{item.description}}</span>
+                            <pre v-if="item.description!=null" class="description">{{item.description}}</pre>
                             <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
                                 <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                                     <div v-if="_item.mediaType==2" class="img-content">
@@ -828,7 +828,14 @@ export default {
                     max-width: 90%;
                     min-width: 90%;
                     @include point(margin-top,30);
-                     @include point(margin-left,20);
+                    @include point(margin-left,20);
+                    font-family:'Microsoft YaHei';
+                    @include point(font-size,14);
+                    white-space:pre-wrap; /* css3.0 */ 
+                    white-space:-moz-pre-wrap; /* Firefox */ 
+                    white-space:-pre-wrap; /* Opera 4-6 */ 
+                    white-space:-o-pre-wrap; /* Opera 7 */ 
+                    word-wrap:break-word; /* Internet Explorer 5.5+ */
                 }
                 .source-content{
                     @include point(margin-left,52);

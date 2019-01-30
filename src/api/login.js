@@ -1,5 +1,5 @@
 import request from '@/common/request'
-
+import {serviceLogout} from '@/common/request'
 //account RESTful 
 export function loginByUsername(data){
     return request({
@@ -10,7 +10,7 @@ export function loginByUsername(data){
 }
 
 export function logout(){
-    return request({
+    return serviceLogout({
         url:'/logout',
         method:'post'
     })

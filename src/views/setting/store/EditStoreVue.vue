@@ -15,7 +15,7 @@
                     :value="item.userId">
                     </el-option>
                 </el-select>
-                <strong style="margin-right:20px;">联系方式</strong><span style="min-width:120px;">{{phone}}</span>
+                <strong style="margin-right:20px;">联系方式</strong><span style="min-width:100px;display:inline-block;">{{phone}}</span>
                 <span style="margin-right:20px;"><strong>巡检排程</strong></span>
                 <el-select v-model="schedule" placeholder="请选择" size="mini" class="el-schedule" :disabled=true>
                     <el-option
@@ -79,7 +79,7 @@ export default {
             storeTitle:'',
             store:{},
             storeLinder:'王三洋',
-            phone:'',
+            phone:' ',
             schedule:'',
             scheduleList:[
                 {

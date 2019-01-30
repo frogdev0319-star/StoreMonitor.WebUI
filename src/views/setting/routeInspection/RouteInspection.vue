@@ -153,7 +153,7 @@ export default {
         self.getDownLoadURL();
         self.getTagList();
         self.initData();
-          
+
         let tabIndex=sessionStorage.getItem('TabIndex');
         self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
     },
@@ -377,7 +377,8 @@ export default {
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
         },
-        bindStore(){
+
+        async bindStore(){
             let self=this;
             let arr=[];
             if(self.elTableData[Number(self.activeName)].routeData.length==0){
@@ -427,14 +428,24 @@ export default {
                 default:
                 this.checkValue='新增巡检表';break;
             }
+            
         },
-        importItem(){
+        async importItem(){
             let self=this;
-            if(self.elTableData[Number(self.activeName)].routeData.length!=0){
-               self.showConfirmImport=true;
+            let ret=await self.isLoginIn();
+            console.log(ret);
+            if(ret.data!=undefined&&ret.data.isLogin){
+                if(self.elTableData[Number(self.activeName)].routeData.length!=0){
+                self.showConfirmImport=true;
+                }
+                else{
+                    self.showImportContent=true;
+                }
             }
             else{
-                self.showImportContent=true;
+                self.$store.dispatch('LogOut').then(()=>{
+                    self.$router.push('/login');
+                })
             }
         },
         checkBeforeImport(){
@@ -472,9 +483,17 @@ export default {
                 console.log(err);
             })
         },
-        exportItem(){
+        async exportItem(){
             let self=this;
-            self.export2Excel();
+            let ret=await self.isLoginIn();
+            if(ret.data!=undefined&&ret.data.isLogin){
+                self.export2Excel();
+            }
+            else{
+                self.$store.dispatch('LogOut').then(()=>{
+                    self.$router.push('/login');
+                })
+            }
         },
         async importfxx(obj) {
             let _this = this;

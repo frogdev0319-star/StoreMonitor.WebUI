@@ -25,10 +25,10 @@ export default new Router({
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',
       leaf:true, //没有子节点
-      isReadOnly:false,
+      isReadOnly:true,
       children:[
         {
-          path:'allscan',
+          path:'/allscan',
           name:'总览',
           component:resolve=>require(['@/views/allscan/AllScan'],resolve),
           meta:{

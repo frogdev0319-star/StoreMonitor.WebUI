@@ -187,9 +187,11 @@ export default {
         },
         fedlogout(){
             let self=this;
-            self.$store.dispatch('LogOut').then(()=>{
-                self.$router.push('/login');
+            self.$router.push('/login');
+            self.$store.dispatch('LogOut').then((res)=>{
+               console.log(res);
             })
+            
         },
         logOut(){
             let self=this;

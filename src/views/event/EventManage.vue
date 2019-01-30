@@ -126,6 +126,7 @@
     import {eventRESTful} from '@/api/index'
     import {Message} from 'element-ui'
     import {getCookie} from '@/common/auth';
+    import {isLoginIn} from '@/api/login'
     export default {
         name: "ExceptEvent",
         data(){
@@ -716,27 +717,35 @@
                 let fileName=label+'-'+util.getCurDateStr();
                 return fileName;
             },
-            export2Excel() {
+            async export2Excel() {
                 var that = this;
-                let tabIndex=Number(that.activeName);
-                if(that.tableDataList[tabIndex].tableData.length==0){
-                    Message({
-                        message:'暂无数据！',
-                        type:'warning',
-                        duration:3*1000
+                let ret=await that.isLoginIn();
+                if(ret.data!=undefined&&ret.data.isLogin){
+                    let tabIndex=Number(that.activeName);
+                    if(that.tableDataList[tabIndex].tableData.length==0){
+                        Message({
+                            message:'暂无数据！',
+                            type:'warning',
+                            duration:3*1000
+                        })
+                        return false;
+                    }
+                    require.ensure([], async() => {
+                        const { export_json_to_excel } = require('@/excel/Export2Excel'); 
+                        const tHeader = that.exportDataHeader; // 导出的表头名
+                        const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
+                        console.log(that.activeName);
+                        let curData=await that.getExportData();
+                        const data = that.formatJson(filterVal, curData);
+                        
+                        export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
                     })
-                    return false;
                 }
-                require.ensure([], async() => {
-                    const { export_json_to_excel } = require('@/excel/Export2Excel'); 
-                    const tHeader = that.exportDataHeader; // 导出的表头名
-                    const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
-                    console.log(that.activeName);
-                    let curData=await that.getExportData();
-                    const data = that.formatJson(filterVal, curData);
-                    
-                    export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
-                })
+                else{
+                    self.$store.dispatch('LogOut').then(()=>{
+                        self.$router.push('/login');
+                    })
+                }
             },
             formatJson(filterVal, jsonData) {
                 return jsonData.map(v => filterVal.map(j => v[j]))
@@ -752,11 +761,23 @@
                 timeTemp[0]=dateStr;
                 timeTemp[1]=dateStr;
                 self.defaultTime=timeTemp;
-            }
+            },
+            isLoginIn(){
+                let self=this;
+                return new Promise((resolve,reject)=>{
+                    isLoginIn().then(res=>{
+                        console.log(res);
+                        resolve(res);
+                    })
+                }).catch(err=>{
+                    console.log(err);
+                })
+            },
         },
-        mounted(){
+        async mounted(){
             let self=this;
             self.getDeafultTime();
+            await self.isLoginIn();
             let windowHeight=window.innerHeight;
             if(windowHeight>800){
                 self.tableHeight=770+'px';

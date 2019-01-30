@@ -56,3 +56,11 @@ export function validateInspectItem(str){
     }
     return retMsg;
 }
+
+export function validatePort(str){
+    let retMsg='';
+    if(!(/(^[1-9]\d*$)/.test(str))){
+        retMsg='端口格式不正确，请检查！'
+    }
+    return retMsg;
+}
