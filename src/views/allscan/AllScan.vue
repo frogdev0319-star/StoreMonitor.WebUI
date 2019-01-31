@@ -13,20 +13,17 @@
         </div>
         <el-dialog title='编辑截图'
         :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=300px top=15%>
-            <!-- <div class="canvas-content" @mouseenter="showModel=true" @mouseleave="showModel=false"> -->
-                <!-- <div class='model' v-if="showModel">
-                    
-                </div> -->
-                <div class='icon-right' v-if="showModel">
-                    <div class="content" v-for="(item,index) in penList" :key="index">
-                        <div :class="{colorActive:item.showContent}">
-                            
+            <div class="canvas-content">
+                <div class='model'>
+                    <div class='icon-right'>
+                        <div class="content" v-for="(item,index) in penList" :key="index">
+                            <div :class="{colorActive:item.showContent}"></div>
+                            <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
                         </div>
-                        <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
                     </div>
                 </div>
-                <canvas id="icanvas" @mouseenter="showModel=true" @mouseleave="showModel=false"></canvas>
-            <!-- </div> -->
+                <canvas id="icanvas"  width="480" height="270" @mousedown="mouseDownAction($event)" @mousemove="mouseMoveAction($event)"></canvas>
+            </div>
             <div slot="footer">
                 <el-button class="file-cancel-btn" @click="confrimEdit" size="mini" style="">确 认</el-button>
                 <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">取 消</el-button>
@@ -49,12 +46,16 @@
         margin-top: 30px;
         
     }
+    .canvas-content{
+        position: relative;
+    }
     .model{
         width: 100%;
         height: 100%;
         background-color: transparent;
         position: absolute;
         z-index: 2;
+        pointer-events: none;
     }
     .icon-right{
         width: 100px;
@@ -253,7 +254,7 @@ import $ from 'jquery';
             }
             ctx.moveTo(x,y);
             ctx.lineWidth=4;
-            ctx.strokeStyle='red';
+            ctx.strokeStyle=self.penChecked;
             ctx.lineTo(x1,y1);
             ctx.stroke();
             if(self.flag!=0){
@@ -266,12 +267,6 @@ import $ from 'jquery';
         let self=this;
         self.videoEl=document.getElementById('previewVideo');
         document.onmouseup=self.mouseUpAction;
-        var cp=document.getElementById('icanvas');
-        cp.onmousedown=self.mouseDownAction;
-        cp.onmousemove=self.mouseMoveAction;
-        cp.onclick=function(){
-            alert();
-        }
     }
   }
 </script>

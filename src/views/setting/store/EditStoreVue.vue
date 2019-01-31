@@ -206,7 +206,7 @@ export default {
             getUserInfo().then(res=>{
                 console.log(res);
                 let temp=res.data;
-                if(self.userId!=null&&self.userId.length==0){
+                if(self.userId!=null&&self.userId.length!=0){
                     if(temp.map(x=>x.userId).indexOf(self.userId)==-1){
                         let obj={
                             userId:self.store.userId,

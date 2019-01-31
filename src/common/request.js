@@ -15,7 +15,7 @@ let itempath='/storemonitor/api/v1.0'
 //const CancelToken=axios.CancelToken;
 //const source=CancelToken.source();
 //store.requestCancel=source.cancel;  //保存到全局变量，用于路由切换时调用
-axios.defaults.withCredentials = true
+axios.defaults.withCredentials = true;
 const service=axios.create({
     baseURL:`${base}${itempath}`,
     timeout:10000,
@@ -26,6 +26,7 @@ const serviceAxios=axios.create({
     baseURL:`${base}${itempath}`,
     timeout:5000
 })
+
 const serviceLogout=axios.create({
     baseURL:`${base}${itempath}`,
     timeout:10000,

@@ -370,7 +370,7 @@ export default {
             self.playState=true;
         },
         searchStore(){
-
+            
         },
         handleClick(tab){
             console.log(tab);

@@ -7,7 +7,7 @@
         </el-col>
         <el-dialog :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=380px top=15%>
             <div class="video-dialog-content" style="overflow:hidden;">
-                <video  height=83% width=90% id="previewVideo" prload autoplay controls
+                <video  height=83% width=90% id="previewVideo" prload controls
                     class="video-js vjs-fill" style="postion:absoulte;top:10px;">
                 </video>
             </div>
@@ -37,12 +37,22 @@
                 <el-button class="file-confirm-btn" @click="confirmWind" size="mini" style="color:#fff">确 认</el-button>
             </div>
         </el-dialog>
-        <transition name="fade">
+        <!-- <transition name="fade">
             <div id="outerdiv" style="" v-show="showOuter">
                 <div id="innerdiv" style="position:absolute;">
                     <img id="bigimg" style="border:5px solid #fff;" :src="bigImgSrc" />
                 </div>
             </div>
+        </transition> -->
+        <transition name="fade">
+            <el-dialog title='查看'
+            :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width=550px height=300px top=15%>
+             <hr style="border: 0.5px solid #FFC1C8;width:100%;margin-top:10px;margin-bottom:15px;"/>
+                <div class="dialog-source-content">
+                    <img v-if="showImg" :src="checkImgSrc"/>
+                
+                </div>
+            </el-dialog>
         </transition>
         <el-col :span="24" class="storeInfo-content">
             <strong>门店</strong><span>{{event.storeName}}</span>
@@ -64,13 +74,13 @@
                 <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                     <div v-if="item.mediaType==2" class="img-content">
                         <!--图片资源-->
-                        <img class="imgLittle" :src="item.url" :title="imgTitle" 
-                        :alt="item.alt" height="140px" style="max-height:140px;" @click="openOuter($event)" @mouseleave="showOuter=false"/>
+                        <img class="imgLittle" :src="item.url" :title="imgTitle" :onerror='deafultImg'
+                         height="140px" @click="openOuter(item)"/>
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
-                        <video  height=83% width=90%  prload autoplay controls :poster="videoPoster"
-                                class="video-js vjs-fill" style="max-height:160px;">
+                        <video  height=83% width=90%  prload controls 
+                                class="video-js vjs-fill" style="min-width:198px;min-height:140px; max-height:140px;object-fit: fill;">
                                 <source :src="item.url">
                         </video>
                     </div>
@@ -125,12 +135,12 @@
                                 <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                                     <div v-if="_item.mediaType==2" class="img-content">
                                         <img class="imgLittle" :title="imgTitle"
-                                          :src="_item.url" alt="截图" height="160px"
-                                         @click="openOuter($event)" @mouseleave="showOuter=false"/>
+                                          :src="_item.url" height="140px" :onerror='deafultImg'
+                                         @click="openOuter(_item)"/>
                                     </div>
                                    <div  v-else class="video-content">
-                                        <video  height=83% width=90%  prload autoplay controls :poster="videoPoster"
-                                                class="video-js vjs-fill" style="min-width:198px;min-height:160px; max-height:160px;object-fit: fill;">
+                                        <video  height=83% width=90%  prload controls
+                                                class="video-js vjs-fill" style="min-width:198px;min-height:140px; max-height:140px;object-fit: fill;">
                                                 <source :src="_item.url">
                                         </video>
                                     </div>
@@ -195,10 +205,11 @@ export default {
             windowHeight:window.innerHeight,
             showOuter:false,
             bigImgSrc:'',
+            checkImgSrc:'',
             imgTitle:'',
             showCheckVideo:false,
             showPhotoContent:false,
-            videoPoster:'./static/img/loading.gif'
+            deafultImg:'this.src="' + require('../../../../static/img/pic2.png') + '"'
         }
     },
     computed: {
@@ -248,13 +259,13 @@ export default {
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
         },
-        openOuter(imgObj){
+        openOuter(item){
             let self=this;
-            console.log(imgObj);
-            let target=imgObj.target;
-            if(imgObj!=null){
+            console.log(item);
+            if(item!=null){
                 self.showOuter=true;
-                self.showOuterPhoto(target);
+                self.checkImgSrc=item.url;
+                self.showImg=true;
             }
         },
         showOuterPhoto(target){
@@ -432,13 +443,11 @@ export default {
                     let dataComments=comments.comment;
                     let temp=[];
                     dataComments.forEach((item,index)=>{
-                        let description=item.description.replace(new RegExp("^\"|\"$", "gm"), "");
-                        description=description.replace(new RegExp("\\\\u003cbr\\\\u003e", "gm"), "\r\n");
                         let obj={};
                         obj.createOr=item.accountName;
                         obj.createDate=util.getDateTime(item.ts);
                         obj.status=item.status;
-                        obj.description=description;
+                        obj.description=item.description;
                         switch(item.status){
                             case 0: obj.showLabel=true;obj.spanStyle={'background-color':'#FCB83B'};
                                 obj.process='待处理'; break;
@@ -629,6 +638,15 @@ export default {
 .el-rate-container{
     @include point(padding,20);
     @include point(padding-right,30);
+    .dialog-source-content{
+        width: 480px;
+        height: 270px;
+        padding: 10px 15px 25px 15px;
+        margin: auto;
+        img{
+            height: 100%;
+        }
+    }
     .title-content{
         text-align: left;
         @include point(margin,10);
@@ -873,10 +891,14 @@ export default {
 </style>
 
 <style>
+.el-dialog__body{
+    padding: 0px;
+}
 .el-dialog__title{
     font-size: 16px !important;
-}
-.el-dialog__body{
-    padding: 0 0 !important;
+    font-size: 16px !important;
+    float: left;
+    margin-bottom: 15px;
+    margin-left: 15px;
 }
 </style>

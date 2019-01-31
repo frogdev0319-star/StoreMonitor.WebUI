@@ -155,8 +155,8 @@
                             v-for="(item,index) in channelList" 
                             :key="index">
                                 <div class="nape-name-data">
-                                    <span class="nape-name" v-if="!item.isClick">{{item.name.length>20?item.name.substr(0,20)+'...':item.name}}</span>
-                                    <el-input size="mini" v-model="item.name" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                                    <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
+                                    <el-input size="mini" maxlength='15' v-model="item.name" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
                                 </div>
                                 <div class="nape-dep-data">
                                     <span class="nape-dep">{{item.channelId}}</span>
