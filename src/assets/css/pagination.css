@@ -1,6 +1,6 @@
 
 .el-pagination.is-background .el-pager li:not(.disabled).active{
-    background-color:#FB505F !important;
+    background-color:#FB4C5D !important;
     color:#fff !important;
 }
 .el-pagination.is-background.el-pagination--small .btn-next, 
@@ -26,4 +26,7 @@
 }
 .el-pagination__editor.el-input .el-input__inner{
     min-height:28px !important;
+}
+.el-date-table td.in-range div, .el-date-table td.in-range div:hover, .el-date-table.is-week-mode .el-date-table__row.current div, .el-date-table.is-week-mode .el-date-table__row:hover div{
+    background-color: rgba(251,76,93, 0.2) !important;
 }

@@ -7,7 +7,8 @@
             </div>
             <div class="store-info">
                 <span style="margin-right:20px;"><strong>负责人</strong></span>
-                <el-select v-model="curPerson" placeholder="请选择" size="mini" class="el-schedule" @change="changePerson">
+                <el-select v-model="curPerson" placeholder="请选择" size="mini"
+                class="el-schedule" @change="changePerson">
                     <el-option
                     v-for="item in personList"
                     :key="item.userId"
@@ -203,7 +204,10 @@ export default {
         },
         getUserList(){
             let self=this;
-            getUserInfo().then(res=>{
+            let params={
+                storeId:self.store.storeId
+            }
+            getUserInfo(params).then(res=>{
                 console.log(res);
                 let temp=res.data;
                 if(self.userId!=null&&self.userId.length!=0){
@@ -309,7 +313,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../../assets/css/textstyle.css';
-    $red:#FB505F;
+    $red:#FB4C5D;
     $fff:#fff;
     @function rem($val){
         @return $val/16+rem;
@@ -449,14 +453,14 @@ export default {
     border-color: #FEE4E7;
 }
 .el-select-dropdown__item.selected{
-    color:#FB505F;
+    color:#FB4C5D;
 }
 .el-checkbox__inner:hover{
-    border-color: #FB505F !important;
+    border-color: #FB4C5D !important;
 }
-.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F !important;
-    border-color:#FB505F !important;
+    background-color: #FB4C5D !important;
+    border-color:#FB4C5D !important;
 }
 </style>

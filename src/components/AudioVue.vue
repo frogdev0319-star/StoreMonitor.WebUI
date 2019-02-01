@@ -82,7 +82,7 @@ export default {
             @include point(width,120);
             @include point(height,30);
             background-color: #FFEDED;
-            color: #FB505F;
+            color: #FB4C5D;
             border: 1px solid #FEC0C7;
             @include point(border-radius,15);
             display: inline-block;

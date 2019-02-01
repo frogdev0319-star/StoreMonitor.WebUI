@@ -615,7 +615,7 @@ $red:#fb4c5d;
 .el-login-input .el-input__inner{
     border-style: none !important;
     border-bottom: 1px solid #cbcbcb !important;
-    background-color: #FB505F !important;
+    background-color: #FB4C5D !important;
     color: #fff !important;
     font-size: 14px !important;
     border-radius: 0px !important;
@@ -624,14 +624,14 @@ $red:#fb4c5d;
 .el-il8List .el-input__inner{
     border-style: none !important;
     border-bottom: 1px solid #cbcbcb !important;
-    background-color: #FB505F !important;
+    background-color: #FB4C5D !important;
     color: #fff !important;
     font-size: 14px !important;
     border-radius: 0px !important;
     border-color: #cbcbcb !important;
 }
  .el-select-dropdown__item.selected{
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 .el-form-item__error{
     color: #fff !important;

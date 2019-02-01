@@ -48,8 +48,8 @@
                         width="28%"
                         top="35vh"
                         left="40vh">
-                            <div class="dialog-content" style="overflow:hidden;">
-                                <hr style="border: 0.5px solid #FB505F;"/>
+                            <div class="dialog-content" style="overflow:hidden;width:100%;">
+                                <hr style="border: 0.5px solid #FB4C5D;"/>
                                 <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
                             </div>
                             <div slot="footer" class="dialog-footer">
@@ -67,8 +67,8 @@
                         width="28%"
                         top="35vh"
                         left="40vh">
-                            <div class="dialog-content" style="overflow:hidden;">
-                                <hr style="border: 0.5px solid #FB505F;"/>
+                            <div class="dialog-content" style="overflow:hidden;width:100%;">
+                                <hr style="border: 0.5px solid #FB4C5D;"/>
                                 
                                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                                     <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
@@ -820,7 +820,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css'; 
 @import '../../../assets/css/textstyle.css';
-$mainColor:#FB505F;
+$mainColor:#FB4C5D;
 @function rem($val){
     @return $val/16+rem;
 }
@@ -906,6 +906,9 @@ $mainColor:#FB505F;
         height: auto;
         position: relative;
         @include point(bottom,25);
+        .dialog-content{
+            width: 100%;
+        }
         .titles{
             display: inline-block;
             span{
@@ -1078,23 +1081,23 @@ $mainColor:#FB505F;
     border-radius: 0px !important;
 }
 .el-input__inner:focus{
-    border:1px solid #FB505F !important;
+    border:1px solid #FB4C5D !important;
 }
 .el-tabs__active-bar{
         height: 4px !important;
-        background-color: #FB505F !important;
+        background-color: #FB4C5D !important;
     }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 .el-tabs__item:hover{
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 .el-table--striped .el-table__body tr.el-table__row--striped.current-row td, 
 .el-table__body tr.current-row>td {
 	background-color: #fff !important;
-    color:#FB505F !important;
+    color:#FB4C5D !important;
     cursor: pointer !important;
 }
 

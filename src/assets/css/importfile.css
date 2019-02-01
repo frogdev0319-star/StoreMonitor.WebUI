@@ -3,7 +3,7 @@
     margin-top: 20px;
     height: 20px;
     border-style: none;
-    border-bottom: 1px solid #FB505F;
+    border-bottom: 1px solid #FB4C5D;
     width: 87%;
     margin-bottom: 30px;
     
@@ -19,8 +19,8 @@
 }
 .file-confirm-btn{
     width: 76px;
-    background-color: #FB505F !important;
-    border-color: #FB505F !important;
+    background-color: #FB4C5D !important;
+    border-color: #FB4C5D !important;
     font-size:0.75rem;
 }
 input:disabled{
@@ -31,8 +31,8 @@ input:disabled{
     margin-left: 12px;
     position: relative;
     display: inline-block;
-    background: #FB505F;
-    border: 1px solid #FB505F;
+    background: #FB4C5D;
+    border: 1px solid #FB4C5D;
     border-radius: 4px;
     padding: 4px 12px;
     color: #fff;
@@ -55,4 +55,7 @@ input:disabled{
     text-decoration: none;
     cursor: pointer;
 }
-
+.el-tabs__nav-wrap::after{
+    height: 1px !important;
+    background-color: #e3e9f4 !important;
+}

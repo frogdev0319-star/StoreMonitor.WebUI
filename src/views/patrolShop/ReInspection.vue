@@ -388,7 +388,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    $red:#FB505F;
+    $red:#FB4C5D;
     $lightRed:#FEE4E7;
     @function rem($val){
         @return $val/16+rem;
@@ -444,7 +444,7 @@ export default {
                 .lside-title{
                     font-weight: bold;
                     color: #424151;
-                    @include point(font-size,16);
+                    font-size: 16px;
                 }
                 .coll{
                     border:1px solid orange;
@@ -677,14 +677,14 @@ export default {
 }
 .el-tabs__active-bar{
     height: 4px !important;
-    background-color: #FB505F !important;
+    background-color: #FB4C5D !important;
 }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 .el-tabs__item:hover{
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 
 .el-test .el-input__inner{

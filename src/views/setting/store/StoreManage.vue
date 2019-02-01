@@ -18,7 +18,7 @@
             </div>
             <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
             <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false"> 
-                <p :style="isChecked?{}:{'color':'#FB505F'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
+                <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
                         style="margin-right:5px;"></el-checkbox>全部</p>
                 <div class="city-details" v-for="(item,index) in cityList" :key="index">
                     <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
@@ -60,8 +60,7 @@
                 prop="napeTable"
                 label="关联巡检表"
                 width="220"
-                align="left"
-                sortable="true">
+                align="left">
                 <template slot-scope="scope">
                     <el-popover
                     v-if="scope.row.napeTable.length!=0&&(scope.row.napeTable!='--'&&scope.row.napwTable!='现场巡检')"
@@ -143,7 +142,8 @@ import PubSub from 'pubsub-js'
                     {
                         "prop":"phone",
                         "label":"联系方式",
-                        "sortable":false
+                        "sortable":false,
+                        "width":180
                     },
                 ],
                 allCityChecked:false,
@@ -523,7 +523,7 @@ import PubSub from 'pubsub-js'
     position: relative;
     .seacrh-content{
         @include point(padding-left,30);
-        @include point(margin-top,30);
+        @include point(margin-top,20);
         @include point(padding-bottom,20);
         position: relative;
         text-align: left;
@@ -538,11 +538,12 @@ import PubSub from 'pubsub-js'
             @include point(margin-left,15);
         }
         .el-search-btn{
-            @include point(width,90);
+            width: 90px;
             text-align: center;
             @include point(margin-left,15);
-            background-color: #FB505F;
+            background-color: #FB4C5D;
             color: #fff;
+            height: 30px;
         }
         .city-content{
             display: inline-block;
@@ -613,6 +614,7 @@ import PubSub from 'pubsub-js'
             color:white;
             padding-left:5px;
             padding-right:5px;
+            font-size: 12px;
         }
     }
 }
@@ -650,12 +652,12 @@ import PubSub from 'pubsub-js'
         background-color: #F4F5F9;
     }
     .el-checkbox__inner:hover{
-        border-color: #FB505F !important;
+        border-color: #FB4C5D !important;
     }
-    .el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+    .el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
     .el-checkbox__input.is-checked .el-checkbox__inner{
-        background-color: #FB505F !important;
-        border-color:#FB505F !important;
+        background-color: #FB4C5D !important;
+        border-color:#FB4C5D !important;
     }
     .province-popper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
@@ -664,7 +666,10 @@ import PubSub from 'pubsub-js'
         border-color: #FEE4E7;
     }
     .province-popper .el-select-dropdown__item.selected{
-        color:#FB505F;
+        color:#FB4C5D;
+    }
+    .current-row > td {
+        background: #FEE7E4 !important;
     }
 </style>
 

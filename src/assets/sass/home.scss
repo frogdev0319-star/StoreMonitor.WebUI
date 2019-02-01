@@ -110,7 +110,7 @@
                 .username{
                     color:#4b5262;
                     i{
-                        color:#FB505F;
+                        color:#FB4C5D;
                         font-weight: bold;
                     }
                 }
@@ -137,7 +137,7 @@
                     position: relative;
                     // @include borderColor;
                     &:hover{
-                        background-color:#FB505F !important;
+                        background-color:#FB4C5D !important;
                     }
                 }
                 #childSubItem.submenu-item{
@@ -168,20 +168,20 @@
             }
         }
         .el-submenu:hover{
-             background-color:#FB505F !important;
+             background-color:#FB4C5D !important;
         }
         .el-menu-item:hover{
-            background-color:#FB505F !important;
+            background-color:#FB4C5D !important;
         }
         .el-menu-item.is-active{
             background-color:#2F2933 !important;
-            color:#FB505F;
+            color:#FB4C5D;
             div{
-                background-color: #FB505F !important;
+                background-color: #FB4C5D !important;
             }
         }
         .el-submenu.is-active .el-submenu__title{
-            background-color:#FB505F !important;
+            background-color:#FB4C5D !important;
         }
         .aside-width{
             width: 16.9%;

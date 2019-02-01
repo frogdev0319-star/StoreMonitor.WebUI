@@ -22,8 +22,8 @@
                 width="28%"
                 top="35vh"
                 left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #FB505F;"/>
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #FB4C5D;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -53,8 +53,8 @@
                 width="28%"
                 top="35vh"
                 left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #FB505F;"/>
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #FB4C5D;"/>
                         
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
@@ -677,7 +677,7 @@ export default {
 </script>
 <style lang="scss" scoped>
     @import '../../../assets/css/importfile.css'; 
-    $mainColor:#FB505F;
+    $mainColor:#FB4C5D;
     *{
         font-family: Microsoft YaHei;
     }
@@ -693,8 +693,9 @@ export default {
         #{$poi}:checkRem($val);
     }
     .dialog-content{
+        width: 100%;
         span{
-            @include point(font-size,14);
+            font-size: 14px;
         }
     }
     .el-route-container{

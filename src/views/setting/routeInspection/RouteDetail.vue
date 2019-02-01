@@ -27,8 +27,8 @@
                 width="28%"
                 top="35vh"
                 left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #FB505F;"/>
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #FB4C5D;"/>
                         
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
@@ -48,8 +48,8 @@
                 width="28%"
                 top="35vh"
                 left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #FB505F;"/>
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #FB4C5D;"/>
                         
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
@@ -83,15 +83,15 @@
                         size="medium"
                         :ref="item.refId"
                         :show-header="false">
-                            <el-table-column prop="checked" min-width="6%" align="center">
+                            <el-table-column prop="checked" width="70px" align="center">
                                 <template slot-scope="scope">
                                     <span class="showNewContent" v-if="scope.row.isNew">new</span>
                                     <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"></el-checkbox>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="name" label="巡检名称" min-width="30%"></el-table-column>
+                            <el-table-column prop="name" label="巡检名称" width="300px"></el-table-column>
                             <el-table-column prop="description" label="巡检项需求描述" min-width='40%'></el-table-column>
-                            <el-table-column prop="score" label="项目分值" min-width="10%"></el-table-column>
+                            <el-table-column prop="score" label="项目分值" min-width="8%"></el-table-column>
                             <el-table-column prop="handle" label="操作" min-width="10%">
                                 <template slot-scope="scope">
                                         <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
@@ -114,7 +114,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #FB505F;"/>
+                        <hr style="border: 0.5px solid #FB4C5D;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -591,7 +591,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
-    $mainColor:#FB505F;
+    $mainColor:#FB4C5D;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -662,35 +662,43 @@ export default {
             font-size: 14px;
             .allcheckBox{
                 float: left;
+                margin-right: 0;
             }
             .name-title{
                 float: left;
-                width: 16%;
-                margin-left: 4%;
+                //width: 16%;
+                width: 300px;
+                // @include point(margin-left,40);
+                margin-left: 40px;
             }
             .description-title{
                 float: left;
                 width: 38%;
-                margin-left: 15%;
+                //margin-left: 12%;
             }
             .score-title{
                 float: left;
                 width: 8%;
-                margin-left: 3%;
+                margin-left: 7%;
             }
             .handle-title{
                 float: left;
-                width: 6%;
-                margin-left: 2%;
+                width: 4%;
+                margin-left: 1%;
             }
         }
         .table-header-title{
             float:left;
             @include point(margin-bottom,10);
             @include point(margin-left,27);
+            margin-right: 0;
+            .all-checkBox{
+                margin-right: 0;
+            }
         }
         .table-title{
-            @include point(margin-left,30);
+            @include point(margin-left,38);
+            margin-left: 38px;
             font-size: 14px;
             font-weight: bold;
             color: #424151;
@@ -736,23 +744,23 @@ export default {
 <style>
 .el-tabs__active-bar{
         height: 4px !important;
-        background-color: #FB505F !important;
+        background-color: #FB4C5D !important;
     }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 .el-tabs__item:hover{
-    color: #FB505F !important;
+    color: #FB4C5D !important;
 }
 
 .el-checkbox__inner:hover{
-    border-color: #FB505F !important;
+    border-color: #FB4C5D !important;
 }
-.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F !important;
-    border-color:#FB505F !important;
+    background-color: #FB4C5D !important;
+    border-color:#FB4C5D !important;
 }
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
     background-color: #FEE7E4;
@@ -771,10 +779,10 @@ export default {
     border: 0px;
 }
 .el-radio-button__orig-radio:checked+.el-radio-button__inner{
-    background-color: #FB505F !important;
+    background-color: #FB4C5D !important;
     border: 0px;
-    box-shadow:-1px 0 0 0 #FB505F !important;
-    -webkit-box-shadow:-1px 0 0 0 #FB505F !important;
+    box-shadow:-1px 0 0 0 #FB4C5D !important;
+    -webkit-box-shadow:-1px 0 0 0 #FB4C5D !important;
 }
 </style>
 

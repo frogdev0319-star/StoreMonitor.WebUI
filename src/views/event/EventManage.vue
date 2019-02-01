@@ -22,7 +22,7 @@
             <el-tooltip :popper-class="toolTipClass" class="item" effect="light"
                 placement="bottom-end">
                 <div slot="content">*最长搜索时间为一个月</div>
-                <i class="iconfont icon-bangzhu" style="margin-left:10px;font-size:20px;position:relative;top:2px;color:#FB505F"></i>
+                <i class="iconfont icon-bangzhu" style="margin-left:10px;font-size:20px;position:relative;top:2px;color:#FB4C5D"></i>
             </el-tooltip>
             <span class="date-title" 
             style="margin-left:30px;margin-right:20px;">处理状态</span>
@@ -44,7 +44,7 @@
             </el-input>
        </div>
        <el-dialog title="导出" :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=450px top=15%>
-            <div class="dialog-content" style="overflow:hidden;">
+            <div class="dialog-content" style="overflow:hidden;width:100%;">
                 <hr style="border: 0.5px solid #FFC1C8;"/>
                 <div class="tabName-input-content">
                     <el-input type="text" size="small" v-model="fileName" class="tabName-input" placeholder="请输入文件名称">
@@ -78,9 +78,9 @@
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
-                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#FDBA40;" v-if="scope.row.status==0" >待处理</span>
-                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#434C5E;" v-else-if="scope.row.status==1" >已处理</span>
-                                        <span style="display:inline-block;width:60px;height:22px;color:white;background-color:#6097F3;" v-else>已结案</span>       
+                                        <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >待处理</span>
+                                        <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >已处理</span>
+                                        <span class="icon-span" style="background-color:#6097F3;" v-else>已结案</span>       
                                     </template>
                                 </el-table-column>
                             <el-table-column v-for="(_item,_index) in tableInfoData" :key="_index"
@@ -89,7 +89,7 @@
                             <el-table-column
                                 prop="option"
                                 label="操作"
-                                width="80"
+                                width="180"
                                 align="left">
                                 <template slot-scope="scope">
                                     <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
@@ -98,7 +98,7 @@
                             <div slot="empty">
                                 <div>
                                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无事件数据</span>
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">暂无事件</span>
                                 </div> 
                             </div>
                         </el-table>
@@ -177,24 +177,25 @@
                         "prop":"subject",
                         "label":"事件名称",
                         "sortable":'custom',
-                        "width":260
+                        "min-width":260
                     },
                     {
                         "prop":"storeName",
                         "label":"所属门店",
                         "sortable":'custom',
-                        "width":180
+                        "min-width":160
                     },
                     {
                         "prop":"assignerName",
                         "label":"提报人",
                         "sortable":'custom',
-                        "width":120
+                        "min-width":160
                     },
                     {
                         "prop":"ts",
                         "label":"提报时间",
                         "sortable":'custom',
+                        "min-width":260
                     }
                 ],
                 event,
@@ -742,8 +743,8 @@
                     })
                 }
                 else{
-                    self.$store.dispatch('LogOut').then(()=>{
-                        self.$router.push('/login');
+                    that.$store.dispatch('LogOut').then(()=>{
+                        that.$router.push('/login');
                     })
                 }
             },
@@ -798,7 +799,7 @@
 <style lang="scss" scoped>
 @import '../../assets/css/textstyle.css';
 @import '../../assets/css/importfile.css'; 
-$red:#FB505F;
+$red:#FB4C5D;
 @function rem($val){
     @return $val/16+rem;
 }
@@ -819,11 +820,18 @@ $red:#FB505F;
         @include point(height,73);
         width: 100%;
     }
+    .icon-span{
+        display:inline-block;
+        width:60px;
+        height:22px;
+        color:white;
+        font-size: 12px;
+    }
     .el-date{
-        @include point(height,80);
-        @include point(line-height,80);
+        height: 70px;
+        line-height: 70px;
         text-align: left;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid #e3e9f4;
         position: relative;
         .date-title{
             @include point(margin-left,30);
@@ -833,7 +841,6 @@ $red:#FB505F;
         }
         .date-range{
             width:320px;
-            
         }
         .el-search{
             position:absolute;
@@ -886,8 +893,8 @@ $red:#FB505F;
     }
     .page-login-toolTipClass.el-tooltip__popper.is-light{
         background: #FEE4E7 !important;
-        color: #FB505F !important;
-        border: 1px solid #FB505F !important;
+        color: #FB4C5D !important;
+        border: 1px solid #FB4C5D !important;
     }
     #tabs-content .el-tabs__nav-scroll{
         margin-left:40px;
@@ -897,14 +904,14 @@ $red:#FB505F;
     }
     .el-tabs__active-bar{
         height: 4px !important;
-        background-color: #FB505F !important;
+        background-color: #FB4C5D !important;
     }
     .el-tabs__item.is-active{
         font-weight: bold !important;
-        color: #FB505F !important;
+        color: #FB4C5D !important;
     }
     .el-tabs__item:hover{
-        color: #FB505F !important;
+        color: #FB4C5D !important;
     }
     .el-dialog__body{
         padding: 0px;
@@ -914,34 +921,17 @@ $red:#FB505F;
         border-left: 0px;
         border-top: 0px;
         border-right: 0px;
-        border-bottom: 1px  solid #FB505F;
+        border-bottom: 1px  solid #FB4C5D;
         font-size: 14px;
     }
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }
-
-    .date-range.el-range-editor.is-active,.date-range .el-range-editor.is-active:hover{
-        border-color:#f0f5f8 !important;
-    }
-    .select-poper .el-select-dropdown__item.hover{
+     .select-poper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-    .select-poper .el-select .el-input.is-focus .el-input__inner{
-        border-color: #FEE4E7;
-    }
-    .select-poper .el-select-dropdown__item.selected{
-        color:#FB505F;
-    }
-    .el-range-editor--mini .el-range-input{
-        font-size:0.75rem !important;
-    }
-    .el-date-table td.end-date span, .el-date-table td.start-date span{
-        background-color:#FB505F !important;
-    }
-    .el-button.is-plain:focus, .el-button.is-plain:hover{
-        color:#FB505F !important;
-        border-color:#FB505F !important;
+    .current-row > td {
+        background: #FEE7E4 !important;
     }
 </style>
 

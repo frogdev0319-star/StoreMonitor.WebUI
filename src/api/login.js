@@ -16,10 +16,11 @@ export function logout(){
     })
 }
 
-export function getUserInfo(){
+export const getUserInfo=params=>{
     return request({
         url:'/user/list',
-        method:'get'
+        method:'get',
+        params
     })
 }
 

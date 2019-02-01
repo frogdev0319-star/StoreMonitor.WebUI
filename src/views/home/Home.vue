@@ -30,8 +30,7 @@
                         style="margin-left:6px;cursor:pointer;"></i></span>
                         <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
                         <el-dropdown-menu slot="dropdown" class="dropdown" style="margin-top:0px;">
-                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>我的消息</el-dropdown-item>
-                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>设置</el-dropdown-item>
+                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>我的</el-dropdown-item>
                             <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -60,7 +59,7 @@
                                 <i :class="item.iconCls" :style="item.styles" class="navIcon"></i>
                                 <span>{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
-                            <!--多级节点-->
+                            <!--多级节点 :disabled="item.name=='巡店管理'"-->
                         <el-submenu class="el-submenu" :key="index" :index="index+''" :disabled="item.name=='巡店管理'"
                         v-if="!item.leaf" style="text-align:left;">
                             <template slot="title">
@@ -74,7 +73,7 @@
                                     <div class="tag-icon"></div>
                                     <span >{{child.name}}</span>
                                     <div v-if="child.name=='门店管理'&&showTag" 
-                                    style="display:inline-block; width:8px;height:8px;background-color:#FB505F;border-radius:50%;margin-left:10px;"></div>
+                                    style="display:inline-block; width:8px;height:8px;background-color:#FB4C5D;border-radius:50%;margin-left:10px;"></div>
                                     <!--collapsed?'':-->
                                 </template>
                             </el-menu-item>
@@ -136,10 +135,10 @@ export default {
           console.log('handleopen');
           switch(Number(index)){
                case 1: 
-               document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#FB505F';
+               document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#FB4C5D';
                document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#232730';break;
                case 5:
-               document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#FB505F';
+               document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#FB4C5D';
                document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#232730';break;
                default: console.log('this is not a group');break;
           }
@@ -338,7 +337,7 @@ export default {
                 float:left;
                 .breadcrumb-item{
                     padding:20px 0px 20px 10px;
-                    @include point(font-size,16);
+                    font-size: 16px;
                     @include point(line-height,20);
                     color:#4b5262 !important;
                     span{
@@ -381,7 +380,7 @@ export default {
                         text-overflow:ellipsis;
                         white-space: nowrap;
                         i{
-                            color:#FB505F;
+                            color:#FB4C5D;
                             font-weight: bold;
                         }
                     }
@@ -418,7 +417,7 @@ export default {
                 .el-submenu{
                     position: relative;
                     &:hover{
-                        background-color:#FB505F !important;
+                        background-color:#FB4C5D !important;
                     }
                 }
                 #childSubItem.submenu-item{
@@ -448,21 +447,21 @@ export default {
             }
         }
         .el-submenu:hover{
-            background-color:#FB505F !important;
+            background-color:#FB4C5D !important;
         }
         .el-menu-item:hover{
-            background-color:#FB505F !important;
+            background-color:#FB4C5D !important;
             color: #eee !important;
         }
         .el-menu-item.is-active{
             background-color:#2F2933 !important;
-            color:#FB505F !important;
+            color:#FB4C5D !important;
             div{
-                background-color: #FB505F !important;
+                background-color: #FB4C5D !important;
             }
         }
         .el-submenu.is-active .el-submenu__title{
-            background-color:#FB505F !important;
+            background-color:#FB4C5D !important;
         }
         .aside-width{
             width: 16.9%;
@@ -491,7 +490,7 @@ export default {
   overflow-x: hidden !important;
 }
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
-    color:#FB505F !important;
     background-color:#FEE4E7 !important;
 }
+
 </style>

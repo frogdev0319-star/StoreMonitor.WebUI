@@ -23,7 +23,7 @@
                 <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
                 <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false">
                     
-                    <p :style="isChecked?{}:{'color':'#FB505F'}">
+                    <p :style="isChecked?{}:{'color':'#FB4C5D'}">
                         <el-checkbox v-model="allCityChecked" @change="choiceAllCity"
                         style="margin-right:5px;"></el-checkbox>全部</p>
                     <div class="city-details" v-for="(item,index) in cityList" :key="index">
@@ -646,7 +646,7 @@ export default {
             @include point(width,90);
             text-align: center;
             @include point(margin-left,15);
-            background-color: #FB505F;
+            background-color: #FB4C5D;
             color: #fff;
         }
         .icon-input{
@@ -757,7 +757,7 @@ export default {
             @include point(margin-bottom,15);
             .btn{
                 @include point(width,120);
-                background-color: #FB505F; 
+                background-color: #FB4C5D; 
                 color: #fff;
             }
         }
@@ -769,12 +769,12 @@ export default {
     padding:7px 15px !important;
 }
 .el-checkbox__inner:hover{
-    border-color: #FB505F !important;
+    border-color: #FB4C5D !important;
 }
-.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F !important;
-    border-color:#FB505F !important;
+    background-color: #FB4C5D !important;
+    border-color:#FB4C5D !important;
 }
 .el-province .el-input__inner{
     border-radius: 0px !important;
@@ -795,7 +795,7 @@ export default {
     border-color: #FEE4E7 !important;
 }
 .el-select-dropdown__item.selected{
-    color:#FB505F !important;
+    color:#FB4C5D !important;
 }
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;

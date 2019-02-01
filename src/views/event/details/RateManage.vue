@@ -24,7 +24,7 @@
         width="28%"
         top="35vh"
         left="40vh">
-            <div class="dialog-content" style="overflow:hidden;">
+            <div class="dialog-content" style="overflow:hidden;width:100%;">
                 <hr style="border: 0.5px solid #FFC1C8;"/>
                 
                <div class="tabName-input-content">
@@ -75,12 +75,12 @@
                     <div v-if="item.mediaType==2" class="img-content">
                         <!--图片资源-->
                         <img class="imgLittle" :src="item.url" :title="imgTitle" :onerror='deafultImg'
-                         height="140px" @click="openOuter(item)"/>
+                         height="100px" @click="openOuter(item,$event)"/>
                     </div>
                         <!--视频资源-->
                     <div  v-else class="video-content">
                         <video  height=83% width=90%  prload controls 
-                                class="video-js vjs-fill" style="min-width:198px;min-height:140px; max-height:140px;object-fit: fill;">
+                                class="video-js vjs-fill" style="min-width:150px;max-width:150px; min-height:100px; max-height:100px;object-fit: fill;">
                                 <source :src="item.url">
                         </video>
                     </div>
@@ -135,12 +135,12 @@
                                 <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                                     <div v-if="_item.mediaType==2" class="img-content">
                                         <img class="imgLittle" :title="imgTitle"
-                                          :src="_item.url" height="140px" :onerror='deafultImg'
-                                         @click="openOuter(_item)"/>
+                                          :src="_item.url" height="100px" :onerror='deafultImg'
+                                         @click="openOuter(_item,$event)"/>
                                     </div>
                                    <div  v-else class="video-content">
                                         <video  height=83% width=90%  prload controls
-                                                class="video-js vjs-fill" style="min-width:198px;min-height:140px; max-height:140px;object-fit: fill;">
+                                                class="video-js vjs-fill" style="min-width:150px;max-width:150px;min-height:100px; max-height:100px;object-fit: fill;">
                                                 <source :src="_item.url">
                                         </video>
                                     </div>
@@ -259,9 +259,10 @@ export default {
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
         },
-        openOuter(item){
+        openOuter(item,$ev){
             let self=this;
             console.log(item);
+            console.log($ev.target.onerror);
             if(item!=null){
                 self.showOuter=true;
                 self.checkImgSrc=item.url;
@@ -310,10 +311,10 @@ export default {
                 var h1=div1[i].offsetHeight;  
                 var h2=div2[i].offsetHeight; 
                 if(h1>h2){  
-                    div1[i].style.borderRight="1px solid #FB505F";  
+                    div1[i].style.borderRight="1px solid #FB4C5D";  
                 }
                 else{  
-                    div2[i].style.borderLeft="1px solid #FB505F";  
+                    div2[i].style.borderLeft="1px solid #FB4C5D";  
                 }   
             }
         },
@@ -392,6 +393,7 @@ export default {
                     }
                 }
             })
+            console.log(self.commentList);
         },
         startSpeech(){
             let self=this;
@@ -486,7 +488,7 @@ export default {
                         temp.push(obj);
 
                     })
-                   self.commentList=temp;
+                   self.commentList=temp.slice(0,temp.length-1);
                 }
             })
         },
@@ -512,6 +514,7 @@ export default {
                     self.getCommentList();
                     self.description='';
                     self.winpDes='';
+                    self.getProcess();
                     if(status==2){
                         self.showWindContent=false;
                     }
@@ -584,10 +587,9 @@ export default {
         self.myfun();
         
         self.$nextTick(function(){
-            setTimeout(()=>{
+            self.timeid=setInterval(()=>{
                 self.getProcess();
             },1000);
-            
         })
     },
     created(){
@@ -638,6 +640,9 @@ export default {
 .el-rate-container{
     @include point(padding,20);
     @include point(padding-right,30);
+    .dialog-content{
+        width: 100%;
+    }
     .dialog-source-content{
         width: 480px;
         height: 270px;
@@ -669,9 +674,10 @@ export default {
         .el-submit{
             position: absolute;
             right: 0px;
+            width: 90px;
+            height: 30px;
             @include point(margin-right,20);
-            @include point(width,90);
-            background-color: #FB505F;
+            background-color: #FB4C5D;
             color: #fff;
         }
     }
@@ -708,13 +714,13 @@ export default {
                 @include point(width,120);
                 @include point(height,30);
                 background-color: #FFEDED;
-                color: #FB505F;
+                color: #FB4C5D;
                 border: 1px solid #FEC0C7;
                 @include point(border-radius,15);
                 display: inline-block;
                 cursor: pointer;
                 .icon-speech{
-                    @include point(font-size,22);
+                    font-size: 22px;
                     @include point(line-height,30);
                     @include point(margin-left,15);
                 }
@@ -730,11 +736,12 @@ export default {
             .source-content{
                 float: left;
                 @include point(margin,5);
-                width: 25%;
                 @include point(max-width,220);
                
                 .img-content{
-
+                    img{
+                        cursor: pointer;
+                    }
                 }
                 .video-content{
                    width: 100%;
@@ -750,25 +757,26 @@ export default {
                 @include point(margin-left,20);
                 display: inline-block;
                 .icon-video{
-                    color: #FB505F;
-                    @include point(font-size,20);
+                    color: #FB4C5D;
+                    font-size: 20px;
                 }
                 .ahref{
                     text-decoration: underline;
-                    color: #FB505F;
+                    color: #FB4C5D;
                     cursor: pointer;
                 }
             }
             
         }
         hr{
-            border: 1px solid #ddd;
+            border: 0.5px solid #e3e9f4;
             margin-top: 15px;
         }
         .el-submit{
-            @include point(width,90);
-            background-color: #FB505F;
+            width: 90px;
+            background-color: #FB4C5D;
             color: #fff;
+            height: 30px;
             @include point(margin-top,10);
             @include point(margin-bottom,20);
         }
@@ -805,7 +813,7 @@ export default {
                 position: relative;
                 top: 4px;
                 left: 4px;
-                background-color: #FB505F;
+                background-color: #FB4C5D;
             }
             .lside{
                 width: 119px;
@@ -815,17 +823,18 @@ export default {
                 span{
                     display: inline-block;
                     position: relative;
-                    @include point(left,20);
+                    @include point(left,30);
                     @include point(top,30);
                     padding: 2px 10px;
                     color: #fff;
+                    font-size: 12px;
                 }
             }
             .rside{
                 width:calc(100% - 120px);
                 height: 100%;
                 @include point(min-height,100);
-                border-left: 1px solid #FB505F;
+                border-left: 1px solid #ddd;
                 float: left;
                 @include point(padding-top,5);
                 .creator{
@@ -848,7 +857,7 @@ export default {
                     @include point(margin-top,30);
                     @include point(margin-left,20);
                     font-family:'Microsoft YaHei';
-                    @include point(font-size,14);
+                    font-size: 14px;
                     white-space:pre-wrap; /* css3.0 */ 
                     white-space:-moz-pre-wrap; /* Firefox */ 
                     white-space:-pre-wrap; /* Opera 4-6 */ 
@@ -859,18 +868,21 @@ export default {
                     @include point(margin-left,52);
                     overflow: hidden;
                     min-width: 90%;
-                    @include point(margin-top,25);
+                    @include point(margin-top,15);
                     .source-details{
                         float: left;
                         @include point(margin-left,15);
                         @include point(margin-right,15);
                         @include point(max-width,220);
                     }
+                    img{
+                        cursor: pointer;
+                    }
                 }
                 .viedo-info{
                     @include point(margin-left,70);
-                    color: #FB505F;
-                    @include point(font-size,20);
+                    color: #FB4C5D;
+                    font-size: 20px;
                     float: left;
                     width: 90%;
                 }
@@ -885,7 +897,7 @@ export default {
         border-left: 0px;
         border-top: 0px;
         border-right: 0px;
-        border-bottom: 1px  solid #FB505F;
+        border-bottom: 1px  solid #FB4C5D;
         font-size: 14px;
     }
 </style>

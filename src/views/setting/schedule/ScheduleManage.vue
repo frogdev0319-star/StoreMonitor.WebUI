@@ -14,7 +14,7 @@
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
-                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB505F'}:{}">{{item.groupName}}</span>
+                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB4C5D'}:{}">{{item.groupName}}</span>
                         <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
                         <div class="iconcontent" v-if="item.showEdit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
@@ -26,7 +26,7 @@
                             </div>
                         </div>
                         <div class="iconcontent">
-                            <div class="iconlised" style="background-color:#FB505F" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
+                            <div class="iconlised" style="background-color:#FB4C5D" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
                                 <i class="el-icon-check"></i>
                             </div>
                             <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
@@ -38,7 +38,7 @@
                <div class="group-add" v-if="showAddGroup">
                    <el-input size="mini" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
                     <div class="iconcontent">
-                        <div class="iconlised" style="background-color:#FB505F" @click="confirmAddGroup">
+                        <div class="iconlised" style="background-color:#FB4C5D" @click="confirmAddGroup">
                             <i class="el-icon-check"></i>
                         </div>
                         <div class="iconrised" @click="cancelAddGroup">
@@ -404,7 +404,7 @@ export default {
 </script>
 <style lang="scss" scoped>
     @import '../../../assets/css/textstyle.css';
-    $mainColor:#FB505F;
+    $mainColor:#FB4C5D;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -426,7 +426,7 @@ export default {
         @include point(line-height,50);
     }
     .opColor{
-        background-color: #FB505F !important;
+        background-color: #FB4C5D !important;
         color: #fff !important;
     }
     .noramlColor{
@@ -639,7 +639,7 @@ export default {
                                 .schedule-tag{
                                     width: 16px;
                                     height: 16px;
-                                    background-color: #FB505F;
+                                    background-color: #FB4C5D;
                                     border-radius: 8px;
                                     margin-top: 20px;
                                     display: inline-block;
@@ -737,28 +737,28 @@ export default {
     font-weight: bold !important;
 }
 .el-radio__input.is-checked .el-radio__inner{
-    background-color: #FB505F;
-    border-color:#FB505F;
+    background-color: #FB4C5D;
+    border-color:#FB4C5D;
 }
 .el-radio__input.is-checked+.el-radio__label{
-    color: #FB505F;
+    color: #FB4C5D;
 }
 .el-month-table td .cell:hover, .el-month-table td.current:not(.disabled) .cell{
-    color: #FB505F;
+    color: #FB4C5D;
 }
 .el-input .el-input__inner:focus{
-    border-color: #FB505F;
+    border-color: #FB4C5D;
 }
 .el-checkbox__inner:hover{
-    border-color: #FB505F !important;
+    border-color: #FB4C5D !important;
 }
-.el-checkbox.is-bordered.is-checked{border-color:#FB505F}
+.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
 .el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB505F !important;
-    border-color:#FB505F !important;
+    background-color: #FB4C5D !important;
+    border-color:#FB4C5D !important;
 }
 .el-time-panel__btn.confirm{
-    background-color: #FB505F;
+    background-color: #FB4C5D;
     color: #fff;
     padding:0px 10px;
     background-color: #EAEDF2;
@@ -766,6 +766,6 @@ export default {
     line-height: 20px;
 }
 .el-time-panel__btn.confirm:hover{
-    color: #FB505F;
+    color: #FB4C5D;
 }
 </style>
