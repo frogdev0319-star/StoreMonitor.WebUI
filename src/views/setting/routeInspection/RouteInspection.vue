@@ -734,7 +734,7 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    padding: 0.125rem 0.625rem !important;
+                    padding: 3px 5px !important;
                     
                     position: relative;
                     top: 3px;

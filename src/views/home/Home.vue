@@ -60,7 +60,7 @@
                                 <span>{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点 :disabled="item.name=='巡店管理'"-->
-                        <el-submenu class="el-submenu" :key="index" :index="index+''" :disabled="item.name=='巡店管理'"
+                        <el-submenu class="el-submenu" :key="index" :index="index+''"
                         v-if="!item.leaf" style="text-align:left;">
                             <template slot="title">
                             <i :class="item.iconCls" :style="item.styles" class="navIcon">
@@ -87,7 +87,7 @@
             
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="($route.path!='/routeinspection'
-                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&
+                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&$route.path!='/stroemonitor'&&
                     $route.path!='/schedule'&&$route.path!='/reinspection'&&$route.path!='/bindroute')
                     ?'content-wrapper-all':'content-wrapper'">
                     <keep-alive>

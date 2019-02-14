@@ -65,7 +65,7 @@
                     </span>
             </el-form-item>
             <div class="rem-content">
-                <el-checkbox v-model="rememberUserName"></el-checkbox>
+                <el-checkbox v-model="rememberUserName" class="elCheckBox"></el-checkbox>
                 <span>记住账号</span>
                 <span class="forget-pass" @click="forgetPass">忘记密码？</span>
             </div>
@@ -564,6 +564,9 @@ $red:#fb4c5d;
                 text-align: left;
                 @include point(padding-left,25);
                 position: relative;
+                .elCheckBox{
+                    margin-right: 10px;
+                }
                 span{
                     @include point(margin-left,15);
                     color: $fff;

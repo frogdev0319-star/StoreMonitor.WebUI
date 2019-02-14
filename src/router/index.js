@@ -25,7 +25,7 @@ export default new Router({
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:25px',
       leaf:true, //没有子节点
-      isReadOnly:true,
+      isReadOnly:false,
       children:[
         {
           path:'/allscan',
@@ -231,7 +231,7 @@ export default new Router({
         {
           path:'/schedule',
           name:'排程配置',
-          isReadOnly:true,
+          isReadOnly:false,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{

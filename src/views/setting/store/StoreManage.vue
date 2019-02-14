@@ -19,9 +19,9 @@
             <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
             <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false"> 
                 <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                        style="margin-right:5px;"></el-checkbox>全部</p>
+                    style="margin-right:10px;"></el-checkbox>全部</p>
                 <div class="city-details" v-for="(item,index) in cityList" :key="index">
-                    <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
+                    <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
                     <span>{{item.cityName}}</span>
                 </div>
             </div>
@@ -43,7 +43,7 @@
             @sort-change='sortChange'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                 <el-table-column
-                    width="150"
+                    min-width="120"
                     header-align="center"
                     align="center">
                         <template slot-scope="scope" v-if="scope.row.showTag">
@@ -54,12 +54,12 @@
                     </template>
                 </el-table-column>
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
-                :prop="item.prop" :label="item.label" :sortable="item.sortable" :width="item.width">
+                :prop="item.prop" :label="item.label" :sortable="item.sortable" :min-width="item.width">
             </el-table-column>
             <el-table-column
                 prop="napeTable"
                 label="关联巡检表"
-                width="220"
+                min-width="180"
                 align="left">
                 <template slot-scope="scope">
                     <el-popover
@@ -81,14 +81,14 @@
             </el-table-column>
             <el-table-column prop="schedue"
                 label="巡检排程"
-                width="160"
+                min-width="140"
                 align="left">
 
             </el-table-column>
             <el-table-column
                 prop="option"
                 label="操作"
-                width="80"
+                min-width="60"
                 align="left">
                 <template slot-scope="scope">
                     <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
@@ -138,12 +138,13 @@ import PubSub from 'pubsub-js'
                         "prop":"userName",
                         "label":"负责人",
                         "sortable":'custom',
+                        "width":120
                     },
                     {
                         "prop":"phone",
                         "label":"联系方式",
                         "sortable":false,
-                        "width":180
+                        "width":160
                     },
                 ],
                 allCityChecked:false,
@@ -521,6 +522,9 @@ import PubSub from 'pubsub-js'
 .el-event-content{
     width: 100%;
     position: relative;
+    .elcheckBox {
+        margin-right: 10px !important;
+    }
     .seacrh-content{
         @include point(padding-left,30);
         @include point(margin-top,20);

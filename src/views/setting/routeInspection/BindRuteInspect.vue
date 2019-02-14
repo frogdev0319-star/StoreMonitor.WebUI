@@ -25,9 +25,9 @@
                     
                     <p :style="isChecked?{}:{'color':'#FB4C5D'}">
                         <el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                        style="margin-right:5px;"></el-checkbox>全部</p>
+                        class="elcheckBox"></el-checkbox>全部</p>
                     <div class="city-details" v-for="(item,index) in cityList" :key="index">
-                        <el-checkbox v-model="item.checked" @change="changeCityItem(item)"></el-checkbox>
+                        <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
                         <span>{{item.cityName}}</span>
                     </div>
                 </div>
@@ -665,6 +665,9 @@ export default {
             z-index: 980;
             background-color: #fff;
             border:1px solid #ddd;
+            .elcheckBox{
+                margin-right: 10px;
+            }
             font-size: 14px;
             p{
                 font-weight: bold;

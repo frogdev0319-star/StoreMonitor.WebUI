@@ -12,8 +12,7 @@
                 </video>
             </div>
             <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" @click="cutPicture" size="mini" style="">截 图</el-button>
-                <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">暂 停</el-button>
+                <el-button class="file-cancel-btn" @click="stopRealTime" size="mini" style="">暂 停</el-button>
                 <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
             </div>
         </el-dialog>
@@ -299,9 +298,8 @@ export default {
                 self.playVideo(self.mpdurl);
             }
         },
-        cutPicture(){
-            let self=this;
-            self.showPhotoContent=true;
+        stopRealTime(){
+
         },
         myfun(){  
             var div1=document.getElementsByClassName("lside");  

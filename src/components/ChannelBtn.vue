@@ -1,5 +1,7 @@
 <template>
-    <div id="btn-circle" @click="clickChannel" :class="isClick?'noramlColor':'abnoramlColor'">
+    <div id="btn-circle"
+    :class="isClick?'noramlColor':'abnoramlColor'" 
+    :style="isOnline?{'cursor':'pointer'}:{'cursor':'not-allowed'}">
         <div id="btn-stroke">
             <span id="btn-title" :class="isOnline?'noramlColor':'abnoramlColor'">{{channelName}}</span>
         </div>
@@ -7,29 +9,33 @@
 
 </template>
 <script>
+import PubSub from 'pubsub-js'
 export default {
     name:'ChannelBtn',
     props:{
         channelName:String,
         isOnline:Boolean,
+        isClick:Boolean
     },
     data(){
         return{
-            isClick:false
+            
         }
     },
+    watch:{
+    },
+    created(){
+    },
     methods:{
-        clickChannel(ev){
-            let self=this;
-            self.isClick=true;
-            let value={
-                name:self.channelName,
-                isClick:self.isClick,
-                isOnline:self.isOnline
-            }
-            console.log(ev.target);
-            self.$emit('change',value,ev)
-        }
+        // clickChannel(ev){
+        //     let self=this;
+        //     self.isClick=true;
+        //     let value={
+        //         isClick:self.isClick,
+        //     }
+        //     console.log(ev.target);
+        //     self.$emit('change',value)
+        // }
     }
 }
 </script>
@@ -47,7 +53,7 @@ export default {
         /* background-color: #DBDBDB; */
         margin: auto;
         position: relative;
-        cursor: pointer;
+        /* cursor: pointer; */
     }
     #btn-stroke{
         width: 66px;

@@ -74,7 +74,7 @@
                             @sort-change='sortChange'
                             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                                 <el-table-column
-                                    width="150"
+                                    min-width="150"
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
@@ -84,12 +84,12 @@
                                     </template>
                                 </el-table-column>
                             <el-table-column v-for="(_item,_index) in tableInfoData" :key="_index"
-                                :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :width="_item.width">
+                                :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
                             </el-table-column>
                             <el-table-column
                                 prop="option"
                                 label="操作"
-                                width="180"
+                                min-width="60"
                                 align="left">
                                 <template slot-scope="scope">
                                     <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
@@ -177,25 +177,25 @@
                         "prop":"subject",
                         "label":"事件名称",
                         "sortable":'custom',
-                        "min-width":260
+                        "width":200
                     },
                     {
                         "prop":"storeName",
                         "label":"所属门店",
                         "sortable":'custom',
-                        "min-width":160
+                        "width":160
                     },
                     {
                         "prop":"assignerName",
                         "label":"提报人",
                         "sortable":'custom',
-                        "min-width":160
+                        "width":120
                     },
                     {
                         "prop":"ts",
                         "label":"提报时间",
                         "sortable":'custom',
-                        "min-width":260
+                        "width":160
                     }
                 ],
                 event,

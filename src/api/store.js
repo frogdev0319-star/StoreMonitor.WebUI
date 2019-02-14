@@ -14,3 +14,27 @@ export const updateStoreInfo=data=>{
         data
     })
 }
+
+export const getFavoriteList=params=>{
+    return request({
+        url:'/store/favorite/list',
+        method:'get',
+        params
+    })
+}
+
+export const addFavoriteStore=data=>{
+    return request({
+        url:'/favorite/add',
+        method:'post',
+        data
+    }) 
+}
+
+export const deleteFavoriteStore=data=>{
+    return request({
+        url:'/favorite/delete',
+        method:'post',
+        data
+    }) 
+}

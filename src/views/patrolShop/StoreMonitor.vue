@@ -5,9 +5,9 @@
                 <span class="lside-title">
                     {{store.storeTitle}}
                 </span>
-                <div class="storeUp-content" :class="store.storeUp?'nocoll':'coll'">
-                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'nocoll-icon':'coll-icon'"></i>
-                    <span :class="store.storeUp?'nocoll-font':'coll-font'">{{store.storeUptitle}}</span>
+                <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp">
+                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'"></i>
+                    <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
             </div>
             <div class="video-content" >
@@ -15,7 +15,7 @@
                 <div class="video-model" v-if="showModelContent">
                     <div class="icon-footer">
                         <div class="iconlside">
-                            <i class="iconfont icon-bofang1 iconplay" @click="playVideo" v-if="playState"></i>
+                            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="playState"></i>
                             <i class="iconfont icon-zantingtingzhi iconplay" @click="purseVideo" v-else></i>
                         </div>
                         <div class="iconrside">
@@ -72,24 +72,69 @@
                     class="el-search-input"
                     placeholder="请输入关键字搜索门店"
                     v-model="serachVale" @keyup.enter.native="searchStore">
-                    <i @click="searchStore" slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                    <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                 </el-input>
             </div>
             <el-tabs v-model="activeIndex" @tab-click="handleClick" id="tabs-content">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
-                    <div class="storeList-content">
-                        <span v-for="(_item,_index) in item.storeList" :key="_index" 
-                        :class="_item.isActive?'activeClass':''" @click="clickStore(item,_item,_index)">
-                            {{_item.storeName}}
-                        </span>
-                    </div>
+                    <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                        <div class="storeList-content" v-if="index!=2">
+                            <span v-for="(_item,_index) in item.storeList" :key="_index" class="store-name"
+                            :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
+                                {{_item.name}}
+                            </span>
+                        </div>
+                        <div class="storeList-content" v-else>
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" >
+                                <span class="citys">{{_item.cityName}}</span>
+                                <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name"
+                                :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
+                                    {{itemDs.name}}
+                                </span>
+                            </div>
+                        </div>
+                    </el-scrollbar>
                 </el-tab-pane>
             </el-tabs>
             <div class="channel-content">
                 <span>区域列表</span>
                 <div v-for="(item,index) in channelBtns" :key="index" class="btn-content">
-                    <channel-btn :channel-name="item.name" :is-online="item.isonline" 
-                    class="channelBtn" @change="clickBtn"></channel-btn>
+                    <channel-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
+                    class="channelBtn" @click.native="clickBtn(item,index)"></channel-btn>
+                </div>
+            </div>
+            <div class="time-content">
+                <span id="date-title">选择日期</span>
+                <div class="date-picker-content">
+                    <span>播放时间</span>
+                    <el-time-picker
+                        class="time-picker"
+                        v-model="curDate"
+                        size="mini"
+                        placeholder="任意时间点">
+                    </el-time-picker>
+                </div>
+                <div class="date-content">
+                    <div class="date-header">
+                        <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
+                        <span>{{curYear}}年{{curMonth}}月</span>
+                        <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>
+                        <!-- <el-button size="mini" @click="backCurTime" class="backTime-btn">回到当前时间</el-button> -->
+                    </div>
+                    <div class="date-data">
+                        <span class="date-title" v-for="(item,index) in weekTitles" :key="index">
+                            {{item}}
+                        </span>
+                        <div class="date-details" v-for="item in weekDays">
+                            <div class="data" v-for="(_item,_index) in item" :key="_index">
+                                <span :class="_item.showBack?'opColor':'noramlColor'"
+                                :style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>
+                            </div>
+                        </div>
+                        <div class="schedule-tag">
+                        </div>
+                        <span style="margin-left:20px;color:#94a4b4;font-size:14px;">有事件</span>
+                    </div>
                 </div>
             </div>
         </el-col>
@@ -97,6 +142,11 @@
 </template>
 <script>
 import ChannelBtn from '@/components/ChannelBtn.vue'
+import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
+import PubSub from 'pubsub-js'
+import util from '@/common/util'
+import dashAPI from '@/api/dash'
+import videojs from '../../../static/video.js'
 export default {
     name:'StoreMoinitor',
     components:{
@@ -108,26 +158,25 @@ export default {
                 {
                     name:'水吧',
                     isonline:true,
+                    isClick:true
                 },
                 {
                     name:'收银台',
-                    isonline:true
+                    isonline:true,
+                    isClick:false
                 },
                 {
                     name:'物料成列',
-                    isonline:false
+                    isonline:false,
+                    isClick:false
                 }
             ],
-            store:{
-                storeName:'西安5店',
-                storeTitle:'西安5店',
-                storeUp:false,
-                storeUptitle:'点击关注'
-            },
+            store:{},
+            cityList:[],
             popperClass:'select-popClass',
             showModelContent:true,
             playState:true,
-            activeIndex:'',
+            activeIndex:'2',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
             showDate:true, 
@@ -135,19 +184,23 @@ export default {
             speedList:[
                 {
                     value:0,
-                    label:'0.5 X'
+                    label:'1/4 X'
                 },
                 {
                     value:1,
-                    label:'1 X'
+                    label:'1/2 X'
                 },
                 {
                     value:2,
-                    label:'1.5 X'
+                    label:'1 X'
                 },
                 {
                     value:3,
                     label:'2 X'
+                },
+                {
+                    value:4,
+                    label:'4 X'
                 }
             ],
             testSpeed:'1 X',
@@ -158,15 +211,11 @@ export default {
                 },
                 {
                     value:1,
-                    label:'20s'
-                },
-                {
-                    value:2,
                     label:'30s'
                 },
                 {
-                    value:3,
-                    label:'40s'
+                    value:2,
+                    label:'60s'
                 }
             ],
             testBack:'10s',
@@ -174,146 +223,199 @@ export default {
             tabList:[
                 {
                     label:'关注',
-                    storeList:[
-                        {
-                            isActive:true,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        }
-                    ]
+                    storeList:[]
                 },
                 {
                     label:'最近访问',
-                    storeList:[
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        }
-                    ]
+                    storeList:[]
                 },
                 {
                     label:'全部门店',
-                    storeList:[
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        },
-                        {
-                            isActive:false,
-                            storeName:'西安6店'
-                        }
-                    ]
+                    storeList:[]
                 }
             ],
-            inspectList:[
-                {
-                    name:'门店形象',
-                    num:12
-                },
-                {
-                    name:'员工形象',
-                    num:4
-                },
-                {
-                    name:'服务',
-                    num:3
-                },
-                {
-                    name:'商品',
-                    num:4
-                }
-            ],
-            inspectItemList:[
-                {
-                    name:'店外整洁，无乱堆乱放现象',
-                    score:2,
-                    ignore:false
-                },
-                {
-                    name:'店外整洁，无乱堆乱放现象',
-                    score:2,
-                    ignore:false
-                },
-                {
-                    name:'店外整洁，无乱堆乱放现象',
-                    score:2,
-                    ignore:false
-                },{
-                    name:'店外整洁，无乱堆乱放现象',
-                    score:2,
-                    ignore:false
-                }
-            ]
+            recentStoreList:[],
+            curDate:new Date(),
+
+            curYear:new Date().getFullYear(),
+            curMonth:new Date().getMonth()+1,
+            curDay:new Date().getDate(),
+            weekTitles:['日','一','二','三','四','五','六'],
+            weekDays:[],
+
+            protocal:'DASH',
+            selGID:0,
+            sessionId:'',
+            ivsID:'',
         }
     },
+    mounted(){
+        let self=this;
+        //初始化页面数据
+        self.getInitStoreData();
+        self.getWeekDay();
+    },
     methods:{
+        getFaStoreList(){
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                getFavoriteList().then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
+            })
+        },
+        getAllStoreList(){
+            let self=this;
+            let params={
+                "filter": {
+                    "page": 0,
+                    "size": 1000
+                }
+            };
+            return new Promise((resolve,reject)=>{
+                getStoreList(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
+            })
+        },
+        async getStoreList(){
+            let self=this;
+            console.log(self.activeIndex);
+            let getStoreTemp=data=>{
+                let temp=[];
+                data.forEach((item,index)=>{
+                    let obj={};
+                    obj.isActive=false;
+                    obj.storeId=item.storeId;
+                    obj.name=item.name;
+                    obj.userId=item.userId;
+                    obj.favorite=item.favorite==undefined?true:item.favorite;
+                    temp.push(obj);
+                })
+                return temp;
+            }
+            let data;
+            switch(Number(self.activeIndex)){
+                case 0: data=await self.getFaStoreList(); 
+                    console.log(data);
+                    if(data.errCode==0){
+                        let storeData=data.data;
+                        self.tabList[0].storeList=getStoreTemp(storeData);
+                    }
+                    break;
+                case 1:
+                    let temp=[];
+                    let data=self.recentStoreList;
+                    console.log(data);
+                    data.map(x=>x.storeId).reverse().forEach(item=>{
+                        if(temp.indexOf(item)==-1){
+                            temp.push(item);
+                        }
+                    })
+                    temp=temp.slice(0,3); //取最近访问的三家门店
+                    console.log(temp);
+                    let dataTemp=await self.getAllStoreList();
+                    let allStoreData=dataTemp.data.content;
+                    let tempStore=[];
+                    for(let i=0;i<temp.length;i++){
+                        for(let j=0;j<allStoreData.length;j++){
+                            if(temp[i]==allStoreData[j].storeId){
+                                tempStore.push(allStoreData[j]);
+                            }
+                        }
+                    }
+                    self.tabList[1].storeList=getStoreTemp(tempStore);
+                    break;
+            }
+        },
+        /**
+         * add favorite or delete favorite
+         */
+        async getInitStoreData(){
+            let self=this;
+            let getStore2Temp=data=>{
+                let cityList=[];
+                data.map(x=>x.city).forEach(item=>{
+                    if(cityList.indexOf(item)==-1){
+                        cityList.push(item);
+                    }
+                })
+                let storeListTemp=[];
+                for(let i=0;i<cityList.length;i++){
+                    let temp=[];
+                    let obj={};
+                    for(let j=0;j<data.length;j++){
+                        if(cityList[i]==data[j].city){
+                           let obj={};
+                           if(i==0&&j==0){
+                               obj.isActive=true;
+                           }
+                           else{
+                               obj.isActive=false;
+                           }
+                            obj.storeId=data[j].storeId;
+                            obj.name=data[j].name;
+                            obj.userId=data[j].userId;
+                            obj.city=data[j].city;
+                            obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
+                            temp.push(obj);
+                        }
+                    }
+                    obj.cityName=cityList[i];
+                    obj.storeList=temp;
+                    storeListTemp.push(obj);
+                }
+                return storeListTemp;
+            }
+            let data=await self.getAllStoreList();
+             if(data.errCode==0){
+                let storeData=data.data.content;
+                self.tabList[2].storeList=getStore2Temp(storeData);
+
+                let obj={};
+                obj.storeId=storeData[0].storeId;
+                obj.storeName=storeData[0].name;
+                obj.storeTitle=storeData[0].name;
+                obj.storeUp=storeData[0].favorite;
+                if(storeData[0].favorite){
+                    obj.storeUpTitle='已关注';
+                }
+                else{
+                    obj.storeUpTitle='点击关注';
+                }
+                self.store=obj;
+                self.recentStoreList.push(self.tabList[2].storeList[0].storeList[0]);
+            }
+        },
+        addStoreUp(){
+            let self=this;
+            let temp=[];
+            temp.push(self.store.storeId);
+            let params={
+                storeIds:temp
+            }
+            if(!self.store.storeUp){
+                addFavoriteStore(params).then(res=>{
+                    console.log(res);
+                    if(res.errCode==0){
+                        self.store.storeUp=true;
+                        self.store.storeUpTitle='已关注';
+                        self.getStoreList();
+                    }
+                })
+            }
+            else{
+                deleteFavoriteStore(params).then(res=>{
+                    if(res.errCode==0){
+                        self.store.storeUp=false;
+                        self.store.storeUpTitle='点击关注';
+                        self.getStoreList();
+                    }
+                })
+            }
+        },
         submit(){
 
         },
@@ -334,10 +436,14 @@ export default {
         },
         async realTime(){
             let self=this;
+            self.playState=false;
             let sessionId= await dashAPI.Online();
+            
             console.log(sessionId);
             let result=await dashAPI.Enum(sessionId);
             let ivsID=result.IVSPlatform[0].ID;
+            self.sessionId=sessionId;
+            self.ivsID=ivsID;
             const data = {
                 request: { 
                   method: 'connection',
@@ -354,48 +460,232 @@ export default {
                 self.playVideo(self.mpdurl);
             }
         },
-        playVideo(){
+        async stopRealTime(){
             let self=this;
-            self.playState=false;
-            self.realTime();
+            self.playState=true;
+             const data = {
+                request: { 
+                  method: 'disconnection',
+                  sessionID: sessionId,
+                  IVSID:ivsID,
+                  channel:JSON.stringify(this.selGID+1)
+                }
+            };
         },
         purseVideo(){
             let self=this;
             self.playState=true;
         },
         searchStore(){
-            
+            let self=this;
+            console.log(self.tabList);
+            console.log(self.serachVale.trim());
+            let tempArray=[];
+            let tempTabList=self.tabList;
+            let getStore2Temp=data=>{
+                let cityList=[];
+                data.map(x=>x.city).forEach(item=>{
+                    if(cityList.indexOf(item)==-1){
+                        cityList.push(item);
+                    }
+                })
+                let storeListTemp=[];
+                for(let i=0;i<cityList.length;i++){
+                    let temp=[];
+                    let obj={};
+                    for(let j=0;j<data.length;j++){
+                        if(cityList[i]==data[j].city){
+                            let obj={};
+                            obj.isActive=false;
+                            obj.storeId=data[j].storeId;
+                            obj.name=data[j].name;
+                            obj.userId=data[j].userId;
+                            obj.city=data[j].city;
+                            obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
+                            temp.push(obj);
+                        }
+                    }
+                    obj.cityName=cityList[i];
+                    obj.storeList=temp;
+                    storeListTemp.push(obj);
+                }
+                return storeListTemp;
+            }
+            tempTabList.forEach((item,index)=>{
+                let temp=[];
+                if(index!=2){
+                    item.storeList.forEach(_item=>{
+                        if(_item.name.indexOf(self.serachVale.trim())!=-1){
+                            temp.push(_item);
+                        }
+                    })
+                    tempArray.push(temp);
+                }
+                else{
+                    item.storeList.forEach((_item,_index)=>{
+                        _item.storeList.forEach((itemDs,indexDs)=>{
+                            if(itemDs.name.indexOf(self.serachVale.trim())!=-1){
+                                temp.push(itemDs);
+                            }
+                        })
+                    })
+                    tempArray.push(getStore2Temp(temp));
+                }
+            })
+            console.log(tempArray);
+            self.tabList=[
+                {label:'关注',storeList:tempArray[0]},
+                {label:'最近访问',storeList:tempArray[1]},
+                {label:'全部门店',storeList:tempArray[2]}
+            ]
         },
         handleClick(tab){
             console.log(tab);
+            let self=this;
+            self.getStoreList();
         },
-        clickStore(item,_item,_index){
+        clickStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
-            item.storeList.forEach((itemS,indexS)=>{
-                if(_index!=indexS){
-                    itemS.isActive=false;
+            let obj={};
+            obj.storeId=_item.storeId;
+            obj.storeName=_item.name;
+            obj.storeTitle=_item.name;
+            obj.storeUp=_item.favorite;
+            if(_item.favorite){
+                obj.storeUpTitle='已关注';
+            }
+            else{
+                obj.storeUpTitle='点击关注';
+            }
+            self.store=obj;
+            let tabIndex=Number(self.activeIndex);
+            if(tabIndex!=2){
+                item.storeList.forEach((itemS,indexS)=>{
+                    if(_index!=indexS){
+                        itemS.isActive=false;
+                    }
+                })
+                if(index!=1){
+                    self.recentStoreList.push(_item);
+                }
+            }
+            else{
+                item.storeList.forEach((itemS,indexS)=>{
+                    itemS.storeList.forEach((itemChild,indexChild)=>{
+                        if(itemChild.storeId!=_item.storeId){
+                            itemChild.isActive=false;
+                        }
+                        else{
+                            self.recentStoreList.push(itemChild);
+                        }
+                    })
+                })
+            }
+            console.log(self.recentStoreList);
+        },
+        clickBtn(item,index){
+            let self=this;
+            if(item.isonline){
+                item.isClick=true;
+            }
+            else{
+                return false;
+            }
+            self.channelBtns.forEach((_item,_index)=>{
+                if(_index!=index){
+                    //PubSub.publish('is-click',{isClick:false});
+                    _item.isClick=false;
                 }
             })
         },
-        clickBtn(val){
-            console.log(val);
+        /**
+         * 
+         */
+        forWard(){
             let self=this;
-            let name=val.name;
-            let isClick=val.isClick;
-            let isOnline=val.isOnline;
-            self.channelBtns.forEach(item=>{
-                if(item.name!=name){
-                    item.isClick=false;
+            if(self.curMonth==1){
+                self.curMonth=12;
+                self.curYear--;
+            }
+            else{
+                self.curMonth--;
+            }
+            self.getWeekDay();
+        },
+        backWard(){
+            let self=this;
+            if(self.curMonth==12){
+                self.curMonth=1;
+                self.curYear++;
+            }
+            else{
+                self.curMonth++;
+            }
+            self.getWeekDay();
+        },
+        getWeekDay(){
+            let self=this;
+            let curWeek=util.getDateCurMonth(self.curYear,self.curMonth);
+            console.log(curWeek);
+            let dayNum=util.getDayNum(self.curYear,self.curMonth);
+            console.log(dayNum);
+            let forWardMonth=(self.curMonth==1?12:self.curMonth-1);
+            let forWardYear=(self.curMonth==1?self.curYear-1:self.curYear);
+            let forWardDayNum=util.getDayNum(forWardYear,forWardMonth);
+            console.log(forWardDayNum);
+            let datenew=new Array(42);
+            let indexTemp=0;
+            let temp=[];
+            for(let i=0;i<datenew.length;i++){
+                let obj={};
+                if(i<curWeek){
+                    obj.showBack=false;
+                    if(i==2){
+                        obj.showBack=true;
+                    }
+                    obj.showOp=true;
+                    obj.data=forWardDayNum-(curWeek-1-i);
+                    datenew[i]=forWardDayNum-(curWeek-1-i);
+                }
+                else if(i==curWeek){
+                    obj.showBack=false;
+                    obj.showOp=false;
+                    obj.data=1;
+                    datenew[i]=1;
                 }
                 else{
-                    if(isOnline==false){
-                        item.isClick=false;
+                    datenew[i]=1+(i-curWeek);
+                    if(datenew[i]==dayNum){
+                        indexTemp=i;
                     }
+                    if(i%6==0){
+                        obj.showBack=true;
+                    }
+                    else{
+                        obj.showBack=false;
+                    }
+                    obj.showOp=false;
+                   
+                    obj.data=datenew[i]=1+(i-curWeek);
                 }
-                
-            })
-        }
+                temp.push(obj);
+            }
+           // for(let i=0;i<datenew.length;i++){
+                // if(i>indexTemp){
+                    // console.log(indexTemp);
+                    // datenew[i]=i-indexTemp;
+            temp=temp.slice(1,indexTemp+1);
+            //}
+            // }
+            var dateList=[];
+            for(let i=0;i<temp.length;i+=7){
+                dateList.push(temp.slice(i,i+7));
+            }
+            console.log(temp);
+            self.weekDays=dateList;
+            console.log(self.weekDays);
+        },
     }
 }
 </script>
@@ -458,31 +748,37 @@ export default {
                     color: #424151;
                     font-size: 18px;
                 }
-                .coll{
-                    border:1px solid orange;
-                }
                 .nocoll{
-                    border:1px solid #DBDBDB;
+                    border:1px solid #FF9803;
                 }
-                .coll-icon{
-                    color: orange;
+                .coll{
+                    border:1px solid #FF9803;
+                    background-color: #FF9803;
                 }
                 .nocoll-icon{
-                    color: #DBDBDB;
+                    color: #FF9803;
+                    font-size: 14px;
+                }
+                .coll-icon{
+                    color: #fff;
+                    font-size: 14px;
                 }
                 .coll-font{
-                    color: orange;
+                    color: #fff;
                 }
                 .nocoll-font{
-                    color: #DBDBDB;
+                    color: #FF9803;
                 }
                 .storeUp-content{
                     display: inline-block;
                     margin-left: 20px;
-                    padding: 0px 10px;
+                    padding: 0px 6px;
                     height: 22px;
-                    line-height: 22px;
-                    min-width: 60px;
+                    line-height: 20px;
+                    width: 70px;
+                    position: relative;
+                    bottom: 2px;
+                    cursor: pointer;
                     span{
                         font-size: 12px;
                         font-weight: bold;
@@ -502,6 +798,10 @@ export default {
                 height: auto;
                 position: relative;
                 margin-top: 20px;
+                #previewVideo{
+                    @include point(min-width,500);
+                    @include point(min-height,414);
+                }
                 .video-model{
                     height: 100%;
                     width: 100%;
@@ -582,59 +882,6 @@ export default {
                     }
                 }
             }
-            .el-inspect{
-                border-left: 1px solid #ddd;
-                border-right: 1px solid #ddd;
-                .inspect-header{
-                    text-align: left;
-                    height: 50px;
-                    line-height: 50px;
-                    padding-left: 20px;
-                    font-size: 14px;
-                    font-weight: bold;
-                    color: #909399;
-                    border-bottom:1px solid #ddd;
-                    span{
-                        margin-left: 15px;
-                    }
-                }
-                .inspect-content{
-                    .inspect-details{
-                        text-align: left;
-                        height: 60px;
-                        line-height: 60px;
-                        padding-left: 35px;
-                        font-size: 14px;
-                        font-weight: bold;
-                        border-bottom:1px solid #ddd;
-                    }
-                    .item-details{
-                        text-align: left;
-                        height: 60px;
-                        line-height: 60px;
-                        padding-left: 15px;
-                        font-size: 14px;
-                        font-weight: bold;
-                        position: relative;
-                        .item-score{
-                            position: absolute;
-                            right: 0;
-                            top: 12px;
-                            margin-right: 20px;
-                            width: 100px;
-                            height: 26px;
-                            padding-left: 10px;
-                            background-color: orange;
-                            line-height: 26px;
-                            color: #fff;
-                            border-radius: 13px;
-                            .iconscore{
-                                margin-left: 10px;
-                            }
-                        }
-                    }
-                }
-            }
         }
         .rside{
             padding: 15px 10px 15px 10px;
@@ -658,23 +905,34 @@ export default {
                 margin-top: 10px;
                 @include point(height,260);
                 .storeList-content{
-                    padding: 0 10px;
                     text-align: left;
+                    @include point(height,220);
                     .activeClass{
                         background-color: $red;
                         color: #fff;
                     }
-                    span{
+                    .store-name{
                         display: inline-block;
-                        min-width: 80px;
                         margin-left: 15px;
                         margin-top: 10px;
+                        margin-bottom: 10px;
                         border: 1px solid #ddd;
                         text-align: center;
                         padding:4px;
                         font-size: 14px;
                         cursor: pointer;
                         border-radius: 4px;
+                        width: 80px;
+                        white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+                        overflow: hidden; //隐藏超出单元格的部分。
+                        text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                    }
+                    .citys{
+                        display: block;
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: #424151;
+                        margin-left: 12px;
                     }
                 }
             }
@@ -696,14 +954,94 @@ export default {
                     float: left;
                 }
             }
+            .time-content{
+               
+                #date-title{
+                    display: block;
+                    text-align: left;
+                    margin: 15px 20px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: #424151;
+                }
+                .date-picker-content{
+                    text-align: left;
+                    padding-left: 25px;
+                    span{
+                        font-size: 14px;
+                        color: #424151;
+                        margin-right: 15px;
+                    }
+                    .time-picker{
+                        width: 120px;
+                    }
+                }   
+                .date-content{
+                    text-align: center;
+                    margin-top: 10px;
+                    .date-header{
+                        margin-bottom: 10px;
+                        position: relative;
+                        user-select: none;
+                        -webkit-user-select: none;
+                        -moz-user-select: none;
+                        .icon-arrow{
+                            @include point(font-size,25);
+                            opacity: 0.2;
+                            position: relative;
+                            top: 4px;
+                            cursor: pointer;
+                        }
+                        span{
+                            @include point(font-size,14);
+                            font-weight: bold;
+                            @include point(margin,25);
+                        }
+                    }
+                    .date-data{
+                        text-align: left;
+                        padding-left: 10px;
+                        .date-title{
+                            display: inline-block;
+                            width: 14%;
+                            position: relative;
+                            @include point(left,10);
+                            @include point(font-size,12);
+                        }
+                        .date-details{
+                            .data{
+                                width: 14%;
+                                display: inline-block;
+                            }
+                            span{
+                                display: block;
+                                @include point(width,36);
+                                @include point(height,36);
+                                background-color: #fff;
+                                @include point(line-height,36);
+                                text-align: center;
+                                @include point(font-size,12);
+                                @include point(border-radius,18);
+                            }
+                        }
+                        .schedule-tag{
+                            width: 16px;
+                            height: 16px;
+                            background-color: #FB4C5D;
+                            border-radius: 8px;
+                            margin-top: 20px;
+                            display: inline-block;
+                        }
+                    }
+                }
+            }
         }
     }
 </style>
 <style scoped>
-    .el-test{
-        width: 70px;
-    }
-    
+.el-test{
+    width: 70px;
+}
 </style>
 <style>
 #tabs-content .el-tabs__nav-scroll{
@@ -739,6 +1077,7 @@ export default {
     line-height: 24px;
     background-color: #34374A;
     color:#fff;
+    text-align:center;
 }
 .select-popClass .el-select-dropdown__item.hover{
     color:#EA6F5A !important;
