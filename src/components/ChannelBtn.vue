@@ -19,7 +19,7 @@ export default {
     },
     data(){
         return{
-            
+
         }
     },
     watch:{
@@ -47,8 +47,8 @@ export default {
         background-color: #DBDBDB;
     }
     #btn-circle{
-        width: 70px;
-        height: 70px;
+        width: 66px;
+        height: 66px;
         border-radius: 50%;
         /* background-color: #DBDBDB; */
         margin: auto;
@@ -56,8 +56,8 @@ export default {
         /* cursor: pointer; */
     }
     #btn-stroke{
-        width: 66px;
-        height: 66px;
+        width: 62px;
+        height: 62px;
         border-radius: 50%;
         background-color: white;
         position: absolute;
@@ -67,15 +67,15 @@ export default {
     #btn-title{
         display: block;
         position: absolute;
-        width: 60px;
-        height: 60px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         /* background-color: #DBDBDB; */
         left: 3px;
         top: 3px;
         text-align: center;
         line-height: 60px;
-        font-size: 14px;
+        font-size: 12px;
         color: #fff;
     }
 </style>

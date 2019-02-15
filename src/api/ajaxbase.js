@@ -11,14 +11,24 @@ function getDashInfo(){
             if(errCode==0){
                 dash=res.data;
             }
-            resolve(data);
+            resolve(dash);
         })
     })
     
 }
-async function getDash(){
+
+async function getBaseURL(){
     let dash=await getDashInfo();
-    return dash;
+    let url='';
+    let dataPort='';
+    if(dash.url.indexOf('https')!=-1){
+        dataPort=dash.httpsCmdPort;
+    }
+    else{
+        dataPort=dash.httpCmdPort;
+    }
+    url=dash.url+':'+dataPort;
+    return url;
 }
 function getAuthority(){
     let username='admin';
@@ -39,17 +49,13 @@ function getAuthority(){
     let auth64='Basic'+btoa(username+':'+password);
     return auth64;
 }
-function getBaseURL(){
-    let baseUrl='http://'+window.location.hostname;
-    return baseUrl;
-}
 
-//let REST_BASEURL=getBaseURL()+':8085';
+let REST_BASEURL= getBaseURL();
+//let REST_BASEURL='http://172.21.84.229:8050';
 //"http://222.91.163.149";
-let dash=getDash();
-let REST_BASEURL=dash.url+':'+dash.dataPort;
+
 const advAxios=axiosA.create({
-    baseURL:REST_BASEURL+':8085',
+    baseURL:REST_BASEURL,
     headers:{
         'Authorization':getAuthority(),
         'Accept':'application/json',
@@ -58,18 +64,21 @@ const advAxios=axiosA.create({
 });
 
 const userAxios=axiosA.create({
-    baseURL:REST_BASEURL+':8085',
+    baseURL:REST_BASEURL,
     headers:{
         'Accept':'application/json',
         'Content-Type':'application/json'
     }
 });
 
-const newAxios=axiosA.create({
-    baseURL:REST_BASEURL+':18050',
-});
-
+// const newAxios=axiosA.create({
+//     baseURL:REST_BASEURL,
+// });
 async function ajax4dash({method,url,data}){
+    let REST_BASEURL=await getBaseURL();
+    const newAxios=axiosA.create({
+        baseURL:REST_BASEURL,
+    });
     const ret=await newAxios({
         method,
         url,
@@ -86,6 +95,6 @@ export{
     advAxios,
     userAxios,
     ajax4dash,
-    getAuthority
+    getAuthority,
 }
 export default advAxios

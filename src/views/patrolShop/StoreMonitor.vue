@@ -10,6 +10,24 @@
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
             </div>
+            <el-dialog title='编辑截图'
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" width=550px height=300px top=15%>
+                <div class="canvas-content">
+                    <div class='model'>
+                        <div class='icon-right'>
+                            <div class="content" v-for="(item,index) in penList" :key="index">
+                                <div :class="{colorActive:item.showContent}"></div>
+                                <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="icanvas"  width="480" height="270" @mousedown="mouseDownAction($event)" @mousemove="mouseMoveAction($event)"></canvas>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取 消</el-button>
+                    <el-button id="confirmBtn" @click="confrimEdit" size="mini" type="primary">确 认</el-button>
+                </div>
+            </el-dialog>
             <div class="video-content" >
                 <!--@mouseenter="showModelContent=true" @mouseleave="showModelContent=false"-->
                 <div class="video-model" v-if="showModelContent">
@@ -44,11 +62,11 @@
                         </div>
                     </div>
                     <div class="iconright">
-                        <div class="paizhao-content">
+                        <div class="paizhao-content" @click="cutPicture">
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:20px;"></i>
                             <span>抓拍</span>
                         </div>
-                        <div class="sheying-content">
+                        <div class="sheying-content" @click="getVideo">
                             <i class="iconfont icon-luxiang iconpaizhao" style="font-size:24px;position:relative;top:3px;"></i>
                             <span>录像</span>
                         </div>
@@ -62,18 +80,51 @@
                     class="video-js vjs-fill">
                 </video>
             </div>
+            <div class="el-event">
+                <div :class="corEvent?'event-lside':''">
+                    <span class="event-title">创建问题</span>
+                    <el-radio-group v-model="activeEventBtn" size="mini" @change="clickEventBtn">
+                        <el-radio-button label="创建问题" class="radio-btn"></el-radio-button>
+                        <el-radio-button label="关联问题" class="radio-btn"></el-radio-button>
+                    </el-radio-group>
+                    <div>
+                        <span>问题名称</span>
+                        <el-input size="mini" class="name-input" maxlength="20" :disabled="corEvent" v-model="eventName"></el-input>
+                        <span v-if="!corEvent">问题描述</span>
+                        <span v-else class="cor-des">追加描述</span>
+                        <el-input size="mini" class="des-input" type="textarea" 
+                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                        <div class="source-content">
+                            <div class="source-details" v-if="showEmptyImg">
+                                <div>
+                                    <img :src="emptyImgSrc"/>
+                                    <span>*视频图片最多支持插入5个。</span>
+                                </div>
+                            </div>
+                            <div class="source-details" v-for="(item,index) in sourceList" :key="index">
 
+                            </div>
+                        </div>
+                        <el-button size="mini" class="submit-btn" @click="submit" type="primary">提交</el-button>
+                    </div>
+                </div>
+                <div class="right-line" v-if="corEvent"></div>
+                <div v-if="corEvent" class="event-rside">
+                    <span class="cor-des" style="margin-left:10px;">事件</span>
+                    <div class="event-content">
+                        <div class="event-details" v-for="(item,index) in eventList" :key="index">
+                            <el-radio v-model="curEvent" :label="item.id" @change="checkEvent">
+                                <span class="event-name">{{item.name}}</span></el-radio>
+                            <span class="event-date">{{item.date}}</span>
+                            <span class="event-des">{{item.descrition}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </el-col>
         <el-col :span="8" class="rside" v-if="!showSpread">
             <div class="el-header-title">
                 <span>选择门店</span>
-                <el-input
-                    size="small"
-                    class="el-search-input"
-                    placeholder="请输入关键字搜索门店"
-                    v-model="serachVale" @keyup.enter.native="searchStore">
-                    <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
-                </el-input>
             </div>
             <el-tabs v-model="activeIndex" @tab-click="handleClick" id="tabs-content">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
@@ -85,7 +136,14 @@
                             </span>
                         </div>
                         <div class="storeList-content" v-else>
-                            <div v-for="(_item,_index) in item.storeList" :key="_index" >
+                            <el-input
+                                size="small"
+                                class="el-search-input"
+                                placeholder="请输入关键字搜索门店"
+                                v-model="serachVale" @keyup.enter.native="searchStore">
+                                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                            </el-input>
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
                                 <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
@@ -97,11 +155,15 @@
                 </el-tab-pane>
             </el-tabs>
             <div class="channel-content">
-                <span>区域列表</span>
-                <div v-for="(item,index) in channelBtns" :key="index" class="btn-content">
-                    <channel-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
-                    class="channelBtn" @click.native="clickBtn(item,index)"></channel-btn>
-                </div>
+                    <span>区域列表</span>
+                    <el-scrollbar style="height:100%;">
+                        <div class="channels-srollbar">
+                            <div v-for="(item,index) in channelBtns" :key="index" class="btn-content">
+                                <channel-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
+                                class="channelBtn" @click.native="clickBtn(item,index)"></channel-btn>
+                            </div>
+                        </div>
+                    </el-scrollbar>
             </div>
             <div class="time-content">
                 <span id="date-title">选择日期</span>
@@ -154,23 +216,7 @@ export default {
     },
     data(){
         return{
-            channelBtns:[
-                {
-                    name:'水吧',
-                    isonline:true,
-                    isClick:true
-                },
-                {
-                    name:'收银台',
-                    isonline:true,
-                    isClick:false
-                },
-                {
-                    name:'物料成列',
-                    isonline:false,
-                    isClick:false
-                }
-            ],
+            channelBtns:[],
             store:{},
             cityList:[],
             popperClass:'select-popClass',
@@ -220,6 +266,29 @@ export default {
             ],
             testBack:'10s',
             showSpread:false,
+            showCutDialog:false,
+            videoEl:'',
+            canvasEl:'',
+            penList:[
+                {
+                    id:'white',
+                    showContent:true
+                },
+                {
+                    id:'yellow',
+                    showContent:false
+                },
+                {
+                    id:'red',
+                    showContent:false
+                }
+            ],
+            penChecked:'',
+            showModel:true,
+            X:0,Y:0,X1:0,Y1:0,
+            isMouseDown:false,
+            flag:0,
+
             tabList:[
                 {
                     label:'关注',
@@ -234,6 +303,7 @@ export default {
                     storeList:[]
                 }
             ],
+            tempStoreList:[],  
             recentStoreList:[],
             curDate:new Date(),
 
@@ -244,13 +314,43 @@ export default {
             weekDays:[],
 
             protocal:'DASH',
-            selGID:0,
+            //selGID:0,
             sessionId:'',
-            ivsID:'',
+            channel:{
+                ivsId:'',
+                channelId:'',
+                channelName:'',
+            },
+            activeEventBtn:'创建问题',
+            corEvent:false,
+            eventList:[
+                {
+                    id:0,
+                    name:'水吧问题1',
+                    descrition:'不干净，有杂物',
+                    date:'6分钟前',
+                    checked:false
+                },
+                {
+                    id:1,
+                    name:'水吧问题2',
+                    descrition:'不干净，有杂物',
+                    date:'2018/2/15',
+                    checked:false
+                }
+            ],
+            curEvent:'',
+            eventName:'',
+            eventDes:'',
+            showEmptyImg:true,
+            emptyImgSrc:require('../../../static/img/pic.png'),
+            sourceList:[]
         }
     },
     mounted(){
         let self=this;
+        self.videoEl=document.getElementById('previewVideo');
+        document.onmouseup=self.mouseUpAction;
         //初始化页面数据
         self.getInitStoreData();
         self.getWeekDay();
@@ -292,6 +392,7 @@ export default {
                     obj.name=item.name;
                     obj.userId=item.userId;
                     obj.favorite=item.favorite==undefined?true:item.favorite;
+                    obj.device=item.device;
                     temp.push(obj);
                 })
                 return temp;
@@ -360,6 +461,7 @@ export default {
                             obj.userId=data[j].userId;
                             obj.city=data[j].city;
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
+                            obj.device=data[j].device;
                             temp.push(obj);
                         }
                     }
@@ -373,7 +475,7 @@ export default {
              if(data.errCode==0){
                 let storeData=data.data.content;
                 self.tabList[2].storeList=getStore2Temp(storeData);
-
+                self.tempStoreList=getStore2Temp(storeData);
                 let obj={};
                 obj.storeId=storeData[0].storeId;
                 obj.storeName=storeData[0].name;
@@ -387,6 +489,7 @@ export default {
                 }
                 self.store=obj;
                 self.recentStoreList.push(self.tabList[2].storeList[0].storeList[0]);
+                self.getChannelByStore(self.tabList[2].storeList[0].storeList[0]);
             }
         },
         addStoreUp(){
@@ -416,6 +519,25 @@ export default {
                 })
             }
         },
+        clickEventBtn(val){
+            let self=this;
+            console.log(val);
+            if(val=='关联问题'){
+                self.corEvent=true;
+            }
+            else{
+                self.corEvent=false;
+            }
+        },
+        checkEvent(val){
+            let self=this;
+            console.log(val);
+            self.eventList.forEach(item=>{
+                if(item.id==val){
+                    self.eventName=item.name;
+                }
+            })
+        },
         submit(){
 
         },
@@ -426,6 +548,59 @@ export default {
         closeContent(){
             let self=this;
             self.showSpread=false;
+        },
+        cutPicture(){
+            let self=this;
+            self.showCutDialog=true;
+            this.$nextTick(()=>{
+                self.canvasEl=document.getElementById('icanvas');
+                var ctx = self.canvasEl.getContext('2d');
+                var width=self.videoEl.videoWidth;
+                var height=self.videoEl.videoHeight;
+                self.canvasEl.width=width/4;
+                self.canvasEl.height=height/4;
+                ctx.drawImage(self.videoEl,0,0,width/4,height/4);
+                var oGrayImg=icanvas.toDataURL('image/png');
+            })
+        },
+        mouseDownAction(e){
+           let self=this;
+           self.isMouseDown=true;
+           self.X=e.offsetX;
+           self.Y=e.offsetY;
+        },
+        mouseMoveAction(e){
+            let self=this;
+            if(self.isMouseDown){
+                self.X1=e.offsetX;
+                self.Y1=e.offsetY;
+                self.drawLine(self.X,self.Y,self.X1,self.Y1);
+                self.flag++;
+            }
+        },
+        mouseUpAction(e){
+            let self=this;
+            self.isMouseDown=false;
+            self.flag=0;
+        },
+        drawLine(x,y,x1,y1){
+            let self=this;
+            var ctx=self.canvasEl.getContext('2d');
+            if(self.flag){
+                ctx.beginPath();
+            }
+            ctx.moveTo(x,y);
+            ctx.lineWidth=4;
+            ctx.strokeStyle=self.penChecked;
+            ctx.lineTo(x1,y1);
+            ctx.stroke();
+            if(self.flag!=0){
+                self.X=self.X1;
+                self.Y=self.Y1;
+            }
+        },
+        getVideo(){
+
         },
         async playVideo(url) {
             console.log('playvideo enter!');
@@ -438,19 +613,15 @@ export default {
             let self=this;
             self.playState=false;
             let sessionId= await dashAPI.Online();
-            
             console.log(sessionId);
-            let result=await dashAPI.Enum(sessionId);
-            let ivsID=result.IVSPlatform[0].ID;
             self.sessionId=sessionId;
-            self.ivsID=ivsID;
             const data = {
                 request: { 
                   method: 'connection',
                   sessionID: sessionId,
                   streamingProtocol:this.protocal,
-                  IVSID:ivsID,
-                  channel:JSON.stringify(this.selGID+1)
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId)
                 }
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
@@ -480,8 +651,8 @@ export default {
             let self=this;
             console.log(self.tabList);
             console.log(self.serachVale.trim());
-            let tempArray=[];
-            let tempTabList=self.tabList;
+            
+            let tempStoreList=self.tempStoreList;
             let getStore2Temp=data=>{
                 let cityList=[];
                 data.map(x=>x.city).forEach(item=>{
@@ -502,6 +673,7 @@ export default {
                             obj.userId=data[j].userId;
                             obj.city=data[j].city;
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
+                            obj.device=data[j].device;
                             temp.push(obj);
                         }
                     }
@@ -511,33 +683,23 @@ export default {
                 }
                 return storeListTemp;
             }
-            tempTabList.forEach((item,index)=>{
-                let temp=[];
-                if(index!=2){
-                    item.storeList.forEach(_item=>{
-                        if(_item.name.indexOf(self.serachVale.trim())!=-1){
-                            temp.push(_item);
-                        }
-                    })
-                    tempArray.push(temp);
-                }
-                else{
-                    item.storeList.forEach((_item,_index)=>{
-                        _item.storeList.forEach((itemDs,indexDs)=>{
-                            if(itemDs.name.indexOf(self.serachVale.trim())!=-1){
-                                temp.push(itemDs);
-                            }
-                        })
-                    })
-                    tempArray.push(getStore2Temp(temp));
-                }
+            let temp=[];
+            let tempArray=[];
+            let tempStore=[];
+            tempStoreList.forEach((_item,_index)=>{
+                _item.storeList.forEach((itemDs,indexDs)=>{
+                    temp.push(util.getPinyinList(itemDs.name));
+                    tempStore.push(itemDs);
+                })
             })
-            console.log(tempArray);
-            self.tabList=[
-                {label:'关注',storeList:tempArray[0]},
-                {label:'最近访问',storeList:tempArray[1]},
-                {label:'全部门店',storeList:tempArray[2]}
-            ]
+            console.log(temp);
+            for(var i=0;i<temp.length;i++){
+                if(temp[i][0].indexOf(self.serachVale.trim())!=-1||
+                    temp[i][1].indexOf(self.serachVale.trim())!=-1){
+                    tempArray.push(tempStore[i]);
+                }
+            }
+            self.tabList[2].storeList=getStore2Temp(tempArray);
         },
         handleClick(tab){
             console.log(tab);
@@ -583,18 +745,49 @@ export default {
                 })
             }
             console.log(self.recentStoreList);
+            self.getChannelByStore(_item);
+        },
+        getChannelByStore(storeItem){
+            let self=this;
+            let temp=[];
+            storeItem.device.forEach((item,index)=>{
+                let obj={};
+                obj.id=item.id;
+                obj.name=item.name;
+                obj.ivsId=item.ivsId;
+                obj.channelId=item.channelId;
+                obj.isonline=true;
+                if(index==0){
+                    obj.isClick=true;
+                    self.channel={
+                        ivsId:item.ivsId,
+                        channelId:item.channelId,
+                        channelName:item.name
+                    }
+                }
+                else{
+                    obj.isClick=false;
+                }
+                temp.push(obj);
+            })
+            self.channelBtns=temp;
         },
         clickBtn(item,index){
             let self=this;
             if(item.isonline){
                 item.isClick=true;
+                let obj={
+                    ivsId:item.ivsId,
+                    channelId:item.channelId,
+                    channelName:item.name
+                }
+                self.channel=obj;
             }
             else{
                 return false;
             }
             self.channelBtns.forEach((_item,_index)=>{
                 if(_index!=index){
-                    //PubSub.publish('is-click',{isClick:false});
                     _item.isClick=false;
                 }
             })
@@ -690,6 +883,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+    *{
+        font-family: 'Microsoft YaHei';
+    }
     $red:#FB4C5D;
     $lightRed:#FEE4E7;
     @function rem($val){
@@ -735,6 +931,7 @@ export default {
                 width: 100%;
             }
         }
+        /*左侧视频区域css*/
         .lside{
             padding:15px 10px 15px 20px;
             .el-header-title{
@@ -793,6 +990,71 @@ export default {
                     color: #fff;
                 }
             }
+            /*截图区域css*/
+            #cancelBtn{
+                width: 76px;
+                margin-right: 15px;
+                background-color: #EAEDF2 !important;
+                color: #708090 !important;
+            }
+            #confirmBtn{
+                width: 76px;
+            }
+            .canvas-content{
+                position: relative;
+                .model{
+                    width: 100%;
+                    height: 100%;
+                    background-color: transparent;
+                    position: absolute;
+                    z-index: 2;
+                    pointer-events: none;
+                    .icon-right{
+                        width: 100px;
+                        height: 30%;
+                        position: absolute;
+                        right: 30px;
+                        top: 15%;
+                        .content{
+                            width: 100%;
+                            height: 30%;
+                            position: relative;
+                            .color{
+                                width: 16px;
+                                height: 16px;
+                                border-radius: 8px;
+                                position: absolute;
+                                margin: auto 0;
+                                top: 4px;
+                                left: 20%;
+                                margin-left: 4px;
+                                z-index: 3;
+                                cursor: pointer;
+                            }
+                            .colorActive{
+                                background-color: #ddd;
+                                border-radius: 50%;
+                                width: 24px;
+                                height: 24px;
+                                position: absolute;
+                                margin: auto 0;
+                                left: 20%;
+                                z-index: 3;
+                            }
+                            #white{
+                                background-color: white;
+                            }   
+                            #yellow{
+                                background-color: yellow;
+                            }
+                            #red{
+                                background-color: red;
+                            }
+                        }
+                    }
+                }
+            }
+            /*video区域css*/
             .video-content{
                 width: 100%;
                 height: auto;
@@ -882,7 +1144,101 @@ export default {
                     }
                 }
             }
+            /*新增问题区域css*/
+            .el-event{
+                text-align: left;
+                border: 1px solid #e3e9f4;
+                overflow: hidden;
+                .event-lside{
+                    width: 60%;
+                    float: left;
+                }
+                .right-line{
+                    width:1px; 
+                    height:340px;
+                    position: relative;
+                    top: 50px;
+                    background-color:#e3e9f4;
+                    float: left;
+                    margin-right: 15px;
+                }
+                .event-rside{
+                    position: relative;
+                    top: 50px;
+                    width:-webkit-calc(40% - 16px); 
+                    width:-moz-calc(40% - 16px); 
+                    width:calc(40% - 16px);
+                    float: right;
+                    .event-content{
+                        padding-left: 10px;
+                        .event-details{
+                            position: relative;
+                            .event-name{
+                                margin-left: 10px;
+                                display: inline;
+                            }
+                            .event-date{
+                                display: inline;
+                                font-size: 12px;
+                                position: absolute;
+                                right: 15px;
+                                margin: 0;
+                            }
+                            .event-des{
+                                font-size: 12px;
+                                margin-left: 35px;
+                            }
+                        }
+                        
+                    }
+                }
+                span{
+                    display: block;
+                    margin: 15px;
+                    margin-left: 20px;
+                    font-size: 14px;
+                }
+                .radio-btn{
+                    margin-left: 20px;
+                    &:last-child{
+                        border-left: 1px solid #dcdfe6;
+                    }
+                }
+                .cor-des{
+                    font-weight: bold;
+                }
+                .name-input{
+                    max-width: 180px;
+                    margin-left: 20px;
+                }
+                .des-input{
+                    width: 90%;
+                    margin: auto 20px;
+                    font-size: 14px;
+                    
+                }
+                .source-content{
+                    min-height: 150px;
+                    width: 90%;
+                    margin: auto 20px;
+                    .source-details{
+                        padding: 15px 0;
+                        display: inline-block;
+                        span{
+                            font-size: 12px;
+                            color: #FCB83B;
+                            margin: 0;
+                        }
+                    }
+                }
+                .submit-btn{
+                    margin-left: 20px;
+                    width: 80px;
+                    margin-bottom: 15px;
+                }
+            }
         }
+        /*右侧区域css*/
         .rside{
             padding: 15px 10px 15px 10px;
             .el-header-title{
@@ -895,21 +1251,28 @@ export default {
                     font-size: 14px;
                     font-weight: bold;
                 }
-                .el-search-input{
-                    @include point(width,200);
-                    @include point(margin-right,20);
-                    @include point(margin-top,20);
-                }
             }
             #tabs-content{
                 margin-top: 10px;
-                @include point(height,260);
+                @include point(height,280);
                 .storeList-content{
                     text-align: left;
-                    @include point(height,220);
+                    @include point(margin-top,10);
+                    @include point(height,260);
                     .activeClass{
                         background-color: $red;
                         color: #fff;
+                    }
+                    .stores{
+                        &:last-child{
+                            @include point(margin-bottom,20);
+                        }
+                    }
+                    .el-search-input{
+                        @include point(width,200);
+                        @include point(margin-left,15);
+                        @include point(margin,15);
+                        @include point(margin-top,10);
                     }
                     .store-name{
                         display: inline-block;
@@ -939,6 +1302,7 @@ export default {
             .channel-content{
                 width: 100%;
                 height: auto;
+                
                 overflow: hidden;
                 span{
                     display: block;
@@ -948,10 +1312,15 @@ export default {
                     font-weight: bold;
                     color: #424151;
                 }
+                .channels-srollbar{
+                    height: 142px;
+                    text-align: left;
+                }
                 .btn-content{
                     //display: inline-block;
                     width: 100px;
-                    float: left;
+                    display: inline-block;
+                    margin-bottom: 5px;
                 }
             }
             .time-content{
@@ -1107,7 +1476,6 @@ export default {
 .select-popClass.el-popper[x-placement^=bottom] .popper__arrow::after{
     border-bottom-color:#34374A !important;
 }
-
 </style>
 <style scoped>
 .el-search-input.el-input--small >>>.el-input__inner{
@@ -1124,5 +1492,8 @@ export default {
 <style>
     #el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
+    }
+    .des-input .el-textarea__inner{
+        font-family: 'Microsoft YaHei';
     }
 </style>

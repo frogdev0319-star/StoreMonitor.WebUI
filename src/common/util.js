@@ -1,41 +1,6 @@
 import { format } from "url";
-
+import ConvertPinyin from '@/common/getpinyin'
 export default {
-
-    //格式化电源状态列表
-    formatter:function(oldlist){
-        var newList=[];
-        for(let i=0;i<oldlist.length;i++){
-            var obj={en:'',zh:''};
-            if('shutdown'==oldlist[i]){
-                obj.en=oldlist[i];
-                obj.zh='关机';
-                newList.push(obj);
-            }
-            else if('restart'==oldlist[i]){
-                obj.en=oldlist[i];
-                obj.zh='重新启动';
-                newList.push(obj);
-            }
-            else if('wol'==oldlist[i]){
-                obj.en=oldlist[i];
-                obj.zh='待机';
-                newList.push(obj);
-            }
-            else if('hibernate'==oldlist[i]){
-                obj.en=oldlist[i];
-                obj.zh='睡眠';
-                newList.push(obj);
-            }
-            else if('suspend'==oldlist[i]){
-                obj.en=oldlist[i];
-                obj.zh='暂停';
-                newList.push(obj);
-            }
-
-        }
-        return newList;
-    },
 
 //显示器请求返回信息处理
     handleScreenData(screenList){
@@ -381,173 +346,6 @@ export default {
         return num;
     },
 
-    getTypeList(type){
-        let objList=[];
-        switch(type){
-            case 'hard':
-                objList=[
-                    {
-                        "id":"0",
-                        "name":"CPU温度",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"摄氏度"
-                            },
-                        ],
-                        "property":"cpu temperature"
-                    },
-                    {
-                        "id":"1",
-                        "name":"CPU风扇转速",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"转/分"
-                            },
-                        ],
-                        "property":"cpu fan speed"
-                    },
-                    {
-                        "id":"2",
-                        "name":"主板温度",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"摄氏度"
-                            },
-                        ],
-                        "property":"system temperature"
-                    },
-                    {
-                        "id":"3",
-                        "name":"主板风扇转速",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"转/分"
-                            },
-                        ],
-                        "property":"system fan speed"
-                    }
-                ];
-                break;
-            case 'pre':
-                objList=[
-                    {
-                        "id":"0",
-                        "name":"显示器连接数目",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"个"
-                            },
-                        ],
-                        "property":""
-                    },
-                    {
-                        "id":"1",
-                        "name":"打印机使用状态切刀数",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"万次"
-                            },
-                        ],
-                        "property":""
-                    },
-                    {
-                        "id":"2",
-                        "name":"打印机使用状态里程数",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"km"
-                            },
-                        ],
-                        "property":""
-                    }
-                ];
-                break;
-            case 'sys':
-                objList=[
-                    {
-                        "id":"0",
-                        "name":"CPU使用率",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"%"
-                            },
-                        ],
-                        "property":"cpu"
-                    },
-                    {
-                        "id":"1",
-                        "name":"内存使用率",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"%"
-                            },
-                        ],
-                        "property":"mem"
-                    }
-                ];
-                break;
-            case 'hdd':
-                objList=[
-                    {
-                        "id":"0",
-                        "name":"硬盘温度",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"温度"
-                            },
-                        ],
-                        "property":"hddTemp"
-                    },
-                    {
-                        "id":"1",
-                        "name":"硬盘存储容量",
-                        "units":[
-                            {
-                                "id":"0",
-                                "name":"%"
-                            },
-                        ],
-                        "property":""
-                    }
-                ];
-                break;
-            case 'bwsys':
-                objList=[
-                    {
-                        "id":"0",
-                        "name":"硬盘温度"
-                    },
-                    {
-                        "id":"1",
-                        "name":"硬盘存储容量"
-                    }
-                ];
-                break;
-            case 'bwpre':
-                objList=[
-                    {
-                        "id":"0",
-                        "name":"CPU使用率"
-                    },
-                    {
-                        "id":"1",
-                        "name":"内存使用率"
-                    }
-                ];
-                break;
-        }
-        return objList;
-    },
     getRouteByTag(curTag,data){
         console.log(data);
         let temp=[];
@@ -594,5 +392,15 @@ export default {
         let minutes=formatDate(date.getMinutes());
         let second=formatDate(date.getSeconds());
         return `${year}${month}${day}-${hours}${minutes}${second}`;
+    },
+    /**
+     * 将当前数组中的汉字转换为其对应的拼音
+     * @param {需要转换的数组} temp 
+     */
+    getPinyinList(str){
+        let temp=[];
+        temp.push(ConvertPinyin(str));
+        temp.push(str);
+       return temp;
     }
 }
