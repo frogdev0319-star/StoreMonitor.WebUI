@@ -1,5 +1,6 @@
 import axiosA from 'axios'
 import {getDashServerInfo} from './device.js'
+import {getCookie} from '@/common/auth.js'
 axiosA.defaults.withCredentials = false
 
 function getDashInfo(){
@@ -16,9 +17,24 @@ function getDashInfo(){
     })
     
 }
-
-async function getBaseURL(){
+async function getBaseURLByDash(){
     let dash=await getDashInfo();
+    let url='';
+    let dataPort='';
+    if(dash.url.indexOf('https')!=-1){
+        dataPort=dash.httpsCmdPort;
+    }
+    else{
+        dataPort=dash.httpCmdPort;
+    }
+    url=dash.url+':'+dataPort;
+    return url;
+}
+function getBaseURL(){
+    let dash;
+    if(getCookie('DASH')!=undefined){
+        dash=JSON.parse(getCookie('DASH'));
+    }
     let url='';
     let dataPort='';
     if(dash.url.indexOf('https')!=-1){
@@ -71,11 +87,12 @@ const userAxios=axiosA.create({
     }
 });
 
-// const newAxios=axiosA.create({
-//     baseURL:REST_BASEURL,
-// });
+
 async function ajax4dash({method,url,data}){
-    let REST_BASEURL=await getBaseURL();
+    //let REST_BASEURL=await getBaseURL();
+    if(REST_BASEURL==undefined){
+        REST_BASEURL=await getBaseURLByDash();
+    }
     const newAxios=axiosA.create({
         baseURL:REST_BASEURL,
     });

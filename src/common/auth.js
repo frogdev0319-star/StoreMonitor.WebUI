@@ -14,6 +14,7 @@ export function removeToken(){
     return Cookies.remove(TokenKey);
 }
 
+
 export function getCookie(name){
     return Cookies.get(name);
 }

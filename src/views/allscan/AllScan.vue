@@ -29,6 +29,9 @@
                 <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">取 消</el-button>
             </div>
         </el-dialog>
+
+        <input type="file" accept="image/*" name="file_head" class="uploadLogoImg" @change="uploadImgLogo($event)"/>
+
      </div>
 
 </template>
@@ -103,16 +106,15 @@
     
 </style>
 <style>
-.el-dialog__body{
+/* .el-dialog__body{
     padding: 0px;
 }
 .el-dialog__title{
     font-size: 16px !important;
-    font-size: 16px !important;
     float: left;
     margin-bottom: 15px;
     margin-left: 15px;
-}
+} */
 </style>
 
 <script>
@@ -153,13 +155,33 @@ import $ from 'jquery';
       };
     },
     methods: {
-       uploading(event){
-            this.file=event.target.files[0]; //获取文件
-            var windowURL=window.URL||window.webkitURL;
-            this.file = event.target.files[0];
-            //创建图片文件的url
-            this.src = windowURL.createObjectURL(event.target.files[0]);
-       },
+       //当选择完成图片之后调用
+        uploadImgLogo(event){
+            let _this = this;
+        
+            //1. 拿到fileinput里面的文件, 这个file是一个file对象， file对象不能直接展示的
+            var file = event.target.files[0];
+            this.fileImg = file;
+            // console.log(file);
+        
+            //2. 读取文件，成功img标签可以直接使用的格式
+            //FileReader类就是专门用来读文件的
+            var reader = new FileReader();
+        
+            //3. 开始读文件
+            //readAsDataURL: dataurl它的本质就是图片的二进制数据， 进行base64加密后形成的一个字符串， 这个字符串可以直接作用img标签的图片资源使用
+            reader.readAsDataURL(file);
+        
+            //4. 因为文件读取是一个耗时操作， 所以它在回调函数中，才能够拿到读取的结果
+            reader.onload = function() {
+                // console.log(reader.result);
+                //直接使用读取的结果
+                _this.imgDataUrl = reader.result;
+                _this.isUpImg = "1";
+            }
+            // this.imgDataUrl = file;
+        },
+
        submit(){
            event.preventDefault(); //取消默认行为
            let formdata=new FormData();

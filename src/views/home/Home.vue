@@ -37,7 +37,7 @@
                 </el-col>
             </el-col>
             <el-col class="main" :span="24" 
-            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event')?
+            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -148,7 +148,6 @@ export default {
         },
         handleselect(key, keyPath){
             console.log(key);
-
         },
         selectItem(item,index){
             console.log(item);
@@ -190,7 +189,6 @@ export default {
             self.$store.dispatch('LogOut').then((res)=>{
                console.log(res);
             })
-            
         },
         logOut(){
             let self=this;

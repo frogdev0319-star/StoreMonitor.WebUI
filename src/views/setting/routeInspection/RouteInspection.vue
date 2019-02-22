@@ -436,7 +436,7 @@ export default {
             console.log(ret);
             if(ret.data!=undefined&&ret.data.isLogin){
                 if(self.elTableData[Number(self.activeName)].routeData.length!=0){
-                self.showConfirmImport=true;
+                    self.showConfirmImport=true;
                 }
                 else{
                     self.showImportContent=true;
@@ -675,8 +675,10 @@ export default {
     }
 }
 </script>
+<style>
+@import '../../../assets/css/importfile.css'; 
+</style>
 <style lang="scss" scoped>
-    @import '../../../assets/css/importfile.css'; 
     $mainColor:#FB4C5D;
     *{
         font-family: Microsoft YaHei;
@@ -734,7 +736,7 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    padding: 3px 5px !important;
+                    padding: 2px 5px !important;
                     
                     position: relative;
                     top: 3px;
@@ -800,8 +802,4 @@ export default {
         width: 100%;
     }
 </style>
-<style>
-.el-dialog__title{
-    font-size: 16px !important;
-}
-</style>
+

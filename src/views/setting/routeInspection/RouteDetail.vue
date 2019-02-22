@@ -118,7 +118,7 @@
                         <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
-                                <el-radio-button style="margin-left:10px;" 
+                                <el-radio-button style="margin-left:10px;" class="elradio"
                                 v-for="(item,key) in radioList" :key="key" 
                                 :label="item.label"></el-radio-button>
                             </el-radio-group>
@@ -451,6 +451,7 @@ export default {
 
         emptyImport(){
             this.showImportContent=true;
+            
         },
         checkBeforeImport(){
             let self=this;
@@ -588,6 +589,9 @@ export default {
     },
 }
 </script>
+<style>
+@import '../../../assets/css/importfile.css'; 
+</style>
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
@@ -723,6 +727,11 @@ export default {
         padding-top: 0px;
         line-height: 10px;
     }
+    .elradio{
+        &:last-child{
+            border-left: 1px solid #dcdfe6;
+        }
+    }
     .data-empty{
         margin: 0 auto;
         margin-top: 14%;
@@ -772,17 +781,9 @@ export default {
 .el-dialog__body{
     padding: 0px;
 }
-.el-radio-button__inner{
-    background-color: #E9ECF1 !important;
+.elradio .el-radio-button__inner{
     width: 86px;
     border-radius: 5px !important;
-    border: 0px;
-}
-.el-radio-button__orig-radio:checked+.el-radio-button__inner{
-    background-color: #FB4C5D !important;
-    border: 0px;
-    box-shadow:-1px 0 0 0 #FB4C5D !important;
-    -webkit-box-shadow:-1px 0 0 0 #FB4C5D !important;
 }
 </style>
 

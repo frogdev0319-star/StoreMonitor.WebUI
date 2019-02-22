@@ -34,3 +34,10 @@ export const getEventCount=data=>{
         data
     })
 }
+
+export const getStorageInfo=()=>{
+    return request({
+        url:'/storage/info',
+        method:'get'
+    })
+}

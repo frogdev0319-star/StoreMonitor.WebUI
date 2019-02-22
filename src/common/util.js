@@ -138,44 +138,6 @@ export default {
         }
     },
 
-    //提取CPU和内存使用率
-    getHardwareUSageList(list){
-        list.forEach(item=>{
-            item.ts=this.getdate(item.ts);
-            item.availphysMemKB=Math.floor((1-parseInt(item.data["availPhysMemKB"])/parseInt(item.data["totalPhysMemKB"]))*100);
-        })
-         return list;
-    },
-    //提取硬盘温度信息
-    getHDDTempList(list){
-        list.forEach(item=>{
-            item.ts=this.getdate(item.ts);
-        })
-         return list;  
-    },
-
-    //硬盘使用率提取
-    changeProcess(value) {
-        var num = value * 3.6;
-        if(num <180) {
-            $('.right').css('transform', 'rotate(' + num + 'deg)');
-        }
-        else {
-            $('.left').css('transform', 'rotate(' + (num-180) + 'deg)');
-            $('.right').css('transform', 'rotate(180deg)');
-        }
-    },
-
-    //提取在线设备和离线设备数量
-    getOnlineDevice(list){
-        let onlineDeviceNum=0;
-        list.forEach((item)=>{
-            if(item.status=='Connected')
-                onlineDeviceNum++;
-        });
-
-        return onlineDeviceNum;
-    },
 
     //提取异常等级分布
     getExceptRank(ranklist,rankvalue,rankmock){
@@ -402,5 +364,28 @@ export default {
         temp.push(ConvertPinyin(str));
         temp.push(str);
        return temp;
+    },
+      // 随机生成文件名
+    random_string(len) {
+        len = len || 32;
+        var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+        var maxPos = chars.length;
+        var pwd = '';
+        for (let i = 0; i < len; i++) {
+          pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+        }
+        return pwd;
+    },
+    getDateStr(ts){
+        let dateStr='';
+        let t=new Date(ts);
+        let years=t.getFullYear();
+        let month=t.getMonth()+1;
+        let day=t.getDate();
+        let hour=t.getHours()<10?'0'+t.getHours():t.getHours();
+        let min=t.getMinutes()<10?'0'+t.getMinutes():t.getMinutes();
+        let second=t.getSeconds()<10?'0'+t.getSeconds():t.getSeconds();
+        dateStr=years+'-'+month+'-'+day+' '+hour+':'+min+':'+second;
+        return dateStr;
     }
 }

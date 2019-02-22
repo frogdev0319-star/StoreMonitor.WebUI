@@ -70,7 +70,7 @@ async function  RealTime(isStart,data) {
        if ( ret.data.result.state == 'OK' ) {
         console.log(ret.data.result.mpd);  
         return ret.data.result.mpd;
-    }
+      }
        else {
             console.log('preview failed!');  
             return '';
@@ -80,31 +80,49 @@ async function  RealTime(isStart,data) {
         console.log(ret.data.result);
     }
 }
+async function stopRealTime(data){
+  const url = '/AdvStreamingService/LiveStream';
+  const method = 'PUT';
+  const ret = await ajax4dash({
+    url,
+    method,
+    data
+  });
 
-async function  Playback(isStart,data) {
-    console.log('Dash.js Playback Enter!');
-    const url = '/AdvStreamingService/PlaybackStream';
-    const method = 'PUT';
-  
-    const ret = await ajax4dash({
-      url,
-      method,
-      data
-    });
-  
-    if ( isStart == 1 ){
-      if ( ret.data.result.state == 'OK' ) {
-        console.log(ret.data.result.mpd);  
-        return ret.data.result.mpd;
-      }
-      else {
-        console.log('playback failed!');  
-        return '';
-      }
-    } 
-    if ( isStart == 0 ) {
-      console.log(ret.data.result);
-      return '';  
+  if ( isStart == 1 ){
+    if ( ret.data.result.state == 'OK' ) {
+      console.log(ret.data.result.mpd);  
+      return ret.data.result.mpd;
     }
+    else {
+        console.log('preview failed!');  
+        return '';
+    }
+  } 
+  if ( isStart == 0 ) {
+      console.log(ret.data.result);
+  }
 }
-export default {Online,Offline,Enum,RealTime,Playback}
+async function playBack(isStart,data){
+  const url = '/AdvStreamingService/PlaybackStream';
+  const method = 'PUT';
+  const ret = await ajax4dash({
+    url,
+    method,
+    data
+  });
+  if ( isStart == 1 ){
+    if ( ret.data.result.state == 'OK' ) {
+      console.log(ret.data.result.mpd);  
+      return ret.data.result.mpd;
+    }
+    else {
+        console.log('preview failed!');  
+        return '';
+    }
+  } 
+  if ( isStart == 0 ) {
+      console.log(ret.data.result);
+  }
+}
+export default {Online,Offline,Enum,RealTime,playBack}

@@ -79,7 +79,7 @@
                         <!--视频资源-->
                     <div  v-else class="video-content">
                         <video  height=83% width=90%  prload controls 
-                                class="video-js vjs-fill" style="min-width:150px;max-width:150px; min-height:100px; max-height:100px;object-fit: fill;">
+                                class="video-js vjs-fill" style="min-width:200px;max-width:200px; min-height:120px; max-height:120px;object-fit: fill;">
                                 <source :src="item.url">
                         </video>
                     </div>
@@ -139,7 +139,7 @@
                                     </div>
                                    <div  v-else class="video-content">
                                         <video  height=83% width=90%  prload controls
-                                                class="video-js vjs-fill" style="min-width:150px;max-width:150px;min-height:100px; max-height:100px;object-fit: fill;">
+                                                class="video-js vjs-fill" style="min-width:200px;max-width:200px;min-height:120px; max-height:120px;object-fit: fill;">
                                                 <source :src="_item.url">
                                         </video>
                                     </div>
@@ -450,7 +450,7 @@ export default {
                         obj.description=item.description;
                         switch(item.status){
                             case 0: obj.showLabel=true;obj.spanStyle={'background-color':'#FCB83B'};
-                                obj.process='待处理'; break;
+                                obj.process='未处理'; break;
                             case 1: obj.showLabel=true;obj.spanStyle={'background-color':'#434B5E'};
                                 obj.process='已处理'; break;
                             case 2: obj.showLabel=true;obj.spanStyle={'background-color':'#6097F4'};

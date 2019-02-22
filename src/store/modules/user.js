@@ -1,5 +1,6 @@
 import {loginByUsername,logout,getUserInfo} from '@/api/login'
-import {getToken,setToken,removeToken} from '@/common/auth'
+import {getDashServerInfo} from '@/api/device'
+import {getToken,setToken,removeToken,getCookie,setCookie} from '@/common/auth'
 import api from '@/api/index'
 
 const user={
@@ -8,6 +9,7 @@ const user={
         status:'',
         code:'',
         token:getToken(),
+        dash:getCookie('DASH'),
         cancel:null,
         name:'',
         avatar:'',
@@ -24,6 +26,9 @@ const user={
           },
           SET_TOKEN: (state, token) => {
             state.token = token
+          },
+          SET_DASH:(state,dash)=>{
+            state.dash=dash
           },
           SET_INTRODUCTION: (state, introduction) => {
             state.introduction = introduction
@@ -45,6 +50,19 @@ const user={
           }
     },
     actions:{
+        SetDash({commit}){
+            return new Promise((resolve,reject)=>{
+                getDashServerInfo().then(res=>{
+                    console.log(res);
+                    const data=res.data;
+                    if(res.data){
+                        commit('SET_DASH',data);
+                        setCookie('DASH',JSON.stringify(data));
+                    }
+                    resolve(res);
+                })
+            })
+        },
         LoginByUser({commit},userInfo){
             const username=userInfo.username.trim();
             let params={

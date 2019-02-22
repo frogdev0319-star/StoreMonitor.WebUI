@@ -90,7 +90,7 @@ export const deleteInspect=async (params1,params2)=>{
 export const submitInspectItem=data=>{
     return request({
         url:'/inspect/submit',
-        method:'get',
+        method:'post',
         data
     })
 }
@@ -131,3 +131,4 @@ export const getInspectBindCount=data=>{
         data
     })
 }
+

@@ -14,6 +14,8 @@ import 'videojs-flash'
 
 import rem from '@/common/rem'
 
+import BootstrapVue from 'bootstrap-vue'
+Vue.use(BootstrapVue)
 
 import store from './store/index.js';
 import $ from 'jquery';

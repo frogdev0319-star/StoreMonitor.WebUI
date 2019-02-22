@@ -36,7 +36,7 @@ input:disabled{
     border-radius: 4px;
     padding: 4px 12px;
     color: #fff;
-    font-size:0.75rem;
+    font-size:12px;
     text-decoration: none;
     text-indent: 0;
     line-height: 20px;
@@ -58,4 +58,15 @@ input:disabled{
 .el-tabs__nav-wrap::after{
     height: 1px !important;
     background-color: #e3e9f4 !important;
+}
+.el-dialog__header{
+    overflow: hidden;
+}
+.el-dialog__body{
+    padding: 0px;
+}
+.el-dialog__title{
+    font-size: 14px;
+    color: #303133;
+    float:left;
 }

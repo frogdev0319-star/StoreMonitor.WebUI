@@ -78,7 +78,7 @@
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
-                                        <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >待处理</span>
+                                        <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >未处理</span>
                                         <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >已处理</span>
                                         <span class="icon-span" style="background-color:#6097F3;" v-else>已结案</span>       
                                     </template>
@@ -139,7 +139,7 @@
                     }
                 },
                 toolTipClass: 'page-login-toolTipClass',
-                states:[{value: 0,label: '全部'},{value: 1,label: '待处理'}, 
+                states:[{value: 0,label: '全部'},{value: 1,label: '未处理'}, 
                         {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
                 curState:'',
                 value:0,

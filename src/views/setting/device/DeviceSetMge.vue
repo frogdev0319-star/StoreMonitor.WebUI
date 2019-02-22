@@ -317,9 +317,7 @@ export default {
                 "url": self.dash.url,
                 "httpCmdPort": self.dash.httpCmdPort,
                 "httpsCmdPort": self.dash.httpsCmdPort,
-                "dataPort": self.dash.dataPort,
-                "loginId": "",
-                "password": ""
+                "dataPort": self.dash.dataPort
             };
             if(data.errCode!=null&&data.errCode==500){ //Dash Server does not exsit!
                 deviceRESTful.addDashServer(params).then(res=>{

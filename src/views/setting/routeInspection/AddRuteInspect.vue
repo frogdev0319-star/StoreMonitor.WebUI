@@ -1039,9 +1039,6 @@ export default {
     background-color: #FB4C5D !important;
     border-color:#FB4C5D !important;
 }
-/* .el-dialog{
-    margin-left:85vh !important;
-} */
 .el-dialog__body{
     padding: 0px !important;
 }
