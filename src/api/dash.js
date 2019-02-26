@@ -73,7 +73,7 @@ async function  RealTime(isStart,data) {
       }
        else {
             console.log('preview failed!');  
-            return '';
+            return ret.data.result;
         }
     } 
     if ( isStart == 0 ) {
@@ -118,7 +118,7 @@ async function playBack(isStart,data){
     }
     else {
         console.log('preview failed!');  
-        return '';
+        return ret.data.result;
     }
   } 
   if ( isStart == 0 ) {

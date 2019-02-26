@@ -13,55 +13,49 @@
                     提交
                 </el-button> 
             </div>
-            <div class="video-content" >
-                <!--@mouseenter="showModelContent=true" @mouseleave="showModelContent=false"-->
-                <div class="video-model" v-if="showModelContent">
-                    <div class="icon-footer">
-                        <div class="iconlside">
-                            <i class="iconfont icon-bofang1 iconplay" @click="playVideo" v-if="playState"></i>
-                            <i class="iconfont icon-zantingtingzhi iconplay" @click="purseVideo" v-else></i>
-                        </div>
-                        <div class="iconrside">
-                            <span>倍速</span>
-                            <el-select class="el-test" size="mini" v-model="testSpeed" :popper-class="popperClass">
-                                <el-option
-                                v-for="(item) in speedList" 
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                                </el-option>
-                            </el-select>
-                            <span>视频回退</span>
-                            <el-select class="el-test" size="mini" v-model="testBack" :popper-class="popperClass">
-                                <el-option
-                                v-for="(item) in backList" 
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                                </el-option>
-                            </el-select>
-                            <div class="iconscreen-content">
-                                <i class="iconfont icon-quanping iconscreen"></i>
-                                <i class="iconfont icon-gongge iconscreen"></i>
+            <el-dialog title='编辑截图'
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" width=550px height=300px top=15%>
+                <div class="canvas-content">
+                    <hr class="dialog-hr"/> 
+                    <div class='model' v-if="showCutModel" @mousedown="modelMouseDown">
+                        <div class='icon-right' @mouseleave="showCutModel=false">
+                            <div class="content" v-for="(item,index) in penList" :key="index">
+                                <div :class="{colorActive:item.showContent}"></div>
+                                <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="iconright">
-                        <div class="paizhao-content">
-                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:22px;"></i>
-                            <span>抓拍</span>
+                     <canvas id="icanvas"  width="480" height="270" @mousedown="mouseDownAction($event)" 
+                    @mousemove="mouseMoveAction($event)"></canvas>
+                    <div class="cancel-content" v-if="showCancelContent">
+                        <div class="content" @click="cancleEditCanvas"> 
+                            <span>取消编辑</span>
                         </div>
-                        <div class="sheying-content">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:24px;position:relative;top:3px;"></i>
-                            <span>录像</span>
-                        </div>
-                        <div class="icon-drap-content">
-                            <i class="iconfont icon-zhedie iconzhedie" @click="spreadContent" v-if="!showSpread"></i>
-                            <i class="iconfont icon-close iconzhedie" @click="closeContent" v-else></i>
+                        <div class="content" @click="confirmEditCanvas">
+                            <span>保存编辑</span>
                         </div>
                     </div>
                 </div>
-                <video  height=83% width=90% id="previewVideo" prload autoplay
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取 消</el-button>
+                    <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
+                </div>
+            </el-dialog>
+            <div class="video-content">
+                <span id="channelName">{{channel.channelName}}</span>
+                <transition name='fade'>
+                    <div class="iconright" v-if="showModelContent" @click="cutPicture">
+                        <i class="iconfont icon-xiangji iconpaizhao" style="font-size:20px;"></i>
+                        <span>抓拍</span>
+                    </div>
+                </transition>
+                <transition name="fade">
+                    <div class="iconright1" v-if="showModelContent" @click="getVideo">
+                        <i class="iconfont icon-luxiang iconpaizhao" style="font-size:24px;position:relative;top:3px;left:3px;"></i>
+                        <span>录像</span>
+                    </div>
+                </transition>
+                <video  height=83% width=90% id="previewVideo" prload autoplay controls
                     class="video-js vjs-fill">
                 </video>
             </div>
@@ -77,7 +71,7 @@
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <div :style="{'max-height':varyWindowHeight*0.32-80+'px'}">
+                            <div :style="{'max-height':varyWindowHeight*0.32-40+'px'}">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                                     <span>{{`${item.groupName}（0/${item.items.length}）`}}</span>
@@ -85,12 +79,11 @@
                             </div>
                          </el-scrollbar>
                     </el-col>
-                    
                     <el-col :span="16">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <div class="item-content" :style="{'max-height':varyWindowHeight*0.32+'px'}"> 
-                                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
-                                    <span class="titles">{{`${index+1}. ${item.subject}`}}</span>
+                            <div class="item-content" :style="{'max-height':varyWindowHeight*0.32+'px'}">
+                                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details" >
+                                    <span class="titles" :class="!item.isIgnore?'noraml-title':'ignore-title'" @click="clickItem(item,index)">{{`${index+1}. ${item.subject}`}}</span>
                                     <el-dropdown trigger="click" class="item-score">
                                         <span class="el-dropdown-link">
                                             {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -101,6 +94,7 @@
                                              :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.scoreTitle}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
+                                    <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i>
                                     <div class="source-content">
                                         <div class="source-details" v-if="showEmptyImg">
                                             <div>
@@ -166,6 +160,9 @@
 import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
 import util from '@/common/util'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
+import {getDeviceList} from '@/api/device'
+import dashAPI from '@/api/dash'
+import videojs from '../../../static/video.js'
 export default {
     
     name:'ReInspection',
@@ -181,13 +178,36 @@ export default {
                 storeUptitle:'点击关注'
             },
             popperClass:'select-popClass',
-            showModelContent:true,
+            showModelContent:false,
             playState:true,
             activeIndex:'2',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
             showDate:true, 
             playDate:new Date(), 
+            channel:{
+                ivsId:'',
+                channelId:'',
+                channelName:'',
+            },
+            penList:[
+                {
+                    id:'white',
+                    showContent:true
+                },
+                {
+                    id:'red',
+                    showContent:false
+                },
+                {
+                    id:'yellow',
+                    showContent:false
+                }
+            ],
+            penChecked:'red',
+            showCutModel:false,
+            errorText:'',
+            showCancelContent:false,
             speedList:[
                 {
                     value:0,
@@ -274,14 +294,129 @@ export default {
             inspectList:[],
             inspectItemList:[],
             allInspectItemList:[], //当前全部没有忽略的巡检项
+            deviceList:[],
+            protocal:'DASH',
+            curDeviceId:-1,
+            videoEl:'',
+            canvasEl:'',
+            showCutDialog:false,
+            imageCanvas:new Image()
         }
     },
     mounted(){
         let self=this;
         //self.getInspectList();
+        document.onmouseup=self.mouseUpAction;
+        self.getRecentStoreList();
+        self.videoEl=document.getElementById('previewVideo');
         self.getInitStoreData();
+        self.getDeviceList();
     },
     methods:{
+        getDeviceList(){
+            let self=this;
+            getDeviceList().then(res=>{
+                if(res.errCode==0){
+                    let data=res.data;
+                    self.deviceList=data;
+                }
+            })
+        },
+        getVideo(){
+
+        },
+        cutPicture(){
+            let self=this;
+            self.showCancelContent=false;
+            if(self.sourceList.length>=5){
+                self.notify('最多上传5个资源！','warning',3000);
+                return false;
+            }
+            self.showCutDialog=true;
+            this.$nextTick(()=>{
+                self.canvasEl=document.getElementById('icanvas');
+                var ctx = self.canvasEl.getContext('2d');
+                ctx.drawImage(self.videoEl,0,0,480,270);
+                var oGrayImg=icanvas.toDataURL('image/png');
+                self.imageCanvas.src=oGrayImg;
+            })
+        },
+        checkPen(item,index){
+            let self=this;
+            item.showContent=true;
+            self.penList.forEach((_item,_index)=>{
+                if(index!=_index){
+                    _item.showContent=false;
+                }
+            })
+            self.penChecked=item.id;
+        },
+        cancleEditCanvas(){
+            let self=this;
+            self.showCancelContent=false;
+            self.canvasEl=document.getElementById('icanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            ctx.clearRect(0,0,480,270);
+            ctx.drawImage(self.imageCanvas,0,0,480,270);
+        },
+        confirmEditCanvas(){
+            let self=this;
+            self.showCancelContent=false;
+        },
+        confirmEdit(){
+            let self=this;
+            self.showEmptyImg=false;
+            let img=new Image();
+            let obj={};
+            obj.src=self.canvasEl.toDataURL("image/png");
+            obj.height='100px';
+            self.sourceList.push(obj);
+            self.showCutDialog=false;
+        },
+        modelMouseDown(e){
+            let self=this;
+            //self.showCutModel=false;
+        },
+        mouseDownAction(e){
+           let self=this;
+           self.isMouseDown=true;
+           self.X=e.offsetX;
+           self.Y=e.offsetY;
+           self.showCutModel=false;
+           self.showCancelContent=false;
+        },
+        mouseMoveAction(e){
+            let self=this;
+            if(self.isMouseDown){
+                self.X1=e.offsetX;
+                self.Y1=e.offsetY;
+                self.drawLine(self.X,self.Y,self.X1,self.Y1);
+                self.flag++;
+            }
+        },
+        mouseUpAction(e){
+            let self=this;
+            self.isMouseDown=false;
+            self.showCutModel=true;
+            self.showCancelContent=true;  //每次鼠标弹起后显示可以取消的框
+            self.flag=0;
+        },
+        drawLine(x,y,x1,y1){
+            let self=this;
+            var ctx=self.canvasEl.getContext('2d');
+            if(self.flag){
+                ctx.beginPath();
+            }
+            ctx.moveTo(x,y);
+            ctx.lineWidth=4;
+            ctx.strokeStyle=self.penChecked;
+            ctx.lineTo(x1,y1);
+            ctx.stroke();
+            if(self.flag!=0){
+                self.X=self.X1;
+                self.Y=self.Y1;
+            }
+        },
         getFaStoreList(){
             let self=this;
             return new Promise((resolve,reject)=>{
@@ -309,6 +444,12 @@ export default {
                     resolve(res);
                 })
             })
+        },
+        getRecentStoreList(){
+            let self=this;
+            if(localStorage.getItem('recentStore_reinspect')!=null){
+                self.recentStoreList=JSON.parse(localStorage.getItem('recentStore_reinspect'));
+            }
         },
         async getStoreList(){
             let self=this;
@@ -435,6 +576,7 @@ export default {
                 self.store=obj;
                 self.getInspectByStore(self.store.storeId);
                 self.recentStoreList.push(self.tabList[2].storeList[0].storeList[0]);
+                localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
             }
         },
         handleClick(tab){
@@ -469,33 +611,88 @@ export default {
                 })
             }
         },
-        getTempInsepectList(){
-            let self=this;
-
-        },
         getItemByGroup(item,index){
+            console.log(item);
             let self=this;
-            let temp=[];
-            item.items.forEach(_item=>{
-                let obj={};
-                obj.id=_item.id;
-                obj.subject=_item.subject;
-                obj.inspectInput='';
-                obj.itemScore=_item.itemScore;
-                obj.deviceId=_item.deviceId;
-                obj.isIgnore=false;  //是否忽略
-                temp.push(obj);
+            self.inspectItemList=item.items;
+            self.inspectItemList.forEach((_item,_index)=>{
+                let channelObj={};
+                if(_index==0){
+                    _item.checked=true;
+                    if(_item.deviceId!=-1){
+                        let device=self.getDeviceById(_item.deviceId);
+                        if(device!=null){
+                            channelObj.ivsId=device.ivsId;
+                            channelObj.channelName=device.name;
+                            channelObj.channelId=device.channelId;
+                        }
+                        self.channel=channelObj;
+                    }
+                }
+                else{
+                    _item.checked=false;
+                }
             });
-            self.inspectItemList=temp;
             let tempArray=[];
-            // let obj={};
-            // obj.id=item.id;
-            // obj.items=temp;
-           // tempArray.map(x=>x.id).indexOf()
             item.isClick=true;
             self.inspectList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isClick=false;
+                }
+            })
+        },
+        getDeviceById(deviceId){
+            let self=this;
+            let device=null;
+            self.deviceList.forEach(item=>{
+                if(deviceId==item.id){
+                    device=item;
+                }
+            })
+            return device;
+        },
+        ignoreItem(item,index){
+            let self=this;
+            if(item.isIgnore){
+                self.notify('当前项已忽略！','warning',3000);
+                return false;
+            }
+            this.$confirm('确认是否忽略当前巡检项？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+                item.isIgnore=true;
+            }).catch(() => {
+                console.log('cancel ignore');     
+            });
+            
+        },
+        clickItem(item,index){
+            let self=this;
+            if(item.isIgnore){
+                return false;
+            }
+            item.checked=true;
+            let obj={};
+
+            if(item.deviceId!=-1&&self.curDeviceId!=item.deviceId){  //当前选择的巡检项已绑定设备
+                let device=self.getDeviceById(item.deviceId);
+                if(device!=null){
+                    obj.ivsId=device.ivsId;
+                    obj.channelName=device.name;
+                    obj.channelId=device.channelId;
+                }
+                self.channel=obj;
+                self.curDeviceId=item.deviceId;
+            }
+            else{
+                return false;
+            }
+            self.realTime();
+            self.inspectItemList.forEach((_item,_index)=>{
+                if(index!=_index){
+                    _item.checked=false;
                 }
             })
         },
@@ -509,24 +706,72 @@ export default {
             checkOutInspectItem(params).then(res=>{
                 if(res.errCode==0){
                     let data=res.data;
-                    self.inspectList=data;
-                    if(data.length!=0){
-                        self.getItemByGroup(data[0],0);
+                    // self.inspectList=data;
+                    // if(data.length!=0){
+                    //     self.getItemByGroup(data[0],0);
+                    // }
+                    let temp=[];
+                    data.forEach((item,index)=>{
+                        let obj={};
+                        obj.groupId=item.groupId;
+                        obj.mode=item.mode;
+                        obj.groupName=item.groupName;
+                        if(index==0){
+                            obj.isClick=true;
+                        }
+                        else{
+                            obj.isClick=false;
+                        }
+                        let tempItems=[];
+                        item.items.forEach((_item,_index)=>{
+                            let itemObj={};
+                            itemObj.id=_item.id;
+                            itemObj.subject=_item.subject;
+                            itemObj.description=_item.description;
+                            itemObj.itemScore=_item.itemScore;
+                            itemObj.deviceId=_item.deviceId;
+                            itemObj.inspectInput='';
+                            itemObj.checked=false;   //是否选中状态
+                            itemObj.isIgnore=false;  //是否被忽略
+                            tempItems.push(itemObj);
+                        })
+                        obj.items=tempItems;
+                        temp.push(obj);
+                    })
+                    self.inspectList=temp;
+                    if(self.inspectList.length!=0){
+                        self.getItemByGroup(self.inspectList[0],0);
                     }
                 }
             })
         },
         submit(){
             let self=this;
-            let obj={};
-            self.inspectList.forEach(item=>{
-                item.items
+            let temp=[];
+            self.inspectList.forEach((item,index)=>{
+                item.items.forEach((_item,_index)=>{
+                    let objItem={};
+                    if(!_item.isIgnore){
+                        objItem.ts=new Date().getTime();
+                        objItem.description=_item.inspectInput.trim();
+                        objItem.score=_item.itemScore;
+                        objItem.storeId=self.store.storeId;
+                        objItem.inspectItemId=_item.id;
+                        temp.push(objItem);
+                    }
+                })
             })
-            obj.ts=new Date().getTime();
-            obj.description
-            let params={
 
+            let params={
+                items:temp
             };
+            submitInspectItem(params).then(res=>{
+                console.log(res);
+                let errCode=res.errCode;
+                if(errCode==0){
+                    self.notify('提交成功！','success',3000);
+                }
+            })
         },
         spreadContent(){
             let self=this;
@@ -538,6 +783,7 @@ export default {
         },
         async playVideo(url) {
             console.log('playvideo enter!');
+            this.showModelContent=true;
             var video = document.getElementById("previewVideo");
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
@@ -547,15 +793,13 @@ export default {
             let self=this;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
-            let result=await dashAPI.Enum(sessionId);
-            let ivsID=result.IVSPlatform[0].ID;
             const data = {
                 request: { 
                   method: 'connection',
                   sessionID: sessionId,
                   streamingProtocol:this.protocal,
-                  IVSID:ivsID,
-                  channel:JSON.stringify(this.selGID+1)
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
                 }
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
@@ -564,15 +808,6 @@ export default {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
             }
-        },
-        playVideo(){
-            let self=this;
-            self.playState=false;
-            self.realTime();
-        },
-        purseVideo(){
-            let self=this;
-            self.playState=true;
         },
         searchStore(){
             let self=this;
@@ -673,13 +908,27 @@ export default {
                 })
             }
             console.log(self.recentStoreList);
-        }
+            localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
+        },
+        notify(msg,type,time) {
+            this.$message({
+                message: msg,
+                type: type,
+                duration:time
+            });
+        },
     }
 }
 </script>
 <style lang="scss" scoped>
     $red:#FB4C5D;
     $lightRed:#FEE4E7;
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s
+    }
+    .fade-enter, .fade-leave-to{
+        opacity: 0;
+    }
     @function rem($val){
         @return $val/16+rem;
     }
@@ -721,6 +970,100 @@ export default {
             }
             to{
                 width: 100%;
+            }
+        }
+        #cancelBtn{
+            width: 76px;
+            margin-right: 15px;
+            background-color: #EAEDF2 !important;
+            color: #708090 !important;
+            font-size: 12px;
+            line-height: 12px;
+        }
+        #confirmBtn{
+            width: 76px;
+            margin-right: 15px;
+            font-size: 12px;
+            line-height: 12px;
+        }
+        .canvas-content{
+            position: relative;
+            .dialog-hr{
+                border: 0.5px solid ;
+                border-color: rgba(251,76,93,0.3);
+                margin-bottom:10px;
+                position: relative;
+                bottom: 5px;
+            }
+            .cancel-content{
+                position: absolute;
+                bottom: 0px;
+                width: 480px;
+                height: 30px;
+                background-color: #000;
+                opacity: 0.8;
+                z-index: 10;
+                overflow: hidden;
+                margin-left: 35px;
+                .content{
+                    width: 50%;
+                    text-align: center;
+                    float: left;
+                    color: #fff;
+                    line-height: 30px;
+                    border-right: 1px solid #fff;
+                    cursor: pointer;
+                }
+            }
+            .model{
+                width: 100%;
+                height: 100%;
+                background-color: transparent;
+                position: absolute;
+                z-index: 2;
+                .icon-right{
+                    width: 80px;
+                    height: 120px;
+                    position: absolute;
+                    right: 30px;
+                    top: 25%;
+                    .content{
+                        width: 100%;
+                        height: 40px;
+                        position: relative;
+                        .color{
+                            width: 16px;
+                            height: 16px;
+                            border-radius: 8px;
+                            position: absolute;
+                            margin: auto 0;
+                            top: 4px;
+                            left: 20%;
+                            margin-left: 4px;
+                            z-index: 3;
+                            cursor: pointer;
+                        }
+                        .colorActive{
+                            background-color: #ddd;
+                            border-radius: 50%;
+                            width: 24px;
+                            height: 24px;
+                            position: absolute;
+                            margin: auto 0;
+                            left: 20%;
+                            z-index: 3;
+                        }
+                        #white{
+                            background-color: white;
+                        }   
+                        #yellow{
+                            background-color: yellow;
+                        }
+                        #red{
+                            background-color: red;
+                        }
+                    }
+                }
             }
         }
         .lside{
@@ -786,85 +1129,57 @@ export default {
                 height: auto;
                 position: relative;
                 margin-top: 20px;
-                .video-model{
-                    height: 100%;
-                    width: 100%;
-                    background-color: transparent ;
+                #previewVideo{
+                    @include point(min-width,500);
+                    @include point(min-height,414);
+                }
+                #channelName{
+                    position: absolute;
+                    color: #fff;
+                    z-index: 10;
+                    left: 30px;
+                    top: 20px;
+                    font-size: 14px;
+                }
+                .iconright{
                     position: absolute;
                     z-index: 990;
-                    .icon-footer{
-                        width: 96%;
-                        position: absolute;
-                        bottom: 0px;
+                    right:0px;
+                    margin-bottom: 40px;
+                    background-color: transparent ;
+                    top: 100px;
+                    span{
+                        font-size: 13px;
+                        margin-left: 15px;
                         color: #fff;
-                        padding-left: 30px;
-                        padding-bottom: 20px;
-                        overflow: hidden;
-                        user-select:none;
-                        .iconlside{
-                            width: 30%;
-                            float: left;
-                            text-align: left;
-                            .iconplay{
-                                font-size: 22px;
-                                cursor: pointer;
-                            }
-                        }
-                        .iconrside{
-                            width: 70%;
-                            max-width: 500px;
-                            float: right; 
-                            position: relative;
-                            span{
-                                font-size: 12px;
-                                margin-right:6px;
-                                margin-left: 20px;
-                            }
-                            .iconscreen-content{
-                                float: right;
-                                margin-right: 20px;
-                            }
-                            .iconscreen{
-                                margin: 8px;
-                                font-size: 20px;
-                                position: relative;
-                                top: 3px;
-                            }
-                        }
+                        margin-right: 35px;
+                        cursor: pointer;
                     }
-                    .iconright{
-                        position: absolute;
-                        right:0px;
-                        height: 50%;
-                        top: 25%;
-                        .paizhao-content{
-                            height: 50px;
-                        }
-                        span{
-                            font-size: 13px;
-                            margin-left: 15px;
-                            color: #fff;
-                            margin-right: 35px;
-                            cursor: pointer;
-                        }
-                        .iconpaizhao{
-                            color: #fff;
-                            cursor: pointer;
-                        }
-                        .icon-drap-content{
-                            height: 40px;
-                            position: absolute;
-                            right: 0px;
-                            background-color: #34374A;
-                            line-height: 40px;
-                            .iconzhedie{
-                                color: #ddd;
-                                cursor: pointer;
-                            }
-                        }
+                    .iconpaizhao{
+                        color: #fff;
+                        cursor: pointer;
+                    }
+                }
+                .iconright1{
+                    position: absolute;
+                    z-index: 990;
+                    right:0px;
+                    background-color: transparent ;
+                    top: 140px;
+                    span{
+                        font-size: 13px;
+                        margin-left: 15px;
+                        color: #fff;
+                        margin-right: 35px;
+                        cursor: pointer;
+                    }
+                    .iconpaizhao{
+                        color: #fff;
+                        cursor: pointer;
                     }
                 }
             }
+            
             .el-inspect{
                 border-left: 1px solid #ddd;
                 border-right: 1px solid #ddd;
@@ -909,6 +1224,13 @@ export default {
                             font-size: 14px;
                             font-weight: bold;
                         }
+                        .noraml-title{
+                            cursor: pointer;
+                        }
+                        .ignore-title{
+                            cursor: not-allowed;
+                            background-color: #ddd;
+                        }
                         .source-content{
                             min-height: 150px;
                             width: 90%;
@@ -937,9 +1259,17 @@ export default {
                             width:-moz-calc(100% - 20px); 
                             width:calc(100% - 20px);
                         }
-                        .item-score{
+                        .iconhulve{
                             position: absolute;
                             right: 0;
+                            color: #ddd;
+                            font-size: 20px;
+                            margin-right: 15px;
+                            cursor: pointer;
+                        }
+                        .item-score{
+                            position: absolute;
+                            right: 25px;
                             top: 12px;
                             font-size: 14px;
                             margin-right: 20px;
@@ -1123,6 +1453,7 @@ export default {
 </style>
 
 <style>
+@import '../../assets/css/importfile.css'; 
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }

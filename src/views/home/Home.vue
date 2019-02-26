@@ -87,7 +87,7 @@
             
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="($route.path!='/routeinspection'
-                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&$route.path!='/stroemonitor'&&
+                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&$route.path!='/storemonitor'&&
                     $route.path!='/schedule'&&$route.path!='/reinspection'&&$route.path!='/bindroute')
                     ?'content-wrapper-all':'content-wrapper'">
                     <keep-alive>

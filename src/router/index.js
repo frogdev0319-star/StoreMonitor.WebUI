@@ -56,7 +56,7 @@ export default new Router({
           isReadOnly:false,
         },
         {
-          path:'/stroemonitor',
+          path:'/storemonitor',
           name:'门店监控',
           component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
           meta:{

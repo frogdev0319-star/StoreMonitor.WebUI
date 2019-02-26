@@ -387,5 +387,35 @@ export default {
         let second=t.getSeconds()<10?'0'+t.getSeconds():t.getSeconds();
         dateStr=years+'-'+month+'-'+day+' '+hour+':'+min+':'+second;
         return dateStr;
+    },
+    getErrorText(errorCode){
+        let msg='';
+        switch(errorCode){
+            case 1: msg='XML/JSON 参数不正确';break;
+            case 2: msg='用户名或密码错误';  break;
+            case 3: msg='用户不在线'; break;
+            case 4: msg='连接 PV6SvrRemote COM 接口出错'; break;
+            case 5: msg='请求的 IVS 数据库中不存在'; break;
+            case 7: msg='视频请求 DASH 服务器网络出错'; break;
+            case 8: msg='用户下线出错'; break;
+            case 9: msg='IVS 不支持的参数'; break;
+            case 10: msg='非法的 URL 地址'; break;
+            case 11: msg='超过 License 授权最大使用数量'; break;
+            case 12: msg='License 不可用'; break;
+            case 13: msg='视频停止错误'; break;
+            case 15: msg='SDK 打开视频错误'; break;
+            case 16: msg='SDK 没有返回数据'; break;
+            case 17: msg='视频播放端连接数量超过 DASH 服务的最大连接数'; break;
+            case 18: msg='SessionID已过期'; break;
+            case 19: msg='内存不足'; break;
+            case 20: msg='不支持此功能'; break;
+            case 21: msg='内部web服务器不能正常工作'; break;
+            case 22: msg='缺少必要参数'; break;
+            case 23: msg='视频已经打开'; break;
+            case 24: msg='视频未打开'; break;
+            case 25: msg='SessionID被占用'; break;
+            default: msg='未知的错误'; break;
+        }
+        return msg;
     }
 }

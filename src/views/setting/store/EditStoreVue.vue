@@ -124,8 +124,9 @@ export default {
         self.userId=self.store.userId;
         self.curTag=self.store.napeTable;
         self.phone=self.store.phone;
-        self.getNapeByStore(storeId);
         self.getChannelByStore(storeId);
+        self.getNapeByStore(storeId);
+        
         self.getUserList();
     },
     methods:{

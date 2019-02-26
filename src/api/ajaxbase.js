@@ -32,18 +32,18 @@ async function getBaseURLByDash(){
 }
 function getBaseURL(){
     let dash;
+    let url='';
     if(getCookie('DASH')!=undefined){
         dash=JSON.parse(getCookie('DASH'));
+        let dataPort='';
+        if(dash.url.indexOf('https')!=-1){
+            dataPort=dash.httpsCmdPort;
+        }
+        else{
+            dataPort=dash.httpCmdPort;
+        }
+        url=dash.url+':'+dataPort;
     }
-    let url='';
-    let dataPort='';
-    if(dash.url.indexOf('https')!=-1){
-        dataPort=dash.httpsCmdPort;
-    }
-    else{
-        dataPort=dash.httpCmdPort;
-    }
-    url=dash.url+':'+dataPort;
     return url;
 }
 function getAuthority(){
@@ -90,7 +90,7 @@ const userAxios=axiosA.create({
 
 async function ajax4dash({method,url,data}){
     //let REST_BASEURL=await getBaseURL();
-    if(REST_BASEURL==undefined){
+    if(REST_BASEURL==undefined||REST_BASEURL.length==0){
         REST_BASEURL=await getBaseURLByDash();
     }
     const newAxios=axiosA.create({

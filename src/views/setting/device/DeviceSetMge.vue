@@ -468,7 +468,7 @@ export default {
             let params={
                 "filter": {
                     "page": 0,
-                    "size": self.total
+                    "size": self.sizeNum
                 }
             };
             return new Promise((resolve,reject)=>{
