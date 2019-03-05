@@ -63,7 +63,20 @@ export default new Router({
             requireAuth: true,
           },
           isReadOnly:false,
-        }
+        },
+        {
+          path:'/storemonitor',
+          name:'门店监控',
+          component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
+          hidden:true,
+          children:[
+            {
+              path:'/storemonitor/submit',
+              name:'提交事件',
+              component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
+            }
+          ]
+        },
       ]
     },
     {
@@ -241,7 +254,8 @@ export default new Router({
         {
           path:'/other',
           name:'其他设置',
-          isReadOnly:true,
+          isReadOnly:false,
+          component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
         }
       ]
     }

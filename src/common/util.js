@@ -1,30 +1,7 @@
 import { format } from "url";
 import ConvertPinyin from '@/common/getpinyin'
 export default {
-
-//显示器请求返回信息处理
-    handleScreenData(screenList){
-        let total=screenList.length;
-        let abnomal=0,nomal=0;
-        var result=[];
-        for(let i=0;i<screenList.length;i++){
-            if(screenList[i].mode=='0'){
-                abnomal++;
-            }else if(screenList[i].mode=='1'){
-                nomal++;
-            }
-
-
-        }
-        result[0]=total;
-        result[1]=abnomal;
-        result[2]=nomal;
-        return result;
-
-
-    },
     //获取一小时前数据的日期格式化
-
     getOneHourTime(para){
         let bt=new Date(new Date().getTime()-1*60*60*1000);
         let et=new Date();
@@ -77,191 +54,6 @@ export default {
         let min=t.getMinutes()<10?'0'+t.getMinutes():t.getMinutes();
         result=years+'/'+month+'/'+day+' '+hour+':'+min;
         return result;
-    },
-    //时间转换为入参
-    getParmDate(date){
-        var result='';
-        let years=date.getFullYear();
-        let month=date.getMonth()+1;
-        let day=date.getDate();
-        let hour=date.getHours();
-        let min=date.getMinutes();
-        result=years+'-'+month+'-'+day+' '+hour+':'+min+':'+'00';
-        return result;
-    },
-    //数组中时间处理
-    timestampToTime(list){
-        for (let i=0;i<list.length;i++) {
-            list[i].ts=this.getdate(list[i].ts);
-            if(list[i].status=='1'){
-                list[i].status='插入';
-            }
-            if(list[i].status=='2'){
-                list[i].status='拔出';
-
-            }
-        };
-        list=Array.reverse(list);
-        return list;
-    },
-    //提取进程数量信息
-    getProcessInfo(list){
-        var results=[];
-        var result=[],result2=[];
-          if(list.every(item=>{
-            item.IsActive==true;
-        }))
-        {
-            result.forEach(item=>{
-            item.showBtn=false;
-        })
-            results[0]=result;
-            results[1]=result2;
-            return results;
-        }
-        else{
-            result=list.filter((item)=>{
-            return item.IsActive==false;
-            })
-            result2=list.filter((item)=>{
-                return item.IsActive!==false;
-            });
-            result.forEach(item=>{
-                item.showBtn=false;
-            })
-            result2.forEach(item=>{
-                item.showBtn=false;
-            })
-            results[0]=result;
-            results[1]=result2;
-            return results;
-        }
-    },
-
-
-    //提取异常等级分布
-    getExceptRank(ranklist,rankvalue,rankmock){
-        rankmock.forEach((item)=>{
-            if(item.agentType=='')
-                item.agentType='unknown';
-        })
-
-        for(let i=0;i<3;i++){
-            rankvalue[i].value=0;
-        }
-        var ranklistcopy=[];
-
-        var obj={rank:0,agentCount:0};
-        rankmock.forEach((item,index)=>{
-        if(item.rank==2){
-            rankvalue[0].value+=item.agentCount;
-
-        }
-        else if(item.rank==1){
-            rankvalue[1].value+=item.agentCount;
-        }
-        else if(item.rank==0){
-            rankvalue[2].value+=item.agentCount;
-        }
-        });
-
-        console.log(rankvalue);
-        var rank2=rankmock.filter((item)=>{
-            return item.rank==2;
-        })
-        rank2.sort((a,b)=>{
-            return b.agentCount-a.agentCount;
-        })
-
-        rank2=rank2.slice(0,6);
-
-        for(let i=0;i<rank2.length;i++){
-            var obj={};
-            obj.agentType=rank2[i].agentType;
-            
-            obj.data=rankmock.filter((item)=>{
-                return item.agentType==rank2[i].agentType;
-            });
-            ranklistcopy.push(obj);
-        }
-        var agentTypearr=[];
-        var rank2=[],rank1=[],rank0=[];
-        for(let i=0;i<ranklistcopy.length;i++){
-            for(let j=0;j<ranklistcopy[i].data.length;j++){
-                switch (ranklistcopy[i].data[j].rank){
-                    case 2: {
-                        if(ranklistcopy[i].data[j].rank!=null&&ranklistcopy[i].data[j].rank==2){
-                            rank2[i]=ranklistcopy[i].data[j].agentCount;
-                        
-                        }
-                        else rank2[i]=0;
-                        break;
-                    }
-                    case 1: {
-                        if(ranklistcopy[i].data[j].rank!=null&&ranklistcopy[i].data[j].rank==1){
-                            rank1[i]=ranklistcopy[i].data[j].agentCount;
-                        
-                        }
-                        else rank1[i]=0;
-                        break;
-                    }
-                    case 0: {
-                        if(ranklistcopy[i].data[j].rank!=null&&ranklistcopy[i].data[j].rank==0){
-                            rank0[i]=ranklistcopy[i].data[j].agentCount;
-                        
-                        }
-                        else rank0[i]=0;
-                        break;
-                    }
-                    default:break;
-                }
-            }
-            agentTypearr.push(ranklistcopy[i].agentType);
-        }
-
-        for(let i=0;i<6;i++){
-            if(rank0[i]==null){
-                rank0[i]=0;
-            }
-            if(rank1[i]==null){
-                rank1[i]=0;
-            }
-            if(rank0[i]==null){
-                rank1[i]=0;
-            }
-        }
-
-        ranklist[0].data=rank2;
-        ranklist[1].data=rank1;
-        ranklist[2].data=rank0;
-        var result=[];
-        result.push(rankvalue);
-        result.push(ranklist);
-        result.push(agentTypearr);
-        console.log();
-        return result;
-},
-//提取类型分布
-    getExceptType(typelist,typemock){
-        typemock.forEach((item,index)=>{
-            switch(item.eventTypeId.substring(0,1)){
-                case '2':typelist[2].data[0].value=item.AgentCount;break;
-                case '3':typelist[1].data[0].value=item.AgentCount;break;
-                case '4':typelist[1].data[1].value=item.AgentCount;break;
-                case '5':typelist[2].data[2].value=item.AgentCount;break;
-                case '6':typelist[0].data[0].value=item.AgentCount;break;
-                case '7':typelist[0].data[1].value=item.AgentCount;break;
-                case '8':typelist[0].data[2].value=item.AgentCount;break;
-            }
-
-        });
-        typelist.forEach((item,index)=>{
-            item.titlevalue=0;
-            for(let i=0;i<item.data.length;i++){
-                item.titlevalue+=item.data[i].value;
-            }
-        })
-        return typelist;
     },
     getDaysCount(){   
         var date=new Date();
@@ -417,5 +209,59 @@ export default {
             default: msg='未知的错误'; break;
         }
         return msg;
+    },
+    /**
+     * 获取当天日期
+     */
+    getCurDate2Str(){
+        let date=new Date();
+        let year=date.getFullYear();
+        let month=date.getMonth()+1;
+        let day=date.getDate();
+        month=month<10?'0'+month:month;
+        day=day<10?'0'+day:day;
+        let str=`${year}${month}${day}`;
+        return str;
+    },
+    getCurDate2StrBySign(sign){
+        let date=new Date();
+        let year=date.getFullYear();
+        let month=date.getMonth()+1;
+        let day=date.getDate();
+        month=month<10?'0'+month:month;
+        day=day<10?'0'+day:day;
+
+        let str='';
+        str=`${year}${sign}${month}${sign}${day}`;
+        return str;
+    },
+    getCurTimeStr(){
+        let date=new Date();
+        let hour=date.getHours();
+        let minute=date.getMinutes();
+        let second=date.getSeconds();
+        hour=hour<10?'0'+hour:hour;
+        minute=minute<10?'0'+minute:minute;
+        second=second<10?'0'+second:second;
+        let str=`${hour}${minute}${second}`;
+        return str;
+    },
+    base64ToBlob(urlData) {
+        var arr = urlData.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
+        // 去掉url的头，并转化为byte
+        var bytes = window.atob(arr[1]);
+        // 处理异常,将ascii码小于0的转换为大于0
+        var ab = new ArrayBuffer(bytes.length);
+        // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
+        var ia = new Uint8Array(ab);
+        
+        for (var i = 0; i < bytes.length; i++) {
+            ia[i] = bytes.charCodeAt(i);
+        }
+
+        return new Blob([ab], {
+            type: mime
+        });
     }
 }

@@ -1,6 +1,7 @@
 import axiosA from 'axios'
 import {getDashServerInfo} from './device.js'
-import {getCookie} from '@/common/auth.js'
+import {Message} from 'element-ui'
+import store from '../store/index.js';
 axiosA.defaults.withCredentials = false
 
 function getDashInfo(){
@@ -17,24 +18,14 @@ function getDashInfo(){
     })
     
 }
-async function getBaseURLByDash(){
-    let dash=await getDashInfo();
-    let url='';
-    let dataPort='';
-    if(dash.url.indexOf('https')!=-1){
-        dataPort=dash.httpsCmdPort;
-    }
-    else{
-        dataPort=dash.httpCmdPort;
-    }
-    url=dash.url+':'+dataPort;
-    return url;
-}
-function getBaseURL(){
+async function getBaseURL(){
     let dash;
     let url='';
-    if(getCookie('DASH')!=undefined){
-        dash=JSON.parse(getCookie('DASH'));
+    if(sessionStorage.getItem('DASH_URL')!=undefined){
+        url=sessionStorage.getItem('DASH_URL'); //将dash存储在loaclStorage 中
+    }
+    else{
+        dash=await getDashInfo();
         let dataPort='';
         if(dash.url.indexOf('https')!=-1){
             dataPort=dash.httpsCmdPort;
@@ -43,6 +34,7 @@ function getBaseURL(){
             dataPort=dash.httpCmdPort;
         }
         url=dash.url+':'+dataPort;
+        sessionStorage.setItem('DASH_URL',url);
     }
     return url;
 }
@@ -66,10 +58,8 @@ function getAuthority(){
     return auth64;
 }
 
-let REST_BASEURL= getBaseURL();
-//let REST_BASEURL='http://172.21.84.229:8050';
-//"http://222.91.163.149";
-
+//let REST_BASEURL= getBaseURL();
+let REST_BASEURL=store.state.user.dashurl;
 const advAxios=axiosA.create({
     baseURL:REST_BASEURL,
     headers:{
@@ -89,14 +79,17 @@ const userAxios=axiosA.create({
 
 
 async function ajax4dash({method,url,data}){
-    //let REST_BASEURL=await getBaseURL();
+    let REST_BASEURL=store.state.user.dashurl;
+    console.log(REST_BASEURL);
     if(REST_BASEURL==undefined||REST_BASEURL.length==0){
-        REST_BASEURL=await getBaseURLByDash();
+        REST_BASEURL=await getBaseURL();
     }
     const newAxios=axiosA.create({
         baseURL:REST_BASEURL,
+        timeout:15000,
     });
-    const ret=await newAxios({
+    let ret=null;
+    await newAxios({
         method,
         url,
         data,
@@ -104,7 +97,16 @@ async function ajax4dash({method,url,data}){
             'Content-Type':'application/json',
             "Accept":"application/json"
         }
-    });
+    }).then(res=>{
+        ret=res;
+    }).catch((err) => {
+        console.log(err);
+        Message({
+            message:'Dash视频服务器请求异常，请重试！',
+            type:'error',
+            duration:5*1000
+        })
+    })
     return ret;
 }
 

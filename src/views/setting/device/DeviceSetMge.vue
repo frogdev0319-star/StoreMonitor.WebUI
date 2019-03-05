@@ -188,6 +188,7 @@ import axios from 'axios'
 import {validateInput,validateURL,validatePort} from '@/common/validate'
 import {deviceRESTful} from '@/api/index'
 import {isLoginIn} from '@/api/login'
+import { mapMutations } from 'vuex'
 export default {
     name:'DeviceSetMge',
     data(){
@@ -300,6 +301,19 @@ export default {
             }
             return msg;
         },
+        getDashURL(){
+            let self=this;
+            let url='';
+            let dataPort='';
+            if(self.dash.url.indexOf('https')!=-1){
+                dataPort=self.dash.httpsCmdPort;
+            }
+            else{
+                dataPort=self.dash.httpCmdPort;
+            }
+            url=self.dash.url+':'+dataPort;
+            return url;
+        },
         async connectServer(){
             let self=this;
             let data=await self.getDashServerInfo();
@@ -324,6 +338,9 @@ export default {
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
                         self.notify('连接成功!','success',3000);
+                        let url=self.getDashURL();
+                        sessionStorage.setItem('DASH_URL',url);
+                        self.$store.commit('SET_DASHURL', url);
                     }
                     else{
                         self.notify('连接失败!','warning',3000);
@@ -336,6 +353,9 @@ export default {
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
                         self.notify('连接成功!','success',3000);
+                        let url=self.getDashURL();
+                        sessionStorage.setItem('DASH_URL',url);
+                        self.$store.commit('SET_DASHURL', url); //修改后更新vuex中的url值
                     }
                     else{
                         self.notify('连接失败!','warning',3000);
@@ -764,15 +784,14 @@ export default {
             }
             self.activeName=sessionStorage.getItem('DevicePage_TabName')==undefined||
                     sessionStorage.getItem('DevicePage_TabName').length==0?'dash':sessionStorage.getItem('DevicePage_TabName');
-            let data=await self.getDashServerInfo();
-            if(!data){
-                return false;
-            }
-            if(data.errMsg=='Success'&&data.data!=null){
-                self.dash=data.data;
-            }
+            //let data=await self.getDashServerInfo();
+            self.$store.dispatch('GetDash').then((res)=>{
+                let data=res.data;
+                if(res.errMsg=='Success'&&res.errCode==0){
+                    self.dash=data;
+                }
+            })
             self.channelData=await self.getChannelData();   //获取channel信息
-
             let params={
                 "filter": {
                     "page": self.page-1,
@@ -793,6 +812,7 @@ export default {
                 duration:time
             });
         },
+        ...mapMutations( [ 'SET_DASHURL'] )
     },
     created(){
         this.varWindowWidth=window.innerWidth;

@@ -9,7 +9,7 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button class="el-submit" size="mini" @click="submit">
+                <el-button class="el-submit" size="mini" @click="submit" v-loading.fullscreen.lock="fullscreenLoading">
                     提交
                 </el-button> 
             </div>
@@ -41,7 +41,7 @@
                     <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
                 </div>
             </el-dialog>
-            <div class="video-content">
+            <div class="video-content" v-if="!showError">
                 <span id="channelName">{{channel.channelName}}</span>
                 <transition name='fade'>
                     <div class="iconright" v-if="showModelContent" @click="cutPicture">
@@ -59,6 +59,9 @@
                     class="video-js vjs-fill">
                 </video>
             </div>
+            <div class="errorVideo-model" v-else>
+                    <span>{{errorText}}</span>
+                </div>
             <div class="el-inspect">
                 <el-row class="inspect-header">
                     <el-col :span="8">
@@ -74,7 +77,7 @@
                             <div :style="{'max-height':varyWindowHeight*0.32-40+'px'}">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
-                                    <span>{{`${item.groupName}（0/${item.items.length}）`}}</span>
+                                    <span>{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
                                 </div>
                             </div>
                          </el-scrollbar>
@@ -84,31 +87,32 @@
                             <div class="item-content" :style="{'max-height':varyWindowHeight*0.32+'px'}">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details" >
                                     <span class="titles" :class="!item.isIgnore?'noraml-title':'ignore-title'" @click="clickItem(item,index)">{{`${index+1}. ${item.subject}`}}</span>
-                                    <el-dropdown trigger="click" class="item-score">
+                                    <el-dropdown trigger="click" class="item-score" size="small">
                                         <span class="el-dropdown-link">
                                             {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <el-dropdown-menu slot="dropdown">
+                                        <el-dropdown-menu slot="dropdown" class="score-menu" 
+                                        style="max-height: 160px;overflow: hidden;overflow-y: scroll;">
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                             v-for="(itemDS,indexDS) in scoreList" 
-                                             :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.scoreTitle}}</el-dropdown-item>
+                                            v-for="(itemDS,indexDS) in scoreList" 
+                                            :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.scoreTitle}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
                                     <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i>
                                     <div class="source-content">
-                                        <div class="source-details" v-if="showEmptyImg">
+                                        <div class="source-details" v-if="item.showEmptyImg">
                                             <div>
                                                 <img :src="emptyImgSrc"/>
                                                 <span class="emptyImg-info">*视频图片最多支持插入5个。</span>
                                             </div>
                                         </div>
-                                        <div class="source-details" v-for="(item,index) in sourceList" :key="index">
-                                            <img :src="item.src" :width="item.width" :height="item.height"/>
+                                        <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
+                                            <img :src="_item.src" :width="_item.width" :height="_item.height"/>
                                         </div>
                                     </div>
                                     <!-- <div class="item-score" @click="clickScore(item)"><span>{{`评分：${item.itemScore}分`}}</span><i class=" iconscore" :class="item.isClick?'el-icon-arrow-up':'el-icon-arrow-down'"></i></div> -->
-                                    <el-input size="mini" class="des-input" type="textarea" 
-                        maxlength="300" v-model="item.inspectInput" placeholder="请输入处理评论文字"></el-input>
+                                    <el-input size="mini" class="des-input" type="textarea" @change="changeInput(item)" @focus="focusInput(item)"
+                        maxlength="300" v-model="item.inspectInput" placeholder="请输入处理评论文字" :disabled="item.disabled"></el-input>
                                 </div>
                             </div>
                         </el-scrollbar>
@@ -125,7 +129,7 @@
             <div class="el-header-title">
                 <span>选择门店</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="tabs-content">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
@@ -160,6 +164,7 @@
 import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
 import util from '@/common/util'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
+import {getStorageInfo} from '@/api/event'
 import {getDeviceList} from '@/api/device'
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
@@ -169,7 +174,6 @@ export default {
     data(){
         return{
             emptyImgSrc:require('../../../static/img/pic.png'),
-            showEmptyImg:true,
             sourceList:[],
             store:{
                 storeName:'西安5店',
@@ -179,8 +183,7 @@ export default {
             },
             popperClass:'select-popClass',
             showModelContent:false,
-            playState:true,
-            activeIndex:'2',
+            activeIndex:'0',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
             showDate:true, 
@@ -207,6 +210,7 @@ export default {
             penChecked:'red',
             showCutModel:false,
             errorText:'',
+            showError:false,
             showCancelContent:false,
             speedList:[
                 {
@@ -262,6 +266,13 @@ export default {
                 }
             ],
             store:{},
+
+            oss:null,
+            bucketVideo:'',
+            bucketImage:'',
+            percentage:0,
+            accountId:'aaoompqqpjy4',
+
             scoreList:[
                 {
                     val:10,
@@ -286,12 +297,35 @@ export default {
                 {
                     val:5,
                     scoreTitle:'5分'
+                },
+                {
+                    val:4,
+                    scoreTitle:'4分'
+                },
+                {
+                    val:3,
+                    scoreTitle:'3分'
+                },
+                {
+                    val:2,
+                    scoreTitle:'2分'
+                },
+                {
+                    val:1,
+                    scoreTitle:'1分'
+                },
+                {
+                    val:0,
+                    scoreTitle:'0分'
                 }
             ],
             tempStoreList:[],  
             recentStoreList:[],
             sessionId:'',
             inspectList:[],
+            curGroupIndex:0,  //当前选中的group index
+            curItemIndex:0,   //当前点击的 item index
+            curItemId:0,      //当前点击的巡检项id
             inspectItemList:[],
             allInspectItemList:[], //当前全部没有忽略的巡检项
             deviceList:[],
@@ -300,19 +334,83 @@ export default {
             videoEl:'',
             canvasEl:'',
             showCutDialog:false,
-            imageCanvas:new Image()
+            imageCanvas:new Image(),
+            playState:false,
+            editCount:0,
+            fullscreenLoading:false
         }
+    },
+    beforeRouteLeave(to, from, next){
+        //离开页面的同时应该停止播放视频
+        let self=this;
+        if(self.playState){
+            self.stopRealTime();
+        }
+        next();
     },
     mounted(){
         let self=this;
         //self.getInspectList();
         document.onmouseup=self.mouseUpAction;
         self.getRecentStoreList();
+        self.getUpLoadBucketInfo();
+        self.getOssInfo();
         self.videoEl=document.getElementById('previewVideo');
+        self.getFaStoreData();
         self.getInitStoreData();
         self.getDeviceList();
     },
     methods:{
+        getOssInfo(){
+            let self=this;
+            getStorageInfo().then(res=>{
+                console.log(res);
+                if(res.errCode==0){
+                    self.oss=res.data;
+                }
+            })
+        },
+        getUpLoadBucketInfo(){
+            let self=this;
+            self.bucketVideo='video'+'/'+util.getCurDate2Str();
+            self.bucketImage='image'+'/'+util.getCurDate2Str();
+        },
+        getFileUrl(fileName){
+            let self=this;
+            let bucketName=self.accountId;
+            let endpoint=self.oss.ossEndPoint;
+            let key=fileName;
+            let url=`http://${bucketName}.${endpoint}/${fileName}`;
+            return url;
+        },
+        upLoadFile(fileItem){
+            let self=this;
+            self.percentage=0;
+            let OSS = require('ali-oss');
+            const client = new OSS({
+                region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
+                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
+                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
+                bucket: self.accountId
+            })
+            let name=fileItem.fileName;
+            return new Promise((resolve,reject)=>{
+                client.put(name,fileItem.file,{
+                progress: function* (percentage, cpt) {
+                   self.percentage = percentage
+                    }
+                })
+                .then((results) => {
+                    // 上传完成
+                    const url = self.getFileUrl(results.name);
+                    console.log(url);
+                    resolve(url); 
+                })
+                .catch((err) => {
+                    console.log(err) 
+                }) 
+            })
+        },
         getDeviceList(){
             let self=this;
             getDeviceList().then(res=>{
@@ -327,6 +425,7 @@ export default {
         },
         cutPicture(){
             let self=this;
+            console.log(self.curGroupIndex);
             self.showCancelContent=false;
             if(self.sourceList.length>=5){
                 self.notify('最多上传5个资源！','warning',3000);
@@ -337,7 +436,7 @@ export default {
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
                 ctx.drawImage(self.videoEl,0,0,480,270);
-                var oGrayImg=icanvas.toDataURL('image/png');
+                var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
             })
         },
@@ -365,13 +464,23 @@ export default {
         },
         confirmEdit(){
             let self=this;
-            self.showEmptyImg=false;
-            let img=new Image();
+            let item=self.inspectItemList[self.curItemIndex];
+            self.inspectItemList[self.curItemIndex].showEmptyImg=false;
             let obj={};
-            obj.src=self.canvasEl.toDataURL("image/png");
+            obj.mediaType=2;
+            obj.src=self.canvasEl.toDataURL("image/jpeg");
             obj.height='100px';
+            obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
+            obj.file=util.base64ToBlob(obj.src);
             self.sourceList.push(obj);
             self.showCutDialog=false;
+
+            self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+            
+            if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+            }
+            self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
         },
         modelMouseDown(e){
             let self=this;
@@ -427,8 +536,17 @@ export default {
             })
         },
         checkScore(item,itemDS){
+            let self=this;
             console.log(item);
+            if(item.id!=self.curItemId){
+                self.notify('请先选中当前巡检项，然后输入分值!','warning',3000);
+                return false;
+            }
             item.itemScore=itemDS.val;
+            if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+            }
+            self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
         },
         getAllStoreList(){
             let self=this;
@@ -454,6 +572,7 @@ export default {
         async getStoreList(){
             let self=this;
             console.log(self.activeIndex);
+            console.log(self.store);
             let getStoreTemp=data=>{
                 let temp=[];
                 data.forEach((item,index)=>{
@@ -464,7 +583,6 @@ export default {
                     else{
                         obj.isActive=false;
                     }
-                    
                     obj.storeId=item.storeId;
                     obj.name=item.name;
                     obj.userId=item.userId;
@@ -487,13 +605,13 @@ export default {
                     let temp=[];
                     let data=self.recentStoreList;
                     console.log(data);
-                    data.map(x=>x.storeId).reverse().forEach(item=>{
+                    data.map(x=>x.storeId).forEach(item=>{
                         if(temp.indexOf(item)==-1){
                             temp.push(item);
                         }
                     })
                     temp=temp.slice(0,3); //取最近访问的三家门店
-                    console.log(temp);
+
                     let dataTemp=await self.getAllStoreList();
                     let allStoreData=dataTemp.data.content;
                     let tempStore=[];
@@ -505,22 +623,63 @@ export default {
                         }
                     }
                     self.tabList[1].storeList=getStoreTemp(tempStore);
+                    localStorage.setItem('recentStore_reinspect',JSON.stringify(self.tabList[1].storeList));
                     break;
                 case 2:
-                console.log(self.tabList[2]);
-                self.tabList[2].storeList.forEach((item,index)=>{
-                    item.storeList.forEach(_item=>{
-                        if(_item.storeId==self.store.storeId){
-                            _item.isActive=true;
-                        }
-                        else{
-                            _item.isActive=false;
-                        }
+                    console.log(self.tabList[2]);
+                    self.tabList[2].storeList.forEach((item,index)=>{
+                        item.storeList.forEach(_item=>{
+                            if(_item.storeId==self.store.storeId){
+                                _item.isActive=true;
+                            }
+                            else{
+                                _item.isActive=false;
+                            }
+                        })
                     })
-                })
+                    break;
             }
         },
-        async getInitStoreData(){
+        async getFaStoreData(){
+            let self=this;
+            let getStoreTemp=data=>{
+                let temp=[];
+                data.forEach((item,index)=>{
+                    let obj={};
+                    if(index==0){
+                        obj.isActive=true;
+                    }
+                    else{
+                        obj.isActive=false;
+                    }
+                    obj.storeId=item.storeId;
+                    obj.name=item.name;
+                    obj.userId=item.userId;
+                    obj.favorite=item.favorite==undefined?true:item.favorite;
+                    obj.device=item.device;
+                    temp.push(obj);
+                })
+                return temp;
+            }
+            let data=await self.getFaStoreList();
+            if(data.errCode==0){
+                let storeData=data.data;
+                self.tabList[0].storeList=getStoreTemp(storeData);
+
+                let obj={};
+                obj.storeId=storeData[0].storeId;
+                obj.storeName=storeData[0].name;
+                obj.storeTitle=storeData[0].name;
+                obj.storeUp=true;
+                obj.storeUpTitle='已关注';
+                self.store=obj;
+
+                self.recentStoreList.unshift(self.tabList[0].storeList[0]);
+                localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
+                self.getInspectByStore(self.tabList[0].storeList[0].storeId);
+            }
+        },
+         async getInitStoreData(){
             let self=this;
             let getStore2Temp=data=>{
                 let cityList=[];
@@ -536,12 +695,7 @@ export default {
                     for(let j=0;j<data.length;j++){
                         if(cityList[i]==data[j].city){
                            let obj={};
-                           if(i==0&&j==0){
-                               obj.isActive=true;
-                           }
-                           else{
-                               obj.isActive=false;
-                           }
+                            obj.isActive=false;
                             obj.storeId=data[j].storeId;
                             obj.name=data[j].name;
                             obj.userId=data[j].userId;
@@ -562,21 +716,9 @@ export default {
                 let storeData=data.data.content;
                 self.tabList[2].storeList=getStore2Temp(storeData);
                 self.tempStoreList=getStore2Temp(storeData);
-                let obj={};
-                obj.storeId=storeData[0].storeId;
-                obj.storeName=storeData[0].name;
-                obj.storeTitle=storeData[0].name;
-                obj.storeUp=storeData[0].favorite;
-                if(storeData[0].favorite){
-                    obj.storeUpTitle='已关注';
+                if(self.tempStoreList.length==0){
+                    self.showSearchInput=false;
                 }
-                else{
-                    obj.storeUpTitle='点击关注';
-                }
-                self.store=obj;
-                self.getInspectByStore(self.store.storeId);
-                self.recentStoreList.push(self.tabList[2].storeList[0].storeList[0]);
-                localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
             }
         },
         handleClick(tab){
@@ -611,12 +753,37 @@ export default {
                 })
             }
         },
+        focusInput(item){
+            let self=this;
+            if(item.id!=self.curItemId){
+                self.notify('请先选中当前巡检项，然后进行输入!','warning',3000);
+                return false;
+            }
+        },
+        changeInput(item){
+            let self=this;
+            console.log(item);
+            item.inputCount++;
+            if(item.inspectInput.trim().length!=0&&item.inputCount==1){
+                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+            }
+        },  
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
+            self.sourceList=[];
+            self.curGroupIndex=index;
+            self.curItemIndex=0;
+            self.curItemId=0;
             self.inspectItemList=item.items;
             self.inspectItemList.forEach((_item,_index)=>{
                 let channelObj={};
+                if(_item.sourceList.length==0){
+                    _item.showEmptyImg=true;
+                }
+                else{
+                    _item.showEmptyImg=false;
+                }
                 if(_index==0){
                     _item.checked=true;
                     if(_item.deviceId!=-1){
@@ -651,8 +818,14 @@ export default {
             })
             return device;
         },
+        getGroupByItem(item){
+            let self=this;
+
+        },
         ignoreItem(item,index){
             let self=this;
+            self.editCount=self.editCount+1;
+            self.curItemIndex=index;
             if(item.isIgnore){
                 self.notify('当前项已忽略！','warning',3000);
                 return false;
@@ -663,6 +836,9 @@ export default {
             type: 'warning'
             }).then(() => {
                 item.isIgnore=true;
+                if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+                    self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+                }
             }).catch(() => {
                 console.log('cancel ignore');     
             });
@@ -670,10 +846,23 @@ export default {
         },
         clickItem(item,index){
             let self=this;
+            self.editCount=self.editCount+1;
             if(item.isIgnore){
                 return false;
             }
+            if(item.clickCount!=0&&self.curItemIndex==index){
+                self.notify('当前视频正在播放，请勿连续点击！','warning',3000);
+                return false;
+            }
+            item.clickCount++;
+            // if(item.id!=self.curItemId){
+
+            // }
+            self.sourceList=[];
             item.checked=true;
+            self.curItemIndex=index;
+            self.curItemId=item.id;
+            item.disabled=false;
             let obj={};
 
             if(item.deviceId!=-1&&self.curDeviceId!=item.deviceId){  //当前选择的巡检项已绑定设备
@@ -682,19 +871,21 @@ export default {
                     obj.ivsId=device.ivsId;
                     obj.channelName=device.name;
                     obj.channelId=device.channelId;
+                    
+                    self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
+                    self.realTime();
                 }
-                self.channel=obj;
                 self.curDeviceId=item.deviceId;
             }
             else{
                 return false;
             }
-            self.realTime();
             self.inspectItemList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.checked=false;
                 }
             })
+
         },
         getInspectByStore(storeId){
             let self=this;
@@ -706,16 +897,13 @@ export default {
             checkOutInspectItem(params).then(res=>{
                 if(res.errCode==0){
                     let data=res.data;
-                    // self.inspectList=data;
-                    // if(data.length!=0){
-                    //     self.getItemByGroup(data[0],0);
-                    // }
                     let temp=[];
                     data.forEach((item,index)=>{
                         let obj={};
                         obj.groupId=item.groupId;
                         obj.mode=item.mode;
                         obj.groupName=item.groupName;
+                        obj.dealCount=0;
                         if(index==0){
                             obj.isClick=true;
                         }
@@ -726,13 +914,18 @@ export default {
                         item.items.forEach((_item,_index)=>{
                             let itemObj={};
                             itemObj.id=_item.id;
+                            itemObj.groupId=item.groupId;
                             itemObj.subject=_item.subject;
                             itemObj.description=_item.description;
                             itemObj.itemScore=_item.itemScore;
                             itemObj.deviceId=_item.deviceId;
                             itemObj.inspectInput='';
+                            itemObj.inputCount=0;
+                            itemObj.clickCount=0;
+                            itemObj.disabled=true;
                             itemObj.checked=false;   //是否选中状态
                             itemObj.isIgnore=false;  //是否被忽略
+                            itemObj.sourceList=[];
                             tempItems.push(itemObj);
                         })
                         obj.items=tempItems;
@@ -745,23 +938,44 @@ export default {
                 }
             })
         },
-        submit(){
+        async submit(){
             let self=this;
             let temp=[];
-            self.inspectList.forEach((item,index)=>{
-                item.items.forEach((_item,_index)=>{
-                    let objItem={};
-                    if(!_item.isIgnore){
-                        objItem.ts=new Date().getTime();
-                        objItem.description=_item.inspectInput.trim();
-                        objItem.score=_item.itemScore;
-                        objItem.storeId=self.store.storeId;
-                        objItem.inspectItemId=_item.id;
-                        temp.push(objItem);
-                    }
-                })
+            let count=0;
+            let dealCount=0;
+            self.inspectList.forEach(item=>{
+                count=count+item.items.length;
+                dealCount=dealCount+item.dealCount;
             })
-
+            if(dealCount<count){
+                self.notify('当前巡检项有未处理项，请确认完全处理后进行提交！','warning',3000);
+                return false;
+            }
+            self.fullscreenLoading=true;
+            for(let i in self.inspectList){
+                for(let  j in self.inspectList[i].items){
+                    let objItem={};
+                    objItem.ts=new Date().getTime();
+                    objItem.description=self.inspectList[i].items[j].inspectInput.trim();
+                    objItem.score=self.inspectList[i].items[j].isIgnore?-1:self.inspectList[i].items[j].itemScore;
+                    objItem.storeId=self.store.storeId;
+                    objItem.inspectItemId=self.inspectList[i].items[j].id;
+                    let tempFileUrl=[];
+                    if(!self.inspectList[i].items[j].isIgnore){
+                        for(let k in self.inspectList[i].items[j].sourceList){
+                            let obj={};
+                            if(self.inspectList[i].items[j].sourceList[k].mediaType==2){
+                                let url=await self.upLoadFile(self.inspectList[i].items[j].sourceList[k]);
+                                obj.mediaType=2;
+                                obj.url=url;
+                            }
+                            tempFileUrl.push(obj);
+                        }
+                    }
+                    objItem.attachment=tempFileUrl;
+                    temp.push(objItem);
+                }
+            }
             let params={
                 items:temp
             };
@@ -770,7 +984,9 @@ export default {
                 let errCode=res.errCode;
                 if(errCode==0){
                     self.notify('提交成功！','success',3000);
+                    self.editFlag=true;
                 }
+                self.fullscreenLoading=false;
             })
         },
         spreadContent(){
@@ -784,6 +1000,7 @@ export default {
         async playVideo(url) {
             console.log('playvideo enter!');
             this.showModelContent=true;
+            this.playState=true;
             var video = document.getElementById("previewVideo");
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
@@ -793,10 +1010,11 @@ export default {
             let self=this;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
+            self.sessionId=sessionId;
             const data = {
                 request: { 
                   method: 'connection',
-                  sessionID: sessionId,
+                  sessionID:self.sessionId,
                   streamingProtocol:this.protocal,
                   IVSID:self.channel.ivsId,
                   channel:JSON.stringify(self.channel.channelId),
@@ -804,10 +1022,37 @@ export default {
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
             console.log(self.mpdurl);
-            if (self.mpdurl != "" ) {
+            if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
             }
+            else{
+                self.showError=true;
+                let errorCode=self.mpdurl.ErrorCode; //错误码
+                let errorText= util.getErrorText(errorCode);
+                self.errorText=errorText;
+            }
+        },
+        stopVideo(){
+            let self=this;
+            self.showModelContent=false;
+            var video = document.getElementById("previewVideo");
+            self.previewplayer = videojs(video);
+            self.previewplayer.pause();
+        },
+        async stopRealTime(){
+            let self=this;
+            self.stopVideo();
+            const data = {
+                request: { 
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId)
+                }
+            };
+            let ret=await dashAPI.RealTime(0,data);
+            await dashAPI.Offline(self.sessionId);
         },
         searchStore(){
             let self=this;
@@ -868,7 +1113,8 @@ export default {
             }
             self.tabList[2].storeList=getStore2Temp(tempArray);
         },
-        clickStore(item,index,_item,_index){
+        //切换门店
+        changeStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
             let obj={};
@@ -892,7 +1138,7 @@ export default {
                     }
                 })
                 if(index!=1){
-                    self.recentStoreList.push(_item);
+                    self.recentStoreList.unshift(_item);
                 }
             }
             else{
@@ -902,13 +1148,31 @@ export default {
                             itemChild.isActive=false;
                         }
                         else{
-                            self.recentStoreList.push(itemChild);
+                            self.recentStoreList.unshift(itemChild);
                         }
                     })
                 })
             }
             console.log(self.recentStoreList);
-            localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
+            let list=self.recentStoreList.map(x=>x.storeId);
+            localStorage.setItem('recentStore_reinspect',JSON.stringify(list));
+        },
+        clickStore(item,index,_item,_index){
+            let self=this;
+            if(self.editCount!=0){
+                self.$confirm('此操作将暂停当前播放视频及清空当前门店输入的巡检项信息，是否继续！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    self.changeStore(item,index,_item,_index);
+                }).catch(() => {
+                    console.log('cancel ignore');     
+                });
+            }
+            else{
+                self.changeStore(item,index,_item,_index);
+            }
         },
         notify(msg,type,time) {
             this.$message({
@@ -922,7 +1186,11 @@ export default {
 </script>
 <style lang="scss" scoped>
     $red:#FB4C5D;
-    $lightRed:#FEE4E7;
+    $black:#424151;
+    $border:#ddd;
+    $background:#fafafb;
+    $tab:#94a4b4;
+
     .fade-enter-active, .fade-leave-active {
         transition: opacity .5s
     }
@@ -1006,7 +1274,7 @@ export default {
                 overflow: hidden;
                 margin-left: 35px;
                 .content{
-                    width: 50%;
+                    width: 239px;
                     text-align: center;
                     float: left;
                     color: #fff;
@@ -1074,10 +1342,11 @@ export default {
                 padding-left: 10px;
                 height: 30px;
                 line-height: 30px;
+                color:$black;
                 .lside-title{
                     font-weight: bold;
-                    color: #424151;
-                    font-size: 16px;
+                    color: $black;
+                    font-size: 18px;
                 }
                 .nocoll{
                     border:1px solid #FF9803;
@@ -1124,6 +1393,21 @@ export default {
                     color: #fff;
                 }
             }
+            .errorVideo-model{
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-top: 20px;
+                @include point(min-width,500);
+                @include point(min-height,414);
+                background-color: #232730;
+                color: $red;
+                span{
+                    position: relative;
+                    top: 50%;
+                    font-size: 12px;
+                }
+            }
             .video-content{
                 width: 100%;
                 height: auto;
@@ -1139,7 +1423,7 @@ export default {
                     z-index: 10;
                     left: 30px;
                     top: 20px;
-                    font-size: 14px;
+                    font-size: 12px;
                 }
                 .iconright{
                     position: absolute;
@@ -1191,7 +1475,7 @@ export default {
                     padding-left: 20px;
                     font-size: 14px;
                     font-weight: bold;
-                    color: #909399;
+                    color: $tab;
                     border-bottom:1px solid #ddd;
                     span{
                         margin-left: 15px;
@@ -1232,7 +1516,7 @@ export default {
                             background-color: #ddd;
                         }
                         .source-content{
-                            min-height: 150px;
+                            min-height: 130px;
                             width: 90%;
                             margin: auto 20px;
                             .source-details{
@@ -1275,7 +1559,7 @@ export default {
                             margin-right: 20px;
                             width: 100px;
                             height: 26px;
-                            padding: 0px 6px 0px 10px;
+                            padding: 0px 0px 0px 15px;
                             background-color: orange;
                             line-height: 26px;
                             color: #fff;
@@ -1284,6 +1568,10 @@ export default {
                             .iconscore{
                                 margin-left: 10px;
                             }
+                        }
+                        .score-menu{
+                            max-height: 160px;
+                            overflow: hidden;
                         }
                     }
                     .inspect-empty{
@@ -1303,6 +1591,9 @@ export default {
             .el-header-title{
                 text-align: left;
                 position: relative;
+                color:$black;
+                font-size: 14px;
+                font-weight: bold;
                 @include point(padding-left,10);
                 span{
                     display: block;
@@ -1314,12 +1605,13 @@ export default {
                     @include point(margin-top,20);
                 }
             }
-            #tabs-content{
+            #storetab-content{
                 margin-top: 10px;
                 .storeList-content{
                     padding: 0 10px;
                     text-align: left;
                     height: 450px;
+                    color: $black;
                     .activeClass{
                         background-color: $red;
                         color: #fff;
@@ -1342,8 +1634,8 @@ export default {
                         margin-bottom: 10px;
                         border: 1px solid #ddd;
                         text-align: center;
-                        padding:4px;
-                        font-size: 14px;
+                        padding:6px;
+                        font-size: 12px;
                         cursor: pointer;
                         border-radius: 4px;
                         width: 80px;
@@ -1355,8 +1647,7 @@ export default {
                         display: block;
                         font-size: 14px;
                         font-weight: bold;
-                        color: #424151;
-                        margin-left: 12px;
+                        margin-left: 15px;
                     }
                 }
             }
@@ -1376,12 +1667,16 @@ export default {
     
 </style>
 <style>
-#tabs-content .el-tabs__nav-scroll{
+#storetab-content .el-tabs__nav-scroll{
     margin-left:40px;
 }
 .el-tabs__active-bar{
     height: 4px !important;
     background-color: #FB4C5D !important;
+}
+.el-tabs__item{
+    color:#94a4b4 !important;
+    font-weight:bold !important;
 }
 .el-tabs__item.is-active{
     font-weight: bold !important;

@@ -11,7 +11,6 @@ import Cookies from 'js-cookie'
 import 'video.js/dist/video-js.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'videojs-flash'
-
 import rem from '@/common/rem'
 
 import BootstrapVue from 'bootstrap-vue'
@@ -28,7 +27,6 @@ Vue.prototype.appName = '看门店管理系统'; //定义一个VUE内全局用�
 process.env.MOCK && require('@/mock')
 
 Vue.use(ElementUI);
-
 new Vue({
   el: '#app',
   router,

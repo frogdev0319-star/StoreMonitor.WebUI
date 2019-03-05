@@ -9,7 +9,7 @@ const user={
         status:'',
         code:'',
         token:getToken(),
-        dash:getCookie('DASH'),
+        dashurl:sessionStorage.getItem('DASH_URL'),
         cancel:null,
         name:'',
         avatar:'',
@@ -27,8 +27,8 @@ const user={
           SET_TOKEN: (state, token) => {
             state.token = token
           },
-          SET_DASH:(state,dash)=>{
-            state.dash=dash
+          SET_DASHURL:(state,dashurl)=>{
+            state.dashurl=dashurl
           },
           SET_INTRODUCTION: (state, introduction) => {
             state.introduction = introduction
@@ -50,14 +50,23 @@ const user={
           }
     },
     actions:{
-        SetDash({commit}){
+        GetDash({commit}){
             return new Promise((resolve,reject)=>{
                 getDashServerInfo().then(res=>{
                     console.log(res);
-                    const data=res.data;
                     if(res.data){
-                        commit('SET_DASH',data);
-                        setCookie('DASH',JSON.stringify(data));
+                        let dash=res.data;
+                        let dataPort='';
+                        let url='';
+                        if(dash.url.indexOf('https')!=-1){
+                            dataPort=dash.httpsCmdPort;
+                        }
+                        else{
+                            dataPort=dash.httpCmdPort;
+                        }
+                        url=dash.url+':'+dataPort;
+                        commit('SET_DASHURL',url);
+                        sessionStorage.setItem('DASH_URL',url);
                     }
                     resolve(res);
                 })

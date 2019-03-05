@@ -81,7 +81,7 @@
                             <div class="screen-content">
                                 <i class="iconfont iconscreen" 
                                 :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
-                                <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen"></i>
+                                <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
                             </div>
                         </div>
                     </div>
@@ -94,11 +94,11 @@
                     
                     <div class="iconright" v-if="showCutContent">
                         <div class="paizhao-content" @click="cutPicture">
-                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:20px;"></i>
+                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
                             <span>抓拍</span>
                         </div>
                         <div class="sheying-content" @click="getVideo">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:24px;position:relative;top:3px;"></i>
+                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;position:relative;top:3px;"></i>
                             <span style="margin-left:12px;">录像</span>
                         </div>
                         <div class="icon-drap-content">
@@ -169,7 +169,8 @@
                                 <img :src="item.src" :width="item.width" :height="item.height"/>
                             </div>
                         </div>
-                        <el-button size="mini" class="submit-btn" @click="submit" type="primary">提交</el-button>
+                        <el-button size="mini" class="submit-btn" v-loading.fullscreen.lock="fullscreenLoading"
+                        @click="submit" type="primary">提交</el-button>
                     </div>
                 </div>
                 <div class="right-line" v-if="corEvent"></div>
@@ -190,7 +191,7 @@
             <div class="el-header-title">
                 <span>选择门店</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="tabs-content">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
@@ -260,9 +261,9 @@
                                 :style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>
                             </div>
                         </div>
-                        <div class="schedule-tag">
+                        <div class="schedule-tag" v-if="false">
                         </div>
-                        <span style="margin-left:20px;color:#94a4b4;font-size:14px;">有事件</span>
+                        <span style="margin-left:20px;color:#94a4b4;font-size:14px;" v-if="false">有事件</span>
                     </div>
                 </div>
             </div>
@@ -272,13 +273,12 @@
 <script>
 import ChannelBtn from '@/components/ChannelBtn.vue'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
-import {getDashServerInfo} from '@/api/device'
-import {addEvent,getStorageInfo,getEventList} from '@/api/event'
+import {addEvent,addComment,getStorageInfo,getEventList} from '@/api/event'
 import PubSub from 'pubsub-js'
 import util from '@/common/util'
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
-import { setInterval } from 'timers';
+import { setInterval, clearInterval } from 'timers';
 
 export default {
     name:'StoreMoinitor',
@@ -287,6 +287,7 @@ export default {
     },
     data(){
         return{
+            fullscreenLoading:false,
             channelBtns:[],
             store:{},
             cityList:[],
@@ -297,7 +298,7 @@ export default {
             showCutContent:false,
             playState:false,
             playBackState:false,
-            activeIndex:'2',
+            activeIndex:'0',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
             showDate:true, 
@@ -359,11 +360,11 @@ export default {
             penList:[
                 {
                     id:'white',
-                    showContent:true
+                    showContent:false
                 },
                 {
                     id:'red',
-                    showContent:false
+                    showContent:true
                 },
                 {
                     id:'yellow',
@@ -401,6 +402,7 @@ export default {
             weekTitles:['一','二','三','四','五','六','日'],
             weekDays:[],
 
+            startTs:0,
             protocal:'DASH',
             //selGID:0,
             sessionId:'',
@@ -420,7 +422,8 @@ export default {
             emptyImgSrc:require('../../../static/img/pic.png'),
             sourceList:[],
             oss:null,
-            bucket:'Bucket Name',
+            bucketVideo:'',
+            bucketImage:'',
             showgongge:false,
             videoSourceList:[
                 {
@@ -468,29 +471,40 @@ export default {
             timeDrap:false,
             curYearNum:0,
             curMonthNum:0,
-            curDayNum:0
+            curDayNum:0,
+            percentage:0,
+            accountId:'aaoompqqpjy4',
         }
     },
-    // beforeDestroy(){
-    //     //离开页面的同时应该停止播放视频
-    //     let self=this;
-    //     if(self.playState){ 
-    //         self.stopRealTime();
-    //     }
-    // },
+    beforeRouteLeave(to, from, next){
+        //离开页面的同时应该停止播放视频
+        let self=this;
+        if(self.playState){ 
+            self.stopRealTime();
+        }
+        next();
+    },
     async mounted(){
         let self=this;
         self.videoEl=document.getElementById('previewVideo');
         document.onmouseup=self.mouseUpAction;
         //self.getPlayer();
         //初始化页面数据
-        self.getDashServer();
+        //self.getDashServer();
         self.getOssInfo();
-        self.getInitStoreData();
+        self.getUpLoadBucketInfo();
+        self.getFaStoreData();   //初始获取已关注门店的列表数据
+        self.getInitStoreData(); //初始获取全部门店的列表数据，并进行处理
         self.getWeekDay();
         self.getRecentStoreList();
     },
     methods:{
+        getUpLoadBucketInfo(){
+            let self=this;
+            self.bucketVideo='video'+'/'+util.getCurDate2Str();
+            self.bucketImage='image'+'/'+util.getCurDate2Str();
+        },
+
         getPlayer(){
             var player=videojs('previewVideo',{
                 'controls':true,
@@ -518,12 +532,6 @@ export default {
                 insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0];
                 controlBar.insertBefore(newbtn,insertBeforeNode);
             })
-        },
-        getDashServer(){
-            let self=this;
-            self.$store.dispatch('SetDash').then((res)=>{
-                console.log(res);
-            });
         },
         getOssInfo(){
             let self=this;
@@ -594,12 +602,13 @@ export default {
                     let temp=[];
                     let data=self.recentStoreList;
                     console.log(data);
-                    data.map(x=>x.storeId).reverse().forEach(item=>{
+                    data.map(x=>x.storeId).forEach(item=>{
                         if(temp.indexOf(item)==-1){
                             temp.push(item);
                         }
                     })
                     temp=temp.slice(0,3); //取最近访问的三家门店
+
                     let dataTemp=await self.getAllStoreList();
                     let allStoreData=dataTemp.data.content;
                     let tempStore=[];
@@ -611,6 +620,7 @@ export default {
                         }
                     }
                     self.tabList[1].storeList=getStoreTemp(tempStore);
+                    localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.tabList[1].storeList));
                     break;
                 case 2:
                     console.log(self.tabList[2]);
@@ -624,18 +634,19 @@ export default {
                             }
                         })
                     })
+                    break;
             }
         },
         /**
          * add favorite or delete favorite
          */
-        async getInitStoreData1(){
+        async getFaStoreData(){
             let self=this;
             let getStoreTemp=data=>{
                 let temp=[];
                 data.forEach((item,index)=>{
                     let obj={};
-                    if(self.store.storeId==item.storeId){
+                    if(index==0){
                         obj.isActive=true;
                     }
                     else{
@@ -655,6 +666,18 @@ export default {
                 let storeData=data.data;
                 self.tabList[0].storeList=getStoreTemp(storeData);
 
+                let obj={};
+                obj.storeId=storeData[0].storeId;
+                obj.storeName=storeData[0].name;
+                obj.storeTitle=storeData[0].name;
+                obj.userName=storeData[0].userName;
+                obj.storeUp=true;
+                obj.storeUpTitle='已关注';
+                self.store=obj;
+
+                self.recentStoreList.unshift(self.tabList[0].storeList[0]);
+                localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
+                self.getChannelByStore(self.tabList[0].storeList[0]);
             }
         },
         async getInitStoreData(){
@@ -673,12 +696,7 @@ export default {
                     for(let j=0;j<data.length;j++){
                         if(cityList[i]==data[j].city){
                            let obj={};
-                           if(i==0&&j==0){
-                               obj.isActive=true;
-                           }
-                           else{
-                               obj.isActive=false;
-                           }
+                            obj.isActive=false;
                             obj.storeId=data[j].storeId;
                             obj.name=data[j].name;
                             obj.userId=data[j].userId;
@@ -702,21 +720,6 @@ export default {
                 if(self.tempStoreList.length==0){
                     self.showSearchInput=false;
                 }
-                let obj={};
-                obj.storeId=storeData[0].storeId;
-                obj.storeName=storeData[0].name;
-                obj.storeTitle=storeData[0].name;
-                obj.storeUp=storeData[0].favorite;
-                if(storeData[0].favorite){
-                    obj.storeUpTitle='已关注';
-                }
-                else{
-                    obj.storeUpTitle='点击关注';
-                }
-                self.store=obj;
-                self.recentStoreList.push(self.tabList[2].storeList[0].storeList[0]);
-                localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
-                self.getChannelByStore(self.tabList[2].storeList[0].storeList[0]);
             }
         },
         addStoreUp(){
@@ -758,8 +761,12 @@ export default {
                 },
                 "filter": {
                     "page": 0,
-                    "size": 1000
+                    "size": 5
                 },
+                "order": {
+                    "direction": "desc",
+                    "property": "ts"
+                }
             }
             return new Promise((resolve,reject)=>{
                 getEventList(params).then(res=>{
@@ -851,6 +858,8 @@ export default {
                         channel:JSON.stringify(self.channel.channelId),
                         beginTime:self.curTime.getTime().toString().substr(0,10),
                         endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
+                        // beginTime:self.startTs,
+                        // endTime:self.startTs+181,
                 }
             };
             url=await dashAPI.playBack(1,dataonLine);
@@ -908,11 +917,14 @@ export default {
         },
         changeDate(val){
             let self=this;
+            self.startTs=0;
             self.showModelContent=true;
             let d=self.getCurTime();
             console.log(d);
             self.curTime=d;
-            let state=self.playBackState;
+            let dstr=Number((d.getTime()+(3*60+1)*1000).toString().substr(0,10));
+            self.startTs=dstr;
+            self.currentTimeValue=0;
             self.playBackState=true;
             if(self.playState){  //切换时间的时候判断当前视频是否在播放
                self.stopAndPlayHistoryVideo();
@@ -963,39 +975,162 @@ export default {
                 })
             })
         },
-        submit(){
+        getFileUrl(fileName){
+            let self=this;
+            let bucketName=self.accountId;
+            let endpoint=self.oss.ossEndPoint;
+            let key=fileName;
+            let url=`http://${bucketName}.${endpoint}/${fileName}`;
+            return url;
+        },
+        upLoadFile(fileItem){
+            let self=this;
+            self.percentage=0;
+            let OSS = require('ali-oss');
+            const client = new OSS({
+                region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
+                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
+                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
+                bucket: self.accountId
+            })
+            let name=fileItem.fileName;
+            return new Promise((resolve,reject)=>{
+                client.multipartUpload(name,fileItem.file,{
+                progress: function* (percentage, cpt) {
+                   self.percentage = percentage
+                    }
+                })
+                .then((results) => {
+                    // 上传完成
+                    const url = self.getFileUrl(results.name);
+                    console.log(url);
+                    resolve(url); 
+                })
+                .catch((err) => {
+                    console.log(err) 
+                }) 
+            })
+        },
+        async submit(){
             let self=this;
             console.log(self.sourceList);
             if(self.eventName.trim().length==0){
                 self.notify('问题名称不能为空！','warning',3000);
                 return false;
             }
-            const client = new OSS.Wrapper({
-                region: self.oss.ossEndPoint,
-                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
-                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                bucket: self.bucket
-            })
+            let tempFileUrl=[];
+            for(let i=0;i<self.sourceList.length;i++){
+                let obj={};
+                if(self.sourceList[i].mediaType==2){
+                    let url=await self.upLoadFile(self.sourceList[i]);
+                    console.log(url);
+                    obj.mediaType=2;
+                    obj.url=url;
+                }
+                tempFileUrl.push(obj);
+            }
 
-            self.sourceList.forEach(item=>{
-
-            })
-            let commentobj={
-                ts:new Date().getTime(),
-                description:self.eventDes.trim(),
-                status:0
-            };
-
-            let obj={};
-            obj.ts=new Date().getTime();
-            obj.subject=self.eventName.trim();
-            obj.storeId=self.store.storeId;
-            obj.deviceId=self.channel.id;
-            obj.comment=commentobj;
-            let params=obj;
-            addEvent(params).then(res=>{
-                console.log(res);
-            })
+            console.log(self.curEvent);
+            let eventIds=[];
+            eventIds.push(self.curEvent);
+            self.fullscreenLoading=true;
+            if(self.activeEventBtn=='创建问题'){
+                let commentobj={
+                    ts:new Date().getTime(),
+                    description:self.eventDes.trim(),
+                    attachment:tempFileUrl,
+                    status:0
+                };
+                let curTs=util.getCurDate2StrBySign('/');
+                let obj={};
+                obj.ts=new Date().getTime();
+                obj.subject=self.eventName.trim();
+                obj.storeId=self.store.storeId;
+                obj.deviceId=self.channel.id;
+                obj.comment=commentobj;
+                let params=obj;
+                let isSuccess=false;
+                addEvent(params).then(res=>{
+                    console.log(res);
+                    self.fullscreenLoading=false;
+                    let notifiedTo=res.data.notifiedTo;
+                    if(res.errCode==0){
+                        isSuccess=true;
+                    }
+                    else{
+                        isSuccess=false;
+                    }
+                    let routeData={
+                        flag:{
+                            addEventType:'add',
+                            isSuccess:isSuccess,
+                        },
+                        store:{
+                            storeId:self.store.storeId,
+                            storeName:self.store.storeName,
+                        },
+                        channel:{
+                            deviceId:self.channel.id,
+                        },
+                        event:{
+                            eventIds:[],
+                            eventName:self.eventName,
+                            description:self.eventDes.trim(),
+                            fileList:tempFileUrl
+                        },
+                        user:notifiedTo,
+                        ts:curTs                     
+                    }
+                    sessionStorage.setItem('store_submit',JSON.stringify(routeData));
+                    self.$router.push({name:"提交事件",params:{data:routeData}});
+                    
+                })
+            }
+            else{
+                let obj={
+                    eventIds:eventIds,
+                    comment:{
+                        ts:new Date().getTime(),
+                        description:self.eventDes.trim(),
+                        attachment:tempFileUrl,
+                        status:1
+                    }
+                };
+                let curTs=util.getCurDate2StrBySign('/');
+                let params=obj;
+                addComment(params).then(res=>{
+                    console.log(res);
+                    self.fullscreenLoading=false;
+                    if(res.errCode==0){
+                        isSuccess=true;
+                    }
+                    else{
+                        isSuccess=false;
+                    }
+                    let routeData={
+                        flag:{
+                            addEventType:'cor',
+                            isSuccess:isSuccess,
+                        },
+                        store:{
+                            storeId:self.store.storeId,
+                            storeName:self.store.storeName,
+                        },
+                        channel:{
+                            deviceId:self.channel.id,
+                        },
+                        event:{
+                            eventIds:eventIds,
+                            eventName:self.eventName,
+                            description:self.eventDes.trim(),
+                            fileList:tempFileUrl
+                        },
+                        ts:curTs              
+                    }
+                    sessionStorage.setItem('store_submit',JSON.stringify(routeData));
+                    self.$router.push({name:"提交事件",params:{data:routeData}});
+                })
+            }
         },
         spreadContent(){
             let self=this;
@@ -1022,7 +1157,7 @@ export default {
                 //self.canvasEl.width=width/4;
                 //self.canvasEl.height=height/4;
                 ctx.drawImage(self.videoEl,0,0,480,270);
-                var oGrayImg=icanvas.toDataURL('image/png');
+                var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
             })
         },
@@ -1103,8 +1238,11 @@ export default {
             self.showEmptyImg=false;
             let img=new Image();
             let obj={};
-            obj.src=self.canvasEl.toDataURL("image/png");
+            obj.mediaType=2;
+            obj.src=self.canvasEl.toDataURL("image/jpeg");
             obj.height='100px';
+            obj.fileName=self.bucketImage+'/'+'event'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.jpg';
+            obj.file=util.base64ToBlob(obj.src);
             self.sourceList.push(obj);
             self.showCutDialog=false;
         },
@@ -1137,9 +1275,10 @@ export default {
                         streamingProtocol:this.protocal,
                         IVSID:self.channel.ivsId,
                         channel:JSON.stringify(self.channel.channelId),
-                        beginTime:self.curTime.getTime().toString().substr(0,10),
-                        endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
-                        
+                        // beginTime:self.curTime.getTime().toString().substr(0,10),
+                        // endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
+                        beginTime:(self.startTs).toString(),
+                        endTime:(self.startTs+181).toString(),
                     }
                 };
                 url=await dashAPI.playBack(1,data);
@@ -1208,7 +1347,7 @@ export default {
                 console.log(ret);
             }
         },
-        getProcess(){
+        async getProcess(){
             let self=this;
             let video=document.getElementById('previewVideo');
             let curTime=video.player.currentTime();
@@ -1228,6 +1367,21 @@ export default {
             }
             self.currentStr=getTimeStr(curTime);
             self.durationStr=getTimeStr(duration);
+            if(self.currentStr==self.durationStr){
+                self.stopVideo();
+                const data = {
+                    request: { 
+                        method: 'disconnection',
+                        sessionID: self.sessionId,
+                        IVSID:self.channel.ivsId,
+                        channel:JSON.stringify(self.channel.channelId)
+                    }
+                };
+                clearInterval(self.timeid);
+                let ret=await dashAPI.playBack(0,data);
+                await dashAPI.Offline(self.sessionId);
+                self.startTs=self.startTs+3*60*1000;
+            }
         },
         adjustSpeed(val){
             console.log(val);
@@ -1364,15 +1518,25 @@ export default {
             let self=this;
             self.getStoreList();
         },
+        clearTheEventInfo(){
+            let self=this;
+            self.activeEventBtn='创建问题';
+            self.corEvent=false;
+            self.eventName='';
+            self.eventDes='';
+            self.sourceList=[];
+        },
         clickStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
+            self.clearTheEventInfo();
+            self.showModelContent=true;
             let obj={};
             obj.storeId=_item.storeId;
             obj.storeName=_item.name;
             obj.storeTitle=_item.name;
             obj.storeUp=_item.favorite;
-
+            obj.userName=_item.userName;
             //切换门店的时候暂停当前播放的视频
             if(_item.favorite){
                 obj.storeUpTitle='已关注';
@@ -1389,7 +1553,7 @@ export default {
                     }
                 })
                 if(index!=1){
-                    self.recentStoreList.push(_item);
+                    self.recentStoreList.unshift(_item);
                 }
             }
             else{
@@ -1399,14 +1563,16 @@ export default {
                             itemChild.isActive=false;
                         }
                         else{
-                            self.recentStoreList.push(itemChild);
+                            self.recentStoreList.unshift(itemChild);
                         }
                     })
                 })
             }
             console.log(self.recentStoreList);
+
             localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
             self.getChannelByStore(_item);
+
         },
         getRecentStoreList(){
             let self=this;
@@ -1431,6 +1597,7 @@ export default {
                 if(index==0){
                     obj.isClick=true;
                     self.channel={
+                        id:item.id,
                         ivsId:item.ivsId,
                         channelId:item.channelId,
                         channelName:item.name
@@ -1478,9 +1645,6 @@ export default {
                     }
                 };
                 url=await dashAPI.playBack(1,data);
-                self.timeid= setInterval(function(){  //播放视频的同时进度条进行
-                    self.getProcess();
-                },1000);
             }
             else{
                 let ret=await dashAPI.RealTime(0,dataDis);
@@ -1504,17 +1668,23 @@ export default {
             }
             self.mpdurl = url;
             console.log(self.mpdurl);
-            if (self.mpdurl != "" ) {
+            if (url.ErrorCode==undefined&&url.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
+                if(self.playBackState){ //播放历史视频时，启动计时器
+                    self.timeid= setInterval(function(){  //播放视频的同时进度条进行
+                        self.getProcess();
+                    },1000);
+                }
             }
             else{   //当前视频如果返回失败，需处于暂停状态
                 self.stopRealTime();
             }
         },
-        async clickBtn(item,index){
+        changeChannel(item,index){
             let self=this;
             self.showModelContent=true;
+            self.clearTheEventInfo();
             if(item.isonline){
                 item.isClick=true;
                 let obj={
@@ -1538,7 +1708,24 @@ export default {
             }
             else{
                 self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-            }   
+            }  
+        },
+        clickBtn(item,index){
+            let self=this;
+            if(self.eventName.trim().length!=0){
+                self.$confirm('将清空当前通道的事件信息，是否继续！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    self.changeChannel(item,index);
+                }).catch(() => {
+                    console.log('cancel ignore');     
+                });
+            }
+            else{
+                self.changeChannel(item,index);
+            }
         },
         /**
          * 时间日期控制区域
@@ -1547,6 +1734,7 @@ export default {
             let self=this;
             self.curTime=new Date();  //点击回到当前时间，首先时间控件恢复，选择的日期回到当前日期，停止播放历史视频。
             self.playBackState=false;
+            self.realTime();
             self.showModelContent=true;
             self.curYear=new Date().getFullYear();
             self.curMonth=new Date().getMonth()+1;
@@ -1651,7 +1839,10 @@ export default {
         font-family: 'Microsoft YaHei';
     }
     $red:#FB4C5D;
-    $lightRed:#FEE4E7;
+    $black:#424151;
+    $border:#ddd;
+    $background:#fafafb;
+    $tab:#94a4b4;
 
 
 
@@ -1721,7 +1912,7 @@ export default {
                 line-height: 30px;
                 .lside-title{
                     font-weight: bold;
-                    color: #424151;
+                    color: $black;
                     font-size: 18px;
                 }
                 .nocoll{
@@ -1749,7 +1940,6 @@ export default {
                     display: inline-block;
                     margin-left: 20px;
                     padding: 0px 6px;
-                    height: 22px;
                     line-height: 20px;
                     width: 85px;
                     position: relative;
@@ -1869,12 +2059,13 @@ export default {
                     height: 100%;
                     width: 100%;
                     background-color: #232730;
-                    color: #FB4C5D;
+                    color: $red;
                     position: absolute;
                     z-index: 990;
                     span{
                         position: relative;
                         top: 50%;
+                        font-size: 12px;
                     }
                 }
                 .video-model{
@@ -1888,7 +2079,7 @@ export default {
                         display: block;
                         margin: 20px;
                         color: #fff;
-                        font-size: 14px;
+                        font-size: 12px;
                     }
                     .progress-content{
                         position: absolute;
@@ -1898,7 +2089,7 @@ export default {
                             float: left;
                             width: 77%;
                             .progress-bar{
-                                background-color: #FB4C5D;
+                                background-color: $red;
                             }
                         }
                         .currentTime{
@@ -1971,14 +2162,13 @@ export default {
                     .iconright{
                         position: absolute;
                         right:0px;
-                       
                         height: 50%;
                         top: 25%;
                         .paizhao-content{
                             height: 50px;
                         }
                         span{
-                            font-size: 13px;
+                            font-size: 12px;
                             margin-left: 15px;
                             color: #fff;
                             margin-right: 35px;
@@ -2091,6 +2281,7 @@ export default {
                 text-align: left;
                 border: 1px solid #e3e9f4;
                 overflow: hidden;
+                background: $background;
                 .event-lside{
                     width: 60%;
                     float: left;
@@ -2182,6 +2373,7 @@ export default {
                     margin-bottom: 15px;
                     line-height: 12px;
                     font-size: 12px;
+                    margin-top: 15px;
                 }
             }
         }
@@ -2195,11 +2387,11 @@ export default {
                 span{
                     display: block;
                     @include point(margin-top,10);
-                    font-size: 14px;
+                    font-size: 16px;
                     font-weight: bold;
                 }
             }
-            #tabs-content{
+            #storetab-content{
                 margin-top: 10px;
                 @include point(height,280);
                 .storeList-content{
@@ -2227,11 +2419,11 @@ export default {
                         margin-bottom: 10px;
                         border: 1px solid #ddd;
                         text-align: center;
-                        padding:4px;
-                        font-size: 14px;
+                        padding:6px;
+                        font-size: 12px;
                         cursor: pointer;
                         border-radius: 4px;
-                        width: 80px;
+                        width: 96px;
                         white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
                         overflow: hidden; //隐藏超出单元格的部分。
                         text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
@@ -2240,8 +2432,8 @@ export default {
                         display: block;
                         font-size: 14px;
                         font-weight: bold;
-                        color: #424151;
-                        margin-left: 12px;
+                        color: $black;
+                        margin-left: 15px;
                     }
                 }
             }
@@ -2249,13 +2441,14 @@ export default {
                 width: 100%;
                 height: auto;        
                 overflow: hidden;
+                margin-top: 20px;
                 span{
                     display: block;
                     text-align: left;
-                    margin: 15px 20px;
+                    margin: 15px;
                     font-size: 14px;
                     font-weight: bold;
-                    color: #424151;
+                    color: $black;
                 }
                 .channels-srollbar{
                     height: 142px;
@@ -2275,15 +2468,15 @@ export default {
                     margin: 15px 20px;
                     font-size: 14px;
                     font-weight: bold;
-                    color: #424151;
+                    color: $black;
                 }
                 .date-picker-content{
                     text-align: left;
-                    padding-left: 25px;
+                    padding-left: 20px;
                     position: relative;
                     span{
                         font-size: 14px;
-                        color: #424151;
+                        color: $black;
                         margin-right: 15px;
                     }
                     .time-picker{
@@ -2306,14 +2499,14 @@ export default {
                         -webkit-user-select: none;
                         -moz-user-select: none;
                         .icon-arrow{
-                            @include point(font-size,25);
+                            font-size: 25px;
                             opacity: 0.2;
                             position: relative;
                             top: 4px;
                             cursor: pointer;
                         }
                         span{
-                            @include point(font-size,14);
+                            font-size: 14px;
                             font-weight: bold;
                             @include point(margin,25);
                         }
@@ -2326,7 +2519,7 @@ export default {
                             width: 14%;
                             position: relative;
                             @include point(left,10);
-                            @include point(font-size,12);
+                            font-size: 12px;
                         }
                         .date-details{
                             .data{
@@ -2341,12 +2534,12 @@ export default {
                                 background-color: #fff;
                                 @include point(line-height,30);
                                 text-align: center;
-                                @include point(font-size,12);
+                                font-size: 12px;
                                 @include point(border-radius,18);
                                 cursor: pointer;
                             }
                             .opColor{
-                                background-color: #FB4C5D !important;
+                                background-color: $red !important;
                                 color: #fff !important;
                             }
                             .noramlColor{
@@ -2356,7 +2549,7 @@ export default {
                         .schedule-tag{
                             width: 16px;
                             height: 16px;
-                            background-color: #FB4C5D;
+                            background-color: $red;
                             border-radius: 8px;
                             margin-top: 20px;
                             display: inline-block;
@@ -2371,49 +2564,22 @@ export default {
 .el-test{
     width: 70px;
 }
-.vjs-has-started .vjs-control-bar {
-display: -webkit-box;
-display: -webkit-flex;
-display: -ms-flexbox;
-/*原为flex*/
-display: block;
-visibility: visible;
-opacity: 1;
--webkit-transition: visibility 0.1s, opacity 0.1s;
--moz-transition: visibility 0.1s, opacity 0.1s;
--o-transition: visibility 0.1s, opacity 0.1s;
-transition: visibility 0.1s, opacity 0.1s;
-}
- 
 
-.video-js .vjs-play-control {
-/*增加float*/
-float:left;
-cursor: pointer;
--webkit-box-flex: none;
--moz-box-flex: none;
--webkit-flex: none;
--ms-flex: none;
-flex: none;
-}
- 
-.video-js .vjs-fullscreen-control {
-cursor: pointer;
--webkit-box-flex: none;
--moz-box-flex: none;
--webkit-flex: none;
--ms-flex: none;
-flex: none;
-/*增加float*/
-float: right;
-}
 </style>
 <style>
+.el-radio-button__inner{
+    border-radius: 0px !important;
+}
 .el-prog .progress-bar{
     background-color: #FB4C5D;
 }
-#tabs-content .el-tabs__nav-scroll{
+#storetab-content .el-tabs__nav-scroll{
     margin-left:40px;
+}
+.el-tabs__item{
+    color:#94a4b4 !important;
+    font-weight:bold !important;
+    font-size:14px;
 }
 .el-tabs__active-bar{
     height: 4px !important;
@@ -2490,10 +2656,12 @@ float: right;
 
 <style>
 @import '../../assets/css/importfile.css'; 
+@import '../../assets/css/videoBar.css'; 
     #el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
         font-family: 'Microsoft YaHei';
     }
+    
 </style>

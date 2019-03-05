@@ -31,7 +31,7 @@
         </el-dialog>
 
         <input type="file" accept="image/*" name="file_head" class="uploadLogoImg" @change="uploadImgLogo($event)"/>
-
+        <el-button class="file-cancel-btn" @click="confirmUpLoad" size="mini" style="">上传至阿里云</el-button>
      </div>
 
 </template>
@@ -121,7 +121,10 @@
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
 import 'videojs-contrib-hls';
+import util from '@/common/util'
 import $ from 'jquery';
+import {addEvent,getStorageInfo,getEventList} from '@/api/event'
+import OSS from 'ali-oss'
   export default {
     data() {
       return {
@@ -151,7 +154,13 @@ import $ from 'jquery';
         showModel:true,
         X:0,Y:0,X1:0,Y1:0,
         isMouseDown:false,
-        flag:0
+        flag:0,
+        imgDataUrl:'',
+        oss:null,
+        percentage:0,
+        accountId:'aaoompqqpjy4',
+        bucketImage:'',
+        fileImg:'',
       };
     },
     methods: {
@@ -181,7 +190,61 @@ import $ from 'jquery';
             }
             // this.imgDataUrl = file;
         },
-
+        getUpLoadBucketInfo(){
+            let self=this;
+            self.bucketVideo='video'+'/'+util.getCurDate2Str();
+            self.bucketImage='image'+'/'+util.getCurDate2Str();
+        },
+        getOssInfo(){
+            let self=this;
+            getStorageInfo().then(res=>{
+                console.log(res);
+                if(res.errCode==0){
+                    self.oss=res.data;
+                }
+            })
+        },
+        getFileUrl(fileName){
+            let self=this;
+            let bucketName=self.accountId;
+            let endpoint=self.oss.ossEndPoint;
+            let key=fileName;
+            let url=`http://${bucketName}.${endpoint}/${fileName}`;
+            return url;
+        },
+        confirmUpLoad(){
+            let self=this;
+            let file=util.base64ToBlob(self.imgDataUrl);
+            //let file=self.fileImg;
+            let fileName='image'+'/'+util.getCurDate2Str()+'/'+'event'+'_'+util.getCurTimeStr()+'_'+'0038932'+'_'+'27'+'.jpg';
+            var OSS = require('ali-oss');
+            // const client =new OSS({
+            //     region:'oss-cn-beijing',
+            //     accessKeyId: 'LTAIV0ioFb79T9p4',//填入自己的id
+            //     accessKeySecret: '0K7AXad9Z0vzNoQJL1kWiC04dLcejR',//填入自己的id
+            //     bucket: self.accountId
+            // })
+            const client = new OSS({
+                region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
+                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
+                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
+                bucket: self.accountId
+            })
+            client.put(fileName,file,{
+            progress: function* (percentage, cpt) {
+                self.percentage = percentage
+                }
+            })
+            .then((results) => {
+                // 上传完成
+                const url = self.getFileUrl(results.name);
+                console.log(url);
+                resolve(url); 
+            })
+            .catch((err) => {
+                console.log(err)
+            }) 
+        },
        submit(){
            event.preventDefault(); //取消默认行为
            let formdata=new FormData();
@@ -287,6 +350,8 @@ import $ from 'jquery';
     },
     mounted(){
         let self=this;
+        self.getOssInfo();
+        self.getUpLoadBucketInfo();
         self.videoEl=document.getElementById('previewVideo');
         document.onmouseup=self.mouseUpAction;
     }
