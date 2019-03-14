@@ -1,5 +1,5 @@
 <template>
-    <div class="el-event-content">
+    <div class="el-event-content" :style="{'height':windowHeight-138+'px'}">
        <div class="seacrh-content">
             <span class="select-title">按省份选择</span>
              <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
@@ -16,7 +16,7 @@
                 <el-input v-model="citys" size="mini" id="elCity" placeholder="城市" :readonly=true></el-input>
                 <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
             </div>
-            <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
+            <el-button size="mini" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
             <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false"> 
                 <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
                     style="margin-right:10px;"></el-checkbox>全部</p>
@@ -59,7 +59,7 @@
             <el-table-column
                 prop="napeTable"
                 label="关联巡检表"
-                min-width="180"
+                min-width="160"
                 align="left">
                 <template slot-scope="scope">
                     <el-popover
@@ -81,7 +81,7 @@
             </el-table-column>
             <el-table-column prop="schedue"
                 label="巡检排程"
-                min-width="140"
+                min-width="120"
                 align="left">
 
             </el-table-column>
@@ -132,7 +132,7 @@ import PubSub from 'pubsub-js'
                         "prop":"name",
                         "label":"门店名称",
                         "sortable":'custom',
-                        "width":180
+                        "width":160
                     },
                     {
                         "prop":"userName",
@@ -175,10 +175,10 @@ import PubSub from 'pubsub-js'
                     return this.windowHeight*0.72;
                 }
                 else if(this.windowHeight>700){
-                    return this.windowHeight*0.66;
+                    return this.windowHeight*0.67;
                 }
                 else{
-                    return this.windowHeight*0.62;
+                    return this.windowHeight*0.63;
                 }
             }
         },
@@ -519,6 +519,7 @@ import PubSub from 'pubsub-js'
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
 }
+ $red:#f31d65;
 .el-event-content{
     width: 100%;
     position: relative;
@@ -545,7 +546,6 @@ import PubSub from 'pubsub-js'
             width: 90px;
             text-align: center;
             @include point(margin-left,15);
-            background-color: #FB4C5D;
             color: #fff;
             height: 30px;
         }
@@ -628,10 +628,6 @@ import PubSub from 'pubsub-js'
 }
 </style>
 <style scoped>
-    .page-login-toolTipClass{
-        background-color: #2992FF !important;
-        color: red;
-    }
     .el-select >>> .el-input__inner{
         background: #F4F5F9 !important;
         border-radius: 0px !important;
@@ -646,31 +642,9 @@ import PubSub from 'pubsub-js'
     .el-table::before{
         height: 0px !important;
     }
-    .el-tooltip__popper.is-light{
-        background: #E2F3FD !important;
-        color: #4b5262 !important;
-        border: 1px solid #2992FF !important;
-    }
     #elCity{
         border-radius: 0px;
         background-color: #F4F5F9;
-    }
-    .el-checkbox__inner:hover{
-        border-color: #FB4C5D !important;
-    }
-    .el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
-    .el-checkbox__input.is-checked .el-checkbox__inner{
-        background-color: #FB4C5D !important;
-        border-color:#FB4C5D !important;
-    }
-    .province-popper .el-select-dropdown__item.hover{
-        background-color:#FEE4E7;
-    }
-    .province-popper .el-select .el-input.is-focus .el-input__inner{
-        border-color: #FEE4E7;
-    }
-    .province-popper .el-select-dropdown__item.selected{
-        color:#FB4C5D;
     }
     .current-row > td {
         background: #FEE7E4 !important;

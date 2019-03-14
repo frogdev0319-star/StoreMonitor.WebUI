@@ -5,34 +5,39 @@
                 <span class="lside-title">
                     {{store.storeTitle}}
                 </span>
-                <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp">
-                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'"></i>
+                <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp" v-if='showStoreUp'>
+                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button class="el-submit" size="mini" @click="submit" v-loading.fullscreen.lock="fullscreenLoading">
+                <!-- <img :src="store.storeUp?storeUpSrc:nostoreUpSrc" alt="icon" class="icon-storeUp"/> -->
+                <el-button class="el-submit" size="mini" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary">
                     提交
                 </el-button> 
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" width=550px height=300px top=15%>
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="550*percentHeight+'px'" height=300px top=15%>
                 <div class="canvas-content">
                     <hr class="dialog-hr"/> 
-                    <div class='model' v-if="showCutModel" @mousedown="modelMouseDown">
-                        <div class='icon-right' @mouseleave="showCutModel=false">
-                            <div class="content" v-for="(item,index) in penList" :key="index">
-                                <div :class="{colorActive:item.showContent}"></div>
-                                <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                        <div class='icon-right' v-if="showPenBtn" id="iconR">
+                            <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
+                            <transition name='fadepen'>
+                            <div class="pen-content" v-if="showPen">
+                                <div class="content" v-for="(item,index) in penList" :key="index">
+                                    <div :class="{colorActive:item.showContent}"></div>
+                                    <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                                </div>
                             </div>
+                            </transition>
                         </div>
-                    </div>
-                     <canvas id="icanvas"  width="480" height="270" @mousedown="mouseDownAction($event)" 
+                     <canvas id="icanvas"  :width="480*percentHeight" :height="270*percentHeight" @mousedown="mouseDownAction($event)" 
                     @mousemove="mouseMoveAction($event)"></canvas>
-                    <div class="cancel-content" v-if="showCancelContent">
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':480*percentHeight+'px',
+                    'margin-left':35*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas"> 
                             <span>取消编辑</span>
                         </div>
                         <div class="content" @click="confirmEditCanvas">
-                            <span>保存编辑</span>
+                            <span>撤销编辑</span>
                         </div>
                     </div>
                 </div>
@@ -41,27 +46,69 @@
                     <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
                 </div>
             </el-dialog>
-            <div class="video-content" v-if="!showError">
-                <span id="channelName">{{channel.channelName}}</span>
+            <div class="guide-content" v-if="showGuide">
+                <div class="guide-lside">
+                    <div class="num-content">
+                        <span class="guide-num">1</span>
+                        <span class="guide-title">
+                            点击下方巡检标题，开始远程巡检！
+                        </span>
+                    </div>
+                    <img :src="arrows1Src" alt="arrow1"/>
+                </div>
+                <div class="guide-rside">
+                    <div class="num-content">
+                        <span class="guide-num">2</span>
+                        <span class="guide-title">
+                            点击作为取证截图！
+                        </span>
+                    </div>
+                    <img :src="arrows2Src" alt="arrow2"/>
+                    <div class="iconright-content">
+                        <div class="iconright">
+                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                            <span>抓拍</span>
+                        </div>
+                        <div class="iconright">
+                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"></i>
+                            <span>录像</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="video-content" v-else-if="!showError&&!showGuide" id="videoContent"
+             @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel">
+                <span id="channelName" v-if="showModelContent">{{channel.channelName}}</span>
+                <div class="icon-footer" v-if="showModelContent">
+                    <div class="iconlside">
+                        <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+                        <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+                    </div>
+                    <div class="screen-content">
+                        <i class="iconfont iconscreen" 
+                        :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
+                        <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+                    </div>
+                </div>
                 <transition name='fade'>
                     <div class="iconright" v-if="showModelContent" @click="cutPicture">
-                        <i class="iconfont icon-xiangji iconpaizhao" style="font-size:20px;"></i>
+                        <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
                         <span>抓拍</span>
                     </div>
                 </transition>
                 <transition name="fade">
                     <div class="iconright1" v-if="showModelContent" @click="getVideo">
-                        <i class="iconfont icon-luxiang iconpaizhao" style="font-size:24px;position:relative;top:3px;left:3px;"></i>
+                        <i class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"></i>
                         <span>录像</span>
                     </div>
                 </transition>
-                <video  height=83% width=90% id="previewVideo" prload autoplay controls
+                <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls"
                     class="video-js vjs-fill">
                 </video>
             </div>
             <div class="errorVideo-model" v-else>
-                    <span>{{errorText}}</span>
-                </div>
+                <span>{{errorText}}</span>
+            </div>
             <div class="el-inspect">
                 <el-row class="inspect-header">
                     <el-col :span="8">
@@ -74,7 +121,7 @@
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <div :style="{'max-height':varyWindowHeight*0.32-40+'px'}">
+                            <div :style="{'max-height':varyWindowHeight*0.38-40+'px'}">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                                     <span>{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
@@ -82,8 +129,8 @@
                             </div>
                          </el-scrollbar>
                     </el-col>
-                    <el-col :span="16">
-                        <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                    <el-col :span="16" id="inspectContent">
+                        <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div class="item-content" :style="{'max-height':varyWindowHeight*0.32+'px'}">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details" >
                                     <span class="titles" :class="!item.isIgnore?'noraml-title':'ignore-title'" @click="clickItem(item,index)">{{`${index+1}. ${item.subject}`}}</span>
@@ -91,22 +138,22 @@
                                         <span class="el-dropdown-link">
                                             {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <el-dropdown-menu slot="dropdown" class="score-menu" 
-                                        style="max-height: 160px;overflow: hidden;overflow-y: scroll;">
+                                        <!-- style="overflow-y:scroll;height:200px;" -->
+                                        <el-dropdown-menu slot="dropdown" class="score-menu" style="overflow-y:scroll;height:200px;">
                                             <el-dropdown-item style="width:70px;text-align:center;"
                                             v-for="(itemDS,indexDS) in scoreList" 
-                                            :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.scoreTitle}}</el-dropdown-item>
+                                            :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.val}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
+
                                     <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i>
-                                    <div class="source-content">
-                                        <div class="source-details" v-if="item.showEmptyImg">
-                                            <div>
-                                                <img :src="emptyImgSrc"/>
-                                                <span class="emptyImg-info">*视频图片最多支持插入5个。</span>
-                                            </div>
-                                        </div>
+                                    <div class="icon-clicked" v-if="item.checked"></div>
+                                    <div class="details-content">
+                                        <span>{{item.description}}</span>
+                                    </div>
+                                    <div class="source-content" v-if="item.sourceList.length!=0">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
+                                            <i class="iconfont icon-shanchu icondelete" @click="deleteImg(item,index)"></i>
                                             <img :src="_item.src" :width="_item.width" :height="_item.height"/>
                                         </div>
                                     </div>
@@ -138,7 +185,7 @@
                                 {{_item.name}}
                             </span>
                         </div>
-                        <div class="storeList-content" v-else :style="{height:varyWindowHeight-130+'px'}">
+                        <div class="storeList-content" v-else :style="{height:varyWindowHeight-100+'px'}">
                             <el-input
                                 size="small"
                                 class="el-search-input"
@@ -148,10 +195,14 @@
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
-                                <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name"
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9'}:{}"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
-                                    {{itemDs.name}}
-                                </span>
+                                    <span v-if="itemDs.hasInspect">{{itemDs.name}}</span>
+                                    <el-tooltip class="item" effect="dark" content="该门店暂未绑定巡检项" 
+                                    placement="bottom" v-else>
+                                    <span>{{itemDs.name}}</span>
+                                    </el-tooltip>
+                                </div>
                             </div>
                         </div>
                     </el-scrollbar>
@@ -173,15 +224,24 @@ export default {
     name:'ReInspection',
     data(){
         return{
+            showControls:false,
+            showGuide:true,
             emptyImgSrc:require('../../../static/img/pic.png'),
             sourceList:[],
+            penBtnSrc:require('../../../static/img/pen_btn.png'),
+            showPenBtn:true,
+            showPen:false,
+            showStoreUp:true,
             store:{
                 storeName:'西安5店',
                 storeTitle:'西安5店远程巡检',
                 storeUp:false,
                 storeUptitle:'点击关注'
             },
-            popperClass:'select-popClass',
+            storeUpSrc:require('../../../static/img/collect2_icon.png'),
+            nostoreUpSrc:require('../../../static/img/collect_icon.png'),
+            arrows1Src:require('../../../static/img/arrows1_pic.png'),
+            arrows2Src:require('../../../static/img/arrows2_pic.png'),
             showModelContent:false,
             activeIndex:'0',
             serachVale:'',
@@ -196,11 +256,11 @@ export default {
             penList:[
                 {
                     id:'white',
-                    showContent:true
+                    showContent:false
                 },
                 {
                     id:'red',
-                    showContent:false
+                    showContent:true
                 },
                 {
                     id:'yellow',
@@ -335,32 +395,62 @@ export default {
             canvasEl:'',
             showCutDialog:false,
             imageCanvas:new Image(),
+            imageCanvasList:[],
             playState:false,
             editCount:0,
-            fullscreenLoading:false
+            fullscreenLoading:false,
+            ignoreTemp:[],
+            fullScreen:false,
+            appliedInspectList:[],
         }
     },
+    computed:{
+        percentHeight:function(){
+            return this.varyWindowHeight/758;
+        },
+    },
     beforeRouteLeave(to, from, next){
-        //离开页面的同时应该停止播放视频
         let self=this;
-        if(self.playState){
-            self.stopRealTime();
+        if(to.name!='巡检提交事件'){
+            from.meta.keepAlive=false;
+            if(self.playState){
+                self.stopRealTime();
+            }
         }
         next();
     },
     mounted(){
         let self=this;
-        //self.getInspectList();
         document.onmouseup=self.mouseUpAction;
         self.getRecentStoreList();
         self.getUpLoadBucketInfo();
         self.getOssInfo();
-        self.videoEl=document.getElementById('previewVideo');
         self.getFaStoreData();
         self.getInitStoreData();
         self.getDeviceList();
+        window.onresize=function(){
+            if(!self.checkFull()){
+                console.log('退出全屏');
+                self.fullScreen=false;
+                var ele = document.getElementById('videoContent');
+                ele.style.width = "auto";
+                ele.style.height = "auto";
+            }
+        }
     },
     methods:{
+        checkFull(){
+            var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+            if(isFull === undefined)
+            {
+                isFull = false;
+            } 
+            return isFull;
+        },
+        anchorLinkTo () {
+            let self=this;
+            self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
+        },
         getOssInfo(){
             let self=this;
             getStorageInfo().then(res=>{
@@ -382,6 +472,21 @@ export default {
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
             return url;
+        },
+        getIndexById(id){
+            let self=this;
+            let tempId=null;
+            self.inspectList.forEach((item,index)=>{
+                item.items.forEach((_item,_index)=>{
+                    if(_item.id==id){
+                        tempId={
+                            groupIndex:index,
+                            itemIndex:_index
+                        };
+                    }
+                })
+            })
+            return tempId;
         },
         upLoadFile(fileItem){
             let self=this;
@@ -427,18 +532,27 @@ export default {
             let self=this;
             console.log(self.curGroupIndex);
             self.showCancelContent=false;
+            self.videoEl=document.getElementById('previewVideo').children[0];
             if(self.sourceList.length>=5){
-                self.notify('最多上传5个资源！','warning',3000);
+                self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
                 return false;
             }
             self.showCutDialog=true;
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                ctx.drawImage(self.videoEl,0,0,480,270);
+                ctx.drawImage(self.videoEl,0,0,480*self.percentHeight,270*self.percentHeight);
                 var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
+                let imgObj=new Image();
+                imgObj.src=oGrayImg;
+                self.imageCanvasList.push(imgObj);
             })
+        },
+        showPenList(){
+            let self=this;
+            self.showPen=!self.showPen;
+            self.showCancelContent=false;
         },
         checkPen(item,index){
             let self=this;
@@ -455,17 +569,25 @@ export default {
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,480,270);
-            ctx.drawImage(self.imageCanvas,0,0,480,270);
+            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
+            ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
         },
         confirmEditCanvas(){
             let self=this;
             self.showCancelContent=false;
+            self.imageCanvasList.pop();
+            self.canvasEl=document.getElementById('icanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
+            if(self.imageCanvasList.length==0){
+                ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
+            }
+            else{
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,480*self.percentHeight,270*self.percentHeight);
+            }
         },
         confirmEdit(){
             let self=this;
-            let item=self.inspectItemList[self.curItemIndex];
-            self.inspectItemList[self.curItemIndex].showEmptyImg=false;
             let obj={};
             obj.mediaType=2;
             obj.src=self.canvasEl.toDataURL("image/jpeg");
@@ -475,12 +597,21 @@ export default {
             self.sourceList.push(obj);
             self.showCutDialog=false;
 
-            self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
-            
-            if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
-                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+            console.log(self.curItemId);
+            let tempId=self.getIndexById(self.curItemId);
+            console.log(tempId);
+            if(tempId!=null){
+                self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
+                self.inspectList[tempId.groupIndex].items[tempId.itemIndex].showEmptyImg=false;
             }
-            self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
+            else{
+                self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+            }
+            
+            if(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].inputCount==0){
+                self.inspectList[tempId.groupIndex].dealCount=self.inspectList[tempId.groupIndex].dealCount+1;
+            }
+            self.inspectList[tempId.groupIndex].items[tempId.itemIndex].inputCount++;
         },
         modelMouseDown(e){
             let self=this;
@@ -492,6 +623,7 @@ export default {
            self.X=e.offsetX;
            self.Y=e.offsetY;
            self.showCutModel=false;
+           self.showPenBtn=false;
            self.showCancelContent=false;
         },
         mouseMoveAction(e){
@@ -500,6 +632,7 @@ export default {
                 self.X1=e.offsetX;
                 self.Y1=e.offsetY;
                 self.drawLine(self.X,self.Y,self.X1,self.Y1);
+                self.showPenBtn=false;
                 self.flag++;
             }
         },
@@ -507,7 +640,13 @@ export default {
             let self=this;
             self.isMouseDown=false;
             self.showCutModel=true;
+            self.showPenBtn=true;
             self.showCancelContent=true;  //每次鼠标弹起后显示可以取消的框
+            if(self.flag!=0&&self.canvasEl!=''){
+                let imgObj=new Image();
+                imgObj.src=self.canvasEl.toDataURL("image/jpeg");
+                self.imageCanvasList.push(imgObj);
+            }
             self.flag=0;
         },
         drawLine(x,y,x1,y1){
@@ -665,7 +804,9 @@ export default {
             if(data.errCode==0){
                 let storeData=data.data;
                 self.tabList[0].storeList=getStoreTemp(storeData);
-
+                if(storeData.length==0){
+                    self.showStoreUp=false;
+                }
                 let obj={};
                 obj.storeId=storeData[0].storeId;
                 obj.storeName=storeData[0].name;
@@ -683,9 +824,13 @@ export default {
             let self=this;
             let getStore2Temp=data=>{
                 let cityList=[];
-                data.map(x=>x.city).forEach(item=>{
-                    if(cityList.indexOf(item)==-1){
-                        cityList.push(item);
+                data.forEach(item=>{
+                    if(cityList.map(x=>x.city).indexOf(item.city)==-1){
+                        let obj={
+                            city:item.city,
+                            province:item.province
+                        }
+                        cityList.push(obj);
                     }
                 })
                 let storeListTemp=[];
@@ -693,7 +838,7 @@ export default {
                     let temp=[];
                     let obj={};
                     for(let j=0;j<data.length;j++){
-                        if(cityList[i]==data[j].city){
+                        if(cityList[i].city==data[j].city){
                            let obj={};
                             obj.isActive=false;
                             obj.storeId=data[j].storeId;
@@ -702,10 +847,17 @@ export default {
                             obj.city=data[j].city;
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
+                            if(data[j].appliedInspect.length!=0&&data[j].appliedInspect.indexOf('远程巡检')!=-1){
+                                self.appliedInspectList.push(data[j]);
+                                obj.hasInspect=true;
+                            }
+                            else{
+                                obj.hasInspect=false;
+                            }
                             temp.push(obj);
                         }
                     }
-                    obj.cityName=cityList[i];
+                    obj.cityName=cityList[i].province+' '+cityList[i].city;
                     obj.storeList=temp;
                     storeListTemp.push(obj);
                 }
@@ -771,10 +923,9 @@ export default {
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
-            self.sourceList=[];
+            
             self.curGroupIndex=index;
             self.curItemIndex=0;
-            self.curItemId=0;
             self.inspectItemList=item.items;
             self.inspectItemList.forEach((_item,_index)=>{
                 let channelObj={};
@@ -802,6 +953,10 @@ export default {
             });
             let tempArray=[];
             item.isClick=true;
+            this.$nextTick(()=>{
+                self.anchorLinkTo();
+            })
+            
             self.inspectList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isClick=false;
@@ -818,9 +973,12 @@ export default {
             })
             return device;
         },
-        getGroupByItem(item){
+        deleteImg(item,index){
             let self=this;
-
+            item.sourceList.splice(index,1);
+            if(item.sourceList.length==0){
+                item.showEmptyImg=true;
+            }
         },
         ignoreItem(item,index){
             let self=this;
@@ -836,6 +994,7 @@ export default {
             type: 'warning'
             }).then(() => {
                 item.isIgnore=true;
+                self.ignoreTemp.push(item);
                 if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                     self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
                 }
@@ -846,14 +1005,14 @@ export default {
         },
         clickItem(item,index){
             let self=this;
-            self.editCount=self.editCount+1;
+            self.showGuide=false;
             if(item.isIgnore){
                 return false;
             }
-            if(item.clickCount!=0&&self.curItemIndex==index){
-                self.notify('当前视频正在播放，请勿连续点击！','warning',3000);
-                return false;
-            }
+            // if(item.clickCount!=0&&self.curItemIndex==index){
+            //     self.notify('当前视频正在播放，请勿连续点击！','warning',3000);
+            //     return false;
+            // }
             item.clickCount++;
             // if(item.id!=self.curItemId){
 
@@ -864,8 +1023,8 @@ export default {
             self.curItemId=item.id;
             item.disabled=false;
             let obj={};
-
-            if(item.deviceId!=-1&&self.curDeviceId!=item.deviceId){  //当前选择的巡检项已绑定设备
+            //&&self.curDeviceId!=item.deviceId
+            if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
                     obj.ivsId=device.ivsId;
@@ -877,7 +1036,8 @@ export default {
                 }
                 self.curDeviceId=item.deviceId;
             }
-            else{
+            else if(item.deviceId==-1){
+                self.notify('当前门店的巡检项未绑定设备！','warning',3000);
                 return false;
             }
             self.inspectItemList.forEach((_item,_index)=>{
@@ -982,11 +1142,28 @@ export default {
             submitInspectItem(params).then(res=>{
                 console.log(res);
                 let errCode=res.errCode;
-                if(errCode==0){
-                    self.notify('提交成功！','success',3000);
-                    self.editFlag=true;
-                }
                 self.fullscreenLoading=false;
+                let routeData=null;
+                if(errCode==0){
+                    //self.notify('提交成功！','success',3000);
+                    self.editFlag=true;
+                    let data=res.data;
+                    routeData={
+                        isSuccess:true,
+                        user:data.notifiedTo,
+                        ignoredItems:data.ignoredItems,
+                        submitResult:data.submitResult,
+                        store:self.store,
+                        ignoreTemp:self.ignoreTemp
+                    };
+                }
+                else{
+                    routeData={
+                        isSuccess:false
+                    };
+                }
+                sessionStorage.setItem('reinspect_submit',JSON.stringify(routeData));
+                self.$router.push({name:"巡检提交事件",params:{data:routeData}});
             })
         },
         spreadContent(){
@@ -998,6 +1175,7 @@ export default {
             self.showSpread=false;
         },
         async playVideo(url) {
+            let self=this;
             console.log('playvideo enter!');
             this.showModelContent=true;
             this.playState=true;
@@ -1005,6 +1183,19 @@ export default {
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
+            setTimeout(() => {
+                self.showModelContent=false;
+            }, 3000);
+        },
+        hiddenModel(){
+            let self=this;
+            self.showModelContent=false;
+        },
+        showModel(){
+            let self=this;
+            if(self.playState){
+                self.showModelContent=true;
+            }
         },
         async realTime(){
             let self=this;
@@ -1018,6 +1209,7 @@ export default {
                   streamingProtocol:this.protocal,
                   IVSID:self.channel.ivsId,
                   channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
                 }
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
@@ -1025,6 +1217,7 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
+                self.editCount=self.editCount+1;
             }
             else{
                 self.showError=true;
@@ -1036,6 +1229,7 @@ export default {
         stopVideo(){
             let self=this;
             self.showModelContent=false;
+            self.playState=false;
             var video = document.getElementById("previewVideo");
             self.previewplayer = videojs(video);
             self.previewplayer.pause();
@@ -1048,11 +1242,71 @@ export default {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
-                  channel:JSON.stringify(self.channel.channelId)
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
                 }
             };
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+        },
+        controlScreen(){
+            let self=this;
+            if(!self.fullScreen){
+                self.fullWindowScreen();
+                self.fullScreen=true;
+                setTimeout(() => {
+                    self.showModelContent=false;
+                }, 3000);
+            }
+            else{
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
+        },
+        //进入全屏
+        fullWindowScreen(...val) {
+            console.log(val);
+            let self=this;
+            //self.showControls=true;
+            var ele = document.getElementById('videoContent');
+            ele.style.width = "100%";
+            ele.style.height = "100%";
+            if (ele.requestFullscreen) {
+                ele.requestFullscreen();
+            } 
+            else if (ele .mozRequestFullScreen) {
+                ele.mozRequestFullScreen();
+            } 
+            else if (ele .webkitRequestFullScreen) {
+                ele.webkitRequestFullScreen();
+            }
+            else if(ele.msRequestFullscreen) {
+                ele.msRequestFullscreen();
+            }
+        },
+        //退出全屏
+        exitFullscreen() {
+            var de = document;
+            var ele = document.getElementById('videoContent');
+            ele.style.width = "auto";
+            ele.style.height = "auto";
+            if (de.exitFullscreen) {
+                de.exitFullscreen();
+            } 
+            else if (de.mozCancelFullScreen) {
+                de.mozCancelFullScreen();
+            } 
+            else if (de.webkitCancelFullScreen) {
+                de.webkitCancelFullScreen();
+            }
+        },
+        gonggeScreen(){
+            let self=this;
+            self.showgongge=true;
+        },
+        recoverScreen(){
+            let self=this;
+            self.showgongge=false;
         },
         searchStore(){
             let self=this;
@@ -1062,9 +1316,13 @@ export default {
             let tempStoreList=self.tempStoreList;
             let getStore2Temp=data=>{
                 let cityList=[];
-                data.map(x=>x.city).forEach(item=>{
-                    if(cityList.indexOf(item)==-1){
-                        cityList.push(item);
+                data.forEach(item=>{
+                    if(cityList.map(x=>x.city).indexOf(item.city)==-1){
+                        let obj={
+                            city:item.city,
+                            province:item.province
+                        }
+                        cityList.push(obj);
                     }
                 })
                 let storeListTemp=[];
@@ -1072,7 +1330,7 @@ export default {
                     let temp=[];
                     let obj={};
                     for(let j=0;j<data.length;j++){
-                        if(cityList[i]==data[j].city){
+                        if(cityList[i].city==data[j].city){
                             let obj={};
                             if(self.store.storeId==data[j].storeId){
                                 obj.isActive=true;
@@ -1089,7 +1347,7 @@ export default {
                             temp.push(obj);
                         }
                     }
-                    obj.cityName=cityList[i];
+                    obj.cityName=cityList[i].province+' '+cityList[i].city;
                     obj.storeList=temp;
                     storeListTemp.push(obj);
                 }
@@ -1117,6 +1375,10 @@ export default {
         changeStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
+            self.editCount=0;
+            if(self.playState){
+                self.stopRealTime();
+            }
             let obj={};
             obj.storeId=_item.storeId;
             obj.storeName=_item.name;
@@ -1154,11 +1416,11 @@ export default {
                 })
             }
             console.log(self.recentStoreList);
-            let list=self.recentStoreList.map(x=>x.storeId);
-            localStorage.setItem('recentStore_reinspect',JSON.stringify(list));
+            localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
         },
         clickStore(item,index,_item,_index){
             let self=this;
+            self.showStoreUp=true;
             if(self.editCount!=0){
                 self.$confirm('此操作将暂停当前播放视频及清空当前门店输入的巡检项信息，是否继续！', '提示', {
                 confirmButtonText: '确定',
@@ -1166,6 +1428,7 @@ export default {
                 type: 'warning'
                 }).then(() => {
                     self.changeStore(item,index,_item,_index);
+
                 }).catch(() => {
                     console.log('cancel ignore');     
                 });
@@ -1185,16 +1448,30 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-    $red:#FB4C5D;
-    $black:#424151;
-    $border:#ddd;
-    $background:#fafafb;
-    $tab:#94a4b4;
-
-    .fade-enter-active, .fade-leave-active {
+    $red:#f31d65;
+    $black:#182752;
+    $border:#e3e9f4;
+    $background:#f4f5f9;
+    $tab:#7d8cad;
+    $h1:#292e36;
+    .fade-enter-active {
+        transition: all 1s ease;
+        width: 68px;
+        overflow: hidden;
+    }
+    .fade-leave-active{
+        transition: all 1s ease;
+        width: 0;
+        overflow: hidden;
+    }
+    .fade-enter, .fade-leave {
+        width: 0;
+        opacity: 0;
+    }
+    .fadepen-enter-active,.fadepen-leave-active{
         transition: opacity .5s
     }
-    .fade-enter, .fade-leave-to{
+    .fadepen-enter, .fadepen-leave-to{
         opacity: 0;
     }
     @function rem($val){
@@ -1214,8 +1491,8 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
-   
     .el-container{
+        background-color: #f7f8fa;
         .spreadLsideClass{
             width: 98%;
         }
@@ -1262,90 +1539,97 @@ export default {
                 margin-bottom:10px;
                 position: relative;
                 bottom: 5px;
+                margin-top: 0;
             }
             .cancel-content{
                 position: absolute;
                 bottom: 0px;
-                width: 480px;
                 height: 30px;
                 background-color: #000;
                 opacity: 0.8;
                 z-index: 10;
                 overflow: hidden;
-                margin-left: 35px;
                 .content{
-                    width: 239px;
                     text-align: center;
                     float: left;
                     color: #fff;
                     line-height: 30px;
-                    border-right: 1px solid #fff;
                     cursor: pointer;
+                    width: 49%;
+                    &:first-child{
+                        border-right: 1px solid #fff;
+                    }
                 }
             }
-            .model{
-                width: 100%;
-                height: 100%;
-                background-color: transparent;
+            .icon-right{
+                width: 80px;
+                height: auto;
                 position: absolute;
-                z-index: 2;
-                .icon-right{
-                    width: 80px;
-                    height: 120px;
-                    position: absolute;
-                    right: 30px;
-                    top: 25%;
-                    .content{
-                        width: 100%;
-                        height: 40px;
-                        position: relative;
-                        .color{
-                            width: 16px;
-                            height: 16px;
-                            border-radius: 8px;
-                            position: absolute;
-                            margin: auto 0;
-                            top: 4px;
-                            left: 20%;
-                            margin-left: 4px;
-                            z-index: 3;
-                            cursor: pointer;
-                        }
-                        .colorActive{
-                            background-color: #ddd;
-                            border-radius: 50%;
-                            width: 24px;
-                            height: 24px;
-                            position: absolute;
-                            margin: auto 0;
-                            left: 20%;
-                            z-index: 3;
-                        }
-                        #white{
-                            background-color: white;
-                        }   
-                        #yellow{
-                            background-color: yellow;
-                        }
-                        #red{
-                            background-color: red;
-                        }
+                right: 30px;
+                top: 5%;
+                .pen-btn{
+                    width: 40px;
+                    margin-right: 20px;
+                    margin-bottom: 20px;
+                    cursor: pointer;
+                }
+                .content{
+                    width: 100%;
+                    height: 40px;
+                    position: relative;
+                    .color{
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 8px;
+                        position: absolute;
+                        margin: auto 0;
+                        top: 4px;
+                        left: 20%;
+                        margin-left: 4px;
+                        z-index: 3;
+                        cursor: pointer;
+                    }
+                    .colorActive{
+                        background-color: #ddd;
+                        border-radius: 50%;
+                        width: 24px;
+                        height: 24px;
+                        position: absolute;
+                        margin: auto 0;
+                        left: 20%;
+                        z-index: 3;
+                    }
+                    #white{
+                        background-color: white;
+                    }   
+                    #yellow{
+                        background-color: yellow;
+                    }
+                    #red{
+                        background-color: red;
                     }
                 }
             }
         }
         .lside{
-            padding:15px 10px 15px 20px;
+            @include point(padding-bottom,20);
+            @include point(margin-right,20);
+            border: 1px solid $border;
+            background-color: #fff;
             .el-header-title{
                 text-align: left;
                 position: relative;
-                padding-left: 10px;
-                height: 30px;
-                line-height: 30px;
-                color:$black;
+                // height: 60px;
+                // line-height: 60px;
+                @include point(height,60);
+                @include point(line-height,60);
+                border-bottom: 1px solid $border;
+                // padding:0 20px;
+                @include point(padding-left,20);
+                @include point(padding-right,20);
                 .lside-title{
                     font-weight: bold;
-                    color: $black;
+                    color:$h1;
                     font-size: 18px;
                 }
                 .nocoll{
@@ -1372,127 +1656,263 @@ export default {
                 .storeUp-content{
                     display: inline-block;
                     margin-left: 20px;
-                    padding: 0px 6px;
+                    padding: 1px 6px;
+                    width: 76px;
                     height: 22px;
-                    line-height: 20px;
-                    width: 70px;
+                    line-height: 18px;
+                    cursor: pointer;
                     position: relative;
                     bottom: 2px;
-                    cursor: pointer;
                     span{
                         font-size: 12px;
-                        font-weight: bold;
+                        vertical-align: middle;
+                        margin-left: 4px;
                     }
                 }
                 .el-submit{
                     position: absolute;
-                    right: 0px;
+                    right: 20px;
                     width: 90px;
-                    top: 4px;
-                    background-color: $red;
+                    // top: 16px;
+                    @include point(top,20);
                     color: #fff;
+                    border-radius: 0;
                 }
             }
             .errorVideo-model{
-                width: 100%;
+                @include point(margin,20);
+                margin-bottom: 0;
                 height: auto;
                 position: relative;
-                margin-top: 20px;
+                
                 @include point(min-width,500);
                 @include point(min-height,414);
                 background-color: #232730;
                 color: $red;
                 span{
-                    position: relative;
+                    position: absolute;
                     top: 50%;
+                    left: 45%;
                     font-size: 12px;
                 }
             }
-            .video-content{
-                width: 100%;
+            .guide-content{
+                @include point(margin,20);
+                margin-bottom: 0;
                 height: auto;
                 position: relative;
-                margin-top: 20px;
+                @include point(min-width,500);
+                @include point(min-height,414);
+                background-color: #000;
+                .guide-lside{
+                    position: absolute;
+                    bottom: 30px;
+                    left: 20%;
+                    width: 350px;
+                    img{
+                        height: 80px;
+                        position: relative;
+                        left: 15%;
+                    }
+                }
+                .num-content{
+                    .guide-num{
+                        display: inline-block;
+                        width: 28px;
+                        height: 28px;
+                        line-height: 28px;
+                        border-radius: 14px;
+                        background-color: $red;
+                        color: #fff;
+                        margin-right: 15px;
+                    }
+                    .guide-title{
+                        color: $red;
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+                }
+                .guide-rside{
+                    position: absolute;
+                    top: 30%;
+                    right: 30px;
+                    width: 260px;
+                    img{
+                        height: 60px;
+                        position: relative;
+                        right: 10%;
+                        top: 20px;
+                    }
+                    .iconright-content{
+                        width: auto;
+                        height: auto;
+                        position: absolute;
+                        top: 30%;
+                        right: 0;
+                        .iconright{
+                            width: 80px;
+                            margin-top: 30px;
+                            height: 30px;
+                            border-radius: 4px;
+                            padding: 0 6px;
+                            background-color: rgba($color: #24293d, $alpha: 0.6);
+                            .iconpaizhao{
+                                color: #fff;
+                                vertical-align:middle;
+                            }
+                            span{
+                                color: #fff;
+                                font-size: 14px;
+                                margin-left: 15px;
+                                vertical-align:middle;
+                            }
+                        }
+                    }
+                }
+            }
+            .video-content{
+                height: auto;
+                position: relative;
+                @include point(margin,20);
+                margin-bottom: 0;
                 #previewVideo{
                     @include point(min-width,500);
-                    @include point(min-height,414);
+                    @include point(min-height,405);
                 }
                 #channelName{
                     position: absolute;
                     color: #fff;
                     z-index: 10;
-                    left: 30px;
-                    top: 20px;
                     font-size: 12px;
+                    display: block;
+                    width:-webkit-calc(100% - 30px); 
+                    width:-moz-calc(100% - 30px); 
+                    width:calc(100% - 30px);
+                    height: 40px;
+                    line-height: 40px;
+                    text-align: left;
+                    padding-left: 30px;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                }
+                .icon-footer{
+                    width: 100%;
+                    height: 45px;
+                    line-height: 45px;
+                    position: absolute;
+                    bottom: 0px;
+                    color: #fff;
+                    overflow: hidden;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                    z-index: 10;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    .iconlside{
+                        float: left;
+                        text-align: left;
+                        margin-left: 30px;
+                        .iconplay{
+                            font-size: 18px;
+                            cursor: pointer;
+                            float: left;
+                        }
+                    }
+                }
+                .screen-content{
+                    display: inline;
+                    margin-left: 30px;
+                    position: absolute;
+                    right: 20px;
+                    .iconscreen{
+                        margin-right: 20px;
+                        font-size: 18px;
+                        position: relative;
+                        cursor: pointer;
+                    }
                 }
                 .iconright{
+                    padding: 2px 6px;
+                    width: 68px;
+                    height: 26px;
                     position: absolute;
                     z-index: 990;
-                    right:0px;
+                    right: 20px;
                     margin-bottom: 40px;
-                    background-color: transparent ;
-                    top: 100px;
+                    border-radius: 4px;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    top: 40%;
                     span{
-                        font-size: 13px;
+                        font-size: 12px;
                         margin-left: 15px;
                         color: #fff;
                         margin-right: 35px;
                         cursor: pointer;
+                        vertical-align:middle;
                     }
                     .iconpaizhao{
                         color: #fff;
                         cursor: pointer;
+                        vertical-align:middle;
                     }
                 }
                 .iconright1{
+                    padding: 2px 6px;
+                    width: 68px;
+                    height: 26px;
                     position: absolute;
                     z-index: 990;
-                    right:0px;
-                    background-color: transparent ;
-                    top: 140px;
+                    right: 20px;
+                    margin-bottom: 40px;
+                    border-radius: 4px;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    top: 56%;
                     span{
-                        font-size: 13px;
-                        margin-left: 15px;
+                        font-size: 12px;
+                        margin-left: 12px;
                         color: #fff;
-                        margin-right: 35px;
+                        margin-right: 32px;
                         cursor: pointer;
+                        vertical-align:middle;
                     }
                     .iconpaizhao{
                         color: #fff;
                         cursor: pointer;
+                        vertical-align:middle;
                     }
                 }
             }
-            
             .el-inspect{
-                border-left: 1px solid #ddd;
-                border-right: 1px solid #ddd;
-                border-bottom: 1px solid #ddd;
+                border-left: 1px solid $border;
+                border-right: 1px solid $border;
+                border-bottom: 1px solid $border;
+                margin: 0;
+                @include point(margin-left,20);
+                @include point(margin-right,20);
                 .inspect-header{
                     text-align: left;
                     height: 50px;
                     line-height: 50px;
-                    padding-left: 20px;
-                    font-size: 14px;
+                    padding-left: 35px;
+                    font-size: 12px;
                     font-weight: bold;
                     color: $tab;
-                    border-bottom:1px solid #ddd;
-                    span{
-                        margin-left: 15px;
-                    }
+                    background-color: $background;
+                    border-bottom:1px solid $border;
+                    
                 }
                 .inspect-content{
                     padding: 15px auto;
                     .inspect-details{
                         text-align: left;
-                        height: 60px;
-                        line-height: 60px;
+                        height: 50px;
+                        line-height: 50px;
                         padding-left: 35px;
                         font-size: 14px;
-                        font-weight: bold;
+                        color: $tab;
                         border-bottom:1px solid #ddd;
                         cursor: pointer;
-                        background-color: #FAFAFA;
+                        background-color: $background;
                         &:last-child{
                             margin-bottom: 15px;
                         }
@@ -1500,10 +1920,22 @@ export default {
                     .item-details{
                         text-align: left;
                         min-height: 60px;
-                        
                         position: relative;
                         padding: 15px;
+                        @include point(padding-left,20);
                         padding-bottom: 0;
+                        margin-top: 5px;
+                        &:last-child{
+                            margin-bottom: 35px;
+                        }
+                        .icon-clicked{
+                            width: 4px;
+                            min-height: 40px;
+                            height: 60%;
+                            position: absolute;
+                            top:50px;
+                            background-color: $red;
+                        }
                         .titles{
                             font-size: 14px;
                             font-weight: bold;
@@ -1515,15 +1947,23 @@ export default {
                             cursor: not-allowed;
                             background-color: #ddd;
                         }
+                        .details-content{
+                            font-size: 12px;
+                            color: $tab;
+                            margin-top: 15px;
+                            span{
+                                margin-left: 15px;
+                            }
+                        }
                         .source-content{
-                            min-height: 130px;
+                            min-height: 110px;
                             width: 90%;
                             margin: auto 20px;
                             .source-details{
-                                //padding: 15px 0;
                                 display: inline-block;
                                 margin-right: 15px;
                                 padding-top: 15px;
+                                position: relative;
                                 span{
                                     font-size: 12px;
                                     color: #FCB83B;
@@ -1532,32 +1972,41 @@ export default {
                                 .emptyImg-info{
                                     display: block;
                                 }
+                                .icondelete{
+                                    position: absolute;
+                                    font-size: 14px;
+                                    right: 5px;
+                                    margin-top: 5px;
+                                    z-index: 2;
+                                    color: #fff;
+                                    cursor: pointer;
+                                }
                             }
                         }
-                        &:last-child{
-                            margin-bottom: 15px;
-                        }
                         .des-input{
-                            margin: 10px 10px;
+                            margin-left: 15px;
                             width:-webkit-calc(100% - 20px); 
                             width:-moz-calc(100% - 20px); 
                             width:calc(100% - 20px);
+                            margin-top: 15px;
                         }
                         .iconhulve{
                             position: absolute;
                             right: 0;
                             color: #ddd;
                             font-size: 20px;
-                            margin-right: 15px;
+                            @include point(right,20);
+                            top: 20px;
                             cursor: pointer;
                         }
                         .item-score{
                             position: absolute;
-                            right: 25px;
-                            top: 12px;
-                            font-size: 14px;
+                            // right: 25px;
+                            @include point(right,35);
+                            top: 18px;
+                            font-size: 12px;
                             margin-right: 20px;
-                            width: 100px;
+                            width: 86px;
                             height: 26px;
                             padding: 0px 0px 0px 15px;
                             background-color: orange;
@@ -1572,6 +2021,7 @@ export default {
                         .score-menu{
                             max-height: 160px;
                             overflow: hidden;
+                           
                         }
                     }
                     .inspect-empty{
@@ -1587,17 +2037,21 @@ export default {
             }
         }
         .rside{
-            padding: 15px 10px 15px 10px;
+            border: 1px solid $border;
+            background-color: #fff;
+            @include point(margin-right,20);
             .el-header-title{
                 text-align: left;
                 position: relative;
                 color:$black;
-                font-size: 14px;
-                font-weight: bold;
+                font-size: 16px; 
+                @include point(height,60);
+                @include point(line-height,60);
+                border-bottom: 1px solid $border;              
                 @include point(padding-left,10);
                 span{
                     display: block;
-                    @include point(margin-top,10);
+                    @include point(margin-left,25);
                 }
                 .el-search-input{
                     @include point(width,200);
@@ -1607,13 +2061,16 @@ export default {
             }
             #storetab-content{
                 margin-top: 10px;
+                @include point(padding-left,20);
+                // @include point(margin-right,20);
                 .storeList-content{
                     padding: 0 10px;
                     text-align: left;
-                    height: 450px;
+                    // height: 450px;
+                    @include point(height,450);
                     color: $black;
                     .activeClass{
-                        background-color: $red;
+                        background-color: $red !important;
                         color: #fff;
                     }
                     .stores{
@@ -1629,42 +2086,43 @@ export default {
                     }
                     .store-name{
                         display: inline-block;
-                        margin-left: 15px;
+                        @include point(margin-left,20);
                         margin-top: 10px;
-                        margin-bottom: 10px;
+                        margin-bottom: 15px;
                         border: 1px solid #ddd;
                         text-align: center;
                         padding:6px;
                         font-size: 12px;
                         cursor: pointer;
-                        border-radius: 4px;
                         width: 80px;
+                        //@include point(width,80);
                         white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
                         overflow: hidden; //隐藏超出单元格的部分。
                         text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                        span{
+                            width: 100%;
+                            display: block;
+                        }
                     }
                     .citys{
                         display: block;
                         font-size: 14px;
                         font-weight: bold;
-                        margin-left: 15px;
+                        // margin-left: 15px;
+                        margin-left: 20px;
                     }
                 }
             }
         }
         .noraml-color{
             background-color: #fff !important;
+            color: $black !important;
+            font-weight: bold;
         }
         .noraml-groupColor{
-            background-color: #FAFAFA !important;
+            background-color: $background !important;
         }
     }
-</style>
-<style scoped>
-    .el-test{
-        width: 70px;
-    }
-    
 </style>
 <style>
 #storetab-content .el-tabs__nav-scroll{
@@ -1672,68 +2130,18 @@ export default {
 }
 .el-tabs__active-bar{
     height: 4px !important;
-    background-color: #FB4C5D !important;
+    background-color: #f31d65 !important;
 }
 .el-tabs__item{
-    color:#94a4b4 !important;
-    font-weight:bold !important;
+    color:#7d8cad !important;
 }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB4C5D !important;
-}
+    color: #f31d65 !important;
+} 
 .el-tabs__item:hover{
-    color: #FB4C5D !important;
+    color: #f31d65 !important;
 }
-
-.el-test .el-input__inner{
-    height: 24px;
-    line-height: 24px;
-    border-radius: 0px;
-    background-color: #34374A;
-    color: #fff;
-    padding:0 10px;
-    border: 0px;
-}
-.el-test .el-input__icon{
-    line-height: 24px;
-}
-.select-popClass .el-select-dropdown__item{
-    font-size:12px;
-    height: 24px;
-    line-height: 24px;
-    background-color: #34374A;
-    color:#fff;
-}
-.select-popClass .el-select-dropdown__item.hover{
-    color:#EA6F5A !important;
-    background-color:#34374A !important;
-}
-.select-popClass .el-select-dropdown__item:hover{
-    color:#EA6F5A !important;
-    background-color:#34374A !important;
-}
-.select-popClass .el-select-dropdown{
-    border:0px !important;
-    background-color:#34374A !important;
-}
-.select-popClass .el-select-dropdown__item.selected{
-    color:#fff;
-    font-weight:500 !important;
-}
-.select-popClass .el-select-dropdown__list{
-    padding:0;
-}
-.el-select-dropdown.el-popper.select-popClass{
-    border:0px;
-}
-.select-popClass.el-popper[x-placement^=bottom] .popper__arrow{
-    border-bottom-color:#34374A !important;
-}
-.select-popClass.el-popper[x-placement^=bottom] .popper__arrow::after{
-    border-bottom-color:#34374A !important;
-}
-
 </style>
 <style scoped>
 .el-search-input.el-input--small >>>.el-input__inner{

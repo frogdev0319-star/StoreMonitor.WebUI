@@ -14,7 +14,7 @@
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
-                <a :href="downLoadSrc" download class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a>
+                <a :href="downLoadSrc" :download='fileName' class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a>
                 <el-dialog title='导入'
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
@@ -23,11 +23,11 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #FB4C5D;"/>
+                        <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
-                                <el-radio-button style="margin-left:10px;" 
+                                <el-radio-button style="margin-left:10px;" class="radio-btn"
                                 v-for="(item,key) in radioList" :key="key" 
                                 :label="item.label"></el-radio-button>
                             </el-radio-group>
@@ -54,8 +54,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #FB4C5D;"/>
-                        
+                        <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
                             <span>此操作将会清空当前页面已有巡检项，是否继续?</span>
@@ -63,7 +62,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">取 消</el-button>
-                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" style="color:#fff">确 认</el-button>
+                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">确 认</el-button>
                     </div>
                 </el-dialog>
             </el-col>
@@ -144,16 +143,23 @@ export default {
 
             allData:[],
             tagList:['远程巡检','现场巡检'],
-            curData:[]
+            curData:[],
+            loading:null,
+            fileName:'',
         }
     },
-    async mounted(){
+    mounted(){
         let self=this;
-        await this.isLoginIn();
+        self.loading = this.$loading({
+            lock: true,
+            text: '正在加载',
+            spinner: 'el-icon-loading',
+            background: 'rgba(0, 0, 0, 0.7)'
+        });
+        //await this.isLoginIn();
         self.getDownLoadURL();
         self.getTagList();
         self.initData();
-
         let tabIndex=sessionStorage.getItem('TabIndex');
         self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
     },
@@ -174,8 +180,9 @@ export default {
                 let blob = new Blob([res],{
                type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
             });
-            let objectUrl = URL.createObjectURL(blob);
-            self.downLoadSrc=objectUrl;
+                let objectUrl = URL.createObjectURL(blob);
+                self.downLoadSrc=objectUrl;
+                self.fileName='巡检表模板';
             })
         },
         getNapeList(){
@@ -186,11 +193,13 @@ export default {
                     let data=res.data;
                     if(code!=null&&code=='Success'){
                         self.allData=data;
+                        self.loading.close();
                         console.log(res.data);
                     }
                     resolve(data);
                 }).catch(err => {
                     console.log(err.message);
+                    self.loading.close();
                 })
                         
             })
@@ -497,7 +506,6 @@ export default {
         },
         async importfxx(obj) {
             let _this = this;
-            
             let inputDOM = this.$refs.inputer;
             // 通过DOM取文件数据
             this.file = event.currentTarget.files[0];
@@ -679,7 +687,7 @@ export default {
 @import '../../../assets/css/importfile.css'; 
 </style>
 <style lang="scss" scoped>
-    $mainColor:#FB4C5D;
+    $mainColor:#f31d65;
     *{
         font-family: Microsoft YaHei;
     }
@@ -698,6 +706,12 @@ export default {
         width: 100%;
         span{
             font-size: 14px;
+        }
+        .radio-btn{
+            margin-left: 20px;
+            &:last-child{
+                border-left: 1px solid #dcdfe6;
+            }
         }
     }
     .el-route-container{

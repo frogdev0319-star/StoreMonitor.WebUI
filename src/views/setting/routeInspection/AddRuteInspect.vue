@@ -1,11 +1,11 @@
 <template>
-    <el-row class="el-addrute">
+    <el-row class="el-addrute" :style="{'min-height':varyWindowHeight-120+'px'}">
         <el-col :span="24" class="el-rute-title">
             <p class="tab-name" v-if="!showEditTab">{{tabName}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></p>
             <el-input size="mini" v-if="showEditTab" class="tabName-input input-details" placeholder="输入巡检表名" v-model="tabName"></el-input>
             <div class="iconcontent" v-if="showEditTab" style="position:relative;left:30px;top:5px;">
-                <div class="iconlised" style="background-color:#FB4C5D" @click="confirmEditTab">
+                <div class="iconlised" style="background-color:#f31d65" @click="confirmEditTab">
                     <i class="el-icon-check"></i>
                 </div>
                 <div class="iconrised" @click="cancelEditTab">
@@ -27,7 +27,7 @@
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
-                            <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB4C5D'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
+                            <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
                         <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input input-details" v-if="item.isEdit"></el-input>
                         <div class="iconcontent" v-if="item.showEdit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
@@ -39,7 +39,7 @@
                             </div>
                         </div>
                         <div class="iconcontent">
-                            <div class="iconlised" style="background-color:#FB4C5D" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
+                            <div class="iconlised" style="background-color:#f31d65" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
                                 <i class="el-icon-check"></i>
                             </div>
                             <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
@@ -50,7 +50,7 @@
                     <div class="group-add" v-if="showAddGroup">
                         <el-input  size="mini" maxlength="10" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
                             <div class="iconcontent">
-                                <div class="iconlised" style="background-color:#FB4C5D" @click="confirmAddGroup">
+                                <div class="iconlised" style="background-color:#f31d65" @click="confirmAddGroup">
                                     <i class="el-icon-check"></i>
                                 </div>
                                 <div class="iconrised" @click="cancelAddGroup">
@@ -97,7 +97,7 @@
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
                            <el-input maxlength="75" size="mini" v-model="item.napeDep" class="nape-input input-details" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
-                                <div class="iconlised" style="background-color:#FB4C5D" @click="confirmeditNape(index,item)">
+                                <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
                                 </div>
                                 <div class="iconrised" @click="cancelEditNape(index,item)">
@@ -118,7 +118,7 @@
                     top="35vh"
                     left="40vh">
                         <div  style="overflow:hidden;">
-                            <hr style="border: 0.5px solid #FB4C5D;"/>
+                            <hr style="border: 0.5px solid #f31d65;"/>
                             
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                                 <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
@@ -127,7 +127,7 @@
                         </div>
                         <div slot="footer" class="dialog-footer">
                             <el-button class="file-cancel-btn" @click="showDeleteItem = false" size="mini" style="">取 消</el-button>
-                            <el-button class="file-confirm-btn" @click="confirmDeleteItem" size="mini" style="color:#fff">确 认</el-button>
+                            <el-button class="file-confirm-btn" @click="confirmDeleteItem" size="mini" type="primary">确 认</el-button>
                         </div>
                     </el-dialog>
 
@@ -139,7 +139,7 @@
                     top="35vh"
                     left="40vh">
                         <div  style="overflow:hidden;">
-                            <hr style="border: 0.5px solid #FB4C5D;"/>
+                            <hr style="border: 0.5px solid #f31d65;"/>
                             
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                                 <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
@@ -148,7 +148,7 @@
                         </div>
                         <div slot="footer" class="dialog-footer">
                             <el-button class="file-cancel-btn" @click="showDeleteGroup = false" size="mini" style="">取 消</el-button>
-                            <el-button class="file-confirm-btn" @click="confirmDeleteGroup" size="mini" style="color:#fff">确 认</el-button>
+                            <el-button class="file-confirm-btn" @click="confirmDeleteGroup" size="mini" type="primary">确 认</el-button>
                         </div>
                     </el-dialog>
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
@@ -159,7 +159,7 @@
                        <div class="nape-dep-data">
                            <el-input maxlength="75" size="mini" v-model="newNapeDep" class="nape-input input-details" placeholder="输入巡检项描述"></el-input>
                             <div class="iconcontent">
-                                <div class="iconlised" style="background-color:#FB4C5D" @click="confirmaddNape">
+                                <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
                                 </div>
                                 <div class="iconrised" @click="cancelAddNape">
@@ -749,7 +749,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
-    $mainColor:#FB4C5D;
+    $mainColor:#f31d65;
     $itemHeight:50px;
     @function rem($val){
         @return $val/16+rem;
@@ -773,7 +773,7 @@ export default {
         height: 100%;
         .el-rute-title{
             width: 100%;
-            @include point(height,60);
+            height: 60px;
             @include point(padding-left,15);
             border-bottom: 1px solid #ddd;
             .tab-name{
@@ -832,8 +832,8 @@ export default {
             }
         }
         .title-content{
-            @include point(height,60);
-            @include point(line-height,60);
+            height: 60px;
+            line-height: 60px;
             text-align: left;
             position: relative;
             overflow: hidden;
@@ -865,7 +865,6 @@ export default {
         }
         .el-rute-group{
             height: auto;
-            //min-height: 90%;
             min-height:calc(100%-60px);
             min-height: -webkit-calc(100%-60px);
             min-height: -moz-calc(100%-60px);
@@ -902,7 +901,7 @@ export default {
                         white-space: nowrap;
                     }
                     &:last-child{
-                        @include point(margin-bottom,15);
+                        @include point(margin-bottom,20);
                     }
                 }
             }
@@ -1028,16 +1027,7 @@ export default {
 </style>
 <style>
 .input-details .el-input__inner{
-    border:1px solid #FB4C5D !important;
     border-radius: 0px !important;
-}
-.el-checkbox__inner:hover{
-    border-color: #FB4C5D !important;
-}
-.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D !important;}
-.el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB4C5D !important;
-    border-color:#FB4C5D !important;
 }
 .el-dialog__body{
     padding: 0px !important;

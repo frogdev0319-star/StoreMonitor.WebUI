@@ -1,6 +1,6 @@
 
 .el-pagination.is-background .el-pager li:not(.disabled).active{
-    background-color:#FB4C5D !important;
+    background-color:#f31d65 !important;
     color:#fff !important;
 }
 .el-pagination.is-background.el-pagination--small .btn-next, 

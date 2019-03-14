@@ -86,7 +86,7 @@ async function ajax4dash({method,url,data}){
     }
     const newAxios=axiosA.create({
         baseURL:REST_BASEURL,
-        timeout:15000,
+        timeout:30000,
     });
     let ret=null;
     await newAxios({
@@ -102,7 +102,7 @@ async function ajax4dash({method,url,data}){
     }).catch((err) => {
         console.log(err);
         Message({
-            message:'Dash视频服务器请求异常，请重试！',
+            message:'Dash视频服务器请求异常，请刷新后重试！',
             type:'error',
             duration:5*1000
         })

@@ -96,9 +96,10 @@ export default {
             this.$refs.loginForm.validate(valid=>{
                 if(valid){
                     self.loading=true;
-                    self.$store.dispatch('LoginByUser',this.loginForm).then(()=>{
+                    self.$store.dispatch('LoginByUser',this.loginForm).then((res)=>{
                         self.loading=false;
-                        self.$router.push({path:self.redirect||'/'});
+                        let data=res.data;
+                        self.$router.push({path:'/',query: {token: data.token,userId:data.userId}});
                     }).catch(()=>{
                         self.loading=false;
                     })

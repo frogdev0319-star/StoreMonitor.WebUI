@@ -5,14 +5,14 @@
                 <span class="lside-title">
                     {{store.storeTitle}}
                 </span>
-                <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp">
-                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'"></i>
+                <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp" v-if='showStoreUp'>
+                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" width=550px height=300px top=15%>
-                <div class="canvas-content" @mouseenter="showPenBtn=true" @mouseleave="showPenBtn=false">
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="550*percentHeight+'px'" height=300px top=15%>
+                <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
                     <hr class="dialog-hr"/> 
                     <!-- <div class='model'> -->
                         <transition name='fade'>
@@ -29,15 +29,16 @@
                             </div>
                         </transition>
                     <!-- </div> -->
-                    <canvas id="icanvas"  width="480" height="270" @mousedown="mouseDownAction($event)" 
+                    <canvas id="icanvas"  :width="480*percentHeight" :height="270*percentHeight" @mousedown="mouseDownAction($event)" 
                     @mousemove="mouseMoveAction($event)"></canvas>
                                     <!-- @click="cancleEditCanvas" @click="confirmEditCanvas" -->
-                    <div class="cancel-content" v-if="showCancelContent">
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':480*percentHeight+'px',
+                    'margin-left':35*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas"> 
                             <span>取消编辑</span>
                         </div>
                         <div class="content" @click="confirmEditCanvas">
-                            <span>保存编辑</span>
+                            <span>撤销编辑</span>
                         </div>
                     </div>
 
@@ -48,12 +49,12 @@
                 </div>
                 
             </el-dialog>
-            <div class="video-content" v-if="!showgongge" id="videoContent">
-                <!--@mouseenter="showModelContent=true" @mouseleave="showModelContent=false"-->
-                <div class="video-model" v-if="showModelContent">
-                    <span id="channelName">{{channel.channelName}}</span>
-                    <div class="icon-footer">
-                        <div class="iconlside">
+            <div class="video-content" v-if="!showgongge" id="videoContent" >
+                <div class="video-model" v-if="showModelContent"  
+                @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel">
+                    <span id="channelName" v-if="showControlInfo">{{channel.channelName}}</span>
+                    <div class="icon-footer" v-if="showControlInfo">
+                        <div class="iconlside" v-if="showStoreUp">
                             <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
                             <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
                         </div>
@@ -78,7 +79,7 @@
                                     </el-option>
                                 </el-select>
                             </div>
-                            <div class="screen-content">
+                            <div class="screen-content" v-if="showStoreUp">
                                 <i class="iconfont iconscreen" 
                                 :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
                                 <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
@@ -86,10 +87,10 @@
                         </div>
                     </div>
                     <div class="progress-content" v-if="playBackState">
-                        <span class="currentTime">{{currentStr}}</span>
+                        <!-- <span class="currentTime">{{currentStr}}</span> -->
                         <b-progress :value="currentTimeValue" id="bprogress"
-                        :max="durationTimeValue" class="mb-3 el-prog" height="0.5rem"/>
-                        <span class="duration">{{durationStr}}</span>
+                        :max="durationTimeValue" class="mb-3 el-prog" height="0.2rem" style="margin-bottom:0px !important;"/>
+                        <!-- <span class="duration">{{durationStr}}</span> -->
                     </div>
                     
                     <div class="iconright" v-if="showCutContent">
@@ -97,8 +98,8 @@
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
                             <span>抓拍</span>
                         </div>
-                        <div class="sheying-content" @click="getVideo">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;position:relative;top:3px;"></i>
+                        <div class="paizhao-content" @click="getVideo">
+                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;"></i>
                             <span style="margin-left:12px;">录像</span>
                         </div>
                         <div class="icon-drap-content">
@@ -146,44 +147,53 @@
             </div>
             <div class="el-event">
                 <div :class="corEvent?'event-lside':''">
-                    <span class="event-title">创建问题</span>
+                    <span class="event-title">创建方式</span>
                     <el-radio-group v-model="activeEventBtn" size="mini" @change="clickEventBtn">
                         <el-radio-button label="创建问题" class="radio-btn"></el-radio-button>
                         <el-radio-button label="关联问题" class="radio-btn"></el-radio-button>
                     </el-radio-group>
-                    <div>
-                        <span>问题名称</span>
-                        <el-input size="mini" class="name-input" maxlength="20" :disabled="corEvent" v-model="eventName"></el-input>
-                        <span v-if="!corEvent">问题描述</span>
-                        <span v-else class="cor-des">追加描述</span>
-                        <el-input size="mini" class="des-input" type="textarea" v-if="showSearchInput"
-                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
-                        <div class="source-content">
-                            <div class="source-details" v-if="showEmptyImg">
-                                <div>
-                                    <img :src="emptyImgSrc"/>
-                                    <span>*视频图片最多支持插入5个。</span>
+                    <div class="lside-scrollbar">
+                        <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                            <span>问题名称</span>
+                            <el-input size="mini" class="name-input" maxlength="10" :disabled="corEvent" v-model="eventName"></el-input>
+                            <span v-if="!corEvent">问题描述</span>
+                            <span v-else class="cor-des">追加描述</span>
+                            <el-input size="mini" class="des-input" type="textarea" v-if="showSearchInput"
+                            maxlength="50" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                            <div class="source-content">
+                                <div class="source-details" v-if="showEmptyImg">
+                                    <div>
+                                        <img :src="emptyImgSrc"/>
+                                        <span>*视频图片最多支持插入5个。</span>
+                                    </div>
+                                </div>
+                                <div class="source-details" v-for="(item,index) in sourceList" :key="index">
+                                    <i class="iconfont icon-shanchu icondelete" @click="deleteImg(item,index)"></i>
+                                    <img :src="item.src" :width="item.width" :height="item.height"/>
                                 </div>
                             </div>
-                            <div class="source-details" v-for="(item,index) in sourceList" :key="index">
-                                <img :src="item.src" :width="item.width" :height="item.height"/>
+                            <el-button size="mini" class="submit-btn" v-loading.fullscreen.lock="fullscreenLoading"
+                            @click="submit" type="primary">提交</el-button>
+                        </el-scrollbar>
+                    </div>
+                   
+                </div>
+                <div class="right-line" v-if="corEvent" id="rightLine"></div>
+                <div v-if="corEvent" class="event-rside">
+                    <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                        <span class="cor-des" style="margin-left:10px;">事件</span>
+                        <div class="event-content">
+                            <div class="event-details" v-for="(item,index) in eventList" :key="index">
+                                <el-radio v-model="curEvent" :label="item.id" @change="checkEvent">
+                                    <span class="event-name">{{item.name}}</span></el-radio>
+                                <div class="event-date">
+                                    <span class='date-year'>{{item.dateYear}}</span>
+                                    <span class='date-day'>{{item.dateDay}}</span>
+                                </div>
+                                <p class="event-des" :title="item.descrition">{{item.descrition}}</p>
                             </div>
                         </div>
-                        <el-button size="mini" class="submit-btn" v-loading.fullscreen.lock="fullscreenLoading"
-                        @click="submit" type="primary">提交</el-button>
-                    </div>
-                </div>
-                <div class="right-line" v-if="corEvent"></div>
-                <div v-if="corEvent" class="event-rside">
-                    <span class="cor-des" style="margin-left:10px;">事件</span>
-                    <div class="event-content">
-                        <div class="event-details" v-for="(item,index) in eventList" :key="index">
-                            <el-radio v-model="curEvent" :label="item.id" @change="checkEvent">
-                                <span class="event-name">{{item.name}}</span></el-radio>
-                            <span class="event-date">{{item.date}}</span>
-                            <span class="event-des">{{item.descrition}}</span>
-                        </div>
-                    </div>
+                    </el-scrollbar>
                 </div>
             </div>
         </el-col>
@@ -193,7 +203,7 @@
             </div>
             <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
-                    <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                    <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
                             <span v-for="(_item,_index) in item.storeList" :key="_index" class="store-name"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
@@ -221,7 +231,7 @@
             </el-tabs>
             <div class="channel-content">
                     <span>区域列表</span>
-                    <el-scrollbar style="height:100%;">
+                    <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="channels-srollbar">
                             <div v-for="(item,index) in channelBtns" :key="index" class="btn-content">
                                 <channel-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
@@ -256,8 +266,12 @@
                             {{item}}
                         </span>
                         <div class="date-details" v-for="(item,index) in weekDays" :key="index">
-                            <div class="data" v-for="(_item,_index) in item" :key="_index" @click="checkDate(item,index,_item,_index)">
-                                <span :class="_item.showBack?'opColor':'noramlColor'"
+                            <div class="data" v-for="(_item,_index) in item" 
+                            :key="_index" @click="checkDate(item,index,_item,_index)" @focus="focusDate(_item)"
+                             :style="_item.disabed?{'cursor': 'not-allowed','background-color':'#F5F7FA'}:{'cursor': 'pointer','background-color':'#fff'}">
+                                <span v-if=" _item.disabed"
+                                 :style="_item.disabed?{'color':'#C3D3EA','background-color':'#F5F7FA'}:''">{{_item.data}}</span>
+                                <span v-else :class="_item.showBack?'opColor':'noramlColor'"
                                 :style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>
                             </div>
                         </div>
@@ -278,7 +292,7 @@ import PubSub from 'pubsub-js'
 import util from '@/common/util'
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
-import { setInterval, clearInterval } from 'timers';
+import {validateInput} from '@/common/validate'
 
 export default {
     name:'StoreMoinitor',
@@ -290,9 +304,11 @@ export default {
             fullscreenLoading:false,
             channelBtns:[],
             store:{},
+            showStoreUp:true,
             cityList:[],
             popperClass:'select-popClass',
             showModelContent:true,
+            showControlInfo:true,
             errorText:'',
             showCancelContent:false,
             showCutContent:false,
@@ -468,6 +484,7 @@ export default {
                 },
             ],
             imageCanvas:new Image(),
+            imageCanvasList:[],
             timeDrap:false,
             curYearNum:0,
             curMonthNum:0,
@@ -476,11 +493,30 @@ export default {
             accountId:'aaoompqqpjy4',
         }
     },
+    computed:{
+        percentHeight:function(){
+            return this.varyWindowHeight/758;
+        },
+    },
+    beforeRouteEnter (to, from, next) {
+        console.log(to);
+        console.log(from);
+        next(vm => {
+            console.log(vm);//当前组件的实例
+            if(to.params.flag){
+                vm.clearEvent();
+            }
+        });
+    },
     beforeRouteLeave(to, from, next){
         //离开页面的同时应该停止播放视频
         let self=this;
+        window.clearInterval(self.timeid);
         if(self.playState){ 
             self.stopRealTime();
+        }
+        if(to.name!='提交事件'){
+            from.meta.keepAlive=false;
         }
         next();
     },
@@ -490,13 +526,22 @@ export default {
         document.onmouseup=self.mouseUpAction;
         //self.getPlayer();
         //初始化页面数据
-        //self.getDashServer();
+        self.myDivHeight();
         self.getOssInfo();
         self.getUpLoadBucketInfo();
         self.getFaStoreData();   //初始获取已关注门店的列表数据
         self.getInitStoreData(); //初始获取全部门店的列表数据，并进行处理
         self.getWeekDay();
         self.getRecentStoreList();
+        window.onresize=function(){
+            if(!self.checkFull()){
+                console.log('退出全屏');
+                self.fullScreen=false;
+                var ele = document.getElementById('videoContent');
+                ele.style.width = "auto";
+                ele.style.height = "auto";
+            }
+        }
     },
     methods:{
         getUpLoadBucketInfo(){
@@ -504,7 +549,6 @@ export default {
             self.bucketVideo='video'+'/'+util.getCurDate2Str();
             self.bucketImage='image'+'/'+util.getCurDate2Str();
         },
-
         getPlayer(){
             var player=videojs('previewVideo',{
                 'controls':true,
@@ -541,6 +585,12 @@ export default {
                     self.oss=res.data;
                 }
             })
+        },
+        clearEvent(){
+            let _this=this;
+            _this.eventName='';
+            _this.eventDes='';
+            _this.sourceList=[];
         },
         getFaStoreList(){
             let self=this;
@@ -665,7 +715,9 @@ export default {
             if(data.errCode==0){
                 let storeData=data.data;
                 self.tabList[0].storeList=getStoreTemp(storeData);
-
+                if(storeData.length==0){
+                    self.showStoreUp=false;
+                }
                 let obj={};
                 obj.storeId=storeData[0].storeId;
                 obj.storeName=storeData[0].name;
@@ -780,7 +832,7 @@ export default {
         async clickEventBtn(val){
             let self=this;
             console.log(val);
-            self.eventName='';
+            //self.eventName='';
             if(val=='关联问题'){
                 self.corEvent=true;
                 let data=await self.getEventList();
@@ -791,11 +843,13 @@ export default {
                     obj.id=item.id;
                     obj.name=item.subject;
                     obj.descrition=item.initialComment.description;
-                    obj.date=util.getDateStr(item.ts);
-                    if(index==0){
-                        self.curEvent=item.id;
-                        self.eventName=item.subject;
-                    }
+                    //obj.date=util.getDateStr(item.ts);
+                    obj.dateYear=util.getYearStr(item.ts);
+                    obj.dateDay=util.getDayStr(item.ts);
+                    // if(index==0){
+                    //     self.curEvent=item.id;
+                    //     self.eventName=item.subject;
+                    // }
                     temp.push(obj);
                 })
                 self.eventList=temp;
@@ -834,7 +888,8 @@ export default {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
-                  channel:JSON.stringify(self.channel.channelId)
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
                 }
             };
             let url='';
@@ -857,7 +912,8 @@ export default {
                         IVSID:self.channel.ivsId,
                         channel:JSON.stringify(self.channel.channelId),
                         beginTime:self.curTime.getTime().toString().substr(0,10),
-                        endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
+                        endTime:(self.curTime.getTime()+(5*60+1)*1000).toString().substr(0,10),
+                        streamType:'SubStream'
                         // beginTime:self.startTs,
                         // endTime:self.startTs+181,
                 }
@@ -895,7 +951,8 @@ export default {
                     IVSID:self.channel.ivsId,
                     channel:JSON.stringify(self.channel.channelId),
                     beginTime:self.curTime.getTime().toString().substr(0,10),
-                    endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
+                    endTime:(self.curTime.getTime()+(5*60+1)*1000).toString().substr(0,10),
+                    streamType:'SubStream'
                 }
             };
             let url=await dashAPI.playBack(1,data);
@@ -922,7 +979,7 @@ export default {
             let d=self.getCurTime();
             console.log(d);
             self.curTime=d;
-            let dstr=Number((d.getTime()+(3*60+1)*1000).toString().substr(0,10));
+            let dstr=Number((d.getTime()+(5*60+1)*1000).toString().substr(0,10));
             self.startTs=dstr;
             self.currentTimeValue=0;
             self.playBackState=true;
@@ -932,10 +989,27 @@ export default {
             else{
                 self.playHistoryVideo();
             }
-            self.playBackState=true;
+        },
+        afterCurDate(sindex,item){
+            let self=this;
+            let flag=false;
+            let date=new Date();
+            let year=date.getFullYear();
+            let month=date.getMonth()+1;
+            let day=date.getDate();
+            if((sindex!=0&&(item.data>day&&year==self.curYear&&month==self.curMonth))||(self.curYear>year)||(self.curYear==year&&self.curMonth>month)){
+                flag=true;
+            }
+            else{
+                flag=false;
+            }
+            return flag;
         },
         checkDate(item,index,_item,_index){
             let self=this;
+            if(_item.disabed){
+                return false;
+            }
             self.curDate=_item.data;
             self.showModelContent=true;
             let curYear=self.curYear;
@@ -958,8 +1032,6 @@ export default {
                 self.curYearNum=self.curYear;
             }
             let d=self.getCurTime();
-            console.log(d);
-            //self.curTime=d;
             _item.showBack=true;
 
             self.weekDays.forEach((itemDs,indexDs)=>{
@@ -1003,7 +1075,6 @@ export default {
                 .then((results) => {
                     // 上传完成
                     const url = self.getFileUrl(results.name);
-                    console.log(url);
                     resolve(url); 
                 })
                 .catch((err) => {
@@ -1011,11 +1082,25 @@ export default {
                 }) 
             })
         },
+        deleteImg(item,index){
+            let self=this;
+            self.sourceList.splice(index,1);
+            if(self.sourceList.length==0){
+                self.showEmptyImg=true;
+            }
+        },
         async submit(){
             let self=this;
-            console.log(self.sourceList);
             if(self.eventName.trim().length==0){
                 self.notify('问题名称不能为空！','warning',3000);
+                return false;
+            }
+            if(validateInput(self.eventName)){
+                self.notify('问题名称中不能含非法字符！','warning',3000);
+                return false;
+            }
+            if(validateInput(self.eventDes)){
+                self.notify('描述中不能含非法字符！','warning',3000);
                 return false;
             }
             let tempFileUrl=[];
@@ -1023,17 +1108,15 @@ export default {
                 let obj={};
                 if(self.sourceList[i].mediaType==2){
                     let url=await self.upLoadFile(self.sourceList[i]);
-                    console.log(url);
                     obj.mediaType=2;
                     obj.url=url;
                 }
                 tempFileUrl.push(obj);
             }
-
-            console.log(self.curEvent);
             let eventIds=[];
             eventIds.push(self.curEvent);
             self.fullscreenLoading=true;
+            let isSuccess=false;
             if(self.activeEventBtn=='创建问题'){
                 let commentobj={
                     ts:new Date().getTime(),
@@ -1049,9 +1132,7 @@ export default {
                 obj.deviceId=self.channel.id;
                 obj.comment=commentobj;
                 let params=obj;
-                let isSuccess=false;
                 addEvent(params).then(res=>{
-                    console.log(res);
                     self.fullscreenLoading=false;
                     let notifiedTo=res.data.notifiedTo;
                     if(res.errCode==0){
@@ -1083,7 +1164,6 @@ export default {
                     }
                     sessionStorage.setItem('store_submit',JSON.stringify(routeData));
                     self.$router.push({name:"提交事件",params:{data:routeData}});
-                    
                 })
             }
             else{
@@ -1099,7 +1179,6 @@ export default {
                 let curTs=util.getCurDate2StrBySign('/');
                 let params=obj;
                 addComment(params).then(res=>{
-                    console.log(res);
                     self.fullscreenLoading=false;
                     if(res.errCode==0){
                         isSuccess=true;
@@ -1140,8 +1219,19 @@ export default {
             let self=this;
             self.showSpread=false;
         },
+        hiddenModel(){
+            let self=this;
+            self.showControlInfo=false;
+            self.showCutContent=false;
+        },
+        showModel(){
+            let self=this;
+            if(self.playState){
+                self.showControlInfo=true;
+                self.showCutContent=true;
+            }
+        },
         cutPicture(...val){
-            console.log(val);
             let self=this;
             self.showCancelContent=false;
             if(self.sourceList.length>=5){
@@ -1152,13 +1242,12 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                //var width=self.videoEl.videoWidth;
-                //var height=self.videoEl.videoHeight;
-                //self.canvasEl.width=width/4;
-                //self.canvasEl.height=height/4;
-                ctx.drawImage(self.videoEl,0,0,480,270);
+                ctx.drawImage(self.videoEl,0,0,480*self.percentHeight,270*self.percentHeight);
                 var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
+                let imgObj=new Image();
+                imgObj.src=oGrayImg;
+                self.imageCanvasList.push(imgObj);
             })
         },
         showPenList(){
@@ -1170,7 +1259,6 @@ export default {
             let self=this;
             item.showContent=true;
             self.showCancelContent=false;
-            //self.showPenBtn=false;
             self.penList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.showContent=false;
@@ -1183,7 +1271,6 @@ export default {
            self.isMouseDown=true;
            self.X=e.offsetX;
            self.Y=e.offsetY;
-           //self.showCutModel=false;
            self.showPenBtn=false;
            self.showCancelContent=false;
         },
@@ -1203,19 +1290,45 @@ export default {
             //self.showCutModel=true;
             self.showPenBtn=true;
             self.showCancelContent=true;  //每次鼠标弹起后显示可以取消的框
+            
+            if(self.flag!=0&&self.canvasEl!=''){
+                let imgObj=new Image();
+                imgObj.src=self.canvasEl.toDataURL("image/jpeg");
+                self.imageCanvasList.push(imgObj);
+            }
             self.flag=0;
+        },
+        showCancel(){
+            let self=this;
+            self.showCancelContent=true;
+            self.showPenBtn=true;
+        },
+        hiddenCancel(){
+            let self=this;
+            self.showCancelContent=false;
+            self.showPenBtn=false;
         },
         cancleEditCanvas(){
             let self=this;
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,480,270);
-            ctx.drawImage(self.imageCanvas,0,0,480,270);
+            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
+            ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
         },
         confirmEditCanvas(){
             let self=this;
             self.showCancelContent=false;
+            self.imageCanvasList.pop();
+            self.canvasEl=document.getElementById('icanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
+            if(self.imageCanvasList.length==0){
+                ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
+            }
+            else{
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,480*self.percentHeight,270*self.percentHeight);
+            }
         },
         drawLine(x,y,x1,y1){
             let self=this;
@@ -1245,6 +1358,7 @@ export default {
             obj.file=util.base64ToBlob(obj.src);
             self.sourceList.push(obj);
             self.showCutDialog=false;
+            self.myDivHeight();
         },
         getVideo(...val){
             console.log(val);
@@ -1258,6 +1372,10 @@ export default {
             this.previewplayer = videojs(video,{playbackRates: [0.5, 1, 1.5, 2]});
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
+            setTimeout(() => {
+                self.showControlInfo=false;
+                self.showCutContent=false;
+            }, 5000);
         },
         async realTime(...val){
             console.log(val);
@@ -1275,10 +1393,9 @@ export default {
                         streamingProtocol:this.protocal,
                         IVSID:self.channel.ivsId,
                         channel:JSON.stringify(self.channel.channelId),
-                        // beginTime:self.curTime.getTime().toString().substr(0,10),
-                        // endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
                         beginTime:(self.startTs).toString(),
-                        endTime:(self.startTs+181).toString(),
+                        endTime:(self.startTs+5*60+1).toString(),
+                        streamType:'SubStream'
                     }
                 };
                 url=await dashAPI.playBack(1,data);
@@ -1295,7 +1412,8 @@ export default {
                         sessionID: sessionId,
                         streamingProtocol:this.protocal,
                         IVSID:self.channel.ivsId,
-                        channel:JSON.stringify(self.channel.channelId)
+                        channel:JSON.stringify(self.channel.channelId),
+                        streamType:'SubStream'
                     }
                 };
                 url=await dashAPI.RealTime(1,data);
@@ -1333,7 +1451,8 @@ export default {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
-                  channel:JSON.stringify(self.channel.channelId)
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
                 }
             };
             if(self.playBackState){
@@ -1351,8 +1470,7 @@ export default {
             let self=this;
             let video=document.getElementById('previewVideo');
             let curTime=video.player.currentTime();
-            //let duration=video.player.duration();
-            let duration=180;
+            let duration=300;
             self.durationTimeValue=duration;
             self.currentTimeValue=curTime;
 
@@ -1367,6 +1485,21 @@ export default {
             }
             self.currentStr=getTimeStr(curTime);
             self.durationStr=getTimeStr(duration);
+            // video.player.on('ended',async function(e){
+            //     self.stopVideo();
+            //     const data = {
+            //         request: { 
+            //             method: 'disconnection',
+            //             sessionID: self.sessionId,
+            //             IVSID:self.channel.ivsId,
+            //             channel:JSON.stringify(self.channel.channelId)
+            //         }
+            //     };
+            //     clearInterval(self.timeid);
+            //     let ret=await dashAPI.playBack(0,data);
+            //     await dashAPI.Offline(self.sessionId);
+            //     self.startTs=self.startTs+5*60*1000;
+            // })
             if(self.currentStr==self.durationStr){
                 self.stopVideo();
                 const data = {
@@ -1374,13 +1507,14 @@ export default {
                         method: 'disconnection',
                         sessionID: self.sessionId,
                         IVSID:self.channel.ivsId,
-                        channel:JSON.stringify(self.channel.channelId)
+                        channel:JSON.stringify(self.channel.channelId),
+                        streamType:'SubStream'
                     }
                 };
                 clearInterval(self.timeid);
                 let ret=await dashAPI.playBack(0,data);
                 await dashAPI.Offline(self.sessionId);
-                self.startTs=self.startTs+3*60*1000;
+                self.startTs=self.startTs+5*60*1000;
             }
         },
         adjustSpeed(val){
@@ -1423,20 +1557,27 @@ export default {
             let self=this;
             //self.showControls=true;
             var ele = document.getElementById('videoContent');
-            if (ele .requestFullscreen) {
-                ele .requestFullscreen();
+            ele.style.width = "100%";
+            ele.style.height = "100%";
+            if (ele.requestFullscreen) {
+                ele.requestFullscreen();
             } 
             else if (ele .mozRequestFullScreen) {
-                ele .mozRequestFullScreen();
+                ele.mozRequestFullScreen();
             } 
             else if (ele .webkitRequestFullScreen) {
-                ele .webkitRequestFullScreen();
+                ele.webkitRequestFullScreen();
             }
-            
+            else if(ele.msRequestFullscreen) {
+                ele.msRequestFullscreen();
+            }
         },
         //退出全屏
         exitFullscreen() {
             var de = document;
+            var ele = document.getElementById('videoContent');
+            ele.style.width = "100%";
+            ele.style.height = "auto";
             if (de.exitFullscreen) {
                 de.exitFullscreen();
             } 
@@ -1526,7 +1667,7 @@ export default {
             self.eventDes='';
             self.sourceList=[];
         },
-        clickStore(item,index,_item,_index){
+        changeStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
             self.clearTheEventInfo();
@@ -1572,7 +1713,24 @@ export default {
 
             localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
             self.getChannelByStore(_item);
-
+        },
+        clickStore(item,index,_item,_index){
+            let self=this;
+            self.showStoreUp=true;
+            if(self.playState||self.eventName.length!=0){
+                self.$confirm('此操作将暂停当前播放视频及清空问题信息，是否继续！', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                    self.changeStore(item,index,_item,_index);
+                }).catch(() => {
+                    console.log('cancel ignore');     
+                });
+            }
+            else{
+                self.changeStore(item,index,_item,_index);
+            }
         },
         getRecentStoreList(){
             let self=this;
@@ -1619,7 +1777,8 @@ export default {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
-                  channel:JSON.stringify(self.channel.channelId)
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
                 }
             };
             let url='';
@@ -1632,7 +1791,6 @@ export default {
                 console.log(sessionId);
                 self.sessionId=sessionId;
                 let data=null;
-                
                 data= {
                     request: { 
                         method: 'connection',
@@ -1641,7 +1799,8 @@ export default {
                         IVSID:self.channel.ivsId,
                         channel:JSON.stringify(self.channel.channelId),
                         beginTime:self.curTime.getTime().toString().substr(0,10),
-                        endTime:(self.curTime.getTime()+(3*60+1)*1000).toString().substr(0,10),
+                        endTime:(self.curTime.getTime()+(5*60+1)*1000).toString().substr(0,10),
+                        streamType:'SubStream'
                     }
                 };
                 url=await dashAPI.playBack(1,data);
@@ -1650,7 +1809,6 @@ export default {
                 let ret=await dashAPI.RealTime(0,dataDis);
                 await dashAPI.Offline(self.sessionId);
                 console.log(ret);
-
                 let sessionId= await dashAPI.Online();
                 console.log(sessionId);
                 self.sessionId=sessionId;
@@ -1661,7 +1819,8 @@ export default {
                         sessionID: sessionId,
                         streamingProtocol:this.protocal,
                         IVSID:self.channel.ivsId,
-                        channel:JSON.stringify(self.channel.channelId)
+                        channel:JSON.stringify(self.channel.channelId),
+                        streamType:'SubStream'
                     }
                 };
                 url=await dashAPI.RealTime(1,data);
@@ -1777,9 +1936,13 @@ export default {
             let temp=[];
             let today=new Date().getDate();
             let curMonth=new Date().getMonth()+1;
+            if(curWeek==0){
+                curWeek=7;
+            }
             for(let i=0;i<datenew.length;i++){
                 let obj={};
                 obj.showBack=false;
+                
                 if(i<curWeek){
                     obj.showOp=true;
                     obj.data=forWardDayNum-(curWeek-1-i);
@@ -1819,8 +1982,38 @@ export default {
                     if(_item.data==today&&curMonth==self.curMonth){
                         _item.showBack=true;
                     }
+                    if(self.afterCurDate(index,_item)){
+                        _item.disabed=true;
+                    }
+                    else{
+                        _item.disabed=false;
+                    }
                 })
             })
+            //let domList=document.getElementsByClassName('data');
+            // for(let i=0;i<domList.length;i++){
+            //     if(domList[i].style.cursor=='not-allowed'){
+            //         domList[i].style.backgroundColor='#F7F7FA';
+            //         domList[i].children[0].style.color='#C3D3EA';
+            //     }
+            // }
+        },
+        myDivHeight(){
+            let self=this;
+            if(self.corEvent){
+                let divLeft=document.getElementsByClassName('el-event')[0].offsetHeight;
+                let divRight=document.getElementsByClassName('event-rside')[0].offsetHeight;
+                let height=divLeft>divRight?divLeft:divRight;
+                document.getElementById('rightLine').style.height=height+'px';
+            }
+        },
+        checkFull(){
+            var isFull =  document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+            if(isFull === undefined)
+            {
+                isFull = false;
+            } 
+            return isFull;
         },
         notify(msg,type,time) {
             this.$message({
@@ -1838,11 +2031,12 @@ export default {
     *{
         font-family: 'Microsoft YaHei';
     }
-    $red:#FB4C5D;
-    $black:#424151;
-    $border:#ddd;
-    $background:#fafafb;
-    $tab:#94a4b4;
+    $red:#f31d65;
+    $black:#182752;
+    $border:#e3e9f4;
+    $background:#f4f5f9;
+    $tab:#7d8cad;
+    $h1:#292e36;
 
 
 
@@ -1903,16 +2097,20 @@ export default {
         }
         /*左侧视频区域css*/
         .lside{
-            padding:15px 10px 15px 20px;
+            padding:0px 0px 20px 0px;
+            margin-right: 20px;
+            border: 1px solid $border;
+            background-color: #fff;
             .el-header-title{
                 text-align: left;
                 position: relative;
-                padding-left: 10px;
-                height: 30px;
-                line-height: 30px;
+                height: 60px;
+                line-height: 60px;
+                border-bottom: 1px solid $border;
+                padding:0 20px;
                 .lside-title{
                     font-weight: bold;
-                    color: $black;
+                    color:$h1;
                     font-size: 18px;
                 }
                 .nocoll{
@@ -1940,14 +2138,16 @@ export default {
                     display: inline-block;
                     margin-left: 20px;
                     padding: 0px 6px;
+                    height: 24px;
                     line-height: 20px;
-                    width: 85px;
+                    width: 90px;
                     position: relative;
                     bottom: 2px;
                     cursor: pointer;
                     span{
                         font-size: 12px;
-                        font-weight: bold;
+                        vertical-align: middle;
+                        margin-left: 4px;
                     }
                 }
             }
@@ -1974,25 +2174,26 @@ export default {
                     margin-bottom:10px;
                     position: relative;
                     bottom: 5px;
+                    margin-top: 0;
                 }
                 .cancel-content{
                     position: absolute;
                     bottom: 0px;
-                    width: 480px;
                     height: 30px;
                     background-color: #000;
                     opacity: 0.8;
                     z-index: 10;
                     overflow: hidden;
-                    margin-left: 35px;
                     .content{
                         width: 50%;
                         text-align: center;
                         float: left;
                         color: #fff;
                         line-height: 30px;
-                        border-right: 1px solid #fff;
                         cursor: pointer;
+                        &:first-child{
+                            border-right: 1px solid #fff;
+                        }
                     }
                 }
                 .icon-right{
@@ -2000,12 +2201,13 @@ export default {
                     height: auto;
                     position: absolute;
                     right: 30px;
-                    top: 5%;
+                    top: 10%;
                     cursor: pointer;
                     .pen-btn{
                         width: 40px;
                         margin-right: 20px;
                         margin-bottom: 20px;
+                        cursor: pointer;
                     }
                     .content{
                         width: 100%;
@@ -2047,12 +2249,12 @@ export default {
             }
             /*video区域css*/
             .video-content{
-                width: 100%;
                 height: auto;
                 position: relative;
-                margin-top: 20px;
+                margin: 20px;
+                margin-bottom: 0;
                 #previewVideo{
-                    @include point(min-width,500);
+                    @include point(min-width,450);
                     @include point(min-height,414);
                 }
                 .errorVideo-model{
@@ -2077,9 +2279,13 @@ export default {
                     text-align: left;
                     #channelName{
                         display: block;
-                        margin: 20px;
+                        width: 100%;
+                        padding-left: 30px;
                         color: #fff;
                         font-size: 12px;
+                        background-color: rgba($color: #24293d, $alpha: 0.6);
+                        height: 40px;
+                        line-height: 40px;
                     }
                     .progress-content{
                         position: absolute;
@@ -2087,7 +2293,7 @@ export default {
                         width: 100%;
                         .el-prog{
                             float: left;
-                            width: 77%;
+                            width: 100%;
                             .progress-bar{
                                 background-color: $red;
                             }
@@ -2111,22 +2317,24 @@ export default {
                     }
                     
                     .icon-footer{
-                        width: 96%;
+                        width: 100%;
                         position: absolute;
                         bottom: 0px;
                         color: #fff;
-                        padding-left: 30px;
-                        padding-bottom: 20px;
-                        margin-bottom: 15px;
+                        margin-bottom: 4px;
                         overflow: hidden;
                         user-select:none;
+                        background-color: rgba($color: #24293d, $alpha: 0.6);
+                        height: 40px;
+                        line-height: 40px;
                         .iconlside{
                             float: left;
                             text-align: left;
                             .iconplay{
-                                font-size: 22px;
+                                font-size: 18px;
                                 cursor: pointer;
                                 float: left;
+                                margin-left: 30px;
                             }
                             
                         }
@@ -2149,11 +2357,10 @@ export default {
                                 position: absolute;
                                 right: 0px;
                                 .iconscreen{
-                                    margin: 8px;
-                                    font-size: 20px;
+                                    font-size: 18px;
                                     position: relative;
-                                    top: 3px;
                                     cursor: pointer;
+                                    margin-right: 20px;
                                 }
                             }
                             
@@ -2161,22 +2368,26 @@ export default {
                     }
                     .iconright{
                         position: absolute;
-                        right:0px;
-                        height: 50%;
-                        top: 25%;
+                        right:20px;
+                        height: 30%;
+                        top: 30%;
                         .paizhao-content{
-                            height: 50px;
-                        }
-                        span{
-                            font-size: 12px;
-                            margin-left: 15px;
-                            color: #fff;
-                            margin-right: 35px;
-                            cursor: pointer;
+                            
+                            margin-top: 30px;
+                            height: 30px;
+                            border-radius: 4px;
+                            padding: 0 6px;
+                            background-color: rgba($color: #24293d, $alpha: 0.6);
                         }
                         .iconpaizhao{
                             color: #fff;
-                            cursor: pointer;
+                            vertical-align:middle;
+                        }
+                        span{
+                            color: #fff;
+                            font-size: 12px;
+                            margin-left: 15px;
+                            vertical-align:middle;
                         }
                         .icon-drap-content{
                             height: 40px;
@@ -2279,21 +2490,29 @@ export default {
             /*新增问题区域css*/
             .el-event{
                 text-align: left;
-                border: 1px solid #e3e9f4;
+                border: 1px solid $border;
                 overflow: hidden;
-                background: $background;
+                margin: 0 20px;
+                padding-left: 20px;
+                .event-title{
+                    color: $black;
+                }
                 .event-lside{
                     width: 60%;
                     float: left;
+                    height: 460px;
                 }
                 .right-line{
                     width:1px; 
-                    height:340px;
+                    min-height:340px;
                     position: relative;
                     top: 50px;
                     background-color:#e3e9f4;
                     float: left;
                     margin-right: 15px;
+                }
+                .lside-scrollbar{
+                    height: 390px;
                 }
                 .event-rside{
                     position: relative;
@@ -2301,9 +2520,11 @@ export default {
                     width:-webkit-calc(40% - 16px); 
                     width:-moz-calc(40% - 16px); 
                     width:calc(40% - 16px);
+                    height: 360px;
                     float: right;
                     .event-content{
                         padding-left: 10px;
+                        padding-bottom: 20px;
                         .event-details{
                             position: relative;
                             .event-name{
@@ -2311,17 +2532,27 @@ export default {
                                 display: inline;
                             }
                             .event-date{
-                                display: inline;
-                                font-size: 12px;
-                                position: absolute;
-                                right: 15px;
-                                margin: 0;
                                 color: #94a4b4;
+                                margin-left: 35px;
+                                position: absolute;
+                                right: 0px;
+                                top: 0px;
+                                width: 70px;
+                                text-align: left;
+                                span{
+                                    margin: 0;
+                                    font-size: 12px;
+                                }
                             }
                             .event-des{
                                 font-size: 12px;
                                 margin-left: 35px;
                                 color: #94a4b4;
+                                margin-top: 10px;
+                                text-overflow: ellipsis;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                width:80%;
                             }
                         }
                         
@@ -2352,7 +2583,7 @@ export default {
                     font-size: 12px;
                 }
                 .source-content{
-                    min-height: 150px;
+                    min-height: 120px;
                     width: 90%;
                     margin: auto 20px;
                     .source-details{
@@ -2360,17 +2591,27 @@ export default {
                         display: inline-block;
                         margin-right: 15px;
                         padding-top: 15px;
+                        position: relative;
                         span{
                             font-size: 12px;
                             color: #FCB83B;
                             margin: 0;
+                        }
+                        .icondelete{
+                            position: absolute;
+                            font-size: 14px;
+                            right: 5px;
+                            margin-top: 5px;
+                            z-index: 2;
+                            color: #fff;
+                            cursor: pointer;
                         }
                     }
                 }
                 .submit-btn{
                     margin-left: 20px;
                     width: 80px;
-                    margin-bottom: 15px;
+                    margin-bottom: 30px;
                     line-height: 12px;
                     font-size: 12px;
                     margin-top: 15px;
@@ -2422,7 +2663,6 @@ export default {
                         padding:6px;
                         font-size: 12px;
                         cursor: pointer;
-                        border-radius: 4px;
                         width: 96px;
                         white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
                         overflow: hidden; //隐藏超出单元格的部分。
@@ -2520,8 +2760,10 @@ export default {
                             position: relative;
                             @include point(left,10);
                             font-size: 12px;
+                            margin-bottom: 15px;
                         }
                         .date-details{
+                            margin-bottom: 8px;
                             .data{
                                 width: 14%;
                                 display: inline-block;
@@ -2536,7 +2778,10 @@ export default {
                                 text-align: center;
                                 font-size: 12px;
                                 @include point(border-radius,18);
-                                cursor: pointer;
+                                //cursor: pointer;
+                            }
+                            .disabedColor{
+                                color:#C3D3EA;
                             }
                             .opColor{
                                 background-color: $red !important;
@@ -2544,6 +2789,10 @@ export default {
                             }
                             .noramlColor{
                                 background-color: #fff;
+                            }
+                            .noramldColor{
+                                color: #C3D3EA;
+                                background-color: #F3F3F3;
                             }
                         }
                         .schedule-tag{
@@ -2583,14 +2832,14 @@ export default {
 }
 .el-tabs__active-bar{
     height: 4px !important;
-    background-color: #FB4C5D !important;
+    /* background-color: #f31d65 !important; */
 }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB4C5D !important;
+    color: #f31d65 !important;
 }
 .el-tabs__item:hover{
-    color: #FB4C5D !important;
+     color: #f31d65 !important;
 }
 
 .el-test .el-input__inner{
@@ -2657,7 +2906,7 @@ export default {
 <style>
 @import '../../assets/css/importfile.css'; 
 @import '../../assets/css/videoBar.css'; 
-    #el-menuscrollbar .el-scrollbar__wrap {
+    .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{

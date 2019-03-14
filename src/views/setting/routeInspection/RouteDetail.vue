@@ -28,16 +28,15 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #FB4C5D;"/>
-                        
+                        <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
                             <span>确认是否删除当前勾选巡检项?</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showDeleteContent = false" size="mini" style="">取 消</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" style="color:#fff">确 认</el-button>
+                        <el-button class="file-cancel-btn" @click="showDeleteContent = false" size="mini">取 消</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" type="primary">确 认</el-button>
                     </div>
                 </el-dialog>
 
@@ -49,8 +48,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #FB4C5D;"/>
-                        
+                        <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
                             <span>确认是否删除当前巡检项?</span>
@@ -58,7 +56,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button class="file-cancel-btn" @click="showSingleDeleteContent = false" size="mini" style="">取 消</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmDeleteSingle" size="mini" style="color:#fff">确 认</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmDeleteSingle" size="mini" type="primary">确 认</el-button>
                     </div>
                 </el-dialog>
 
@@ -103,7 +101,7 @@
                 <div class="data-empty" v-if="routeData.length==0">
                     <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
                     <p class="empty-title">
-                        请先<span class="title-btn" @click="downLoadModel">下载巡检表模板</span>进行编辑，再点击<span @click="emptyImport">导入</span>按钮~
+                        请先<a :href="downLoadSrc" :download='fileName' class="downLoad-btn">下载巡检表模板</a>进行编辑，再点击<span @click="emptyImport">导入</span>按钮~
                     </p>
                 </div>
                 <el-dialog title='导入'
@@ -114,7 +112,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #FB4C5D;"/>
+                        <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -176,7 +174,8 @@ export default {
             tabNameInput:'',
             varyWindowWidth:window.innerHeight,
             allchecked:false,
-            curDeleteId:''
+            curDeleteId:'',
+            fileName:'',
         }
     },
     computed:{
@@ -194,9 +193,21 @@ export default {
     mounted(){
         let self=this;
         self.getNum();
+        self.getDownLoadURL();
     },
     methods:{
-        
+        getDownLoadURL(){
+            let self=this;
+            inpectRESTful.downLoadTemplate().then(res=>{
+                console.log(res);
+                let blob = new Blob([res],{
+               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+            });
+                let objectUrl = URL.createObjectURL(blob);
+                self.downLoadSrc=objectUrl;
+                self.fileName='巡检表模板';
+            })
+        },
         getNum(){
             let self=this;
             if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
@@ -595,7 +606,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
-    $mainColor:#FB4C5D;
+    $mainColor:#f31d65;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -660,7 +671,8 @@ export default {
             float: left;
             overflow: hidden;
             text-align: left;
-            @include point(padding-left,27);
+            //@include point(padding-left,27);
+            padding-left: 27px;
             @include point(padding-bottom,10);
             border-bottom:1px solid #e3e9f4;
             font-size: 14px;
@@ -694,7 +706,8 @@ export default {
         .table-header-title{
             float:left;
             @include point(margin-bottom,10);
-            @include point(margin-left,27);
+            // @include point(margin-left,27);
+            margin-left: 27px;
             margin-right: 0;
             .all-checkBox{
                 margin-right: 0;
@@ -742,6 +755,10 @@ export default {
                 color: $mainColor;
                 cursor: pointer;
             }
+            .downLoad-btn{
+                color:  $mainColor;
+                text-decoration: none;
+            }
         }
     }
     .tabName-input-content{
@@ -753,24 +770,16 @@ export default {
 <style>
 .el-tabs__active-bar{
         height: 4px !important;
-        background-color: #FB4C5D !important;
+        background-color: #f31d65 !important;
     }
 .el-tabs__item.is-active{
     font-weight: bold !important;
-    color: #FB4C5D !important;
+    color: #f31d65 !important; 
 }
 .el-tabs__item:hover{
-    color: #FB4C5D !important;
+    color: #f31d65 !important;
 }
 
-.el-checkbox__inner:hover{
-    border-color: #FB4C5D !important;
-}
-.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
-.el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB4C5D !important;
-    border-color:#FB4C5D !important;
-}
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
     background-color: #FEE7E4;
     color: #000;

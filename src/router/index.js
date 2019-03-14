@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Home from '@/views/home/Home'
 import Login from '@/views/login/Login'
 import LoginForm from '@/views/login/LoginForm'
+import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
@@ -17,15 +18,21 @@ export default new Router({
       }
     },
     {
-      path: '/',
+      path:'/',
+      name:'AuthRedirect',
+      hidden:true,
+      component:AuthRedirect
+    },
+    {
+      path: '/home',
       name: '总览',
       redirect:'/event',
       component: Home,
       hidden: false,
       iconCls:'iconfont icon-zonglan',
-      styles:'font-size:25px',
+      styles:'font-size:22px',
       leaf:true, //没有子节点
-      isReadOnly:false,
+      isReadOnly:true,
       children:[
         {
           path:'/allscan',
@@ -38,7 +45,7 @@ export default new Router({
       ]
     },
     {
-      path: '/',
+      path: '/home',
       name:'巡店管理',
       component:Home,
       iconCls:'iconfont icon-menu-xundian',
@@ -52,8 +59,22 @@ export default new Router({
           component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
           meta:{
             requireAuth: true,
+            keepAlive:true,
           },
           isReadOnly:false,
+        },
+        {
+          path:'/reinspection',
+          name:'远程巡检',
+          component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
+          hidden:true,
+          children:[
+            {
+              path:'/reinspect/submit',
+              name:'巡检提交事件',
+              component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
+            }
+          ]
         },
         {
           path:'/storemonitor',
@@ -61,6 +82,7 @@ export default new Router({
           component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
           meta:{
             requireAuth: true,
+            keepAlive:true,
           },
           isReadOnly:false,
         },
@@ -80,7 +102,7 @@ export default new Router({
       ]
     },
     {
-      path: '/',
+      path: '/home',
       name:'事件管理',
       component:Home,
       iconCls:'iconfont icon-shijian',
@@ -118,11 +140,11 @@ export default new Router({
       ]
     },
     {
-      path: '/',
+      path: '/home',
       name:'统计分析',
       component:Home,
       iconCls:'iconfont icon-tongjifenxi',
-      styles:'font-size:25px',
+      styles:'font-size:22px',
       leaf:true,
       isReadOnly:true,
       hidden: false,
@@ -138,11 +160,11 @@ export default new Router({
       ]
     },
     {
-      path: '/',
+      path: '/home',
       name:'数据中心',
       component:Home,
       iconCls:'iconfont icon-menu-shujuzhongxin',
-      styles:'font-size:20px',
+      styles:'font-size:22px',
       leaf:true,
       isReadOnly:true,
       hidden: false,
@@ -158,10 +180,10 @@ export default new Router({
       ]
     },
     {
-      path: '/',
+      path: '/home',
       name:'系统设定',
       iconCls:'iconfont icon-button',
-      styles:'font-size:24px',
+      styles:'font-size:22px',
       component:Home,
       leaf:false,
       hidden: false,
@@ -244,7 +266,7 @@ export default new Router({
         {
           path:'/schedule',
           name:'排程配置',
-          isReadOnly:false,
+          isReadOnly:true,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{
@@ -254,8 +276,8 @@ export default new Router({
         {
           path:'/other',
           name:'其他设置',
-          isReadOnly:false,
-          component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
+          isReadOnly:true,
+          component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
         }
       ]
     }

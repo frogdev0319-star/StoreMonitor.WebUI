@@ -1,5 +1,5 @@
 <template>
-    <div class="el-event-content">
+    <div class="el-event-content" :style="{'height':windowHeight-118+'px'}">
        <div class="el-date">
             <span class="date-title">选择时间</span>
             <el-date-picker
@@ -43,19 +43,6 @@
                 <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
             </el-input>
        </div>
-       <el-dialog title="导出" :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=450px top=15%>
-            <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FFC1C8;"/>
-                <div class="tabName-input-content">
-                    <el-input type="text" size="small" v-model="fileName" class="tabName-input" placeholder="请输入文件名称">
-                    </el-input>
-                </div>
-            </div>
-            <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" @click="dialogFormVisible = false" size="mini" style="">取 消</el-button>
-                <el-button class="file-confirm-btn" type="primary" @click="exportCSV" size="mini">确 定</el-button>
-            </div>
-        </el-dialog>
         <div class="el-table-content">
             <el-button type="primary" size="mini" class="export-btn" @click="export2Excel">
                <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel">
@@ -70,11 +57,11 @@
                             :highlight-current-row="true"
                             empty-text='没有事件数据'
                             align='left'
-                            :height="tableHieght"
+                            :height="windowHeight-320"
                             @sort-change='sortChange'
                             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                                 <el-table-column
-                                    min-width="150"
+                                    min-width="120"
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
@@ -204,7 +191,6 @@
                 sizeNum:10,
                 params:{},
                 fileName:'数据详情'+'.xlsx',
-                dialogFormVisible:false,
                 exportDataList:[],  //需要导出的数据
                 exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
                 windowHeight:window.innerHeight,
@@ -218,7 +204,7 @@
         computed:{
             tableHieght(){
                 if(this.windowHeight>800){
-                    return this.windowHeight*0.62;
+                    return this.windowHeight*0.63;
                 }
                 else if(this.windowHeight>700){
                     return this.windowHeight*0.58;
@@ -597,15 +583,6 @@
                 self.params.order={"direction": "desc","property": "ts"};
                 self.getEventList(self.params);
             },
-            exportData(){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                if(self.tableDataList[tabIndex].tableData.length==0){
-                    return false;
-                }
-                self.dialogFormVisible=true;
-                self.getExportData();
-            },
             getEventCount(start,end,status,...value){
                 console.log(value);
                 let self=this;
@@ -686,23 +663,6 @@
                         console.log("Error:"+err);
                     });
                 })
-            },
-            async exportCSV(){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                if(self.tableDataList[tabIndex].tableData.length==0){
-                    Message({
-                        message:'暂无数据！',
-                        type:'warning',
-                        duration:3*1000
-                    })
-                    return false;
-                }
-                self.exportDataList=await self.getExportData();
-                CsvExportor.downloadCsv(
-                this.exportDataList, { header: this.exportDataHeader}, 
-                this.fileName);
-                this.dialogFormVisible=false;
             },
             getExportFileName(){
                 let self=this;
@@ -799,7 +759,7 @@
 <style lang="scss" scoped>
 @import '../../assets/css/textstyle.css';
 @import '../../assets/css/importfile.css'; 
-$red:#FB4C5D;
+$red:#f31d65;
 @function rem($val){
     @return $val/16+rem;
 }
@@ -815,11 +775,6 @@ $red:#FB4C5D;
     width: 100%;
     position: relative;
     overflow: hidden;
-    .tabName-input-content{
-        background: #fff;
-        @include point(height,73);
-        width: 100%;
-    }
     .icon-span{
         display:inline-block;
         width:60px;
@@ -893,8 +848,8 @@ $red:#FB4C5D;
     }
     .page-login-toolTipClass.el-tooltip__popper.is-light{
         background: #FEE4E7 !important;
-        color: #FB4C5D !important;
-        border: 1px solid #FB4C5D !important;
+        color: #f31d65 !important;
+        border: 1px solid #f31d65 !important;
     }
     #tabs-content .el-tabs__nav-scroll{
         margin-left:40px;
@@ -904,25 +859,14 @@ $red:#FB4C5D;
     }
     .el-tabs__active-bar{
         height: 4px !important;
-        background-color: #FB4C5D !important;
+        background-color: #f31d65 !important;
     }
     .el-tabs__item.is-active{
         font-weight: bold !important;
-        color: #FB4C5D !important;
+        color: #f31d65 !important;
     }
     .el-tabs__item:hover{
-        color: #FB4C5D !important;
-    }
-    .el-dialog__body{
-        padding: 0px;
-    }
-    .tabName-input .el-input__inner{
-        border-radius: 0px !important;
-        border-left: 0px;
-        border-top: 0px;
-        border-right: 0px;
-        border-bottom: 1px  solid #FB4C5D;
-        font-size: 14px;
+        color: #f31d65 !important;
     }
     .date-picker-poper .el-button--text{
         visibility: hidden !important;

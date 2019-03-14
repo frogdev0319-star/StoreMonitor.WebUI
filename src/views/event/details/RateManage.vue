@@ -5,16 +5,18 @@
             <span class="event-score">得分：{{event.score==null?'---':event.score}}分</span>
             <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
         </el-col>
-        <el-dialog :visible.sync="dialogFormVisible" :close-on-click-modal="false" v-if="dialogFormVisible" width=550px height=380px top=15%>
+        <el-dialog  title='播放' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
+        v-if="dialogFormVisible" width=550px height=380px top=15% @close='stopRealTime' class='rate-video-dialog'>
+            <!-- <hr style="border: 0.5px solid #FFC1C8;margin-top: 0;"/> -->
             <div class="video-dialog-content" style="overflow:hidden;">
                 <video  height=83% width=90% id="previewVideo" prload controls
                     class="video-js vjs-fill" style="postion:absoulte;top:10px;">
                 </video>
             </div>
-            <div slot="footer" class="dialog-footer">
+            <!-- <div slot="footer" class="dialog-footer">
                 <el-button class="file-cancel-btn" @click="stopRealTime" size="mini" style="">暂 停</el-button>
                 <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
-            </div>
+            </div> -->
         </el-dialog>
         <el-dialog title='结案'
         :visible.sync="showWindContent" v-if="showWindContent"
@@ -24,8 +26,7 @@
         top="35vh"
         left="40vh">
             <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FFC1C8;"/>
-                
+                <hr style="border: 0.5px solid #FFC1C8;margin-top: 0;"/>
                <div class="tabName-input-content">
                     <el-input type="text" size="small" v-model="winpDes" class="tabName-input" style=""  maxlength='50'
                     placeholder="请输入结案评论"></el-input>
@@ -89,7 +90,7 @@
                 <span>{{event.createDate}}</span>
                 <div v-if="showCheckVideo">
                     <i class="iconfont icon-bofang icon-video"></i>
-                    <span class="ahref" @click="checkVideo">{{curChannel}}</span>
+                    <span class="ahref" @click="checkVideo">{{curChannel.name+'区域'}}</span>
                 </div>
             </div>
             <span class="sub-time"></span> 
@@ -108,7 +109,7 @@
             </div>
             <el-col :span="24" class="deal-content">
                 <span class="group-title">问题处理</span>
-                <div class="deal-info">
+                <div class="deal-info" :style="{'min-height':windowHeight-658+'px'}">
                     <div v-for="(item,index) in commentList" :key="index" class="deal-detal-content">
                         <div class="circle-content" :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}">
                             <div class="circle"></div>
@@ -147,10 +148,6 @@
                             </div>
                             <div class="viedo-info">
                                 <span>{{item.createDate}}</span>
-                                <div v-if="showCheckVideo">
-                                    <i class="iconfont icon-bofang icon-video"></i>
-                                    <span class="ahref" @click="checkVideo">{{curChannel}}</span>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,7 +188,7 @@ export default {
             audioSrc:'',
             showAudio:false,
             videoSrc:"",
-            curChannel:"",
+            curChannel:null,
             sourceList:[],
             commentList:[],
             protocal:'DASH',
@@ -208,7 +205,8 @@ export default {
             imgTitle:'',
             showCheckVideo:false,
             showPhotoContent:false,
-            deafultImg:'this.src="' + require('../../../../static/img/pic2.png') + '"'
+            deafultImg:'this.src="' + require('../../../../static/img/pic2.png') + '"',
+            sessionId:''
         }
     },
     computed: {
@@ -280,26 +278,42 @@ export default {
             console.log('实时播放');
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
-            let result=await dashAPI.Enum(sessionId);
-            let ivsID=result.IVSPlatform[0].ID;
+            self.sessionId=sessionId;
             const data = {
                 request: { 
                   method: 'connection',
                   sessionID: sessionId,
                   streamingProtocol:this.protocal,
-                  IVSID:ivsID,
-                  channel:JSON.stringify(this.selGID+1)
+                  IVSID:self.curChannel.ivsId,
+                  channel:JSON.stringify(self.curChannel.channelId)
                 }
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
             console.log(self.mpdurl);
-            if (self.mpdurl != "" ) {
+            if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
             }
         },
-        stopRealTime(){
-
+        stopVideo(){
+            let self=this;
+            //var video = document.getElementById("previewVideo");
+            //self.previewplayer = videojs(video);
+            self.previewplayer.pause();
+        },
+        async stopRealTime(){
+            let self=this;
+            self.stopVideo();
+            const data = {
+                request: { 
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.curChannel.ivsId,
+                  channel:JSON.stringify(self.curChannel.channelId)
+                }
+            };
+            let ret=await dashAPI.RealTime(0,data);
+            await dashAPI.Offline(self.sessionId);
         },
         myfun(){  
             var div1=document.getElementsByClassName("lside");  
@@ -348,7 +362,7 @@ export default {
                 deviceList.forEach(item=>{
                     if(item.id==deviceId){
                         flag=true;
-                        self.curChannel=item.name+'区域';
+                        self.curChannel=item;
                     }
                 })
             }
@@ -399,11 +413,15 @@ export default {
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
                 self.speech=true;
+                self.timeid=setInterval(()=>{
+                    self.getProcess();
+                },1000);
             }
             else{
                 self.$refs.audioRef.pause();
                 self.isPlaying=false;
                 self.speech=false;
+                clearInterval(self.timeid);
             }
         },
         startSpeechItem(item,index){
@@ -425,7 +443,9 @@ export default {
             })
         },
         checkVideo(){
-            this.dialogFormVisible=true;
+            let self=this;
+            self.dialogFormVisible=true;
+            self.realTime();
         },
         getCommentList(){
             let self=this;
@@ -583,12 +603,12 @@ export default {
         self.getSessionData();  //获取session中存储的event信息
         self.getCommentList();  //获取comment信息
         self.myfun();
-        
-        self.$nextTick(function(){
-            self.timeid=setInterval(()=>{
-                self.getProcess();
-            },1000);
-        })
+        self.getProcess();
+        // self.$nextTick(function(){
+        //     self.timeid=setInterval(()=>{
+        //         self.getProcess();
+        //     },1000);
+        // })
     },
     created(){
         let self=this;
@@ -680,8 +700,8 @@ export default {
         }
     }
     .video-dialog-content{
-        width:98%;
-        height:98%;
+        width:100%;
+        height:100%;
         margin: auto;
     }
     #previewVideo{
@@ -748,7 +768,7 @@ export default {
         }
         .viedo-info{
             span{
-                font-size: 14px;
+                font-size: 12px;
                 color: #94a4b4;
             }
             div{
@@ -785,7 +805,7 @@ export default {
             @include point(margin-top,20);
             width: 100%;
             height: auto;
-            min-height: 100px;
+            //min-height: 100px;
             background-color: #FAFAFA;
             border: 1px solid #ddd;
             .deal-detal-content{
@@ -879,6 +899,7 @@ export default {
                 }
                 .viedo-info{
                     @include point(margin-left,70);
+                    @include point(margin-bottom,15);
                     color: #FB4C5D;
                     font-size: 20px;
                     float: left;
@@ -901,14 +922,13 @@ export default {
 </style>
 
 <style>
-.el-dialog__body{
-    padding: 0px;
+@import '../../../assets/css/importfile.css'; 
+.rate-video-dialog .el-dialog__header{ 
+    padding-bottom: 0 !important;
+    padding-top: 10px !important;
+    padding-left: 15px !important; 
 }
-.el-dialog__title{
-    font-size: 16px !important;
-    font-size: 16px !important;
-    float: left;
-    margin-bottom: 15px;
-    margin-left: 15px;
+.rate-video-dialog .el-dialog__body{ 
+    padding-bottom: 5px !important; 
 }
 </style>

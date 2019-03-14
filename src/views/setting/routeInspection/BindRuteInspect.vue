@@ -20,10 +20,10 @@
                  :readonly=true></el-input>
                  <i :class="showDrap?'el-icon-arrow-down':'el-icon-arrow-up'" class='icon-input'></i>
                 </div>
-                <el-button size="mini" class="el-search-btn" @click="searchStore">搜索</el-button>
+                <el-button size="mini" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
                 <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false">
                     
-                    <p :style="isChecked?{}:{'color':'#FB4C5D'}">
+                    <p :style="isChecked?{}:{'color':'#f31d65'}">
                         <el-checkbox v-model="allCityChecked" @change="choiceAllCity"
                         class="elcheckBox"></el-checkbox>全部</p>
                     <div class="city-details" v-for="(item,index) in cityList" :key="index">
@@ -646,7 +646,6 @@ export default {
             @include point(width,90);
             text-align: center;
             @include point(margin-left,15);
-            background-color: #FB4C5D;
             color: #fff;
         }
         .icon-input{
@@ -760,7 +759,7 @@ export default {
             @include point(margin-bottom,15);
             .btn{
                 @include point(width,120);
-                background-color: #FB4C5D; 
+                background-color: #f31d65; 
                 color: #fff;
             }
         }
@@ -770,14 +769,6 @@ export default {
 <style>
 .el-button--mini, .el-button--mini.is-round{
     padding:7px 15px !important;
-}
-.el-checkbox__inner:hover{
-    border-color: #FB4C5D !important;
-}
-.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
-.el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB4C5D !important;
-    border-color:#FB4C5D !important;
 }
 .el-province .el-input__inner{
     border-radius: 0px !important;
@@ -798,7 +789,7 @@ export default {
     border-color: #FEE4E7 !important;
 }
 .el-select-dropdown__item.selected{
-    color:#FB4C5D !important;
+    color:#f31d65 !important;
 }
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;

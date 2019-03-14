@@ -6,10 +6,10 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-//let base='http://'+window.location.host;
+let base='http://'+window.location.host;
 //let base ="http://172.21.84.62:8085";
 //let base="http://172.21.81.160:8085";
-let base ='http://222.91.163.149:18081'
+//let base ='http://222.91.163.149:18081'
 let itempath='/storemonitor/api/v1.0'
 
 //配置
@@ -156,7 +156,7 @@ service.interceptors.response.use(
                 router.push('/login');
             }
             else if(errCode===500&&errMsg=='No authority'){
-                router.push('/');
+                router.push('/home');
                 Message({
                     message:'无操作权限!',
                     type:'error',

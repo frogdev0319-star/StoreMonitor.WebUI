@@ -3,7 +3,7 @@
         <el-row class="container">
             <el-col class="header">
                 <el-col :span="10" class="logo-content" :class="collapsed?'logo-collapse-width':'logo-width'">
-                    <!-- <img :src="imgSrc" alt="logo"> -->
+                    <img :src="imgSrc" alt="logo" id="imgLogo">
                     <span class="sys-name" v-if="!collapsed">{{appName}}</span>
                 </el-col>
                 <el-col :span="1" class="el-traggle-content">
@@ -15,8 +15,8 @@
                         <el-breadcrumb-item 
                         v-for="(item,index) in breadList" 
                         :key="item.path" class="breadcrumb-item" :to="{ path:item.path}"
-                        v-if="index!=0">
-                            <span style="color:#4b5262;" >{{ item.name }}</span>
+                        v-if="index!=0" >
+                            <span :style="breadList.length>2&&index==1?{'color':'#D3D3D3'}:{}">{{ item.name }}</span>
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
@@ -37,14 +37,14 @@
                 </el-col>
             </el-col>
             <el-col class="main" :span="24" 
-            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection')?
+            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <el-menu :default-active="$route.path"
                         class="el-menu-vertical-demo" 
                         text-color="#eee"
-                        background-color="#232730"
+                        background-color="#222538"
                         @open="handleopen" @close="handleclose" @select="handleselect" 
                         router :collapse="collapsed"
                     id="nav-menu"
@@ -56,25 +56,24 @@
                                 :key="index"  :index="item.children[0].path" 
                                 :disabled="item.isReadOnly"
                                 style="text-align:left;">
-                                <i :class="item.iconCls" :style="item.styles" class="navIcon"></i>
-                                <span>{{collapsed?'':item.children[0].name}}</span>
+                                <i :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                                <span style="font-size: 16px;">{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点 :disabled="item.name=='巡店管理'"-->
                         <el-submenu class="el-submenu" :key="index" :index="index+''"
                         v-if="!item.leaf" style="text-align:left;">
                             <template slot="title">
-                            <i :class="item.iconCls" :style="item.styles" class="navIcon">
-                            </i>{{item.name}}
+                            <i :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}">
+                            </i><span class="el-submenu-group">{{item.name}}</span>
                             </template>
                             <el-menu-item id="childSubItem" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                              v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                            :key="child.path" v-if="!child.hidden" style="padding-left: 30px;color:#a0a4ad;">
+                            :key="child.path" v-if="!child.hidden" style="padding-left: 26px;color:#a0a4ad;">
                                 <template>
                                     <div class="tag-icon"></div>
                                     <span >{{child.name}}</span>
                                     <div v-if="child.name=='门店管理'&&showTag" 
-                                    style="display:inline-block; width:8px;height:8px;background-color:#FB4C5D;border-radius:50%;margin-left:10px;"></div>
-                                    <!--collapsed?'':-->
+                                    style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
                                 </template>
                             </el-menu-item>
                         </el-submenu>
@@ -86,10 +85,8 @@
                 </aside>
             
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
-                    <el-col :class="($route.path!='/routeinspection'
-                    &&$route.path!='/storedetail'&&$route.path!='/rate'&&$route.path!='/storemonitor'&&
-                    $route.path!='/schedule'&&$route.path!='/reinspection'&&$route.path!='/bindroute')
-                    ?'content-wrapper-all':'content-wrapper'">
+                    <el-col :class="wrapperAll
+                    ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}">
                     <keep-alive>
                         <router-view v-if="$route.meta.keepAlive"></router-view>
                     </keep-alive>
@@ -124,7 +121,46 @@ export default {
             collapsed:false,
             varyWindowWidth:window.innerWidth,
             varyWindowHeight:window.innerHeight,
-            routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length)
+            routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length),
+            //wrapperAll:true,
+            route:this.$route,
+            path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute',],
+            wapper:false,
+        }
+    },
+    computed:{
+        wrapperAll(){
+            let flag;
+            this.path.forEach(item=>{
+                flag=flag&&(this.$route.path!=item);
+            })
+            if((this.$route.path=='/storemonitor/submit'||this.$route.path=='/reinspect/submit')&&this.wapper==true){
+                flag=true;
+            }
+            return flag;
+        },
+        showBorder(){
+            if((this.$route.path!='/reinspection'&&this.$route.path!='/storemonitor')){
+                return true;
+            }
+        },
+        curPath(){
+            return this.route.path
+        },
+        ...mapGetters([
+            'token',
+            'name'
+        ])
+    },
+    watch:{
+        curPath(val){
+            console.log(val);
+            if(this.path.indexOf(val)){
+                this.wrapperAll=false;
+            }
+        },
+        $route(){
+            this.getBread();
         }
     },
     methods:{
@@ -135,10 +171,10 @@ export default {
           console.log('handleopen');
           switch(Number(index)){
                case 1: 
-               document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#FB4C5D';
+               document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#f31d65';
                document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#232730';break;
                case 5:
-               document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#FB4C5D';
+               document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#f31d65';
                document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#232730';break;
                default: console.log('this is not a group');break;
           }
@@ -211,30 +247,26 @@ export default {
         }
 
     },
-    computed:{
-        ...mapGetters([
-            'token',
-            'name'
-        ])
-    },
     created(){
         let self=this;
         this.headUrl='./static/img/admin.png';
         console.log(this.$route.matched);
         this.getBread();
+        console.log(this.$route.query);
+        //self.$router.push('/');
+        let params=self.$route.query;
         PubSub.subscribe('change-color',(event,data)=>{
             self.showTag=data.showTag;
+        })
+        PubSub.subscribe('success-page',(event,data)=>{
+            if(data.changeStyle){ //当前为提交失败页面
+                self.wapper=true;
+            }
         })
     },
     mounted(){
         this.getUserName();
     },
-    
-    watch:{
-        $route(){
-            this.getBread();
-        }
-    }
 }
 </script>
 <style lang="scss" scoped>
@@ -275,8 +307,9 @@ export default {
     .navIcon{
         display:inline-block;
         @include point(width,60);
-        @include point(font-size,25);
+        font-size: 25px;
         color:#fff;
+        @include point(margin-left,25);
     }
     .container{
         position: absolute;
@@ -287,7 +320,7 @@ export default {
         padding:0;
         .header{
             width: 100%;
-            @include point(height,60);
+            height: 60px;
             z-index:999;
             position:fixed;
             background-color:#fff;
@@ -298,19 +331,17 @@ export default {
             }
             .logo-collapse-width{
                 width:$collapseWidth;
-                width: 4.5%;
                 @include point(max-width,65);
             }
             .logo-content{
                 height: 100%;
-                @include point(font-size,20);
                 background-color:#232730;
                 @include point(padding-top,10);
                 position: relative;
                 @include borderColor;
-                .img-logo{
-                    display:inline-block;
-                   @include point(margin-top,8);
+                #imgLogo{
+                    height: 32px;
+                    margin-right: 10px;
                 }
                 .sys-name{
                     position: relative;
@@ -318,6 +349,7 @@ export default {
                     @include point(margin-left,10);
                     font-weight: bold;
                     color: #f6f9fe;
+                    font-size: 18px;
                 }
             }
             .el-traggle-content{
@@ -337,10 +369,6 @@ export default {
                     padding:20px 0px 20px 10px;
                     font-size: 16px;
                     @include point(line-height,20);
-                    color:#4b5262 !important;
-                    span{
-                        color:#4b5262 !important;
-                    }
                 }
             }
             .headUrl-content{
@@ -356,6 +384,10 @@ export default {
                     border-right:1px solid rgba(255,255,255,0.2);
                     position: relative;
                     float: left;
+                    cursor: pointer;
+                    &:hover{
+                        background-color: #F3F3F3;
+                    }
                     .el-icon-bell{
                         font-size: 25px;
                         vertical-align:middle;
@@ -378,7 +410,7 @@ export default {
                         text-overflow:ellipsis;
                         white-space: nowrap;
                         i{
-                            color:#FB4C5D;
+                            color:#f31d65;
                             font-weight: bold;
                         }
                     }
@@ -394,19 +426,20 @@ export default {
         .main{
             display: flex;
             position: absolute;
-            @include point(top,60);
+            top: 60px;
             bottom:0px;
             background-color: #f6f9fe;
             .tag-icon{
-                width: 10px;
-                height: 10px;
+                @include point(width,10);
+                @include point(height,10);
                 background-color:white;
                 border-radius: 50%;
                 -moz-border-radius: 50%;
                 -webkit-border-radius: 50%;
                 float:left;
-                @include point(margin-right,40);
-                @include point(margin-top,18);
+                @include point(margin-right,48);
+                @include point(margin-left,25);
+                margin-top: 18px;
             }
             aside{
                 height:100%;
@@ -415,26 +448,31 @@ export default {
                 .el-submenu{
                     position: relative;
                     &:hover{
-                        background-color:#FB4C5D !important;
+                        background-color:#f31d65 !important;
                     }
+                }
+                .el-submenu-group{
+                    @include point(margin-left,4);
+                    font-size: 16px;
                 }
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
-                    
                 }
             }
             .content-wrapper-all{
                 height: 93%;
                 @include point(margin,15);
-                border:0.5px solid #e3e9f4;
+                border: solid #e3e9f4;
+                border-width: 0;
                 width: 97.5%;
                 background: #fff;
             }
             .content-wrapper{
                 height: auto;
                 @include point(margin,15);
-                border:0.5px solid #e3e9f4;
+                border: solid #e3e9f4;
+                border-width: 0;
                 width: 97.5%;
                 background: #fff;
             }
@@ -445,21 +483,21 @@ export default {
             }
         }
         .el-submenu:hover{
-            background-color:#FB4C5D !important;
+            background-color:#f31d65 !important;
         }
         .el-menu-item:hover{
-            background-color:#FB4C5D !important;
+            background-color:#f31d65 !important;
             color: #eee !important;
         }
         .el-menu-item.is-active{
             background-color:#2F2933 !important;
-            color:#FB4C5D !important;
+            color:#f31d65 !important;
             div{
-                background-color: #FB4C5D !important;
+                background-color: #f31d65 !important;
             }
         }
         .el-submenu.is-active .el-submenu__title{
-            background-color:#FB4C5D !important;
+            background-color:#f31d65 !important;
         }
         .aside-width{
             width: 16.9%;
@@ -467,8 +505,7 @@ export default {
         }
         .aside-collapse-width{
             width:$collapseWidth;
-           @include point(max-width,65);
-            width: 4.5%;
+            @include point(max-width,65);
             overflow: hidden !important;
             background-color: #232730;
         }
@@ -492,3 +529,8 @@ export default {
 }
 
 </style>
+<style scoped>
+.el-bread-one{
+    font-size: 15px;
+    color: 	#D3D3D3;
+}

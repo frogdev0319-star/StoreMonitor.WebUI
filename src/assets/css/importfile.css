@@ -15,13 +15,11 @@
     width: 76px !important;
     background-color: #EAEDF2 !important;
     color: 	#708090 !important;
-    font-size:0.75rem;
+    font-size:12px;
 }
 .file-confirm-btn{
     width: 76px;
-    background-color: #FB4C5D !important;
-    border-color: #FB4C5D !important;
-    font-size:0.75rem;
+    font-size:12px;
 }
 input:disabled{
     background-color: 	#F5F5F5 !important;
@@ -60,13 +58,17 @@ input:disabled{
     background-color: #e3e9f4 !important;
 }
 .el-dialog__header{
-    overflow: hidden;
+    overflow: hidden !important;
+    /* padding-bottom: 0 !important;
+    padding-top: 10px !important;
+    padding-left: 15px !important; */
 }
 .el-dialog__body{
-    padding: 0px;
+    padding: 0px !important;
+    /* padding-bottom: 5px !important; */
 }
 .el-dialog__title{
-    font-size: 14px;
-    color: #303133;
-    float:left;
+    font-size: 14px !important;
+    color: #303133 !important;
+    float:left !important;
 }

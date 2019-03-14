@@ -7,7 +7,7 @@
                 <p class="sucret-info" v-if="isSuccess">{{curSecond}}秒自动返回门店监控页面！</p>
             </div>
         </div>
-        <div class="page-content" v-if="isSuccess">
+        <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
             <div class="details">
                 <span class="event-label">门店名称：</span>
                 <span>{{storeName}}</span>
@@ -54,6 +54,7 @@
 </template>
 <script>
 import {addEvent,addComment} from '@/api/event'
+import PubSub from 'pubsub-js';
 export default {
     name:'StoreSuccessPage',
     data(){
@@ -72,6 +73,7 @@ export default {
             sourceList:[],
             routeData:null,
             timeid:0,
+            varyWindowHeight:window.innerHeight,
         }
     },
     computed:{
@@ -94,13 +96,16 @@ export default {
             }
             self.routeData=routeData;
             self.isSuccess=routeData.flag.isSuccess;
-           // self.isSuccess=false;
+            //self.isSuccess=false;
+            if(self.isSuccess==false){
+                PubSub.publish('success-page',{changeStyle:true});
+            }
             self.storeName=routeData.store.storeName;
             self.eventName=routeData.event.eventName;
             self.sourceList=routeData.event.fileList;
             if(routeData.flag.addEventType=='add'){
                 self.showLeader=true;
-                self.leader=routeData.user[0].userName;
+                self.leader=routeData.user.length!=0?routeData.user[0].userName:'';
             }
             else{
                 self.showLeader=false;
@@ -117,7 +122,7 @@ export default {
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                self.$router.push({name:'门店监控'});
+                self.$router.push({name:'门店监控',params:{flag:self.isSuccess}});
             }
         },
         getCommentList(){
@@ -134,48 +139,7 @@ export default {
         },
         reTry(){
             let self=this;
-            console.log(self.routeData);
-            if(self.routeData.flag.addEventType=='add'){    //新增事件
-                let commentobj={
-                    ts:new Date().getTime(),
-                    description:self.routeData.event.description,
-                    attachment:self.routeData.event.fileList,
-                    status:0
-                };
-                let obj={};
-                obj.ts=new Date().getTime();
-                obj.subject=self.eventName.trim();
-                obj.storeId=self.routeData.store.storeId;
-                obj.deviceId=self.routeData.channel.deviceId;
-                obj.comment=commentobj;
-                let params=obj;
-                addEvent(params).then(res=>{
-                    console.log(res);
-                    if(res.errCode==0){
-                        self.notify('提交成功！','success',3000);
-                        self.isSuccess=true;
-                    }
-                });
-            }   
-            else{             //新增comment
-                let obj={
-                    eventIds:self.routeData.event.eventIds,
-                    comment:{
-                        ts:new Date().getTime(),
-                        description:self.routeData.event.description,
-                        attachment:self.routeData.event.fileList,
-                        status:1
-                    }
-                };
-                let params=obj;
-                addComment(params).then(res=>{
-                    console.log(res);
-                    if(res.errCode==0){
-                        self.notify('提交成功！','success',3000);
-                        self.isSuccess=true;
-                    }
-                });
-            }
+            self.$router.push({name:"门店监控",params:{flag:self.isSuccess}});
         },
         notify(msg,type,time) {
             this.$message({
@@ -187,7 +151,6 @@ export default {
     },
     created(){
         let self=this;
-        
     },
     mounted(){
         let self=this;
@@ -199,6 +162,17 @@ export default {
                 self.getBackSecond();
             },1000)
         }
+    },
+    beforeRouteLeave(to, from, next) {
+        if(to.name=='门店监控'){
+            if(this.isSuccess==true){
+                to.meta.keepAlive = true;
+            }
+            else{
+                to.meta.keepAlive=true;
+            }
+        }
+        next();
     }
 }
 </script>
@@ -233,8 +207,11 @@ export default {
             margin: 20px;
             background-color: #fafafb;
             width: auto;
-            min-height: 300px;
-            padding: 20px;
+            //min-height: 300px;
+            height: auto;
+            padding-left: 20px;
+            padding-top: 20px;
+            padding-bottom: 20px;
             border: 0.5px solid #e3e9f4;
             .details{
                 text-align: left;
@@ -261,6 +238,7 @@ export default {
                     width: 100%;
                     min-height: 150px;
                     position: relative;
+                    overflow: hidden;
                     .circle-content{
                         background-color: #FBC7CC;
                         border-radius: 50%;
@@ -300,7 +278,7 @@ export default {
                         }
                         .source-content{
                             min-height: 150px;
-                            width: 90%;
+                            width: auto;
                             margin: auto 20px;
                             .source-details{
                                 display: inline-block;

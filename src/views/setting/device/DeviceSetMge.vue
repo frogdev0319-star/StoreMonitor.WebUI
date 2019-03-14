@@ -1,5 +1,5 @@
 <template>
-    <el-row class="el-device">
+    <el-row class="el-device" :style="{'min-height':varyWindowHeight-120+'px'}">
         <el-col :span="24" class="el-btns">
             <div style="display:inline-block;" v-if="activeName=='dash'">
                 <el-button @click="connectServer"  size="mini" class="btns">
@@ -120,6 +120,7 @@
                         
                         <div class="toolbar pagination" style="width:100%; margin-top:10px;">
                             <el-pagination
+                                style="text-align:right;margin-right:15px;"
                                 @size-change="sizeChange"
                                 @current-change="currentChange"
                                 :pager-count="paperCount"
@@ -924,6 +925,7 @@ $mainColor:#FB4C5D;
         height: auto;
         position: relative;
         @include point(bottom,25);
+        @include point(padding-bottom,0);
         .dialog-content{
             width: 100%;
         }

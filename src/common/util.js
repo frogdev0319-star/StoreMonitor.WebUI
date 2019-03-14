@@ -168,6 +168,24 @@ export default {
         }
         return pwd;
     },
+    getYearStr(ts){
+        let dateStr='';
+        let t=new Date(ts);
+        let years=t.getFullYear();
+        let month=t.getMonth()+1;
+        let day=t.getDate();
+        dateStr=years+'-'+month+'-'+day;
+        return dateStr;
+    },
+    getDayStr(ts){
+        let dateStr='';
+        let t=new Date(ts);
+        let hour=t.getHours()<10?'0'+t.getHours():t.getHours();
+        let min=t.getMinutes()<10?'0'+t.getMinutes():t.getMinutes();
+        let second=t.getSeconds()<10?'0'+t.getSeconds():t.getSeconds();
+        dateStr=hour+':'+min+':'+second;
+        return dateStr;
+    },
     getDateStr(ts){
         let dateStr='';
         let t=new Date(ts);
@@ -263,5 +281,61 @@ export default {
         return new Blob([ab], {
             type: mime
         });
+    },
+}
+class indexedDB{
+    static request=window.indexedDB.open('dataBase');
+
+    static addTable(tableObj) {
+        this.request.onupgradeneeded=function(event){
+            db=event.target.result;
+            var objectStore;
+            if (!db.objectStoreNames.contains(tableObj.tabName)) {
+                objectStore = db.createObjectStore(tableObj.tabName, { keyPath: 'id' });
+                tableObj.colList.forEach(item=>{
+                    objectStore.createIndex(item.colName,item.colOp,{unique:false});
+                })
+            }
+        }
+    }
+    static addData(tabName,data){
+        this.request.onupgradeneeded=function(event){
+            db=event.target.result;
+            let temp=[];
+            temp.push(tabName);
+            var request=db.transaction(temp,'readwrite').objectStore(tabName);
+            request.add(data);
+            request.onsuccess=function(event){
+                console.log('数据库写入成功!');
+            }
+            request.onerror=function(event){
+                console.log('数据库写入失败!');
+            }
+        }
+    }
+    
+    static readData(id,tabName){
+        let obj=null;
+        this.request.onupgradeneeded=function(event){
+            db=event.target.result;
+            let temp=[];
+            temp.push(tabName);
+            var transaction=db.transaction(temp);
+            var objectStore=transaction.objectStore(tabName);
+            var request=objectStore.get(id);
+            request.onerror = function(event) {
+                console.log('事务失败');
+            };
+            
+            request.onsuccess = function( event) {
+                if (request.result) {
+                    obj=request.request;
+                } 
+                else {
+                    console.log('未获得数据记录');
+                }
+            };
+        }
+        return obj;
     }
 }

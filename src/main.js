@@ -6,7 +6,9 @@ import './assets/font/iconfont.css'
 
 import ElementUI from 'element-ui';
 //import 'element-ui/lib/theme-chalk/index.css';
-import 'element-ui/lib/lib/index.css';
+//import './element-variables.scss'
+//import 'element-ui/lib/lib/index.css';
+import '../theme/index.css'
 import Cookies from 'js-cookie'
 import 'video.js/dist/video-js.css'
 import 'vue-video-player/src/custom-theme.css'
