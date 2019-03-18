@@ -6,17 +6,12 @@
             <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
         </el-col>
         <el-dialog  title='播放' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
-        v-if="dialogFormVisible" width=550px height=380px top=15% @close='stopRealTime' class='rate-video-dialog'>
-            <!-- <hr style="border: 0.5px solid #FFC1C8;margin-top: 0;"/> -->
+        v-if="dialogFormVisible" :width="550*percentHeight+'px'" height=380px top=15% @close='stopRealTime' class='rate-video-dialog'>
             <div class="video-dialog-content" style="overflow:hidden;">
                 <video  height=83% width=90% id="previewVideo" prload controls
                     class="video-js vjs-fill" style="postion:absoulte;top:10px;">
                 </video>
             </div>
-            <!-- <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" @click="stopRealTime" size="mini" style="">暂 停</el-button>
-                <el-button class="file-confirm-btn" type="primary" @click="realTime" size="mini">播 放</el-button>
-            </div> -->
         </el-dialog>
         <el-dialog title='结案'
         :visible.sync="showWindContent" v-if="showWindContent"
@@ -216,9 +211,9 @@ export default {
         currentStream() {
             return this.currentTech === 'Flash' ? 'RTMP' : 'HLS'
         },
-        // audioOftenText(){
-        //     return this.audioOften+'"';
-        // },
+         percentHeight:function(){
+            return this.varyWindowHeight/758;
+        },
         divHeight(){
             if(this.windowHeight>800){
                 return this.windowHeight*0.749;
@@ -705,6 +700,7 @@ export default {
         margin: auto;
     }
     #previewVideo{
+        margin: 10px;
         @include point(min-width,500);
         @include point(min-height,320);
     }

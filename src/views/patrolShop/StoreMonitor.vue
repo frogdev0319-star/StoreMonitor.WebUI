@@ -9,9 +9,11 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
+                <el-button size="mini" class="el-submit" v-loading.fullscreen.lock="fullscreenLoading"
+                            @click="submit" type="primary">提交</el-button>
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="550*percentHeight+'px'" height=300px top=15%>
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="650*percentHeight+'px'" height=300px top=8%>
                 <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
                     <hr class="dialog-hr"/> 
                     <!-- <div class='model'> -->
@@ -29,11 +31,11 @@
                             </div>
                         </transition>
                     <!-- </div> -->
-                    <canvas id="icanvas"  :width="480*percentHeight" :height="270*percentHeight" @mousedown="mouseDownAction($event)" 
+                    <canvas id="icanvas"  :width="567*percentHeight" :height="319*percentHeight" @mousedown="mouseDownAction($event)" 
                     @mousemove="mouseMoveAction($event)"></canvas>
                                     <!-- @click="cancleEditCanvas" @click="confirmEditCanvas" -->
-                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':480*percentHeight+'px',
-                    'margin-left':35*percentHeight+'px'}">
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':567*percentHeight+'px',
+                    'margin-left':42*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas"> 
                             <span>取消编辑</span>
                         </div>
@@ -51,7 +53,7 @@
             </el-dialog>
             <div class="video-content" v-if="!showgongge" id="videoContent" >
                 <div class="video-model" v-if="showModelContent"  
-                @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel">
+                @mouseleave="hiddenModel" @mouseenter="showHiddenModel" @mousemove="showHiddenModel">
                     <span id="channelName" v-if="showControlInfo">{{channel.channelName}}</span>
                     <div class="icon-footer" v-if="showControlInfo">
                         <div class="iconlside" v-if="showStoreUp">
@@ -161,19 +163,12 @@
                             <el-input size="mini" class="des-input" type="textarea" v-if="showSearchInput"
                             maxlength="50" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
                             <div class="source-content">
-                                <div class="source-details" v-if="showEmptyImg">
-                                    <div>
-                                        <img :src="emptyImgSrc"/>
-                                        <span>*视频图片最多支持插入5个。</span>
-                                    </div>
-                                </div>
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
                                     <i class="iconfont icon-shanchu icondelete" @click="deleteImg(item,index)"></i>
                                     <img :src="item.src" :width="item.width" :height="item.height"/>
                                 </div>
+                                <span>*视频图片最多支持插入5个。</span>
                             </div>
-                            <el-button size="mini" class="submit-btn" v-loading.fullscreen.lock="fullscreenLoading"
-                            @click="submit" type="primary">提交</el-button>
                         </el-scrollbar>
                     </div>
                    
@@ -209,7 +204,16 @@
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
                             </span>
+                            <!-- <div v-for="(_item,_index) in item.storeList" :key="_index" class="store-name" 
+                            :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)" :style="!_item.hasInspect?{'background-color':'#f4f5f9'}:{}">
+                                <span v-if="_item.hasInspect">{{_item.name}}</span>
+                                <el-tooltip class="item" effect="dark" content="该门店暂未绑定巡检项" 
+                                placement="bottom" v-else>
+                                <span>{{_item.name}}</span>
+                                </el-tooltip>
+                            </div> -->
                         </div>
+                        
                         <div class="storeList-content" v-else>
                             <el-input
                                 size="small"
@@ -220,26 +224,41 @@
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
-                                <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name"
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9'}:{}"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
-                                    {{itemDs.name}}
-                                </span>
+                                    <span v-if="itemDs.hasInspect">{{itemDs.name}}</span>
+                                    <el-tooltip class="item" effect="dark" content="该门店暂未绑定巡检项" 
+                                    placement="bottom" v-else>
+                                    <span>{{itemDs.name}}</span>
+                                    </el-tooltip>
+                                </div>
                             </div>
                         </div>
                     </el-scrollbar>
                 </el-tab-pane>
             </el-tabs>
+            <hr class="rside-hr"/>
             <div class="channel-content">
-                    <span>区域列表</span>
-                    <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                        <div class="channels-srollbar">
-                            <div v-for="(item,index) in channelBtns" :key="index" class="btn-content">
-                                <channel-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
-                                class="channelBtn" @click.native="clickBtn(item,index)"></channel-btn>
-                            </div>
+                <span>区域列表</span>
+                
+                <div class="channels-srollbar">
+                    <div class="arrow-content">
+                        <i @click="lastBar" class="el-icon-arrow-left icon-arrow" v-if="hideLast"></i>
+                    </div>
+                    <div class="btn-content">
+                        <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
+                            <!-- <channel-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
+                            class="channelBtn" @click.native="clickBtn(item,index)"></channel-btn> -->
+                            <channel-icon-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
+                            class="channelBtn" @click.native="clickBtn(item,index)"></channel-icon-btn>
                         </div>
-                    </el-scrollbar>
+                    </div>
+                    <div class="arrow-content">
+                        <i @click="nextBar" class="el-icon-arrow-right icon-arrow" v-if="hideNext"></i>
+                    </div>
+                </div>
             </div>
+            <hr class="rside-hr" style="margin-top:0"/>
             <div class="time-content">
                 <span id="date-title">选择日期</span>
                 <div class="date-picker-content">
@@ -285,7 +304,7 @@
     </el-row>
 </template>
 <script>
-import ChannelBtn from '@/components/ChannelBtn.vue'
+import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
 import {addEvent,addComment,getStorageInfo,getEventList} from '@/api/event'
 import PubSub from 'pubsub-js'
@@ -297,12 +316,15 @@ import {validateInput} from '@/common/validate'
 export default {
     name:'StoreMoinitor',
     components:{
-        ChannelBtn
+        ChannelIconBtn
     },
     data(){
         return{
+            hideLast:false,
+            hideNext:false,
             fullscreenLoading:false,
             channelBtns:[],
+            showChannelBtns:[],
             store:{},
             showStoreUp:true,
             cityList:[],
@@ -434,7 +456,6 @@ export default {
             curEvent:'',
             eventName:'',
             eventDes:'',
-            showEmptyImg:true,
             emptyImgSrc:require('../../../static/img/pic.png'),
             sourceList:[],
             oss:null,
@@ -491,6 +512,7 @@ export default {
             curDayNum:0,
             percentage:0,
             accountId:'aaoompqqpjy4',
+            appliedInspectList:[]
         }
     },
     computed:{
@@ -529,8 +551,9 @@ export default {
         self.myDivHeight();
         self.getOssInfo();
         self.getUpLoadBucketInfo();
+        self.getInitStoreData();
         self.getFaStoreData();   //初始获取已关注门店的列表数据
-        self.getInitStoreData(); //初始获取全部门店的列表数据，并进行处理
+        //self.getData();
         self.getWeekDay();
         self.getRecentStoreList();
         window.onresize=function(){
@@ -635,6 +658,12 @@ export default {
                     obj.userId=item.userId;
                     obj.favorite=item.favorite==undefined?true:item.favorite;
                     obj.device=item.device;
+                    if(item.appliedInspect.length!=0&&item.appliedInspect.indexOf('远程巡检')!=-1){
+                        obj.hasInspect=true;
+                    }
+                    else{
+                        obj.hasInspect=false;
+                    }
                     temp.push(obj);
                 })
                 return temp;
@@ -644,7 +673,7 @@ export default {
                 case 0: data=await self.getFaStoreList(); 
                     console.log(data);
                     if(data.errCode==0){
-                        let storeData=data.data;
+                        let storeData=data.data.content;
                         self.tabList[0].storeList=getStoreTemp(storeData);
                     }
                     break;
@@ -690,7 +719,34 @@ export default {
         /**
          * add favorite or delete favorite
          */
-        async getFaStoreData(){
+        async getData(){
+            let self=this;
+            let allDataRes=await self.getAllStoreList();
+            let faDataRes=await self.getFaStoreList();
+            let appliedInspectList=[];
+            if(allDataRes.errCode==0){
+                let allData=allDataRes.data.content;
+                self.getInitStoreData(allData);
+                allData.forEach((item,index)=>{
+                    if(item.appliedInspect.length!=0&&item.appliedInspect.indexOf('远程巡检')!=-1){
+                        appliedInspectList.push(item);
+                    }
+                })
+            }
+            if(faDataRes.errCode==0){
+                let faData=faDataRes.data;
+                faData.forEach((item,index)=>{
+                    if(appliedInspectList.map(x=>x.storeId).indexOf(item.storeId)!=-1){
+                        item.hasInspect=true;
+                    }
+                    else{
+                        item.hasInspect=false;
+                    }
+                })
+                self.getFaStoreData(faData);
+            }
+        },
+        async getFaStoreData(storeData){
             let self=this;
             let getStoreTemp=data=>{
                 let temp=[];
@@ -707,13 +763,14 @@ export default {
                     obj.userId=item.userId;
                     obj.favorite=item.favorite==undefined?true:item.favorite;
                     obj.device=item.device;
+                    obj.hasInspect=item.hasInspect;
                     temp.push(obj);
                 })
                 return temp;
             }
-            let data=await self.getFaStoreList();
-            if(data.errCode==0){
-                let storeData=data.data;
+            let res=await self.getFaStoreList();
+            if(res.errCode==0){
+                let storeData=res.data;
                 self.tabList[0].storeList=getStoreTemp(storeData);
                 if(storeData.length==0){
                     self.showStoreUp=false;
@@ -726,13 +783,12 @@ export default {
                 obj.storeUp=true;
                 obj.storeUpTitle='已关注';
                 self.store=obj;
-
                 self.recentStoreList.unshift(self.tabList[0].storeList[0]);
                 localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
                 self.getChannelByStore(self.tabList[0].storeList[0]);
             }
         },
-        async getInitStoreData(){
+        async getInitStoreData(storeData){
             let self=this;
             let getStore2Temp=data=>{
                 let cityList=[];
@@ -755,6 +811,12 @@ export default {
                             obj.city=data[j].city;
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
+                            if(data[j].appliedInspect.length!=0&&data[j].appliedInspect.indexOf('远程巡检')!=-1){
+                                obj.hasInspect=true;
+                            }
+                            else{
+                                obj.hasInspect=false;
+                            }
                             temp.push(obj);
                         }
                     }
@@ -764,11 +826,17 @@ export default {
                 }
                 return storeListTemp;
             }
-            let data=await self.getAllStoreList();
-             if(data.errCode==0){
-                let storeData=data.data.content;
+            let res=await self.getAllStoreList();
+            if(res.errCode==0){
+                let storeData=res.data.content;
                 self.tabList[2].storeList=getStore2Temp(storeData);
                 self.tempStoreList=getStore2Temp(storeData);
+                storeData.forEach((item,index)=>{
+                    if(item.appliedInspect.length!=0&&item.appliedInspect.indexOf('远程巡检')!=-1){
+                        self.appliedInspectList.push(item);
+                    }
+                })
+                
                 if(self.tempStoreList.length==0){
                     self.showSearchInput=false;
                 }
@@ -1085,9 +1153,6 @@ export default {
         deleteImg(item,index){
             let self=this;
             self.sourceList.splice(index,1);
-            if(self.sourceList.length==0){
-                self.showEmptyImg=true;
-            }
         },
         async submit(){
             let self=this;
@@ -1221,10 +1286,8 @@ export default {
         },
         hiddenModel(){
             let self=this;
-            self.showControlInfo=false;
-            self.showCutContent=false;
         },
-        showModel(){
+        showHiddenModel(){
             let self=this;
             if(self.playState){
                 self.showControlInfo=true;
@@ -1242,7 +1305,7 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                ctx.drawImage(self.videoEl,0,0,480*self.percentHeight,270*self.percentHeight);
+                ctx.drawImage(self.videoEl,0,0,567*self.percentHeight,319*self.percentHeight);
                 var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
                 let imgObj=new Image();
@@ -1313,8 +1376,8 @@ export default {
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
-            ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
+            ctx.clearRect(0,0,567*self.percentHeight,319*self.percentHeight);
+            ctx.drawImage(self.imageCanvas,0,0,567*self.percentHeight,319*self.percentHeight);
         },
         confirmEditCanvas(){
             let self=this;
@@ -1322,12 +1385,12 @@ export default {
             self.imageCanvasList.pop();
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
+            ctx.clearRect(0,0,567*self.percentHeight,319*self.percentHeight);
             if(self.imageCanvasList.length==0){
-                ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
+                ctx.drawImage(self.imageCanvas,0,0,567*self.percentHeight,319*self.percentHeight);
             }
             else{
-                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,480*self.percentHeight,270*self.percentHeight);
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,567*self.percentHeight,319*self.percentHeight);
             }
         },
         drawLine(x,y,x1,y1){
@@ -1348,7 +1411,6 @@ export default {
         },
         confirmEdit(){
             let self=this;
-            self.showEmptyImg=false;
             let img=new Image();
             let obj={};
             obj.mediaType=2;
@@ -1373,9 +1435,9 @@ export default {
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
             setTimeout(() => {
-                self.showControlInfo=false;
-                self.showCutContent=false;
-            }, 5000);
+                // self.showControlInfo=false;
+                // self.showCutContent=false;
+            }, 3000);
         },
         async realTime(...val){
             console.log(val);
@@ -1576,7 +1638,7 @@ export default {
         exitFullscreen() {
             var de = document;
             var ele = document.getElementById('videoContent');
-            ele.style.width = "100%";
+            ele.style.width = "auto";
             ele.style.height = "auto";
             if (de.exitFullscreen) {
                 de.exitFullscreen();
@@ -1741,6 +1803,8 @@ export default {
         getChannelByStore(storeItem){
             let self=this;
             let temp=[];
+            self.hideLast=false;
+            self.hideNext=false;
             //切换门店时暂停播放之前播放的视频，并自动播放当前门店下第一个通道的视频
             if(self.playState){
                 self.stopRealTime();
@@ -1767,8 +1831,23 @@ export default {
                 temp.push(obj);
             })
             self.channelBtns=temp;
+            self.getshowBtns(temp);
         },
-        
+        getshowBtns(list){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth); //当前容器最大可显示数量
+            if(count>=list.length){
+                self.showChannelBtns=list;
+            }
+            else{
+                self.showChannelBtns=list.slice(0,count);
+            }
+            if(count<self.channelBtns.length){
+                self.hideNext=true;
+            }
+        },
         async stopAndRealTime(){
             let self=this;
             self.stopVideo();
@@ -1857,7 +1936,7 @@ export default {
             else{
                 return false;
             }
-            self.channelBtns.forEach((_item,_index)=>{
+            self.showChannelBtns.forEach((_item,_index)=>{
                 if(_index!=index){
                     _item.isClick=false;
                 }
@@ -1868,6 +1947,74 @@ export default {
             else{
                 self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
             }  
+        },
+        getIndexById(id){
+            let self=this;
+            let curIndex=0;
+            self.channelBtns.forEach((item,index)=>{
+                if(item.id==id){
+                    curIndex=index;
+                }
+            })
+            return curIndex;
+        },
+        lastBar(){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=self.channelBtns.length){
+                return false;
+            }
+            else{
+                console.log(self.showChannelBtns[0].id);
+                let index=self.getIndexById(self.showChannelBtns[0].id);
+                self.showChannelBtns.unshift(self.channelBtns[index-1]);
+                self.showChannelBtns.pop();
+                console.log(self.channel.id);
+                self.showChannelBtns.forEach((item,index)=>{
+                    if(item.id==self.channel.id){
+                        item.isClick=true;
+                    }
+                    else{
+                        item.isClick=false;
+                    }
+                })
+                if(self.showChannelBtns[0].id==self.channelBtns[0].id){
+                    self.hideLast=false;
+                }
+                if(self.showChannelBtns[count-1].id!=self.channelBtns[self.channelBtns.length-1].id){
+                    self.hideNext=true;
+                }
+            }
+        },
+        nextBar(){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=self.channelBtns.length){
+                return false;
+            }
+            else{
+                let index=self.getIndexById(self.showChannelBtns[count-1].id);
+                self.showChannelBtns.push(self.channelBtns[index+1]);
+                self.showChannelBtns.shift();
+                self.showChannelBtns.forEach((item,index)=>{
+                    if(item.id==self.channel.id){
+                        item.isClick=true;
+                    }
+                    else{
+                        item.isClick=false;
+                    }
+                })
+                if(self.showChannelBtns[0].id!=self.channelBtns[0].id){
+                    self.hideLast=true;
+                }
+                if(self.showChannelBtns[count-1].id==self.channelBtns[self.channelBtns.length-1].id){
+                    self.hideNext=false;
+                }
+            }
         },
         clickBtn(item,index){
             let self=this;
@@ -2008,7 +2155,7 @@ export default {
             }
         },
         checkFull(){
-            var isFull =  document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+            var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
             if(isFull === undefined)
             {
                 isFull = false;
@@ -2071,6 +2218,7 @@ export default {
         opacity: 0;
     }
     .el-container{
+        background-color: #f7f8fa;
         .spreadLsideClass{
             width: 98%;
         }
@@ -2097,15 +2245,14 @@ export default {
         }
         /*左侧视频区域css*/
         .lside{
-            padding:0px 0px 20px 0px;
-            margin-right: 20px;
+            @include point(margin-right,20);
             border: 1px solid $border;
             background-color: #fff;
             .el-header-title{
                 text-align: left;
                 position: relative;
-                height: 60px;
-                line-height: 60px;
+                @include point(height,60);
+                @include point(line-height,60);
                 border-bottom: 1px solid $border;
                 padding:0 20px;
                 .lside-title{
@@ -2150,19 +2297,32 @@ export default {
                         margin-left: 4px;
                     }
                 }
+                .el-submit{
+                    position: absolute;
+                    // right: 20px;
+                    @include point(right,20);
+                    width: 100px;
+                    height: 28px;
+                    font-size: 12px;
+                    line-height: 0;
+                    @include point(top,20);
+                    color: #fff;
+                    border-radius: 0;
+                }
             }
             /*截图区域css*/
             #cancelBtn{
-                width: 76px;
-                margin-right: 15px;
+                @include point(width,76);
+                @include point(margin-right,20);
                 background-color: #EAEDF2 !important;
                 color: #708090 !important;
                 font-size: 12px;
                 line-height: 12px;
             }
             #confirmBtn{
-                width: 76px;
-                margin-right: 15px;
+                @include point(width,76);
+                // margin-right: 15px;
+                @include point(margin-right,20);
                 font-size: 12px;
                 line-height: 12px;
             }
@@ -2251,7 +2411,7 @@ export default {
             .video-content{
                 height: auto;
                 position: relative;
-                margin: 20px;
+                @include point(margin,20);
                 margin-bottom: 0;
                 #previewVideo{
                     @include point(min-width,450);
@@ -2355,7 +2515,7 @@ export default {
                                 display: inline;
                                 margin-left: 30px;
                                 position: absolute;
-                                right: 0px;
+                                right: 20px;
                                 .iconscreen{
                                     font-size: 18px;
                                     position: relative;
@@ -2372,8 +2532,10 @@ export default {
                         height: 30%;
                         top: 30%;
                         .paizhao-content{
-                            
+                            cursor: pointer;
                             margin-top: 30px;
+                            width: 92px;
+                            text-align: center;
                             height: 30px;
                             border-radius: 4px;
                             padding: 0 6px;
@@ -2492,8 +2654,9 @@ export default {
                 text-align: left;
                 border: 1px solid $border;
                 overflow: hidden;
-                margin: 0 20px;
+                @include point(margin,20);
                 padding-left: 20px;
+                margin-top: 0;
                 .event-title{
                     color: $black;
                 }
@@ -2574,7 +2737,7 @@ export default {
                     font-weight: bold;
                 }
                 .name-input{
-                    max-width: 180px;
+                    @include point(width,200);
                     margin-left: 20px;
                 }
                 .des-input{
@@ -2586,17 +2749,18 @@ export default {
                     min-height: 120px;
                     width: 90%;
                     margin: auto 20px;
+                    span{
+                        font-size: 12px;
+                        color: #FCB83B;
+                        margin: 15px 0;
+                        display: block;
+                    }
                     .source-details{
                         //padding: 15px 0;
                         display: inline-block;
                         margin-right: 15px;
                         padding-top: 15px;
                         position: relative;
-                        span{
-                            font-size: 12px;
-                            color: #FCB83B;
-                            margin: 0;
-                        }
                         .icondelete{
                             position: absolute;
                             font-size: 14px;
@@ -2608,38 +2772,36 @@ export default {
                         }
                     }
                 }
-                .submit-btn{
-                    margin-left: 20px;
-                    width: 80px;
-                    margin-bottom: 30px;
-                    line-height: 12px;
-                    font-size: 12px;
-                    margin-top: 15px;
-                }
             }
         }
         /*右侧区域css*/
         .rside{
-            padding: 15px 10px 15px 10px;
+            border: 1px solid $border;
+            background-color: #fff;
+            @include point(margin-right,20);
             .el-header-title{
                 text-align: left;
                 position: relative;
+                color:$black;
+                font-size: 16px; 
+                @include point(height,60);
+                @include point(line-height,60);
+                border-bottom: 1px solid $border;              
                 @include point(padding-left,10);
                 span{
                     display: block;
-                    @include point(margin-top,10);
-                    font-size: 16px;
-                    font-weight: bold;
+                    @include point(margin-left,20);
                 }
             }
             #storetab-content{
                 margin-top: 10px;
+                @include point(padding-left,20);
                 @include point(height,280);
                 .storeList-content{
                     text-align: left;
                     @include point(height,260);
                     .activeClass{
-                        background-color: $red;
+                        background-color: $red !important;
                         color: #fff;
                     }
                     .stores{
@@ -2655,83 +2817,140 @@ export default {
                     }
                     .store-name{
                         display: inline-block;
-                        margin-left: 15px;
+                        @include point(margin-left,20);
                         margin-top: 10px;
-                        margin-bottom: 10px;
+                        margin-bottom: 15px;
                         border: 1px solid #ddd;
                         text-align: center;
                         padding:6px;
                         font-size: 12px;
                         cursor: pointer;
-                        width: 96px;
+                        // width: 96px;
+                        @include point(width,90);
+                        @include point(padding,6);
                         white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
                         overflow: hidden; //隐藏超出单元格的部分。
                         text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                        span{
+                            width: 100%;
+                            display: block;
+                        }
                     }
                     .citys{
                         display: block;
                         font-size: 14px;
                         font-weight: bold;
                         color: $black;
-                        margin-left: 15px;
+                        @include point(margin-left,20);
                     }
                 }
             }
-            .channel-content{
+            .rside-hr{
                 width: 100%;
-                height: auto;        
+                margin-top: 35px;
+                border: 0.5px solid $border;
+            }
+            .channel-content{
+                width: 100%;     
                 overflow: hidden;
-                margin-top: 20px;
+                margin-top: 10px;
                 span{
                     display: block;
                     text-align: left;
-                    margin: 15px;
-                    font-size: 14px;
-                    font-weight: bold;
+                    @include point(margin-left,30);
+                    font-size: 16px;
                     color: $black;
+                    margin-bottom: 15px;
                 }
                 .channels-srollbar{
-                    height: 142px;
                     text-align: left;
+                    padding: 10px;
+                    margin-left: 5%;
+                    overflow: hidden;
+                    min-height: 115px;
                 }
+                .arrow-content{
+                    min-width: 20px;
+                    min-height: 20px;
+                    float: left;
+                    margin-top: 20px;
+                }
+                .icon-arrow{
+                    cursor: pointer;
+                }
+
                 .btn-content{
-                    width: 100px;
-                    display: inline-block;
-                    margin-bottom: 5px;
+                    width: 80%;
+                    float: left;
+                    .btn-details{
+                        // width: 100px;
+                        display: inline-block;
+                        margin-bottom: 5px;
+                        @include point(margin-left,15);
+                    }
                 }
+                
             }
             .time-content{
                
                 #date-title{
                     display: block;
                     text-align: left;
-                    margin: 15px 20px;
-                    font-size: 14px;
-                    font-weight: bold;
+                    margin:20px;
+                    @include point(margin-left,30);
+                    font-size: 16px;
                     color: $black;
                 }
-                .date-picker-content{
-                    text-align: left;
-                    padding-left: 20px;
-                    position: relative;
-                    span{
-                        font-size: 14px;
-                        color: $black;
-                        margin-right: 15px;
+                 @media screen and (min-width: 1366px){
+                    .date-picker-content{
+                        text-align: left;
+                        @include point(padding-left,20);
+                        position: relative;
+                        span{
+                            font-size: 14px;
+                            color: $black;
+                            margin-right: 15px;
+                            @include point(margin-left,30);
+                        }
+                        .time-picker{
+                            width: 120px;
+                        }
+                        .backdate-btn{
+                            position: absolute;
+                            @include point(right,20);
+                            font-size: 12px;
+                            line-height: 12px;
+                        }
+                    }   
+                }
+                @media screen and (max-width: 1366px){
+                    .date-picker-content{
+                        text-align: left;
+                        @include point(padding-left,10);
+                        position: relative;
+                        span{
+                            font-size: 12px;
+                            color: $black;
+                            margin-right: 10px;
+                            @include point(margin-left,30);
+                        }
+                        .time-picker{
+                            width: 110px;
+                            font-size: 12px;
+                        }
+                        .backdate-btn{
+                            position: absolute;
+                            @include point(right,10);
+                            font-size: 12px;
+                            line-height: 12px;
+                        }
                     }
-                    .time-picker{
-                        width: 120px;
-                    }
-                    .backdate-btn{
-                        position: absolute;
-                        right: 10px;
-                        font-size: 12px;
-                        line-height: 12px;
-                    }
-                }   
+                }
                 .date-content{
                     text-align: center;
                     margin-top: 10px;
+                    @include point(padding-left,25);
+                    @include point(padding-right,25);
                     .date-header{
                         margin-bottom: 10px;
                         position: relative;
@@ -2818,6 +3037,7 @@ export default {
 <style>
 .el-radio-button__inner{
     border-radius: 0px !important;
+    width:90px;
 }
 .el-prog .progress-bar{
     background-color: #FB4C5D;

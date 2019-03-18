@@ -19,7 +19,9 @@ export default {
     },
     data(){
         return{
-
+            onlineSrc:require('../../static/img/1.png'),
+            onlineSrc1:require('../../static/img/2.png'),
+            disOnlineSrc:require('../../static/img/3.png'),
         }
     },
     watch:{

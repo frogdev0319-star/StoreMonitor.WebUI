@@ -59,6 +59,7 @@
                             align='left'
                             :height="windowHeight-320"
                             @sort-change='sortChange'
+                            @row-click='rowClickItem'
                             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                                 <el-table-column
                                     min-width="120"
@@ -469,6 +470,13 @@
                 }
                 let like=self.params.like;
                 self.getEventCount(start,end,status,like);
+            },
+            rowClickItem(row,column,event){
+                let self=this;
+                this.event=row;
+                sessionStorage.setItem('event',JSON.stringify(this.event));
+                sessionStorage.setItem('queryparams',JSON.stringify(self.params));
+                this.$router.push({name:"事件详情",params:{event:this.event}});
             },
             toEventDetail(row){
                 console.log(row);

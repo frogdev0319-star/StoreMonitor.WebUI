@@ -233,6 +233,7 @@ export default {
                                 objChild.checked=false;
                                 objChild.name=itemChild.subject;
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
+                                //objChild.score=itemChild.itemScore+'分';
                                 objChild.score=itemChild.itemScore+'分';
                                 tempChild.push(objChild);
                             })

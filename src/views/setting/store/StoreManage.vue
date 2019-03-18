@@ -41,6 +41,7 @@
             align='left'
             :height="tableHieght"
             @sort-change='sortChange'
+            @row-click='rowClickItem'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
                 <el-table-column
                     min-width="120"
@@ -435,10 +436,13 @@ import PubSub from 'pubsub-js'
             },
             toEventDetail(row){
                 let self=this;
-                console.log(row);
                 sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
                 self.$router.push({name:'门店详情',params:row});
-                
+            },
+            rowClickItem(row,column,event){
+                let self=this;
+                sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
+                self.$router.push({name:'门店详情',params:row});
             },
             getStoreData(params){
                 let self=this;

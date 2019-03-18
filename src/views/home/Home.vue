@@ -40,6 +40,21 @@
             :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
+                    <div class="brand-panel" v-if="false">
+                        <span class="brand-label">品牌</span>
+                        <el-collapse v-model="activeNames" @change="handleChange" class="brand-content">
+                        <el-collapse-item class="brand-title">
+                            <template slot="title">
+                            <span class="brand-name">{{brandName}}</span>
+                            </template>
+                            <div class="item-content">
+                                <div class="item-details" v-for="(item,index) in brandList" :key="index">
+                                    <span>{{item.name}}</span>
+                                </div>
+                            </div>
+                        </el-collapse-item>
+                        </el-collapse>
+                    </div>
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <el-menu :default-active="$route.path"
                         class="el-menu-vertical-demo" 
@@ -52,7 +67,7 @@
                         <template v-for="(item,index) in routerList">
                             <template v-if="!item.hidden">
                             <!--只有一个节点-->
-                            <el-menu-item  v-if="item.leaf&&item.children.length>0" class="submenu-item"
+                            <el-menu-item  v-if="item.leaf&&item.children.length>0" id="groupSubItem" class="submenu-item"
                                 :key="index"  :index="item.children[0].path" 
                                 :disabled="item.isReadOnly"
                                 style="text-align:left;">
@@ -60,17 +75,19 @@
                                 <span style="font-size: 16px;">{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点 :disabled="item.name=='巡店管理'"-->
-                        <el-submenu class="el-submenu" :key="index" :index="index+''"
-                        v-if="!item.leaf" style="text-align:left;">
+                        <el-submenu class="el-submenu-content" :key="index" :index="index+''"
+                        v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
                             <template slot="title">
                             <i :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}">
                             </i><span class="el-submenu-group">{{item.name}}</span>
                             </template>
                             <el-menu-item id="childSubItem" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                              v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                            :key="child.path" v-if="!child.hidden" style="padding-left: 26px;color:#a0a4ad;">
+                            :key="child.path" v-if="!child.hidden" style="padding-left: 26px;color:#a0a4ad;height:">
                                 <template>
-                                    <div class="tag-icon"></div>
+                                    <div class="icon-content">
+                                        <div class="tag-icon"></div>
+                                    </div>
                                     <span >{{child.name}}</span>
                                     <div v-if="child.name=='门店管理'&&showTag" 
                                     style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
@@ -126,9 +143,23 @@ export default {
             route:this.$route,
             path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute',],
             wapper:false,
+            brandName:'研华科技',
+            brandList:[
+                {
+                    id:0,
+                    name:'鱼池18',
+                },
+                {
+                    id:1,
+                    name:'研华科技'
+                }
+            ],
         }
     },
     computed:{
+        groupHeight(){
+            return (this.varyWindowWidth*70)/1920;
+        },
         wrapperAll(){
             let flag;
             this.path.forEach(item=>{
@@ -172,10 +203,10 @@ export default {
           switch(Number(index)){
                case 1: 
                document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#f31d65';
-               document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#232730';break;
+               document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#222538';break;
                case 5:
                document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#f31d65';
-               document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#232730';break;
+               document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#222538';break;
                default: console.log('this is not a group');break;
           }
         },
@@ -270,6 +301,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+    *{
+        font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    }
     $collapseWidth:5.5%;
     //rem(val)
     @function rem($val){
@@ -320,27 +354,27 @@ export default {
         padding:0;
         .header{
             width: 100%;
-            height: 60px;
             z-index:999;
             position:fixed;
             background-color:#fff;
-            line-height: 60px;
+            @include point(height,60);
+            @include point(line-height,60);
             border-bottom: 0.5px solid #ebebeb;
             .logo-width{
                 width:16.9%;
             }
             .logo-collapse-width{
                 width:$collapseWidth;
-                @include point(max-width,65);
+                width: 65px;
             }
             .logo-content{
                 height: 100%;
-                background-color:#232730;
+                background-color:#222538;
                 @include point(padding-top,10);
                 position: relative;
                 @include borderColor;
                 #imgLogo{
-                    height: 32px;
+                    height: 42px;
                     margin-right: 10px;
                 }
                 .sys-name{
@@ -349,13 +383,13 @@ export default {
                     @include point(margin-left,10);
                     font-weight: bold;
                     color: #f6f9fe;
-                    font-size: 18px;
+                    @include point(font-size,18);
                 }
             }
             .el-traggle-content{
                 height: 100%;
                 border-right: 1px solid;
-                border-color: rgba(238,241,146,0.3);
+                border-color: rgb(238,241,146);
                 position: relative;
                 .icon-collapse{
                     @include point(font-size,32);
@@ -378,8 +412,8 @@ export default {
                 overflow: hidden;
                 width: 320px;
                 .bell-content{
-                    width: 60px;
-                    height: 60px;
+                    @include point(width,60);
+                    @include point(height,60);
                     border-left:1px solid rgba(255,255,255,0.2);
                     border-right:1px solid rgba(255,255,255,0.2);
                     position: relative;
@@ -426,26 +460,62 @@ export default {
         .main{
             display: flex;
             position: absolute;
-            top: 60px;
+            @include point(top,60);
             bottom:0px;
             background-color: #f6f9fe;
+            .brand-panel{
+                background-color: #222538;
+                text-align: left;
+                .brand-content{
+                    border: 0 !important;
+                }
+                .brand-label{
+                    color: #fff;
+                    font-size: 14px;
+
+                    margin-left: 60px;
+                }
+                margin-bottom: 20px;
+            }
+            .brand-title{
+                background-color: #222538;
+                .item-content{
+                    background-color: #222538;
+                    .item-details{
+                        height: 45px;
+                        line-height: 45px;
+                        span{
+                            color: #fff;
+                            margin-left: 60px;
+                            font-size: 16px;
+                        }
+                    }
+                }
+                .brand-name{
+                    @include point(font-size,18);
+                    color: #fff !important;
+                }
+            }
+            .icon-content{
+                float:left;
+                @include point(width,48);
+                @include point(margin-left,25);
+                @include point(margin-right,10);
+            }
             .tag-icon{
-                @include point(width,10);
-                @include point(height,10);
+                width: 10px;
+                height: 10px;
                 background-color:white;
                 border-radius: 50%;
                 -moz-border-radius: 50%;
                 -webkit-border-radius: 50%;
-                float:left;
-                @include point(margin-right,48);
-                @include point(margin-left,25);
-                margin-top: 18px;
+                @include point(margin-top,18);
             }
             aside{
                 height:100%;
                 float:left;
                 position: fixed;
-                .el-submenu{
+                .el-submenu-content{
                     position: relative;
                     &:hover{
                         background-color:#f31d65 !important;
@@ -454,15 +524,22 @@ export default {
                 .el-submenu-group{
                     @include point(margin-left,4);
                     font-size: 16px;
+                    
+                }
+                #groupSubItem.submenu-item{
+                    @include point(height,52);
+                    @include point(line-height,52);
                 }
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
+                    @include point(height,45);
+                    @include point(line-height,45);
                 }
             }
             .content-wrapper-all{
                 height: 93%;
-                @include point(margin,15);
+                @include point(margin,20);
                 border: solid #e3e9f4;
                 border-width: 0;
                 width: 97.5%;
@@ -470,7 +547,7 @@ export default {
             }
             .content-wrapper{
                 height: auto;
-                @include point(margin,15);
+                @include point(margin,20);
                 border: solid #e3e9f4;
                 border-width: 0;
                 width: 97.5%;
@@ -490,10 +567,10 @@ export default {
             color: #eee !important;
         }
         .el-menu-item.is-active{
-            background-color:#2F2933 !important;
+            background-color: rgba(243,29,101,0.1) !important;
             color:#f31d65 !important;
-            div{
-                background-color: #f31d65 !important;
+            .tag-icon{
+                background-color: #f31d65;
             }
         }
         .el-submenu.is-active .el-submenu__title{
@@ -501,16 +578,16 @@ export default {
         }
         .aside-width{
             width: 16.9%;
-            background-color: #232730;
+            background-color: #222538;
         }
         .aside-collapse-width{
             width:$collapseWidth;
-            @include point(max-width,65);
+            max-width: 65px;
             overflow: hidden !important;
-            background-color: #232730;
+            background-color: #222538;
         }
         .sec-collapsed{
-            margin-left:4.5%;
+            margin-left:65px;
             width:95.5%;
         }
         .sec-uncoll{
@@ -527,7 +604,31 @@ export default {
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
     background-color:#FEE4E7 !important;
 }
-
+.brand-title .el-collapse-item__header{
+    background-color: #222538;
+    color: #fff;
+    padding-left: 60px;
+    font-weight: bold;
+    border: 0;
+}
+.brand-title .el-collapse-item__arrow{
+    font-size: 16px !important;
+    margin-right: 35px !important;
+    color: #fff !important;
+}
+.el-collapse-item__content{
+    padding-bottom: 0px !important;
+}
+@media screen and (max-width:1366px){
+    .el-submenu__icon-arrow{
+        margin-right: 0px !important;
+    }
+}
+@media screen and (min-width:1366px){
+    .el-submenu__icon-arrow{
+        margin-right: 20px !important;
+    }
+}
 </style>
 <style scoped>
 .el-bread-one{

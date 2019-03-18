@@ -1114,17 +1114,6 @@ $mainColor:#FB4C5D;
 .el-tabs__item:hover{
     color: #FB4C5D !important;
 }
-.el-table--striped .el-table__body tr.el-table__row--striped.current-row td, 
-.el-table__body tr.current-row>td {
-	background-color: #fff !important;
-    color:#FB4C5D !important;
-    cursor: pointer !important;
-}
-
-.el-table--enable-row-hover .el-table__body tr:hover>td{
-	background-color: #fff !important;
-    cursor: pointer !important;
-}
 #importId .el-dialog__body{
     padding-top:0px !important;
 }

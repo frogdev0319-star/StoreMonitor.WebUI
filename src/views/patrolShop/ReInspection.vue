@@ -15,7 +15,7 @@
                 </el-button> 
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="550*percentHeight+'px'" height=300px top=15%>
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="650*percentHeight+'px'" height=300px top=8%>
                 <div class="canvas-content">
                     <hr class="dialog-hr"/> 
                         <div class='icon-right' v-if="showPenBtn" id="iconR">
@@ -29,10 +29,10 @@
                             </div>
                             </transition>
                         </div>
-                     <canvas id="icanvas"  :width="480*percentHeight" :height="270*percentHeight" @mousedown="mouseDownAction($event)" 
+                     <canvas id="icanvas"  :width="567*percentHeight" :height="319*percentHeight" @mousedown="mouseDownAction($event)" 
                     @mousemove="mouseMoveAction($event)"></canvas>
-                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':480*percentHeight+'px',
-                    'margin-left':35*percentHeight+'px'}">
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':567*percentHeight+'px',
+                    'margin-left':42*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas"> 
                             <span>取消编辑</span>
                         </div>
@@ -47,15 +47,6 @@
                 </div>
             </el-dialog>
             <div class="guide-content" v-if="showGuide">
-                <div class="guide-lside">
-                    <div class="num-content">
-                        <span class="guide-num">1</span>
-                        <span class="guide-title">
-                            点击下方巡检标题，开始远程巡检！
-                        </span>
-                    </div>
-                    <img :src="arrows1Src" alt="arrow1"/>
-                </div>
                 <div class="guide-rside">
                     <div class="num-content">
                         <span class="guide-num">2</span>
@@ -110,6 +101,15 @@
                 <span>{{errorText}}</span>
             </div>
             <div class="el-inspect">
+                <div class="guide-lside" v-if="showGuide">
+                    <div class="num-content">
+                        <span class="guide-num">1</span>
+                        <span class="guide-title">
+                            点击巡检标题，开始远程巡检！
+                        </span>
+                    </div>
+                    <img :src="arrows1Src" alt="arrow1"/>
+                </div>
                 <el-row class="inspect-header">
                     <el-col :span="8">
                         <span>巡检类别</span>
@@ -121,7 +121,7 @@
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <div :style="{'max-height':varyWindowHeight*0.38-40+'px'}">
+                            <div :style="{'height':varyWindowHeight*0.38-40+'px'}">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                                     <span>{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
@@ -131,10 +131,10 @@
                     </el-col>
                     <el-col :span="16" id="inspectContent">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
-                            <div class="item-content" :style="{'max-height':varyWindowHeight*0.32+'px'}">
-                                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details" >
-                                    <span class="titles" :class="!item.isIgnore?'noraml-title':'ignore-title'" @click="clickItem(item,index)">{{`${index+1}. ${item.subject}`}}</span>
-                                    <el-dropdown trigger="click" class="item-score" size="small">
+                            <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}">
+                                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
+                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'">{{`${index+1}. ${item.subject}`}}</span>
+                                    <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
                                             {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
@@ -146,14 +146,15 @@
                                         </el-dropdown-menu>
                                     </el-dropdown>
 
-                                    <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i>
+                                    <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)" v-if="!item.isIgnore"></i>
+                                    <span class="ignored-icon" v-else>已忽略</span>
                                     <div class="icon-clicked" v-if="item.checked"></div>
-                                    <div class="details-content">
+                                    <div class="details-content" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span>{{item.description}}</span>
                                     </div>
-                                    <div class="source-content" v-if="item.sourceList.length!=0">
+                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
-                                            <i class="iconfont icon-shanchu icondelete" @click="deleteImg(item,index)"></i>
+                                            <i class="iconfont icon-shanchu icondelete" @click="deleteImg(item,_index)"></i>
                                             <img :src="_item.src" :width="_item.width" :height="_item.height"/>
                                         </div>
                                     </div>
@@ -240,7 +241,7 @@ export default {
             },
             storeUpSrc:require('../../../static/img/collect2_icon.png'),
             nostoreUpSrc:require('../../../static/img/collect_icon.png'),
-            arrows1Src:require('../../../static/img/arrows1_pic.png'),
+            arrows1Src:require('../../../static/img/arrows3_pic.png'),
             arrows2Src:require('../../../static/img/arrows2_pic.png'),
             showModelContent:false,
             activeIndex:'0',
@@ -541,7 +542,7 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                ctx.drawImage(self.videoEl,0,0,480*self.percentHeight,270*self.percentHeight);
+                ctx.drawImage(self.videoEl,0,0,567*self.percentHeight,319*self.percentHeight);
                 var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
                 let imgObj=new Image();
@@ -569,8 +570,8 @@ export default {
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
-            ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
+            ctx.clearRect(0,0,567*self.percentHeight,319*self.percentHeight);
+            ctx.drawImage(self.imageCanvas,0,0,567*self.percentHeight,319*self.percentHeight);
         },
         confirmEditCanvas(){
             let self=this;
@@ -578,12 +579,12 @@ export default {
             self.imageCanvasList.pop();
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,480*self.percentHeight,270*self.percentHeight);
+            ctx.clearRect(0,0,567*self.percentHeight,319*self.percentHeight);
             if(self.imageCanvasList.length==0){
-                ctx.drawImage(self.imageCanvas,0,0,480*self.percentHeight,270*self.percentHeight);
+                ctx.drawImage(self.imageCanvas,0,0,567*self.percentHeight,319*self.percentHeight);
             }
             else{
-                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,480*self.percentHeight,270*self.percentHeight);
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,567*self.percentHeight,319*self.percentHeight);
             }
         },
         confirmEdit(){
@@ -936,7 +937,7 @@ export default {
                     _item.showEmptyImg=false;
                 }
                 if(_index==0){
-                    _item.checked=true;
+                    // _item.checked=false;
                     if(_item.deviceId!=-1){
                         let device=self.getDeviceById(_item.deviceId);
                         if(device!=null){
@@ -947,9 +948,9 @@ export default {
                         self.channel=channelObj;
                     }
                 }
-                else{
-                    _item.checked=false;
-                }
+                // else{
+                //     _item.checked=false;
+                // }
             });
             let tempArray=[];
             item.isClick=true;
@@ -985,7 +986,7 @@ export default {
             self.editCount=self.editCount+1;
             self.curItemIndex=index;
             if(item.isIgnore){
-                self.notify('当前项已忽略！','warning',3000);
+                self.notify('该项已被忽略！','warning',3000);
                 return false;
             }
             this.$confirm('确认是否忽略当前巡检项？', '提示', {
@@ -994,6 +995,7 @@ export default {
             type: 'warning'
             }).then(() => {
                 item.isIgnore=true;
+                item.disabled=true;
                 self.ignoreTemp.push(item);
                 if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                     self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
@@ -1077,7 +1079,7 @@ export default {
                             itemObj.groupId=item.groupId;
                             itemObj.subject=_item.subject;
                             itemObj.description=_item.description;
-                            itemObj.itemScore=_item.itemScore;
+                            itemObj.itemScore=0;
                             itemObj.deviceId=_item.deviceId;
                             itemObj.inspectInput='';
                             itemObj.inputCount=0;
@@ -1108,7 +1110,7 @@ export default {
                 dealCount=dealCount+item.dealCount;
             })
             if(dealCount<count){
-                self.notify('当前巡检项有未处理项，请确认完全处理后进行提交！','warning',3000);
+                self.notify('当前尚有未完成巡检项，请完成后进行提交！','warning',3000);
                 return false;
             }
             self.fullscreenLoading=true;
@@ -1518,16 +1520,17 @@ export default {
             }
         }
         #cancelBtn{
-            width: 76px;
-            margin-right: 15px;
+            @include point(width,76);
+            @include point(margin-right,20);
             background-color: #EAEDF2 !important;
             color: #708090 !important;
             font-size: 12px;
             line-height: 12px;
         }
         #confirmBtn{
-            width: 76px;
-            margin-right: 15px;
+            @include point(width,76);
+            // margin-right: 15px;
+            @include point(margin-right,20);
             font-size: 12px;
             line-height: 12px;
         }
@@ -1611,6 +1614,24 @@ export default {
                 }
             }
         }
+        @mixin arrow-icon{
+            .guide-num{
+                display: inline-block;
+                height: 28px;
+                width: 28px;
+                line-height: 28px;
+                border-radius: 50%;
+                background-color: $red;
+                color: #fff;
+                margin-right: 15px;
+                font-size: 14px;
+            }
+            .guide-title{
+                color: $red;
+                font-size: 14px;
+                font-weight: bold;
+            }
+        }
         .lside{
             @include point(padding-bottom,20);
             @include point(margin-right,20);
@@ -1671,7 +1692,7 @@ export default {
                 }
                 .el-submit{
                     position: absolute;
-                    right: 20px;
+                    @include point(right,20);
                     width: 90px;
                     // top: 16px;
                     @include point(top,20);
@@ -1704,34 +1725,6 @@ export default {
                 @include point(min-width,500);
                 @include point(min-height,414);
                 background-color: #000;
-                .guide-lside{
-                    position: absolute;
-                    bottom: 30px;
-                    left: 20%;
-                    width: 350px;
-                    img{
-                        height: 80px;
-                        position: relative;
-                        left: 15%;
-                    }
-                }
-                .num-content{
-                    .guide-num{
-                        display: inline-block;
-                        width: 28px;
-                        height: 28px;
-                        line-height: 28px;
-                        border-radius: 14px;
-                        background-color: $red;
-                        color: #fff;
-                        margin-right: 15px;
-                    }
-                    .guide-title{
-                        color: $red;
-                        font-size: 14px;
-                        font-weight: bold;
-                    }
-                }
                 .guide-rside{
                     position: absolute;
                     top: 30%;
@@ -1743,6 +1736,9 @@ export default {
                         right: 10%;
                         top: 20px;
                     }
+                    .num-content{
+                        @include arrow-icon;
+                    }
                     .iconright-content{
                         width: auto;
                         height: auto;
@@ -1751,8 +1747,10 @@ export default {
                         right: 0;
                         .iconright{
                             width: 80px;
+                            text-align: center;
                             margin-top: 30px;
-                            height: 30px;
+                            height: 32px;
+                            line-height: 30px;
                             border-radius: 4px;
                             padding: 0 6px;
                             background-color: rgba($color: #24293d, $alpha: 0.6);
@@ -1763,7 +1761,7 @@ export default {
                             span{
                                 color: #fff;
                                 font-size: 14px;
-                                margin-left: 15px;
+                                margin-left: 12px;
                                 vertical-align:middle;
                             }
                         }
@@ -1832,9 +1830,10 @@ export default {
                     }
                 }
                 .iconright{
-                    padding: 2px 6px;
-                    width: 68px;
-                    height: 26px;
+                    padding: 0 6px;
+                    width: 80px;
+                    height: 32px;
+                    line-height: 30px;
                     position: absolute;
                     z-index: 990;
                     right: 20px;
@@ -1854,12 +1853,14 @@ export default {
                         color: #fff;
                         cursor: pointer;
                         vertical-align:middle;
+                        margin-left: 10px;
                     }
                 }
                 .iconright1{
-                    padding: 2px 6px;
-                    width: 68px;
-                    height: 26px;
+                    padding: 0 6px;
+                    width: 80px;
+                    height: 32px;
+                    line-height: 30px;
                     position: absolute;
                     z-index: 990;
                     right: 20px;
@@ -1879,6 +1880,7 @@ export default {
                         color: #fff;
                         cursor: pointer;
                         vertical-align:middle;
+                        margin-left: 10px;
                     }
                 }
             }
@@ -1889,6 +1891,23 @@ export default {
                 margin: 0;
                 @include point(margin-left,20);
                 @include point(margin-right,20);
+                position: relative;
+                .guide-lside{
+                    position: absolute;
+                    top: 20px;
+                    right:12%;
+                   
+                    width: auto;
+                    z-index: 20;
+                    img{
+                        height: 56px;
+                        position: relative;
+                        right: 15%;
+                    }
+                }
+                .num-content{
+                    @include arrow-icon;
+                }
                 .inspect-header{
                     text-align: left;
                     height: 50px;
@@ -1917,6 +1936,14 @@ export default {
                             margin-bottom: 15px;
                         }
                     }
+                    .noraml-title{
+                        cursor: pointer;
+                        opacity: 1;
+                    }
+                    .ignore-title{
+                        cursor: not-allowed;
+                        opacity: 0.5;
+                    }
                     .item-details{
                         text-align: left;
                         min-height: 60px;
@@ -1940,19 +1967,13 @@ export default {
                             font-size: 14px;
                             font-weight: bold;
                         }
-                        .noraml-title{
-                            cursor: pointer;
-                        }
-                        .ignore-title{
-                            cursor: not-allowed;
-                            background-color: #ddd;
-                        }
                         .details-content{
                             font-size: 12px;
                             color: $tab;
                             margin-top: 15px;
                             span{
                                 margin-left: 15px;
+                                display: block;
                             }
                         }
                         .source-content{
@@ -1992,25 +2013,37 @@ export default {
                         }
                         .iconhulve{
                             position: absolute;
-                            right: 0;
                             color: #ddd;
                             font-size: 20px;
                             @include point(right,20);
-                            top: 20px;
+                            @include point(top,10);
                             cursor: pointer;
+                        }
+                        .ignored-icon{
+                            display:inline-block;
+                            position: absolute;
+                            @include point(right,10);
+                            @include point(top,10);
+                            font-size: 12px;
+                            padding:2px 6px;
+                            border-radius: 4px;
+                            color: #fff;
+                            background-color: $black;
+                            cursor: not-allowed;
                         }
                         .item-score{
                             position: absolute;
-                            // right: 25px;
-                            @include point(right,35);
-                            top: 18px;
+                            @include point(right,46);
+                            @include point(top,10);
                             font-size: 12px;
                             margin-right: 20px;
-                            width: 86px;
-                            height: 26px;
-                            padding: 0px 0px 0px 15px;
+                            max-width: 80px;
+                            height: 22px;
+                            @include point(width,76);
+                           
+                            @include point(padding-left,10);
                             background-color: orange;
-                            line-height: 26px;
+                            line-height: 22px;
                             color: #fff;
                             border-radius: 13px;
                             cursor: pointer;
@@ -2053,11 +2086,6 @@ export default {
                     display: block;
                     @include point(margin-left,25);
                 }
-                .el-search-input{
-                    @include point(width,200);
-                    @include point(margin-right,20);
-                    @include point(margin-top,20);
-                }
             }
             #storetab-content{
                 margin-top: 10px;
@@ -2091,11 +2119,12 @@ export default {
                         margin-bottom: 15px;
                         border: 1px solid #ddd;
                         text-align: center;
-                        padding:6px;
+                        // padding:6px;
                         font-size: 12px;
                         cursor: pointer;
-                        width: 80px;
-                        //@include point(width,80);
+                        // width: 82px;
+                        @include point(width,76);
+                        @include point(padding,6);
                         white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
                         overflow: hidden; //隐藏超出单元格的部分。
                         text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
@@ -2108,8 +2137,7 @@ export default {
                         display: block;
                         font-size: 14px;
                         font-weight: bold;
-                        // margin-left: 15px;
-                        margin-left: 20px;
+                        @include point(margin-left,20);
                     }
                 }
             }
