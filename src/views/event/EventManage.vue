@@ -869,13 +869,13 @@ $red:#f31d65;
         height: 4px !important;
         background-color: #f31d65 !important;
     }
-    .el-tabs__item.is-active{
+    /* .el-tabs__item.is-active{
         font-weight: bold !important;
         color: #f31d65 !important;
     }
     .el-tabs__item:hover{
         color: #f31d65 !important;
-    }
+    } */
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }

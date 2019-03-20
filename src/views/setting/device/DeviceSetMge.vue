@@ -1104,16 +1104,10 @@ $mainColor:#FB4C5D;
     border:1px solid #FB4C5D !important;
 }
 .el-tabs__active-bar{
-        height: 4px !important;
-        background-color: #FB4C5D !important;
-    }
-.el-tabs__item.is-active{
-    font-weight: bold !important;
-    color: #FB4C5D !important;
+    height: 4px !important;
+    background-color: #FB4C5D !important;
 }
-.el-tabs__item:hover{
-    color: #FB4C5D !important;
-}
+
 #importId .el-dialog__body{
     padding-top:0px !important;
 }

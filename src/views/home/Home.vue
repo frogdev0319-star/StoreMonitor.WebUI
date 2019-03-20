@@ -72,7 +72,7 @@
                                 :disabled="item.isReadOnly"
                                 style="text-align:left;">
                                 <i :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                                <span style="font-size: 16px;">{{collapsed?'':item.children[0].name}}</span>
+                                <span>{{collapsed?'':item.children[0].name}}</span>
                             </el-menu-item>
                             <!--多级节点 :disabled="item.name=='巡店管理'"-->
                         <el-submenu class="el-submenu-content" :key="index" :index="index+''"
@@ -374,7 +374,8 @@ export default {
                 position: relative;
                 @include borderColor;
                 #imgLogo{
-                    height: 42px;
+                    @include point(height,42);
+                    max-height: 42px;
                     margin-right: 10px;
                 }
                 .sys-name{
@@ -388,8 +389,7 @@ export default {
             }
             .el-traggle-content{
                 height: 100%;
-                border-right: 1px solid;
-                border-color: rgb(238,241,146);
+                border-right: 1px solid #e3e9f4;
                 position: relative;
                 .icon-collapse{
                     @include point(font-size,32);
@@ -400,9 +400,15 @@ export default {
             .breadcrumb-inner{
                 float:left;
                 .breadcrumb-item{
-                    padding:20px 0px 20px 10px;
+                    @include point(height,60);
+                    @include point(line-height,60);
+                    @include point(margin-left,20);
+                }
+                @media screen  and(min-width:1366px){
                     font-size: 16px;
-                    @include point(line-height,20);
+                }
+                 @media screen  and(max-width:1366px){
+                    @include point(font-size,16);
                 }
             }
             .headUrl-content{
@@ -430,8 +436,7 @@ export default {
                     .item{
                         position:absolute;
                         top: -5px;
-                        left: 35px;
-
+                        @include point(left,35);
                     }
                 }
                 .el-user-drop{
@@ -523,12 +528,31 @@ export default {
                 }
                 .el-submenu-group{
                     @include point(margin-left,4);
-                    font-size: 16px;
-                    
+                    //font-size: 16px;
                 }
-                #groupSubItem.submenu-item{
-                    @include point(height,52);
-                    @include point(line-height,52);
+                @media screen  and(min-width:1366px){
+                    .el-submenu-group{
+                        font-size: 16px;
+                    }
+                    #groupSubItem.submenu-item{
+                        @include point(height,52);
+                        @include point(line-height,52);
+                        span{
+                            font-size: 16px;
+                        }
+                    }
+                }
+                 @media screen  and(max-width:1366px){
+                    .el-submenu-group{
+                        @include point(font-size,16);
+                    }
+                    #groupSubItem.submenu-item{
+                        @include point(height,52);
+                        @include point(line-height,52);
+                    }
+                    span{
+                        @include point(font-size,16);
+                    }
                 }
                 #childSubItem.submenu-item{
                     position: relative;
@@ -542,16 +566,18 @@ export default {
                 @include point(margin,20);
                 border: solid #e3e9f4;
                 border-width: 0;
-                width: 97.5%;
+                width:auto;
                 background: #fff;
+                @include point(margin-right,50);
             }
             .content-wrapper{
                 height: auto;
                 @include point(margin,20);
                 border: solid #e3e9f4;
                 border-width: 0;
-                width: 97.5%;
+                width: 96.5%;
                 background: #fff;
+                @include point(margin-right,50);
             }
             .footercontent{
                 padding:0px 0 10px 60px;

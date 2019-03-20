@@ -9,13 +9,12 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <!-- <img :src="store.storeUp?storeUpSrc:nostoreUpSrc" alt="icon" class="icon-storeUp"/> -->
-                <el-button class="el-submit" size="mini" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary">
+                <el-button class="el-submit" size="small" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary">
                     提交
                 </el-button> 
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="650*percentHeight+'px'" height=300px top=8%>
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="1050*percentHeight+'px'" height=300px top=2%>
                 <div class="canvas-content">
                     <hr class="dialog-hr"/> 
                         <div class='icon-right' v-if="showPenBtn" id="iconR">
@@ -29,10 +28,10 @@
                             </div>
                             </transition>
                         </div>
-                     <canvas id="icanvas"  :width="567*percentHeight" :height="319*percentHeight" @mousedown="mouseDownAction($event)" 
+                     <canvas id="icanvas"  :width="947*percentHeight" :height="532*percentHeight" @mousedown="mouseDownAction($event)" 
                     @mousemove="mouseMoveAction($event)"></canvas>
-                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':567*percentHeight+'px',
-                    'margin-left':42*percentHeight+'px'}">
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':947*percentHeight+'px',
+                    'margin-left':52*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas"> 
                             <span>取消编辑</span>
                         </div>
@@ -46,6 +45,9 @@
                     <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
                 </div>
             </el-dialog>
+            <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
+            <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
+            <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
                     <div class="num-content">
@@ -67,38 +69,40 @@
                     </div>
                 </div>
             </div>
-            <div class="video-content" v-else-if="!showError&&!showGuide" id="videoContent"
-             @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel">
-                <span id="channelName" v-if="showModelContent">{{channel.channelName}}</span>
-                <div class="icon-footer" v-if="showModelContent">
-                    <div class="iconlside">
-                        <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-                        <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
-                    </div>
-                    <div class="screen-content">
-                        <i class="iconfont iconscreen" 
-                        :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
-                        <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
-                    </div>
+            <div v-else>
+                <div class="errorVideo-model" v-if="showError">
+                    <span>{{errorText}}</span>
                 </div>
-                <transition name='fade'>
-                    <div class="iconright" v-if="showModelContent" @click="cutPicture">
-                        <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                        <span>抓拍</span>
+                <div class="video-content"  id="videoContent"
+                @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
+                    <span id="channelName" v-if="showModelContent">{{channel.channelName}}</span>
+                    <div class="icon-footer" v-if="showModelContent">
+                        <div class="iconlside">
+                            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+                            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+                        </div>
+                        <div class="screen-content">
+                            <i class="iconfont iconscreen" 
+                            :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
+                            <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+                        </div>
                     </div>
-                </transition>
-                <transition name="fade">
-                    <div class="iconright1" v-if="showModelContent" @click="getVideo">
-                        <i class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"></i>
-                        <span>录像</span>
-                    </div>
-                </transition>
-                <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls"
-                    class="video-js vjs-fill">
-                </video>
-            </div>
-            <div class="errorVideo-model" v-else>
-                <span>{{errorText}}</span>
+                    <transition name='fade'>
+                        <div class="iconright" v-if="showModelContent" @click="cutPicture">
+                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                            <span>抓拍</span>
+                        </div>
+                    </transition>
+                    <transition name="fade">
+                        <div class="iconright1" v-if="showModelContent" @click="getVideo">
+                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"></i>
+                            <span>录像</span>
+                        </div>
+                    </transition>
+                    <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls"
+                        class="video-js vjs-fill">
+                    </video>
+                </div>
             </div>
             <div class="el-inspect">
                 <div class="guide-lside" v-if="showGuide">
@@ -121,7 +125,7 @@
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <div :style="{'height':varyWindowHeight*0.38-40+'px'}">
+                            <div :style="{'height':varyWindowHeight*0.38-40+'px'}" style="background-color:#f4f5f9">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                                     <span>{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
@@ -133,12 +137,11 @@
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
-                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'">{{`${index+1}. ${item.subject}`}}</span>
+                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'" :style="item.checked?{'font-weight':'bold'}:{}">{{`${index+1}. ${item.subject}`}}</span>
                                     <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
                                             {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <!-- style="overflow-y:scroll;height:200px;" -->
                                         <el-dropdown-menu slot="dropdown" class="score-menu" style="overflow-y:scroll;height:200px;">
                                             <el-dropdown-item style="width:70px;text-align:center;"
                                             v-for="(itemDS,indexDS) in scoreList" 
@@ -154,11 +157,10 @@
                                     </div>
                                     <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
-                                            <i class="iconfont icon-shanchu icondelete" @click="deleteImg(item,_index)"></i>
+                                            <i class="el-icon-close icondelete" @click="deleteImg(item,_index)"></i>
                                             <img :src="_item.src" :width="_item.width" :height="_item.height"/>
                                         </div>
                                     </div>
-                                    <!-- <div class="item-score" @click="clickScore(item)"><span>{{`评分：${item.itemScore}分`}}</span><i class=" iconscore" :class="item.isClick?'el-icon-arrow-up':'el-icon-arrow-down'"></i></div> -->
                                     <el-input size="mini" class="des-input" type="textarea" @change="changeInput(item)" @focus="focusInput(item)"
                         maxlength="300" v-model="item.inspectInput" placeholder="请输入处理评论文字" :disabled="item.disabled"></el-input>
                                 </div>
@@ -220,9 +222,12 @@ import {getStorageInfo} from '@/api/event'
 import {getDeviceList} from '@/api/device'
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
+import DialogVue from '@/components/DialogVue.vue'
 export default {
-    
     name:'ReInspection',
+    components:{
+        DialogVue
+    },
     data(){
         return{
             showControls:false,
@@ -247,6 +252,7 @@ export default {
             activeIndex:'0',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
+            varyWindowWidth:window.innerWidth,
             showDate:true, 
             playDate:new Date(), 
             channel:{
@@ -384,9 +390,17 @@ export default {
             recentStoreList:[],
             sessionId:'',
             inspectList:[],
+            curGroup:null,
             curGroupIndex:0,  //当前选中的group index
             curItemIndex:0,   //当前点击的 item index
+            curItem:null,
             curItemId:0,      //当前点击的巡检项id
+
+            curTabIndex:0,
+            curTabItem:null,
+            curStoreIndex:0,
+            curStoreItem:null, //当前点击的门店对象
+
             inspectItemList:[],
             allInspectItemList:[], //当前全部没有忽略的巡检项
             deviceList:[],
@@ -403,6 +417,24 @@ export default {
             ignoreTemp:[],
             fullScreen:false,
             appliedInspectList:[],
+            changeStoreObj:{
+                title:'确认',
+                showInfo:'本次巡店尚未完成，确认是否切换当前门店？',
+                isWarning:true,
+                dialogCosed:false
+            },
+            ignoreInspectObj:{
+                title:'确认',
+                showInfo:'确认是否忽略当前巡检项？',
+                isWarning:true,
+                dialogCosed:false
+            },
+            noBindDeviceObj:{
+                title:'提示',
+                showInfo:'当前门店的巡检项未绑定设备！',
+                isWarning:false,
+                dialogCosed:false
+            }
         }
     },
     computed:{
@@ -542,7 +574,7 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                ctx.drawImage(self.videoEl,0,0,567*self.percentHeight,319*self.percentHeight);
+                ctx.drawImage(self.videoEl,0,0,947*self.percentHeight,532*self.percentHeight);
                 var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
                 let imgObj=new Image();
@@ -570,8 +602,8 @@ export default {
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,567*self.percentHeight,319*self.percentHeight);
-            ctx.drawImage(self.imageCanvas,0,0,567*self.percentHeight,319*self.percentHeight);
+            ctx.clearRect(0,0,947*self.percentHeight,532*self.percentHeight);
+            ctx.drawImage(self.imageCanvas,0,0,947*self.percentHeight,532*self.percentHeight);
         },
         confirmEditCanvas(){
             let self=this;
@@ -579,12 +611,12 @@ export default {
             self.imageCanvasList.pop();
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,567*self.percentHeight,319*self.percentHeight);
+            ctx.clearRect(0,0,947*self.percentHeight,532*self.percentHeight);
             if(self.imageCanvasList.length==0){
-                ctx.drawImage(self.imageCanvas,0,0,567*self.percentHeight,319*self.percentHeight);
+                ctx.drawImage(self.imageCanvas,0,0,947*self.percentHeight,532*self.percentHeight);
             }
             else{
-                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,567*self.percentHeight,319*self.percentHeight);
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,947*self.percentHeight,532*self.percentHeight);
             }
         },
         confirmEdit(){
@@ -613,10 +645,6 @@ export default {
                 self.inspectList[tempId.groupIndex].dealCount=self.inspectList[tempId.groupIndex].dealCount+1;
             }
             self.inspectList[tempId.groupIndex].items[tempId.itemIndex].inputCount++;
-        },
-        modelMouseDown(e){
-            let self=this;
-            //self.showCutModel=false;
         },
         mouseDownAction(e){
            let self=this;
@@ -924,8 +952,8 @@ export default {
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
-            
             self.curGroupIndex=index;
+            self.curGroup=item;
             self.curItemIndex=0;
             self.inspectItemList=item.items;
             self.inspectItemList.forEach((_item,_index)=>{
@@ -937,7 +965,6 @@ export default {
                     _item.showEmptyImg=false;
                 }
                 if(_index==0){
-                    // _item.checked=false;
                     if(_item.deviceId!=-1){
                         let device=self.getDeviceById(_item.deviceId);
                         if(device!=null){
@@ -948,16 +975,12 @@ export default {
                         self.channel=channelObj;
                     }
                 }
-                // else{
-                //     _item.checked=false;
-                // }
             });
             let tempArray=[];
             item.isClick=true;
             this.$nextTick(()=>{
                 self.anchorLinkTo();
             })
-            
             self.inspectList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isClick=false;
@@ -981,33 +1004,44 @@ export default {
                 item.showEmptyImg=true;
             }
         },
+        ignoreInspectDialog(val){
+            let self=this;
+            console.log(val);
+            self.curItem.isIgnore=true;
+            self.curItem.disabled=true;
+            self.showGuide=false;
+            self.ignoreTemp.push(self.curItem);
+            if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+            }
+            self.ignoreInspectObj.dialogCosed=false
+        },
+        cancelIgnoreInspect(val){
+            let self=this;
+            console.log(val);
+            self.ignoreInspectObj.dialogCosed=false;
+        },
         ignoreItem(item,index){
             let self=this;
             self.editCount=self.editCount+1;
             self.curItemIndex=index;
+            self.curItem=item;
             if(item.isIgnore){
                 self.notify('该项已被忽略！','warning',3000);
                 return false;
             }
-            this.$confirm('确认是否忽略当前巡检项？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-            }).then(() => {
-                item.isIgnore=true;
-                item.disabled=true;
-                self.ignoreTemp.push(item);
-                if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
-                    self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
-                }
-            }).catch(() => {
-                console.log('cancel ignore');     
-            });
-            
+            self.ignoreInspectObj.dialogCosed=true;
+        },
+        noBindDeviceDialog(val){
+            let self=this;
+            self.noBindDeviceObj.dialogCosed=false;
+        },
+        canceldNoBind(val){
+            let self=this;
+            self.noBindDeviceObj.dialogCosed=false;
         },
         clickItem(item,index){
             let self=this;
-            self.showGuide=false;
             if(item.isIgnore){
                 return false;
             }
@@ -1016,30 +1050,28 @@ export default {
             //     return false;
             // }
             item.clickCount++;
-            // if(item.id!=self.curItemId){
-
-            // }
             self.sourceList=[];
             item.checked=true;
+            self.curItem=item;
             self.curItemIndex=index;
             self.curItemId=item.id;
             item.disabled=false;
+            self.showError=false;
+            self.showGuide=false;
             let obj={};
-            //&&self.curDeviceId!=item.deviceId
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
                     obj.ivsId=device.ivsId;
                     obj.channelName=device.name;
                     obj.channelId=device.channelId;
-                    
                     self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
                     self.realTime();
                 }
                 self.curDeviceId=item.deviceId;
             }
             else if(item.deviceId==-1){
-                self.notify('当前门店的巡检项未绑定设备！','warning',3000);
+                self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
             self.inspectItemList.forEach((_item,_index)=>{
@@ -1047,7 +1079,6 @@ export default {
                     _item.checked=false;
                 }
             })
-
         },
         getInspectByStore(storeId){
             let self=this;
@@ -1147,7 +1178,6 @@ export default {
                 self.fullscreenLoading=false;
                 let routeData=null;
                 if(errCode==0){
-                    //self.notify('提交成功！','success',3000);
                     self.editFlag=true;
                     let data=res.data;
                     routeData={
@@ -1189,6 +1219,12 @@ export default {
                 self.showModelContent=false;
             }, 3000);
         },
+        destroyVideo(){
+            let self=this;
+            var video = document.getElementById("previewVideo");
+            this.previewplayer = videojs(video);
+            self.previewplayer.dispose();
+        },
         hiddenModel(){
             let self=this;
             self.showModelContent=false;
@@ -1217,15 +1253,17 @@ export default {
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
             console.log(self.mpdurl);
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
-                console.log(self.mpdurl);
+                console.log(self.mpdurl); 
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
             }
             else{
+                self.showGuide=false;
                 self.showError=true;
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
+                self.destroyVideo();
             }
         },
         stopVideo(){
@@ -1377,7 +1415,9 @@ export default {
         changeStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
+            self.showStoreUp=true;
             self.editCount=0;
+            self.showError=false;
             if(self.playState){
                 self.stopRealTime();
             }
@@ -1420,20 +1460,26 @@ export default {
             console.log(self.recentStoreList);
             localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
         },
+        changeStoreDialog(val){
+            let self=this;
+            self.changeStoreObj.dialogCosed=false;
+            self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+        },
+        canceldChangeStore(){
+            let self=this;
+            self.changeStoreObj.dialogCosed=false;
+        },
         clickStore(item,index,_item,_index){
             let self=this;
-            self.showStoreUp=true;
+            if(!_item.hasInspect&&_item.hasInspect!=undefined){
+                return false;
+            }
+            self.curTabIndex=index;
+            self.curTabItem=item;
+            self.curStoreIndex=_index;
+            self.curStoreItem=_item;
             if(self.editCount!=0){
-                self.$confirm('此操作将暂停当前播放视频及清空当前门店输入的巡检项信息，是否继续！', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-                }).then(() => {
-                    self.changeStore(item,index,_item,_index);
-
-                }).catch(() => {
-                    console.log('cancel ignore');     
-                });
+                self.changeStoreObj.dialogCosed=true;
             }
             else{
                 self.changeStore(item,index,_item,_index);
@@ -1651,7 +1697,27 @@ export default {
                 .lside-title{
                     font-weight: bold;
                     color:$h1;
-                    font-size: 18px;
+                    //font-size: 18px;
+                }
+                @media screen and(min-width: 1366px){
+                    .lside-title{
+                        font-size: 18px;
+                    }
+                    .storeUp-content{
+                        height:22px;
+                        width: 86px;
+                        text-align: center;
+                    }
+                }
+                @media screen and(max-width: 1366px){
+                    .lside-title{
+                        @include point(font-size,18);
+                    }
+                    .storeUp-content{
+                        height:auto;
+                        width: 72px;
+                        
+                    }
                 }
                 .nocoll{
                     border:1px solid #FF9803;
@@ -1674,12 +1740,13 @@ export default {
                 .nocoll-font{
                     color: #FF9803;
                 }
+
                 .storeUp-content{
                     display: inline-block;
                     margin-left: 20px;
                     padding: 1px 6px;
-                    width: 76px;
-                    height: 22px;
+                    //width: 76px;
+                    //height: 22px;
                     line-height: 18px;
                     cursor: pointer;
                     position: relative;
@@ -1693,11 +1760,9 @@ export default {
                 .el-submit{
                     position: absolute;
                     @include point(right,20);
-                    width: 90px;
-                    // top: 16px;
+                    @include point(width,90);
                     @include point(top,20);
                     color: #fff;
-                    border-radius: 0;
                 }
             }
             .errorVideo-model{
@@ -1731,9 +1796,9 @@ export default {
                     right: 30px;
                     width: 260px;
                     img{
-                        height: 60px;
+                        @include point(height,42);
                         position: relative;
-                        right: 10%;
+                        right: 5%;
                         top: 20px;
                     }
                     .num-content{
@@ -1760,7 +1825,7 @@ export default {
                             }
                             span{
                                 color: #fff;
-                                font-size: 14px;
+                                font-size: 12px;
                                 margin-left: 12px;
                                 vertical-align:middle;
                             }
@@ -1773,6 +1838,36 @@ export default {
                 position: relative;
                 @include point(margin,20);
                 margin-bottom: 0;
+                @media screen and(max-width: 1366px){
+                    #channelName{
+                        font-size: 12px;
+                    }
+                    .iconright{
+                        span{
+                            font-size:12px;
+                        }
+                    }
+                     .iconright1{
+                        span{
+                            font-size:12px;
+                        }
+                    }
+                }
+                @media screen and(min-width: 1366px){
+                    #channelName{
+                        font-size: 16px;
+                    }
+                    .iconright{
+                        span{
+                            font-size:14px;
+                        }
+                    }
+                    .iconright1{
+                        span{
+                            font-size:14px;
+                        }
+                    }
+                }
                 #previewVideo{
                     @include point(min-width,500);
                     @include point(min-height,405);
@@ -1781,7 +1876,7 @@ export default {
                     position: absolute;
                     color: #fff;
                     z-index: 10;
-                    font-size: 12px;
+                    
                     display: block;
                     width:-webkit-calc(100% - 30px); 
                     width:-moz-calc(100% - 30px); 
@@ -1842,7 +1937,7 @@ export default {
                     background-color: rgba($color: #24293d, $alpha: 0.6);
                     top: 40%;
                     span{
-                        font-size: 12px;
+                        // font-size: 12px;
                         margin-left: 15px;
                         color: #fff;
                         margin-right: 35px;
@@ -1869,7 +1964,6 @@ export default {
                     background-color: rgba($color: #24293d, $alpha: 0.6);
                     top: 56%;
                     span{
-                        font-size: 12px;
                         margin-left: 12px;
                         color: #fff;
                         margin-right: 32px;
@@ -1894,13 +1988,10 @@ export default {
                 position: relative;
                 .guide-lside{
                     position: absolute;
-                    top: 20px;
-                    right:12%;
-                   
                     width: auto;
                     z-index: 20;
                     img{
-                        height: 56px;
+                        @include point(height,42);
                         position: relative;
                         right: 15%;
                     }
@@ -1910,24 +2001,48 @@ export default {
                 }
                 .inspect-header{
                     text-align: left;
-                    height: 50px;
-                    line-height: 50px;
                     padding-left: 35px;
                     font-size: 12px;
                     font-weight: bold;
                     color: $tab;
                     background-color: $background;
                     border-bottom:1px solid $border;
-                    
+                }
+                @media screen and (min-width: 1366px){
+                    .inspect-header{
+                        height: 50px;
+                        line-height: 50px;
+                    }
+                    .inspect-details{
+                        height: 50px;
+                        line-height: 50px;
+                        font-size: 14px;
+                    }
+                    .guide-lside{
+                        top: 20px;
+                        right:16%;
+                    }
+                }
+                @media screen and (max-width: 1366px){
+                     .inspect-header{
+                        height: 40px;
+                        line-height: 40px;
+                    }
+                    .inspect-details{
+                        height: 40px;
+                        line-height: 40px;
+                        font-size: 12px;
+                    }
+                    .guide-lside{
+                        top: 10px;
+                        right:2%;
+                    }
                 }
                 .inspect-content{
                     padding: 15px auto;
                     .inspect-details{
                         text-align: left;
-                        height: 50px;
-                        line-height: 50px;
                         padding-left: 35px;
-                        font-size: 14px;
                         color: $tab;
                         border-bottom:1px solid #ddd;
                         cursor: pointer;
@@ -1963,12 +2078,24 @@ export default {
                             top:50px;
                             background-color: $red;
                         }
-                        .titles{
-                            font-size: 14px;
-                            font-weight: bold;
+                        @media screen and(max-width:1366px) {
+                            .titles{
+                                font-size: 12px;
+                            }
+                            .details-content{
+                                @include point(font-size,12);
+                            }
+                        }
+                        @media screen and(min-width:1366px) {
+                            .titles{
+                                font-size: 14px;
+                            }
+                            .details-content{
+                                font-size: 12px;
+                            }
                         }
                         .details-content{
-                            font-size: 12px;
+                            // font-size: 12px;
                             color: $tab;
                             margin-top: 15px;
                             span{
@@ -1997,10 +2124,12 @@ export default {
                                     position: absolute;
                                     font-size: 14px;
                                     right: 5px;
-                                    margin-top: 5px;
+                                    margin-top: 8px;
                                     z-index: 2;
                                     color: #fff;
                                     cursor: pointer;
+                                    background-color: rgba($color: $black, $alpha: 0.8);
+                                    border-radius: 50%;
                                 }
                             }
                         }
@@ -2034,7 +2163,7 @@ export default {
                         .item-score{
                             position: absolute;
                             @include point(right,46);
-                            @include point(top,10);
+                            @include point(top,12);
                             font-size: 12px;
                             margin-right: 20px;
                             max-width: 80px;
@@ -2089,8 +2218,8 @@ export default {
             }
             #storetab-content{
                 margin-top: 10px;
-                @include point(padding-left,20);
-                // @include point(margin-right,20);
+                @include point(margin-left,15);
+                @include point(margin-right,15);
                 .storeList-content{
                     padding: 0 10px;
                     text-align: left;
@@ -2098,8 +2227,9 @@ export default {
                     @include point(height,450);
                     color: $black;
                     .activeClass{
-                        background-color: $red !important;
-                        color: #fff;
+                        background-color: #FDE8EF !important;
+                        color: $red;
+                        border-color: $red !important;
                     }
                     .stores{
                         &:last-child{
@@ -2114,16 +2244,15 @@ export default {
                     }
                     .store-name{
                         display: inline-block;
-                        @include point(margin-left,20);
+                        @include point(margin-left,15);
                         margin-top: 10px;
                         margin-bottom: 15px;
                         border: 1px solid #ddd;
+                        border-radius: 4px;
                         text-align: center;
-                        // padding:6px;
                         font-size: 12px;
                         cursor: pointer;
-                        // width: 82px;
-                        @include point(width,76);
+                        @include point(width,71);
                         @include point(padding,6);
                         white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
                         overflow: hidden; //隐藏超出单元格的部分。
@@ -2154,21 +2283,50 @@ export default {
 </style>
 <style>
 #storetab-content .el-tabs__nav-scroll{
-    margin-left:40px;
+    width: 100%;
+    /* margin-left: 10%;
+    margin-right: 10%; */
 }
-.el-tabs__active-bar{
+#storetab-content.el-tabs__active-bar{
     height: 4px !important;
     background-color: #f31d65 !important;
 }
-.el-tabs__item{
+#storetab-content.el-tabs__item{
     color:#7d8cad !important;
 }
-.el-tabs__item.is-active{
+#storetab-content.el-tabs__item.is-active{
     font-weight: bold !important;
     color: #f31d65 !important;
 } 
-.el-tabs__item:hover{
+#storetab-content.el-tabs__item:hover{
     color: #f31d65 !important;
+}
+
+@media screen and (min-width: 1366px){
+    #storetab-content .el-tabs__nav.is-top{
+        margin-left: 10%;
+        width: 80%;
+    }
+}
+@media screen and (max-width: 1366px){
+    #storetab-content .el-tabs__nav.is-top{
+        width: 100%;
+    }
+    span.el-tabs__nav-prev{
+        visibility: hidden;
+    }
+    .el-tabs__nav-next{
+        visibility: hidden;
+    }
+}
+#storetab-content div#tab-0{
+    width:33.33%;
+}
+#storetab-content div#tab-1{
+    width:33.33%;
+}
+#storetab-content div#tab-2{
+    width:33.33%;
 }
 </style>
 <style scoped>
@@ -2185,6 +2343,7 @@ export default {
 
 <style>
 @import '../../assets/css/importfile.css'; 
+@import '../../assets/css/videoBar.css';
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }

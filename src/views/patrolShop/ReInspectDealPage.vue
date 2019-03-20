@@ -12,24 +12,24 @@
                 <span class="event-label">门店名称：</span>
                 <span>{{storeName}}</span>
             </div>
-            <div class="table-content">
+            <div class="table-content" v-if="tableData.length!=0">
                 <div class="table-header">
                     <div class="table-details" v-for="(item,index) in headerList" :key="index" :style="{'width':item.width+'%'}">
                         <span>{{item.label}}</span>
                     </div>
-                    <div class="data-rows" v-for="(item,index) in tableData" :key="index" :style="index%2!=0?{'background-color':'#F4F5F9'}:{'background-color':'#fff'}">
-                        <div class="item-cols" style="width:20%;">
-                            <span>{{item.groupName}}</span>
-                        </div>
-                        <div class="item-cols" style="width:20%;">
-                            <span class="icon-span" :style="item.result==0?{'background-color':'#FDBA40'}:{'background-color':'#6097F3'}">{{item.result==0?'不合格':'合格'}}</span>
-                        </div>
-                        <div class="item-cols" style="width:20%;"> 
-                            <span>{{item.score}}</span>
-                        </div>
-                        <div class="item-cols" style="">
-                            <span>{{item.totalScore}}</span>
-                        </div>
+                </div>
+                <div class="data-rows" v-for="(item,index) in tableData" :key="index" :style="index%2!=0?{'background-color':'#F4F5F9'}:{'background-color':'#fff'}">
+                    <div class="item-cols" style="width:20%;">
+                        <span>{{item.groupName}}</span>
+                    </div>
+                    <div class="item-cols" style="width:20%;">
+                        <span class="icon-span" :style="item.result==0?{'background-color':'#FDBA40'}:{'background-color':'#6097F3'}">{{item.result==0?'不合格':'合格'}}</span>
+                    </div>
+                    <div class="item-cols" style="width:20%;"> 
+                        <span>{{item.score}}</span>
+                    </div>
+                    <div class="item-cols" style="">
+                        <span>{{item.totalScore}}</span>
                     </div>
                 </div>
             </div>
@@ -56,7 +56,7 @@ export default {
             isSuccess:true,
             sucSrc:require('../../../static/img/succeed_icon.png'),
             errSrc:require('../../../static/img/failed_icon.png'),
-            curSecond:30,
+            curSecond:10,
             leader:'',
             storeName:'',
             ignoreCount:0,
@@ -91,12 +91,16 @@ export default {
     },
     computed:{
         retInfo(){
+            let msg='';
             if(this.isSuccess){
-                return `已将不合格项抄送至${this.leader}！`;
+                if(this.leader!=undefined&&this.leader.length!=0){
+                    msg=`已将不合格项抄送至${this.leader}！`;
+                }
             }
             else{
-                return `提交失败！`;
+                msg= `提交失败！`;
             }
+            return msg;
         }
     },
     beforeRouteLeave(to, from, next) {
@@ -153,7 +157,7 @@ export default {
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                self.$router.push({name:'远程巡检'});
+                //self.$router.push({name:'远程巡检'});
             }
         },
         reTry(){
@@ -229,14 +233,14 @@ export default {
         }
         .table-content{
             margin: 20px;
-            height: 200px;
+            height: auto;
             border: 1px solid #e3e9f4;
             background-color: #fff;
             .table-header{
                 width: 100%;
-                height: 36px;
+                height: 39px;
                 background-color: #F4F5F9;
-                line-height: 36px;
+                line-height: 32px;
                 .table-details{
                     text-align: left;
                     display: inline-block;
@@ -247,40 +251,47 @@ export default {
                     }
                     
                 }
-                .data-rows{
-                    width: 100%;
-                    height: 36px;
-                    line-height: 36px;
-                    text-align: left;
-                    .item-cols{
-                        display: inline-block;
-                        font-size: 12px;
-                        font-weight: bold;
-                        border-right: 1px solid #e3e9f4;
+            }
+            .data-rows{
+                width: 100%;
+                height: 39px;
+                line-height: 36px;
+                text-align: left;
+                .item-cols{
+                    height: 39px;
+                    float: left;
+                    display: block;
+                    line-height: 39px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    border-right: 1px solid #e3e9f4;
+                    span{
+                        margin-left: 20px;
+                    }
+                    &:last-child{
+                        border-width: 0;
+                    }
+                    &:first-child{
                         span{
-                            margin-left: 20px;
-                        }
-                        &:last-child{
-                            border-width: 0;
-                        }
-                        &:first-child{
-                            span{
-                                margin-left: 30px;
-                            }
-                        }
-                        .icon-span{
-                            display:inline-block;
-                            width: 50px;
-                            height:20px;
-                            line-height: 20px;
-                            color:white;
-                            padding-left:5px;
-                            padding-right:5px;
-                            font-size: 12px;
-                            text-align: center;
-                            font-weight: normal;
+                            margin-left: 30px;
                         }
                     }
+                    .icon-span{
+                        display:inline-block;
+                        width: 50px;
+                        height:20px;
+                        line-height: 20px;
+                        color:white;
+                        padding-left:5px;
+                        padding-right:5px;
+                        font-size: 12px;
+                        text-align: center;
+                        font-weight: normal;
+                    }
+                }
+                &:last-child{
+                    border-bottom: 1px solid #e3e9f4;
+                    margin-bottom: 20px;
                 }
             }
         }

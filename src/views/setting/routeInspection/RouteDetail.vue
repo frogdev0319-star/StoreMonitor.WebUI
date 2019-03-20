@@ -771,15 +771,7 @@ export default {
 .el-tabs__active-bar{
         height: 4px !important;
         background-color: #f31d65 !important;
-    }
-.el-tabs__item.is-active{
-    font-weight: bold !important;
-    color: #f31d65 !important; 
 }
-.el-tabs__item:hover{
-    color: #f31d65 !important;
-}
-
 .el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
     background-color: #FEE7E4;
     color: #000;

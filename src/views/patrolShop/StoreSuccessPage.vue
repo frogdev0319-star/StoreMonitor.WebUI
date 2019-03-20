@@ -64,7 +64,7 @@ export default {
             errSrc:require('../../../static/img/failed_icon.png'),
             sucInfo:'问题提交成功！',
             errInfo:'提交失败！',
-            curSecond:30,
+            curSecond:10,
             storeName:'西安6店',
             eventName:'水吧问题2',
             leader:'小明',

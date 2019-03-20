@@ -2901,7 +2901,7 @@ export default {
                     font-size: 16px;
                     color: $black;
                 }
-                 @media screen and (min-width: 1366px){
+                @media screen and (min-width: 1366px){
                     .date-picker-content{
                         text-align: left;
                         @include point(padding-left,20);
@@ -3054,14 +3054,9 @@ export default {
     height: 4px !important;
     /* background-color: #f31d65 !important; */
 }
-.el-tabs__item.is-active{
-    font-weight: bold !important;
-    color: #f31d65 !important;
-}
 .el-tabs__item:hover{
      color: #f31d65 !important;
 }
-
 .el-test .el-input__inner{
     height: 24px;
     line-height: 24px;

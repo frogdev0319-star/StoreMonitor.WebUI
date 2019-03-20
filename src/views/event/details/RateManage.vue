@@ -1,153 +1,156 @@
 <template>
     <el-row class="el-rate-container">
-        <el-col :span="24" class="title-content">
-            <span class="event-title">{{event.eventTitle}}</span>
-            <span class="event-score">得分：{{event.score==null?'---':event.score}}分</span>
-            <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
-        </el-col>
-        <el-dialog  title='播放' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
-        v-if="dialogFormVisible" :width="550*percentHeight+'px'" height=380px top=15% @close='stopRealTime' class='rate-video-dialog'>
-            <div class="video-dialog-content" style="overflow:hidden;">
-                <video  height=83% width=90% id="previewVideo" prload controls
-                    class="video-js vjs-fill" style="postion:absoulte;top:10px;">
-                </video>
-            </div>
-        </el-dialog>
-        <el-dialog title='结案'
-        :visible.sync="showWindContent" v-if="showWindContent"
-        :append-to-body='true'
-        :close-on-click-modal="false"
-        width="28%"
-        top="35vh"
-        left="40vh">
-            <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FFC1C8;margin-top: 0;"/>
-               <div class="tabName-input-content">
-                    <el-input type="text" size="small" v-model="winpDes" class="tabName-input" style=""  maxlength='50'
-                    placeholder="请输入结案评论"></el-input>
-                </div>
-            </div>
-            <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" @click="showWindContent = false" size="mini" style="">取 消</el-button>
-                <el-button class="file-confirm-btn" @click="confirmWind" size="mini" style="color:#fff">确 认</el-button>
-            </div>
-        </el-dialog>
-        <!-- <transition name="fade">
-            <div id="outerdiv" style="" v-show="showOuter">
-                <div id="innerdiv" style="position:absolute;">
-                    <img id="bigimg" style="border:5px solid #fff;" :src="bigImgSrc" />
-                </div>
-            </div>
-        </transition> -->
-        <transition name="fade">
-            <el-dialog title='查看'
-            :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width=550px height=300px top=15%>
-             <hr style="border: 0.5px solid #FFC1C8;width:100%;margin-top:10px;margin-bottom:15px;"/>
-                <div class="dialog-source-content">
-                    <img v-if="showImg" :src="checkImgSrc"/>
-                
+        <el-col :span="16" class="lside">
+            <el-col :span="24" class="title-content">
+                <span class="event-title">{{event.eventTitle}}</span>
+                <span class="event-score">得分：{{event.score==null?'---':event.score}}分</span>
+                <el-button size="mini" class="el-submit" @click="windUp" v-if="showWinpBtn">结案</el-button>
+            </el-col>
+            <el-dialog  title='播放' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
+            v-if="dialogFormVisible" :width="550*percentHeight+'px'" height=380px top=15% @close='stopRealTime' class='rate-video-dialog'>
+                <div class="video-dialog-content" style="overflow:hidden;">
+                    <video  height=83% width=90% id="previewVideo" prload controls
+                        class="video-js vjs-fill" style="postion:absoulte;top:10px;">
+                    </video>
                 </div>
             </el-dialog>
-        </transition>
-        <el-col :span="24" class="storeInfo-content">
-            <strong>门店</strong><span>{{event.storeName}}</span>
-            <strong>提报人</strong><span>{{event.createor}}</span>
-            <strong>提报时间</strong><span>{{event.createDate}}</span>
-        </el-col>
-        <el-col :span="24" class="eventInfo-content" :style="{'min-height':divHeight+'px'}">
-            <strong>事件详情</strong>
-            <div class="speech-content" v-if="showAudio">
-               <div class="speech-info" @click="startSpeech"> 
-                   <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
-               </div>
-               <audio :ref="audioRef" id="audio">
-                    <source :src="audioSrc" type="audio/mpeg" />
-                </audio> 
-               <span class="often-text">{{audioOftenText}}</span>
-            </div>
-            <div class="photo-content">
-                <div v-for="(item,index) in sourceList" :key="index" class="source-content">
-                    <div v-if="item.mediaType==2" class="img-content">
-                        <!--图片资源-->
-                        <img class="imgLittle" :src="item.url" :title="imgTitle" :onerror='deafultImg'
-                         height="100px" @click="openOuter(item,$event)"/>
-                    </div>
-                        <!--视频资源-->
-                    <div  v-else class="video-content">
-                        <video  height=83% width=90%  prload controls 
-                                class="video-js vjs-fill" style="min-width:200px;max-width:200px; min-height:120px; max-height:120px;object-fit: fill;">
-                                <source :src="item.url">
-                        </video>
+            <el-dialog title='结案'
+            :visible.sync="showWindContent" v-if="showWindContent"
+            :append-to-body='true'
+            :close-on-click-modal="false"
+            width="28%"
+            top="35vh"
+            left="40vh">
+                <div class="dialog-content" style="overflow:hidden;width:100%;">
+                    <hr style="border: 0.5px solid #FFC1C8;margin-top: 0;"/>
+                <div class="tabName-input-content">
+                        <el-input type="text" size="small" v-model="winpDes" class="tabName-input" style=""  maxlength='50'
+                        placeholder="请输入结案评论"></el-input>
                     </div>
                 </div>
-            </div>
-            <div class="viedo-info">
-                <span>{{event.createDate}}</span>
-                <div v-if="showCheckVideo">
-                    <i class="iconfont icon-bofang icon-video"></i>
-                    <span class="ahref" @click="checkVideo">{{curChannel.name+'区域'}}</span>
+                <div slot="footer" class="dialog-footer">
+                    <el-button class="file-cancel-btn" @click="showWindContent = false" size="mini" style="">取 消</el-button>
+                    <el-button class="file-confirm-btn" @click="confirmWind" size="mini" style="color:#fff">确 认</el-button>
                 </div>
-            </div>
-            <span class="sub-time"></span> 
-            <div class="start-video-content"></div>
-            <hr/>
-            <div v-if="showWinpBtn">
-                <span class="group-title" style="display:block;margin:15px auto;">添加处理信息</span>
-                <el-input
-                    type="textarea"
-                    maxlength='300'
-                    :autosize="{ minRows: 2, maxRows: 4}"
-                    placeholder="请输入处理评论文字"
-                    v-model="description">
-                </el-input>
-                <el-button size="mini" class="el-submit" @click="submit">提交</el-button>
-            </div>
-            <el-col :span="24" class="deal-content">
-                <span class="group-title">问题处理</span>
-                <div class="deal-info" :style="{'min-height':windowHeight-658+'px'}">
-                    <div v-for="(item,index) in commentList" :key="index" class="deal-detal-content">
-                        <div class="circle-content" :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="lside">
-                            <span v-if="item.showLabel" :style="item.spanStyle">{{item.process}}</span>
-                        </div>
-                        <div class="rside">
-                            <div class="">
-                                <span class="creator">{{item.createOr}}</span>
-                                <div class="speech-content deal-speech" v-if="item.showAudio">
-                                    <div class="speech-info" @click="startSpeechItem(item,index)">
-                                        <i class="iconfont icon-yuyin icon-speech"></i>
-                                    </div>
-                                    <audio :ref="item.audio.audioRef">
-                                        <source :src="item.audio.audioSrc" type="audio/mpeg" />
-                                    </audio>
-                                    <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOftenText}}</span>
-                                </div>
-                            </div>
-                            <pre v-if="item.description!=null" class="description">{{item.description}}</pre>
-                            <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
-                                <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                                    <div v-if="_item.mediaType==2" class="img-content">
-                                        <img class="imgLittle" :title="imgTitle"
-                                          :src="_item.url" height="100px" :onerror='deafultImg'
-                                         @click="openOuter(_item,$event)"/>
-                                    </div>
-                                   <div  v-else class="video-content">
-                                        <video  height=83% width=90%  prload controls
-                                                class="video-js vjs-fill" style="min-width:200px;max-width:200px;min-height:120px; max-height:120px;object-fit: fill;">
-                                                <source :src="_item.url">
-                                        </video>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="viedo-info">
-                                <span>{{item.createDate}}</span>
-                            </div>
-                        </div>
+            </el-dialog>
+            <!-- <transition name="fade">
+                <div id="outerdiv" style="" v-show="showOuter">
+                    <div id="innerdiv" style="position:absolute;">
+                        <img id="bigimg" style="border:5px solid #fff;" :src="bigImgSrc" />
                     </div>
                 </div>
+            </transition> -->
+            <transition name="fade">
+                <el-dialog title='查看'
+                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width=550px height=300px top=15%>
+                <hr style="border: 0.5px solid #FFC1C8;width:100%;margin-top:10px;margin-bottom:15px;"/>
+                    <div class="dialog-source-content">
+                        <img v-if="showImg" :src="checkImgSrc"/>
+                    
+                    </div>
+                </el-dialog>
+            </transition>
+            <el-col :span="24" class="storeInfo-content">
+                <strong>门店</strong><span>{{event.storeName}}</span>
+                <strong>提报人</strong><span>{{event.createor}}</span>
+                <strong>提报时间</strong><span>{{event.createDate}}</span>
             </el-col>
+            <el-col :span="24" class="eventInfo-content" :style="{'min-height':divHeight+'px'}">
+                <strong>事件详情</strong>
+                <div class="speech-content" v-if="showAudio">
+                <div class="speech-info" @click="startSpeech"> 
+                    <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
+                </div>
+                <audio :ref="audioRef" id="audio">
+                        <source :src="audioSrc" type="audio/mpeg" />
+                    </audio> 
+                <span class="often-text">{{audioOftenText}}</span>
+                </div>
+                <div class="photo-content">
+                    <div v-for="(item,index) in sourceList" :key="index" class="source-content">
+                        <div v-if="item.mediaType==2" class="img-content">
+                            <!--图片资源-->
+                            <img class="imgLittle" :src="item.url" :title="imgTitle" :onerror='deafultImg'
+                            height="100px" @click="openOuter(item,$event)"/>
+                        </div>
+                            <!--视频资源-->
+                        <div  v-else class="video-content">
+                            <video  height=83% width=90%  prload controls 
+                                    class="video-js vjs-fill" style="min-width:200px;max-width:200px; min-height:120px; max-height:120px;object-fit: fill;">
+                                    <source :src="item.url">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="viedo-info">
+                    <span>{{event.createDate}}</span>
+                    <div v-if="showCheckVideo">
+                        <i class="iconfont icon-bofang icon-video"></i>
+                        <span class="ahref" @click="checkVideo">{{curChannel.name+'区域'}}</span>
+                    </div>
+                </div>
+                <span class="sub-time"></span> 
+                <div class="start-video-content"></div>
+                <hr/>
+                <div v-if="showWinpBtn">
+                    <span class="group-title" style="display:block;margin:15px auto;">添加处理信息</span>
+                    <el-input
+                        type="textarea"
+                        maxlength='300'
+                        :autosize="{ minRows: 2, maxRows: 4}"
+                        placeholder="请输入处理评论文字"
+                        v-model="description">
+                    </el-input>
+                    <el-button size="mini" class="el-submit" @click="submit">提交</el-button>
+                </div>
+
+            </el-col>
+        </el-col>
+        <el-col :span="8" class="rside">
+            <span class="group-title">问题处理</span>
+            <div class="deal-info" :style="{'min-height':windowHeight-658+'px'}">
+                <div v-for="(item,index) in commentList" :key="index" class="deal-detal-content">
+                    <div class="circle-content" :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="lside">
+                        <span v-if="item.showLabel" :style="item.spanStyle">{{item.process}}</span>
+                    </div>
+                    <div class="rside">
+                        <div class="">
+                            <span class="creator">{{item.createOr}}</span>
+                            <div class="speech-content deal-speech" v-if="item.showAudio">
+                                <div class="speech-info" @click="startSpeechItem(item,index)">
+                                    <i class="iconfont icon-yuyin icon-speech"></i>
+                                </div>
+                                <audio :ref="item.audio.audioRef">
+                                    <source :src="item.audio.audioSrc" type="audio/mpeg" />
+                                </audio>
+                                <span class="often-text" v-if="item.audio!=null">{{item.audio.audioOftenText}}</span>
+                            </div>
+                        </div>
+                        <pre v-if="item.description!=null" class="description">{{item.description}}</pre>
+                        <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
+                            <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                                <div v-if="_item.mediaType==2" class="img-content">
+                                    <img class="imgLittle" :title="imgTitle"
+                                    :src="_item.url" height="100px" :onerror='deafultImg'
+                                    @click="openOuter(_item,$event)"/>
+                                </div>
+                            <div  v-else class="video-content">
+                                    <video  height=83% width=90%  prload controls
+                                            class="video-js vjs-fill" style="min-width:200px;max-width:200px;min-height:120px; max-height:120px;object-fit: fill;">
+                                            <source :src="_item.url">
+                                    </video>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="viedo-info">
+                            <span>{{item.createDate}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </el-col>
     </el-row>
 </template>

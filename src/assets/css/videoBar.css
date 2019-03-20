@@ -1,0 +1,3 @@
+.video-js.vjs-ended .vjs-big-play-button, .video-js.vjs-paused .vjs-big-play-button, .vjs-paused.vjs-has-started.vjs-custom-skin > .video-js .vjs-big-play-button{
+    visibility: hidden !important;
+}
