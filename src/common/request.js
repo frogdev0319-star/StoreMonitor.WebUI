@@ -8,17 +8,15 @@ import {getToken} from '@/common/auth.js'
 
 //let base='http://'+window.location.host;
 let base ='http://222.91.163.149:18081'
-let itempath='/storemonitor/api/v1.0'
 
+
+
+let itempath='/storemonitor/api/v1.0'
 //配置
-//const CancelToken=axios.CancelToken;
-//const source=CancelToken.source();
-//store.requestCancel=source.cancel;  //保存到全局变量，用于路由切换时调用
 axios.defaults.withCredentials = true;
 const service=axios.create({
     baseURL:`${base}${itempath}`,
     timeout:10000,
-    // cancelToken:source.token
 })
 //文件下载axios
 const serviceAxios=axios.create({
@@ -69,7 +67,6 @@ serviceAxios.interceptors.request.use(
         return config;
     },
     error=>{
-        //Do something with request error
         console.log(error);
         Promise.reject(error);
     }
@@ -90,6 +87,7 @@ serviceAxios.interceptors.response.use(
             }).then(()=>{
                 store.dispatch('FedLogOut').then(()=>{
                     router.push('/login');
+                    //window.location.href='https://portals.storeviu.com';
                     Message({
                         message:err.response.data.errMsg,
                         type:'error',
@@ -100,9 +98,8 @@ serviceAxios.interceptors.response.use(
             
         }
         else if(errCode===500&&errMsg=='No authority'){
-            router.push('/');
+            router.push('/home');
             Message({
-                //message:err.response.data.errMsg,
                 message:'无操作权限!',
                 type:'error',
                 duration:5*1000
@@ -114,7 +111,6 @@ serviceAxios.interceptors.response.use(
 
 service.interceptors.request.use(
     config=>{
-        //Do something before request is sent
         if(store.getters.token){
             config.headers={
                 'token':getToken(),
@@ -126,7 +122,6 @@ service.interceptors.request.use(
         return config;
     },
     error=>{
-        //Do something with request error
         console.log(error);
         Promise.reject(error);
     }
@@ -144,6 +139,7 @@ service.interceptors.response.use(
             if(errCode===500&&(errMsg=='Invalid token'||
                 errMsg=='Fail to verify token'||errMsg=='User does not exist')){
                 router.push('/login');
+                //window.location.href='https://portals.storeviu.com';
                 Message({
                     message:'登录信息异常，请重新登录!',
                     type:'error',
@@ -152,6 +148,7 @@ service.interceptors.response.use(
             }
             else if(errCode===500&&errMsg=='Token does not exist'){
                 router.push('/login');
+                //window.location.href='https://portals.storeviu.com';
             }
             else if(errCode===500&&errMsg=='No authority'){
                 router.push('/home');
@@ -187,7 +184,6 @@ service.interceptors.response.use(
 
 service.interceptors.request.use(
     config=>{
-        //Do something before request is sent
         if(store.getters.token){
             config.headers={
                 'token':getToken(),
@@ -199,7 +195,6 @@ service.interceptors.request.use(
         return config;
     },
     error=>{
-        //Do something with request error
         console.log(error);
         Promise.reject(error);
     }

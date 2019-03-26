@@ -20,7 +20,7 @@
                  :readonly=true></el-input>
                  <i :class="showDrap?'el-icon-arrow-down':'el-icon-arrow-up'" class='icon-input'></i>
                 </div>
-                <el-button size="mini" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
+                <el-button :size="varyWindowWidth>1366?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
                 <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false">
                     
                     <p :style="isChecked?{}:{'color':'#f31d65'}">
@@ -46,7 +46,7 @@
             <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}表共有{{totalCount}}家门店,已绑定{{storeCount}}家门店</p>
            
         </div>
-        <div class="el-bind-content" :style="{'min-height':varyWindowWidth*0.56+'px'}">
+        <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.56+'px'}">
             <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                 <div class="el-all-checkbox" v-if="storeList.length!=0">
                     <el-checkbox  v-model="allData" @change="choiceAll"></el-checkbox>
@@ -87,7 +87,8 @@ export default {
             totalCount:0,
             storeList:[],
             tempStoreList:[],
-            varyWindowWidth:window.innerHeight,
+            varyWindowHeight:window.innerHeight,
+            varyWindowWidth:window.innerWidth,
             provinceList:[],
             curProvince:'',
             multeCityList:[],
@@ -596,6 +597,12 @@ export default {
     text-align: left;
     font-family: 'Microsoft YaHei';
 }
+$red:#f31d65;
+$black:#182752;
+$border:#e3e9f4;
+$background:#f4f5f9;
+$tab:#7d8cad;
+$h1:#292e36;
 @function rem($val){
     @return $val/16+rem;
 }
@@ -618,6 +625,9 @@ export default {
         @include point(margin-top,30);
         @include point(margin-left,30);
         position: relative;
+        span{
+            font-size: 14px;
+        }
         .el-province{
             @include point(width,160);
             @include point(margin-left,15);
@@ -647,6 +657,7 @@ export default {
             text-align: center;
             @include point(margin-left,15);
             color: #fff;
+            padding: 9px 15px;
         }
         .icon-input{
             position: absolute;
@@ -687,6 +698,7 @@ export default {
         position: relative;
         top: 5px;
         display: inline;
+        color: $black;
     }
     .el-header-hr{
         @include point(margin-left,30);
@@ -699,7 +711,7 @@ export default {
     .choice-device{
         @include point(margin-right,30);
         font-size: 12px;
-        color: #4b5262;
+        color: $tab;
         display: inline;
         position: absolute;
         @include point(right,10);
@@ -711,8 +723,10 @@ export default {
         @include point(margin-right,20);
         background-color: #F6F7FB;
         border:0.5px solid #e3e9f4;
+        color: $black;
         .el-all-checkbox{
             margin: 20px auto 20px 15px;
+            @include point(margin-left,15);
             .all-device-title{
                 @include point(margin-left,15);
                 font-size: 14px;
@@ -758,7 +772,7 @@ export default {
             @include point(margin-top,15);
             @include point(margin-bottom,15);
             .btn{
-                @include point(width,120);
+                @include point(width,90);
                 background-color: #f31d65; 
                 color: #fff;
             }

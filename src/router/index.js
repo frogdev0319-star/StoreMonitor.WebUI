@@ -26,7 +26,7 @@ export default new Router({
     {
       path: '/home',
       name: '总览',
-      redirect:'/event',
+      redirect:'/reinspection',
       component: Home,
       hidden: false,
       iconCls:'iconfont icon-zonglan',

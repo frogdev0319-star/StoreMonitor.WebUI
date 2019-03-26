@@ -77,7 +77,7 @@
                             </div>
                             <div slot="footer" class="dialog-footer">
                                 <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">取 消</el-button>
-                                <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" style="color:#fff">确 认</el-button>
+                                <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">确 认</el-button>
                             </div>
                         </el-dialog>
                     </el-col>
@@ -235,7 +235,7 @@ export default {
                     enabled:true,
                 }
             ],
-            varWindowWidth:1440, 
+            varWindowWidth:window.innerWidth, 
             varyWindowHeight:window.innerHeight,
         }
     },
@@ -816,8 +816,8 @@ export default {
         ...mapMutations( [ 'SET_DASHURL'] )
     },
     created(){
-        this.varWindowWidth=window.innerWidth;
-        console.log(this.varWindowWidth);
+        // this.varWindowWidth=window.innerWidth;
+        // console.log(this.varWindowWidth);
     },
     mounted(){
         let self=this;

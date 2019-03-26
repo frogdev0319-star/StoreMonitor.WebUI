@@ -104,6 +104,8 @@ export default {
         }
     },
     beforeRouteLeave(to, from, next) {
+        let self=this;
+        clearInterval(self.timeid);
         if(to.name=='远程巡检'){
             if(this.isSuccess==true){
                 to.meta.keepAlive = false;
@@ -157,7 +159,7 @@ export default {
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                //self.$router.push({name:'远程巡检'});
+                self.$router.push({name:'远程巡检'});
             }
         },
         reTry(){

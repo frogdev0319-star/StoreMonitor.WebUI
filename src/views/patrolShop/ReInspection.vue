@@ -9,13 +9,13 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button class="el-submit" size="small" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary">
+                <el-button class="el-submit" :size="varyWindowWidth>1366?'small':'mini'" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary">
                     提交
                 </el-button> 
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="1050*percentHeight+'px'" height=300px top=2%>
-                <div class="canvas-content">
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
                     <hr class="dialog-hr"/> 
                         <div class='icon-right' v-if="showPenBtn" id="iconR">
                             <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
@@ -28,15 +28,17 @@
                             </div>
                             </transition>
                         </div>
-                     <canvas id="icanvas"  :width="947*percentHeight" :height="532*percentHeight" @mousedown="mouseDownAction($event)" 
+                     <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)" 
                     @mousemove="mouseMoveAction($event)"></canvas>
-                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':947*percentHeight+'px',
-                    'margin-left':52*percentHeight+'px'}">
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
+                    'margin-left':47*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas"> 
-                            <span>取消编辑</span>
+                            <img :src="clearIconSrc" class="icon-clear" height="22px"/> 
+                            <span>清除</span>
                         </div>
                         <div class="content" @click="confirmEditCanvas">
-                            <span>撤销编辑</span>
+                            <img :src="removeIconSrc" class="icon-clear" height="22px"/> 
+                            <span>撤销</span>
                         </div>
                     </div>
                 </div>
@@ -48,6 +50,7 @@
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
+            <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
             <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
                     <div class="num-content">
@@ -138,6 +141,7 @@
                             <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
                                     <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'" :style="item.checked?{'font-weight':'bold'}:{}">{{`${index+1}. ${item.subject}`}}</span>
+                                    <div class="dropdown-model" v-if="item.disabled"></div>
                                     <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
                                             {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -161,7 +165,7 @@
                                             <img :src="_item.src" :width="_item.width" :height="_item.height"/>
                                         </div>
                                     </div>
-                                    <el-input size="mini" class="des-input" type="textarea" @change="changeInput(item)" @focus="focusInput(item)"
+                                    <el-input size="mini" class="des-input" type="textarea" 
                         maxlength="300" v-model="item.inspectInput" placeholder="请输入处理评论文字" :disabled="item.disabled"></el-input>
                                 </div>
                             </div>
@@ -183,7 +187,7 @@
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
-                            <span v-for="(_item,_index) in item.storeList" :key="_index" class="store-name"
+                            <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
                             </span>
@@ -244,10 +248,10 @@ export default {
                 storeUp:false,
                 storeUptitle:'点击关注'
             },
-            storeUpSrc:require('../../../static/img/collect2_icon.png'),
-            nostoreUpSrc:require('../../../static/img/collect_icon.png'),
             arrows1Src:require('../../../static/img/arrows3_pic.png'),
             arrows2Src:require('../../../static/img/arrows2_pic.png'),
+            clearIconSrc:require('../../../static/img/清除.png'),
+            removeIconSrc:require('../../../static/img/撤销.png'),
             showModelContent:false,
             activeIndex:'0',
             serachVale:'',
@@ -338,7 +342,7 @@ export default {
             bucketVideo:'',
             bucketImage:'',
             percentage:0,
-            accountId:'aaoompqqpjy4',
+            accountId:'',
 
             scoreList:[
                 {
@@ -434,6 +438,12 @@ export default {
                 showInfo:'当前门店的巡检项未绑定设备！',
                 isWarning:false,
                 dialogCosed:false
+            },
+            noAllInspectObj:{
+                title:'提示',
+                showInfo:'当前尚有未完成巡检项，请完成后进行提交！',
+                isWarning:false,
+                dialogCosed:false
             }
         }
     },
@@ -486,6 +496,7 @@ export default {
         },
         getOssInfo(){
             let self=this;
+            self.accountId=sessionStorage.getItem('oss_bucket');
             getStorageInfo().then(res=>{
                 console.log(res);
                 if(res.errCode==0){
@@ -574,7 +585,7 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                ctx.drawImage(self.videoEl,0,0,947*self.percentHeight,532*self.percentHeight);
+                ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
                 var oGrayImg=icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
                 let imgObj=new Image();
@@ -602,8 +613,9 @@ export default {
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,947*self.percentHeight,532*self.percentHeight);
-            ctx.drawImage(self.imageCanvas,0,0,947*self.percentHeight,532*self.percentHeight);
+            ctx.clearRect(0,0,767*self.percentHeight,431*self.percentHeight);
+            ctx.drawImage(self.imageCanvas,0,0,767*self.percentHeight,431*self.percentHeight);
+            self.imageCanvasList=[];
         },
         confirmEditCanvas(){
             let self=this;
@@ -611,12 +623,12 @@ export default {
             self.imageCanvasList.pop();
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,947*self.percentHeight,532*self.percentHeight);
+            ctx.clearRect(0,0,767*self.percentHeight,431*self.percentHeight);
             if(self.imageCanvasList.length==0){
-                ctx.drawImage(self.imageCanvas,0,0,947*self.percentHeight,532*self.percentHeight);
+                ctx.drawImage(self.imageCanvas,0,0,767*self.percentHeight,431*self.percentHeight);
             }
             else{
-                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,947*self.percentHeight,532*self.percentHeight);
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,767*self.percentHeight,431*self.percentHeight);
             }
         },
         confirmEdit(){
@@ -640,11 +652,6 @@ export default {
             else{
                 self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
             }
-            
-            if(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].inputCount==0){
-                self.inspectList[tempId.groupIndex].dealCount=self.inspectList[tempId.groupIndex].dealCount+1;
-            }
-            self.inspectList[tempId.groupIndex].items[tempId.itemIndex].inputCount++;
         },
         mouseDownAction(e){
            let self=this;
@@ -694,6 +701,16 @@ export default {
                 self.Y=self.Y1;
             }
         },
+        showCancel(){
+            let self=this;
+            self.showCancelContent=true;
+            self.showPenBtn=true;
+        },
+        hiddenCancel(){
+            let self=this;
+            self.showCancelContent=false;
+            self.showPenBtn=false;
+        },
         getFaStoreList(){
             let self=this;
             return new Promise((resolve,reject)=>{
@@ -706,10 +723,6 @@ export default {
         checkScore(item,itemDS){
             let self=this;
             console.log(item);
-            if(item.id!=self.curItemId){
-                self.notify('请先选中当前巡检项，然后输入分值!','warning',3000);
-                return false;
-            }
             item.itemScore=itemDS.val;
             if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                 self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
@@ -767,12 +780,16 @@ export default {
                     if(data.errCode==0){
                         let storeData=data.data;
                         self.tabList[0].storeList=getStoreTemp(storeData);
+                        self.tabList[0].storeList.push({'name':'Team18 厦门自贸店'});
                     }
                     break;
                 case 1:
                     let temp=[];
                     let data=self.recentStoreList;
                     console.log(data);
+                    data=data.filter(function(x){
+                        return x!=null;
+                    })
                     data.map(x=>x.storeId).forEach(item=>{
                         if(temp.indexOf(item)==-1){
                             temp.push(item);
@@ -836,17 +853,19 @@ export default {
                 if(storeData.length==0){
                     self.showStoreUp=false;
                 }
-                let obj={};
-                obj.storeId=storeData[0].storeId;
-                obj.storeName=storeData[0].name;
-                obj.storeTitle=storeData[0].name;
-                obj.storeUp=true;
-                obj.storeUpTitle='已关注';
-                self.store=obj;
+                else{
+                    let obj={};
+                    obj.storeId=storeData[0].storeId;
+                    obj.storeName=storeData[0].name;
+                    obj.storeTitle=storeData[0].name;
+                    obj.storeUp=true;
+                    obj.storeUpTitle='已关注';
+                    self.store=obj;
 
-                self.recentStoreList.unshift(self.tabList[0].storeList[0]);
-                localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
-                self.getInspectByStore(self.tabList[0].storeList[0].storeId);
+                    self.recentStoreList.unshift(self.tabList[0].storeList[0]);
+                    localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
+                    self.getInspectByStore(self.tabList[0].storeList[0].storeId);
+                }
             }
         },
          async getInitStoreData(){
@@ -874,6 +893,7 @@ export default {
                             obj.name=data[j].name;
                             obj.userId=data[j].userId;
                             obj.city=data[j].city;
+                            obj.province=data[j].province;
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
                             if(data[j].appliedInspect.length!=0&&data[j].appliedInspect.indexOf('远程巡检')!=-1){
@@ -934,21 +954,6 @@ export default {
                 })
             }
         },
-        focusInput(item){
-            let self=this;
-            if(item.id!=self.curItemId){
-                self.notify('请先选中当前巡检项，然后进行输入!','warning',3000);
-                return false;
-            }
-        },
-        changeInput(item){
-            let self=this;
-            console.log(item);
-            item.inputCount++;
-            if(item.inspectInput.trim().length!=0&&item.inputCount==1){
-                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
-            }
-        },  
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
@@ -1045,11 +1050,6 @@ export default {
             if(item.isIgnore){
                 return false;
             }
-            // if(item.clickCount!=0&&self.curItemIndex==index){
-            //     self.notify('当前视频正在播放，请勿连续点击！','warning',3000);
-            //     return false;
-            // }
-            item.clickCount++;
             self.sourceList=[];
             item.checked=true;
             self.curItem=item;
@@ -1066,9 +1066,16 @@ export default {
                     obj.channelName=device.name;
                     obj.channelId=device.channelId;
                     self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
-                    self.realTime();
+                    if(item.deviceId!=self.curDeviceId){
+                        if(self.playState){
+                            self.stopAndRealTime();
+                        }
+                        else{
+                            self.realTime();
+                        }
+                        self.curDeviceId=item.deviceId;
+                    }
                 }
-                self.curDeviceId=item.deviceId;
             }
             else if(item.deviceId==-1){
                 self.noBindDeviceObj.dialogCosed=true;
@@ -1077,6 +1084,7 @@ export default {
             self.inspectItemList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.checked=false;
+                    _item.disabled=true;
                 }
             })
         },
@@ -1114,7 +1122,6 @@ export default {
                             itemObj.deviceId=_item.deviceId;
                             itemObj.inspectInput='';
                             itemObj.inputCount=0;
-                            itemObj.clickCount=0;
                             itemObj.disabled=true;
                             itemObj.checked=false;   //是否选中状态
                             itemObj.isIgnore=false;  //是否被忽略
@@ -1131,6 +1138,14 @@ export default {
                 }
             })
         },
+        noAllInspectDialog(){
+            let self=this;
+            self.noAllInspectObj.dialogCosed=false;
+        },
+        canceldNoAllInspect(){
+            let self=this;
+            self.noAllInspectObj.dialogCosed=false;
+        },
         async submit(){
             let self=this;
             let temp=[];
@@ -1141,7 +1156,8 @@ export default {
                 dealCount=dealCount+item.dealCount;
             })
             if(dealCount<count){
-                self.notify('当前尚有未完成巡检项，请完成后进行提交！','warning',3000);
+                //self.notify('当前尚有未完成巡检项，请完成后进行提交！','warning',3000);
+                self.noAllInspectObj.dialogCosed=true;
                 return false;
             }
             self.fullscreenLoading=true;
@@ -1289,6 +1305,50 @@ export default {
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
         },
+       async stopAndRealTime(){
+            let self=this;
+            self.stopVideo();
+            const dataDis = {
+                request: { 
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            let url='';
+            let ret=await dashAPI.RealTime(0,dataDis);
+            await dashAPI.Offline(self.sessionId);
+            let sessionId= await dashAPI.Online();
+            self.sessionId=sessionId;
+            let data=null;
+            data = {
+                request: { 
+                    method: 'connection',
+                    sessionID: sessionId,
+                    streamingProtocol:this.protocal,
+                    IVSID:self.channel.ivsId,
+                    channel:JSON.stringify(self.channel.channelId),
+                    streamType:'SubStream'
+                }
+            };
+            url=await dashAPI.RealTime(1,data);
+            
+            self.mpdurl = url;
+            console.log(self.mpdurl);
+            if (url.ErrorCode==undefined&&url.length!=0) {
+                self.playVideo(self.mpdurl);
+            }
+            else{   //当前视频如果返回失败，需处于暂停状态
+                self.showGuide=false;
+                self.showError=true;
+                let errorCode=self.mpdurl.ErrorCode; //错误码
+                let errorText= util.getErrorText(errorCode);
+                self.errorText=errorText;
+                self.destroyVideo();
+            }
+        },
         controlScreen(){
             let self=this;
             if(!self.fullScreen){
@@ -1352,7 +1412,6 @@ export default {
             let self=this;
             console.log(self.tabList);
             console.log(self.serachVale.trim());
-            
             let tempStoreList=self.tempStoreList;
             let getStore2Temp=data=>{
                 let cityList=[];
@@ -1382,8 +1441,10 @@ export default {
                             obj.name=data[j].name;
                             obj.userId=data[j].userId;
                             obj.city=data[j].city;
+                            obj.province=data[j].province;
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
+                            obj.hasInspect=data[j].hasInspect;
                             temp.push(obj);
                         }
                     }
@@ -1592,21 +1653,26 @@ export default {
             }
             .cancel-content{
                 position: absolute;
-                bottom: 0px;
-                height: 30px;
-                background-color: #000;
-                opacity: 0.8;
+                bottom: 2px;
+                @include point(height,30);
+                @include point(line-height,30);
+                background-color: $black;
+                opacity: 0.5;
                 z-index: 10;
                 overflow: hidden;
                 .content{
                     text-align: center;
                     float: left;
                     color: #fff;
-                    line-height: 30px;
                     cursor: pointer;
                     width: 49%;
                     &:first-child{
                         border-right: 1px solid #fff;
+                    }
+                    .icon-clear{
+                        position: relative;
+                        @include point(top,3);
+                        margin-right: 15px;
                     }
                 }
             }
@@ -1686,18 +1752,14 @@ export default {
             .el-header-title{
                 text-align: left;
                 position: relative;
-                // height: 60px;
-                // line-height: 60px;
                 @include point(height,60);
                 @include point(line-height,60);
                 border-bottom: 1px solid $border;
-                // padding:0 20px;
                 @include point(padding-left,20);
                 @include point(padding-right,20);
                 .lside-title{
                     font-weight: bold;
                     color:$h1;
-                    //font-size: 18px;
                 }
                 @media screen and(min-width: 1366px){
                     .lside-title{
@@ -1716,7 +1778,6 @@ export default {
                     .storeUp-content{
                         height:auto;
                         width: 72px;
-                        
                     }
                 }
                 .nocoll{
@@ -1745,8 +1806,6 @@ export default {
                     display: inline-block;
                     margin-left: 20px;
                     padding: 1px 6px;
-                    //width: 76px;
-                    //height: 22px;
                     line-height: 18px;
                     cursor: pointer;
                     position: relative;
@@ -1761,8 +1820,17 @@ export default {
                     position: absolute;
                     @include point(right,20);
                     @include point(width,90);
-                    @include point(top,20);
                     color: #fff;
+                }
+                @media screen and(min-width: 1366px){
+                    .el-submit{
+                        top: 30%;
+                    }
+                }
+                @media screen and(max-width: 1366px){
+                    .el-submit{
+                        top: 20%;
+                    }
                 }
             }
             .errorVideo-model{
@@ -1770,7 +1838,6 @@ export default {
                 margin-bottom: 0;
                 height: auto;
                 position: relative;
-                
                 @include point(min-width,500);
                 @include point(min-height,414);
                 background-color: #232730;
@@ -1876,7 +1943,6 @@ export default {
                     position: absolute;
                     color: #fff;
                     z-index: 10;
-                    
                     display: block;
                     width:-webkit-calc(100% - 30px); 
                     width:-moz-calc(100% - 30px); 
@@ -2160,6 +2226,18 @@ export default {
                             background-color: $black;
                             cursor: not-allowed;
                         }
+                        .dropdown-model{
+                            position: absolute;
+                            @include point(right,46);
+                            @include point(top,12);
+                            margin-right: 20px;
+                            max-width: 80px;
+                            height: 22px;
+                            @include point(width,76);
+                            background-color: transparent;
+                            z-index: 20;
+                            cursor: not-allowed;
+                        }
                         .item-score{
                             position: absolute;
                             @include point(right,46);
@@ -2223,7 +2301,6 @@ export default {
                 .storeList-content{
                     padding: 0 10px;
                     text-align: left;
-                    // height: 450px;
                     @include point(height,450);
                     color: $black;
                     .activeClass{
@@ -2242,6 +2319,22 @@ export default {
                         @include point(margin,15);
                         @include point(margin-top,10);
                     }
+                    .storename{
+                        display: inline-block;
+                        @include point(margin-left,15);
+                        margin-top: 10px;
+                        margin-bottom: 15px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        text-align: center;
+                        font-size: 12px;
+                        cursor: pointer;
+                        @include point(width,76);
+                        @include point(padding,6);
+                        white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+                        overflow: hidden; //隐藏超出单元格的部分。
+                        text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                    }
                     .store-name{
                         display: inline-block;
                         @include point(margin-left,15);
@@ -2252,16 +2345,18 @@ export default {
                         text-align: center;
                         font-size: 12px;
                         cursor: pointer;
-                        @include point(width,71);
+                        @include point(width,76);
                         @include point(padding,6);
-                        white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-                        overflow: hidden; //隐藏超出单元格的部分。
-                        text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                        
                         span{
                             width: 100%;
                             display: block;
+                            white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+                            overflow: hidden; //隐藏超出单元格的部分。
+                            text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
                         }
                     }
+
                     .citys{
                         display: block;
                         font-size: 14px;
@@ -2284,8 +2379,6 @@ export default {
 <style>
 #storetab-content .el-tabs__nav-scroll{
     width: 100%;
-    /* margin-left: 10%;
-    margin-right: 10%; */
 }
 #storetab-content.el-tabs__active-bar{
     height: 4px !important;

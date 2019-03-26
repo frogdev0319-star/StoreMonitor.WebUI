@@ -3,8 +3,8 @@
         :visible.sync="dialogClosed" :close-on-click-modal="false" v-if="dialogClosed"  width="28%" top="35vh" @close='cancle'>
         <div class="dialog-content">
             <hr style="border: 0.5px solid #f31d65;"/>
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
+            <p style="margin:20px;">
+                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;float:left;"></i>
                 <span>{{showInfo}}</span>
             </p>
         </div>

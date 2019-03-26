@@ -70,7 +70,7 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" :closable="index!=0&&index!=1?true:false" >
                         <div v-if="item.routeData">
-                            <route-detail :ref="curIndex" :route-data="item.routeData"
+                            <route-detail :ref="curIndex" :route-data="item.routeData" :down-src="downLoadSrc"
                              :tab-name="item.label" @refreshList="getTagList"></route-detail>
                         </div>
                     </el-tab-pane>
@@ -145,18 +145,17 @@ export default {
             tagList:['远程巡检','现场巡检'],
             curData:[],
             loading:null,
-            fileName:'',
+            fileName:'巡检表模板',
         }
     },
     mounted(){
         let self=this;
-        self.loading = this.$loading({
-            lock: true,
-            text: '正在加载',
-            spinner: 'el-icon-loading',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
-        //await this.isLoginIn();
+        // self.loading = this.$loading({
+        //     lock: true,
+        //     text: '正在加载',
+        //     spinner: 'el-icon-loading',
+        //     background: 'rgba(0, 0, 0, 0.7)'
+        // });
         self.getDownLoadURL();
         self.getTagList();
         self.initData();
@@ -174,16 +173,16 @@ export default {
         },
         getDownLoadURL(){
             let self=this;
-            //self.downLoadSrc=inpectRESTful.getTemplate();
             inpectRESTful.downLoadTemplate().then(res=>{
                 console.log(res);
                 let blob = new Blob([res],{
-               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+            type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
             });
                 let objectUrl = URL.createObjectURL(blob);
-                self.downLoadSrc=objectUrl;
-                self.fileName='巡检表模板';
+                let url=objectUrl;
+                self.downLoadSrc=url;
             })
+            
         },
         getNapeList(){
             let self=this;
@@ -193,13 +192,13 @@ export default {
                     let data=res.data;
                     if(code!=null&&code=='Success'){
                         self.allData=data;
-                        self.loading.close();
+                        //self.loading.close();
                         console.log(res.data);
                     }
                     resolve(data);
                 }).catch(err => {
                     console.log(err.message);
-                    self.loading.close();
+                    //self.loading.close();
                 })
                         
             })

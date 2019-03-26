@@ -101,7 +101,7 @@
                 <div class="data-empty" v-if="routeData.length==0">
                     <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
                     <p class="empty-title">
-                        请先<a :href="downLoadSrc" :download='fileName' class="downLoad-btn">下载巡检表模板</a>进行编辑，再点击<span @click="emptyImport">导入</span>按钮~
+                        请先<a :href="downSrc" :download='fileName' class="downLoad-btn">下载巡检表模板</a>进行编辑，再点击<span @click="emptyImport">导入</span>按钮~
                     </p>
                 </div>
                 <el-dialog title='导入'
@@ -149,12 +149,12 @@ export default {
     props:{
         routeData:Array,
         tabName:String,
+        downSrc:String
     },
     data(){
         return{
             typeNum:0,
             itemNum:0,
-            napeData:[],
             showBtnContent:false,
             showDeleteContent:false,
             showSingleDeleteContent:false,
@@ -175,7 +175,7 @@ export default {
             varyWindowWidth:window.innerHeight,
             allchecked:false,
             curDeleteId:'',
-            fileName:'',
+            fileName:'巡检表模板',
         }
     },
     computed:{
@@ -193,21 +193,8 @@ export default {
     mounted(){
         let self=this;
         self.getNum();
-        self.getDownLoadURL();
     },
     methods:{
-        getDownLoadURL(){
-            let self=this;
-            inpectRESTful.downLoadTemplate().then(res=>{
-                console.log(res);
-                let blob = new Blob([res],{
-               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
-            });
-                let objectUrl = URL.createObjectURL(blob);
-                self.downLoadSrc=objectUrl;
-                self.fileName='巡检表模板';
-            })
-        },
         getNum(){
             let self=this;
             if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
@@ -412,6 +399,17 @@ export default {
                     }
                 })
             }
+        },
+        getDownLoadURL(){
+            let self=this;
+            inpectRESTful.downLoadTemplate().then(res=>{
+                console.log(res);
+                let blob = new Blob([res],{
+               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+            });
+                let objectUrl = URL.createObjectURL(blob);
+                self.downLoadSrc=objectUrl;
+            })
         },
         handleDelete(index,row){
             console.log(index);
@@ -758,6 +756,7 @@ export default {
             .downLoad-btn{
                 color:  $mainColor;
                 text-decoration: none;
+                cursor: pointer;
             }
         }
     }
@@ -768,14 +767,6 @@ export default {
     }
 </style>
 <style>
-.el-tabs__active-bar{
-        height: 4px !important;
-        background-color: #f31d65 !important;
-}
-.el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
-    background-color: #FEE7E4;
-    color: #000;
-}
 .current-row > td {
   background: #FEE7E4 !important;
 }

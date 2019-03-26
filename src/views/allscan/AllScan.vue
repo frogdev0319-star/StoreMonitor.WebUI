@@ -38,10 +38,30 @@
             <el-col :xs="4" :sm="6" :md="8" :lg="9" :xl="11"><div class="grid-content bg-purple"></div></el-col>
             <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1"><div class="grid-content bg-purple-light"></div></el-col>
         </el-row>
+        <div id="tran">
+            <transition name="myBox">
+                <div class="box"  v-show="boxshow"></div>
+            </transition>
+            <button @click="togglebox">按钮</button>
+        </div>
      </div>
     
 </template>
 <style scoped>
+.box{
+    height:500px;
+    background-color:black;  
+    overflow: hidden;                       
+}
+.mybox-leave-active,.mybox-enter-active{
+    transition:all 1s ease;
+}
+.mybox-leave-active,.mybox-enter{
+    height:0px !important;
+}
+.mybox-leave,.mybox-enter-active{
+    height:500px;
+}
 .el-col {
     border-radius: 4px;
   }
@@ -183,10 +203,15 @@ import OSS from 'ali-oss'
         accountId:'aaoompqqpjy4',
         bucketImage:'',
         fileImg:'',
+        boxshow:false
       };
     },
     methods: {
        //当选择完成图片之后调用
+        togglebox(){
+            let self=this;
+            self.boxshow=!self.boxshow;
+        },
         uploadImgLogo(event){
             let _this = this;
         

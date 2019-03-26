@@ -1,7 +1,7 @@
 <template>
     <div class="el-event-content" :style="{'height':windowHeight-118+'px'}">
        <div class="el-date">
-            <span class="date-title">选择时间</span>
+            <span class="date-title">起止时间</span>
             <el-date-picker
                 ref="datePicker"
                 v-model="dateValue"
@@ -19,10 +19,10 @@
                 @change="dateChange"
                 :default-time="defaultTime">
             </el-date-picker>
-            <el-tooltip :popper-class="toolTipClass" class="item" effect="light"
+            <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
                 placement="bottom-end">
                 <div slot="content">*最长搜索时间为一个月</div>
-                <i class="iconfont icon-bangzhu" style="margin-left:10px;font-size:20px;position:relative;top:2px;color:#FB4C5D"></i>
+                <i class="iconfont icon-bangzhu iconbangzhu"></i>
             </el-tooltip>
             <span class="date-title" 
             style="margin-left:30px;margin-right:20px;">处理状态</span>
@@ -57,18 +57,34 @@
                             :highlight-current-row="true"
                             empty-text='没有事件数据'
                             align='left'
+                            border
+                            stripe
                             :height="windowHeight-320"
                             @sort-change='sortChange'
                             @row-click='rowClickItem'
-                            style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
+                            style="border-left:1px solid #eee;"
+                            class="table-content">
                                 <el-table-column
-                                    min-width="120"
+                                    min-width="80"
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
                                         <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >未处理</span>
                                         <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >已处理</span>
                                         <span class="icon-span" style="background-color:#6097F3;" v-else>已结案</span>       
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    prop="option"
+                                    label="事件名称"
+                                    min-width="220"
+                                    sortable='custom'
+                                    align="left">
+                                    <template slot-scope="scope">
+                                        <img class='sourceType-icon' v-if="scope.row.sourceType==0" :src='videoSrc' height="24px"/>
+                                        <img class='sourceType-icon' v-else-if="scope.row.sourceType==1" :src='inspectSrc' height="24px"/>
+                                        <img class='sourceType-icon' v-else :src='insiteInspectSrc' height="24px"/>
+                                        <span class="event-subject">{{scope.row.subject}}</span>
                                     </template>
                                 </el-table-column>
                             <el-table-column v-for="(_item,_index) in tableInfoData" :key="_index"
@@ -122,13 +138,11 @@
                 dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
                 dateOpt: {
                     disabledDate:(time)=>{
-                        //const lastMonthTime = new Date().setMonth(new Date().getMonth() - 1)
                         return time.getTime() > Date.now();
                     }
                 },
                 toolTipClass: 'page-login-toolTipClass',
-                states:[{value: 0,label: '全部'},{value: 1,label: '未处理'}, 
-                        {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
+                states:[{value: 0,label: '全部'},{value: 1,label: '未处理'}, {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
                 curState:'',
                 value:0,
                 serachVale:'',
@@ -160,13 +174,10 @@
                     }
                 ],
                 activeName:'0',
+                videoSrc:require('../../../static/img/监控icon.png'),
+                inspectSrc:require('../../../static/img/远程icon.png'),
+                insiteInspectSrc:require('../../../static/img/现场icon.png'),
                 tableInfoData:[
-                    {
-                        "prop":"subject",
-                        "label":"事件名称",
-                        "sortable":'custom',
-                        "width":200
-                    },
                     {
                         "prop":"storeName",
                         "label":"所属门店",
@@ -183,7 +194,7 @@
                         "prop":"ts",
                         "label":"提报时间",
                         "sortable":'custom',
-                        "width":160
+                        "width":140
                     }
                 ],
                 event,
@@ -550,11 +561,14 @@
                             ts:util.getDateTime(item.ts),
                             assignee:item.assignee,
                             assignerName:item.assignerName,
+                            assigneeName:item.assigneeName,
                             deviceId:item.deviceId,
                             status:item.status,
                             storeId:item.storeId,
                             storeName:item.storeName,
                             subject:item.subject,
+                            score:item.score,
+                            sourceType:item.sourceType,
                             initialComment:item.initialComment
                         }
                        temp.push(obj);
@@ -768,6 +782,11 @@
 @import '../../assets/css/textstyle.css';
 @import '../../assets/css/importfile.css'; 
 $red:#f31d65;
+$black:#182752;
+$border:#e3e9f4;
+$background:#f4f5f9;
+$tab:#7d8cad;
+$h1:#292e36;
 @function rem($val){
     @return $val/16+rem;
 }
@@ -783,6 +802,12 @@ $red:#f31d65;
     width: 100%;
     position: relative;
     overflow: hidden;
+    .sourceType-icon{
+        margin-right: 15px;
+        position: relative;
+        float: left;
+        @include point(bottom,3);
+    }
     .icon-span{
         display:inline-block;
         width:60px;
@@ -800,7 +825,14 @@ $red:#f31d65;
             @include point(margin-left,30);
             @include point(margin-right,20);
             font-size: 14px;
-            color: #424151;
+            color: $black;
+        }
+        .iconbangzhu{
+           margin-left:10px;
+           font-size:20px;
+           position:relative;
+           top:2px;
+           color:$black;
         }
         .date-range{
             width:320px;
@@ -820,19 +852,29 @@ $red:#f31d65;
         }
     }
     .el-table-content{
-        width: 97.46%;
+        width: 100%;
         float: left;
         background-color: #fff;
         position: relative;
         @include point(padding-top,20);
         .export-btn{
             position: absolute;
-            right: 0px;
-            margin-right: 10px;
+            @include point(right,20);
             background-color: $red;
             border-color: $red;
             border-radius: 0px;
             z-index: 990;
+        }
+        .table-content{
+            width:96%;
+            @include point(margin-left,15);
+            @include point(margin-right,15);
+            text-align: center;
+            height:300px;
+            float:left;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
         }
     }
     
@@ -869,13 +911,6 @@ $red:#f31d65;
         height: 4px !important;
         background-color: #f31d65 !important;
     }
-    /* .el-tabs__item.is-active{
-        font-weight: bold !important;
-        color: #f31d65 !important;
-    }
-    .el-tabs__item:hover{
-        color: #f31d65 !important;
-    } */
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }
@@ -884,6 +919,24 @@ $red:#f31d65;
     }
     .current-row > td {
         background: #FEE7E4 !important;
+    }
+    .el-table tbody tr:hover>td {
+        background-color: #FDE8EF !important;
+    }
+    .el-table--border th{
+        border-right: 0 !important;
+    }
+    .el-table--border, .el-table--group{
+        border: none !important;
+    }
+    .el-table__header-wrapper th:nth-last-of-type(2){
+        border-right: none !important;
+    }
+    .el-table--border td:nth-last-of-type(1){
+        border-right: none !important;
+    }
+    .el-table--border::after, .el-table--group::after{
+        width: 0 !important;
     }
 </style>
 

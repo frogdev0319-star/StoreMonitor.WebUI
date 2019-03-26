@@ -7,8 +7,8 @@
                     <span class="sys-name" v-if="!collapsed">{{appName}}</span>
                 </el-col>
                 <el-col :span="1" class="el-traggle-content">
-                    <i class="iconfont icon-shouqi icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
-                    <i class="iconfont icon-zhankai icon-collapse" @click="clickCollapse" v-else></i>
+                    <i class="iconfont icon-zhankai icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
+                    <i class="iconfont icon-shouqi icon-collapse" @click="clickCollapse" v-else></i>
                 </el-col>
                 <el-col :span="10">
                     <el-breadcrumb separator="|" class="breadcrumb-inner">
@@ -16,7 +16,7 @@
                         v-for="(item,index) in breadList" 
                         :key="item.path" class="breadcrumb-item" :to="{ path:item.path}"
                         v-if="index!=0" >
-                            <span :style="breadList.length>2&&index==1?{'color':'#D3D3D3'}:{}">{{ item.name }}</span>
+                            <span :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ item.name }}</span>
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
@@ -111,7 +111,7 @@
                     </el-col>
                     <el-col :sapn='24' class="footercontent">
                         <footer class="footerInfo">
-                            <p style="text-align:left;">Version 1.0.1&copy; 2016-2018 Advantech Corp. All rights reserved</p>
+                            <p style="text-align:left;">Version 1.0.1&copy; 2018-2019 Storeviu Corp. All rights reserved</p>
                         </footer>
                     </el-col>
                 </section>
@@ -154,6 +154,7 @@ export default {
                     name:'研华科技'
                 }
             ],
+            accountId:''
         }
     },
     computed:{
@@ -171,7 +172,7 @@ export default {
             return flag;
         },
         showBorder(){
-            if((this.$route.path!='/reinspection'&&this.$route.path!='/storemonitor')){
+            if((this.$route.path!='/reinspection'&&this.$route.path!='/storemonitor'&&this.$route.path!='/rate')){
                 return true;
             }
         },
@@ -253,6 +254,7 @@ export default {
         fedlogout(){
             let self=this;
             self.$router.push('/login');
+            //window.location.href='https://portals.storeviu.com';
             self.$store.dispatch('LogOut').then((res)=>{
                console.log(res);
             })
@@ -272,6 +274,8 @@ export default {
                 res.data.forEach(item=>{
                     if(item.userId==userId){
                         self.userName=item.userName.length>10?item.userName.substr(0,10)+'...':item.userName;
+                        self.accountId=item.accountId.toLowerCase();
+                        sessionStorage.setItem('oss_bucket',self.accountId);
                     }
                 })
             }) 
@@ -284,7 +288,6 @@ export default {
         console.log(this.$route.matched);
         this.getBread();
         console.log(this.$route.query);
-        //self.$router.push('/');
         let params=self.$route.query;
         PubSub.subscribe('change-color',(event,data)=>{
             self.showTag=data.showTag;
@@ -402,7 +405,9 @@ export default {
                 .breadcrumb-item{
                     @include point(height,60);
                     @include point(line-height,60);
-                    @include point(margin-left,20);
+                    &:first-child{
+                        @include point(margin-left,20);
+                    }
                 }
                 @media screen  and(min-width:1366px){
                     font-size: 16px;
@@ -656,8 +661,4 @@ export default {
     }
 }
 </style>
-<style scoped>
-.el-bread-one{
-    font-size: 15px;
-    color: 	#D3D3D3;
-}
+

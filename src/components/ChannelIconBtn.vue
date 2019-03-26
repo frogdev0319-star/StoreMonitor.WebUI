@@ -56,6 +56,7 @@ export default {
     }
     .channel-btn-content{
         height: 90px;
+        text-align: center;
     }
     .btn-circle{
         width: 60px;
@@ -65,9 +66,13 @@ export default {
         position: relative;
         cursor: pointer;
     }
+    .btn-circle img{
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+    }
     .btn-title{
         font-size: 12px;
-        margin-left: 20px;
     }
 </style>
 

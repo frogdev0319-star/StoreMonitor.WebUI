@@ -29,8 +29,8 @@ input:disabled{
     margin-left: 12px;
     position: relative;
     display: inline-block;
-    background: #FB4C5D;
-    border: 1px solid #FB4C5D;
+    background: #f31d65;
+    border: 1px solid #f31d65;
     border-radius: 4px;
     padding: 4px 12px;
     color: #fff;
@@ -71,4 +71,53 @@ input:disabled{
     font-size: 14px !important;
     color: #303133 !important;
     float:left !important;
+}
+
+/*远程巡店及门店监控tab页样式*/
+#storetab-content .el-tabs__nav-scroll{
+    width: 100%;
+}
+#storetab-content.el-tabs__active-bar{
+    height: 4px !important;
+    background-color: #f31d65 !important;
+}
+#storetab-content.el-tabs__item{
+    color:#7d8cad !important;
+}
+#storetab-content.el-tabs__item.is-active{
+    font-weight: bold !important;
+    color: #f31d65 !important;
+} 
+#storetab-content.el-tabs__item:hover{
+    color: #f31d65 !important;
+}
+
+@media screen and (min-width: 1366px){
+    #storetab-content .el-tabs__nav.is-top{
+        margin-left: 10%;
+        width: 80%;
+    }
+}
+@media screen and (max-width: 1366px){
+    #storetab-content .el-tabs__nav.is-top{
+        width: 100%;
+    }
+    span.el-tabs__nav-prev{
+        visibility: hidden;
+    }
+    .el-tabs__nav-next{
+        visibility: hidden;
+    }
+}
+#storetab-content div#tab-0{
+    width:33.33%;
+}
+#storetab-content div#tab-1{
+    width:33.33%;
+}
+#storetab-content div#tab-2{
+    width:33.33%;
+}
+.el-textarea__inner{
+    font-family: 'Microsoft YaHei';
 }

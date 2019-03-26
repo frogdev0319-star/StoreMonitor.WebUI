@@ -10,8 +10,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+const  Version = new Date().getTime(); // 这里使用的是时间戳 来区分 ，也可以自己定义成别的如：1.1
 const env = require('../config/prod.env')
+
+/*
+var GenerateAssetPlugin = require('generate-asset-webpack-plugin'); 
+var createServerConfig = function(compilation){
+  let cfgJson={bucketName:'aaoompqqpjy4'};
+  return JSON.stringify(cfgJson);
+
+}
+*/
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -24,14 +33,26 @@ const webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
-    filename: utils.assetsPath('js/[name].[chunkhash].js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
+    filename: utils.assetsPath('js/[name].[chunkhash].'+Version + '.js'),
+    chunkFilename: utils.assetsPath('js/[id].[chunkhash].'+Version + '.js')
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
       'process.env': env
     }),
+
+    /*
+    //生成配置文件
+    new GenerateAssetPlugin({
+      filename: 'serverconfig.json',
+      fn: (compilation, cb) => {
+          cb(null, createServerConfig(compilation));
+      },
+      extraFiles: []
+    }),
+    */
+
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: {

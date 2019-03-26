@@ -18,7 +18,7 @@
             </div>
             <div class="details">
                 <span class="event-label">问题状态：</span>
-                <span class="icon-span">待处理</span>
+                <span class="icon-span">未处理</span>
             </div>
             <div class="details">
                 <span class="event-label">问题描述：</span>
@@ -164,6 +164,8 @@ export default {
         }
     },
     beforeRouteLeave(to, from, next) {
+        let self=this;
+        clearInterval(self.timeid);
         if(to.name=='门店监控'){
             if(this.isSuccess==true){
                 to.meta.keepAlive = true;
