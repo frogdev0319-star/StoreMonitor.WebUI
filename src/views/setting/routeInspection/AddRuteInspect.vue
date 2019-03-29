@@ -1,11 +1,11 @@
 <template>
     <el-row class="el-addrute" :style="{'min-height':varyWindowHeight-120+'px'}">
         <el-col :span="24" class="el-rute-title">
-            <p class="tab-name" v-if="!showEditTab">{{tabName}}<i class="iconfont icon-bianji icon-tabname"
-             @click="editTabName"></i></p>
-            <el-input size="mini" v-if="showEditTab" class="tabName-input input-details" placeholder="输入巡检表名" v-model="tabName"></el-input>
-            <div class="iconcontent" v-if="showEditTab" style="position:relative;left:30px;top:5px;">
-                <div class="iconlised" style="background-color:#f31d65" @click="confirmEditTab">
+            <span class="tab-name" v-if="!showEditTab">{{tabName}}<i class="iconfont icon-bianji icon-tabname"
+             @click="editTabName"></i></span>
+            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" placeholder="输入巡检表名" v-model="tabName"></el-input>
+            <div class="iconcontent" v-if="showEditTab">
+                <div class="iconlised" @click="confirmEditTab">
                     <i class="el-icon-check"></i>
                 </div>
                 <div class="iconrised" @click="cancelEditTab">
@@ -18,7 +18,7 @@
                <div class="title-content">
                    <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
                    <div class="btn-content">
-                       <el-button class="rute-btn" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span>添加巡检类别</span></el-button>
+                       <el-button class="rute-btn" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span style='margin-left:5px;'>添加巡检类别</span></el-button>
                    </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -28,8 +28,8 @@
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
                             <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
-                        <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input input-details" v-if="item.isEdit"></el-input>
-                        <div class="iconcontent" v-if="item.showEdit">
+                        <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input" v-if="item.isEdit"></el-input>
+                        <div v-if="item.showEdit" class="show-edit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
                                 <i class="iconfont icon-bianji" 
                                 style="font-size: 20px;cursor:pointer;margin-right:10px;" 
@@ -39,7 +39,7 @@
                             </div>
                         </div>
                         <div class="iconcontent">
-                            <div class="iconlised" style="background-color:#f31d65" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
+                            <div class="iconlised" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
                                 <i class="el-icon-check"></i>
                             </div>
                             <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
@@ -48,9 +48,9 @@
                         </div>
                     </div>
                     <div class="group-add" v-if="showAddGroup">
-                        <el-input  size="mini" maxlength="10" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
+                        <el-input  size="mini" maxlength="10" class="groupName-input" placeholder="输入类别名" v-model="groupNameInput"></el-input>
                             <div class="iconcontent">
-                                <div class="iconlised" style="background-color:#f31d65" @click="confirmAddGroup">
+                                <div class="iconlised" @click="confirmAddGroup">
                                     <i class="el-icon-check"></i>
                                 </div>
                                 <div class="iconrised" @click="cancelAddGroup">
@@ -74,7 +74,7 @@
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
-                   <div class="nape-items-title tabTitle" v-if="napeList.length!=0">
+                   <div class="nape-items-title" v-if="napeList.length!=0">
                        <div class="nape-name-title">
                            <span>巡检名称</span>
                        </div>
@@ -91,11 +91,11 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input maxlength="75" size="mini" v-model="item.napeDep" class="nape-input input-details" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
+                           <el-input maxlength="75" size="mini" v-model="item.napeDep" class="nape-input" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -154,10 +154,10 @@
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input input-details" placeholder="输入巡检项名称" ></el-input>
+                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" placeholder="输入巡检项名称" ></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input maxlength="75" size="mini" v-model="newNapeDep" class="nape-input input-details" placeholder="输入巡检项描述"></el-input>
+                           <el-input maxlength="75" size="mini" v-model="newNapeDep" class="nape-input" placeholder="输入巡检项描述"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -206,6 +206,7 @@ export default {
             deleteItemFlag:'',
             curItemId:'',
             varyWindowHeight:window.innerHeight,
+            varyWindowWidth:window.innerWidth,
             bindStoreList:[]
         }
     },
@@ -749,7 +750,12 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
-    $mainColor:#f31d65;
+    $red:#f31d65;
+    $black:#182752;
+    $border:#e3e9f4;
+    $background:#f4f5f9;
+    $tab:#7d8cad;
+    $h1:#292e36;
     $itemHeight:50px;
     @function rem($val){
         @return $val/16+rem;
@@ -763,39 +769,79 @@ export default {
         #{$poi}:checkRem($val);
     }
     .nape-input{
-        @include point(width,220);
+        @include point(width,180);
         float: left;
         @include point(margin-left,10);
-        @include point(line-height,50);
     }
     .el-addrute{
         width: 100%;
         height: 100%;
+        color: $black;
+        @media screen and (min-width:1366px){
+            .tab-name{
+                font-size: 18px;
+            } 
+            .icon-tabname{
+                font-size:18px;
+            }
+            .iconlised{
+                @include point(height,20);
+                @include point(line-height,20);
+            } 
+            .iconrised{
+                @include point(height,20);
+                @include point(line-height,20);
+            }  
+        }
+        @media screen and (max-width:1366px){
+            .tab-name{
+                @include point(font-size,18);
+            }  
+            .icon-tabname{
+                @include point(font-size,18);
+            } 
+            .iconlised{
+                height: 20px;
+                line-height: 20px;
+            } 
+            .iconrised{
+                height: 20px;
+                line-height: 20px;
+            }
+        }
+        @mixin iconContent{
+            float: left;
+            position: relative;
+            padding: 1px 6px;
+            border: 1px solid $border;
+            cursor: pointer;
+           
+        }
         .el-rute-title{
             width: 100%;
-            height: 60px;
+            @include point(height,60);
+            @include point(line-height,60);
             @include point(padding-left,15);
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid $border;
+            text-align: left;
             .tab-name{
                 text-align: left ;
                 @include point(margin-left,10);
-                font-size: 18px;
                 font-weight: bold;
             }
             .icon-tabname{
                 @include point(margin-left,20);
-                font-size: 18px;
                 color: #ddd;
                 cursor: pointer;
             }
             .tabName-input{
-                @include point(width,220);
+                @include point(width,180);
                 float: left;
                 @include point(margin-left,5);
             }
         }
         .rute-btn{
-            background-color: $mainColor;
+            background-color: $red;
             color: #fff;
             font-size: 12px;
             width: 120px;
@@ -804,40 +850,28 @@ export default {
             }
         }
         .iconcontent{
-            position: absolute;
-            @include point(right,10);
-            @include point(margin-top,13);
-            @include point(margin-right,15);
-            margin-right: 15px;
+            @include point(margin-left,20);
+            display: inline-block;
+            position: relative;
+            @include point(top,6);
             .iconlised{
-                float: left;
-                position: relative;
-                background-color: orange;
-                padding: 1px 6px;
+                @include iconContent;
+                background-color: $red;
                 color: #fff;
-                border-width: 1px 1px 1px 1px;
-                border-style: solid;
-                border-color: #ddd;
-                cursor: pointer;
             }
             .iconrised{
-                float: left;
-                position: relative;
-                padding: 1px 6px;
-                border-width: 1px 1px 1px 0px;
-                border-style: solid;
-                border-color: #ddd;
                 background-color: #fff;
-                cursor: pointer;
+                @include iconContent;
+                border-left:0;
             }
         }
         .title-content{
-            height: 60px;
-            line-height: 60px;
+            @include point(height,52);
+            @include point(line-height,52);
             text-align: left;
             position: relative;
             overflow: hidden;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid $border;
             span{
                 @include point(margin-left,10);
             }
@@ -872,10 +906,11 @@ export default {
             .group-items{
                 font-size: 14px;
                 .groupItem{
-                    height: $itemHeight;
+                    @include point(height,50);
+                    @include point(line-height,50);
                     position: relative;
                     overflow: hidden;
-                    border-bottom: 1px solid #ddd;
+                    border-bottom: 1px solid $border;
                     cursor: pointer;
                     text-align: left;
                     .proper-flag{
@@ -883,22 +918,39 @@ export default {
                         width: 4px;
                         position:absolute;
                         top: 15%;
-                        background-color: $mainColor;
+                        background-color: $red;
                     }
                     .group-input{
                         max-width: 60%;
                         float: left;
                         @include point(margin-left,20);
-                        @include point(line-height,50);
+                        
                     }
                     span{
                         float: left;
                         @include point(margin-left,25);
-                        @include point(line-height,50);
                         width: 70%;
                         text-overflow: ellipsis;
                         overflow: hidden;
                         white-space: nowrap;
+                    }
+                    .iconcontent{
+                        @include point(margin-left,25);
+                        display: inline-block;
+                        .iconlised{
+                            @include iconContent;
+                            background-color: $red;
+                            color: #fff;
+                            height: 22px;
+                            line-height: 22px;
+                        }
+                        .iconrised{
+                            background-color: #fff;
+                            @include iconContent;
+                            border-left:0;
+                            height: 22px;
+                            line-height: 22px;
+                        }
                     }
                     &:last-child{
                         @include point(margin-bottom,20);
@@ -910,12 +962,30 @@ export default {
                 position: relative;
                 overflow: hidden;
                 @include point(height,50);
+                @include point(line-height,50);
                 @include point(margin-bottom,20);
                 .groupName-input{
-                    width: 60%;
+                    max-width: 60%;
                     float: left;
-                    @include point(margin-left,25);
-                    @include point(line-height,50);
+                    @include point(margin-left,20);
+                }
+                .iconcontent{
+                    @include point(margin-left,20);
+                    display: inline-block;
+                    .iconlised{
+                        @include iconContent;
+                        background-color: $red;
+                        color: #fff;
+                        height: 22px;
+                        line-height: 22px;
+                    }
+                    .iconrised{
+                        background-color: #fff;
+                        @include iconContent;
+                        border-left:0;
+                        height: 22px;
+                        line-height: 22px;
+                    }
                 }
             }
         }
@@ -948,10 +1018,11 @@ export default {
                 }
             }
             .nape-items-title{
-                height: $itemHeight;
-                line-height: $itemHeight;
+                @include point(height,50);
+                @include point(line-height,50);
                 text-align: left;
                 font-size: 14px;
+                color: $tab;
             }
             .nape-items-data{
                 overflow: hidden;
@@ -962,6 +1033,7 @@ export default {
                 cursor: pointer;
                 font-size: 14px;
                 color: #424151;
+                 @include point(line-height,50);
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
@@ -969,21 +1041,20 @@ export default {
                     @include point(width,220);
                     float: left;
                     @include point(margin-left,10);
-                    @include point(line-height,50);
+                   
                 }
                 .nape-name-data{
                     width: 36%;
                     display: inline-block;
                     position: relative;
                     float: left;
-                    @include point(line-height,50);
                     .item-checkbox{
                         float: left;
                         margin-right: 0px;
                     }
                     span{
                         float: left;
-                        @include point(margin-left,20);
+                        @include point(margin-left,15);
                         text-align: left;
                         width: 80%;
                     }
@@ -993,24 +1064,36 @@ export default {
                     display: inline-block;
                     position: relative;
                     float: left;
-                    @include point(line-height,25);
-                    // @include point(margin-top,10);
                     overflow: hidden;
                     span{
                         float: left;
                         @include point(margin-left,25);
-                        @include point(margin-top,10);
                         text-align: left;
-                    }
-                    .nape-input{
-                        @include point(line-height,50);
                     }
                 }
                 .nape-items-handle{
                     width: 10%;
                     display: inline-block;
                     @include point(line-height,50);
-
+                    text-align: left;
+                }
+                .iconcontent{
+                    @include point(margin-left,25);
+                    display: inline-block;
+                    .iconlised{
+                        @include iconContent;
+                        background-color: $red;
+                        color: #fff;
+                        height: 22px;
+                        line-height: 22px;
+                    }
+                    .iconrised{
+                        background-color: #fff;
+                        @include iconContent;
+                        border-left:0;
+                        height: 22px;
+                        line-height: 22px;
+                    }
                 }
             }
         }
@@ -1026,9 +1109,6 @@ export default {
     }
 </style>
 <style>
-.input-details .el-input__inner{
-    border-radius: 0px !important;
-}
 .el-dialog__body{
     padding: 0px !important;
 }

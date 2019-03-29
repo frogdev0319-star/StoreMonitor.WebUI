@@ -5,7 +5,7 @@
                 <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" />
                 <span class="event-title">{{event.eventTitle}}</span>
                 <span class="event-score" v-if="event.score!=-1">得分：{{event.score}}分</span>
-                <el-button :size="varyWindowWidth>1366?'small':'mini'" class="el-submit" @click="submit" v-if="showWinpBtn" type="primary">提交</el-button>
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-submit" @click="submit" v-if="showWinpBtn" type="primary">提交</el-button>
             </div>
             <el-dialog  title='查看' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
             v-if="dialogFormVisible" width="850px" top=12% @close='stopRealTime' class='rate-video-dialog'>
@@ -79,7 +79,7 @@
                         </audio> 
                         <span class="often-text">{{audioOftenText}}</span>
                     </div>
-                    <pre  class="description">{{event.initialComment.description}}</pre>
+                    <pre  class="description">{{event.description}}</pre>
                     <div class="photo-content">
                         <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                             <div v-if="item.mediaType==2" class="img-content">
@@ -189,7 +189,6 @@ export default {
             dialogFormVisible:false,
             dialogCommentVideo:false,
             showWinpBtn:true,
-            description:'',
             audioOftenText:'',
             speech:false,
             audioRef:'audioRef',
@@ -415,7 +414,7 @@ export default {
                 status:event.status,
                 score:event.score,
                 sourceType:event.sourceType,
-                initialComment:event.initialComment
+                description:event.initialComment.description
             };
             self.event=obj;
             let deviceId=self.event.deviceId;
@@ -965,7 +964,7 @@ $h1:#292e36;
                     .icon-speech{
                         @include point(font-size,18);
                         @include point(line-height,26);
-                        @include point(margin-left,15);
+                        @include point(margin-left,5);
                     }
                 }
                 .often-text{
@@ -1023,9 +1022,8 @@ $h1:#292e36;
     .rside{
         border: 1px solid $border;
         background-color: #fff;
-        @include point(margin-right,20);
+        // @include point(margin-right,20);
         color: $black;
-        width: 32%;
         height: 100%;
         .title-content{
             @include title-content;
@@ -1118,7 +1116,7 @@ $h1:#292e36;
                                 .icon-speech{
                                     @include point(font-size,18);
                                     @include point(line-height,26);
-                                    @include point(margin-left,15);
+                                    @include point(margin-left,5);
                                 }
                             }
                             .often-text{
@@ -1162,7 +1160,7 @@ $h1:#292e36;
                             .imgInner{
                                 position: absolute;
                                 left: 0;
-                                clip: rect(0px 100px 75px 0px);
+                                clip: rect(0px 80px 60px 0px);
                             }
                             &:first-child{
                                 @include point(margin-left,15);

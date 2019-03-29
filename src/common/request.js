@@ -6,8 +6,8 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-//let base='http://'+window.location.host;
-let base ='http://222.91.163.149:18081'
+let base='http://'+window.location.host;
+//let base ='http://222.91.163.149:18081'
 
 
 
@@ -86,8 +86,8 @@ serviceAxios.interceptors.response.use(
                 type:'warning'
             }).then(()=>{
                 store.dispatch('FedLogOut').then(()=>{
-                    router.push('/login');
-                    //window.location.href='https://portals.storeviu.com';
+                    //router.push('/login');
+                    window.location.href='https://portals.storeviu.com';
                     Message({
                         message:err.response.data.errMsg,
                         type:'error',
@@ -138,8 +138,8 @@ service.interceptors.response.use(
             let errMsg=err.response.data.errMsg;
             if(errCode===500&&(errMsg=='Invalid token'||
                 errMsg=='Fail to verify token'||errMsg=='User does not exist')){
-                router.push('/login');
-                //window.location.href='https://portals.storeviu.com';
+                //router.push('/login');
+                window.location.href='https://portals.storeviu.com';
                 Message({
                     message:'登录信息异常，请重新登录!',
                     type:'error',
@@ -147,8 +147,8 @@ service.interceptors.response.use(
                 })
             }
             else if(errCode===500&&errMsg=='Token does not exist'){
-                router.push('/login');
-                //window.location.href='https://portals.storeviu.com';
+                //router.push('/login');
+                window.location.href='https://portals.storeviu.com';
             }
             else if(errCode===500&&errMsg=='No authority'){
                 router.push('/home');

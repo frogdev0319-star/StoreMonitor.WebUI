@@ -2,14 +2,14 @@
     <el-row class="el-container">
         <el-col :span="16" class="lside" :class="{liseAnmiClass:showSpread}">
             <div class="el-header-title">
-                <span class="lside-title">
+                <span class="lside-title" v-if='showStoreUp'>
                     {{store.storeTitle}}
                 </span>
                 <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp" v-if='showStoreUp'>
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button class="el-submit" :size="varyWindowWidth>1366?'small':'mini'" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary">
+                <el-button class="el-submit" :size="varyWindowWidth>1680?'small':'mini'" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary" v-if="showStoreUp">
                     提交
                 </el-button> 
             </div>
@@ -78,8 +78,8 @@
                 </div>
                 <div class="video-content"  id="videoContent"
                 @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
-                    <span id="channelName" v-if="showModelContent">{{channel.channelName}}</span>
-                    <div class="icon-footer" v-if="showModelContent">
+                    <span id="channelName" v-if="showInfoContent">{{channel.channelName}}</span>
+                    <div class="icon-footer" v-if="showInfoContent">
                         <div class="iconlside">
                             <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
                             <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
@@ -197,7 +197,7 @@
                                 size="small"
                                 class="el-search-input"
                                 placeholder="请输入关键字搜索门店"
-                                v-model="serachVale" @keyup.enter.native="searchStore">
+                                v-model="serachVale" @keyup.enter.native="searchStore" v-if="item.storeList.length!=0">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
@@ -222,11 +222,13 @@
 import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
 import util from '@/common/util'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
+import {mapGetters} from 'vuex'
 import {getStorageInfo} from '@/api/event'
 import {getDeviceList} from '@/api/device'
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
 import DialogVue from '@/components/DialogVue.vue'
+import {getCookie} from '@/common/auth';
 export default {
     name:'ReInspection',
     components:{
@@ -253,6 +255,7 @@ export default {
             clearIconSrc:require('../../../static/img/清除.png'),
             removeIconSrc:require('../../../static/img/撤销.png'),
             showModelContent:false,
+            showInfoContent:false,
             activeIndex:'0',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
@@ -343,7 +346,7 @@ export default {
             bucketImage:'',
             percentage:0,
             accountId:'',
-
+            userId:'',
             scoreList:[
                 {
                     val:10,
@@ -391,7 +394,7 @@ export default {
                 }
             ],
             tempStoreList:[],  
-            recentStoreList:[],
+            allInitStoreList:[],
             sessionId:'',
             inspectList:[],
             curGroup:null,
@@ -444,13 +447,26 @@ export default {
                 showInfo:'当前尚有未完成巡检项，请完成后进行提交！',
                 isWarning:false,
                 dialogCosed:false
-            }
+            },
+
         }
     },
     computed:{
         percentHeight:function(){
             return this.varyWindowHeight/758;
         },
+        ...mapGetters({
+            accountChanged:'accountChanged'
+        })
+    },
+    watch:{
+        accountChanged(val,oldVal){
+            console.log(val);
+            let self=this;
+            if(val!=0){
+                self.changeBrand();
+            }
+        }
     },
     beforeRouteLeave(to, from, next){
         let self=this;
@@ -465,7 +481,6 @@ export default {
     mounted(){
         let self=this;
         document.onmouseup=self.mouseUpAction;
-        self.getRecentStoreList();
         self.getUpLoadBucketInfo();
         self.getOssInfo();
         self.getFaStoreData();
@@ -482,6 +497,18 @@ export default {
         }
     },
     methods:{
+        changeBrand(){
+            let self=this;
+            if(self.playState){
+                self.stopRealTime();
+            }
+            self.activeIndex='0';
+            self.showGuide=true;
+            self.accountId=sessionStorage.getItem('oss_bucket');
+            self.getFaStoreData();
+            self.getInitStoreData();
+            self.getDeviceList();
+        },
         checkFull(){
             var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
             if(isFull === undefined)
@@ -492,11 +519,15 @@ export default {
         },
         anchorLinkTo () {
             let self=this;
-            self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
+            if(document.getElementById('inspectContent')!=null){
+                self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
+            }
         },
         getOssInfo(){
             let self=this;
             self.accountId=sessionStorage.getItem('oss_bucket');
+            let userId=getCookie('UserId');
+            self.userId=userId;
             getStorageInfo().then(res=>{
                 console.log(res);
                 if(res.errCode==0){
@@ -580,6 +611,10 @@ export default {
             if(self.sourceList.length>=5){
                 self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
                 return false;
+            }
+            if(self.fullScreen){
+                self.exitFullscreen();
+                self.fullScreen=false;
             }
             self.showCutDialog=true;
             this.$nextTick(()=>{
@@ -744,11 +779,43 @@ export default {
                 })
             })
         },
-        getRecentStoreList(){
+
+        saveStoreObj(storeObj){
             let self=this;
-            if(localStorage.getItem('recentStore_reinspect')!=null){
-                self.recentStoreList=JSON.parse(localStorage.getItem('recentStore_reinspect'));
+            let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
+            let temp=[];
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!=undefined){
+                temp=JSON.parse(localStorage.getItem(key));
             }
+            temp.forEach((item,index)=>{
+                if(item.userId==storeObj.userId&&item.storeId==storeObj.storeId){
+                    temp.splice(index,1);
+                }
+            })
+            temp.unshift(storeObj);
+            temp=temp.slice(0,3);
+            localStorage.setItem(key,JSON.stringify(temp));
+        },
+        getStoreObj(){
+            let self=this;
+            let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
+            let temp=[];
+            let tempArray=[];
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!=undefined){
+                temp=JSON.parse(localStorage.getItem(key));
+            }
+            let indexArray=[];
+            temp.forEach((item,index)=>{
+                indexArray.push(self.allInitStoreList.map(x=>x.storeId).indexOf(item.storeId));
+            })
+            console.log(indexArray);
+            indexArray=indexArray.filter(function(x){
+                return x!=-1
+            })
+            indexArray.forEach(item=>{
+                tempArray.push(self.allInitStoreList[item]);
+            })
+            return tempArray;
         },
         async getStoreList(){
             let self=this;
@@ -780,35 +847,12 @@ export default {
                     if(data.errCode==0){
                         let storeData=data.data;
                         self.tabList[0].storeList=getStoreTemp(storeData);
-                        self.tabList[0].storeList.push({'name':'Team18 厦门自贸店'});
                     }
                     break;
                 case 1:
-                    let temp=[];
-                    let data=self.recentStoreList;
+                    data=self.getStoreObj();
                     console.log(data);
-                    data=data.filter(function(x){
-                        return x!=null;
-                    })
-                    data.map(x=>x.storeId).forEach(item=>{
-                        if(temp.indexOf(item)==-1){
-                            temp.push(item);
-                        }
-                    })
-                    temp=temp.slice(0,3); //取最近访问的三家门店
-
-                    let dataTemp=await self.getAllStoreList();
-                    let allStoreData=dataTemp.data.content;
-                    let tempStore=[];
-                    for(let i=0;i<temp.length;i++){
-                        for(let j=0;j<allStoreData.length;j++){
-                            if(temp[i]==allStoreData[j].storeId){
-                                tempStore.push(allStoreData[j]);
-                            }
-                        }
-                    }
-                    self.tabList[1].storeList=getStoreTemp(tempStore);
-                    localStorage.setItem('recentStore_reinspect',JSON.stringify(self.tabList[1].storeList));
+                    self.tabList[1].storeList=getStoreTemp(data);
                     break;
                 case 2:
                     console.log(self.tabList[2]);
@@ -852,6 +896,7 @@ export default {
                 self.tabList[0].storeList=getStoreTemp(storeData);
                 if(storeData.length==0){
                     self.showStoreUp=false;
+                    self.inspectList=[];
                 }
                 else{
                     let obj={};
@@ -861,9 +906,13 @@ export default {
                     obj.storeUp=true;
                     obj.storeUpTitle='已关注';
                     self.store=obj;
+                    self.showStoreUp=true;
+                    let curStoreId=storeData[0].storeId;
+                    let storeObj={
+                        storeId:curStoreId
+                    };
+                    self.saveStoreObj(storeObj);
 
-                    self.recentStoreList.unshift(self.tabList[0].storeList[0]);
-                    localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
                     self.getInspectByStore(self.tabList[0].storeList[0].storeId);
                 }
             }
@@ -915,10 +964,14 @@ export default {
             let data=await self.getAllStoreList();
              if(data.errCode==0){
                 let storeData=data.data.content;
-                self.tabList[2].storeList=getStore2Temp(storeData);
-                self.tempStoreList=getStore2Temp(storeData);
-                if(self.tempStoreList.length==0){
-                    self.showSearchInput=false;
+                self.allInitStoreList=storeData;
+                if(storeData.length==0){
+                    self.tabList[2].storeList=[];
+                    self.tempStoreList=[];
+                }
+                else{
+                    self.tabList[2].storeList=getStore2Temp(storeData);
+                    self.tempStoreList=getStore2Temp(storeData);
                 }
             }
         },
@@ -1225,14 +1278,16 @@ export default {
         async playVideo(url) {
             let self=this;
             console.log('playvideo enter!');
-            this.showModelContent=true;
-            this.playState=true;
+            self.showModelContent=true;
+            self.showInfoContent=true;
+            self.playState=true;
             var video = document.getElementById("previewVideo");
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
             setTimeout(() => {
                 self.showModelContent=false;
+                self.showInfoContent=false;
             }, 3000);
         },
         destroyVideo(){
@@ -1244,9 +1299,11 @@ export default {
         hiddenModel(){
             let self=this;
             self.showModelContent=false;
+            self.showInfoContent=false;
         },
         showModel(){
             let self=this;
+            self.showInfoContent=true;
             if(self.playState){
                 self.showModelContent=true;
             }
@@ -1356,6 +1413,7 @@ export default {
                 self.fullScreen=true;
                 setTimeout(() => {
                     self.showModelContent=false;
+                    self.showInfoContent=false;
                 }, 3000);
             }
             else{
@@ -1479,6 +1537,7 @@ export default {
             self.showStoreUp=true;
             self.editCount=0;
             self.showError=false;
+            self.curDeviceId=-1;
             if(self.playState){
                 self.stopRealTime();
             }
@@ -1494,6 +1553,7 @@ export default {
                 obj.storeUpTitle='点击关注';
             }
             self.store=obj;
+            let curStoreId='';
             self.getInspectByStore(self.store.storeId);
             let tabIndex=Number(self.activeIndex);
             if(tabIndex!=2){
@@ -1503,7 +1563,7 @@ export default {
                     }
                 })
                 if(index!=1){
-                    self.recentStoreList.unshift(_item);
+                    curStoreId=_item.storeId;
                 }
             }
             else{
@@ -1513,13 +1573,15 @@ export default {
                             itemChild.isActive=false;
                         }
                         else{
-                            self.recentStoreList.unshift(itemChild);
+                            curStoreId=itemChild.storeId;
                         }
                     })
                 })
             }
-            console.log(self.recentStoreList);
-            localStorage.setItem('recentStore_reinspect',JSON.stringify(self.recentStoreList));
+            let storeObj={
+                storeId:curStoreId
+            };
+            self.saveStoreObj(storeObj);
         },
         changeStoreDialog(val){
             let self=this;

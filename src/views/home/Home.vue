@@ -40,20 +40,16 @@
             :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
-                    <div class="brand-panel" v-if="false">
+                    <div class="brand-panel" v-if="!collapsed">
                         <span class="brand-label">品牌</span>
-                        <el-collapse v-model="activeNames" @change="handleChange" class="brand-content">
-                        <el-collapse-item class="brand-title">
-                            <template slot="title">
-                            <span class="brand-name">{{brandName}}</span>
-                            </template>
-                            <div class="item-content">
-                                <div class="item-details" v-for="(item,index) in brandList" :key="index">
-                                    <span>{{item.name}}</span>
-                                </div>
-                            </div>
-                        </el-collapse-item>
-                        </el-collapse>
+                        <el-select v-model="curBrand" placeholder="请选择" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
+                            <el-option
+                            style="font-size:18px;margin-left:15px;"
+                            v-for="(item,index) in brandList" :key="index"
+                            :label="item.name"
+                            :value="item.accountId">
+                            </el-option>
+                        </el-select>
                     </div>
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <el-menu :default-active="$route.path"
@@ -122,7 +118,7 @@
 <script>
 import RateManage from '../event/details/RateManage'
 import {mapGetters,mapMutations,mapActions} from 'vuex';
-import {getUserInfo} from '@/api/login'
+import {getUserInfo,getAccountList} from '@/api/login'
 import PubSub from 'pubsub-js';
 import {getCookie} from '@/common/auth';
 export default {
@@ -131,7 +127,7 @@ export default {
     data(){
         return{
             showTag:false,
-            imgSrc:'./static/img/logo.png',
+            imgSrc:require('../../../static/img/logo.png'),
             userName:'Admin',
             headUrl:'',
             breadList:[],
@@ -143,17 +139,8 @@ export default {
             route:this.$route,
             path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute',],
             wapper:false,
-            brandName:'研华科技',
-            brandList:[
-                {
-                    id:0,
-                    name:'鱼池18',
-                },
-                {
-                    id:1,
-                    name:'研华科技'
-                }
-            ],
+            curBrand:'',
+            brandList:[],
             accountId:''
         }
     },
@@ -182,7 +169,10 @@ export default {
         ...mapGetters([
             'token',
             'name'
-        ])
+        ]),
+        brandDisabled(){
+            return this.$route.matched.length!=2;
+        }
     },
     watch:{
         curPath(val){
@@ -225,9 +215,6 @@ export default {
            let url="../../../static/webapp/index.html";
            window.open(url, '_blank');
         },
-        getRequireAuthRoute(routeList){
-
-        },
         getBread(){
             this.breadList=[];
             //this.breadList=this.$route.matched;
@@ -253,17 +240,40 @@ export default {
         },
         fedlogout(){
             let self=this;
-            self.$router.push('/login');
-            //window.location.href='https://portals.storeviu.com';
-            self.$store.dispatch('LogOut').then((res)=>{
-               console.log(res);
-            })
+            //self.$router.push('/login');
+            window.location.href='https://portals.storeviu.com';
+            // self.$store.dispatch('LogOut').then((res)=>{
+            //    console.log(res);
+            // })
         },
         logOut(){
             let self=this;
             self.$store.dispatch('logout').then(()=>{
 
             })
+        },
+        getAccountList(){
+            let self=this;
+            getAccountList().then(res=>{
+                let data=res.data;
+                if(res.errCode==0){
+                    self.brandList=data;
+                    self.curBrand=self.accountId;
+                }
+            })
+        },
+        changeAccount(accountId){
+            let self=this;
+            let params={
+                accountId:accountId
+            };
+            self.$store.dispatch('changeAccount',params).then((res)=>{
+                console.log(res);
+                if(res.errCode==0){
+                    self.$route.meta.keepAlive=false;
+                    self.getUserName();
+                }
+            });
         },
         getUserName(){
             let self=this;
@@ -274,8 +284,9 @@ export default {
                 res.data.forEach(item=>{
                     if(item.userId==userId){
                         self.userName=item.userName.length>10?item.userName.substr(0,10)+'...':item.userName;
-                        self.accountId=item.accountId.toLowerCase();
-                        sessionStorage.setItem('oss_bucket',self.accountId);
+                        self.accountId=item.accountId;
+                        let accountId=item.accountId.toLowerCase();
+                        sessionStorage.setItem('oss_bucket',accountId);
                     }
                 })
             }) 
@@ -300,6 +311,7 @@ export default {
     },
     mounted(){
         this.getUserName();
+        this.getAccountList();
     },
 }
 </script>
@@ -476,16 +488,19 @@ export default {
             .brand-panel{
                 background-color: #222538;
                 text-align: left;
-                .brand-content{
-                    border: 0 !important;
-                }
+                padding-top: calc(15/1920*100vw);
                 .brand-label{
-                    color: #fff;
-                    font-size: 14px;
-
-                    margin-left: 60px;
+                    display: block;
+                    color: #a0a4ad;
+                    font-size: 16px;
+                    @include point(margin-left,60);
+                    margin-bottom: calc(15/1920*100vw);
                 }
-                margin-bottom: 20px;
+                .brand-list{
+                    @include point(width,170);
+                    @include point(margin-left,50);
+                    text-align: center;
+                }
             }
             .brand-title{
                 background-color: #222538;
@@ -628,7 +643,24 @@ export default {
     }
 </style>
 <style>
+.brand-list .el-input__inner{
+    background-color: #222538 !important;
+    color: #fff;
+    text-align: left;
+    font-weight: bold !important;
+    background-color: transparent;
+    border: none !important;
+    font-size: calc(24/1920*100vw);
+}
+.brand-list .is-disabled .el-input__inner{
+    background-color: #222538 !important;
+}
 
+.brand-list .el-input__icon{
+    color: #fff !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+}
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden !important;
 }
@@ -650,15 +682,10 @@ export default {
 .el-collapse-item__content{
     padding-bottom: 0px !important;
 }
-@media screen and (max-width:1366px){
-    .el-submenu__icon-arrow{
-        margin-right: 0px !important;
-    }
+.el-submenu__icon-arrow{
+    margin-right:calc(20/1920*100vw) !important;
+    color: #fff !important;
 }
-@media screen and (min-width:1366px){
-    .el-submenu__icon-arrow{
-        margin-right: 20px !important;
-    }
-}
+
 </style>
 

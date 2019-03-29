@@ -39,7 +39,7 @@
                 size="small"
                 class="el-search"
                 clearable
-                v-model="serachVale" @clear="searchEventList" @keyup.enter.native="searchEventList">
+                v-model="serachVale" @clear="searchEventList(true)" @keyup.enter.native="searchEventList(true)">
                 <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
             </el-input>
        </div>
@@ -131,6 +131,7 @@
     import {Message} from 'element-ui'
     import {getCookie} from '@/common/auth';
     import {isLoginIn} from '@/api/login'
+    import {mapGetters} from 'vuex'
     export default {
         name: "ExceptEvent",
         data(){
@@ -225,6 +226,16 @@
                     return this.windowHeight*0.52;
                 }
             },
+            ...mapGetters({accountChanged:'accountChanged'})
+        },
+        watch:{
+            accountChanged(val,oldVal){
+                console.log(val);
+                let self=this;
+                if(val!=0){
+                    self.searchEventList(false);
+                }
+            }
         },
         methods:{
             dateChange(val){
@@ -395,11 +406,10 @@
                 
                 self.getEventCount(start,end,status);
             },
-            searchEventList(){
+            searchEventList(flag){
                 let self=this;
                 let tabIndex=Number(self.activeName);
                 let val=self.value;
-                //self.page=1;
                 self.tableDataList[tabIndex].page=1;
                 self.serachData=self.serachVale.trim();
                 switch(val){
@@ -462,7 +472,12 @@
                     break;
                 }
                 if(self.serachData!=undefined&&self.serachData.length!=0){
-                    self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
+                    if(flag){
+                        self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
+                    }
+                    else{
+                        self.params.like={};
+                    }
                 }
                 else{
                     self.params.like={};
@@ -725,9 +740,7 @@
                     })
                 }
                 else{
-                    that.$store.dispatch('LogOut').then(()=>{
-                        that.$router.push('/login');
-                    })
+                    window.location.href='https://portals.storeviu.com';
                 }
             },
             formatJson(filterVal, jsonData) {
@@ -768,6 +781,13 @@
             console.log(self.tableHeight);
             self.getUserId();
             self.getInitList();
+        },
+        beforeRouteEnter (to, from, next) {
+            next(vm => {
+                if(from.name=='提交事件'){
+                    to.meta.keepAlive=false;
+                }
+            });
         },
         beforeDestroy(){
         },
@@ -862,7 +882,6 @@ $h1:#292e36;
             @include point(right,20);
             background-color: $red;
             border-color: $red;
-            border-radius: 0px;
             z-index: 990;
         }
         .table-content{

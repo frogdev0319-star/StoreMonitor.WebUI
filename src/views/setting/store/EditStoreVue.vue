@@ -3,7 +3,7 @@
         <el-col :span="24" class="storeEdit-header">
             <div class="store-title ">
                 <span>{{storeTitle}}</span>
-                <el-button @click="submitData" class="sub-btn" size="mini">提交</el-button>
+                <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary'>提交</el-button>
             </div>
             <div class="store-info">
                 <span style="margin-right:20px;"><strong>负责人</strong></span>
@@ -99,7 +99,8 @@ export default {
             scheduleData:[],
             alleList:[],
             userId:'',
-            varyWindowHeight:window.innerHeight
+            varyWindowHeight:window.innerHeight,
+            varyWindowWidth:window.innerWidth
         }
     },
     computed:{
@@ -349,10 +350,7 @@ export default {
                 .sub-btn{
                     float: right;
                     @include point(margin-right,20);
-                    @include point(width,80);
-                    color: $fff;
-                    background-color: $red;
-                    border-color: $red;
+                    @include point(width,90);
                 }
             }
             .store-info{
@@ -444,24 +442,5 @@ export default {
     border-radius: 0px;
     background-color: #fff;
 }
-.el-select-dropdown__item{
-    padding: 0 20px !important;
-}
-.el-select-dropdown__item.hover{
-    background-color:#FEE4E7;
-}
-.el-select .el-input.is-focus .el-input__inner{
-    border-color: #FEE4E7;
-}
-.el-select-dropdown__item.selected{
-    color:#FB4C5D;
-}
-.el-checkbox__inner:hover{
-    border-color: #FB4C5D !important;
-}
-.el-checkbox.is-bordered.is-checked{border-color:#FB4C5D}
-.el-checkbox__input.is-checked .el-checkbox__inner{
-    background-color: #FB4C5D !important;
-    border-color:#FB4C5D !important;
-}
+
 </style>

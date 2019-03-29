@@ -14,7 +14,7 @@
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
-                <a :href="downLoadSrc" :download='fileName' class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a>
+                <!-- <a :href="downLoadSrc" :download='fileName' class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a> -->
                 <el-dialog title='导入'
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
@@ -85,6 +85,7 @@ import api from '@/api/index'
 import {inpectRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
 import {isLoginIn} from '@/api/login'
+import {mapGetters} from 'vuex'
 export default {
     name:'RouteInspection',
     components:{
@@ -132,13 +133,13 @@ export default {
                     btnTitle:'导出',
                     enabled:true,
                 },
-                // {
-                //     id:0,
-                //     iconClass:'iconfont icon-xiazai',
-                //     name:'download',
-                //     btnTitle:'下载',
-                //     enabled:true,
-                // }
+                {
+                    id:0,
+                    iconClass:'iconfont icon-xiazai',
+                    name:'download',
+                    btnTitle:'下载',
+                    enabled:true,
+                }
             ],
 
             allData:[],
@@ -148,15 +149,30 @@ export default {
             fileName:'巡检表模板',
         }
     },
+    computed:{
+        ...mapGetters({accountChanged:'accountChanged'})
+    },
+    watch:{
+        accountChanged(val,oldVal){
+            console.log(val);
+            let self=this;
+            if(val!=0){
+                self.getTagList();
+            }
+        }
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            if(from.name=='巡检项设置'){
+                to.meta.keepAlive=false;
+            }
+            else{
+                to.meta.keepAlive=true;
+            }
+        });
+    },
     mounted(){
         let self=this;
-        // self.loading = this.$loading({
-        //     lock: true,
-        //     text: '正在加载',
-        //     spinner: 'el-icon-loading',
-        //     background: 'rgba(0, 0, 0, 0.7)'
-        // });
-        self.getDownLoadURL();
         self.getTagList();
         self.initData();
         let tabIndex=sessionStorage.getItem('TabIndex');
@@ -171,18 +187,35 @@ export default {
                 default:self.changeValue='新增巡检表';break;
             }
         },
+        downItem(){
+            let self=this;
+            inpectRESTful.downLoadTemplate().then(res=>{
+                console.log(res);
+                let blob = new Blob([res],{
+                    type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                });
+                let objectUrl = URL.createObjectURL(blob);
+                let url=objectUrl;
+                self.downLoadSrc=url;
+                var link = document.createElement('a');
+                link.href=url;
+                link.download=self.fileName;
+                link.click();
+            })
+        },
         getDownLoadURL(){
             let self=this;
             inpectRESTful.downLoadTemplate().then(res=>{
                 console.log(res);
                 let blob = new Blob([res],{
-            type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
-            });
+                    type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                });
                 let objectUrl = URL.createObjectURL(blob);
                 let url=objectUrl;
                 self.downLoadSrc=url;
+
+                window.open(self.downLoadSrc,'_self');
             })
-            
         },
         getNapeList(){
             let self=this;
@@ -452,9 +485,10 @@ export default {
                 }
             }
             else{
-                self.$store.dispatch('LogOut').then(()=>{
-                    self.$router.push('/login');
-                })
+                // self.$store.dispatch('LogOut').then(()=>{
+                //     self.$router.push('/login');
+                // })
+                window.location.href='https://portals.storeviu.com';
             }
         },
         checkBeforeImport(){
@@ -499,9 +533,10 @@ export default {
                 self.export2Excel();
             }
             else{
-                self.$store.dispatch('LogOut').then(()=>{
-                    self.$router.push('/login');
-                })
+                // self.$store.dispatch('LogOut').then(()=>{
+                //     self.$router.push('/login');
+                // })
+                window.location.href='https://portals.storeviu.com';
             }
         },
         async importfxx(obj) {
@@ -780,13 +815,15 @@ export default {
                     padding: 3px 5px !important;
                     position: relative;
                     top: 3px;
+                    border-right: 0;
                     span{
                         position: relative;
                         @include point(bottom,3);
                     }
-                    &:nth-child(4){
-                        border-left-width: 0px;
+                    &:last-child{
+                        border-right: 1px solid;
                     }
+
                     &:hover{
                         background-color: #FEE4E7;
                     }

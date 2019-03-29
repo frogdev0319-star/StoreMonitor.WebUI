@@ -282,60 +282,102 @@ export default {
             type: mime
         });
     },
+
+    init(){
+        let self=this;
+        let req=window.indexedDB.open('store_db');
+        req.onupgradeneeded=e=>{
+            let db=req.result;
+            /*
+            createObjectStore 相当于创建一个表
+            "geo" 相当于表名
+            keyPath 索引 primary key 
+            */
+            let obStore=db.createObjectStore('recentstore',{keyPath:'id'});
+            obStore.createIndex("storeId","storeId",{unique:false});
+            req.result.close();
+        }
+    },
+    add(payload){
+        return new Promise((resolve,reject)=>{
+            let db=window.indexedDB.open('store_db');
+            db.onsuccess=()=>{
+                db.result.transaction('recentstore','readwrite')
+                .objectStore('recentstore')
+                .add(payload);
+            };
+            db=e=>{
+                reject(e);
+            };
+        });
+    },
+    get(key){
+        return new Promise((resolve,reject)=>{
+            let db=window.indexedDB.open('store_db');
+            db.onsuccess=()=>{
+                let req=db.result.transaction('recentstore','readonly')
+                        .objectStore('recentstore').get(key);
+                db.result.close();
+                req.onsuccess=e=>{
+                    resolve(e.target.result);
+                };
+                req=err=>{
+                    reject(err);
+                };
+            }
+            db=e=>{
+                reject(e);
+            }
+        })
+    }
 }
 class indexedDB{
-    static request=window.indexedDB.open('dataBase');
-
-    static addTable(tableObj) {
-        this.request.onupgradeneeded=function(event){
-            db=event.target.result;
-            var objectStore;
-            if (!db.objectStoreNames.contains(tableObj.tabName)) {
-                objectStore = db.createObjectStore(tableObj.tabName, { keyPath: 'id' });
-                tableObj.colList.forEach(item=>{
-                    objectStore.createIndex(item.colName,item.colOp,{unique:false});
-                })
-            }
+    init(){
+        let self=this;
+        let req=window.indexedDB.open('store_db');
+        req.onupgradeneeded=e=>{
+            let db=req.result;
+            /*
+            createObjectStore 相当于创建一个表
+            "geo" 相当于表名
+            keyPath 索引 primary key 
+            */
+            let obStore=db.createObjectStore('recentstore',{keyPath:'id'});
+            obStore.createIndex("storeId","storeId",{unique:false});
+            req.result.close();
         }
     }
-    static addData(tabName,data){
-        this.request.onupgradeneeded=function(event){
-            db=event.target.result;
-            let temp=[];
-            temp.push(tabName);
-            var request=db.transaction(temp,'readwrite').objectStore(tabName);
-            request.add(data);
-            request.onsuccess=function(event){
-                console.log('数据库写入成功!');
-            }
-            request.onerror=function(event){
-                console.log('数据库写入失败!');
-            }
-        }
+    add(payload){
+        return new Promise((resolve,reject)=>{
+            let db=window.indexedDB.open('store_db');
+            db.onsuccess=()=>{
+                db.result.transaction('recentstore','readwrite')
+                .objectStore('recentstore')
+                .add(payload);
+            };
+            db=e=>{
+                reject(e);
+            };
+        });
     }
-    
-    static readData(id,tabName){
-        let obj=null;
-        this.request.onupgradeneeded=function(event){
-            db=event.target.result;
-            let temp=[];
-            temp.push(tabName);
-            var transaction=db.transaction(temp);
-            var objectStore=transaction.objectStore(tabName);
-            var request=objectStore.get(id);
-            request.onerror = function(event) {
-                console.log('事务失败');
-            };
-            
-            request.onsuccess = function( event) {
-                if (request.result) {
-                    obj=request.request;
-                } 
-                else {
-                    console.log('未获得数据记录');
-                }
-            };
-        }
-        return obj;
+    get(key){
+        return new Promise((resolve,reject)=>{
+            let db=window.indexedDB.open('store_db');
+            db.onsuccess=()=>{
+                let req=db.result.transaction('recentstore','readonly')
+                        .objectStore('recentstore').get(key);
+                db.result.close();
+                req.onsuccess=e=>{
+                    resolve(e.target.result);
+                };
+                req=err=>{
+                    reject(err);
+                };
+            }
+            db=e=>{
+                reject(e);
+            }
+        })
     }
 }
+export {indexedDB}

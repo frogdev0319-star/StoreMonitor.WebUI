@@ -21,11 +21,12 @@ export default{
                     setCookie(TokenKey,obj.token);
                     setCookie('UserId',obj.userId);
                 }
-                window.location.href=window.location.origin+window.location.pathname+'#/home';
             }
-            else{
-                this.$router.push('/login');
-            }
+            window.location.href=window.location.origin+window.location.pathname+'#/home';
+            //}
+            // else{
+            //     this.$router.push('/login');
+            // }
         }
     }
 }

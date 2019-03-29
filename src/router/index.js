@@ -195,6 +195,7 @@ export default new Router({
           hidden:false,
           meta:{
             requireAuth: true,
+            keepAlive:true,
           }
         },
         {

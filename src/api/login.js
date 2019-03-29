@@ -24,9 +24,23 @@ export const getUserInfo=params=>{
     })
 }
 
+export const getAccountList=()=>{
+    return request({
+        url:'/user/account/list',
+        method:'get'
+    })
+}
 export function isLoginIn(){
     return request({
         url:'/islogin',
         method:'post'
+    })
+}
+
+export const changeAccount=params=>{
+    return request({
+        url:'/user/change/account',
+        method:'post',
+        params
     })
 }

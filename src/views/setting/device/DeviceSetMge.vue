@@ -2,7 +2,7 @@
     <el-row class="el-device" :style="{'min-height':varyWindowHeight-120+'px'}">
         <el-col :span="24" class="el-btns">
             <div style="display:inline-block;" v-if="activeName=='dash'">
-                <el-button @click="connectServer"  size="mini" class="btns">
+                <el-button @click="connectServer"  :size="varWindowWidth>1680?'small':'mini'" class="btns" type="primary">
                     提交
                 </el-button>
             </div>
@@ -15,7 +15,7 @@
                 </el-input>
                  <el-button v-for="(item,index) in btnList" 
                 :key="index" size="mini" @click="handleNVR(index,item)" class="el-handle-btn" :disabled="index==2">
-                    <i :class="item.iconClass" style="font-size:20px;"></i>
+                    <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
             </div>
@@ -23,7 +23,7 @@
         <el-col :span="24" class="el-tabPanels">
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="流媒体服务" name="dash">
-                    <el-col :span="varWindowWidth<1366?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
+                    <el-col :span="varWindowWidth<1540?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
                         <div class="details">
                             <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>服务器IP</span>
                             <el-input class="dash-input" v-model="dash.url" size="mini"></el-input>
@@ -189,7 +189,7 @@ import axios from 'axios'
 import {validateInput,validateURL,validatePort} from '@/common/validate'
 import {deviceRESTful} from '@/api/index'
 import {isLoginIn} from '@/api/login'
-import { mapMutations } from 'vuex'
+import { mapMutations,mapGetters} from 'vuex'
 export default {
     name:'DeviceSetMge',
     data(){
@@ -239,6 +239,15 @@ export default {
             varyWindowHeight:window.innerHeight,
         }
     },
+    watch:{
+        accountChanged(val,oldVal){
+            console.log(val);
+            let self=this;
+            if(val!=0){
+                self.InitData();
+            }
+        }
+    },
     computed:{
         varyDivHeight:function(){
             if(this.varyWindowHeight>800){
@@ -250,7 +259,10 @@ export default {
             else{
                 return this.varyWindowHeight*0.526;
             }
-        }
+        },
+        ...mapGetters({
+            accountChanged:'accountChanged'
+        })
     },
     methods:{
         // 修改table tr行的背景色
@@ -370,7 +382,7 @@ export default {
         },
         handleClick(tabs){
             console.log(tabs);
-            sessionStorage.setItem('DevicePage_TabName',tabs.name);
+           // sessionStorage.setItem('DevicePage_TabName',tabs.name);
         },
         importItem(){
             this.showConfirmImport=true;
@@ -549,7 +561,6 @@ export default {
             self.getNVRList(params);
         },
         downItem(){
-            this.RemoveAllTags();
         },
         importData(){
             let self=this;
@@ -783,9 +794,6 @@ export default {
             else {
                 self.sizeChange=10;
             }
-            self.activeName=sessionStorage.getItem('DevicePage_TabName')==undefined||
-                    sessionStorage.getItem('DevicePage_TabName').length==0?'dash':sessionStorage.getItem('DevicePage_TabName');
-            //let data=await self.getDashServerInfo();
             self.$store.dispatch('GetDash').then((res)=>{
                 let data=res.data;
                 if(res.errMsg=='Success'&&res.errCode==0){
@@ -839,7 +847,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css'; 
 @import '../../../assets/css/textstyle.css';
-$mainColor:#FB4C5D;
+$mainColor:#f31d65;
 @function rem($val){
     @return $val/16+rem;
 }
@@ -915,9 +923,6 @@ $mainColor:#FB4C5D;
             @include point(right,25);
             z-index: 979;
             @include point(width,90);
-            background-color: $mainColor;
-            color: #fff;
-            border-color: $mainColor;
         }
     }
     .el-tabPanels{
@@ -1097,12 +1102,6 @@ $mainColor:#FB4C5D;
 </style>
 <style>
 @import '../../../assets/css/pagination.css';
-.el-input__inner{
-    border-radius: 0px !important;
-}
-.el-input__inner:focus{
-    border:1px solid #FB4C5D !important;
-}
 .el-tabs__active-bar{
     height: 4px !important;
     background-color: #FB4C5D !important;

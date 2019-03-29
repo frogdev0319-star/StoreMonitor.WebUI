@@ -11,26 +11,31 @@
                     :value="item.value">
                     </el-option>
             </el-select>
-            <div class="city-content" @click="choiceCity">
-                <div class="input-arrow-panel"></div>
-                <el-input v-model="citys" size="mini" id="elCity" placeholder="城市" :readonly=true></el-input>
-                <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-            </div>
-            <el-button size="mini" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
-            <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false"> 
-                <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                    style="margin-right:10px;"></el-checkbox>全部</p>
-                <div class="city-details" v-for="(item,index) in cityList" :key="index">
-                    <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
-                    <span>{{item.cityName}}</span>
-                </div>
-            </div>
+            <el-popover
+                placement="bottom-start"
+                width="600"
+                visible-arrow='false'
+                :disabled='showPopoVer'
+                v-model="showCityContent"
+                trigger="click">
+                    <div class="city-panel" @mouseleave="showCityContent=false"> 
+                        <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
+                            style="margin-right:10px;"></el-checkbox>全部</p>
+                        <div class="city-details" v-for="(item,index) in cityList" :key="index">
+                            <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
+                            <span>{{item.cityName}}</span>
+                        </div>
+                    </div>
+                <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
+            </el-popover>
+
+            <el-button :size="varyWindowWidth>1680?'small':'mini'"  class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
             <el-input
                 size="small"
                 class="el-search-input"
                 clearable
                 v-model="serachVale" @keyup.enter.native="searchEventList" @clear="searchEventList">
-                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                <i slot="prefix" class="iconfont icon-sousuo iconsou"></i>
             </el-input>
        </div>
         <div class="el-table-content">
@@ -39,6 +44,8 @@
             :highlight-current-row="true"
             empty-text='没有门店信息'
             align='left'
+            border
+            stripe
             :height="tableHieght"
             @sort-change='sortChange'
             @row-click='rowClickItem'
@@ -119,6 +126,7 @@
 
 <script>
 import api from '@/api/index'
+import {mapGetters} from 'vuex'
 import {getInspectBindCount} from '@/api/inspect'
 import {getStoreList} from '@/api/store'
 import {isLoginIn} from '@/api/login'
@@ -127,7 +135,6 @@ import PubSub from 'pubsub-js'
         name: "StoreManage",
         data(){
             return{
-                citys:'',
                 tableInfoData:[
                      {
                         "prop":"name",
@@ -160,6 +167,7 @@ import PubSub from 'pubsub-js'
                 multeCityList:[],
                 tagList:[],
                 windowHeight:window.innerHeight,
+                varyWindowWidth:window.innerWidth,
                 params:{},
                 total:0,
                 sizeNum:10,
@@ -167,7 +175,19 @@ import PubSub from 'pubsub-js'
                 serachVale:'',
                 timeid:0,
                 isChecked:false,
-                popperClass:'province-popper'
+                popperClass:'province-popper',
+                curCitys:'城市',
+                showPopoVer:true,
+            }
+        },
+        watch:{
+            accountChanged(val,oldVal){
+                console.log(val);
+                let self=this;
+                if(val!=0){
+                    self.getProvinceList();
+                    self.getInitData();
+                }
             }
         },
         computed:{
@@ -181,50 +201,65 @@ import PubSub from 'pubsub-js'
                 else{
                     return this.windowHeight*0.63;
                 }
-            }
+            },
+            ...mapGetters({accountChanged:'accountChanged'})
         },
         methods:{
             changePro(val){
                 let self=this;
-                console.log(val);
                 self.getCityByProvince(val);
-                self.citys='';
+                self.curCitys='城市';
                 self.multeCityList.length=0;
                 self.allCityChecked=false;
+                
             },
             clearCitys(){
                 let self=this;
                 self.cityList=[];
-                
+                self.showCityContent=false;
+                self.curCitys='城市';
                 self.multeCityList.length=0;
             },
             choiceCity(){
                 let self=this;
                 if(self.curProvince.length==0){
                     self.notify('请选择省份！','warning',3000);
+                    self.showPopoVer=true;
                     return false;
                 }
-                self.showCityContent=!self.showCityContent;
-                self.showDrap=!self.showDrap;
+                else{
+                    self.showPopoVer=false;
+                    self.showDrap=!self.showDrap;
+                }
             },
             choiceAllCity(val){
                 let self=this;
                 let str='';
                 let temp=[];
                 if(!val){
-                    self.citys='';
+                    self.curCitys='城市';
                     self.multeCityList=[];
+                    self.cityList.forEach(item=>{
+                        item.checked=val;
+                        if(val){
+                            str=str+item.cityName+';';
+                            temp.push(item.cityName);
+                        }
+                    })
                 }
-                self.cityList.forEach(item=>{
-                    item.checked=val;
-                    if(val){
-                        str=str+item.cityName+';';
-                        temp.push(item.cityName);
-                    }
-                })
-                self.isChecked=val;
-                self.citys=str.substring(0,str.length-1);
-                self.multeCityList=temp;
+                else{
+                    self.cityList.forEach(item=>{
+                        item.checked=val;
+                        if(val){
+                            str=str+item.cityName+';';
+                            temp.push(item.cityName);
+                        }
+                    })
+                    self.isChecked=val;
+                    self.curCitys='';
+                    self.curCitys=str.substring(0,str.length-1);
+                    self.multeCityList=temp;
+                }
             },
             changeCityItem(item){
                 console.log(item);
@@ -245,7 +280,8 @@ import PubSub from 'pubsub-js'
                 else{
                     self.isChecked=false;
                 }
-                self.citys=str.substring(0,str.length-1);
+                self.curCitys='';
+                self.curCitys=str.substring(0,str.length-1);
                 if(temp.length==self.cityList.length){
                     self.allCityChecked=true;
                 }
@@ -256,8 +292,6 @@ import PubSub from 'pubsub-js'
             },
             searchStore(){
                 let self=this;
-                self.showCityContent=false;
-                //self.serachVale='';
                 self.params.like={};
                 let temp=[];
                 self.page=1;
@@ -340,8 +374,17 @@ import PubSub from 'pubsub-js'
                 }
                 self.provinceList=temp;
             },
+            clearPage(){
+                let self=this;
+                self.params={};
+                self.curProvince='';
+                self.curCitys='城市';
+                self.serachVale='';
+                self.multeCityList=[];
+            },
             getInitData(){
                 let self=this;
+                self.clearPage();
                 self.params.filter={
                     'page':self.page-1,
                     'size':self.sizeNum
@@ -350,12 +393,9 @@ import PubSub from 'pubsub-js'
             },
             async getStoreList(params){
                 let self=this;
-                console.log(params);
                 params.filter={page:this.page-1,size:this.sizeNum};
                 let data=await self.getStoreData(params);
-
                 self.storeData=data.data;
-                console.log(self.storeData);
                 let temp=[];
                 self.storeData.content.forEach(item=>{
                     let obj={};
@@ -386,9 +426,7 @@ import PubSub from 'pubsub-js'
                 if(paramsGetBind.storeIds.length!=0){
                     getInspectBindCount(paramsGetBind).then(res=>{
                         let data=res.data;
-                        console.log(data);
                         let tempRet=[];
-
                         for(let i=0;i<tempStoreId.length;i++){
                             for(let j=0;j<data.length;j++){
                                 if(tempStoreId[i]==data[j].storeId){
@@ -396,7 +434,6 @@ import PubSub from 'pubsub-js'
                                 }
                             }
                         }
-                        console.log(tempRet);
                         for(let i=0;i<data.length;i++){
                             self.tableData[i].bindDevice=(tempRet[i].unbindCount==0)?true:false;
                         }
@@ -407,7 +444,7 @@ import PubSub from 'pubsub-js'
                 let self=this;
                 self.params.clause={};
                 self.curProvince='';
-                self.citys='';
+                self.curCitys='城市';
                 self.page=1;
                 if(self.serachVale.length!=0){
                     self.params.like={
@@ -422,7 +459,6 @@ import PubSub from 'pubsub-js'
                 self.getStoreList(self.params);
             },
             sortChange(column){
-                console.log(column);
                 let self=this;
                 self.params.order={
                     direction:column.order=='ascending'?'asc':'desc',
@@ -454,7 +490,6 @@ import PubSub from 'pubsub-js'
                             resolve(res);
                         }
                     }).catch(res => {
-                        console.log(res);
                         resolve(res);
                     })
                 })
@@ -463,7 +498,6 @@ import PubSub from 'pubsub-js'
                 let self=this;
                 return new Promise((resolve,reject)=>{
                     isLoginIn().then(res=>{
-                        console.log(res);
                         self.getProvinceList();
                         self.getInitData();
                         resolve(res);
@@ -488,7 +522,6 @@ import PubSub from 'pubsub-js'
                 this.tableHeight=770+'px';
                 this.sizeNum=20;
             }
-            console.log(this.tableHeight);
             await this.isLoginIn();
             if(!this.timeid){
                 this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
@@ -524,6 +557,26 @@ import PubSub from 'pubsub-js'
     #{$poi}:checkRem($val);
 }
  $red:#f31d65;
+.city-panel{
+    @include point(height,auto);
+    padding: 0px 15px 30px 15px;
+    z-index: 980;
+    .elcheckBox{
+        margin-right:10px;
+    }
+    font-size: 14px;
+    p{
+        font-weight: bold;
+    }
+    .city-details{
+        width: auto;
+        min-width: 12.5%;
+        display: inline-block;
+        @include point(margin-top,5);
+        @include point(margin-bottom,5);
+        @include point(margin-right,20);
+    }
+}
 .el-event-content{
     width: 100%;
     position: relative;
@@ -532,8 +585,8 @@ import PubSub from 'pubsub-js'
     }
     .seacrh-content{
         @include point(padding-left,30);
-        @include point(margin-top,20);
-        @include point(padding-bottom,20);
+        @include point(height,60);
+        @include point(line-height,60);
         position: relative;
         text-align: left;
         border-bottom: 0.5px solid #e3e9f4;
@@ -545,56 +598,43 @@ import PubSub from 'pubsub-js'
             @include point(width,160);
             @include point(margin-right,20);
             @include point(margin-left,15);
+            position: relative;
+            @include point(bottom,1);
         }
         .el-search-btn{
             width: 90px;
             text-align: center;
             @include point(margin-left,15);
             color: #fff;
-            height: 30px;
-        }
-        .city-content{
-            display: inline-block;
             position: relative;
+            @include point(bottom,1);
+        }
+        .city-input{
+            @include point(width,160);
+            height: 28px;
+            line-height: 28px;
+            background: #F4F5F9 !important;
             cursor: pointer;
-            #elCity{
-                @include point(width,160);
-                border-radius: 0px;
-                background-color: #f0f5f8;
-            }
-            .input-arrow-panel{
-                @include point(width,160);
-                @include point(height,28);
-                position: absolute;
-                background-color: transparent;
-                cursor: pointer;
-                z-index: 100;
+            display:inline-block;
+            position: relative;
+            border: 1px solid #DCDFE6;
+            top: 8px;
+            span{
+                display: inline-block;
+                font-size: 12px;
+                color: #C0C4CC;
+                margin-left: 15px;
+                @include point(width,140);
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
             }
             .icon-input{
                 position: absolute;
                 @include point(right,10);
-                @include point(top,6);
-            }
-        }
-        .city-panel{
-            position: absolute;
-            @include point(margin-top,3);
-            @include point(left,305);
-            width: 55%;
-            @include point(height,auto);
-            padding: 10px 0px 30px 15px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            p{
-                font-weight: bold;
-            }
-            .city-details{
-                width: auto;
-                min-width: 12.5%;
-                display: inline-block;
-                @include point(margin-top,10);
+                top: 6px;
+                font-size: 14px;
+                color: #C0C4CC;
             }
         }
         .el-search-input{
@@ -602,6 +642,11 @@ import PubSub from 'pubsub-js'
             @include point(margin-right,20);
             position:absolute;
             right: 0px;
+        }
+        .iconsou{
+            position:relative;
+            left:6px;
+            font-size:18px;
         }
     }
     .el-table-content{
@@ -652,6 +697,24 @@ import PubSub from 'pubsub-js'
     }
     .current-row > td {
         background: #FEE7E4 !important;
+    }
+    .el-table tbody tr:hover>td {
+        background-color: #FDE8EF !important;
+    }
+    .el-table--border th{
+        border-right: 0 !important;
+    }
+    .el-table--border, .el-table--group{
+        border: none !important;
+    }
+    .el-table__header-wrapper th:nth-last-of-type(2){
+        border-right: none !important;
+    }
+    .el-table--border td:nth-last-of-type(1){
+        border-right: none !important;
+    }
+    .el-table--border::after, .el-table--group::after{
+        width: 0 !important;
     }
 </style>
 

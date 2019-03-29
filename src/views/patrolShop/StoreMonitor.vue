@@ -2,14 +2,14 @@
     <el-row class="el-container">
         <el-col :span="16" class="lside" :class="{liseAnmiClass:showSpread}">
             <div class="el-header-title">
-                <span class="lside-title">
+                <span class="lside-title" v-if='showStoreUp'>
                     {{store.storeTitle}}
                 </span>
                 <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp" v-if='showStoreUp'>
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button :size="varyWindowWidth>1366?'small':'mini'" class="el-submit" v-loading.fullscreen.lock="fullscreenLoading"
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-submit" v-loading.fullscreen.lock="fullscreenLoading" v-if="showStoreUp"
                             @click="submit" type="primary">提交</el-button>
             </div>
             <el-dialog title='编辑截图'
@@ -163,7 +163,7 @@
                             <el-input size="mini" class="name-input" maxlength="10" :disabled="corEvent" v-model="eventName"></el-input>
                             <span v-if="!corEvent" class="event-title">问题描述</span>
                             <span v-else class="event-title">问题描述</span>
-                            <el-input size="mini" class="des-input" type="textarea" v-if="showSearchInput" resize='none' :autosize="{ minRows: 2}"
+                            <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
                             maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
                             <div class="source-content">
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
@@ -178,7 +178,7 @@
                 <div class="right-line" v-if="corEvent" id="rightLine"></div>
                 <div v-if="corEvent" class="event-rside">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                        <span class="event-title cor-des" style="margin-left:10px;">相关事件</span>
+                        <span class="event-title cor-des">相关事件</span>
                         <div class="event-content">
                             <div class="event-details" v-for="(item,index) in eventList" :key="index">
                                 <el-radio v-model="curEvent" :label="item.id" @change="checkEvent">
@@ -213,8 +213,8 @@
                                 size="small"
                                 class="el-search-input"
                                 placeholder="请输入关键字搜索门店"
-                                v-model="serachVale" @keyup.enter.native="searchStore">
-                                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                                v-model="serachVale" @keyup.enter.native="searchStore" v-if="item.storeList.length!=0">
+                                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;" ></i>
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
@@ -295,6 +295,7 @@
 
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
 import {addEvent,addComment,getStorageInfo,getEventList} from '@/api/event'
+import {mapGetters} from 'vuex'
 import PubSub from 'pubsub-js'
 import util from '@/common/util'
 import dashAPI from '@/api/dash'
@@ -302,7 +303,8 @@ import videojs from '../../../static/video.js'
 import {validateInput} from '@/common/validate'
 import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import DialogVue from '@/components/DialogVue.vue'
-import axios from 'axios'
+import {getCookie} from '@/common/auth';
+import {indexedDB} from '@/common/util'
 export default {
     name:'StoreMoinitor',
     components:{
@@ -433,7 +435,7 @@ export default {
                 }
             ],
             tempStoreList:[],  
-            recentStoreList:[],
+            allInitStoreList:[],
             curTime:new Date(),
             curDate:'',
             curYear:new Date().getFullYear(),
@@ -444,16 +446,10 @@ export default {
 
             startTs:0,
             protocal:'DASH',
-            //selGID:0,
             sessionId:'',
-            channel:{
-                ivsId:'',
-                channelId:'',
-                channelName:'',
-            },
+            channel:{},
             evBtns:[{'name':'创建问题','isActive':true},{'name':'关联问题','isActive':false}],
-            corEvent:false,
-            showSearchInput:true,
+            //corEvent:false,
             eventList:[],
             curEvent:'',
             eventName:'',
@@ -514,6 +510,7 @@ export default {
             curDayNum:0,
             percentage:0,
             accountId:'',
+            userId:'',
             changeStoreObj:{
                 title:'确认',
                 showInfo:'问题尚未提交，切换后系统不再保存，是否确认切换？',
@@ -538,6 +535,21 @@ export default {
         percentHeight:function(){
             return this.varyWindowHeight/758;
         },
+        ...mapGetters({
+            accountChanged:'accountChanged'
+        }),
+        corEvent:function(){
+            return this.evBtns[1].isActive;
+        }
+    },
+    watch:{
+        accountChanged(val,oldVal){
+            console.log(val);
+            let self=this;
+            if(val!=0){
+                self.changeBrand();
+            }
+        }
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {
@@ -570,7 +582,6 @@ export default {
         self.getInitStoreData();
         self.getFaStoreData();   //初始获取已关注门店的列表数据
         self.getWeekDay();
-        self.getRecentStoreList();
         window.onresize=function(){
             if(!self.checkFull()){
                 self.fullScreen=false;
@@ -581,6 +592,22 @@ export default {
         }
     },
     methods:{
+        changeBrand(){
+            let self=this;
+            self.clearEvent();
+            if(self.playState){
+                self.stopRealTime();
+            }
+            self.activeIndex='0';
+            self.accountId=sessionStorage.getItem('oss_bucket');
+            self.hideLast=false;
+            self.hideNext=false;
+            self.evBtns[0].isActive=true;
+            self.evBtns[1].isActive=false;
+            //self.corEvent=false;
+            self.getInitStoreData();
+            self.getFaStoreData();
+        },
         getUpLoadBucketInfo(){
             let self=this;
             self.bucketVideo='video'+'/'+util.getCurDate2Str();
@@ -617,6 +644,8 @@ export default {
         getOssInfo(){
             let self=this;
             self.accountId=sessionStorage.getItem('oss_bucket');
+            let userId=getCookie('UserId');
+            self.userId=userId;
             getStorageInfo().then(res=>{
                 if(res.errCode==0){
                     self.oss=res.data;
@@ -681,30 +710,9 @@ export default {
                     }
                     break;
                 case 1:
-                    let temp=[];
-                    let data=self.recentStoreList;
-                    data=data.filter(function(x){
-                        return x!=null;
-                    })
-                    data.map(x=>x.storeId).forEach(item=>{
-                        if(temp.indexOf(item)==-1){
-                            temp.push(item);
-                        }
-                    })
-                    temp=temp.slice(0,3); //取最近访问的三家门店
-
-                    let dataTemp=await self.getAllStoreList();
-                    let allStoreData=dataTemp.data.content;
-                    let tempStore=[];
-                    for(let i=0;i<temp.length;i++){
-                        for(let j=0;j<allStoreData.length;j++){
-                            if(temp[i]==allStoreData[j].storeId){
-                                tempStore.push(allStoreData[j]);
-                            }
-                        }
-                    }
-                    self.tabList[1].storeList=getStoreTemp(tempStore);
-                    localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.tabList[1].storeList));
+                    data=self.getStoreObj();
+                    console.log(data);
+                    self.tabList[1].storeList=getStoreTemp(data);
                     break;
                 case 2:
                     self.tabList[2].storeList.forEach((item,index)=>{
@@ -750,6 +758,10 @@ export default {
                 self.tabList[0].storeList=getStoreTemp(storeData);
                 if(storeData.length==0){
                     self.showStoreUp=false;
+                    self.store={};
+                    self.channel={};
+                    self.channelBtns=[];
+                    self.showChannelBtns=[];
                 }
                 else{
                     let obj={};
@@ -760,8 +772,14 @@ export default {
                     obj.storeUp=true;
                     obj.storeUpTitle='已关注';
                     self.store=obj;
-                    self.recentStoreList.unshift(self.tabList[0].storeList[0]);
-                    localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
+                    self.showStoreUp=true;
+                    let curStoreId=storeData[0].storeId;
+
+                    let storeObj={
+                        storeId:curStoreId
+                    };
+
+                    self.saveStoreObj(storeObj);
                     self.getChannelByStore(self.tabList[0].storeList[0]);
                 }
             }
@@ -806,10 +824,14 @@ export default {
             let res=await self.getAllStoreList();
             if(res.errCode==0){
                 let storeData=res.data.content;
-                self.tabList[2].storeList=getStore2Temp(storeData);
-                self.tempStoreList=getStore2Temp(storeData);
-                if(self.tempStoreList.length==0){
-                    self.showSearchInput=false;
+                self.allInitStoreList=storeData;
+                if(storeData.length==0){
+                    self.tabList[2].storeList=[];
+                    self.tempStoreList=[];
+                }
+                else{
+                    self.tabList[2].storeList=getStore2Temp(storeData);
+                    self.tempStoreList=getStore2Temp(storeData);
                 }
             }
         },
@@ -870,7 +892,7 @@ export default {
         async clickEventBtn(item,index){
             let self=this;
             if(index==1){
-                self.corEvent=true;
+                //self.corEvent=true;
                 item.isActive=true;
                 self.evBtns[0].isActive=false;
                 let data=await self.getEventList();
@@ -888,7 +910,7 @@ export default {
                 self.eventList=temp;
             }
             else{
-                self.corEvent=false;
+                //self.corEvent=false;
                 item.isActive=true;
                 self.evBtns[1].isActive=false;
             }
@@ -1264,6 +1286,10 @@ export default {
             if(self.sourceList.length>=5){
                 self.notify('最多上传5个资源！','warning',3000);
                 return false;
+            }
+            if(self.fullScreen){
+                self.exitFullscreen();
+                self.fullScreen=false;
             }
             self.showCutDialog=true;
             this.$nextTick(()=>{
@@ -1700,14 +1726,14 @@ export default {
             let self=this;
             self.evBtns[0].isActive=true;
             self.evBtns[1].isActive=false;
-            self.corEvent=false;
+            //self.corEvent=false;
             self.eventName='';
             self.eventDes='';
             self.sourceList=[];
             self.curSpeed='1 X';
             self.curBack='';
         },
-        changeStore(item,index,_item,_index){
+        async changeStore(item,index,_item,_index){
             let self=this;
             _item.isActive=true;
             self.clearTheEventInfo();
@@ -1727,6 +1753,7 @@ export default {
             }
             self.store=obj;
             let tabIndex=Number(self.activeIndex);
+            let curStoreId='';
             if(tabIndex!=2){
                 item.storeList.forEach((itemS,indexS)=>{
                     if(_index!=indexS){
@@ -1734,7 +1761,7 @@ export default {
                     }
                 })
                 if(index!=1){
-                    self.recentStoreList.unshift(_item);
+                    curStoreId=_item.storeId;
                 }
             }
             else{
@@ -1744,13 +1771,53 @@ export default {
                             itemChild.isActive=false;
                         }
                         else{
-                            self.recentStoreList.unshift(itemChild);
+                            curStoreId=itemChild.storeId;
                         }
                     })
                 })
             }
-            localStorage.setItem('recentStore_storeMonitor',JSON.stringify(self.recentStoreList));
+            let storeObj={
+                storeId:curStoreId
+            };
+            self.saveStoreObj(storeObj);
             self.getChannelByStore(_item);
+        },
+        saveStoreObj(storeObj){
+            let self=this;
+            let key='recentStore_storeMonitor'+'_'+self.accountId+'_'+self.userId;
+            let temp=[];
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!=undefined){
+                temp=JSON.parse(localStorage.getItem(key));
+            }
+            temp.forEach((item,index)=>{
+                if(item.userId==storeObj.userId&&item.storeId==storeObj.storeId){
+                    temp.splice(index,1);
+                }
+            })
+            temp.unshift(storeObj);
+            temp=temp.slice(0,3);
+            localStorage.setItem(key,JSON.stringify(temp));
+        },
+        getStoreObj(){
+            let self=this;
+            let key='recentStore_storeMonitor'+'_'+self.accountId+'_'+self.userId;
+            let temp=[];
+            let tempArray=[];
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!=undefined){
+                temp=JSON.parse(localStorage.getItem(key));
+            }
+            let indexArray=[];
+            temp.forEach((item,index)=>{
+                indexArray.push(self.allInitStoreList.map(x=>x.storeId).indexOf(item.storeId));
+            })
+            console.log(indexArray);
+            indexArray=indexArray.filter(function(x){
+                return x!=-1
+            })
+            indexArray.forEach(item=>{
+                tempArray.push(self.allInitStoreList[item]);
+            })
+            return tempArray;
         },
         changeStoreDialog(){
             let self=this;
@@ -1774,12 +1841,6 @@ export default {
             }
             else{
                 self.changeStore(item,index,_item,_index);
-            }
-        },
-        getRecentStoreList(){
-            let self=this;
-            if(localStorage.getItem('recentStore_storeMonitor')!=null){
-                self.recentStoreList=JSON.parse(localStorage.getItem('recentStore_storeMonitor'));
             }
         },
         getChannelByStore(storeItem){
@@ -2017,11 +2078,13 @@ export default {
             let self=this;
             self.curTime=new Date();  //点击回到当前时间，首先时间控件恢复，选择的日期回到当前日期，停止播放历史视频。
             self.playBackState=false;
-            self.realTime();
             self.showModelContent=true;
             self.curYear=new Date().getFullYear();
             self.curMonth=new Date().getMonth()+1;
             self.getWeekDay();
+            if(self.store.storeId!=undefined){
+                self.realTime();
+            }
         },
         forWard(){
             let self=this;
@@ -2683,6 +2746,32 @@ export default {
                 @include point(margin,20);
                 padding-left: 20px;
                 margin-top: 0;
+                @media screen and(min-width:1466px){
+                    .cor-des{
+                        font-weight: bold;
+                        margin-left:10px !important;
+                    }
+                    .event-content{
+                        padding-left: 10px;
+                    }
+                    .event-name{
+                        margin-left: 10px;
+                        font-size: 14px;
+                    }
+                }
+                @media screen and(min-width:1466px){
+                    .cor-des{
+                        font-weight: bold;
+                        margin-left:0px !important;
+                    }
+                    .event-content{
+                        padding-left: 0px;
+                    }
+                    .event-name{
+                        margin-left: 0px;
+                        font-size: 12px;
+                    }
+                }
                 .event-title{
                     color: $black;
                     display: block;
@@ -2739,12 +2828,10 @@ export default {
                     height: 360px;
                     float: right;
                     .event-content{
-                        padding-left: 10px;
                         padding-bottom: 20px;
                         .event-details{
                             position: relative;
                             .event-name{
-                                margin-left: 10px;
                                 display: inline;
                             }
                             .event-date{

@@ -1,4 +1,4 @@
-.tabName-input{
+/* .tabName-input{
     margin-left: 30px;
     margin-top: 20px;
     height: 20px;
@@ -10,7 +10,7 @@
 }
 .tabName-input ::-webkit-input-placeholder{
     color: #EAEDF2 !important;
-}
+} */
 .file-cancel-btn{
     width: 76px !important;
     background-color: #EAEDF2 !important;

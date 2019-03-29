@@ -1,4 +1,4 @@
-import {loginByUsername,logout,getUserInfo} from '@/api/login'
+import {loginByUsername,logout,getUserInfo,changeAccount} from '@/api/login'
 import {getDashServerInfo} from '@/api/device'
 import {getToken,setToken,removeToken,getCookie,setCookie} from '@/common/auth'
 import api from '@/api/index'
@@ -18,36 +18,39 @@ const user={
         setting:{
             articlePlatform:[]
         },
-        changeColor:false
+        accountChanged:0
     },
     mutations:{
         SET_CODE: (state, code) => {
             state.code = code
-          },
-          SET_TOKEN: (state, token) => {
+        },
+        SET_TOKEN: (state, token) => {
             state.token = token
-          },
-          SET_DASHURL:(state,dashurl)=>{
+        },
+        SET_DASHURL:(state,dashurl)=>{
             state.dashurl=dashurl
-          },
-          SET_INTRODUCTION: (state, introduction) => {
+        },
+        SET_INTRODUCTION: (state, introduction) => {
             state.introduction = introduction
-          },
-          SET_SETTING: (state, setting) => {
+        },
+        SET_SETTING: (state, setting) => {
             state.setting = setting
-          },
-          SET_STATUS: (state, status) => {
+        },
+        SET_STATUS: (state, status) => {
             state.status = status
-          },
-          SET_NAME: (state, name) => {
+        },
+        SET_NAME: (state, name) => {
             state.name = name
-          },
-          SET_AVATAR: (state, avatar) => {
+        },
+        SET_AVATAR: (state, avatar) => {
             state.avatar = avatar
-          },
-          SET_ROLES: (state, roles) => {
+        },
+        SET_ROLES: (state, roles) => {
             state.roles = roles
-          }
+        },
+        Account_Changed:(state,accountChanged)=>{
+            state.accountChanged=accountChanged
+        }
     },
     actions:{
         GetDash({commit}){
@@ -67,6 +70,20 @@ const user={
                         url=dash.url+':'+dataPort;
                         commit('SET_DASHURL',url);
                         sessionStorage.setItem('DASH_URL',url);
+                    }
+                    resolve(res);
+                })
+            })
+        },
+        changeAccount({commit},params){
+
+            return new Promise((resolve,reject)=>{
+                changeAccount(params).then(res=>{
+                    if(res.errCode==0){
+                        commit('Account_Changed',++user.state.accountChanged);
+                    }
+                    else{
+                        commit('Account_Changed',0);
                     }
                     resolve(res);
                 })

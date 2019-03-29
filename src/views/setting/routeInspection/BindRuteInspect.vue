@@ -20,7 +20,7 @@
                  :readonly=true></el-input>
                  <i :class="showDrap?'el-icon-arrow-down':'el-icon-arrow-up'" class='icon-input'></i>
                 </div>
-                <el-button :size="varyWindowWidth>1366?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
                 <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false">
                     
                     <p :style="isChecked?{}:{'color':'#f31d65'}">
