@@ -44,7 +44,7 @@
                         <span class="brand-label">品牌</span>
                         <el-select v-model="curBrand" placeholder="请选择" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
                             <el-option
-                            style="font-size:18px;margin-left:15px;"
+                            style="font-size:18px;padding-left:15px;"
                             v-for="(item,index) in brandList" :key="index"
                             :label="item.name"
                             :value="item.accountId">
@@ -492,7 +492,7 @@ export default {
                 .brand-label{
                     display: block;
                     color: #a0a4ad;
-                    font-size: 16px;
+                    font-size: calc(16/1920*100vw);
                     @include point(margin-left,60);
                     margin-bottom: calc(15/1920*100vw);
                 }

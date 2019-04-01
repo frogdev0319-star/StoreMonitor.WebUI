@@ -20,8 +20,9 @@ import store from './store/index.js';
 import $ from 'jquery';
 import jquery from 'jquery';
 Vue.config.productionTip = false
-// import VideoPlayer from 'vue-video-player'
-// Vue.use(VideoPlayer);
+
+// import VueI18n from 'vue-i18n'
+// Vue.use(VueI18n)
 
 Vue.prototype.appName = '看门店管理系统'; //定义一个VUE内全局用到的名称（标题）
 process.env.MOCK && require('@/mock')

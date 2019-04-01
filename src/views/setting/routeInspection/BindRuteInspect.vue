@@ -773,6 +773,7 @@ $h1:#292e36;
             @include point(margin-bottom,15);
             .btn{
                 @include point(width,90);
+                min-width: 100px;
                 background-color: #f31d65; 
                 color: #fff;
             }

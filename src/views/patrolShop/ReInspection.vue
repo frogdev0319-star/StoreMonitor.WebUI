@@ -424,6 +424,7 @@ export default {
             ignoreTemp:[],
             fullScreen:false,
             appliedInspectList:[],
+
             changeStoreObj:{
                 title:'确认',
                 showInfo:'本次巡店尚未完成，确认是否切换当前门店？',
@@ -470,6 +471,21 @@ export default {
     },
     beforeRouteLeave(to, from, next){
         let self=this;
+        // if(self.editCount!=0){
+        //     let confirm=window.confirm('当前巡检项尚未提交，确认是否离开页面？');
+        //     if(confirm==true){
+        //         if(to.name!='巡检提交事件'){
+        //             from.meta.keepAlive=false;
+        //             if(self.playState){
+        //                 self.stopRealTime();
+        //             }
+        //         }
+        //         next();
+        //     }
+        //     else{
+        //         next(false);
+        //     }
+        // }
         if(to.name!='巡检提交事件'){
             from.meta.keepAlive=false;
             if(self.playState){

@@ -1033,7 +1033,8 @@ export default {
                 cursor: pointer;
                 font-size: 14px;
                 color: #424151;
-                 @include point(line-height,50);
+                @include point(height,50);
+                @include point(line-height,50);
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
@@ -1061,6 +1062,7 @@ export default {
                 }
                 .nape-dep-data{
                     width: 50%;
+                    height: 100%;
                     display: inline-block;
                     position: relative;
                     float: left;

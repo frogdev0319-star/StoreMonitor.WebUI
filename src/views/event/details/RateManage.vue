@@ -79,6 +79,7 @@
                         </audio> 
                         <span class="often-text">{{audioOftenText}}</span>
                     </div>
+                    
                     <pre  class="description">{{event.description}}</pre>
                     <div class="photo-content">
                         <div v-for="(item,index) in sourceList" :key="index" class="source-content">

@@ -6,8 +6,8 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-let base='http://'+window.location.host;
-//let base ='http://222.91.163.149:18081'
+//let base='http://'+window.location.host;
+let base ='http://222.91.163.149:18081'
 
 
 
