@@ -13,14 +13,14 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const  Version = new Date().getTime(); // 这里使用的是时间戳 来区分 ，也可以自己定义成别的如：1.1
 const env = require('../config/prod.env')
 
-/*
+
 var GenerateAssetPlugin = require('generate-asset-webpack-plugin'); 
 var createServerConfig = function(compilation){
-  let cfgJson={bucketName:'aaoompqqpjy4'};
+  let cfgJson={loginURL:'https://portals.storeviu.com'};
   return JSON.stringify(cfgJson);
 
 }
-*/
+
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -42,7 +42,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       'process.env': env
     }),
 
-    /*
+    
     //生成配置文件
     new GenerateAssetPlugin({
       filename: 'serverconfig.json',
@@ -51,14 +51,14 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       extraFiles: []
     }),
-    */
+    
 
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: {
           warnings: false,
-          drop_debugger: true,
-          drop_console: true
+          // drop_debugger: true,
+          // drop_console: true
         }
       },
       sourceMap: config.build.productionSourceMap,

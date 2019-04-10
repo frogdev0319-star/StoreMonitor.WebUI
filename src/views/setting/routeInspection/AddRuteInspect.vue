@@ -95,7 +95,7 @@
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input maxlength="75" size="mini" v-model="item.napeDep" class="nape-input" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
+                           <el-input maxlength="70" size="mini" v-model="item.napeDep" class="nape-input" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -157,7 +157,7 @@
                             <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" placeholder="输入巡检项名称" ></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input maxlength="75" size="mini" v-model="newNapeDep" class="nape-input" placeholder="输入巡检项描述"></el-input>
+                           <el-input maxlength="70" size="mini" v-model="newNapeDep" class="nape-input" placeholder="输入巡检项描述"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -852,8 +852,6 @@ export default {
         .iconcontent{
             @include point(margin-left,20);
             display: inline-block;
-            position: relative;
-            @include point(top,6);
             .iconlised{
                 @include iconContent;
                 background-color: $red;
@@ -1033,8 +1031,7 @@ export default {
                 cursor: pointer;
                 font-size: 14px;
                 color: #424151;
-                @include point(height,50);
-                @include point(line-height,50);
+                height:auto;
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
@@ -1049,6 +1046,7 @@ export default {
                     display: inline-block;
                     position: relative;
                     float: left;
+                    @include point(line-height,50);
                     .item-checkbox{
                         float: left;
                         margin-right: 0px;
@@ -1067,6 +1065,7 @@ export default {
                     position: relative;
                     float: left;
                     overflow: hidden;
+                    @include point(margin-top,15);
                     span{
                         float: left;
                         @include point(margin-left,25);

@@ -7,14 +7,14 @@
             <el-col :span="8" class="schedule-group">
                 <div class="title-content">
                     <i class="iconfont icon-wenjian icontitle"></i><span class="level2">排程名称</span>
-                    <el-button size="mini" @click="addSchedule" class="title-btn"><i class="el-icon-plus"></i><span>添加排程</span></el-button>
+                    <el-button size="mini" @click="addSchedule" class="title-btn" type="primary"><i class="el-icon-plus"></i><span>添加排程</span></el-button>
                 </div>
                 <div class="group-items group-title">
                    <div v-for="(item,index) in groupList" 
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
-                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#FB4C5D'}:{}">{{item.groupName}}</span>
+                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}</span>
                         <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
                         <div class="iconcontent" v-if="item.showEdit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
@@ -26,7 +26,7 @@
                             </div>
                         </div>
                         <div class="iconcontent">
-                            <div class="iconlised" style="background-color:#FB4C5D" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
+                            <div class="iconlised" style="background-color:#f31d65" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
                                 <i class="el-icon-check"></i>
                             </div>
                             <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
@@ -50,7 +50,7 @@
             <el-col :span="16" class="schedule-content">
                 <div class="schedule-title">
                    <span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}详情</span>
-                   <el-button size="mini" @click="saveSchedule" class="title-btn">保 存</el-button>
+                   <el-button size="mini" @click="saveSchedule" class="title-btn" type="primary">保 存</el-button>
                 </div>
                 <div class="scheule-info">
                     <div class="scheule-choice">
@@ -67,7 +67,7 @@
                         placeholder="选择月" @change="changeMonth">
                         </el-date-picker>
                         <span style="margin-left:30px;margin-right:20px;">日期</span>
-                        <el-input size="mini" style="width:200px;" v-model="modeDate"></el-input>
+                        <el-input size="mini" class="show-dateStr"  v-model="modeDate"></el-input>
                         <div class="date-content">
                             <div class="date-header">
                                 <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
@@ -404,7 +404,12 @@ export default {
 </script>
 <style lang="scss" scoped>
     @import '../../../assets/css/textstyle.css';
-    $mainColor:#FB4C5D;
+    $red:#f31d65;
+    $black:#182752;
+    $border:#e3e9f4;
+    $background:#f4f5f9;
+    $tab:#7d8cad;
+    $h1:#292e36;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -426,7 +431,7 @@ export default {
         @include point(line-height,50);
     }
     .opColor{
-        background-color: #FB4C5D !important;
+        background-color: $red !important;
         color: #fff !important;
     }
     .noramlColor{
@@ -442,10 +447,9 @@ export default {
         position: absolute;
         @include point(right,15);
         @include point(top,16);
-        background-color: $mainColor;
         color: #fff;
-        @include point(width,120);
-        @include point(font-size,14);
+        @include point(width,90);
+        font-size: 14px;
         span{
             @include point( margin-left,15);
         }
@@ -453,12 +457,12 @@ export default {
     .iconcontent{
         position: absolute;
         right: 10px;
-        margin-top: 13px;
+        @include point(margin-top,12);
         margin-right: 15px;
         .iconlised{
             float: left;
             position: relative;
-            background-color: orange;
+            background-color: $red;
             padding: 1px 6px;
             color: #fff;
             border-width: 1px 1px 1px 1px;
@@ -504,8 +508,18 @@ export default {
                         font-weight: bold;
                     }
                 }
+                @media screen and(max-width:1440px){
+                    .group-items{
+                        font-size:14px;
+                    }
+                }
+                @media screen and(min-width:1440px){
+                    .group-items{
+                        font-size:18px;
+                    }
+                }
                 .group-items{
-                    @include point(font-size,14);
+                    
                     .groupItem{
                         @include point(height,50);
                         position: relative;
@@ -517,7 +531,7 @@ export default {
                             width: 4px;
                             position:absolute;
                             top: 15%;
-                            background-color: $mainColor;
+                            background-color: $red;
                         }
                         span{
                             float: left;
@@ -584,10 +598,13 @@ export default {
                         @include point(line-height,50);
                         text-align: left;
                         @include point(margin-left,30);
-                        @include point(font-size,14);
+                        font-size: 14px;
                         color: #424151;
                         .el-date{
-                            @include point(width,200);
+                            @include point(width,180);
+                        }
+                        .show-dateStr{
+                            @include point(width,180);
                         }
                         .date-content{
                             width: 90%;
@@ -599,14 +616,14 @@ export default {
                                 -webkit-user-select: none;
                                 -moz-user-select: none;
                                 .icon-arrow{
-                                    @include point(font-size,30);
+                                    font-size: 30px;
                                     opacity: 0.4;
                                     position: relative;
                                     top: 4px;
                                     cursor: pointer;
                                 }
                                 span{
-                                    @include point(font-size,14);
+                                    font-size: 14px;
                                     font-weight: bold;
                                     @include point(margin,25);
                                 }
@@ -627,19 +644,19 @@ export default {
                                     }
                                     span{
                                         display: block;
-                                        @include point(width,36);
-                                        @include point(height,36);
+                                        width: 40px;
+                                        height: 40px;
                                         background-color: #fff;
-                                        @include point(line-height,36);
+                                        line-height: 40px;
                                         text-align: center;
-                                        @include point(font-size,14);
-                                        @include point(border-radius,18);
+                                        font-size: 14px;
+                                        border-radius: 50%;
                                     }
                                 }
                                 .schedule-tag{
                                     width: 16px;
                                     height: 16px;
-                                    background-color: #FB4C5D;
+                                    background-color: $red;
                                     border-radius: 8px;
                                     margin-top: 20px;
                                     display: inline-block;

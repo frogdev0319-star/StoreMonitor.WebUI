@@ -37,14 +37,14 @@
                 </el-col>
             </el-col>
             <el-col class="main" :span="24" 
-            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit')?
+            :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit'||$route.path=='/datacenter')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <div class="brand-panel" v-if="!collapsed">
                         <span class="brand-label">品牌</span>
                         <el-select v-model="curBrand" placeholder="请选择" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
                             <el-option
-                            style="font-size:18px;padding-left:15px;"
+                            class="options"
                             v-for="(item,index) in brandList" :key="index"
                             :label="item.name"
                             :value="item.accountId">
@@ -241,10 +241,9 @@ export default {
         fedlogout(){
             let self=this;
             //self.$router.push('/login');
-            window.location.href='https://portals.storeviu.com';
-            // self.$store.dispatch('LogOut').then((res)=>{
-            //    console.log(res);
-            // })
+            //window.location.href='https://portals.storeviu.com';
+            let url=sessionStorage.getItem('LoginURL');
+            window.location.href=url;
         },
         logOut(){
             let self=this;
@@ -500,6 +499,7 @@ export default {
                     @include point(width,170);
                     @include point(margin-left,50);
                     text-align: center;
+                    
                 }
             }
             .brand-title{
@@ -686,6 +686,9 @@ export default {
     margin-right:calc(20/1920*100vw) !important;
     color: #fff !important;
 }
-
+.options{
+    padding-left: 20px;
+    font-size: calc(18/1920*100vw); 
+}
 </style>
 

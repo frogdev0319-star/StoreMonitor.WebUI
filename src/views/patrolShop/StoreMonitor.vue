@@ -1,5 +1,5 @@
 <template>
-    <el-row class="el-container">
+    <el-row class="el-container" :class="isREC?'noeventClass':''">
         <el-col :span="16" class="lside" :class="{liseAnmiClass:showSpread}">
             <div class="el-header-title">
                 <span class="lside-title" v-if='showStoreUp'>
@@ -48,14 +48,27 @@
                     <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取 消</el-button>
                     <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
                 </div>
-                
+            </el-dialog>
+            <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+            v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5% @close='stopCommentVideo'>
+                <div class="canvas-content">
+                    <hr class="dialog-hr"/>
+                    <video  :width="580*percentHeight" :height="430*percentHeight" id="previewCutVideo" prload controls :src="curVideoSrc">
+                    </video>
+                </div>
             </el-dialog>
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='changeChannelObj.title' :show-info='changeChannelObj.showInfo' :is-warning='changeChannelObj.isWarning' :dialog-closed='changeChannelObj.dialogCosed' @confirmed='changeChannelDialog' @canceled='cancelchangeChannel'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <div class="video-content" v-if="!showgongge" id="videoContent" >
-                <div class="video-model" v-if="showModelContent"  
-                @mouseleave="hiddenModel" @mouseenter="showHiddenModel" @mousemove="showHiddenModel">
+                <div class="getvideo-content" v-if="showGetVideo">
+                    <!-- <div class="btn-graph" v-if="showVideoBtn">
+                        <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+                    </div> -->
+                    <get-video-btn class="btn-graph" v-if="showVideoBtn" :btn-width="graphBtnWidth" :video-speed="videoSpeed"></get-video-btn>
+                    <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.288+'px'" v-if="!showVideoCanvas"></canvas>
+                </div>
+                <div class="video-model" v-if="showModelContent">
                     <span id="channelName" v-if="showControlInfo">{{channel.channelName}}</span>
                     <div class="icon-footer" v-if="showControlInfo">
                         <div class="iconlside" v-if="showStoreUp">
@@ -167,8 +180,15 @@
                             maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
                             <div class="source-content">
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
-                                    <i class="el-icon-close icondelete" @click="deleteImg(item,index)"></i>
-                                    <img :src="item.src" :width="item.width" :height="item.height"/>
+                                    <div class="img-content" v-if="item.mediaType==2">
+                                        <i class="el-icon-close icondelete" @click="deleteImg(item,index)" ></i>
+                                        <img :src="item.src" :width="item.width" :height="item.height"/>
+                                    </div>
+                                    <div class="img-content" v-if="item.mediaType==1">
+                                        <i class="el-icon-close icondelete" @click="deleteImg(item,index)" ></i>
+                                        <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(item,index)"/>
+                                        <img class="imgLittle" :src="videoImgSrc" :height="item.height"/>
+                                    </div>
                                 </div>
                                 <span>*视频图片最多支持插入5个。</span>
                             </div>
@@ -266,7 +286,6 @@
                         <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
                         <span>{{curYear}}年{{curMonth}}月</span>
                         <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>
-                        <!-- <el-button size="mini" @click="backCurTime" class="backTime-btn">回到当前时间</el-button> -->
                     </div>
                     <div class="date-data">
                         <span class="date-title" v-for="(item,index) in weekTitles" :key="index">
@@ -303,13 +322,18 @@ import videojs from '../../../static/video.js'
 import {validateInput} from '@/common/validate'
 import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import DialogVue from '@/components/DialogVue.vue'
+import GetVideoBtn from '@/components/GetVideoBtn.vue'
 import {getCookie} from '@/common/auth';
 import {indexedDB} from '@/common/util'
+import axios from 'axios';
+import RecordRTC from '../../../static/RecordRTC.js'
+import { clearTimeout, setInterval, setTimeout, clearInterval } from 'timers';
 export default {
     name:'StoreMoinitor',
     components:{
         ChannelIconBtn,
-        DialogVue
+        DialogVue,
+        GetVideoBtn
     },
     data(){
         return{
@@ -391,13 +415,20 @@ export default {
             curBack:'',
             showControls:false,
             showSpread:false,
+            isREC:false,
             showCutDialog:false,
             videoEl:'',
             canvasEl:'',
+            timeVideo:0,
+            startTimeCutVideo:0,
+            endTImeCutVideo:0,
+
             showCutModel:false,
             penBtnSrc:require('../../../static/img/pen_btn.png'),
             clearIconSrc:require('../../../static/img/清除.png'),
             removeIconSrc:require('../../../static/img/撤销.png'),
+            startIcon:require('../../../static/img/pic_play_icon.png'),    
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
             showPenBtn:false,
             penList:[
                 {
@@ -449,7 +480,6 @@ export default {
             sessionId:'',
             channel:{},
             evBtns:[{'name':'创建问题','isActive':true},{'name':'关联问题','isActive':false}],
-            //corEvent:false,
             eventList:[],
             curEvent:'',
             eventName:'',
@@ -460,6 +490,8 @@ export default {
             bucketVideo:'',
             bucketImage:'',
             showgongge:false,
+            showGetVideo:false,
+            showVideoBtn:false,
             videoSourceList:[
                 {
                     id:'id'+0,
@@ -529,9 +561,24 @@ export default {
                 isWarning:false,
                 dialogCosed:false
             },
+            recorder:null,
+            showVideoCanvas:false,
+            videoCanvasSrc:'',
+            isRecordingStarted : false,
+            isStoppedRecording : false,
+            dialogCommentVideo : false,
+            curVideoSrc:'',
+            videoSpeed:0,
+            videoSpeedId:0,
         }
     },
     computed:{
+        graphBtnWidth:function(){
+            return this.varyWindowHeight*0.185;
+        },
+        btnFontSize:function(){
+            return this.varyWindowHeight*0.022;
+        },
         percentHeight:function(){
             return this.varyWindowHeight/758;
         },
@@ -572,6 +619,7 @@ export default {
     },
     async mounted(){
         let self=this;
+        self.isREC=false;
         self.videoEl=document.getElementById('previewVideo');
         document.onmouseup=self.mouseUpAction;
         //self.getPlayer();
@@ -582,6 +630,7 @@ export default {
         self.getInitStoreData();
         self.getFaStoreData();   //初始获取已关注门店的列表数据
         self.getWeekDay();
+        self.looper();
         window.onresize=function(){
             if(!self.checkFull()){
                 self.fullScreen=false;
@@ -1051,7 +1100,7 @@ export default {
             let year=date.getFullYear();
             let month=date.getMonth()+1;
             let day=date.getDate();
-            if((sindex!=0&&(item.data>day&&year==self.curYear&&month==self.curMonth))||(self.curYear>year)||(self.curYear==year&&self.curMonth>month)){
+            if((sindex==0&&(item.data>day&&item.data<=7&&year==self.curYear&&month==self.curMonth)||sindex!=0&&(item.data>day&&year==self.curYear&&month==self.curMonth))||(self.curYear>year)||(self.curYear==year&&self.curMonth>month)){
                 flag=true;
             }
             else{
@@ -1162,6 +1211,11 @@ export default {
                     obj.mediaType=2;
                     obj.url=url;
                 }
+                else if(self.sourceList[i].mediaType==1){
+                    let url=await self.upLoadFile(self.sourceList[i]);
+                    obj.mediaType=1;
+                    obj.url=url;
+                }
                 tempFileUrl.push(obj);
             }
             let eventIds=[];
@@ -1270,16 +1324,6 @@ export default {
             let self=this;
             self.showSpread=false;
         },
-        hiddenModel(){
-            let self=this;
-        },
-        showHiddenModel(){
-            let self=this;
-            if(self.playState){
-                self.showControlInfo=true;
-                self.showCutContent=true;
-            }
-        },
         cutPicture(...val){
             let self=this;
             self.showCancelContent=false;
@@ -1295,8 +1339,12 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
+                // let width=self.videoEl.videoWidth;
+                // let height=self.videoEl.videoHeight;
+                // self.canvasWidth=width;
+                // self.canvasHeight=height;
                 ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
-                var oGrayImg=icanvas.toDataURL('image/jpeg');
+                var oGrayImg=self.canvasEl.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
                 let imgObj=new Image();
                 imgObj.src=oGrayImg;
@@ -1407,14 +1455,178 @@ export default {
             obj.mediaType=2;
             obj.src=self.canvasEl.toDataURL("image/jpeg");
             obj.height='100px';
+            obj.width='140px';
             obj.fileName=self.bucketImage+'/'+'event'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.jpg';
             obj.file=util.base64ToBlob(obj.src);
             self.sourceList.push(obj);
             self.showCutDialog=false;
             self.myDivHeight();
         },
+        addVideoToList(){
+            let self=this;
+            self.recorder.stopRecording(function(){
+                self.isRecordingStarted=false;
+                self.isStoppedRecording=true;
+                var blob =self.recorder.getBlob();
+                let url=URL.createObjectURL(blob);
+                let obj={};
+                obj.fileName=self.bucketImage+'/'+'event'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+                obj.file=blob;
+                obj.mediaType=1;
+                obj.src=url;
+                obj.height='100px';
+                self.sourceList.push(obj);
+            })
+        },
+        stopCommentVideo(){
+            var video = document.getElementById("previewCutVideo");
+            this.previewplayer = videojs(video);
+            this.previewplayer.pause();
+        },
         getVideo(...val){
-            console.log(val);
+            let self=this;
+            if(self.sourceList.length>=5){
+                self.notify('最多上传5个资源！','warning',3000);
+                return false;
+            }
+            self.showGetVideo=true;
+            self.showVideoBtn=true;
+            self.videoSpeed=0;
+            self.$nextTick(()=>{
+                self.startTimeCutVideo=new Date().getTime();
+                self.computeFrame();
+                self.looper();
+                setTimeout(()=>{
+                    var btn_canvas = document.getElementById("btn-graph-canvas");
+                    self.drawMain(btn_canvas, 100, "#f31d65", "#f31d65");
+                },1000)
+            })
+        },
+        playCutVideo(item,index){
+            let self=this;
+            self.dialogCommentVideo=true;
+            self.curVideoSrc=item.src;
+        },
+        looper(){
+            let self=this;
+            if(!self.isRecordingStarted){
+                self.timeVideo=setTimeout(self.looper, 0);
+            }
+            else{
+                self.endTImeCutVideo=new Date().getTime();
+                if((self.endTImeCutVideo-self.startTimeCutVideo)/1000>11){
+                    clearTimeout(self.timeVideo);
+                    self.showGetVideo=false;
+                    self.isRecordingStarted=false;
+                    self.isREC=false;
+                    setTimeout(()=>{
+                        self.addVideoToList();
+                    },100)
+                }
+                else{
+                    self.isREC=true;
+                    html2canvas(self.videoEl).then(function(canvas){
+                        var ctx = self.canvasEl.getContext('2d');
+                        let width=self.varyWindowWidth*0.418;
+                        let height=self.varyWindowWidth*0.288;
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(self.videoEl,0,0,width,height);
+                        if(self.isStoppedRecording) {
+                            return;
+                        }
+                        requestAnimationFrame(self.looper);
+                    })
+                }
+            }
+        },
+        drawMain(drawing_elem, percent, forecolor, bgcolor) {
+            /*
+                @drawing_elem: 绘制对象
+                @percent：绘制圆环百分比, 范围[0, 100]
+                @forecolor: 绘制圆环的前景色，颜色代码
+                @bgcolor: 绘制圆环的背景色，颜色代码
+            */
+            let self=this;
+            var context = drawing_elem.getContext("2d");
+            var center_x = drawing_elem.width / 2;
+            var center_y = drawing_elem.height / 2;
+            var rad = Math.PI*2/100; 
+            
+            
+            // 绘制背景圆圈
+            function backgroundCircle(){
+                context.beginPath();
+                context.lineWidth = 14; //设置线宽
+                var radius = center_x - context.lineWidth;
+                context.arc(center_x, center_y, radius, 0, Math.PI*2, false);
+                context.fillStyle=bgcolor;
+                context.globalAlpha = 0.5;
+                context.fill();
+            }
+ 
+            //绘制运动圆环
+            function foregroundCircle(n){
+                context.save();
+                context.strokeStyle = forecolor;
+                context.globalAlpha = 1;
+                context.lineWidth = 6;
+                context.lineCap = "round";
+                var radius = center_x - context.lineWidth;
+                context.beginPath();
+                context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
+                context.stroke();
+                context.closePath();
+                context.restore();
+            }
+ 
+            //绘制文字
+            function text(n){
+                context.save();
+                context.fillStyle='white';
+                context.globalAlpha = 1;
+                var font_size=self.btnFontSize;
+                context.font='bold '+font_size+'px Helvetica';
+                var textStr='';
+                if(n==100){
+                    textStr='录制成功';
+                }
+                else{
+                    textStr='正在录制';
+                }
+                var text_width = context.measureText(textStr).width;
+                context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
+                context.restore();
+            }
+            //执行动画
+            function drawFrame(speed){
+                context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
+                backgroundCircle();
+                text(speed);
+                foregroundCircle(speed);
+                if(speed>=percent){
+                    clearInterval(self.videoSpeedId);
+                }
+            }
+            self.videoSpeedId=setInterval(() => {
+                if(self.videoSpeed >= percent){
+                    return;
+                }
+                else{
+                    self.videoSpeed += 2;
+                    drawFrame(self.videoSpeed);
+                }
+            }, 100);
+        },
+        computeFrame(){
+            let self=this;
+            self.canvasEl=document.getElementById('vcanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            self.recorder = RecordRTC(self.canvasEl, {
+                type: 'canvas'
+            });
+            self.isStoppedRecording =false;
+            self.isRecordingStarted = true;
+            self.recorder.startRecording();
         },
         async playVideo(url) {
             let self=this;
@@ -1425,10 +1637,6 @@ export default {
             this.previewplayer = videojs(video,{playbackRates: [0.5, 1, 1.5, 2]});
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
-            setTimeout(() => {
-                // self.showControlInfo=false;
-                // self.showCutContent=false;
-            }, 3000);
         },
         noBindDeviceDialog(val){
             let self=this;
@@ -1726,7 +1934,6 @@ export default {
             let self=this;
             self.evBtns[0].isActive=true;
             self.evBtns[1].isActive=false;
-            //self.corEvent=false;
             self.eventName='';
             self.eventDes='';
             self.sourceList=[];
@@ -2167,7 +2374,7 @@ export default {
             self.weekDays=dateList;
             self.weekDays.forEach((item,index)=>{
                 item.forEach((_item,_index)=>{
-                    if(_item.data==today&&curMonth==self.curMonth&&index!=0){
+                    if(_item.data==today&&curMonth==self.curMonth&&(index!=0||index==0&&_item.data<=7)){
                         _item.showBack=true;
                     }
                     if(self.afterCurDate(index,_item)){
@@ -2178,13 +2385,6 @@ export default {
                     }
                 })
             })
-            //let domList=document.getElementsByClassName('data');
-            // for(let i=0;i<domList.length;i++){
-            //     if(domList[i].style.cursor=='not-allowed'){
-            //         domList[i].style.backgroundColor='#F7F7FA';
-            //         domList[i].children[0].style.color='#C3D3EA';
-            //     }
-            // }
         },
         myDivHeight(){
             let self=this;
@@ -2255,6 +2455,9 @@ export default {
     }
     .fadepen-enter, .fadepen-leave-to{
         opacity: 0;
+    }
+    .noeventClass{
+        pointer-events: none;
     }
     .el-container{
         background-color: #f7f8fa;
@@ -2391,6 +2594,10 @@ export default {
             }
             .canvas-content{
                 position: relative;
+                #previewCutVideo{
+                    @include point(margin-bottom,25);
+                    @include point(margin-top,15);
+                }
                 .dialog-hr{
                     border: 0.5px solid ;
                     border-color: rgba(251,76,93,0.3);
@@ -2481,6 +2688,26 @@ export default {
                 position: relative;
                 @include point(margin,20);
                 margin-bottom: 0;
+                .btn-graph {
+                    position: absolute;
+                    left: 45%;
+                    top: 45%;
+                    display:flex;
+                    display:-webkit-flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                #btn-graph-canvas {
+                    width: 100px;
+                    height: 100px;
+                }
+                .getvideo-content{
+                    position: absolute;
+                    z-index: 930;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #000;
+                }
                 #previewVideo{
                     @include point(min-width,450);
                     @include point(min-height,414);
@@ -2491,7 +2718,7 @@ export default {
                     background-color: #232730;
                     color: $red;
                     position: absolute;
-                    z-index: 990;
+                    z-index: 900;
                     span{
                         position: relative;
                         top: 50%;
@@ -2503,7 +2730,7 @@ export default {
                     width: 100%;
                     background-color: transparent ;
                     position: absolute;
-                    z-index: 990;
+                    z-index: 900;
                     text-align: left;
                     @media screen and(max-width: 1366px){
                         #channelName{
@@ -2884,7 +3111,11 @@ export default {
                         display: inline-block;
                         margin-right: 15px;
                         padding-top: 15px;
-                        position: relative;
+                        .img-content{
+                            width: 100%;
+                            height: 100%;
+                            position: relative;
+                        }
                         .icondelete{
                             position: absolute;
                             font-size: 14px;
@@ -2895,6 +3126,12 @@ export default {
                             cursor: pointer;
                             background-color: rgba($color: $black, $alpha: 0.8);
                             border-radius: 50%;
+                        }
+                        .start-icon{
+                            position: absolute;
+                            left: 35%;
+                            top: 30%;
+                            cursor: pointer;
                         }
                     }
                 }

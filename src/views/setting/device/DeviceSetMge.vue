@@ -70,7 +70,7 @@
                             <div class="dialog-content" style="overflow:hidden;width:100%;">
                                 <hr style="border: 0.5px solid #FB4C5D;"/>
                                 
-                                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
+                                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                                     <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
                                     <span>此操作将会清空当前页面已有NVR及设备，是否继续?</span>
                                 </p>
@@ -157,7 +157,7 @@
                             :key="index">
                                 <div class="nape-name-data">
                                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                                    <el-input size="mini" maxlength='15' v-model="item.name" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
                                 </div>
                                 <div class="nape-dep-data">
                                     <span class="nape-dep">{{item.channelId}}</span>
@@ -237,6 +237,7 @@ export default {
             ],
             varWindowWidth:window.innerWidth, 
             varyWindowHeight:window.innerHeight,
+            curNVRItem:null
         }
     },
     watch:{
@@ -278,6 +279,7 @@ export default {
         clickNVR(index,item){
             let self=this;
             item.isClick=true;
+            self.curNVRItem=item;
             self.getChannelListByNVR(item.ivsId);
             self.nvrData.forEach((_item,_index)=>{
                 if(index!=_index){
@@ -380,9 +382,38 @@ export default {
                 })
             }
         },
+        async getChannelListInit(){
+            let self=this;
+            //self.channelData=await self.getChannelData();   //获取channel信息
+            let params={
+                "filter": {
+                    "page": self.page-1,
+                    "size": self.sizeNum
+                },
+                "order": {
+                    "direction": "asc",
+                    "property": "name"
+                }
+            };
+            self.getNVRList(params);       //获取NVR 数据信息
+        },
         handleClick(tabs){
             console.log(tabs);
-           // sessionStorage.setItem('DevicePage_TabName',tabs.name);
+            let self=this;
+            let index=Number(tabs.index);
+            switch(index){
+                case 0:
+                    self.$store.dispatch('GetDash').then((res)=>{
+                        let data=res.data;
+                        if(res.errMsg=='Success'&&res.errCode==0){
+                            self.dash=data;
+                        }
+                    });
+                break;
+                case 1:
+                    self.getChannelListInit();
+                break;
+            }
         },
         importItem(){
             this.showConfirmImport=true;
@@ -700,11 +731,11 @@ export default {
         cancelEdit(index,item){
             item.isClick=false;
         },
-        confrimEdit(){
+        confrimEdit(index,item){
             let self=this;
             let obj={};
             obj.id=self.curChannelItem.id;
-            obj.name=self.curChannelItem.name;
+            obj.name=self.curChannelItem.tempName;
             let params=obj;
             deviceRESTful.updateDevice(params).then(res=>{
                 console.log(res.data);
@@ -719,6 +750,7 @@ export default {
             })
             .then(async()=>{
                 self.channelData=await self.getChannelData();  //修改后更新数据源
+                self.getChannelListByNVR(self.curNVRItem.ivsId);
             })
         },
         getNVRList(params){
@@ -750,8 +782,13 @@ export default {
             .then(async()=>{
                 if(self.nvrData.length!=0){
                     console.log(self.nvrData[0].ivsId);
+                    self.curNVRItem=self.nvrData[0];
                     self.channelData=await self.getChannelData();
                     self.getChannelListByNVR(self.nvrData[0].ivsId);
+                }
+                else{
+                    self.channelData=[];
+                    self.channelList=[];
                 }   
             })
         },
@@ -779,6 +816,7 @@ export default {
                     let obj={};
                     obj.id=item.id;
                     obj.name=item.name;
+                    obj.tempName=item.name;
                     obj.channelId=item.channelId;
                     obj.isClick=false;
                     temp.push(obj);
@@ -800,7 +838,7 @@ export default {
                     self.dash=data;
                 }
             })
-            self.channelData=await self.getChannelData();   //获取channel信息
+            //self.channelData=await self.getChannelData();   //获取channel信息
             let params={
                 "filter": {
                     "page": self.page-1,

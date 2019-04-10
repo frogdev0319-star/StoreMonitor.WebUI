@@ -87,7 +87,8 @@ serviceAxios.interceptors.response.use(
             }).then(()=>{
                 store.dispatch('FedLogOut').then(()=>{
                     //router.push('/login');
-                    window.location.href='https://portals.storeviu.com';
+                    let url=sessionStorage.getItem('LoginURL');
+                    window.location.href=url;
                     Message({
                         message:err.response.data.errMsg,
                         type:'error',
@@ -139,7 +140,8 @@ service.interceptors.response.use(
             if(errCode===500&&(errMsg=='Invalid token'||
                 errMsg=='Fail to verify token'||errMsg=='User does not exist')){
                 //router.push('/login');
-                window.location.href='https://portals.storeviu.com';
+                let url=sessionStorage.getItem('LoginURL');
+                window.location.href=url;
                 Message({
                     message:'登录信息异常，请重新登录!',
                     type:'error',
@@ -148,7 +150,8 @@ service.interceptors.response.use(
             }
             else if(errCode===500&&errMsg=='Token does not exist'){
                 //router.push('/login');
-                window.location.href='https://portals.storeviu.com';
+                let url=sessionStorage.getItem('LoginURL');
+                window.location.href=url;
             }
             else if(errCode===500&&errMsg=='No authority'){
                 router.push('/home');

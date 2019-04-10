@@ -55,8 +55,9 @@ export default {
         color: #7d8cad;
     }
     .channel-btn-content{
-        height: 90px;
+        height: auto;
         text-align: center;
+        width: 60px;
     }
     .btn-circle{
         width: 60px;

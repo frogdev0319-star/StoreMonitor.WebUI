@@ -8,15 +8,15 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
-    {
-      path:'/login',
-      name:'Login',
-      hidden: true,
-      component:LoginForm,
-      meta:{
-        requireAuth: false,
-      }
-    },
+    // {
+    //   path:'/login',
+    //   name:'Login',
+    //   hidden: true,
+    //   component:LoginForm,
+    //   meta:{
+    //     requireAuth: false,
+    //   }
+    // },
     {
       path:'/',
       name:'AuthRedirect',
@@ -125,7 +125,7 @@ export default new Router({
           name:'事件管理',
           component:resolve=>require(['@/views/event/details/RateManage'],resolve),
           meta:{
-            requireAuth: true,
+            requireAuth: false,
           },
           children:[
             {
@@ -166,7 +166,7 @@ export default new Router({
       iconCls:'iconfont icon-menu-shujuzhongxin',
       styles:'font-size:22px',
       leaf:true,
-      isReadOnly:true,
+      isReadOnly:false,
       hidden: false,
       children:[
         {
@@ -244,7 +244,7 @@ export default new Router({
           component:resolve=>require(['@/views/setting/store/StoreManage'],resolve),
           hidden:false,
           meta:{
-            keepAlive:true,  //the component is't to be cache.
+            keepAlive:false,  //the component is't to be cache.
             requireAuth:true
           }
         },
@@ -267,7 +267,7 @@ export default new Router({
         {
           path:'/schedule',
           name:'排程配置',
-          isReadOnly:true,
+          isReadOnly:false,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{

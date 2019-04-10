@@ -85,7 +85,8 @@
                         <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                             <div v-if="item.mediaType==2" class="img-content">
                                 <!--图片资源-->
-                                <img class="imgLittle imgInner" :src="item.url" :title="imgTitle" :onerror='deafultImg'
+                                <!-- :width="imgHeight*1.4+'px'" -->
+                                <img class="imgLittle imgInner" :src="item.url" :title="imgTitle" :onerror='deafultImg' 
                                 :height="imgHeight+'px'" @click="openOuter(item,$event)"/>
                             </div>
                                 <!--视频资源-->
@@ -991,8 +992,13 @@ $h1:#292e36;
                         }
                     }
                     .video-content{
-                    width: 100%;
+                        width: 100%;
                     }
+                    // .imgInner{
+                    //     position: absolute;
+                    //     left: 0;
+                    //     clip: rect(0px 130px 100px 0px);
+                    // }
                 }
             }
             .viedo-info{
@@ -1157,11 +1163,6 @@ $h1:#292e36;
                                     left: 35%;
                                     top: 30%;
                                 }
-                            }
-                            .imgInner{
-                                position: absolute;
-                                left: 0;
-                                clip: rect(0px 80px 60px 0px);
                             }
                             &:first-child{
                                 @include point(margin-left,15);

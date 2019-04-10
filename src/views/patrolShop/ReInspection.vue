@@ -617,7 +617,24 @@ export default {
             })
         },
         getVideo(){
-
+            let self=this;
+            console.log(self.curGroupIndex);
+            if(self.sourceList.length>=5){
+                self.notify('最多上传5个资源！','warning',3000);
+                return false;
+            }
+            self.showGetVideo=true;
+            self.showVideoBtn=true;
+            self.videoSpeed=0;
+            self.$nextTick(()=>{
+                self.startTimeCutVideo=new Date().getTime();
+                self.computeFrame();
+                self.looper();
+                setTimeout(()=>{
+                    var btn_canvas = document.getElementById("btn-graph-canvas");
+                    self.drawMain(btn_canvas, 100, "#f31d65", "#f31d65");
+                },1000)
+            })
         },
         cutPicture(){
             let self=this;
@@ -688,6 +705,7 @@ export default {
             obj.mediaType=2;
             obj.src=self.canvasEl.toDataURL("image/jpeg");
             obj.height='100px';
+            obj.width='140px';
             obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
             obj.file=util.base64ToBlob(obj.src);
             self.sourceList.push(obj);
@@ -775,10 +793,19 @@ export default {
             let self=this;
             console.log(item);
             item.itemScore=itemDS.val;
-            if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
-                self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+            
+            if(item.itemScore!=0){
+                if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+                    self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
+                }
+                self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
             }
-            self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
+            else{
+                if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!=0){
+                    self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
+                    self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount-1;
+                }
+            }
         },
         getAllStoreList(){
             let self=this;
@@ -1120,13 +1147,7 @@ export default {
                 return false;
             }
             self.sourceList=[];
-            item.checked=true;
-            self.curItem=item;
-            self.curItemIndex=index;
-            self.curItemId=item.id;
-            item.disabled=false;
-            self.showError=false;
-            self.showGuide=false;
+            
             let obj={};
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
@@ -1135,6 +1156,15 @@ export default {
                     obj.channelName=device.name;
                     obj.channelId=device.channelId;
                     self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
+
+                    item.checked=true;
+                    self.curItem=item;
+                    self.curItemIndex=index;
+                    self.curItemId=item.id;
+                    item.disabled=false;
+                    self.showError=false;
+                    self.showGuide=false;
+
                     if(item.deviceId!=self.curDeviceId){
                         if(self.playState){
                             self.stopAndRealTime();
@@ -1225,7 +1255,6 @@ export default {
                 dealCount=dealCount+item.dealCount;
             })
             if(dealCount<count){
-                //self.notify('当前尚有未完成巡检项，请完成后进行提交！','warning',3000);
                 self.noAllInspectObj.dialogCosed=true;
                 return false;
             }
@@ -2217,7 +2246,7 @@ export default {
                         .icon-clicked{
                             width: 4px;
                             min-height: 40px;
-                            height: 60%;
+                            height: calc(100% - 50px);
                             position: absolute;
                             top:50px;
                             background-color: $red;

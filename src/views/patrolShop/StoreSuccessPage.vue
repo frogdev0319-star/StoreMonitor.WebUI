@@ -7,6 +7,14 @@
                 <p class="sucret-info" v-if="isSuccess">{{curSecond}}秒自动返回门店监控页面！</p>
             </div>
         </div>
+        <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+            v-if="dialogCommentVideo" :width="720*percentHeight+'px'" height=300px top=5% @close='stopCommentVideo'>
+            <div class="canvas-content">
+                <hr class="dialog-hr"/>
+                <video  :width="667*percentHeight" :height="431*percentHeight" id="previewCutVideo" prload controls :src="curVideoSrc">
+                </video>
+            </div>
+        </el-dialog>
         <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
             <div class="details">
                 <span class="event-label">门店名称：</span>
@@ -35,7 +43,13 @@
                         </span>
                         <div class="source-content">
                             <div class="source-details" v-for="(_item,_index) in sourceList" :key="_index">
-                                <img :src="_item.url"  height="120"/>
+                                <div class="img-content" v-if="_item.mediaType==2">
+                                    <img :src="_item.url"  height="100" width="140"/>
+                                </div>
+                                <div class="img-content" v-if="_item.mediaType==1">
+                                    <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
+                                    <img :src="videoImgSrc" height="100"/>
+                                </div>
                             </div>
                         </div>
                         <span class="event-ts">{{item.ts}}</span>
@@ -74,6 +88,10 @@ export default {
             routeData:null,
             timeid:0,
             varyWindowHeight:window.innerHeight,
+            startIcon:require('../../../static/img/pic_play_icon.png'),    
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
+            dialogCommentVideo:false,
+            curVideoSrc:''
         }
     },
     computed:{
@@ -84,7 +102,10 @@ export default {
             else{
                 return this.errInfo;
             }
-        }
+        },
+        percentHeight:function(){
+            return this.varyWindowHeight/758;
+        },
     },
     methods:{
         getRouterData(){
@@ -124,6 +145,11 @@ export default {
                 clearInterval(self.timeid);
                 self.$router.push({name:'门店监控',params:{flag:self.isSuccess}});
             }
+        },
+        playCutVideo(item,index){
+            let self=this;
+            self.dialogCommentVideo=true;
+            self.curVideoSrc=item.url;
         },
         getCommentList(){
             let self=this;
@@ -179,9 +205,41 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+    @function rem($val){
+        @return $val/16+rem;
+    }
+    @function checkRem($val){
+        @if($val==0){
+            @return 0;
+        }
+        @else if($val==auto){
+            @return auto;
+        }
+        @else{
+            @return rem($val);
+        }
+    }
+    @mixin point($poi,$val){
+        #{$poi}:checkRem($val);
+    }
     .el-sucPage-content{
         width: 100%;
         height: 100%;
+        .canvas-content{
+            position: relative;
+            #previewCutVideo{
+                @include point(margin-bottom,20);
+                @include point(margin-top,15);
+            }
+            .dialog-hr{
+                border: 0.5px solid ;
+                border-color: rgba(251,76,93,0.3);
+                margin-bottom:10px;
+                position: relative;
+                bottom: 5px;
+                margin-top: 0;
+            }
+        }
         .page-icon{
             margin-bottom: 40px;
             position: relative;
@@ -286,6 +344,17 @@ export default {
                                 display: inline-block;
                                 margin-right: 15px;
                                 padding-top: 15px;
+                                .img-content{
+                                    width: 100%;
+                                    height: 100%;
+                                    position: relative;
+                                    .start-icon{
+                                        position: absolute;
+                                        left: 35%;
+                                        top: 30%;
+                                        cursor: pointer;
+                                    }
+                                }
                             }
                         }
                         .event-ts{
@@ -301,4 +370,7 @@ export default {
             }
         }
     }
+</style>
+<style>
+@import '../../assets/css/importfile.css'; 
 </style>

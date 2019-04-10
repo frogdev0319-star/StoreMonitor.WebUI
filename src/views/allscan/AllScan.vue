@@ -43,11 +43,41 @@
                 <div class="box"  v-show="boxshow"></div>
             </transition>
             <button @click="togglebox">按钮</button>
+            <button @click="showVideo">录制视频</button>
+            <button @click="showVideoMore">重新录制视频</button>
+        </div>
+        <div class="time-graph">
+          <canvas id="time-graph-canvas" width="160" height="160"></canvas>
+        </div>
+        <div class="btn-graph" v-if="showVideoBtn">
+          <canvas id="btn-graph-canvas" width="200" height="200"></canvas>
         </div>
      </div>
     
 </template>
 <style scoped>
+.time-graph {
+	padding-top: 20px;
+	display:flex;
+	display:-webkit-flex;
+	justify-content: center;
+	align-items: center;
+}
+#time-graph-canvas {
+	width: 80px;
+	height: 80px;
+}
+.btn-graph {
+	padding-top: 20px;
+	display:flex;
+	display:-webkit-flex;
+	justify-content: center;
+	align-items: center;
+}
+#btn-graph-canvas {
+	width: 100px;
+	height: 100px;
+}
 .box{
     height:500px;
     background-color:black;  
@@ -203,10 +233,30 @@ import OSS from 'ali-oss'
         accountId:'aaoompqqpjy4',
         bucketImage:'',
         fileImg:'',
-        boxshow:false
+        boxshow:false,
+        speed :0,
+        showVideoBtn:false,
+        itemid:0,
       };
     },
     methods: {
+        showVideoMore(){
+            let self=this;
+            self.showVideoBtn=true;
+            self.$nextTick(()=>{
+                self.speed=0;
+                var btn_canvas = document.getElementById("btn-graph-canvas");
+                self.drawMain1(btn_canvas, 100, "#f31d65", "#f31d65");
+            })
+        },
+        showVideo(){
+            let self=this;
+            self.showVideoBtn=true;
+            self.$nextTick(()=>{
+                var btn_canvas = document.getElementById("btn-graph-canvas");
+                self.drawMain1(btn_canvas, 100, "#f31d65", "#f31d65");
+            })
+        },
        //当选择完成图片之后调用
         togglebox(){
             let self=this;
@@ -393,7 +443,159 @@ import OSS from 'ali-oss'
                 self.X=self.X1;
                 self.Y=self.Y1;
             }
-        }
+        },
+        // drawMain(drawing_elem, percent, forecolor, bgcolor) {
+        //     /*
+        //         @drawing_elem: 绘制对象
+        //         @percent：绘制圆环百分比, 范围[0, 100]
+        //         @forecolor: 绘制圆环的前景色，颜色代码
+        //         @bgcolor: 绘制圆环的背景色，颜色代码
+        //     */
+        //     var context = drawing_elem.getContext("2d");
+        //     var center_x = drawing_elem.width / 2;
+        //     var center_y = drawing_elem.height / 2;
+        //     var rad = Math.PI*2/100; 
+        //     var speed = 0;
+            
+        //     // 绘制背景圆圈
+        //     function backgroundCircle(){
+        //         context.save();
+        //         context.beginPath();
+        //         context.lineWidth = 8; //设置线宽
+        //         var radius = center_x - context.lineWidth;
+        //         context.lineCap = "round";
+        //         context.strokeStyle = bgcolor;
+        //         context.arc(center_x, center_y, radius, 0, Math.PI*2, false);
+        //         context.stroke();
+        //         context.closePath();
+        //         context.restore();
+        //     }
+ 
+        //     //绘制运动圆环
+        //     function foregroundCircle(n){
+        //         context.save();
+        //         context.strokeStyle = forecolor;
+        //         context.lineWidth = 8;
+        //         context.lineCap = "round";
+        //         var radius = center_x - context.lineWidth;
+        //         context.beginPath();
+        //         context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
+        //         context.stroke();
+        //         context.closePath();
+        //         context.restore();
+        //     }
+ 
+        //     //绘制文字
+        //     function text(n){
+        //         context.save(); //save和restore可以保证样式属性只运用于该段canvas元素
+        //         context.fillStyle = forecolor;
+        //         var font_size = 40;
+        //         context.font = font_size + "px Helvetica";
+        //         var text_width = context.measureText(n.toFixed(0)+"%").width;
+        //         context.fillText(n.toFixed(0)+"%", center_x-text_width/2, center_y + font_size/2);
+        //         context.restore();
+        //     }
+ 
+        //     //执行动画
+        //     (function drawFrame(){
+        //         window.requestAnimationFrame(drawFrame);
+        //         context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
+        //         backgroundCircle();
+        //         text(speed);
+        //         foregroundCircle(speed);
+        //         if(speed >= percent) return;
+        //         speed += 1;
+        //     }());
+        // },
+        drawMain1(drawing_elem, percent, forecolor, bgcolor) {
+            /*
+                @drawing_elem: 绘制对象
+                @percent：绘制圆环百分比, 范围[0, 100]
+                @forecolor: 绘制圆环的前景色，颜色代码
+                @bgcolor: 绘制圆环的背景色，颜色代码
+            */
+            let self=this;
+            var context = drawing_elem.getContext("2d");
+            var center_x = drawing_elem.width / 2;
+            var center_y = drawing_elem.height / 2;
+            var rad = Math.PI*2/100; 
+            
+            
+            // 绘制背景圆圈
+            function backgroundCircle(){
+                context.beginPath();
+                context.lineWidth = 14; //设置线宽
+                var radius = center_x - context.lineWidth;
+                context.arc(center_x, center_y, radius, 0, Math.PI*2, false);
+                context.fillStyle=bgcolor;
+                context.globalAlpha = 0.5;
+                context.fill();
+            }
+ 
+            //绘制运动圆环
+            function foregroundCircle(n){
+                context.save();
+                context.strokeStyle = forecolor;
+                context.globalAlpha = 1;
+                context.lineWidth = 6;
+                context.lineCap = "round";
+                var radius = center_x - context.lineWidth;
+                context.beginPath();
+                context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
+                context.stroke();
+                context.closePath();
+                context.restore();
+            }
+ 
+            //绘制文字
+            function text(n){
+                context.save();
+                context.fillStyle='white';
+                context.globalAlpha = 1;
+                var font_size=24;
+                context.font='bold '+font_size+'px Helvetica';
+                var textStr='';
+                if(n==100){
+                    textStr='录制成功';
+                }
+                else{
+                    textStr='正在录制';
+                }
+                var text_width = context.measureText(textStr).width;
+                context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
+                context.restore();
+            }
+ 
+            //执行动画
+            // (function drawFrame(){
+            //     window.requestAnimationFrame(drawFrame);
+            //     context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
+            //     backgroundCircle();
+            //     text(speed);
+            //     foregroundCircle(speed);
+            //     if(speed >= percent) return;
+            //     speed += 1;
+            // }());
+            function drawFrame(speed){
+                context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
+                backgroundCircle();
+                text(speed);
+                foregroundCircle(speed);
+            }
+            self.itemid=setInterval(() => {
+                drawFrame(self.speed);
+                if(self.speed >= percent){
+                    clearTimeout(self.itemid);
+                    setTimeout(()=>{
+                        self.showVideoBtn=false;
+                    },2000);
+                }
+                else{
+                    self.speed += 1;
+                }
+                
+            }, 100);
+        },
     },
     mounted(){
         let self=this;
@@ -401,6 +603,10 @@ import OSS from 'ali-oss'
         self.getUpLoadBucketInfo();
         self.videoEl=document.getElementById('previewVideo');
         document.onmouseup=self.mouseUpAction;
+        //var time_canvas = document.getElementById("time-graph-canvas");
+        //this.drawMain(time_canvas, 70, "#85d824", "#eef7e4");
+
+        
     }
   }
 </script>

@@ -282,7 +282,18 @@ export default {
             type: mime
         });
     },
-
+    piPx() {  
+        return new Promise(function (resolve, reject) {  
+          window.onload = function () {  
+            resolve(BMap)  
+          }  
+          let script = document.createElement('script');  
+          script.type = 'text/javascript';  
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js';  
+          script.onerror = reject;  
+          document.head.appendChild(script);  
+        })  
+    },
     init(){
         let self=this;
         let req=window.indexedDB.open('store_db');

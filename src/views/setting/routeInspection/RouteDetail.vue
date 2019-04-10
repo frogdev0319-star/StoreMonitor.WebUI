@@ -29,7 +29,7 @@
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
                         <hr style="border: 0.5px solid #f31d65;"/>
-                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
                             <span>确认是否删除当前勾选巡检项?</span>
                         </p>
@@ -49,7 +49,7 @@
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
                         <hr style="border: 0.5px solid #f31d65;"/>
-                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
                             <span>确认是否删除当前巡检项?</span>
                         </p>
