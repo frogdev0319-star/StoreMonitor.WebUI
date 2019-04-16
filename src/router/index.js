@@ -8,15 +8,15 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
-    // {
-    //   path:'/login',
-    //   name:'Login',
-    //   hidden: true,
-    //   component:LoginForm,
-    //   meta:{
-    //     requireAuth: false,
-    //   }
-    // },
+    {
+      path:'/login',
+      name:'Login',
+      hidden: true,
+      component:LoginForm,
+      meta:{
+        requireAuth: false,
+      }
+    },
     {
       path:'/',
       name:'AuthRedirect',
@@ -195,7 +195,7 @@ export default new Router({
           hidden:false,
           meta:{
             requireAuth: true,
-            keepAlive:true,
+            keepAlive:false,
           }
         },
         {

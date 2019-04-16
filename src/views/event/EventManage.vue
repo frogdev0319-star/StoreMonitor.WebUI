@@ -590,6 +590,9 @@
                     })
                     self.tableDataList[tabIndex].tableData=temp;
                     self.tableDataList[tabIndex].total=res.data.totalElements;
+                    if(tabIndex==0){
+                        self.tableDataList[tabIndex].eventCount=res.data.totalElements;
+                    }
                 }).catch(err=>{
                     console.log("Error:"+err);
                 });
@@ -789,10 +792,9 @@
                 }
             });
         },
-        beforeDestroy(){
-        },
         activated(){
             let self=this;
+            console.log(self.params);
             self.getEventList(self.params);
         }
     }

@@ -3,8 +3,8 @@
         <el-row class="container">
             <el-col class="header">
                 <el-col :span="10" class="logo-content" :class="collapsed?'logo-collapse-width':'logo-width'">
-                    <img :src="imgSrc" alt="logo" id="imgLogo">
-                    <span class="sys-name" v-if="!collapsed">{{appName}}</span>
+                    <img :src="imgSrc" alt="logo" id="imgLogo" @click="routerHome">
+                    <span class="sys-name" v-if="!collapsed" @click="routerHome">{{appName}}</span>
                 </el-col>
                 <el-col :span="1" class="el-traggle-content">
                     <i class="iconfont icon-zhankai icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
@@ -57,7 +57,7 @@
                         text-color="#eee"
                         background-color="#222538"
                         @open="handleopen" @close="handleclose" @select="handleselect" 
-                        router :collapse="collapsed"
+                        router :collapse="collapsed" :unique-opened="true"
                     id="nav-menu"
                     :collapse-transition="false" style="border:0px;min-height:800px;">
                         <template v-for="(item,index) in routerList">
@@ -200,6 +200,11 @@ export default {
                document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#222538';break;
                default: console.log('this is not a group');break;
           }
+        },
+        routerHome(){
+            let self=this;
+            let url=sessionStorage.getItem('LoginURL');
+            window.location.href=url+'/homepage';
         },
         handleclose(index) {
           console.log('handleclose');
@@ -387,6 +392,7 @@ export default {
                 @include point(padding-top,10);
                 position: relative;
                 @include borderColor;
+                cursor: pointer;
                 #imgLogo{
                     @include point(height,42);
                     max-height: 42px;

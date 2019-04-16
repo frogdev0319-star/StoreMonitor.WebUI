@@ -528,7 +528,13 @@ export default {
                     dataArry.forEach((item,index)=>{
                         let obj={};
                         obj.name=item[0]['检查分类'];
-                        obj.mode=0;
+                        //obj.mode=0;
+                        if(_this.tabName=='远程巡检'){
+                            obj.mode=0;
+                        }
+                        if(_this.tabName=='现场巡检'){
+                            obj.mode=1;
+                        }
                         obj.tag=_this.checkValue;
                         tempGroups.push(obj);
                     })

@@ -167,7 +167,7 @@ export default {
                 to.meta.keepAlive=false;
             }
             else{
-                to.meta.keepAlive=true;
+                to.meta.keepAlive=false;
             }
         });
     },

@@ -1,5 +1,5 @@
 <template>
-    <el-row class="el-container">
+    <el-row class="el-container" :class="isREC?'noeventClass':''">
         <el-col :span="16" class="lside" :class="{liseAnmiClass:showSpread}">
             <div class="el-header-title">
                 <span class="lside-title" v-if='showStoreUp'>
@@ -32,7 +32,7 @@
                     @mousemove="mouseMoveAction($event)"></canvas>
                     <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
                     'margin-left':47*percentHeight+'px'}">
-                        <div class="content" @click="cancleEditCanvas"> 
+                        <div class="content" @click="cancelEditCanvas"> 
                             <img :src="clearIconSrc" class="icon-clear" height="22px"/> 
                             <span>清除</span>
                         </div>
@@ -45,6 +45,83 @@
                 <div slot="footer">
                     <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取 消</el-button>
                     <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+            v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content">
+                    <hr class="dialog-hr"/>
+                    <video  :width="580*percentHeight" :height="420*percentHeight" id="previewCutVideo" prload controls autoplay :src="curVideoSrc">
+                    </video>
+                </div>
+            </el-dialog>
+            <el-dialog title='查看'
+                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" :width="680*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="dialog-img-content">
+                        <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight"/>
+                    </div>
+                </div>
+            </el-dialog>
+            <el-dialog title='问题反馈'
+                :visible.sync="showFeedDialog1" :close-on-click-modal="false" v-if="showFeedDialog1" :width="480*percentHeight+'px'" top=12%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="dialog-event-content">
+                        <span class="event-title">问题名称</span>
+                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title">问题描述</span>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
+                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showFeedDialog1 = false" size="mini">取 消</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack1" size="mini" type="primary">确 认</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog title='问题反馈'
+            :visible.sync="showFeedDialog2" :close-on-click-modal="false" v-if="showFeedDialog2" :width="860*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+                        <div class='icon-right' v-if="showPenBtn" id="iconR">
+                            <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
+                            <transition name='fadepen'>
+                            <div class="pen-content" v-if="showPen">
+                                <div class="content" v-for="(item,index) in penList" :key="index">
+                                    <div :class="{colorActive:item.showContent}"></div>
+                                    <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                                </div>
+                            </div>
+                            </transition>
+                        </div>
+                        <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)" 
+                        @mousemove="mouseMoveAction($event)"></canvas>
+                        <div class="cancel-content" v-if="showCancelContent" :style="{'width':520*percentHeight+'px',
+                        'margin-left':47*percentHeight+'px'}">
+                            <div class="content" @click="cancelEditCanvas"> 
+                                <img :src="clearIconSrc" class="icon-clear" height="22px"/> 
+                                <span>清除</span>
+                            </div>
+                            <div class="content" @click="confirmEditCanvas">
+                                <img :src="removeIconSrc" class="icon-clear" height="22px"/> 
+                                <span>撤销</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <span class="event-title">问题名称</span>
+                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title">问题描述</span>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
+                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showFeedDialog2 = false" size="mini">取 消</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack2" size="mini" type="primary">确 认</el-button>
                 </div>
             </el-dialog>
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
@@ -78,6 +155,12 @@
                 </div>
                 <div class="video-content"  id="videoContent"
                 @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
+                    <div class="getvideo-content" v-if="showGetVideo">
+                        <div class="btn-graph">
+                            <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+                        </div>
+                        <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
+                    </div>
                     <span id="channelName" v-if="showInfoContent">{{channel.channelName}}</span>
                     <div class="icon-footer" v-if="showInfoContent">
                         <div class="iconlside">
@@ -119,10 +202,10 @@
                 </div>
                 <el-row class="inspect-header">
                     <el-col :span="8">
-                        <span>巡检类别</span>
+                        <span style="margin-left:35px;">巡检类别</span>
                     </el-col>
-                    <el-col :span="16">
-                        <span>巡检项目</span>
+                    <el-col :span="16" v-if="!showFeedBack">
+                        <span style="margin-left:35px;">巡检项目</span>
                     </el-col>
                 </el-row>
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
@@ -131,14 +214,15 @@
                             <div :style="{'height':varyWindowHeight*0.38-40+'px'}" style="background-color:#f4f5f9">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
-                                    <span>{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
+                                    <span v-if="item.items!=undefined">{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
+                                    <span v-else>{{item.groupName}}</span>
                                 </div>
                             </div>
                          </el-scrollbar>
                     </el-col>
                     <el-col :span="16" id="inspectContent">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
-                            <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}">
+                            <div :style="{'height':varyWindowHeight*0.32+'px'}" v-if="!showFeedBack">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
                                     <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'" :style="item.checked?{'font-weight':'bold'}:{}">{{`${index+1}. ${item.subject}`}}</span>
                                     <div class="dropdown-model" v-if="item.disabled"></div>
@@ -152,7 +236,6 @@
                                             :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.val}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
-
                                     <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)" v-if="!item.isIgnore"></i>
                                     <span class="ignored-icon" v-else>已忽略</span>
                                     <div class="icon-clicked" v-if="item.checked"></div>
@@ -161,13 +244,43 @@
                                     </div>
                                     <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
-                                            <i class="el-icon-close icondelete" @click="deleteImg(item,_index)"></i>
-                                            <img :src="_item.src" :width="_item.width" :height="_item.height"/>
+                                            <div class="img-content" v-if="_item.mediaType==2">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img :src="_item.src" :width="_item.width" :height="_item.height" @click="openOuter(_item)" style="cursor: pointer"/>
+                                            </div>
+                                            <div class="img-content" v-if="_item.mediaType==1">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
+                                                <img class="imgLittle" :src="videoImgSrc" :height="_item.height"/>
+                                            </div>
                                         </div>
                                     </div>
-                                    <el-input size="mini" class="des-input" type="textarea" 
+                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
                         maxlength="300" v-model="item.inspectInput" placeholder="请输入处理评论文字" :disabled="item.disabled"></el-input>
                                 </div>
+                            </div>
+                            <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else-if="showFeedBackInfo">
+                                <div id="feedback-content">
+                                    <span class="feedback-info">方式一：点击右下方新增按钮，进行意见反馈创建！</span>
+                                    <span class="feedback-info">方式二：通过视频截图进行创建！</span>
+                                </div>
+                                <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70"/>
+                                <img :src="plusSrc" alt="plusSrc"  class="plus-icon" @click="addFeedBack"/>
+                            </div>
+                            <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else>
+                                <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                                    <div class="feedbacks-content">
+                                        <div class="feedbacks-details" v-for="(item,index) in eventList" :key="index">
+                                            <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" ></i>
+                                            <span class="feedback-eventname">{{`${index+1}. ${item.eventName}`}}</span>
+                                            <span class="feedback-eventdes">{{item.eventDes}}</span>
+                                            <img v-if="item.sourceObj!=null" :src="item.sourceObj.src" 
+                                            :width="item.sourceObj.width" :height="item.sourceObj.height" class="feedback-pic" @click="openOuter(item.sourceObj)"/>
+                                            <hr class="feedbacks-hr"/>
+                                        </div>
+                                    </div>
+                                </el-scrollbar>
+                                <img :src="plusSrc" alt="plusSrc"  class="plus-icon" @click="addFeedBack"/>
                             </div>
                         </el-scrollbar>
                     </el-col>
@@ -183,7 +296,7 @@
             <div class="el-header-title">
                 <span>选择门店</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content" :style="showFeedBack?{'height':'50%'}:{}">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
@@ -192,12 +305,12 @@
                                 {{_item.name}}
                             </span>
                         </div>
-                        <div class="storeList-content" v-else :style="{height:varyWindowHeight-100+'px'}">
+                        <div class="storeList-content" v-else :style="!showFeedBack?{height:varyWindowHeight-100+'px'}:{'height':(varyWindowHeight)/2+'px'}">
                             <el-input
                                 size="small"
                                 class="el-search-input"
                                 placeholder="请输入关键字搜索门店"
-                                v-model="serachVale" @keyup.enter.native="searchStore" v-if="item.storeList.length!=0">
+                                v-model="serachVale" @keyup.enter.native="searchStore">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
@@ -215,6 +328,26 @@
                     </el-scrollbar>
                 </el-tab-pane>
             </el-tabs>
+            <div class="channelbar-content" v-if="showFeedBack">
+                <hr class="rside-hr"/>
+                <div class="channel-content">
+                    <span>区域列表</span>
+                    <div class="channels-srollbar">
+                        <div class="arrow-content">
+                            <i @click="lastBar" class="el-icon-arrow-left icon-arrow" v-if="hideLast"></i>
+                        </div>
+                        <div class="btn-content">
+                            <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
+                                <channel-icon-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
+                                class="channelBtn" @click.native="clickBtn(item,index)"></channel-icon-btn>
+                            </div>
+                        </div>
+                        <div class="arrow-content">
+                            <i @click="nextBar" class="el-icon-arrow-right icon-arrow" v-if="hideNext"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </el-col>
     </el-row>
 </template>
@@ -228,17 +361,19 @@ import {getDeviceList} from '@/api/device'
 import dashAPI from '@/api/dash'
 import videojs from '../../../static/video.js'
 import DialogVue from '@/components/DialogVue.vue'
+import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import {getCookie} from '@/common/auth';
+import RecordRTC from '../../../static/RecordRTC.js'
 export default {
     name:'ReInspection',
     components:{
-        DialogVue
+        DialogVue,
+        ChannelIconBtn
     },
     data(){
         return{
             showControls:false,
             showGuide:true,
-            emptyImgSrc:require('../../../static/img/pic.png'),
             sourceList:[],
             penBtnSrc:require('../../../static/img/pen_btn.png'),
             showPenBtn:true,
@@ -250,10 +385,15 @@ export default {
                 storeUp:false,
                 storeUptitle:'点击关注'
             },
+            showFeedDialog1:false,
+            showFeedDialog2:false,
             arrows1Src:require('../../../static/img/arrows3_pic.png'),
-            arrows2Src:require('../../../static/img/arrows2_pic.png'),
+            arrows2Src:require('../../../static/img/arrows2_pic.png'), 
+            plusSrc:require('../../../static/img/plus_icon.png'),
             clearIconSrc:require('../../../static/img/清除.png'),
             removeIconSrc:require('../../../static/img/撤销.png'),
+            checkImgSrc:'',
+            showOuter:false,
             showModelContent:false,
             showInfoContent:false,
             activeIndex:'0',
@@ -262,11 +402,7 @@ export default {
             varyWindowWidth:window.innerWidth,
             showDate:true, 
             playDate:new Date(), 
-            channel:{
-                ivsId:'',
-                channelId:'',
-                channelName:'',
-            },
+            channel:null,
             penList:[
                 {
                     id:'white',
@@ -397,6 +533,7 @@ export default {
             allInitStoreList:[],
             sessionId:'',
             inspectList:[],
+            showFeedBack:false,
             curGroup:null,
             curGroupIndex:0,  //当前选中的group index
             curItemIndex:0,   //当前点击的 item index
@@ -449,10 +586,41 @@ export default {
                 isWarning:false,
                 dialogCosed:false
             },
+            recorder:null,
+            videoCanvasSrc:'',
+            isRecordingStarted : false,
+            isStoppedRecording : false,
+            dialogCommentVideo : false,
+            curVideoSrc:'',
+            videoSpeed:0,
+            videoSpeedId:0,
+            showGetVideo:false,
+            timeVideo:0,
+            startTimeCutVideo:0,
+            endTImeCutVideo:0,
+            isREC:false,
+            startIcon:require('../../../static/img/pic_play_icon.png'),    
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
+
+            eventList:[],
+            channelBtns:[],
+            showChannelBtns:[],
+            hideLast:false,
+            hideNext:false,
+            eventName:'',
+            eventDes:'',
+            showFeedBackInfo:true,
+            showAddFeedBackBtn:true,
 
         }
     },
     computed:{
+        graphBtnWidth:function(){
+            return this.varyWindowHeight*0.185;
+        },
+        btnFontSize:function(){
+            return this.varyWindowHeight*0.022;
+        },
         percentHeight:function(){
             return this.varyWindowHeight/758;
         },
@@ -497,11 +665,13 @@ export default {
     mounted(){
         let self=this;
         document.onmouseup=self.mouseUpAction;
+        self.isREC=false;
         self.getUpLoadBucketInfo();
         self.getOssInfo();
         self.getFaStoreData();
         self.getInitStoreData();
         self.getDeviceList();
+        self.looper();
         window.onresize=function(){
             if(!self.checkFull()){
                 console.log('退出全屏');
@@ -536,7 +706,9 @@ export default {
         anchorLinkTo () {
             let self=this;
             if(document.getElementById('inspectContent')!=null){
-                self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
+                if(self.$refs['myScrollbar']!=undefined){
+                    self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
+                }
             }
         },
         getOssInfo(){
@@ -564,10 +736,64 @@ export default {
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
             return url;
         },
+        deleteEvent(item,index){
+            let self=this;
+            console.log(item);
+            console.log(index);
+            self.eventList.splice(index,1);
+        },
+        addFeedBack(){
+            let self=this;
+            self.showFeedDialog1=true;
+            self.eventName='';
+            self.eventDes='';
+        },
+        confirmAddFeedBack2(){
+            let self=this;
+            let imgObj=null;
+            let src=self.canvasEl.toDataURL("image/jpeg");
+            imgObj={
+                mediaType:2,
+                src:src,
+                height:'100px',
+                width:'140px',
+                fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
+                file:util.base64ToBlob(src)
+            }
+            let obj={
+                eventName:self.eventName,
+                eventDes:self.eventDes,
+                sourceObj:imgObj
+            }
+            if(self.eventName.trim().length==0){
+                self.notify('事件名称不能为空！','warning',3000);
+                return false;
+            }
+            self.eventList.push(obj);
+            self.showFeedDialog2=false;
+            self.showFeedBackInfo=false;
+        },
+        confirmAddFeedBack1(){
+            let self=this;
+            let obj={
+                eventName:self.eventName,
+                eventDes:self.eventDes,
+                sourceObj:null
+            }
+            if(self.eventName.trim().length==0){
+                self.notify('事件名称不能为空！','warning',3000);
+                return false;
+            }
+            self.eventList.push(obj);
+            self.showFeedDialog1=false;
+            self.showFeedBackInfo=false;
+        },
         getIndexById(id){
             let self=this;
             let tempId=null;
-            self.inspectList.forEach((item,index)=>{
+            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
+            let inspectList=self.inspectList.slice(0,indexFeed);
+            inspectList.forEach((item,index)=>{
                 item.items.forEach((_item,_index)=>{
                     if(_item.id==id){
                         tempId={
@@ -578,6 +804,16 @@ export default {
                 })
             })
             return tempId;
+        },
+        getChannelIndexById(id){
+            let self=this;
+            let curIndex=0;
+            self.channelBtns.forEach((item,index)=>{
+                if(item.id==id){
+                    curIndex=index;
+                }
+            })
+            return curIndex;
         },
         upLoadFile(fileItem){
             let self=this;
@@ -616,6 +852,158 @@ export default {
                 }
             })
         },
+        addVideoToList(){
+            let self=this;
+            self.recorder.stopRecording(function(){
+                self.isRecordingStarted=false;
+                self.isStoppedRecording=true;
+                var blob =self.recorder.getBlob();
+                let url=URL.createObjectURL(blob);
+                let obj={};
+                obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+                obj.file=blob;
+                obj.mediaType=1;
+                obj.src=url;
+                obj.height='100px';
+                self.sourceList.push(obj);
+                console.log(self.curItemId);
+                let tempId=self.getIndexById(self.curItemId);
+                console.log(tempId);
+                if(tempId!=null){
+                    self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
+                }
+                else{
+                    self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+                }
+            })
+        },
+        playCutVideo(item,index){
+            let self=this;
+            self.dialogCommentVideo=true;
+            self.curVideoSrc=item.src;
+        },
+        looper(){
+            let self=this;
+            if(!self.isRecordingStarted){
+                self.timeVideo=setTimeout(self.looper, 0);
+            }
+            else{
+                self.endTImeCutVideo=new Date().getTime();
+                console.log((self.endTImeCutVideo-self.startTimeCutVideo)/1000);
+                if((self.endTImeCutVideo-self.startTimeCutVideo)/1000>11){
+                    clearTimeout(self.timeVideo);
+                    self.showGetVideo=false;
+                    self.isRecordingStarted=false;
+                    self.isREC=false;
+                    setTimeout(()=>{
+                        self.addVideoToList();
+                    },100)
+                }
+                else{
+                    self.isREC=true;
+                    html2canvas(self.videoEl).then(function(canvas){
+                        var ctx = self.canvasEl.getContext('2d');
+                        let width=self.varyWindowWidth*0.418;
+                        let height=self.varyWindowWidth*0.288;
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(self.videoEl,0,0,width,height);
+                        if(self.isStoppedRecording) {
+                            return;
+                        }
+                        requestAnimationFrame(self.looper);
+                    })
+                }
+            }
+        },
+        computeFrame(){
+            let self=this;
+            self.canvasEl=document.getElementById('vcanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            self.recorder = RecordRTC(self.canvasEl, {
+                type: 'canvas'
+            });
+            self.isStoppedRecording =false;
+            self.isRecordingStarted = true;
+            self.recorder.startRecording();
+        },
+        drawMain(drawing_elem, percent, forecolor, bgcolor) {
+            /*
+                @drawing_elem: 绘制对象
+                @percent：绘制圆环百分比, 范围[0, 100]
+                @forecolor: 绘制圆环的前景色，颜色代码
+                @bgcolor: 绘制圆环的背景色，颜色代码
+            */
+            let self=this;
+            var context = drawing_elem.getContext("2d");
+            var center_x = drawing_elem.width / 2;
+            var center_y = drawing_elem.height / 2;
+            var rad = Math.PI*2/100; 
+            
+            
+            // 绘制背景圆圈
+            function backgroundCircle(){
+                context.beginPath();
+                context.lineWidth = 14; //设置线宽
+                var radius = center_x - context.lineWidth;
+                context.arc(center_x, center_y, radius, 0, Math.PI*2, false);
+                context.fillStyle=bgcolor;
+                context.globalAlpha = 0.5;
+                context.fill();
+            }
+ 
+            //绘制运动圆环
+            function foregroundCircle(n){
+                context.save();
+                context.strokeStyle = forecolor;
+                context.globalAlpha = 1;
+                context.lineWidth = 6;
+                context.lineCap = "round";
+                var radius = center_x - context.lineWidth;
+                context.beginPath();
+                context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
+                context.stroke();
+                context.closePath();
+                context.restore();
+            }
+ 
+            //绘制文字
+            function text(n){
+                context.save();
+                context.fillStyle='white';
+                context.globalAlpha = 1;
+                var font_size=self.btnFontSize;
+                context.font='bold '+font_size+'px Helvetica';
+                var textStr='';
+                if(n==100){
+                    textStr='录制成功';
+                }
+                else{
+                    textStr='正在录制';
+                }
+                var text_width = context.measureText(textStr).width;
+                context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
+                context.restore();
+            }
+            //执行动画
+            function drawFrame(speed){
+                context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
+                backgroundCircle();
+                text(speed);
+                foregroundCircle(speed);
+                if(speed>=percent){
+                    clearInterval(self.videoSpeedId);
+                }
+            }
+            self.videoSpeedId=setInterval(() => {
+                if(self.videoSpeed >= percent){
+                    return;
+                }
+                else{
+                    self.videoSpeed += 2;
+                    drawFrame(self.videoSpeed);
+                }
+            }, 100);
+        },
         getVideo(){
             let self=this;
             console.log(self.curGroupIndex);
@@ -623,9 +1011,13 @@ export default {
                 self.notify('最多上传5个资源！','warning',3000);
                 return false;
             }
+            if(self.fullScreen){
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
             self.showGetVideo=true;
-            self.showVideoBtn=true;
             self.videoSpeed=0;
+            self.videoEl=document.getElementById('previewVideo').children[0];
             self.$nextTick(()=>{
                 self.startTimeCutVideo=new Date().getTime();
                 self.computeFrame();
@@ -639,27 +1031,46 @@ export default {
         cutPicture(){
             let self=this;
             console.log(self.curGroupIndex);
-            self.showCancelContent=false;
             self.videoEl=document.getElementById('previewVideo').children[0];
-            if(self.sourceList.length>=5){
-                self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
-                return false;
-            }
+            self.imageCanvasList=[];
             if(self.fullScreen){
                 self.exitFullscreen();
                 self.fullScreen=false;
             }
-            self.showCutDialog=true;
-            this.$nextTick(()=>{
-                self.canvasEl=document.getElementById('icanvas');
-                var ctx = self.canvasEl.getContext('2d');
-                ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
-                var oGrayImg=icanvas.toDataURL('image/jpeg');
-                self.imageCanvas.src=oGrayImg;
-                let imgObj=new Image();
-                imgObj.src=oGrayImg;
-                self.imageCanvasList.push(imgObj);
-            })
+            if(self.showFeedBack){
+                self.showFeedDialog2=true;
+                self.eventName='';
+                self.eventDes='';
+
+                this.$nextTick(()=>{
+                    self.canvasEl=document.getElementById('icanvas');
+                    var ctx = self.canvasEl.getContext('2d');
+                    ctx.drawImage(self.videoEl,0,0,520*self.percentHeight,340*self.percentHeight);
+                    var oGrayImg=icanvas.toDataURL('image/jpeg');
+                    self.imageCanvas.src=oGrayImg;
+                    let imgObj=new Image();
+                    imgObj.src=oGrayImg;
+                    self.imageCanvasList.push(imgObj);
+                })
+            }
+            else{
+                self.showCancelContent=false;
+                if(self.sourceList.length>=5){
+                    self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
+                    return false;
+                }
+                self.showCutDialog=true;
+                this.$nextTick(()=>{
+                    self.canvasEl=document.getElementById('icanvas');
+                    var ctx = self.canvasEl.getContext('2d');
+                    ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
+                    var oGrayImg=icanvas.toDataURL('image/jpeg');
+                    self.imageCanvas.src=oGrayImg;
+                    let imgObj=new Image();
+                    imgObj.src=oGrayImg;
+                    self.imageCanvasList.push(imgObj);
+                })
+            }
         },
         showPenList(){
             let self=this;
@@ -676,13 +1087,20 @@ export default {
             })
             self.penChecked=item.id;
         },
-        cancleEditCanvas(){
+        cancelEditCanvas(){
             let self=this;
             self.showCancelContent=false;
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,767*self.percentHeight,431*self.percentHeight);
-            ctx.drawImage(self.imageCanvas,0,0,767*self.percentHeight,431*self.percentHeight);
+            let vcanvas=null;
+            if(self.showFeedBack){
+                vcanvas={width:520*self.percentHeight,height:340*self.percentHeight};
+            }
+            else{
+                vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
+            }
+            ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
+            ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
             self.imageCanvasList=[];
         },
         confirmEditCanvas(){
@@ -691,12 +1109,19 @@ export default {
             self.imageCanvasList.pop();
             self.canvasEl=document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
-            ctx.clearRect(0,0,767*self.percentHeight,431*self.percentHeight);
-            if(self.imageCanvasList.length==0){
-                ctx.drawImage(self.imageCanvas,0,0,767*self.percentHeight,431*self.percentHeight);
+            let vcanvas=null;
+            if(self.showFeedBack){
+                vcanvas={width:520*self.percentHeight,height:340*self.percentHeight};
             }
             else{
-                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,767*self.percentHeight,431*self.percentHeight);
+                vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
+            }
+            ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
+            if(self.imageCanvasList.length==0){
+                ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
+            }
+            else{
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,vcanvas.width,vcanvas.height);
             }
         },
         confirmEdit(){
@@ -710,13 +1135,11 @@ export default {
             obj.file=util.base64ToBlob(obj.src);
             self.sourceList.push(obj);
             self.showCutDialog=false;
-
             console.log(self.curItemId);
             let tempId=self.getIndexById(self.curItemId);
             console.log(tempId);
             if(tempId!=null){
                 self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
-                self.inspectList[tempId.groupIndex].items[tempId.itemIndex].showEmptyImg=false;
             }
             else{
                 self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
@@ -822,7 +1245,6 @@ export default {
                 })
             })
         },
-
         saveStoreObj(storeObj){
             let self=this;
             let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
@@ -955,8 +1377,8 @@ export default {
                         storeId:curStoreId
                     };
                     self.saveStoreObj(storeObj);
-
                     self.getInspectByStore(self.tabList[0].storeList[0].storeId);
+                    self.getChannelByStore(self.tabList[0].storeList[0]);
                 }
             }
         },
@@ -1037,6 +1459,25 @@ export default {
                         self.store.storeUp=true;
                         self.store.storeUpTitle='已关注';
                         self.getStoreList();
+                        self.tabList[2].storeList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=true;
+                                }
+                            })
+                        })
+                        self.tempStoreList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=true;
+                                }
+                            })
+                        })
+                        self.allInitStoreList.forEach((item,index)=>{
+                            if(self.store.storeId==item.storeId){
+                                item.favorite=true;
+                            }
+                        })
                     }
                 })
             }
@@ -1046,6 +1487,25 @@ export default {
                         self.store.storeUp=false;
                         self.store.storeUpTitle='点击关注';
                         self.getStoreList();
+                        self.tabList[2].storeList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=false;
+                                }
+                            })
+                        })
+                        self.tempStoreList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=false;
+                                }
+                            })
+                        })
+                        self.allInitStoreList.forEach((item,index)=>{
+                            if(self.store.storeId==item.storeId){
+                                item.favorite=false;
+                            }
+                        })
                     }
                 })
             }
@@ -1053,35 +1513,40 @@ export default {
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
-            self.curGroupIndex=index;
-            self.curGroup=item;
-            self.curItemIndex=0;
-            self.inspectItemList=item.items;
-            self.inspectItemList.forEach((_item,_index)=>{
-                let channelObj={};
-                if(_item.sourceList.length==0){
-                    _item.showEmptyImg=true;
+            if(item.groupId=='feedBack'){
+                item.isClick=true;
+                self.showFeedBack=true;
+                if(self.eventList.length==0){
+                    self.showFeedBackInfo=true;
                 }
-                else{
-                    _item.showEmptyImg=false;
-                }
-                if(_index==0){
-                    if(_item.deviceId!=-1){
-                        let device=self.getDeviceById(_item.deviceId);
-                        if(device!=null){
-                            channelObj.ivsId=device.ivsId;
-                            channelObj.channelName=device.name;
-                            channelObj.channelId=device.channelId;
+                self.showGuide=false;
+                console.log(self.channel);
+                self.channelBtns.forEach((_item,_index)=>{
+                    if(self.channel!=null){
+                        if(_item.channelId==self.channel.channelId){
+                            _item.isClick=true;
                         }
-                        self.channel=channelObj;
+                        else{
+                            _item.isClick=false;
+                        }
                     }
-                }
-            });
-            let tempArray=[];
-            item.isClick=true;
-            this.$nextTick(()=>{
-                self.anchorLinkTo();
-            })
+                })
+                self.$nextTick(()=>{
+                    self.getshowBtns(self.channelBtns);
+                })
+            }
+            else{
+                self.curGroupIndex=index;
+                self.curGroup=item;
+                self.curItemIndex=0;
+                self.inspectItemList=item.items;
+                self.showFeedBack=false;
+    
+                item.isClick=true;
+                this.$nextTick(()=>{
+                    self.anchorLinkTo();
+                })
+            }
             self.inspectList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isClick=false;
@@ -1098,12 +1563,17 @@ export default {
             })
             return device;
         },
+        openOuter(item){
+            let self=this;
+            console.log(item);
+            if(item!=null){
+                self.showOuter=true;
+                self.checkImgSrc=item.src;
+            }
+        },
         deleteImg(item,index){
             let self=this;
             item.sourceList.splice(index,1);
-            if(item.sourceList.length==0){
-                item.showEmptyImg=true;
-            }
         },
         ignoreInspectDialog(val){
             let self=this;
@@ -1141,6 +1611,29 @@ export default {
             let self=this;
             self.noBindDeviceObj.dialogCosed=false;
         },
+        clickBtn(item,index){
+            let self=this;
+            console.log(item);
+            let obj={
+                id:item.id,
+                channelId:item.channelId,
+                ivsId:item.ivsId,
+                channelName:item.name
+            };
+            self.channel=obj;
+            item.isClick=true;
+            self.showChannelBtns.forEach((_item,_index)=>{
+                if(_index!=index){
+                    _item.isClick=false;
+                }
+            })
+            if(self.playState){
+                self.stopAndRealTime();
+            }
+            else{
+                self.realTime();
+            }
+        },
         clickItem(item,index){
             let self=this;
             if(item.isIgnore){
@@ -1152,6 +1645,7 @@ export default {
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
+                    obj.id=device.id;
                     obj.ivsId=device.ivsId;
                     obj.channelName=device.name;
                     obj.channelId=device.channelId;
@@ -1231,7 +1725,13 @@ export default {
                         temp.push(obj);
                     })
                     self.inspectList=temp;
+                    let feedobj={
+                        groupId:'feedBack',
+                        groupName:'问题反馈',
+                        isClick:false,
+                    }
                     if(self.inspectList.length!=0){
+                        self.inspectList.push(feedobj);
                         self.getItemByGroup(self.inspectList[0],0);
                     }
                 }
@@ -1250,7 +1750,10 @@ export default {
             let temp=[];
             let count=0;
             let dealCount=0;
-            self.inspectList.forEach(item=>{
+            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
+            let inspectList=self.inspectList.slice(0,indexFeed);
+            
+            inspectList.forEach(item=>{
                 count=count+item.items.length;
                 dealCount=dealCount+item.dealCount;
             })
@@ -1259,21 +1762,26 @@ export default {
                 return false;
             }
             self.fullscreenLoading=true;
-            for(let i in self.inspectList){
-                for(let  j in self.inspectList[i].items){
+            for(let i in inspectList){
+                for(let  j in inspectList[i].items){
                     let objItem={};
                     objItem.ts=new Date().getTime();
-                    objItem.description=self.inspectList[i].items[j].inspectInput.trim();
-                    objItem.score=self.inspectList[i].items[j].isIgnore?-1:self.inspectList[i].items[j].itemScore;
+                    objItem.description=inspectList[i].items[j].inspectInput.trim();
+                    objItem.score=inspectList[i].items[j].isIgnore?-1:inspectList[i].items[j].itemScore;
                     objItem.storeId=self.store.storeId;
-                    objItem.inspectItemId=self.inspectList[i].items[j].id;
+                    objItem.inspectItemId=inspectList[i].items[j].id;
                     let tempFileUrl=[];
-                    if(!self.inspectList[i].items[j].isIgnore){
-                        for(let k in self.inspectList[i].items[j].sourceList){
+                    if(!inspectList[i].items[j].isIgnore){
+                        for(let k in inspectList[i].items[j].sourceList){
                             let obj={};
-                            if(self.inspectList[i].items[j].sourceList[k].mediaType==2){
-                                let url=await self.upLoadFile(self.inspectList[i].items[j].sourceList[k]);
+                            if(inspectList[i].items[j].sourceList[k].mediaType==2){
+                                let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=2;
+                                obj.url=url;
+                            }
+                            else if(inspectList[i].items[j].sourceList[k].mediaType==1){
+                                let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
+                                obj.mediaType=1;
                                 obj.url=url;
                             }
                             tempFileUrl.push(obj);
@@ -1283,17 +1791,38 @@ export default {
                     temp.push(objItem);
                 }
             }
+            let feedEventList=[];
+            console.log(self.eventList);
+            
+            for(let i in self.eventList){
+                let obj={};
+                obj.ts=new Date().getTime();
+                obj.storeId=self.store.storeId,
+                obj.deviceId=self.channel.id;
+                obj.subject=self.eventList[i].eventName;
+                obj.description=self.eventList[i].description;
+
+                let commentTemp=[];
+                if(self.eventList[i].sourceObj!=null){
+                    let url=await self.upLoadFile(self.eventList[i].sourceObj);
+                    let commentObj={
+                        mediaType:2,
+                        url:url
+                    }
+                    commentTemp.push(commentObj);
+                }
+                obj.attachment=commentTemp;
+                feedEventList.push(obj);
+            }
             let params={
-                items:temp
+                items:temp,
+                feedback:feedEventList
             };
+            let routeData=null;
             submitInspectItem(params).then(res=>{
-                console.log(res);
-                let errCode=res.errCode;
-                self.fullscreenLoading=false;
-                let routeData=null;
-                if(errCode==0){
-                    self.editFlag=true;
+                if(res.errCode==0){
                     let data=res.data;
+                    self.editFlag=true;
                     routeData={
                         isSuccess:true,
                         user:data.notifiedTo,
@@ -1311,6 +1840,7 @@ export default {
                 sessionStorage.setItem('reinspect_submit',JSON.stringify(routeData));
                 self.$router.push({name:"巡检提交事件",params:{data:routeData}});
             })
+            
         },
         spreadContent(){
             let self=this;
@@ -1591,6 +2121,8 @@ export default {
             obj.storeName=_item.name;
             obj.storeTitle=_item.name;
             obj.storeUp=_item.favorite;
+            self.channel=null;
+            self.getChannelByStore(_item);
             if(_item.favorite){
                 obj.storeUpTitle='已关注';
             }
@@ -1607,9 +2139,7 @@ export default {
                         itemS.isActive=false;
                     }
                 })
-                if(index!=1){
-                    curStoreId=_item.storeId;
-                }
+                curStoreId=_item.storeId;
             }
             else{
                 item.storeList.forEach((itemS,indexS)=>{
@@ -1636,6 +2166,95 @@ export default {
         canceldChangeStore(){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
+        },
+
+        lastBar(){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=self.channelBtns.length){
+                return false;
+            }
+            else{
+                let index=self.getChannelIndexById(self.showChannelBtns[0].id);
+                self.showChannelBtns.unshift(self.channelBtns[index-1]);
+                self.showChannelBtns.pop();
+                self.showChannelBtns.forEach((item,index)=>{
+                    if(item.id==self.channel.id){
+                        item.isClick=true;
+                    }
+                    else{
+                        item.isClick=false;
+                    }
+                })
+                if(self.showChannelBtns[0].id==self.channelBtns[0].id){
+                    self.hideLast=false;
+                }
+                if(self.showChannelBtns[count-1].id!=self.channelBtns[self.channelBtns.length-1].id){
+                    self.hideNext=true;
+                }
+            }
+        },
+        nextBar(){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=self.channelBtns.length){
+                return false;
+            }
+            else{
+                let index=self.getChannelIndexById(self.showChannelBtns[count-1].id);
+                self.showChannelBtns.push(self.channelBtns[index+1]);
+                self.showChannelBtns.shift();
+                self.showChannelBtns.forEach((item,index)=>{
+                    if(item.id==self.channel.id){
+                        item.isClick=true;
+                    }
+                    else{
+                        item.isClick=false;
+                    }
+                })
+                if(self.showChannelBtns[0].id!=self.channelBtns[0].id){
+                    self.hideLast=true;
+                }
+                if(self.showChannelBtns[count-1].id==self.channelBtns[self.channelBtns.length-1].id){
+                    self.hideNext=false;
+                }
+            }
+        },
+        getshowBtns(list){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth); //当前容器最大可显示数量
+            if(count>=list.length){
+                self.showChannelBtns=list;
+            }
+            else{
+                self.showChannelBtns=list.slice(0,count);
+            }
+            if(count<self.channelBtns.length){
+                self.hideNext=true;
+            }
+        },
+        getChannelByStore(storeItem){
+            let self=this;
+            let temp=[];
+            self.hideLast=false;
+            self.hideNext=false;
+            storeItem.device.forEach((item,index)=>{
+                let obj={};
+                obj.id=item.id;
+                obj.name=item.name;
+                obj.ivsId=item.ivsId;
+                obj.channelId=item.channelId;
+                obj.isonline=true;
+                obj.isClick=false;
+                temp.push(obj);
+            })
+            self.channelBtns=temp;
         },
         clickStore(item,index,_item,_index){
             let self=this;
@@ -1707,6 +2326,9 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
+    .noeventClass{
+        pointer-events: none;
+    }
     .el-container{
         background-color: #f7f8fa;
         .spreadLsideClass{
@@ -1750,21 +2372,84 @@ export default {
         }
         .canvas-content{
             position: relative;
+            
             .dialog-hr{
                 border: 0.5px solid ;
                 border-color: rgba(251,76,93,0.3);
-                margin-bottom:10px;
+                margin-bottom:0px;
                 position: relative;
                 bottom: 5px;
-                margin-top: 0;
+            }
+            #icanvas{
+                @include point(margin-top,15);
+            }
+            .dialog-img-content{
+                @include point(padding,15);
+            }
+            .dialog-event-content{
+                text-align: left;
+                @include point(margin-bottom,20);
+                .event-title{
+                    color: $black;
+                    display: block;
+                    margin: 15px;
+                    @include point(margin-left,20);
+                    font-size: 14px;
+                }
+                .name-input{
+                    @include point(width,150);
+                    @include point(margin-left,20);
+                }
+                .des-input{
+                    width: 90%;
+                    @include point(margin-left,20);
+                }
+            }
+            .feed-canvas-content{
+                width: 65%;
+                float: left;
+                position: relative;
+                text-align: left;
+                margin-left: 1%;
+                #icanvas{
+                    margin-left: 20px;
+                }
+                .cancel-content{
+                    margin-left: 20px !important;
+                    height:30px;
+                    line-height: 30px;
+                }
+            }
+            .event-content{
+                width:33%;
+                float: left;
+                text-align: left;
+                margin-left: 1%;
+                .event-title{
+                    color: $black;
+                    display: block;
+                    margin: 15px;
+                    margin-left: 0;
+                    font-size: 14px;
+                }
+                .name-input{
+                    @include point(width,150);
+                    @include point(margin-bottom,15);
+                }
+                .des-input{
+                    width: 80%;
+                }
+            }
+            #previewCutVideo{
+                @include point(margin-bottom,20);
+                @include point(margin-top,10);
             }
             .cancel-content{
                 position: absolute;
                 bottom: 2px;
                 @include point(height,30);
                 @include point(line-height,30);
-                background-color: $black;
-                opacity: 0.5;
+                background-color: rgba($color: $black, $alpha: 0.5);
                 z-index: 10;
                 overflow: hidden;
                 .content{
@@ -1789,6 +2474,7 @@ export default {
                 position: absolute;
                 right: 30px;
                 top: 5%;
+                text-align: center;
                 .pen-btn{
                     width: 40px;
                     margin-right: 20px;
@@ -2012,6 +2698,26 @@ export default {
                 position: relative;
                 @include point(margin,20);
                 margin-bottom: 0;
+                .getvideo-content{
+                    position: absolute;
+                    z-index: 930;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #000;
+                    .btn-graph {
+                        position: absolute;
+                        left: 45%;
+                        top: 45%;
+                        display:flex;
+                        display:-webkit-flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    #btn-graph-canvas {
+                        width: 100px;
+                        height: 100px;
+                    }
+                }
                 @media screen and(max-width: 1366px){
                     #channelName{
                         font-size: 12px;
@@ -2103,7 +2809,7 @@ export default {
                     height: 32px;
                     line-height: 30px;
                     position: absolute;
-                    z-index: 990;
+                    z-index: 900;
                     right: 20px;
                     margin-bottom: 40px;
                     border-radius: 4px;
@@ -2130,7 +2836,7 @@ export default {
                     height: 32px;
                     line-height: 30px;
                     position: absolute;
-                    z-index: 990;
+                    z-index: 900;
                     right: 20px;
                     margin-bottom: 40px;
                     border-radius: 4px;
@@ -2174,7 +2880,6 @@ export default {
                 }
                 .inspect-header{
                     text-align: left;
-                    padding-left: 35px;
                     font-size: 12px;
                     font-weight: bold;
                     color: $tab;
@@ -2213,6 +2918,72 @@ export default {
                 }
                 .inspect-content{
                     padding: 15px auto;
+                    .item-content{
+                        .feedbacks-content{
+                            .feedbacks-details{
+                                
+                                text-align: left;
+                                @include point(margin-top,15);
+                                @include point(margin-bottom,15);
+                                @include point(padding-left,20);
+                                @include point(padding-right,15);
+                                position: relative;
+                                .feedback-eventname{
+                                    font-size: 14px;
+                                    display: block;
+                                    margin-bottom: 8px;
+                                    color: $black;
+                                }
+                                .feedback-eventdes{
+                                    font-size: 12px;
+                                    display: block;
+                                    margin-bottom: 15px;
+                                    color: $tab;
+                                    margin-left: 15px;
+                                }
+                                .icon-delete-event{
+                                    position: absolute;
+                                    right: 0;
+                                    @include point(margin-right,15);
+                                    cursor: pointer;
+                                    color: #fff;
+                                    background-color: #D9DBE3;
+                                    border-radius: 50%;
+
+                                }
+                                .feedback-pic{
+                                    margin-left: 15px;
+                                }
+                                .feedbacks-hr{
+                                    border: 0.5px solid $border;
+                                }
+                            }
+                        }
+                    }
+                    #feedback-content{
+                        @include point(padding-top,20);
+                        @include point(margin-left,30);
+                        text-align: left;
+                        .feedback-info{
+                            display: block;
+                            color: $red;
+                            font-size: calc(18/1920*100vw);
+                            font-weight: bold;
+                            &:last-child{
+                                @include point(margin-top,30);
+                            }
+                        }
+                    }
+                    .feed-arrow{
+                        position: relative;
+                        @include point(left,30);
+                    }
+                    .plus-icon{
+                        position: absolute;
+                        @include point(bottom,10);
+                        @include point(right,30);
+                        cursor: pointer;
+                    }
                     .inspect-details{
                         text-align: left;
                         padding-left: 35px;
@@ -2290,9 +3061,6 @@ export default {
                                     color: #FCB83B;
                                     margin-top: 0;
                                 }
-                                .emptyImg-info{
-                                    display: block;
-                                }
                                 .icondelete{
                                     position: absolute;
                                     font-size: 14px;
@@ -2303,6 +3071,17 @@ export default {
                                     cursor: pointer;
                                     background-color: rgba($color: $black, $alpha: 0.8);
                                     border-radius: 50%;
+                                }
+                                .img-content{
+                                    width: 100%;
+                                    height: 100%;
+                                    position: relative;
+                                }
+                                .start-icon{
+                                    position: absolute;
+                                    left: 35%;
+                                    top: 30%;
+                                    cursor: pointer;
                                 }
                             }
                         }
@@ -2469,6 +3248,54 @@ export default {
                         font-size: 14px;
                         font-weight: bold;
                         @include point(margin-left,20);
+                    }
+                }
+            }
+            .channelbar-content{
+                .rside-hr{
+                    width: 100%;
+                    border: 0.5px solid $border;
+                }
+                .channel-content{
+                    width: 100%;     
+                    overflow: hidden;
+                    margin-top: 10px;
+                    span{
+                        display: block;
+                        text-align: left;
+                        @include point(margin-left,30);
+                        color: $black;
+                        margin-bottom: 15px;
+                        font-size: 16px;
+                    }
+                    .channels-srollbar{
+                        text-align: left;
+                        padding: 10px;
+                        margin-left: 5%;
+                        overflow: hidden;
+                        min-height: 115px;
+                    }
+                    .arrow-content{
+                        @include point(min-width,20);
+                        min-height: 20px;
+                        float: left;
+                        margin-top: 20px;
+                        width: 4%;
+                    }
+                    .icon-arrow{
+                        cursor: pointer;
+                    }
+                    .btn-content{
+                        width: 86%;
+                        float: left;
+                        .btn-details{
+                            display: inline-block;
+                            margin-bottom: 5px;
+                            @include point(margin-left,15);
+                            &:last-child{
+                                @include point(margin-right,15);
+                            }
+                        }
                     }
                 }
             }

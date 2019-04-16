@@ -15,6 +15,8 @@ module.exports = {
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
     port: 8088, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    //host:'xuyue.com',
+    //port:80,
     autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,
@@ -49,7 +51,7 @@ module.exports = {
      * Source Maps
      */
 
-    productionSourceMap: false,
+    productionSourceMap: true,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 

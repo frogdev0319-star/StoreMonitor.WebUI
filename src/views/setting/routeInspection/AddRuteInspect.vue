@@ -95,7 +95,7 @@
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input maxlength="70" size="mini" v-model="item.napeDep" class="nape-input" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
+                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -224,15 +224,12 @@ export default {
         }
     },
     methods:{
-        // check(strVal){
-        //     console.log(strVal);
-        //     if(validateInput(strVal)){
-        //         alert('含有非法字符！');
-        //     }
-        // },
         editTabName(){
             let self=this;
             self.showEditTab=true;
+        },
+        confirmEditTab(){
+            console.log('修改tab');
         },
         cancelEditTab(){
             let self=this;
@@ -557,6 +554,7 @@ export default {
             let self=this;
             item.isClick=false;
             item.napeDep=self.napeDepTemp;
+            item.napeName=item.napeNameShow.slice(item.napeNameShow.indexOf('，')+1);
         },
         confirmaddNape(){
             let self=this;
@@ -621,7 +619,10 @@ export default {
                     })
                     self.notify('添加成功!','success',3000);
                     setTimeout(function(){
-                        PubSub.publish('change-color',{showTag:true});
+                        console.log(self.tabName);
+                        if(self.tabName=='远程巡检'){
+                            PubSub.publish('change-color',{showTag:true});
+                        }
                     },1000)
                 }
                 else{
@@ -638,6 +639,7 @@ export default {
             self.napeDepTemp=item.napeDep;
             item.isClick=true;
             self.showAddNape=false;
+            //item.napeName=item.napeNameShow.slice(indexOf(',')+1);
             self.napeList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isClick=false;
@@ -651,7 +653,7 @@ export default {
             self.deleteItemFlag='S';
             self.curItemId=item.id;
         },
-
+        
         getAllData(){
             return new Promise((resolve,reject)=>{
                 inpectRESTful.getInspectItemList().then(res=>{
@@ -851,6 +853,7 @@ export default {
         }
         .iconcontent{
             @include point(margin-left,20);
+            @include point(margin-top,18);
             display: inline-block;
             .iconlised{
                 @include iconContent;
@@ -935,6 +938,7 @@ export default {
                     .iconcontent{
                         @include point(margin-left,25);
                         display: inline-block;
+                        @include point(margin-top,15);
                         .iconlised{
                             @include iconContent;
                             background-color: $red;
@@ -1032,6 +1036,7 @@ export default {
                 font-size: 14px;
                 color: #424151;
                 height:auto;
+                @include point(min-height,50);
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
@@ -1039,6 +1044,7 @@ export default {
                     @include point(width,220);
                     float: left;
                     @include point(margin-left,10);
+                    @include point(margin-bottom,10);
                    
                 }
                 .nape-name-data{
@@ -1046,7 +1052,8 @@ export default {
                     display: inline-block;
                     position: relative;
                     float: left;
-                    @include point(line-height,50);
+                    @include point(line-height,20);
+                    @include point(margin-top,15);
                     .item-checkbox{
                         float: left;
                         margin-right: 0px;
@@ -1065,6 +1072,7 @@ export default {
                     position: relative;
                     float: left;
                     overflow: hidden;
+                    @include point(line-height,20);
                     @include point(margin-top,15);
                     span{
                         float: left;
@@ -1075,12 +1083,14 @@ export default {
                 .nape-items-handle{
                     width: 10%;
                     display: inline-block;
-                    @include point(line-height,50);
+                    @include point(line-height,20);
+                    @include point(margin-top,15);
                     text-align: left;
                 }
                 .iconcontent{
                     @include point(margin-left,25);
                     display: inline-block;
+                    margin-top: 0;
                     .iconlised{
                         @include iconContent;
                         background-color: $red;
@@ -1115,5 +1125,8 @@ export default {
 }
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
+}
+.nape-input .el-textarea__inner{
+    font-family: 'Microsoft YaHei';
 }
 </style>

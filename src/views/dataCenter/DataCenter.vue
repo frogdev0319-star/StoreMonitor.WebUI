@@ -1,12 +1,12 @@
 <template>
     <div class="el-container">
-        <div class="btn-content">
-            <el-button size="mini" class="btns" @click="deleteSource">删除</el-button>
-            <el-button size="mini" class="btns" @click="exportSource">导出</el-button>
+        <div class="btn-content"> 
+            <el-button size="mini" class=" btns" @click="deleteSource"><i class="iconfont icon-shanchu iconbtn"></i>删除</el-button>
+            <el-button size="mini" class=" btns" @click="exportSource"><i class="iconfont icon-daochu iconbtn"></i>导出</el-button>
         </div>
         <el-tabs v-model="activeName" @tab-click="handleClick" class="el-source-tabs">
            <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
-
+               
            </el-tab-pane>
         </el-tabs>
     </div>
@@ -81,7 +81,13 @@ export default {
             @include point(top,20);
             @include point(margin-right,25);
             .btns{
-                width: 90px;
+                @include point(width,90);
+                border: 1px solid rgba($color: $red, $alpha: 0.5);
+                color: $red;
+            }
+            .iconbtn{
+                font-size: 16px;
+                margin-right: 20px;
             }
         }
         .el-source-tabs{

@@ -50,11 +50,20 @@
                 </div>
             </el-dialog>
             <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
-            v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5% @close='stopCommentVideo'>
+            v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content">
                     <hr class="dialog-hr"/>
-                    <video  :width="580*percentHeight" :height="430*percentHeight" id="previewCutVideo" prload controls :src="curVideoSrc">
+                    <video  :width="580*percentHeight" :height="430*percentHeight" id="previewCutVideo" prload controls autoplay :src="curVideoSrc">
                     </video>
+                </div>
+            </el-dialog>
+            <el-dialog title='查看'
+                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" :width="680*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="dialog-img-content">
+                        <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight"/>
+                    </div>
                 </div>
             </el-dialog>
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
@@ -62,11 +71,10 @@
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <div class="video-content" v-if="!showgongge" id="videoContent" >
                 <div class="getvideo-content" v-if="showGetVideo">
-                    <!-- <div class="btn-graph" v-if="showVideoBtn">
+                    <div class="btn-graph">
                         <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
-                    </div> -->
-                    <get-video-btn class="btn-graph" v-if="showVideoBtn" :btn-width="graphBtnWidth" :video-speed="videoSpeed"></get-video-btn>
-                    <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.288+'px'" v-if="!showVideoCanvas"></canvas>
+                    </div>
+                    <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.288+'px'"></canvas>
                 </div>
                 <div class="video-model" v-if="showModelContent">
                     <span id="channelName" v-if="showControlInfo">{{channel.channelName}}</span>
@@ -182,7 +190,7 @@
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
                                     <div class="img-content" v-if="item.mediaType==2">
                                         <i class="el-icon-close icondelete" @click="deleteImg(item,index)" ></i>
-                                        <img :src="item.src" :width="item.width" :height="item.height"/>
+                                        <img :src="item.src" :width="item.width" :height="item.height" @click="openOuter(item)" style="cursor: pointer"/>
                                     </div>
                                     <div class="img-content" v-if="item.mediaType==1">
                                         <i class="el-icon-close icondelete" @click="deleteImg(item,index)" ></i>
@@ -233,7 +241,7 @@
                                 size="small"
                                 class="el-search-input"
                                 placeholder="请输入关键字搜索门店"
-                                v-model="serachVale" @keyup.enter.native="searchStore" v-if="item.storeList.length!=0">
+                                v-model="serachVale" @keyup.enter.native="searchStore">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;" ></i>
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
@@ -291,9 +299,9 @@
                         <span class="date-title" v-for="(item,index) in weekTitles" :key="index">
                             {{item}}
                         </span>
-                        <div class="date-details" v-for="(item,index) in weekDays" :key="index">
+                        <div class="date-details" v-for="(item,index) in weekDays">
                             <div class="data" v-for="(_item,_index) in item" 
-                            :key="_index" @click="checkDate(item,index,_item,_index)" @focus="focusDate(_item)"
+                            :key="_index" @click="checkDate(item,index,_item,_index)"
                              :style="_item.disabed?{'cursor': 'not-allowed','background-color':'#F5F7FA'}:{'cursor': 'pointer','background-color':'#fff'}">
                                 <span v-if=" _item.disabed"
                                  :style="_item.disabed?{'color':'#C3D3EA','background-color':'#F5F7FA'}:''">{{_item.data}}</span>
@@ -322,10 +330,9 @@ import videojs from '../../../static/video.js'
 import {validateInput} from '@/common/validate'
 import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import DialogVue from '@/components/DialogVue.vue'
-import GetVideoBtn from '@/components/GetVideoBtn.vue'
+// import GetVideoBtn from '@/components/GetVideoBtn.vue'
 import {getCookie} from '@/common/auth';
 import {indexedDB} from '@/common/util'
-import axios from 'axios';
 import RecordRTC from '../../../static/RecordRTC.js'
 import { clearTimeout, setInterval, setTimeout, clearInterval } from 'timers';
 export default {
@@ -333,7 +340,6 @@ export default {
     components:{
         ChannelIconBtn,
         DialogVue,
-        GetVideoBtn
     },
     data(){
         return{
@@ -372,7 +378,7 @@ export default {
             durationTimeValue:0,
             currentStr:'0:00:00',
             durationStr:'0:00:00',
-            timeid:0,
+            timeid:null,
             speedList:[
                 {
                     value:0,
@@ -429,6 +435,8 @@ export default {
             removeIconSrc:require('../../../static/img/撤销.png'),
             startIcon:require('../../../static/img/pic_play_icon.png'),    
             videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
+            checkImgSrc:'',
+            showOuter:false,
             showPenBtn:false,
             penList:[
                 {
@@ -484,14 +492,12 @@ export default {
             curEvent:'',
             eventName:'',
             eventDes:'',
-            emptyImgSrc:require('../../../static/img/pic.png'),
             sourceList:[],
             oss:null,
             bucketVideo:'',
             bucketImage:'',
             showgongge:false,
             showGetVideo:false,
-            showVideoBtn:false,
             videoSourceList:[
                 {
                     id:'id'+0,
@@ -561,8 +567,8 @@ export default {
                 isWarning:false,
                 dialogCosed:false
             },
+
             recorder:null,
-            showVideoCanvas:false,
             videoCanvasSrc:'',
             isRecordingStarted : false,
             isStoppedRecording : false,
@@ -570,6 +576,8 @@ export default {
             curVideoSrc:'',
             videoSpeed:0,
             videoSpeedId:0,
+            timerPlayReal:null,
+            realTimeSpeed:0,
         }
     },
     computed:{
@@ -596,19 +604,31 @@ export default {
             if(val!=0){
                 self.changeBrand();
             }
+        },
+        realTimeSpeed(val,oldVal){
+            let self=this;
+            console.log(val);
+            if(val>=300){
+                self.stopRealTime();
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal=null;
+            }
         }
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {
-            if(to.params.flag){
-                vm.clearEvent();
-            }
+            //if(to.params.flag){
+                //vm.clearEvent();
+                //let store_route=JSON.parse(sessionStorage.getItem('store_submit'));
+            //}
+            vm.clearEvent();
         });
     },
     beforeRouteLeave(to, from, next){
         //离开页面的同时应该停止播放视频
         let self=this;
         window.clearInterval(self.timeid);
+        self.timeid=null;
         if(self.playState){ 
             self.stopRealTime();
         }
@@ -897,6 +917,25 @@ export default {
                         self.store.storeUp=true;
                         self.store.storeUpTitle='已关注';
                         self.getStoreList();
+                        self.tabList[2].storeList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=true;
+                                }
+                            })
+                        })
+                        self.tempStoreList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=true;
+                                }
+                            })
+                        })
+                        self.allInitStoreList.forEach((item,index)=>{
+                            if(self.store.storeId==item.storeId){
+                                item.favorite=true;
+                            }
+                        })
                     }
                 })
             }
@@ -906,6 +945,25 @@ export default {
                         self.store.storeUp=false;
                         self.store.storeUpTitle='点击关注';
                         self.getStoreList();
+                        self.tabList[2].storeList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=false;
+                                }
+                            })
+                        })
+                        self.tempStoreList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId==_item.storeId){
+                                    _item.favorite=false;
+                                }
+                            })
+                        })
+                        self.allInitStoreList.forEach((item,index)=>{
+                            if(self.store.storeId==item.storeId){
+                                item.favorite=false;
+                            }
+                        })
                     }
                 })
             }
@@ -940,6 +998,8 @@ export default {
         },
         async clickEventBtn(item,index){
             let self=this;
+            self.eventName='';
+            self.eventDes='';
             if(index==1){
                 //self.corEvent=true;
                 item.isActive=true;
@@ -1011,15 +1071,13 @@ export default {
             let dataonLine={
                 request: { 
                     method: 'connection',
-                        sessionID: sessionId,
-                        streamingProtocol:this.protocal,
-                        IVSID:self.channel.ivsId,
-                        channel:JSON.stringify(self.channel.channelId),
-                        beginTime:self.curTime.getTime().toString().substr(0,10),
-                        endTime:(self.curTime.getTime()+(5*60+1)*1000).toString().substr(0,10),
-                        streamType:'SubStream'
-                        // beginTime:self.startTs,
-                        // endTime:self.startTs+181,
+                    sessionID: sessionId,
+                    streamingProtocol:this.protocal,
+                    IVSID:self.channel.ivsId,
+                    channel:JSON.stringify(self.channel.channelId),
+                    beginTime:self.curTime.getTime().toString().substr(0,10),
+                    endTime:(self.curTime.getTime()+(5*60+1)*1000).toString().substr(0,10),
+                    streamType:'SubStream'
                 }
             };
             url=await dashAPI.playBack(1,dataonLine);
@@ -1028,7 +1086,7 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
-                self.timeid= setInterval(function(){  //播放视频的同时进度条进行
+                self.timeid= window.setInterval(function(){  //播放视频的同时进度条进行
                     self.getProcess();
                 },1000);
             }
@@ -1063,7 +1121,7 @@ export default {
             self.mpdurl=url;
             if(url.ErrorCode==undefined&&url.length!=0){
                 self.playVideo(self.mpdurl);
-                self.timeid= setInterval(function(){  //播放视频的同时进度条进行
+                self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                     self.getProcess();
                 },1000);
             }
@@ -1082,10 +1140,17 @@ export default {
             self.showModelContent=true;
             let d=self.getCurTime();
             self.curTime=d;
-            let dstr=Number((d.getTime()+(5*60+1)*1000).toString().substr(0,10));
+            let dstr=Number((d.getTime()+(1*60+1)*1000).toString().substr(0,10));
             self.startTs=dstr;
             self.currentTimeValue=0;
             self.playBackState=true;
+            self.curSpeed='1 X';
+            self.curBack='';
+            if(self.timeid!=null){
+                window.clearInterval(self.timeid);
+                self.timeid=null;
+                self.timeid=0;
+            }
             if(self.playState){  //切换时间的时候判断当前视频是否在播放
                self.stopAndPlayHistoryVideo();
             }
@@ -1184,6 +1249,14 @@ export default {
                     console.log(err) 
                 }) 
             })
+        },
+        openOuter(item){
+            let self=this;
+            console.log(item);
+            if(item!=null){
+                self.showOuter=true;
+                self.checkImgSrc=item.src;
+            }
         },
         deleteImg(item,index){
             let self=this;
@@ -1339,10 +1412,6 @@ export default {
             this.$nextTick(()=>{
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
-                // let width=self.videoEl.videoWidth;
-                // let height=self.videoEl.videoHeight;
-                // self.canvasWidth=width;
-                // self.canvasHeight=height;
                 ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
                 var oGrayImg=self.canvasEl.toDataURL('image/jpeg');
                 self.imageCanvas.src=oGrayImg;
@@ -1478,19 +1547,17 @@ export default {
                 self.sourceList.push(obj);
             })
         },
-        stopCommentVideo(){
-            var video = document.getElementById("previewCutVideo");
-            this.previewplayer = videojs(video);
-            this.previewplayer.pause();
-        },
         getVideo(...val){
             let self=this;
             if(self.sourceList.length>=5){
                 self.notify('最多上传5个资源！','warning',3000);
                 return false;
             }
+            if(self.fullScreen){
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
             self.showGetVideo=true;
-            self.showVideoBtn=true;
             self.videoSpeed=0;
             self.$nextTick(()=>{
                 self.startTimeCutVideo=new Date().getTime();
@@ -1514,6 +1581,7 @@ export default {
             }
             else{
                 self.endTImeCutVideo=new Date().getTime();
+                
                 if((self.endTImeCutVideo-self.startTimeCutVideo)/1000>11){
                     clearTimeout(self.timeVideo);
                     self.showGetVideo=false;
@@ -1538,6 +1606,17 @@ export default {
                     })
                 }
             }
+        },
+        computeFrame(){
+            let self=this;
+            self.canvasEl=document.getElementById('vcanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            self.recorder = RecordRTC(self.canvasEl, {
+                type: 'canvas'
+            });
+            self.isStoppedRecording =false;
+            self.isRecordingStarted = true;
+            self.recorder.startRecording();
         },
         drawMain(drawing_elem, percent, forecolor, bgcolor) {
             /*
@@ -1617,17 +1696,7 @@ export default {
                 }
             }, 100);
         },
-        computeFrame(){
-            let self=this;
-            self.canvasEl=document.getElementById('vcanvas');
-            var ctx = self.canvasEl.getContext('2d');
-            self.recorder = RecordRTC(self.canvasEl, {
-                type: 'canvas'
-            });
-            self.isStoppedRecording =false;
-            self.isRecordingStarted = true;
-            self.recorder.startRecording();
-        },
+        
         async playVideo(url) {
             let self=this;
             console.log('playvideo enter!');
@@ -1658,7 +1727,16 @@ export default {
             self.sessionId=sessionId;
             let data=null;
             let url='';
+            if(self.timeid!=null){
+                window.clearInterval(self.timeid);
+                self.timeid=null;
+                self.timeid=0;
+            }
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
             if(self.playBackState){ //播放历史视频
+                self.curSpeed='1 X';
+                self.curBack='';
                 data= {
                     request: { 
                         method: 'connection',
@@ -1673,7 +1751,7 @@ export default {
                 };
                 url=await dashAPI.playBack(1,data);
                 if(url.ErrorCode==undefined&&url.length!=0){
-                    self.timeid= setInterval(function(){  //播放视频的同时进度条进行
+                    self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                         self.getProcess();
                     },1000);
                 }
@@ -1696,6 +1774,11 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
+                if(!self.playBackState){
+                    self.timerPlayReal=window.setInterval(()=>{
+                        self.realTimeSpeed=self.realTimeSpeed+1;
+                    },1000);
+                }
             }
             else{   //当前视频如果返回失败，需处于暂停状态
                 //self.stopRealTime();
@@ -1737,6 +1820,21 @@ export default {
                 await dashAPI.Offline(self.sessionId);
             }
         },
+        async stopHDash(){
+            let self=this;
+            const data = {
+                request: { 
+                    method: 'disconnection',
+                    sessionID: self.sessionId,
+                    IVSID:self.channel.ivsId,
+                    channel:JSON.stringify(self.channel.channelId),
+                    streamType:'SubStream'
+                }
+            };
+            self.stopVideo();
+            let ret=await dashAPI.playBack(0,data);
+            await dashAPI.Offline(self.sessionId);
+        },
         async getProcess(){
             let self=this;
             let video=document.getElementById('previewVideo');
@@ -1756,36 +1854,12 @@ export default {
             }
             self.currentStr=getTimeStr(curTime);
             self.durationStr=getTimeStr(duration);
-            // video.player.on('ended',async function(e){
-            //     self.stopVideo();
-            //     const data = {
-            //         request: { 
-            //             method: 'disconnection',
-            //             sessionID: self.sessionId,
-            //             IVSID:self.channel.ivsId,
-            //             channel:JSON.stringify(self.channel.channelId)
-            //         }
-            //     };
-            //     clearInterval(self.timeid);
-            //     let ret=await dashAPI.playBack(0,data);
-            //     await dashAPI.Offline(self.sessionId);
-            //     self.startTs=self.startTs+5*60*1000;
-            // })
-            if(self.currentStr==self.durationStr){
-                self.stopVideo();
-                const data = {
-                    request: { 
-                        method: 'disconnection',
-                        sessionID: self.sessionId,
-                        IVSID:self.channel.ivsId,
-                        channel:JSON.stringify(self.channel.channelId),
-                        streamType:'SubStream'
-                    }
-                };
-                clearInterval(self.timeid);
-                let ret=await dashAPI.playBack(0,data);
-                await dashAPI.Offline(self.sessionId);
-                self.startTs=self.startTs+5*60*1000;
+            if(curTime>=duration){
+                self.stopHDash();
+                self.startTs=self.startTs+5*60;
+                window.clearInterval(self.timeid);
+                self.timeid=null;
+                self.timeid=0;
             }
         },
         adjustSpeed(val){
@@ -1967,9 +2041,7 @@ export default {
                         itemS.isActive=false;
                     }
                 })
-                if(index!=1){
-                    curStoreId=_item.storeId;
-                }
+                curStoreId=_item.storeId;
             }
             else{
                 item.storeList.forEach((itemS,indexS)=>{
@@ -2111,6 +2183,13 @@ export default {
                 }
             };
             let url='';
+            if(self.timeid!=null){
+                window.clearInterval(self.timeid);
+                self.timeid=null;
+                self.timeid=0;
+            }
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
             if(self.playBackState){
                 let ret=await dashAPI.playBack(0,dataDis);
                 await dashAPI.Offline(self.sessionId);
@@ -2154,13 +2233,24 @@ export default {
             if (url.ErrorCode==undefined&&url.length!=0) {
                 self.playVideo(self.mpdurl);
                 if(self.playBackState){ //播放历史视频时，启动计时器
-                    self.timeid= setInterval(function(){  //播放视频的同时进度条进行
+                    self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                         self.getProcess();
                     },1000);
                 }
+                else{
+                    self.realTimeSpeed=0;
+                    self.timerPlayReal=window.setInterval(()=>{
+                        self.realTimeSpeed=self.realTimeSpeed+1;
+                    },1000);
+                }
             }
-            else{   //当前视频如果返回失败，需处于暂停状态
-                self.stopRealTime();
+            else{
+                self.playState=false;
+                self.showModelContent=false;
+                console.log(self.mpdurl.ErrorCode);
+                let errorCode=self.mpdurl.ErrorCode; //错误码
+                let errorText= util.getErrorText(errorCode);
+                self.errorText=errorText;
             }
         },
         changeChannel(item,index){
@@ -2290,7 +2380,12 @@ export default {
             self.curMonth=new Date().getMonth()+1;
             self.getWeekDay();
             if(self.store.storeId!=undefined){
-                self.realTime();
+                if(self.playState){
+                    self.stopAndRealTime();
+                }
+                else{
+                    self.realTime();
+                }
             }
         },
         forWard(){
@@ -2376,6 +2471,9 @@ export default {
                 item.forEach((_item,_index)=>{
                     if(_item.data==today&&curMonth==self.curMonth&&(index!=0||index==0&&_item.data<=7)){
                         _item.showBack=true;
+                        self.curDayNum=today;
+                        self.curMonthNum=self.curMonth;
+                        self.curYearNum=self.curYear;
                     }
                     if(self.afterCurDate(index,_item)){
                         _item.disabed=true;
@@ -2598,21 +2696,25 @@ export default {
                     @include point(margin-bottom,25);
                     @include point(margin-top,15);
                 }
+                #icanvas{
+                    @include point(margin-top,15);
+                }
+                .dialog-img-content{
+                    @include point(padding,15);
+                }
                 .dialog-hr{
                     border: 0.5px solid ;
                     border-color: rgba(251,76,93,0.3);
-                    margin-bottom:10px;
+                    margin-bottom:0px;
                     position: relative;
                     bottom: 5px;
-                    margin-top: 0;
                 }
                 .cancel-content{
                     position: absolute;
                     bottom: 2px;
                     @include point(height,30);
                     @include point(line-height,30);
-                    background-color: $black;
-                    opacity: 0.5;
+                    background-color: rgba($color: $black, $alpha: 0.5);
                     z-index: 10;
                     overflow: hidden;
                     .content{
@@ -2688,25 +2790,25 @@ export default {
                 position: relative;
                 @include point(margin,20);
                 margin-bottom: 0;
-                .btn-graph {
-                    position: absolute;
-                    left: 45%;
-                    top: 45%;
-                    display:flex;
-                    display:-webkit-flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-                #btn-graph-canvas {
-                    width: 100px;
-                    height: 100px;
-                }
                 .getvideo-content{
                     position: absolute;
                     z-index: 930;
                     width: 100%;
                     height: 100%;
                     background-color: #000;
+                    .btn-graph {
+                        position: absolute;
+                        left: 45%;
+                        top: 45%;
+                        display:flex;
+                        display:-webkit-flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    #btn-graph-canvas {
+                        width: 100px;
+                        height: 100px;
+                    }
                 }
                 #previewVideo{
                     @include point(min-width,450);
