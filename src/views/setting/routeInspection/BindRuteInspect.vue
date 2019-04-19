@@ -12,25 +12,27 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <div class="city-content" @click="choiceCity">
-                    <div class="input-arrow-panel">
 
-                    </div>
-                    <el-input v-model="citys" size="mini" id="elCity" placeholder="城市" 
-                 :readonly=true></el-input>
-                 <i :class="showDrap?'el-icon-arrow-down':'el-icon-arrow-up'" class='icon-input'></i>
-                </div>
+                <el-popover
+                    placement="bottom-start"
+                    width="600"
+                    visible-arrow='false'
+                    :disabled='showPopoVer'
+                    v-model="showCityContent"
+                    trigger="click">
+                        <div class="city-panel" @mouseleave="showCityContent=false"> 
+                            <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
+                                style="margin-right:10px;"></el-checkbox>全部</p>
+                            <div class="city-details" v-for="(item,index) in cityList" :key="index">
+                                <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
+                                <span>{{item.cityName}}</span>
+                            </div>
+                        </div>
+                    <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
+                </el-popover>
+
                 <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
-                <div class="city-panel" v-if="showCityContent" @mouseleave="showCityContent=false">
-                    
-                    <p :style="isChecked?{}:{'color':'#f31d65'}">
-                        <el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                        class="elcheckBox"></el-checkbox>全部</p>
-                    <div class="city-details" v-for="(item,index) in cityList" :key="index">
-                        <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
-                        <span>{{item.cityName}}</span>
-                    </div>
-                </div>
+
                 <el-input
                     size="small"
                     class="el-search-input"
@@ -100,73 +102,96 @@ export default {
             showDrap:true,
             storeData:[],
             napeIdList:[],
-            serachVale:''
+            serachVale:'',
+            curCitys:'城市',
+            showPopoVer:true,
         }
     },
     methods:{
         //切换省份
         changePro(val){
             let self=this;
-            console.log(val);
             self.getCityByProvince(val);
-            self.citys='';
+            self.curCitys='城市';
             self.multeCityList.length=0;
-            self.serachVale='';
             self.allCityChecked=false;
         },
-         clearCitys(){
+        clearCitys(){
             let self=this;
+            self.cityList=[];
+            self.showCityContent=false;
+            self.curCitys='城市';
             self.multeCityList.length=0;
         },
         choiceCity(){
             let self=this;
             if(self.curProvince.length==0){
                 self.notify('请选择省份！','warning',3000);
+                self.showPopoVer=true;
                 return false;
             }
-            self.showCityContent=!self.showCityContent;
-            self.showDrap=!self.showDrap;
+            else{
+                self.showPopoVer=false;
+                self.showDrap=!self.showDrap;
+            }
         },
         choiceAllCity(val){
             let self=this;
             let str='';
             let temp=[];
             if(!val){
-                self.citys='';
+                self.curCitys='城市';
                 self.multeCityList=[];
+                self.cityList.forEach(item=>{
+                    item.checked=val;
+                    if(val){
+                        str=str+item.cityName+';';
+                        temp.push(item.cityName);
+                    }
+                })
             }
-            self.cityList.forEach(item=>{
-                item.checked=val;
-                if(val){
-                    str=str+item.cityName+';';
-                    temp.push(item.cityName);
-                }
-            })
-            let cityStr=str.substring(0,str.length-1);
-            self.citys=cityStr.length>10?cityStr.substr(0,10):cityStr;
-            self.multeCityList=temp;
+            else{
+                self.cityList.forEach(item=>{
+                    item.checked=val;
+                    if(val){
+                        str=str+item.cityName+';';
+                        temp.push(item.cityName);
+                    }
+                })
+                self.isChecked=val;
+                self.curCitys='';
+                self.curCitys=str.substring(0,str.length-1);
+                self.multeCityList=temp;
+            }
         },
         changeCityItem(item){
-            console.log(item);
+           console.log(item);
             let self=this;
             let str='';
-            let flag=false;
             let temp=[];
             self.cityList.forEach(_item=>{
                 if(_item.checked){
                     str=str+_item.cityName+';';
                     temp.push(_item.cityName);
+                    
                 }
-                flag=flag||_item.checked;
             })
-            self.isChecked=flag;
-            let cityStr=str.substring(0,str.length-1);
-            self.citys=cityStr.length>10?cityStr.substr(0,10):cityStr;
+            if(temp.length!=0){
+                self.isChecked=true;
+            }
+            else{
+                self.isChecked=false;
+            }
+            self.curCitys='';
+            self.curCitys=str.substring(0,str.length-1);
             if(temp.length==self.cityList.length){
                 self.allCityChecked=true;
             }
             else{
                 self.allCityChecked=false;
+            }
+            if(temp.length==0){
+                self.curCitys='城市';
             }
             self.multeCityList=temp;
         },
@@ -619,6 +644,29 @@ $h1:#292e36;
     @include point(margin-right,20);
     position:absolute;
     right: 0px;
+    top: 3px;
+}
+.city-panel{
+    @include point(height,auto);
+    padding: 0px 15px 30px 15px;
+    z-index: 980;
+    .elcheckBox{
+        margin-right:10px;
+    }
+    font-size: 14px;
+    p{
+        font-weight: bold;
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+    .city-details{
+        width: auto;
+        min-width: 12.5%;
+        display: inline-block;
+        @include point(margin-top,5);
+        @include point(margin-bottom,5);
+        @include point(margin-right,20);
+    }
 }
 .el-bind-device{
     .seacrh-content{
@@ -633,23 +681,32 @@ $h1:#292e36;
             @include point(margin-left,15);
             @include point(margin-right,20);
         }
-        #elCity{
+        .city-input{
             @include point(width,160);
-        }
-        .city-content{
-            display: inline-block;
-            position: relative;
+            height: 28px;
+            line-height: 28px;
+            background: #F4F5F9 !important;
             cursor: pointer;
-            .input-arrow-panel{
-                @include point(width,160);
-                @include point(height,28);
-                position: absolute;
-                background-color: transparent;
-                cursor: pointer;
-                z-index: 100;
+            display:inline-block;
+            position: relative;
+            border: 1px solid #DCDFE6;
+            top: 8px;
+            span{
+                display: inline-block;
+                font-size: 12px;
+                color: #C0C4CC;
+                margin-left: 15px;
+                @include point(width,130);
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
             }
-            .el-input{
-                @include point(width,160);
+            .icon-input{
+                position: absolute;
+                @include point(right,10);
+                top: 6px;
+                font-size: 14px;
+                color: #C0C4CC;
             }
         }
         .el-search-btn{
@@ -664,31 +721,6 @@ $h1:#292e36;
             right: 10px;
             @include point(right,10);
             @include point(top,6);
-        }
-        .city-panel{
-            position:absolute;
-            margin-top: 3px;
-            @include point(left,275);
-            width: 60%;
-            height: auto;
-            padding:10px 0px 30px 15px;
-            z-index: 980;
-            background-color: #fff;
-            border:1px solid #ddd;
-            .elcheckBox{
-                margin-right: 10px;
-            }
-            font-size: 14px;
-            p{
-                font-weight: bold;
-            }
-            .city-details{
-                width: auto;
-                min-width: 12.5%;
-                display: inline-block;
-                @include point(margin-right,15);
-                @include point(margin-top,10);
-            }
         }
     }
     .el-header-title{
@@ -788,11 +820,6 @@ $h1:#292e36;
 .el-province .el-input__inner{
     border-radius: 0px !important;
     background-color: #F4F5F9 !important;
-}
-#elCity{
-    border-radius: 0px;
-    background-color: #F4F5F9;
-    border: 1px solid #dcdfe6;
 }
 .el-select-dropdown__item{
     padding: 0 20px !important;

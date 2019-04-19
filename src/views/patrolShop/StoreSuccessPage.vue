@@ -8,7 +8,7 @@
             </div>
         </div>
         <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
-            v-if="dialogCommentVideo" :width="720*percentHeight+'px'" height=300px top=5% @close='stopCommentVideo'>
+            v-if="dialogCommentVideo" :width="720*percentHeight+'px'" height=300px top=5%>
             <div class="canvas-content">
                 <hr class="dialog-hr"/>
                 <video  :width="667*percentHeight" :height="431*percentHeight" id="previewCutVideo" prload controls :src="curVideoSrc">

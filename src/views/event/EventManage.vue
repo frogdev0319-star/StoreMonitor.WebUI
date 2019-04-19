@@ -17,6 +17,7 @@
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 @change="dateChange"
+                @focus="focusDate"
                 :default-time="defaultTime">
             </el-date-picker>
             <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
@@ -42,6 +43,7 @@
                 v-model="serachVale" @clear="searchEventList(true)" @keyup.enter.native="searchEventList(true)">
                 <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
             </el-input>
+            <!-- <input type="text" id="test1"> -->
        </div>
         <div class="el-table-content">
             <el-button type="primary" size="mini" class="export-btn" @click="export2Excel">
@@ -75,7 +77,7 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    prop="option"
+                                    prop="subject"
                                     label="事件名称"
                                     min-width="220"
                                     sortable='custom'
@@ -124,249 +126,341 @@
 </template>
 
 <script>
-    import api  from '../../api/index';
-    import util from '../../common/util.js'
-    import CsvExportor from 'csv-exportor'
-    import {eventRESTful} from '@/api/index'
-    import {Message} from 'element-ui'
-    import {getCookie} from '@/common/auth';
-    import {isLoginIn} from '@/api/login'
-    import {mapGetters} from 'vuex'
-    export default {
-        name: "ExceptEvent",
-        data(){
-            return{
-                dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
-                dateOpt: {
-                    disabledDate:(time)=>{
-                        return time.getTime() > Date.now();
-                    }
+import api  from '../../api/index';
+import util from '../../common/util.js'
+import CsvExportor from 'csv-exportor'
+import {eventRESTful} from '@/api/index'
+import {Message} from 'element-ui'
+import {getCookie} from '@/common/auth';
+import {isLoginIn} from '@/api/login'
+import {mapGetters} from 'vuex'
+export default {
+    name: "ExceptEvent",
+    data(){
+        return{
+            dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
+            dateOpt: {
+                disabledDate:(time)=>{
+                    return time.getTime() > Date.now();
+                }
+            },
+            toolTipClass: 'page-login-toolTipClass',
+            states:[{value: 0,label: '全部'},{value: 1,label: '未处理'}, {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
+            curState:'',
+            value:0,
+            serachVale:'',
+            serachData:'',
+            tableDataList:[
+                {
+                    label:'待处理事件',
+                    eventCount:0,
+                    tableData:[],
+                    total:0,
+                    sizeNum:10,
+                    page:1
                 },
-                toolTipClass: 'page-login-toolTipClass',
-                states:[{value: 0,label: '全部'},{value: 1,label: '未处理'}, {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
-                curState:'',
-                value:0,
-                serachVale:'',
-                serachData:'',
-                tableDataList:[
-                    {
-                        label:'待处理事件',
-                        eventCount:0,
-                        tableData:[],
-                        total:0,
-                        sizeNum:10,
-                        page:1
-                    },
-                    {
-                        label:'我创建事件',
-                        eventCount:0,
-                        tableData:[],
-                        total:0,
-                        sizeNum:10,
-                        page:1
-                    },
-                    {
-                        label:'全部事件',
-                        eventCount:0,
-                        tableData:[],
-                        total:0,
-                        sizeNum:10,
-                        page:1
-                    }
-                ],
-                activeName:'0',
-                videoSrc:require('../../../static/img/监控icon.png'),
-                inspectSrc:require('../../../static/img/远程icon.png'),
-                insiteInspectSrc:require('../../../static/img/现场icon.png'),
-                tableInfoData:[
-                    {
-                        "prop":"storeName",
-                        "label":"所属门店",
-                        "sortable":'custom',
-                        "width":160
-                    },
-                    {
-                        "prop":"assignerName",
-                        "label":"提报人",
-                        "sortable":'custom',
-                        "width":120
-                    },
-                    {
-                        "prop":"ts",
-                        "label":"提报时间",
-                        "sortable":'custom',
-                        "width":140
-                    }
-                ],
-                event,
-                total:0,
-                page:1,
-                sizeNum:10,
-                params:{},
-                fileName:'数据详情'+'.xlsx',
-                exportDataList:[],  //需要导出的数据
-                exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
-                windowHeight:window.innerHeight,
-                userId:'',
-                poperClass:'date-picker-poper',
-                selectpoperClass:'select-poper',
-                defaultTime:[],
-            }
-
-        },
-        computed:{
-            tableHieght(){
-                if(this.windowHeight>800){
-                    return this.windowHeight*0.63;
+                {
+                    label:'我创建事件',
+                    eventCount:0,
+                    tableData:[],
+                    total:0,
+                    sizeNum:10,
+                    page:1
+                },
+                {
+                    label:'全部事件',
+                    eventCount:0,
+                    tableData:[],
+                    total:0,
+                    sizeNum:10,
+                    page:1
                 }
-                else if(this.windowHeight>700){
-                    return this.windowHeight*0.58;
+            ],
+            activeName:'0',
+            videoSrc:require('../../../static/img/监控icon.png'),
+            inspectSrc:require('../../../static/img/远程icon.png'),
+            insiteInspectSrc:require('../../../static/img/现场icon.png'),
+            tableInfoData:[
+                {
+                    "prop":"storeName",
+                    "label":"所属门店",
+                    "sortable":'custom',
+                    "width":160
+                },
+                {
+                    "prop":"assignerName",
+                    "label":"提报人",
+                    "sortable":'custom',
+                    "width":120
+                },
+                {
+                    "prop":"ts",
+                    "label":"提报时间",
+                    "sortable":'custom',
+                    "width":140
+                }
+            ],
+            event,
+            total:0,
+            page:1,
+            sizeNum:10,
+            params:{},
+            fileName:'数据详情'+'.xlsx',
+            exportDataList:[],  //需要导出的数据
+            exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
+            windowHeight:window.innerHeight,
+            userId:'',
+            poperClass:'date-picker-poper',
+            selectpoperClass:'select-poper',
+            defaultTime:[],
+        }
+
+    },
+    computed:{
+        tableHieght(){
+            if(this.windowHeight>800){
+                return this.windowHeight*0.63;
+            }
+            else if(this.windowHeight>700){
+                return this.windowHeight*0.58;
+            }
+            else{
+                return this.windowHeight*0.52;
+            }
+        },
+        ...mapGetters({accountChanged:'accountChanged'})
+    },
+    watch:{
+        accountChanged(val,oldVal){
+            console.log(val);
+            let self=this;
+            if(val!=0){
+                self.searchEventList(false);
+            }
+        }
+    },
+    methods:{
+        focusDate(val){
+            let self=this;
+            console.log(val);
+        },
+        dateChange(val){
+            let self=this;
+            console.log(val);
+            let tabIndex=Number(self.activeName);
+            let start=typeof(val[0])==='object'?val[0].getTime():val[0];
+            let end=typeof(val[1])==='object'?val[1].getTime():val[1];
+            
+
+            if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
+                Message({
+                    message:'当前选择时间范围最大为一个月，已调整！',
+                    type:'warning',
+                    duration:3*1000
+                })
+                // self.$refs.datePicker.pickerVisible=true;
+                // return false;
+                start=end-3600*24*30*1000;
+                self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+            }
+            self.serachData='';
+            self.tableDataList[tabIndex].page=1;
+            self.params.like={};
+            self.params.beginTs=start;
+            self.params.endTs=end;
+            //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+            let selectValue=self.value;
+            let status=[];
+            self.getEventList(self.params);
+            switch(selectValue){
+                case 0:status=[0,1,2];break;
+                default:status=selectValue-1;break;
+            }
+            self.getEventCount(start,end,status);
+        },
+        handleClick(val){
+            let self=this;
+            console.log(val.index);
+            let selectValue=self.value;
+            let tabIndex=Number(val.index);
+            //self.page=1;
+            switch(tabIndex){
+                case 0:
+                if(selectValue==0||selectValue==1){
+                    self.params.clause={"status":0,"assignee":self.userId};
                 }
                 else{
-                    return this.windowHeight*0.52;
+                    self.params.clause={"status":-1,"assignee":self.userId};
                 }
-            },
-            ...mapGetters({accountChanged:'accountChanged'})
-        },
-        watch:{
-            accountChanged(val,oldVal){
-                console.log(val);
-                let self=this;
-                if(val!=0){
-                    self.searchEventList(false);
+                break;
+                case 1: 
+                if(selectValue==0){
+                    self.params.clause={"status":[0,1,2],"assigner":self.userId};
                 }
+                else{
+                    self.params.clause={"status":selectValue-1,"assigner":self.userId};
+                }
+                break;
+                case 2:
+                if(selectValue==0){
+                    self.params.clause={"status":[0,1,2]};
+                }
+                else{
+                    self.params.clause={"status":selectValue-1};
+                }
+                break;
             }
-        },
-        methods:{
-            dateChange(val){
-                let self=this;
-                console.log(val);
-                let tabIndex=Number(self.activeName);
-                let start=typeof(val[0])==='object'?val[0].getTime():val[0];
-                let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-               
-
-                if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                    Message({
-                        message:'当前选择时间范围最大为一个月，已调整！',
-                        type:'warning',
-                        duration:3*1000
-                    })
-                    // self.$refs.datePicker.pickerVisible=true;
-                    // return false;
-                    start=end-3600*24*30*1000;
-                    self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
-                }
-                self.serachData='';
-                self.tableDataList[tabIndex].page=1;
+            if(self.serachData!=undefined&&self.serachData.length!=0){
+                self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
+            }
+            else{
                 self.params.like={};
-                self.params.beginTs=start;
-                self.params.endTs=end;
-                //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
-                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-                let selectValue=self.value;
-                let status=[];
-                self.getEventList(self.params);
-                switch(selectValue){
-                    case 0:status=[0,1,2];break;
-                    default:status=selectValue-1;break;
-                }
-                self.getEventCount(start,end,status);
-            },
-            handleClick(val){
-                let self=this;
-                console.log(val.index);
-                let selectValue=self.value;
-                let tabIndex=Number(val.index);
-                //self.page=1;
-                switch(tabIndex){
-                    case 0:
-                    if(selectValue==0||selectValue==1){
-                        self.params.clause={"status":0,"assignee":self.userId};
-                    }
-                    else{
-                        self.params.clause={"status":-1,"assignee":self.userId};
-                    }
-                    break;
-                    case 1: 
-                    if(selectValue==0){
-                        self.params.clause={"status":[0,1,2],"assigner":self.userId};
-                    }
-                    else{
-                        self.params.clause={"status":selectValue-1,"assigner":self.userId};
-                    }
-                    break;
-                    case 2:
-                    if(selectValue==0){
-                        self.params.clause={"status":[0,1,2]};
-                    }
-                    else{
-                        self.params.clause={"status":selectValue-1};
-                    }
-                    break;
-                }
-                if(self.serachData!=undefined&&self.serachData.length!=0){
-                    self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
-                }
-                else{
-                    self.params.like={};
-                }
-                let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-                let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-                self.params.beginTs=start;
-                self.params.endTs=end;
-                //self.params.filter={page:self.page-1,size:self.tableDataList[tabIndex].sizeNum};
-                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-                this.getEventList(this.params);
-            },
-            //点击状态搜索时，总共需要时间范围，状态
-            selectChange(val){
-                console.log(val);
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                switch(val){
-                    case 0:
-                        if(tabIndex==0){
-                            self.params.clause={
-                                status:0,
-                                assignee:self.userId
-                            };
-                        }
-                        else if(tabIndex==1){
-                            self.params.clause={
-                                status:[0,1,2],
-                                assigner:self.userId
-                            };
-                        }
-                        else{
-                            self.params.clause={
-                                status:[0,1,2]
-                            };
-                        }
-                    break;
-                    case 1:
-                        if(tabIndex==0){
-                            self.params.clause={
-                                status:0,
-                                assignee:self.userId
-                            };
-                        }
-                        else if(tabIndex==1){
-                            self.params.clause={
-                                status:0,
-                                assigner:self.userId
-                            };
-                        }
-                        else{
-                            self.params.clause={
-                                status:0
-                            };
-                        }
-                    break;
-                    default:
+            }
+            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            self.params.beginTs=start;
+            self.params.endTs=end;
+            //self.params.filter={page:self.page-1,size:self.tableDataList[tabIndex].sizeNum};
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+            this.getEventList(this.params);
+        },
+        //点击状态搜索时，总共需要时间范围，状态
+        selectChange(val){
+            console.log(val);
+            let self=this;
+            let tabIndex=Number(self.activeName);
+            switch(val){
+                case 0:
                     if(tabIndex==0){
                         self.params.clause={
-                            status:-1,  //表示选择其他状态时为空。
+                            status:0,
+                            assignee:self.userId
+                        };
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:[0,1,2],
+                            assigner:self.userId
+                        };
+                    }
+                    else{
+                        self.params.clause={
+                            status:[0,1,2]
+                        };
+                    }
+                break;
+                case 1:
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:0,
+                            assignee:self.userId
+                        };
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:0,
+                            assigner:self.userId
+                        };
+                    }
+                    else{
+                        self.params.clause={
+                            status:0
+                        };
+                    }
+                break;
+                default:
+                if(tabIndex==0){
+                    self.params.clause={
+                        status:-1,  //表示选择其他状态时为空。
+                        assignee:self.userId
+                    }
+                }
+                else if(tabIndex==1){
+                    self.params.clause={
+                        status:val-1,
+                        assigner:self.userId
+                    }
+                }
+                else{
+                    self.params.clause={
+                        status:val-1
+                    }
+                }
+                break;
+            }
+
+            self.serachData='';
+            //self.page=1;
+            self.tableDataList[tabIndex].page=1;
+            self.params.like={};
+
+            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            self.params.beginTs=start;
+            self.params.endTs=end;
+            //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+            self.getEventList(self.params);
+            let status=[];
+            if(val==0){
+                status=[0,1,2];
+            }
+            else{
+                status=val-1;
+            }
+            
+            self.getEventCount(start,end,status);
+        },
+        searchEventList(flag){
+            let self=this;
+            let tabIndex=Number(self.activeName);
+            let val=self.value;
+            self.tableDataList[tabIndex].page=1;
+            self.serachData=self.serachVale.trim();
+            switch(val){
+                case 0:
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:0,
+                            assignee:self.userId
+                        }
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:[0,1,2],
+                            assigner:self.userId
+                        }
+                    }
+                    else{
+                        self.params.clause={
+                            status:[0,1,2]
+                        }
+                    }
+                break;
+                case 1:
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:0,
+                            assignee:self.userId
+                        }
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:0,
+                            assigner:self.userId
+                        }
+                    }
+                    else{
+                        self.params.clause={
+                            status:0
+                        }
+                    }
+                break;
+                default:
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:-1,
                             assignee:self.userId
                         }
                     }
@@ -374,430 +468,350 @@
                         self.params.clause={
                             status:val-1,
                             assigner:self.userId
-                        }
+                        };
                     }
                     else{
                         self.params.clause={
                             status:val-1
-                        }
+                        };
                     }
-                    break;
-                }
-
-                self.serachData='';
-                //self.page=1;
-                self.tableDataList[tabIndex].page=1;
-                self.params.like={};
-
-                let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-                let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-                self.params.beginTs=start;
-                self.params.endTs=end;
-                //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
-                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-                self.getEventList(self.params);
-                let status=[];
-                if(val==0){
-                    status=[0,1,2];
-                }
-                else{
-                    status=val-1;
-                }
-                
-                self.getEventCount(start,end,status);
-            },
-            searchEventList(flag){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                let val=self.value;
-                self.tableDataList[tabIndex].page=1;
-                self.serachData=self.serachVale.trim();
-                switch(val){
-                    case 0:
-                        if(tabIndex==0){
-                            self.params.clause={
-                                status:0,
-                                assignee:self.userId
-                            }
-                        }
-                        else if(tabIndex==1){
-                            self.params.clause={
-                                status:[0,1,2],
-                                assigner:self.userId
-                            }
-                        }
-                        else{
-                            self.params.clause={
-                                status:[0,1,2]
-                            }
-                        }
-                    break;
-                    case 1:
-                        if(tabIndex==0){
-                            self.params.clause={
-                                status:0,
-                                assignee:self.userId
-                            }
-                        }
-                        else if(tabIndex==1){
-                            self.params.clause={
-                                status:0,
-                                assigner:self.userId
-                            }
-                        }
-                        else{
-                            self.params.clause={
-                                status:0
-                            }
-                        }
-                    break;
-                    default:
-                        if(tabIndex==0){
-                            self.params.clause={
-                                status:-1,
-                                assignee:self.userId
-                            }
-                        }
-                        else if(tabIndex==1){
-                            self.params.clause={
-                                status:val-1,
-                                assigner:self.userId
-                            };
-                        }
-                        else{
-                            self.params.clause={
-                                status:val-1
-                            };
-                        }
-                    break;
-                }
-                if(self.serachData!=undefined&&self.serachData.length!=0){
-                    if(flag){
-                        self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
-                    }
-                    else{
-                        self.params.like={};
-                    }
+                break;
+            }
+            if(self.serachData!=undefined&&self.serachData.length!=0){
+                if(flag){
+                    self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
                 }
                 else{
                     self.params.like={};
                 }
-                //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
-                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-                self.getEventList(self.params);
-                
-                let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-                let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-                let status=[];
-                let selectValue=self.value;
-                switch(selectValue){
-                    case 0:status=[0,1,2];break;
-                    default:status=selectValue-1;break;
+            }
+            else{
+                self.params.like={};
+            }
+            //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+            self.getEventList(self.params);
+            
+            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            let status=[];
+            let selectValue=self.value;
+            switch(selectValue){
+                case 0:status=[0,1,2];break;
+                default:status=selectValue-1;break;
+            }
+            let like=self.params.like;
+            self.getEventCount(start,end,status,like);
+        },
+        rowClickItem(row,column,event){
+            let self=this;
+            this.event=row;
+            sessionStorage.setItem('event',JSON.stringify(this.event));
+            sessionStorage.setItem('queryparams',JSON.stringify(self.params));
+            this.$router.push({name:"事件详情",params:{event:this.event}});
+        },
+        toEventDetail(row){
+            console.log(row);
+            let self=this;
+            this.event=row;
+            sessionStorage.setItem('event',JSON.stringify(this.event));
+            sessionStorage.setItem('queryparams',JSON.stringify(self.params));
+            this.$router.push({name:"事件详情",params:{event:this.event}});
+        },
+        sortChange(col){
+            console.log(col);
+            let self=this;
+            let tabIndex=Number(self.activeName);
+            //self.page=1;   //页码置为1
+            self.tableDataList[tabIndex].page=1;
+            let column=col.column;
+            let order=col.order;
+            if(order=="ascending"){
+                self.params.order={
+                    "direction":"asc",
+                    "property":col.column.property
                 }
-                let like=self.params.like;
-                self.getEventCount(start,end,status,like);
-            },
-            rowClickItem(row,column,event){
-                let self=this;
-                this.event=row;
-                sessionStorage.setItem('event',JSON.stringify(this.event));
-                sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-                this.$router.push({name:"事件详情",params:{event:this.event}});
-            },
-            toEventDetail(row){
-                console.log(row);
-                let self=this;
-                this.event=row;
-                sessionStorage.setItem('event',JSON.stringify(this.event));
-                sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-                this.$router.push({name:"事件详情",params:{event:this.event}});
-            },
-            sortChange(col){
-                console.log(col);
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                //self.page=1;   //页码置为1
-                self.tableDataList[tabIndex].page=1;
-                let column=col.column;
-                let order=col.order;
-                if(order=="ascending"){
-                    self.params.order={
-                        "direction":"asc",
-                        "property":col.column.property
-                    }
+            }
+            else if(order=="descending"){
+                self.params.order={
+                    "direction":"desc",
+                    "property": col.column.property
                 }
-                else if(order=="descending"){
-                    self.params.order={
-                        "direction":"desc",
-                        "property": col.column.property
-                    }
-                }
-                else{
-                    self.params.order={};
-                }
-                self.params.filter={
-                    page:self.tableDataList[tabIndex].page-1,
-                    size:self.tableDataList[tabIndex].sizeNum
-                }
-                self.getEventList(self.params);
-            },
-            getUserId(){
-                let self=this;
-                self.userId=getCookie('UserId');
-                let start=new Date().getTime()-1000*3600*24;
-                let end=new Date().getTime();
-                let status=[0,1,2];
-                self.getEventCount(start,end,status);  //初始加载
-            },
-            async getEventList(params){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                if(params.hasOwnProperty('clause')&&typeof(params.clause.status)=='object'){  //传入的是一个数组类型
-                    if(tabIndex==2){
-                        for(var key in params){
-                            if(key=='clause'){
-                                delete params["clause"]
-                            }
+            }
+            else{
+                self.params.order={};
+            }
+            self.params.filter={
+                page:self.tableDataList[tabIndex].page-1,
+                size:self.tableDataList[tabIndex].sizeNum
+            }
+            self.getEventList(self.params);
+        },
+        getUserId(){
+            let self=this;
+            self.userId=getCookie('UserId');
+            let start=new Date().getTime()-1000*3600*24;
+            let end=new Date().getTime();
+            let status=[0,1,2];
+            self.getEventCount(start,end,status);  //初始加载
+        },
+        async getEventList(params){
+            let self=this;
+            let tabIndex=Number(self.activeName);
+            if(params.hasOwnProperty('clause')&&typeof(params.clause.status)=='object'){  //传入的是一个数组类型
+                if(tabIndex==2){
+                    for(var key in params){
+                        if(key=='clause'){
+                            delete params["clause"]
                         }
                     }
-                    if(tabIndex==1){
-                        params.clause={
-                            assigner:self.userId
-                        }
+                }
+                if(tabIndex==1){
+                    params.clause={
+                        assigner:self.userId
                     }
                 }
+            }
+            
+            eventRESTful.getEventList(params).then((res)=>{
+                let data=res.data.content;
+                let temp=[];
+                data.forEach(item=>{
+                    let obj={
+                        id:item.id,
+                        ts:util.getDateTime(item.ts),
+                        assignee:item.assignee,
+                        assignerName:item.assignerName,
+                        assigneeName:item.assigneeName,
+                        deviceId:item.deviceId,
+                        status:item.status,
+                        storeId:item.storeId,
+                        storeName:item.storeName,
+                        subject:item.subject,
+                        score:item.score,
+                        sourceType:item.sourceType,
+                        initialComment:item.initialComment
+                    }
+                    temp.push(obj);
+                })
+                self.tableDataList[tabIndex].tableData=temp;
+                self.tableDataList[tabIndex].total=res.data.totalElements;
+                //if(tabIndex==0){
+                self.tableDataList[tabIndex].eventCount=res.data.totalElements;
+                //}
+            }).catch(err=>{
+                console.log("Error:"+err);
+            });
+        },
+        sizeChange(val){
+            let self=this;
+            let tabIndex=Number(self.activeName);
+            self.tableDataList[tabIndex].sizeNum=val;
+            //self.page=1;
+            self.tableDataList[tabIndex].page=1;
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:val};
+            self.getEventList(self.params);
+        },
+        currentChange(val){
+            let self=this;
+            let tabIndex=Number(self.activeName);
+            self.tableDataList[tabIndex].page=val;
+            self.params.filter={page:val-1,size:self.tableDataList[tabIndex].sizeNum};
+            this.getEventList(this.params);
+            let dom=document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+            let offestTop=dom.offsetTop;
+            if(dom!=undefined){
+                document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop=0;
+            }
+        },
+        getInitList(){
+            let self=this;
+            let start=new Date().getTime()-1000*3600*24;
+            let end=new Date().getTime();
+            self.params.beginTs=start;
+            self.params.endTs=end;
+            self.params.clause={"status":0,"assignee":self.userId};
+            self.params.order={"direction": "desc","property": "ts"};
+            self.getEventList(self.params);
+        },
+        getEventCount(start,end,status,...value){
+            console.log(value);
+            let self=this;
+            let params={
+                beginTs:start,
+                endTs:end,
+                "cases": [
+                    1,
+                    2,
+                    3
+                ],
+                "clause":{
+                    "status":status
+                },
                 
+            };
+            if(typeof(status)=='number'){  //只有是数值类型时才带
+                params.clause.status=status;
+            }
+            else{
+                for(var key in params){
+                    console.log(key)
+                    if(key=='clause'){
+                        delete params["clause"];
+                    }
+                }
+            }
+            if(value.length!=0){
+                params.like=value[0];
+            }
+            eventRESTful.getEventCount(params).then(res=>{
+                let data=res.data;
+                let errMsg=res.errMsg;
+                console.log(errMsg);
+                self.tableDataList[0].eventCount=data.assigned;
+                self.tableDataList[1].eventCount=data.reported;
+                self.tableDataList[2].eventCount=data.total;
+            })
+        },
+        getExportDataSize(){
+            let self=this;
+            let params=self.params;
+            params.filter={};
+            return new Promise((resolve,reject)=>{
                 eventRESTful.getEventList(params).then((res)=>{
+                    console.log(res);
+                    let size=res.data.totalElements;
+                    resolve(size);
+                }) 
+                .catch((error) => {
+                    reject(error);
+                })
+            })
+            
+        },
+        async getExportData(){
+            let self=this;
+            let size=await self.getExportDataSize();
+            self.params.filter={
+                "page": 0,
+                "size": size
+            };
+            return new Promise((resolve,reject)=>{
+                eventRESTful.getEventList(self.params).then((res)=>{
+                    console.log(res);
                     let data=res.data.content;
                     let temp=[];
                     data.forEach(item=>{
-                        let obj={
-                            id:item.id,
-                            ts:util.getDateTime(item.ts),
-                            assignee:item.assignee,
-                            assignerName:item.assignerName,
-                            assigneeName:item.assigneeName,
-                            deviceId:item.deviceId,
-                            status:item.status,
-                            storeId:item.storeId,
-                            storeName:item.storeName,
-                            subject:item.subject,
-                            score:item.score,
-                            sourceType:item.sourceType,
-                            initialComment:item.initialComment
-                        }
-                       temp.push(obj);
+                        let obj={};
+                        obj.subject=item.subject;
+                        obj.storeName=item.storeName;
+                        obj.assignerName=item.assignerName;
+                        obj.ts=util.getDateTime(item.ts);
+                        temp.push(obj);
                     })
-                    self.tableDataList[tabIndex].tableData=temp;
-                    self.tableDataList[tabIndex].total=res.data.totalElements;
-                    if(tabIndex==0){
-                        self.tableDataList[tabIndex].eventCount=res.data.totalElements;
-                    }
+                    resolve(temp);
                 }).catch(err=>{
                     console.log("Error:"+err);
                 });
-            },
-            sizeChange(val){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                self.tableDataList[tabIndex].sizeNum=val;
-                //self.page=1;
-                self.tableDataList[tabIndex].page=1;
-                self.params.filter={page:self.tableDataList[tabIndex].page-1,size:val};
-                self.getEventList(self.params);
-            },
-            currentChange(val){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                self.tableDataList[tabIndex].page=val;
-                self.params.filter={page:val-1,size:self.tableDataList[tabIndex].sizeNum};
-                this.getEventList(this.params);
-            },
-            getInitList(){
-                let self=this;
-                let start=new Date().getTime()-1000*3600*24;
-                let end=new Date().getTime();
-                self.params.beginTs=start;
-                self.params.endTs=end;
-                self.params.clause={"status":0,"assignee":self.userId};
-                self.params.order={"direction": "desc","property": "ts"};
-                self.getEventList(self.params);
-            },
-            getEventCount(start,end,status,...value){
-                console.log(value);
-                let self=this;
-                let params={
-                    beginTs:start,
-                    endTs:end,
-                    "cases": [
-                        1,
-                        2,
-                        3
-                    ],
-                    "clause":{
-                        "status":status
-                    },
-                    
-                };
-                if(typeof(status)=='number'){  //只有是数值类型时才带
-                    params.clause.status=status;
-                }
-                else{
-                    for(var key in params){
-                        console.log(key)
-                        if(key=='clause'){
-                            delete params["clause"];
-                        }
-                    }
-                }
-                if(value.length!=0){
-                    params.like=value[0];
-                }
-                eventRESTful.getEventCount(params).then(res=>{
-                    let data=res.data;
-                    let errMsg=res.errMsg;
-                    console.log(errMsg);
-                    self.tableDataList[0].eventCount=data.assigned;
-                    self.tableDataList[1].eventCount=data.reported;
-                    self.tableDataList[2].eventCount=data.total;
-                })
-            },
-            getExportDataSize(){
-                let self=this;
-                let params=self.params;
-                params.filter={};
-                return new Promise((resolve,reject)=>{
-                    eventRESTful.getEventList(params).then((res)=>{
-                        console.log(res);
-                        let size=res.data.totalElements;
-                        resolve(size);
-                    }) 
-                    .catch((error) => {
-                        reject(error);
-                    })
-                })
-                
-            },
-            async getExportData(){
-                let self=this;
-                let size=await self.getExportDataSize();
-                self.params.filter={
-                    "page": 0,
-                    "size": size
-                };
-                return new Promise((resolve,reject)=>{
-                    eventRESTful.getEventList(self.params).then((res)=>{
-                        console.log(res);
-                        let data=res.data.content;
-                        let temp=[];
-                        data.forEach(item=>{
-                            let obj={};
-                            obj.subject=item.subject;
-                            obj.storeName=item.storeName;
-                            obj.assignerName=item.assignerName;
-                            obj.ts=util.getDateTime(item.ts);
-                            temp.push(obj);
-                        })
-                        resolve(temp);
-                    }).catch(err=>{
-                        console.log("Error:"+err);
-                    });
-                })
-            },
-            getExportFileName(){
-                let self=this;
-                let tabIndex=Number(self.activeName);
-                console.log(tabIndex);
-                let label='';
-                switch(tabIndex){
-                    case 0: label='待处理';break;
-                    case 1: label='我创建';break;
-                    case 2: label='全部';break;
-                    default: console.error('error tab pages！');break;
-                }
-                let fileName=label+'-'+util.getCurDateStr();
-                return fileName;
-            },
-            async export2Excel() {
-                var that = this;
-                let ret=await that.isLoginIn();
-                if(ret.data!=undefined&&ret.data.isLogin){
-                    let tabIndex=Number(that.activeName);
-                    if(that.tableDataList[tabIndex].tableData.length==0){
-                        Message({
-                            message:'暂无数据！',
-                            type:'warning',
-                            duration:3*1000
-                        })
-                        return false;
-                    }
-                    require.ensure([], async() => {
-                        const { export_json_to_excel } = require('@/excel/Export2Excel'); 
-                        const tHeader = that.exportDataHeader; // 导出的表头名
-                        const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
-                        console.log(that.activeName);
-                        let curData=await that.getExportData();
-                        const data = that.formatJson(filterVal, curData);
-                        
-                        export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
-                    })
-                }
-                else{
-                    window.location.href='https://portals.storeviu.com';
-                }
-            },
-            formatJson(filterVal, jsonData) {
-                return jsonData.map(v => filterVal.map(j => v[j]))
-            },
-            getDeafultTime(){
-                let self=this;
-                let date=new Date();
-                let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
-                let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
-                let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
-                let dateStr=hour+':'+minutes+':'+second;
-                let timeTemp=[];
-                timeTemp[0]=dateStr;
-                timeTemp[1]=dateStr;
-                self.defaultTime=timeTemp;
-            },
-            isLoginIn(){
-                let self=this;
-                return new Promise((resolve,reject)=>{
-                    isLoginIn().then(res=>{
-                        console.log(res);
-                        resolve(res);
-                    })
-                }).catch(err=>{
-                    console.log(err);
-                })
-            },
+            })
         },
-        async mounted(){
+        getExportFileName(){
             let self=this;
-            self.getDeafultTime();
-            await self.isLoginIn();
-            let windowHeight=window.innerHeight;
-            if(windowHeight>800){
-                self.tableHeight=770+'px';
+            let tabIndex=Number(self.activeName);
+            console.log(tabIndex);
+            let label='';
+            switch(tabIndex){
+                case 0: label='待处理';break;
+                case 1: label='我创建';break;
+                case 2: label='全部';break;
+                default: console.error('error tab pages！');break;
             }
-            console.log(self.tableHeight);
-            self.getUserId();
-            self.getInitList();
+            let fileName=label+'-'+util.getCurDateStr();
+            return fileName;
         },
-        beforeRouteEnter (to, from, next) {
-            next(vm => {
-                if(from.name=='提交事件'){
-                    to.meta.keepAlive=false;
+        async export2Excel() {
+            var that = this;
+            let ret=await that.isLoginIn();
+            if(ret.data!=undefined&&ret.data.isLogin){
+                let tabIndex=Number(that.activeName);
+                if(that.tableDataList[tabIndex].tableData.length==0){
+                    Message({
+                        message:'暂无数据！',
+                        type:'warning',
+                        duration:3*1000
+                    })
+                    return false;
                 }
-            });
+                require.ensure([], async() => {
+                    const { export_json_to_excel } = require('@/excel/Export2Excel'); 
+                    const tHeader = that.exportDataHeader; // 导出的表头名
+                    const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
+                    console.log(that.activeName);
+                    let curData=await that.getExportData();
+                    const data = that.formatJson(filterVal, curData);
+                    
+                    export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
+                })
+            }
+            else{
+                window.location.href='https://portals.storeviu.com';
+            }
         },
-        activated(){
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => v[j]))
+        },
+        getDeafultTime(){
             let self=this;
-            console.log(self.params);
-            self.getEventList(self.params);
+            let date=new Date();
+            let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
+            let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
+            let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
+            let dateStr=hour+':'+minutes+':'+second;
+            let timeTemp=[];
+            timeTemp[0]=dateStr;
+            timeTemp[1]=dateStr;
+            self.defaultTime=timeTemp;
+        },
+        isLoginIn(){
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                isLoginIn().then(res=>{
+                    console.log(res);
+                    resolve(res);
+                })
+            }).catch(err=>{
+                console.log(err);
+            })
+        },
+    },
+    async mounted(){
+        let self=this;
+        self.getDeafultTime();
+        await self.isLoginIn();
+        let windowHeight=window.innerHeight;
+        if(windowHeight>800){
+            self.tableHeight=770+'px';
         }
+        console.log(self.tableHeight);
+        self.getUserId();
+        self.getInitList();
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            if(from.name!='事件详情'){
+                to.meta.keepAlive=false;
+            }
+            else{
+                to.meta.keepAlive=true;
+            }
+        });
+    },
+    activated(){
+        let self=this;
+        console.log(self.params);
+        self.getEventList(self.params);
     }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -910,6 +924,21 @@ $h1:#292e36;
 </style>
 <style>
  @import '../../assets/css/pagination.css';
+    /* input#test1{
+        width: 260px;
+        height: 26px;
+        padding-left: 20px;
+        border: 1px solid #DCDFE6;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #606266;
+    }
+    .layui-laydate .layui-this{
+        background-color: #f31d65 !important;
+    }
+    .layui-laydate-content td.laydate-selected{
+        background-color: rgba(251,76,93, 0.2) !important;
+    } */
     .el-table::before{
         height: 0px !important;
     }

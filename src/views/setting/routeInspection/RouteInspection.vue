@@ -146,7 +146,7 @@ export default {
             tagList:['远程巡检','现场巡检'],
             curData:[],
             loading:null,
-            fileName:'巡检表模板',
+            fileName:'店铺标准-巡检表示例',
         }
     },
     computed:{

@@ -175,7 +175,7 @@ export default {
             varyWindowWidth:window.innerHeight,
             allchecked:false,
             curDeleteId:'',
-            fileName:'巡检表模板',
+            fileName:'店铺标准-巡检表示例',
         }
     },
     computed:{

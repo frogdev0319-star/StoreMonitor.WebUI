@@ -6,8 +6,8 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-//let base='http://'+window.location.host;
-let base ='http://222.91.163.149:18081'
+let base='http://'+window.location.host;
+//let base ='http://222.91.163.149:18081'
 
 
 
@@ -36,7 +36,6 @@ serviceLogout.interceptors.request.use(
                 'token':getToken(),
                 'Accept':'application/json',
                 'Content-Type':'application/json;charset=UTF-8',
-                
             }
         }
         return config;
@@ -138,7 +137,7 @@ service.interceptors.response.use(
             let errCode=err.response.data.errCode;
             let errMsg=err.response.data.errMsg;
             if(errCode===500&&(errMsg=='Invalid token'||
-                errMsg=='Fail to verify token'||errMsg=='User does not exist')){
+                errMsg=='Failed to verify token'||errMsg=='User does not exist')){
                 //router.push('/login');
                 let url=sessionStorage.getItem('LoginURL');
                 window.location.href=url;

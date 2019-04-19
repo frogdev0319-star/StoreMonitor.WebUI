@@ -8,6 +8,7 @@
             </div>
             <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-else>
                 <el-input
+                    v-if="false"
                     size="small"
                     class="el-search-input"
                     v-model="serachVale" @keyup.enter.native="searchNVRList" placeholder='请输入关键词搜索'>
@@ -117,13 +118,12 @@
                                 </div>
                             </div>
                         </el-scrollbar>
-                        
+                                                        <!-- :pager-count="paperCount" -->
                         <div class="toolbar pagination" style="width:100%; margin-top:10px;">
                             <el-pagination
                                 style="text-align:right;margin-right:15px;"
                                 @size-change="sizeChange"
                                 @current-change="currentChange"
-                                :pager-count="paperCount"
                                 :page-size="sizeNum" 
                                 :total="total"
                                 :current-page="page"
@@ -205,7 +205,7 @@ export default {
             storeFilter:true,
             channelFilter:true,
             channelNumFilter:true,
-            paperCount:3,
+            // paperCount:3,
             showImportContent:false,
             showConfirmImport:false,
             channelList:[],

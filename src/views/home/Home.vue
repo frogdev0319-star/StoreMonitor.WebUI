@@ -42,7 +42,7 @@
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <div class="brand-panel" v-if="!collapsed">
                         <span class="brand-label">品牌</span>
-                        <el-select v-model="curBrand" placeholder="请选择" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
+                        <el-select v-model="accountId" placeholder="请选择" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
                             <el-option
                             class="options"
                             v-for="(item,index) in brandList" :key="index"
@@ -175,6 +175,11 @@ export default {
         }
     },
     watch:{
+        curBrand(val,oldval){
+            if(val.length==0){
+                this.curBrand=this.accountId;
+            }
+        },
         curPath(val){
             console.log(val);
             if(this.path.indexOf(val)){
@@ -262,7 +267,7 @@ export default {
                 let data=res.data;
                 if(res.errCode==0){
                     self.brandList=data;
-                    self.curBrand=self.accountId;
+                    //self.curBrand=self.accountId;
                 }
             })
         },

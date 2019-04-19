@@ -13,7 +13,7 @@
                             @click="submit" type="primary">提交</el-button>
             </div>
             <el-dialog title='编辑截图'
-            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5% @close="closeEdit">
                 <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
                     <hr class="dialog-hr"/> 
                     <transition name='fade'>
@@ -45,7 +45,7 @@
 
                 </div>
                 <div slot="footer">
-                    <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取 消</el-button>
+                    <el-button id="cancelBtn" @click="cancelEdit" size="mini">取 消</el-button>
                     <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
                 </div>
             </el-dialog>
@@ -69,6 +69,7 @@
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='changeChannelObj.title' :show-info='changeChannelObj.showInfo' :is-warning='changeChannelObj.isWarning' :dialog-closed='changeChannelObj.dialogCosed' @confirmed='changeChannelDialog' @canceled='cancelchangeChannel'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
+            <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <div class="video-content" v-if="!showgongge" id="videoContent" >
                 <div class="getvideo-content" v-if="showGetVideo">
                     <div class="btn-graph">
@@ -95,7 +96,7 @@
                                     </el-option>
                                 </el-select>
                                 <span>视频回退</span>
-                                <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" @change="adjustProcess">
+                                <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" @change="adjustProcess" placeholder=' '>
                                     <el-option
                                     v-for="(item) in backList" 
                                     :key="item.value"
@@ -567,7 +568,12 @@ export default {
                 isWarning:false,
                 dialogCosed:false
             },
-
+            noStoreUser:{
+                title:'提示',
+                showInfo:'当前门店未绑定负责人，是否继续！',
+                isWarning:true,
+                dialogCosed:false
+            },
             recorder:null,
             videoCanvasSrc:'',
             isRecordingStarted : false,
@@ -578,6 +584,7 @@ export default {
             videoSpeedId:0,
             timerPlayReal:null,
             realTimeSpeed:0,
+            cutDialogcurTime:0
         }
     },
     computed:{
@@ -1091,7 +1098,6 @@ export default {
                 },1000);
             }
             else{   //当前视频如果返回失败，需处于暂停状态
-                //self.stopRealTime();
                 self.playState=false;
                 self.showModelContent=false;
                 console.log(self.mpdurl.ErrorCode);
@@ -1410,6 +1416,10 @@ export default {
             }
             self.showCutDialog=true;
             this.$nextTick(()=>{
+                if(self.playBackState){
+                    let video=document.getElementById('previewVideo');
+                    self.cutDialogcurTime=video.player.currentTime();
+                }
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
                 ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
@@ -1517,6 +1527,23 @@ export default {
                 self.Y=self.Y1;
             }
         },
+        closeEdit(){
+            let self=this;
+            if(self.playBackState){
+                let video=document.getElementById('previewVideo');
+                console.log(self.cutDialogcurTime);
+                video.player.currentTime(self.cutDialogcurTime);
+            }
+        },
+        cancelEdit(){
+            let self=this;
+            self.showCutDialog = false;
+            if(self.playBackState){
+                let video=document.getElementById('previewVideo');
+                console.log(self.cutDialogcurTime);
+                video.player.currentTime(self.cutDialogcurTime);
+            }
+        },
         confirmEdit(){
             let self=this;
             let img=new Image();
@@ -1530,6 +1557,11 @@ export default {
             self.sourceList.push(obj);
             self.showCutDialog=false;
             self.myDivHeight();
+            if(self.playBackState){
+                let video=document.getElementById('previewVideo');
+                console.log(self.cutDialogcurTime);
+                video.player.currentTime(self.cutDialogcurTime);
+            }
         },
         addVideoToList(){
             let self=this;
@@ -1781,7 +1813,6 @@ export default {
                 }
             }
             else{   //当前视频如果返回失败，需处于暂停状态
-                //self.stopRealTime();
                 self.playState=false;
                 self.showModelContent=false;
                 console.log(self.mpdurl.ErrorCode);
@@ -2101,11 +2132,25 @@ export default {
         changeStoreDialog(){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
-            self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+            if(self.curStoreItem.userId==null){
+                self.noStoreUser.dialogCosed=true;
+            }
+            else{
+                self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+            }
         },
         canceldChangeStore(){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
+        },
+        cancelNoUser(){
+            let self=this;
+            self.noStoreUser.dialogCosed=false;
+        },
+        noStoreUserDialog(){
+            let self=this;
+            self.noStoreUser.dialogCosed=false;
+            self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
         },
         clickStore(item,index,_item,_index){
             let self=this;
@@ -2119,7 +2164,13 @@ export default {
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
-                self.changeStore(item,index,_item,_index);
+                //self.changeStore(item,index,_item,_index);
+                if(_item.userId==null){
+                    self.noStoreUser.dialogCosed=true;
+                }
+                else{
+                    self.changeStore(item,index,_item,_index);
+                }
             }
         },
         getChannelByStore(storeItem){

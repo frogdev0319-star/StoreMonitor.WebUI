@@ -1,3 +1,7 @@
+/**
+ * mock.js 文件，模拟api的数据返回
+ * 可以使用node.js 在前台写api.
+ */
 import axios from 'axios'
 import Nape from '@/api/ApiPath'
 

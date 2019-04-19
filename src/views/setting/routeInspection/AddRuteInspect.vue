@@ -157,7 +157,7 @@
                             <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" placeholder="输入巡检项名称" ></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input maxlength="70" size="mini" v-model="newNapeDep" class="nape-input" placeholder="输入巡检项描述"></el-input>
+                           <el-input maxlength="70" type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" placeholder="输入巡检项描述"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -226,7 +226,7 @@ export default {
     methods:{
         editTabName(){
             let self=this;
-            self.showEditTab=true;
+            //self.showEditTab=true;
         },
         confirmEditTab(){
             console.log('修改tab');

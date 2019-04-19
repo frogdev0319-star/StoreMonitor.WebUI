@@ -8,11 +8,25 @@
                 <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-submit" @click="submit" v-if="showWinpBtn" type="primary">提交</el-button>
             </div>
             <el-dialog  title='查看' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
-            v-if="dialogFormVisible" width="850px" top=12% @close='stopRealTime' class='rate-video-dialog'>
-                <div class="video-dialog-content" style="overflow:hidden;">
+            v-if="dialogFormVisible" width="850px" top=12% @close='closeRealTime' class='rate-video-dialog'>
+                <div class="video-dialog-content" style="overflow:hidden;" @mousemove="showControlInfo=true" @mouseleave="showControlInfo=false">
                     <hr class="dialog-hr"/>
-                    <div class="video-content" >
-                        <video  height=83% width=90% id="previewVideo" prload controls
+                    <div class="video-content" id="videoContent">
+                        <div id="channelName" v-if="showControlInfo"><span>{{curChannel.name}}</span></div>
+                        <div class="icon-footer" v-if="showControlInfo">
+                            <div class="iconlside">
+                                <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+                                <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+                            </div>
+                            <div class="iconrside">
+                                <div class="screen-content">
+                                    <i class="iconfont iconscreen" 
+                                    :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
+                                    <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <video  height=83% width=90% id="previewVideo" prload :controls="false"
                             class="video-js vjs-fill">
                         </video>
                     </div>
@@ -23,7 +37,7 @@
                 <div class="video-dialog-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
                     <div class="video-content" >
-                        <video  height=83% width=90% id="previewVideo" prload controls
+                        <video  height=83% width=90% id="previewVideo" prload  controls
                             class="video-js vjs-fill">
                         </video>
                     </div>
@@ -228,6 +242,9 @@ export default {
             startIcon:require('../../../../static/img/pic_play_icon.png'),    
             videoImgSrc:require('../../../../static/img/image_videoThumbnail.png'),         
             curStatus:null,
+            fullScreen:false,
+            showControlInfo:true,
+            playState:false,
         }
     },
     computed: {
@@ -297,11 +314,16 @@ export default {
             console.log('currentTime', e.cache_.currentTime)
         },
         async playVideo(url) {
+            let self=this;
+            self.playState=true;
             console.log('playvideo enter!');
             var video = document.getElementById("previewVideo");
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
+            setTimeout(() => {
+                self.showControlInfo=false;
+            }, 3000);
         },
 
         stopCommentVideo(){
@@ -365,6 +387,13 @@ export default {
             //var video = document.getElementById("previewVideo");
             //self.previewplayer = videojs(video);
             self.previewplayer.pause();
+            self.playState=false;
+        },
+        closeRealTime(){
+            let self=this;
+            if(self.playState){
+                self.stopRealTime();
+            }
         },
         async stopRealTime(){
             let self=this;
@@ -380,6 +409,56 @@ export default {
             };
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+        },
+        gonggeScreen(){
+
+        },
+        controlScreen(){
+            let self=this;
+            if(!self.fullScreen){
+                self.fullWindowScreen();
+                self.fullScreen=true;
+            }
+            else{
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
+        },
+        //进入全屏
+        fullWindowScreen(...val) {
+            console.log(val);
+            let self=this;
+            var ele = document.getElementById('videoContent');
+            ele.style.width = "100%";
+            ele.style.height = "100%";
+            if (ele.requestFullscreen) {
+                ele.requestFullscreen();
+            } 
+            else if (ele .mozRequestFullScreen) {
+                ele.mozRequestFullScreen();
+            } 
+            else if (ele .webkitRequestFullScreen) {
+                ele.webkitRequestFullScreen();
+            }
+            else if(ele.msRequestFullscreen) {
+                ele.msRequestFullscreen();
+            }
+        },
+        //退出全屏
+        exitFullscreen() {
+            var de = document;
+            var ele = document.getElementById('videoContent');
+            ele.style.width = "auto";
+            ele.style.height = "auto";
+            if (de.exitFullscreen) {
+                de.exitFullscreen();
+            } 
+            else if (de.mozCancelFullScreen) {
+                de.mozCancelFullScreen();
+            } 
+            else if (de.webkitCancelFullScreen) {
+                de.webkitCancelFullScreen();
+            }
         },
         myfun(){  
             var div1=document.getElementsByClassName("lside");  
@@ -470,6 +549,19 @@ export default {
                 }
             })
             console.log(self.commentList);
+        },
+        getCommentProcess(){
+            let self=this;
+            self.commentList.forEach((_item,_index)=>{
+                if(_item.showAudio){
+                    if(isNaN(self.$refs[_item.audio.audioRef][0].duration)){
+                        _item.showAudio=false;
+                    }
+                    else{
+                        _item.audio.audioOftenText=parseInt(self.$refs[_item.audio.audioRef][0].duration)+'"';
+                    }
+                }
+            })
         },
         startSpeech(){
             let self=this;
@@ -606,7 +698,9 @@ export default {
                     self.notify('提交成功！','success',3000);
                     self.getCommentList();
                     self.eventDes='';
-                    self.getProcess();
+                    setTimeout(()=>{
+                        self.getCommentProcess();
+                    },3000);
                 }
                 else{
                     self.notify('提交失败！','warning',3000);
@@ -632,6 +726,14 @@ export default {
                 status=self.curStatus;
             }
             self.addComment(status,description);
+        },
+        checkFull(){
+            var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+            if(isFull === undefined)
+            {
+                isFull = false;
+            } 
+            return isFull;
         },
         notify(msg,type,time) {
             this.$message({
@@ -671,13 +773,19 @@ export default {
         this.$nextTick(function(){
             setTimeout(()=>{
                 self.myfun();
-                
             },500);
             setTimeout(()=>{
                 self.getProcess();
             },3000);
         })
-        
+        window.onresize=function(){
+            if(!self.checkFull()){
+                self.fullScreen=false;
+                var ele = document.getElementById('videoContent');
+                ele.style.width = "auto";
+                ele.style.height = "auto";
+            }
+        }
     },
     created(){
         let self=this;
@@ -822,6 +930,7 @@ $h1:#292e36;
 
             img{
                 height: 100%;
+                user-select: none;
             }
         }
         .video-dialog-content{
@@ -836,8 +945,75 @@ $h1:#292e36;
                 margin-top: 0;
             }
             .video-content{
-                @include point(padding,20);
+                @include point(margin,20);
                 padding-top: 0;
+                position: relative;
+                #channelName{
+                    width: 100%;
+                    color: #fff;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    position: absolute;
+                    z-index: 10;
+                    text-align: left;
+                    span{
+                        margin-left: 30px;
+                    }
+                }
+                .icon-footer{
+                    width: 100%;
+                    position: absolute;
+                    bottom: 0px;
+                    color: #fff;
+                    overflow: hidden;
+                    user-select:none;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    z-index: 10;
+                    .iconlside{
+                        float: left;
+                        text-align: left;
+                        .iconplay{
+                            font-size: 18px;
+                            cursor: pointer;
+                            float: left;
+                            margin-left: 30px;
+                        }
+                        
+                    }
+                    .iconrside{
+                        max-width: 500px;
+                        float: right; 
+                        position: relative;
+                        span{
+                            font-size: 13px;
+                            margin-right:6px;
+                            margin-left: 20px;
+                        }
+                        .speed-content{
+                            display: inline-block;
+                            span{
+                                position: relative;
+                                bottom:3px;
+                            }
+                        }
+                        .screen-content{
+                            display: inline;
+                            margin-left: 30px;
+                            position: absolute;
+                            right: 20px;
+                            .iconscreen{
+                                font-size: 18px;
+                                position: relative;
+                                cursor: pointer;
+                                margin-right: 20px;
+                                bottom: 3px;
+                            }
+                        }
+                    }
+                }
             }
         }
         #previewVideo{

@@ -8,15 +8,15 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
-    {
-      path:'/login',
-      name:'Login',
-      hidden: true,
-      component:LoginForm,
-      meta:{
-        requireAuth: false,
-      }
-    },
+    // {
+    //   path:'/login',
+    //   name:'Login',
+    //   hidden: true,
+    //   component:LoginForm,
+    //   meta:{
+    //     requireAuth: false,
+    //   }
+    // },
     {
       path:'/',
       name:'AuthRedirect',
@@ -166,7 +166,7 @@ export default new Router({
       iconCls:'iconfont icon-menu-shujuzhongxin',
       styles:'font-size:22px',
       leaf:true,
-      isReadOnly:false,
+      isReadOnly:true,
       hidden: false,
       children:[
         {
@@ -267,7 +267,7 @@ export default new Router({
         {
           path:'/schedule',
           name:'排程配置',
-          isReadOnly:false,
+          isReadOnly:true,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{

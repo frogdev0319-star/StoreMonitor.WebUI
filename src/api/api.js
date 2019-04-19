@@ -1,3 +1,6 @@
+/**
+ * 这个文件中的api没有配置带token的header信息
+ */
 import axios from 'axios'
 import qs from 'qs'
 import axiosFile from 'axios'

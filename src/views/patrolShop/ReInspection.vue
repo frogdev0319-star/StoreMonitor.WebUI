@@ -128,6 +128,7 @@
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
+            <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
                     <div class="num-content">
@@ -161,7 +162,7 @@
                         </div>
                         <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
                     </div>
-                    <span id="channelName" v-if="showInfoContent">{{channel.channelName}}</span>
+                    <span id="channelName" v-if="showInfoContent">{{channel!=null?channel.channelName:''}}</span>
                     <div class="icon-footer" v-if="showInfoContent">
                         <div class="iconlside">
                             <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
@@ -185,7 +186,7 @@
                             <span>录像</span>
                         </div>
                     </transition>
-                    <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls"
+                    <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
                         class="video-js vjs-fill">
                     </video>
                 </div>
@@ -421,6 +422,7 @@ export default {
             showCutModel:false,
             errorText:'',
             showError:false,
+            showVideo:true,
             showCancelContent:false,
             speedList:[
                 {
@@ -584,6 +586,12 @@ export default {
                 title:'提示',
                 showInfo:'当前尚有未完成巡检项，请完成后进行提交！',
                 isWarning:false,
+                dialogCosed:false
+            },
+            noStoreUser:{
+                title:'提示',
+                showInfo:'当前门店未绑定负责人，是否继续！',
+                isWarning:true,
                 dialogCosed:false
             },
             recorder:null,
@@ -1601,6 +1609,10 @@ export default {
                 self.notify('该项已被忽略！','warning',3000);
                 return false;
             }
+            if(item.deviceId==-1){
+                self.noBindDeviceObj.dialogCosed=true;
+                return false;
+            }
             self.ignoreInspectObj.dialogCosed=true;
         },
         noBindDeviceDialog(val){
@@ -1887,6 +1899,9 @@ export default {
             let self=this;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
+            // if(!self.showVideo){
+            //     self.showVideo=true;
+            // }
             self.sessionId=sessionId;
             const data = {
                 request: { 
@@ -1936,6 +1951,9 @@ export default {
             };
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+            //self.showVideo=false;
+            //self.destroyVideo();
+            //self.showGuide=true;
         },
        async stopAndRealTime(){
             let self=this;
@@ -2116,6 +2134,10 @@ export default {
             if(self.playState){
                 self.stopRealTime();
             }
+            else{
+                //self.destroyVideo();
+                self.showGuide=true;
+            }
             let obj={};
             obj.storeId=_item.storeId;
             obj.storeName=_item.name;
@@ -2161,7 +2183,13 @@ export default {
         changeStoreDialog(val){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
-            self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+            //self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+            if(self.curStoreItem.userId==null){
+                self.noStoreUser.dialogCosed=true;
+            }
+            else{
+                self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+            }
         },
         canceldChangeStore(){
             let self=this;
@@ -2256,6 +2284,15 @@ export default {
             })
             self.channelBtns=temp;
         },
+        cancelNoUser(){
+            let self=this;
+            self.noStoreUser.dialogCosed=false;
+        },
+        noStoreUserDialog(){
+            let self=this;
+            self.noStoreUser.dialogCosed=false;
+            self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+        },
         clickStore(item,index,_item,_index){
             let self=this;
             if(!_item.hasInspect&&_item.hasInspect!=undefined){
@@ -2269,7 +2306,13 @@ export default {
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
-                self.changeStore(item,index,_item,_index);
+                //self.changeStore(item,index,_item,_index);
+                if(_item.userId==null){
+                    self.noStoreUser.dialogCosed=true;
+                }
+                else{
+                    self.changeStore(item,index,_item,_index);
+                }
             }
         },
         notify(msg,type,time) {
@@ -2697,6 +2740,9 @@ export default {
                 height: auto;
                 position: relative;
                 @include point(margin,20);
+                @include point(min-width,500);
+                @include point(min-height,408);
+                background-color: #000;
                 margin-bottom: 0;
                 .getvideo-content{
                     position: absolute;

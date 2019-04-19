@@ -3,7 +3,7 @@
        <div class="seacrh-content">
             <span class="select-title">按省份选择</span>
              <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
-             class="el-province" @change="changePro" @clear="clearCitys" :popper-class="popperClass">
+             class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
                     :key="item.value"
@@ -175,7 +175,6 @@ import PubSub from 'pubsub-js'
                 serachVale:'',
                 timeid:0,
                 isChecked:false,
-                popperClass:'province-popper',
                 curCitys:'城市',
                 showPopoVer:true,
             }
@@ -211,7 +210,6 @@ import PubSub from 'pubsub-js'
                 self.curCitys='城市';
                 self.multeCityList.length=0;
                 self.allCityChecked=false;
-                
             },
             clearCitys(){
                 let self=this;
@@ -287,6 +285,9 @@ import PubSub from 'pubsub-js'
                 }
                 else{
                     self.allCityChecked=false;
+                }
+                if(temp.length==0){
+                    self.curCitys='城市';
                 }
                 self.multeCityList=temp;
             },
@@ -624,7 +625,7 @@ import PubSub from 'pubsub-js'
                 font-size: 12px;
                 color: #C0C4CC;
                 margin-left: 15px;
-                @include point(width,140);
+                @include point(width,130);
                 white-space: nowrap; 
                 overflow: hidden; 
                 text-overflow: ellipsis; 
@@ -690,10 +691,6 @@ import PubSub from 'pubsub-js'
 @import '../../../assets/css/pagination.css';
     .el-table::before{
         height: 0px !important;
-    }
-    #elCity{
-        border-radius: 0px;
-        background-color: #F4F5F9;
     }
     .current-row > td {
         background: #FEE7E4 !important;
