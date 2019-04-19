@@ -155,7 +155,6 @@
                                     <audio :ref="item.audio.audioRef">
                                         <source :src="item.audio.audioSrc" type="audio/mpeg" />
                                     </audio>
-                                    <!-- v-if="item.audio!=null" -->
                                     <span class="often-text">{{item.audio.audioOftenText}}</span>
                                 </div>
                             </div>
@@ -531,20 +530,25 @@ export default {
         getProcess(){
             let self=this;
             if(self.showAudio){
-                if(isNaN(self.$refs.audioRef.duration)){
+                let audio=self.$refs.audioRef;
+                let du=audio.duration;
+                if(isNaN(du)){
                     self.showAudio=false;
                 }
                 else{
-                    self.audioOftenText=parseInt(self.$refs.audioRef.duration)+'"';
+                    self.audioOftenText=parseInt(du)+'"';
                 }
             }
             self.commentList.forEach((_item,_index)=>{
                 if(_item.showAudio){
-                    if(isNaN(self.$refs[_item.audio.audioRef][0].duration)){
+                    let audio=self.$refs[_item.audio.audioRef][0];
+                    let du=audio.duration;
+                    if(isNaN(du)){
                         _item.showAudio=false;
                     }
                     else{
-                        _item.audio.audioOftenText=parseInt(self.$refs[_item.audio.audioRef][0].duration)+'"';
+                        _item.audio.audioOftenText=parseInt(du)+'"';
+                        console.log(_item.audio.audioOftenText);
                     }
                 }
             })
@@ -651,6 +655,7 @@ export default {
                                     audioObj.audioSrc=_item.url;
                                     audioObj.audioRef='audioRef'+index;
                                     audioObj.isPlaying=false;
+                                    audioObj.audioOftenText='';
                                     obj.showAudio=true;
                                 }
                                 else{
@@ -664,7 +669,6 @@ export default {
 
                     })
                    self.commentList=temp.slice(0,temp.length-1);
-                   //self.commentList=temp;
                 }
             })
         },
@@ -770,14 +774,15 @@ export default {
         let self=this;
         self.getSessionData();  //获取session中存储的event信息
         self.getCommentList();  //获取comment信息
-        this.$nextTick(function(){
+        self.$nextTick(function(){
             setTimeout(()=>{
                 self.myfun();
             },500);
-            setTimeout(()=>{
+            setTimeout(() => {
                 self.getProcess();
-            },3000);
+            }, 3000);
         })
+        
         window.onresize=function(){
             if(!self.checkFull()){
                 self.fullScreen=false;
