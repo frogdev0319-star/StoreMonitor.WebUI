@@ -129,7 +129,7 @@
                                 :current-page="page"
                                 background
                                 small
-                                layout="jumper,prev,pager,next">
+                                layout="jumper,total,prev,pager,next">
                             </el-pagination>
                         </div>
                     </el-col>
@@ -202,6 +202,7 @@ export default {
             nvrData:[],
             //the filter flag
             nvrFilter:true,
+            nvrFilterName:'',
             storeFilter:true,
             channelFilter:true,
             channelNumFilter:true,
@@ -408,6 +409,9 @@ export default {
                         if(res.errMsg=='Success'&&res.errCode==0){
                             self.dash=data;
                         }
+                        else{
+                            self.dash={'url':'','httpCmdPort':'','httpsCmdPort':'','dataPort':''}
+                        }
                     });
                 break;
                 case 1:
@@ -458,6 +462,7 @@ export default {
             self.nvrFilter=!self.nvrFilter;
             console.log(self.nvrFilter);
             self.page=1;
+            self.nvrFilterName='name';
             let params={
                 "filter": {
                     "page": self.page-1,
@@ -475,6 +480,7 @@ export default {
             self.storeFilter=!self.storeFilter;
             console.log(self.storeFilter);
             self.page=1;
+            self.nvrFilterName='storeName';
             let params={
                 "filter": {
                     "page": self.page-1,
@@ -532,7 +538,7 @@ export default {
             let params={
                 "filter": {
                     "page": 0,
-                    "size": self.sizeNum
+                    "size": 1000
                 }
             };
             return new Promise((resolve,reject)=>{
@@ -549,6 +555,7 @@ export default {
         async addAllData(paramsNVR,paramsDevice){
             let self=this;
             let data=await self.getAllNVRData();
+            self.channelData=await self.getChannelData();
             console.log(data);
             let nvrList=[];
             let channelList=self.channelData.map(x=>x.id);
@@ -937,8 +944,8 @@ $mainColor:#f31d65;
         position: relative;
         bottom: 3px;
     }
-    &:nth-child(3){
-        border-left-width: 0px;
+    &:first-child{
+        border-right-width: 0px;
     }
     &:last-child{
         border-left-width: 0px;

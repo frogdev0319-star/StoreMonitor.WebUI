@@ -17,9 +17,9 @@
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 @change="dateChange"
-                @focus="focusDate"
                 :default-time="defaultTime">
             </el-date-picker>
+                            <!-- @focus="focusDate" -->
             <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
                 placement="bottom-end">
                 <div slot="content">*最长搜索时间为一个月</div>
@@ -240,10 +240,10 @@ export default {
         }
     },
     methods:{
-        focusDate(val){
+        /*focusDate(val){
             let self=this;
             console.log(val);
-        },
+        },*/
         dateChange(val){
             let self=this;
             console.log(val);
@@ -258,8 +258,6 @@ export default {
                     type:'warning',
                     duration:3*1000
                 })
-                // self.$refs.datePicker.pickerVisible=true;
-                // return false;
                 start=end-3600*24*30*1000;
                 self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
             }
@@ -268,7 +266,6 @@ export default {
             self.params.like={};
             self.params.beginTs=start;
             self.params.endTs=end;
-            //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             let selectValue=self.value;
             let status=[];
@@ -284,7 +281,6 @@ export default {
             console.log(val.index);
             let selectValue=self.value;
             let tabIndex=Number(val.index);
-            //self.page=1;
             switch(tabIndex){
                 case 0:
                 if(selectValue==0||selectValue==1){
@@ -321,7 +317,6 @@ export default {
             let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
             self.params.beginTs=start;
             self.params.endTs=end;
-            //self.params.filter={page:self.page-1,size:self.tableDataList[tabIndex].sizeNum};
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             this.getEventList(this.params);
         },
@@ -391,7 +386,6 @@ export default {
             }
 
             self.serachData='';
-            //self.page=1;
             self.tableDataList[tabIndex].page=1;
             self.params.like={};
 
@@ -399,7 +393,6 @@ export default {
             let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
             self.params.beginTs=start;
             self.params.endTs=end;
-            //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             self.getEventList(self.params);
             let status=[];
@@ -488,7 +481,6 @@ export default {
             else{
                 self.params.like={};
             }
-            //self.params.filter={page:0,size:self.tableDataList[tabIndex].sizeNum};
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             self.getEventList(self.params);
             
@@ -522,7 +514,6 @@ export default {
             console.log(col);
             let self=this;
             let tabIndex=Number(self.activeName);
-            //self.page=1;   //页码置为1
             self.tableDataList[tabIndex].page=1;
             let column=col.column;
             let order=col.order;
@@ -797,13 +788,14 @@ export default {
         self.getInitList();
     },
     beforeRouteEnter (to, from, next) {
+        if(from.name!='事件详情'&&from.path!='/'){
+            to.meta.keepAlive=false;
+        }
+        else{
+            to.meta.keepAlive=true;
+        }
         next(vm => {
-            if(from.name!='事件详情'){
-                to.meta.keepAlive=false;
-            }
-            else{
-                to.meta.keepAlive=true;
-            }
+           console.log(vm);
         });
     },
     activated(){

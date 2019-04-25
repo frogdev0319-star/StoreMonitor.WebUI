@@ -356,6 +356,7 @@
 import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
 import util from '@/common/util'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
+import {getUserInfo} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {getStorageInfo} from '@/api/event'
 import {getDeviceList} from '@/api/device'
@@ -698,7 +699,7 @@ export default {
             }
             self.activeIndex='0';
             self.showGuide=true;
-            self.accountId=sessionStorage.getItem('oss_bucket');
+            self.accountId=localStorage.getItem('oss_bucket');
             self.getFaStoreData();
             self.getInitStoreData();
             self.getDeviceList();
@@ -719,11 +720,30 @@ export default {
                 }
             }
         },
-        getOssInfo(){
+        getAccountId(){
             let self=this;
-            self.accountId=sessionStorage.getItem('oss_bucket');
             let userId=getCookie('UserId');
             self.userId=userId;
+            return new Promise((resolve,reject)=>{
+                getUserInfo().then(res=>{
+                    console.log(res);
+                    res.data.forEach(item=>{
+                        if(item.userId==userId){
+                            let accountId=item.accountId.toLowerCase();
+                            self.accountId=accountId;
+                            localStorage.setItem('oss_bucket',accountId);
+                            resolve(accountId);
+                        }
+                    })
+                }) 
+            })
+            
+        },
+        async getOssInfo(){
+            let self=this;
+            let accountId=await self.getAccountId();
+            console.log(accountId);
+            self.accountId=localStorage.getItem('oss_bucket');
             getStorageInfo().then(res=>{
                 console.log(res);
                 if(res.errCode==0){
@@ -1897,6 +1917,9 @@ export default {
         },
         async realTime(){
             let self=this;
+            if(self.channel==null){
+                return false;
+            }
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             // if(!self.showVideo){
@@ -2134,10 +2157,7 @@ export default {
             if(self.playState){
                 self.stopRealTime();
             }
-            else{
-                //self.destroyVideo();
-                self.showGuide=true;
-            }
+            self.showGuide=true;
             let obj={};
             obj.storeId=_item.storeId;
             obj.storeName=_item.name;

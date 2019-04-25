@@ -99,7 +99,7 @@
             
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="wrapperAll
-                    ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}">
+                    ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}" v-if="!showHeader">
                     <keep-alive>
                         <router-view v-if="$route.meta.keepAlive"></router-view>
                     </keep-alive>
@@ -141,7 +141,9 @@ export default {
             wapper:false,
             curBrand:'',
             brandList:[],
-            accountId:''
+            accountId:'',
+            roleId:0,
+            showHeader:false,
         }
     },
     computed:{
@@ -280,6 +282,8 @@ export default {
                 console.log(res);
                 if(res.errCode==0){
                     self.$route.meta.keepAlive=false;
+                    let accountId=accountId.toLowerCase();
+                    localStorage.setItem('oss_bucket',accountId);
                     self.getUserName();
                 }
             });
@@ -295,12 +299,12 @@ export default {
                         self.userName=item.userName.length>10?item.userName.substr(0,10)+'...':item.userName;
                         self.accountId=item.accountId;
                         let accountId=item.accountId.toLowerCase();
-                        sessionStorage.setItem('oss_bucket',accountId);
+                        localStorage.setItem('oss_bucket',accountId);
+                        self.roleId=item.roleId;
                     }
                 })
             }) 
         }
-
     },
     created(){
         let self=this;

@@ -18,7 +18,8 @@ const user={
         setting:{
             articlePlatform:[]
         },
-        accountChanged:0
+        accountChanged:0,
+        accountId:''
     },
     mutations:{
         SET_CODE: (state, code) => {
@@ -50,6 +51,9 @@ const user={
         },
         Account_Changed:(state,accountChanged)=>{
             state.accountChanged=accountChanged
+        },
+        SET_ACCOUNTID:(state,accountId) => {
+            state.accountId=accountId
         }
     },
     actions:{
@@ -76,7 +80,6 @@ const user={
             })
         },
         changeAccount({commit},params){
-
             return new Promise((resolve,reject)=>{
                 changeAccount(params).then(res=>{
                     if(res.errCode==0){

@@ -330,6 +330,11 @@ import PubSub from 'pubsub-js'
                 let self=this;
                 self.page=val;
                 self.getStoreList(self.params);
+                let dom=document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+                let offestTop=dom.offsetTop;
+                if(dom!=undefined){
+                    document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop=0;
+                }
             },
             getCityByProvince(province){
                 let self=this;

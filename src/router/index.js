@@ -8,15 +8,15 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
-    // {
-    //   path:'/login',
-    //   name:'Login',
-    //   hidden: true,
-    //   component:LoginForm,
-    //   meta:{
-    //     requireAuth: false,
-    //   }
-    // },
+    {
+      path:'/login',
+      name:'Login',
+      hidden: true,
+      component:LoginForm,
+      meta:{
+        requireAuth: false,
+      }
+    },
     {
       path:'/',
       name:'AuthRedirect',
@@ -96,6 +96,29 @@ export default new Router({
               path:'/storemonitor/submit',
               name:'提交事件',
               component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
+            }
+          ]
+        },
+        {
+          path:'/report',
+          name:'巡检报告',
+          component:resolve=>require(['@/views/patrolShop/InspectReportList'],resolve),
+          meta:{
+            requireAuth: true,
+            keepAlive:true,
+          },
+          isReadOnly:false,
+        },
+        {
+          path:'/reportdetails',
+          name:'巡检报告',
+          component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
+          hidden:true,
+          children:[
+            {
+              path:'/storemonitor/submit',
+              name:'报告详情',
+              component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
             }
           ]
         },
@@ -277,8 +300,8 @@ export default new Router({
         {
           path:'/other',
           name:'其他设置',
-          isReadOnly:true,
-          component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
+          isReadOnly:false,
+          component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
         }
       ]
     }

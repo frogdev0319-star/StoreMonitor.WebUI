@@ -635,6 +635,8 @@ export default {
         //离开页面的同时应该停止播放视频
         let self=this;
         window.clearInterval(self.timeid);
+        window.clearInterval(self.timerPlayReal);
+        self.timerPlayReal=null;
         self.timeid=null;
         if(self.playState){ 
             self.stopRealTime();
@@ -675,7 +677,7 @@ export default {
                 self.stopRealTime();
             }
             self.activeIndex='0';
-            self.accountId=sessionStorage.getItem('oss_bucket');
+            self.accountId=localStorage.getItem('oss_bucket');
             self.hideLast=false;
             self.hideNext=false;
             self.evBtns[0].isActive=true;
@@ -719,7 +721,7 @@ export default {
         },
         getOssInfo(){
             let self=this;
-            self.accountId=sessionStorage.getItem('oss_bucket');
+            self.accountId=localStorage.getItem('oss_bucket');
             let userId=getCookie('UserId');
             self.userId=userId;
             getStorageInfo().then(res=>{
@@ -1416,6 +1418,7 @@ export default {
             }
             self.showCutDialog=true;
             this.$nextTick(()=>{
+                self.imageCanvasList=[];
                 if(self.playBackState){
                     let video=document.getElementById('previewVideo');
                     self.cutDialogcurTime=video.player.currentTime();

@@ -88,7 +88,7 @@
                         <div class="speech-info" @click="startSpeech"> 
                             <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
                         </div>
-                        <audio :ref="audioRef" id="audio">
+                        <audio :ref="audioRef" id="audio" @canplay="getDuration">
                             <source :src="audioSrc" type="audio/mpeg" />
                         </audio> 
                         <span class="often-text">{{audioOftenText}}</span>
@@ -152,7 +152,7 @@
                                     <div class="speech-info" @click="startSpeechItem(item,index)">
                                         <i class="iconfont icon-yuyin icon-speech"></i>
                                     </div>
-                                    <audio :ref="item.audio.audioRef">
+                                    <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)">
                                         <source :src="item.audio.audioSrc" type="audio/mpeg" />
                                     </audio>
                                     <span class="often-text">{{item.audio.audioOftenText}}</span>
@@ -527,7 +527,7 @@ export default {
             self.sourceList=temp;
             console.log(self.event);
         },
-        getProcess(){
+        getDuration(){
             let self=this;
             if(self.showAudio){
                 let audio=self.$refs.audioRef;
@@ -539,20 +539,20 @@ export default {
                     self.audioOftenText=parseInt(du)+'"';
                 }
             }
-            self.commentList.forEach((_item,_index)=>{
-                if(_item.showAudio){
-                    let audio=self.$refs[_item.audio.audioRef][0];
-                    let du=audio.duration;
-                    if(isNaN(du)){
-                        _item.showAudio=false;
-                    }
-                    else{
-                        _item.audio.audioOftenText=parseInt(du)+'"';
-                        console.log(_item.audio.audioOftenText);
-                    }
+        },
+        getCommentDuration(item){
+            let self=this;
+            if(item.showAudio){
+                let audio=self.$refs[item.audio.audioRef][0];
+                let du=audio.duration;
+                if(isNaN(du)){
+                    item.showAudio=false;
                 }
-            })
-            console.log(self.commentList);
+                else{
+                    item.audio.audioOftenText=parseInt(du)+'"';
+                    console.log(item.audio.audioOftenText);
+                }
+            }
         },
         getCommentProcess(){
             let self=this;
@@ -573,9 +573,6 @@ export default {
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
                 self.speech=true;
-                // self.timeid=setInterval(()=>{
-                //     self.getProcess();
-                // },3000);
             }
             else{
                 self.$refs.audioRef.pause();
@@ -596,9 +593,11 @@ export default {
                 item.audio.isPlaying=false;
             }
             self.commentList.forEach((_item,_index)=>{
-                if(_index!=index){
-                    self.$refs[_item.audio.audioRef][0].pause();
-                    _item.audio.isPlaying=false;
+                if(_item.audio!=undefined){
+                    if(_index!=index){
+                        self.$refs[_item.audio.audioRef][0].pause();
+                        _item.audio.isPlaying=false;
+                    }
                 }
             })
         },
@@ -703,7 +702,9 @@ export default {
                     self.getCommentList();
                     self.eventDes='';
                     setTimeout(()=>{
-                        self.getCommentProcess();
+                        self.commentList.forEach((_item,_index)=>{
+                            self.getCommentDuration(_item);
+                        });
                     },3000);
                 }
                 else{
@@ -779,8 +780,12 @@ export default {
                 self.myfun();
             },500);
             setTimeout(() => {
-                self.getProcess();
-            }, 3000);
+                self.getDuration();
+                self.commentList.forEach((_item,_index)=>{
+                    self.getCommentDuration(_item);
+                });
+            }, 0);
+            
         })
         
         window.onresize=function(){

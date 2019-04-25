@@ -255,6 +255,10 @@ export default {
             };
             if(self.scheduleData.length==0){
                 let resUpdateStore=null;
+                if(self.curPerson==null||self.curPerson.length==0){
+                    self.notify('请选择门店负责人！','warning',3000);
+                    return false;
+                }
                 if(self.curPerson.length!=0&&(self.userId!=self.curPerson)){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
                 }

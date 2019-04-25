@@ -131,4 +131,18 @@ export const getInspectBindCount=data=>{
         data
     })
 }
+export const getInspectReportInfo=data=>{
+    return request({
+        url:'/inspect/report/info',
+        method:'post',
+        data
+    })
+}
+export const getInspectReportList=data=>{
+    return request({
+        url:'/inspect/report/list',
+        method:'post',
+        data
+    })
+}
 

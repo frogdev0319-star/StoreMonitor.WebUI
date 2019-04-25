@@ -63,12 +63,6 @@ router.beforeEach((to,from,next)=>{
       let url=sessionStorage.getItem('LoginURL');
       window.location.href=url;
     }
-    // else{
-    //   next({
-    //     path:'/login',
-    //     query:{redirect:to.fullPath}
-    //   })
-    // }
   }
   else{
     next();
