@@ -198,6 +198,18 @@ export default {
         dateStr=years+'-'+month+'-'+day+' '+hour+':'+min+':'+second;
         return dateStr;
     },
+    getDateStr1(ts){
+        let dateStr='';
+        let t=new Date(ts);
+        let years=t.getFullYear();
+        let month=(t.getMonth()+1)<10?'0'+(t.getMonth()+1):(t.getMonth()+1);
+        let day=t.getDate()<10?'0'+t.getDate():t.getDate();
+        let hour=t.getHours()<10?'0'+t.getHours():t.getHours();
+        let min=t.getMinutes()<10?'0'+t.getMinutes():t.getMinutes();
+        let second=t.getSeconds()<10?'0'+t.getSeconds():t.getSeconds();
+        dateStr=years+'-'+month+'-'+day+' '+hour+':'+min+':'+second;
+        return dateStr;
+    },
     getErrorText(errorCode){
         let msg='';
         switch(errorCode){

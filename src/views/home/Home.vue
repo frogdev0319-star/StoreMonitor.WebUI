@@ -100,16 +100,30 @@
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="wrapperAll
                     ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}" v-if="!showHeader">
-                    <keep-alive>
-                        <router-view v-if="$route.meta.keepAlive"></router-view>
-                    </keep-alive>
+                        <keep-alive>
+                            <router-view v-if="$route.meta.keepAlive"></router-view>
+                        </keep-alive>
                         <router-view v-if="!$route.meta.keepAlive"></router-view>
+                        <!-- <keep-alive :include="cachePath">
+                            <router-view></router-view>
+                        </keep-alive>
+                        <router-view></router-view> -->
+                    </el-col>
+                    <el-col class='wrapper-header' v-else>
+                        <keep-alive>
+                            <router-view v-if="$route.meta.keepAlive"></router-view>
+                        </keep-alive>
+                        <router-view v-if="!$route.meta.keepAlive"></router-view>
+                        <!-- <keep-alive :include="cachePath">
+                            <router-view></router-view>
+                        </keep-alive> -->
                     </el-col>
                     <el-col :sapn='24' class="footercontent">
                         <footer class="footerInfo">
                             <p style="text-align:left;">Version 1.0.1&copy; 2018-2019 Storeviu Corp. All rights reserved</p>
                         </footer>
                     </el-col>
+                   
                 </section>
             </el-col>
         </el-row>
@@ -143,7 +157,6 @@ export default {
             brandList:[],
             accountId:'',
             roleId:0,
-            showHeader:false,
         }
     },
     computed:{
@@ -165,8 +178,18 @@ export default {
                 return true;
             }
         },
+        showHeader(){
+            let flag=false;
+            if((this.$route.path=='/report')){
+                flag= true;
+            }
+            return flag;
+        },
         curPath(){
             return this.route.path
+        },
+        cachePath(el){
+            return this.$store.state.cachePath;
         },
         ...mapGetters([
             'token',
@@ -614,6 +637,17 @@ export default {
                 background: #fff;
                 @include point(margin-right,50);
             }
+            // .wrapper-all-header{
+            //     height: 93%;
+            //     border:1px solid #e3e9f4;
+            //     width:auto;
+            // }
+            .wrapper-header{
+                height: auto;
+                // border:1px solid #e3e9f4;
+                // width: 96.5%;
+                margin-bottom: calc(10/1920*100vw);
+            }
             .footercontent{
                 padding:0px 0 10px 60px;
                 color:#777;
@@ -649,7 +683,8 @@ export default {
         }
         .sec-collapsed{
             margin-left:65px;
-            width:95.5%;
+            //width:95.5%;
+            width: auto;
         }
         .sec-uncoll{
             margin-left:16.9%;

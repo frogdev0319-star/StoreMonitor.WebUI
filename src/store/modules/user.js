@@ -19,7 +19,8 @@ const user={
             articlePlatform:[]
         },
         accountChanged:0,
-        accountId:''
+        accountId:'',
+        cachePath:[""]
     },
     mutations:{
         SET_CODE: (state, code) => {
@@ -54,6 +55,9 @@ const user={
         },
         SET_ACCOUNTID:(state,accountId) => {
             state.accountId=accountId
+        },
+        newCachePath(state,msg){
+            state.cachePath=msg
         }
     },
     actions:{

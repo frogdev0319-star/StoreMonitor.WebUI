@@ -2,7 +2,7 @@
     <div class="el-event-content" :style="{'height':windowHeight-118+'px'}">
        <div class="el-date">
             <span class="date-title">起止时间</span>
-            <el-date-picker
+            <el-date-picker v-if="false"
                 ref="datePicker"
                 v-model="dateValue"
                 type="datetimerange"
@@ -19,7 +19,7 @@
                 @change="dateChange"
                 :default-time="defaultTime">
             </el-date-picker>
-                            <!-- @focus="focusDate" -->
+            <input type="text" id="dateinput" v-model="dateInputStr" readonly @focus="getNewestDate">
             <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
                 placement="bottom-end">
                 <div slot="content">*最长搜索时间为一个月</div>
@@ -43,7 +43,6 @@
                 v-model="serachVale" @clear="searchEventList(true)" @keyup.enter.native="searchEventList(true)">
                 <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
             </el-input>
-            <!-- <input type="text" id="test1"> -->
        </div>
         <div class="el-table-content">
             <el-button type="primary" size="mini" class="export-btn" @click="export2Excel">
@@ -139,6 +138,7 @@ export default {
     data(){
         return{
             dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
+            dateInputStr:'',
             dateOpt: {
                 disabledDate:(time)=>{
                     return time.getTime() > Date.now();
@@ -244,6 +244,61 @@ export default {
             let self=this;
             console.log(val);
         },*/
+        dealDateStr(val){
+            let dateRet='';
+            let startStr=val.split('~')[0];
+            let endStr=val.split('~')[1];
+            let start=new Date(startStr).getTime();
+            let end=new Date(endStr).getTime();
+
+            let todayFullYear=new Date().getFullYear();
+            let todayMonth=(new Date().getMonth()+1)<10?'0'+(new Date().getMonth()+1):(new Date().getMonth()+1);
+            let todayDate=new Date().getDate()<10?'0'+(new Date().getDate()):(new Date().getDate());
+            let nowHour=new Date().getHours()<10?'0'+(new Date().getHours()):(new Date().getHours());
+            let nowMin=new Date().getMinutes()<10?'0'+(new Date().getMinutes()):(new Date().getMinutes());
+            let nowSec=new Date().getSeconds()<10?'0'+(new Date().getSeconds()):(new Date().getSeconds());
+            
+            let endFullYear=new Date(endStr).getFullYear();
+            let endMonth=new Date(endStr).getMonth()+1<10?('0'+(new Date(endStr).getMonth()+1)):new Date(endStr).getMonth()+1;
+            let endDate=new Date(endStr).getDate()<10?'0'+new Date(endStr).getDate():new Date(endStr).getDate(); 
+            if(todayFullYear==endFullYear&&todayMonth==endMonth&&todayDate==endDate){  //截至日期选的是今天
+                //dateRet=startStr
+            }
+        },
+        dateChangeInput(val){
+            let self=this;
+            console.log(val);
+            let startStr=val.split('~')[0];
+            let endStr=val.split('~')[1];
+            let start=new Date(startStr).getTime();
+            let end=new Date(endStr).getTime();
+
+            if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
+                Message({
+                    message:'当前选择时间范围最大为一个月，已调整！',
+                    type:'warning',
+                    duration:3*1000
+                })
+                start=end-3600*24*30*1000;
+                let initDateStr=util.getDateStr1(start)+' ~ '+util.getDateStr1(end);
+                self.dateInputStr=initDateStr;
+            }
+            self.serachData='';
+            let tabIndex=Number(self.activeName);
+            self.tableDataList[tabIndex].page=1;
+            self.params.like={};
+            self.params.beginTs=start;
+            self.params.endTs=end;
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+            let selectValue=self.value;
+            let status=[];
+            self.getEventList(self.params);
+            switch(selectValue){
+                case 0:status=[0,1,2];break;
+                default:status=selectValue-1;break;
+            }
+            self.getEventCount(start,end,status);
+        },
         dateChange(val){
             let self=this;
             console.log(val);
@@ -313,8 +368,14 @@ export default {
             else{
                 self.params.like={};
             }
-            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+            //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            let dateval=self.dateInputStr;
+            let startStr=dateval.split('~')[0];
+            let endStr=dateval.split('~')[1];
+            let start=new Date(startStr).getTime();
+            let end=new Date(endStr).getTime();
+
             self.params.beginTs=start;
             self.params.endTs=end;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
@@ -389,8 +450,14 @@ export default {
             self.tableDataList[tabIndex].page=1;
             self.params.like={};
 
-            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+            //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            let dateval=self.dateInputStr;
+            let startStr=dateval.split('~')[0];
+            let endStr=dateval.split('~')[1];
+            let start=new Date(startStr).getTime();
+            let end=new Date(endStr).getTime();
+
             self.params.beginTs=start;
             self.params.endTs=end;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
@@ -484,8 +551,14 @@ export default {
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             self.getEventList(self.params);
             
-            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+            //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            let dateval=self.dateInputStr;
+            let startStr=dateval.split('~')[0];
+            let endStr=dateval.split('~')[1];
+            let start=new Date(startStr).getTime();
+            let end=new Date(endStr).getTime();
+
             let status=[];
             let selectValue=self.value;
             switch(selectValue){
@@ -658,7 +731,6 @@ export default {
             eventRESTful.getEventCount(params).then(res=>{
                 let data=res.data;
                 let errMsg=res.errMsg;
-                console.log(errMsg);
                 self.tableDataList[0].eventCount=data.assigned;
                 self.tableDataList[1].eventCount=data.reported;
                 self.tableDataList[2].eventCount=data.total;
@@ -774,6 +846,41 @@ export default {
                 console.log(err);
             })
         },
+        getInitDateStr(){
+            let self=this;
+            let dateRetStr='';
+            let startStr=self.dateInputStr.split('~')[0];
+            let endStr=self.dateInputStr.split('~')[1];
+            let formatDate=function(datetype){
+                return datetype<10?('0'+datetype):datetype;
+            }
+            let getDateObj=dateStr=>{
+                let obj={
+                    year:new Date(dateStr).getFullYear(),
+                    month:formatDate(new Date(dateStr).getMonth()+1),
+                    date:formatDate(new Date(dateStr).getDate()),
+                    hour:formatDate(new Date(dateStr).getHours()),
+                    minutes:formatDate(new Date(dateStr).getMinutes()),
+                    second:formatDate(new Date(dateStr).getSeconds())
+                }
+                return obj;
+            }
+            let nowHours=formatDate(new Date().getHours());
+            let nowMin=formatDate(new Date().getMinutes());
+            let nowSecond=formatDate(new Date().getSeconds());
+            let start=getDateObj(startStr);
+            let end=getDateObj(endStr);
+            let startRet=start.year+'-'+start.month+'-'+start.date+' '+nowHours+':'+nowMin+':'+nowSecond;
+            let endRet=end.year+'-'+end.month+'-'+end.date+' '+nowHours+':'+nowMin+':'+nowSecond;
+            dateRetStr=startRet+' ~ '+endRet;
+            return dateRetStr;
+        },
+        getNewestDate(){
+            let self=this;
+            let dateStr=self.getInitDateStr();
+            console.log(dateStr);
+            //self.dateInputStr=dateStr;
+        }
     },
     async mounted(){
         let self=this;
@@ -786,6 +893,44 @@ export default {
         console.log(self.tableHeight);
         self.getUserId();
         self.getInitList();
+
+        let initDateStr=util.getDateStr1(new Date().getTime()-3600*1000*24)+' ~ '+util.getDateStr1(new Date().getTime());
+        self.dateInputStr=initDateStr;
+        var ins1=laydate.render({
+            elem: '#dateinput',
+            type: 'datetime',
+            range: '~',
+            value: initDateStr,
+            btns: ['clear','confirm'],
+            max:util.getDateStr1(new Date().getTime()),
+            /*ready: function(date){
+                console.log(date);
+                console.log(self.dateInputStr);
+                let dateStr=self.getInitDateStr();
+                console.log(dateStr);
+                self.dateInputStr=dateStr;
+                ins1.config.value=dateStr;
+                //ins1.hint(dateStr); /*打开后的提示信息*/
+        //},
+            done: (value) => {
+                console.log(value);
+                self.dateInputStr = value;
+                self.dateChangeInput(value);
+                //ins1.hint(value);
+            }
+        });
+    },
+    beforeRouteLeave (to, from, next) {
+        if(to.name=='事件详情'){
+            if(!from.meta.keepAlive){
+                from.meta.keepAlive=true;
+            }
+        }
+        else{
+            from.meta.keepAlive=false;
+            //this.$destroy();
+        }
+        next();
     },
     beforeRouteEnter (to, from, next) {
         if(from.name!='事件详情'&&from.path!='/'){
@@ -913,24 +1058,27 @@ $h1:#292e36;
     @include point(font-size,22);
     color: #53c247;
 }
+#dateinput{
+    width: calc(300/1920*100vw);
+    height: calc(24/1920*100vw);
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    padding-left: 30px;
+    font-size: 12px;
+}
+</style>
+<style scoped>
+    .el-select >>> .el-input__inner{
+        background: #F4F5F9 !important;
+        border-radius: 0px !important;
+        border: 0 !important;
+    }
 </style>
 <style>
  @import '../../assets/css/pagination.css';
-    /* input#test1{
-        width: 260px;
-        height: 26px;
-        padding-left: 20px;
-        border: 1px solid #DCDFE6;
-        border-radius: 4px;
-        font-size: 12px;
-        color: #606266;
-    }
     .layui-laydate .layui-this{
-        background-color: #f31d65 !important;
+        background-color:#f31d65 !important;
     }
-    .layui-laydate-content td.laydate-selected{
-        background-color: rgba(251,76,93, 0.2) !important;
-    } */
     .el-table::before{
         height: 0px !important;
     }

@@ -59,13 +59,9 @@ input:disabled{
 }
 .el-dialog__header{
     overflow: hidden !important;
-    /* padding-bottom: 0 !important;
-    padding-top: 10px !important;
-    padding-left: 15px !important; */
 }
 .el-dialog__body{
     padding: 0px !important;
-    /* padding-bottom: 5px !important; */
 }
 .el-dialog__title{
     font-size: 14px !important;

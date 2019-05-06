@@ -231,10 +231,17 @@
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
-                            <span v-for="(_item,_index) in item.storeList" :key="_index" class="store-name"
+                            <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="store-name"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
-                            </span>
+                            </span> -->
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="store-name" :class="_item.isActive?'activeClass':''" 
+                             @click="clickStore(item,index,_item,_index)">
+                                <el-tooltip class="item" effect="dark" :content="_item.name" 
+                                    placement="bottom">
+                                    <span>{{_item.name}}</span>
+                                </el-tooltip>
+                            </div>
                         </div>
                         
                         <div class="storeList-content" v-else>
@@ -247,10 +254,17 @@
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
-                                <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" 
+                                <!-- <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" 
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
                                     {{itemDs.name}}
-                                </span>
+                                </span> -->
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :class="itemDs.isActive?'activeClass':''" 
+                                @click="clickStore(item,index,itemDs,indexDs)">
+                                    <el-tooltip class="item" effect="dark" :content="itemDs.name" 
+                                        placement="bottom">
+                                        <span>{{itemDs.name}}</span>
+                                    </el-tooltip>
+                                </div>
                             </div>
                         </div>
                     </el-scrollbar>
@@ -488,6 +502,7 @@ export default {
             protocal:'DASH',
             sessionId:'',
             channel:{},
+            isPlayingFlag:-1,   //判断当前是否正在播放实时视频
             evBtns:[{'name':'创建问题','isActive':true},{'name':'关联问题','isActive':false}],
             eventList:[],
             curEvent:'',
@@ -564,7 +579,7 @@ export default {
             },
             noBindDeviceObj:{
                 title:'提示',
-                showInfo:'当前门店的巡检项未绑定设备！',
+                showInfo:'当前门店未绑定设备！',
                 isWarning:false,
                 dialogCosed:false
             },
@@ -584,7 +599,8 @@ export default {
             videoSpeedId:0,
             timerPlayReal:null,
             realTimeSpeed:0,
-            cutDialogcurTime:0
+            cutDialogcurTime:0,
+            
         }
     },
     computed:{
@@ -623,6 +639,13 @@ export default {
         }
     },
     beforeRouteEnter (to, from, next) {
+        console.log(from);
+        if(from.name=='提交事件'){
+            to.meta.keepAlive=true;
+        }
+        else{
+            to.meta.keepAlive=false;
+        }
         next(vm => {
             //if(to.params.flag){
                 //vm.clearEvent();
@@ -636,6 +659,7 @@ export default {
         let self=this;
         window.clearInterval(self.timeid);
         window.clearInterval(self.timerPlayReal);
+        self.isPlayingFlag=-1;
         self.timerPlayReal=null;
         self.timeid=null;
         if(self.playState){ 
@@ -668,6 +692,24 @@ export default {
                 ele.style.height = "auto";
             }
         }
+        /**
+         * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
+         */
+        window.addEventListener("visibilitychange",()=>{
+            if(document.hidden){
+                console.log("我暂时离开页面了");
+                if(self.playState&&!self.playBackState){  //当前播放的是实时视频
+                    self.stopRealTimeVisPage();
+                    window.clearInterval(self.timerPlayReal);
+                }
+            }else{
+                console.log("我进入页面了");
+                console.log(self.playBackState);
+                if(self.isPlayingFlag==1){
+                    self.realTime();
+                }
+            }
+        })
     },
     methods:{
         changeBrand(){
@@ -682,7 +724,6 @@ export default {
             self.hideNext=false;
             self.evBtns[0].isActive=true;
             self.evBtns[1].isActive=false;
-            //self.corEvent=false;
             self.getInitStoreData();
             self.getFaStoreData();
         },
@@ -731,10 +772,11 @@ export default {
             })
         },
         clearEvent(){
-            let _this=this;
-            _this.eventName='';
-            _this.eventDes='';
-            _this.sourceList=[];
+            let self=this;
+            self.eventName='';
+            self.eventDes='';
+            self.sourceList=[];
+            self.curEvent=''
         },
         getFaStoreList(){
             let self=this;
@@ -1009,8 +1051,8 @@ export default {
             let self=this;
             self.eventName='';
             self.eventDes='';
+            self.curEvent='';
             if(index==1){
-                //self.corEvent=true;
                 item.isActive=true;
                 self.evBtns[0].isActive=false;
                 let data=await self.getEventList();
@@ -1028,7 +1070,6 @@ export default {
                 self.eventList=temp;
             }
             else{
-                //self.corEvent=false;
                 item.isActive=true;
                 self.evBtns[1].isActive=false;
             }
@@ -1359,7 +1400,7 @@ export default {
                         ts:new Date().getTime(),
                         description:self.eventDes.trim(),
                         attachment:tempFileUrl,
-                        status:1
+                        status:0
                     }
                 };
                 let curTs=util.getCurDate2StrBySign('/');
@@ -1810,6 +1851,7 @@ export default {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
                 if(!self.playBackState){
+                    self.isPlayingFlag=1;
                     self.timerPlayReal=window.setInterval(()=>{
                         self.realTimeSpeed=self.realTimeSpeed+1;
                     },1000);
@@ -1832,6 +1874,21 @@ export default {
             self.previewplayer = videojs(video);
             self.previewplayer.pause();
         },
+        async stopRealTimeVisPage(){
+            let self=this;
+            self.stopVideo();
+            const data = {
+                request: { 
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            let ret=await dashAPI.RealTime(0,data);
+            await dashAPI.Offline(self.sessionId);
+        },
         async stopRealTime(...val){
             console.log(val);
             let self=this;
@@ -1852,6 +1909,7 @@ export default {
             else{
                 let ret=await dashAPI.RealTime(0,data);
                 await dashAPI.Offline(self.sessionId);
+                self.isPlayingFlag=-1;
             }
         },
         async stopHDash(){
@@ -2292,7 +2350,9 @@ export default {
                     },1000);
                 }
                 else{
+                    self.isPlayingFlag=1;
                     self.realTimeSpeed=0;
+
                     self.timerPlayReal=window.setInterval(()=>{
                         self.realTimeSpeed=self.realTimeSpeed+1;
                     },1000);
@@ -3370,12 +3430,13 @@ export default {
                         cursor: pointer;
                         @include point(width,90);
                         @include point(padding,6);
-                        white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-                        overflow: hidden; //隐藏超出单元格的部分。
-                        text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                        
                         span{
                             width: 100%;
                             display: block;
+                            white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+                            overflow: hidden; //隐藏超出单元格的部分。
+                            text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
                         }
                     }
                     .citys{

@@ -11,7 +11,7 @@ let base ='http://222.91.163.149:18081'
 
 
 
-let itempath='/storemonitor/api/v1.0'
+let itempath='/storemonitor/api/'
 //配置
 axios.defaults.withCredentials = true;
 const service=axios.create({

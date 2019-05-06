@@ -68,3 +68,19 @@ router.beforeEach((to,from,next)=>{
     next();
   }
 })
+
+// Vue.mixin({
+//   beforeRouteLeave (to, from, next) {
+//     if(from.name=='事件管理'&&to.name=='事件详情'){ //从事件管理页面进入详情页面
+//       this.$store.commit('newCachePath',from.path.split('/'));
+//     }
+//     else if(from.name=='事件详情'&&to.name=='事件管理'){
+//       this.$store.commit('newCachePath',to.path.split('/'));
+//     }
+//     else if(from.name=='事件管理'&&to.name!='事件详情'){
+//       this.$destroy();
+//       //this.$store.commit('newCachePath',from.path.split('/'));
+//     }
+//     next();
+//   }
+// })

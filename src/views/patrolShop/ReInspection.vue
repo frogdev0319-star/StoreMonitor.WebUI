@@ -124,6 +124,28 @@
                     <el-button id="confirmBtn" @click="confirmAddFeedBack2" size="mini" type="primary">确 认</el-button>
                 </div>
             </el-dialog>
+
+            <el-dialog title='问题反馈'
+            :visible.sync="showFeedDialog3" :close-on-click-modal="false" v-if="showFeedDialog3" :width="860*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="feed-canvas-content">
+                        <video  :width="520*percentHeight" :height="340*percentHeight" id="previewCutVideo" prload controls autoplay :src="feedBackVideoFileObj.src"></video>
+                    </div>
+                    <div class="event-content">
+                        <span class="event-title">问题名称</span>
+                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title">问题描述</span>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
+                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showFeedDialog3 = false" size="mini">取 消</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack3" size="mini" type="primary">确 认</el-button>
+                </div>
+            </el-dialog>
+
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
@@ -275,8 +297,14 @@
                                             <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" ></i>
                                             <span class="feedback-eventname">{{`${index+1}. ${item.eventName}`}}</span>
                                             <span class="feedback-eventdes">{{item.eventDes}}</span>
-                                            <img v-if="item.sourceObj!=null" :src="item.sourceObj.src" 
+                                            <div class="img-content" v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
+                                                <img :src="item.sourceObj.src" 
                                             :width="item.sourceObj.width" :height="item.sourceObj.height" class="feedback-pic" @click="openOuter(item.sourceObj)"/>
+                                            </div>
+                                            <div class="img-content" v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1">
+                                                <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(item,index)"/>
+                                                <img class="imgLittle" :src="videoImgSrc" height="100"/>
+                                            </div>
                                             <hr class="feedbacks-hr"/>
                                         </div>
                                     </div>
@@ -301,10 +329,18 @@
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
-                            <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
+                            <span class="icon-info">* 未绑定巡检项的门店，无法点击切换</span>
+                            <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
-                            </span>
+                            </span> -->
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''" 
+                            :style="!_item.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}" @click="clickStore(item,index,_item,_index)">
+                                <el-tooltip class="item" effect="dark" :content="_item.name" 
+                                    placement="bottom">
+                                    <span>{{_item.name}}</span>
+                                </el-tooltip>
+                            </div>
                         </div>
                         <div class="storeList-content" v-else :style="!showFeedBack?{height:varyWindowHeight-100+'px'}:{'height':(varyWindowHeight)/2+'px'}">
                             <el-input
@@ -314,13 +350,14 @@
                                 v-model="serachVale" @keyup.enter.native="searchStore">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                             </el-input>
+                            <span class="icon-info" style="margin-bottom:15px">* 未绑定巡检项的门店，无法点击切换</span>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
-                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9'}:{}"
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
-                                    <span v-if="itemDs.hasInspect">{{itemDs.name}}</span>
-                                    <el-tooltip class="item" effect="dark" content="该门店暂未绑定巡检项" 
-                                    placement="bottom" v-else>
+                                    <!-- <span v-if="itemDs.hasInspect">{{itemDs.name}}</span> -->
+                                    <el-tooltip class="item" effect="dark" :content="itemDs.name" 
+                                    placement="bottom">
                                     <span>{{itemDs.name}}</span>
                                     </el-tooltip>
                                 </div>
@@ -366,6 +403,7 @@ import DialogVue from '@/components/DialogVue.vue'
 import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import {getCookie} from '@/common/auth';
 import RecordRTC from '../../../static/RecordRTC.js'
+import {validateInput} from '@/common/validate'
 export default {
     name:'ReInspection',
     components:{
@@ -389,6 +427,7 @@ export default {
             },
             showFeedDialog1:false,
             showFeedDialog2:false,
+            showFeedDialog3:false,
             arrows1Src:require('../../../static/img/arrows3_pic.png'),
             arrows2Src:require('../../../static/img/arrows2_pic.png'), 
             plusSrc:require('../../../static/img/plus_icon.png'),
@@ -601,6 +640,9 @@ export default {
             isStoppedRecording : false,
             dialogCommentVideo : false,
             curVideoSrc:'',
+            curFeedBackVideoSrc:'',
+
+            feedBackVideoFileObj:{},
             videoSpeed:0,
             videoSpeedId:0,
             showGetVideo:false,
@@ -620,7 +662,8 @@ export default {
             eventDes:'',
             showFeedBackInfo:true,
             showAddFeedBackBtn:true,
-
+            timerPlayReal:null,
+            isPlayingFlag:-1,
         }
     },
     computed:{
@@ -663,6 +706,7 @@ export default {
         //         next(false);
         //     }
         // }
+        self.isPlayingFlag=-1;
         if(to.name!='巡检提交事件'){
             from.meta.keepAlive=false;
             if(self.playState){
@@ -677,8 +721,8 @@ export default {
         self.isREC=false;
         self.getUpLoadBucketInfo();
         self.getOssInfo();
+        //self.getInitStoreData();
         self.getFaStoreData();
-        self.getInitStoreData();
         self.getDeviceList();
         self.looper();
         window.onresize=function(){
@@ -690,6 +734,22 @@ export default {
                 ele.style.height = "auto";
             }
         }
+         /**
+         * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
+         */
+        window.addEventListener("visibilitychange",()=>{
+            if(document.hidden){
+                if(self.playState){
+                    self.stopRealTimeVisPage();
+                    window.clearInterval(self.timerPlayReal);
+                }
+            }
+            else{
+                if(self.isPlayingFlag==1){
+                    self.realTime();
+                }
+            }
+        })
     },
     methods:{
         changeBrand(){
@@ -700,8 +760,9 @@ export default {
             self.activeIndex='0';
             self.showGuide=true;
             self.accountId=localStorage.getItem('oss_bucket');
+            //self.getInitStoreData();
             self.getFaStoreData();
-            self.getInitStoreData();
+            
             self.getDeviceList();
         },
         checkFull(){
@@ -776,11 +837,28 @@ export default {
             self.eventName='';
             self.eventDes='';
         },
+        confirmAddFeedBack3(){
+            let self=this;
+            let srcObj=null;
+            srcObj=self.feedBackVideoFileObj;
+            let obj={
+                eventName:self.eventName,
+                eventDes:self.eventDes,
+                sourceObj:srcObj
+            }
+            if(self.eventName.trim().length==0){
+                self.notify('事件名称不能为空！','warning',3000);
+                return false;
+            }
+            self.eventList.push(obj);
+            self.showFeedDialog3=false;
+            self.showFeedBackInfo=false;
+        },
         confirmAddFeedBack2(){
             let self=this;
-            let imgObj=null;
+            let srcObj=null;
             let src=self.canvasEl.toDataURL("image/jpeg");
-            imgObj={
+            srcObj={
                 mediaType:2,
                 src:src,
                 height:'100px',
@@ -788,10 +866,11 @@ export default {
                 fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
                 file:util.base64ToBlob(src)
             }
+
             let obj={
                 eventName:self.eventName,
                 eventDes:self.eventDes,
-                sourceObj:imgObj
+                sourceObj:srcObj
             }
             if(self.eventName.trim().length==0){
                 self.notify('事件名称不能为空！','warning',3000);
@@ -908,7 +987,12 @@ export default {
         playCutVideo(item,index){
             let self=this;
             self.dialogCommentVideo=true;
-            self.curVideoSrc=item.src;
+            if(self.showFeedBack){
+                self.curVideoSrc=item.sourceObj.src;
+            }
+            else{
+                self.curVideoSrc=item.src;
+            }
         },
         looper(){
             let self=this;
@@ -924,7 +1008,28 @@ export default {
                     self.isRecordingStarted=false;
                     self.isREC=false;
                     setTimeout(()=>{
-                        self.addVideoToList();
+                        if(self.showFeedBack){
+                            self.showFeedDialog3=true;
+                            self.eventName='';
+                            self.eventDes='';
+                            this.$nextTick(()=>{
+                                self.recorder.stopRecording(function(){
+                                    self.isRecordingStarted=false;
+                                    self.isStoppedRecording=true;
+                                    var blob =self.recorder.getBlob();
+                                    let url=URL.createObjectURL(blob);
+                                    let obj={};
+                                    obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+                                    obj.file=blob;
+                                    obj.mediaType=1;
+                                    obj.src=url;
+                                    self.feedBackVideoFileObj=obj;
+                                })
+                            })
+                        }
+                        else{
+                            self.addVideoToList();
+                        }
                     },100)
                 }
                 else{
@@ -1036,7 +1141,7 @@ export default {
             let self=this;
             console.log(self.curGroupIndex);
             if(self.sourceList.length>=5){
-                self.notify('最多上传5个资源！','warning',3000);
+                self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
                 return false;
             }
             if(self.fullScreen){
@@ -1069,7 +1174,6 @@ export default {
                 self.showFeedDialog2=true;
                 self.eventName='';
                 self.eventDes='';
-
                 this.$nextTick(()=>{
                     self.canvasEl=document.getElementById('icanvas');
                     var ctx = self.canvasEl.getContext('2d');
@@ -1329,6 +1433,12 @@ export default {
                     obj.userId=item.userId;
                     obj.favorite=item.favorite==undefined?true:item.favorite;
                     obj.device=item.device;
+                    if(self.appliedInspectList.indexOf(item.storeId)!=-1){
+                        obj.hasInspect=true;
+                    }
+                    else{
+                        obj.hasInspect=false;
+                    }
                     temp.push(obj);
                 })
                 return temp;
@@ -1368,22 +1478,28 @@ export default {
                 let temp=[];
                 data.forEach((item,index)=>{
                     let obj={};
-                    if(index==0){
-                        obj.isActive=true;
-                    }
-                    else{
-                        obj.isActive=false;
-                    }
                     obj.storeId=item.storeId;
                     obj.name=item.name;
                     obj.userId=item.userId;
                     obj.favorite=item.favorite==undefined?true:item.favorite;
                     obj.device=item.device;
+                    obj.isActive=false;
+                    if(self.appliedInspectList.indexOf(item.storeId)!=-1){
+                        obj.hasInspect=true;
+                        if(index==0){
+                            obj.isActive=true;
+                        }
+                    }
+                    else{
+                        obj.hasInspect=false;
+                    }
                     temp.push(obj);
                 })
                 return temp;
             }
             let data=await self.getFaStoreList();
+            let allStoreData=await self.getAllStoreList();
+            self.getInitStoreData(allStoreData);
             if(data.errCode==0){
                 let storeData=data.data;
                 self.tabList[0].storeList=getStoreTemp(storeData);
@@ -1392,25 +1508,30 @@ export default {
                     self.inspectList=[];
                 }
                 else{
-                    let obj={};
-                    obj.storeId=storeData[0].storeId;
-                    obj.storeName=storeData[0].name;
-                    obj.storeTitle=storeData[0].name;
-                    obj.storeUp=true;
-                    obj.storeUpTitle='已关注';
-                    self.store=obj;
-                    self.showStoreUp=true;
-                    let curStoreId=storeData[0].storeId;
-                    let storeObj={
-                        storeId:curStoreId
-                    };
-                    self.saveStoreObj(storeObj);
-                    self.getInspectByStore(self.tabList[0].storeList[0].storeId);
-                    self.getChannelByStore(self.tabList[0].storeList[0]);
+                    if(self.appliedInspectList.indexOf(storeData[0].storeId)!=-1){
+                        let obj={};
+                        obj.storeId=storeData[0].storeId;
+                        obj.storeName=storeData[0].name;
+                        obj.storeTitle=storeData[0].name;
+                        obj.storeUp=true;
+                        obj.storeUpTitle='已关注';
+                        self.store=obj;
+                        self.showStoreUp=true;
+                        let curStoreId=storeData[0].storeId;
+                        let storeObj={
+                            storeId:curStoreId
+                        };
+                        self.saveStoreObj(storeObj);
+                        self.getInspectByStore(self.tabList[0].storeList[0].storeId);
+                        self.getChannelByStore(self.tabList[0].storeList[0]);
+                    }
+                    else{
+                        self.showStoreUp=false;
+                    }
                 }
             }
         },
-         async getInitStoreData(){
+         async getInitStoreData(data){
             let self=this;
             let getStore2Temp=data=>{
                 let cityList=[];
@@ -1439,7 +1560,7 @@ export default {
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
                             if(data[j].appliedInspect.length!=0&&data[j].appliedInspect.indexOf('远程巡检')!=-1){
-                                self.appliedInspectList.push(data[j]);
+                                self.appliedInspectList.push(data[j].storeId);
                                 obj.hasInspect=true;
                             }
                             else{
@@ -1454,7 +1575,7 @@ export default {
                 }
                 return storeListTemp;
             }
-            let data=await self.getAllStoreList();
+            // let data=await self.getAllStoreList();
              if(data.errCode==0){
                 let storeData=data.data.content;
                 self.allInitStoreList=storeData;
@@ -1654,6 +1775,10 @@ export default {
             };
             self.channel=obj;
             item.isClick=true;
+            self.inspectItemList.forEach(_item=>{
+                _item.checked=false;
+                _item.disabled=true;
+            })
             self.showChannelBtns.forEach((_item,_index)=>{
                 if(_index!=index){
                     _item.isClick=false;
@@ -1674,6 +1799,7 @@ export default {
             self.sourceList=[];
             
             let obj={};
+            
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
@@ -1711,6 +1837,14 @@ export default {
                     _item.checked=false;
                     _item.disabled=true;
                 }
+            })
+            self.inspectList.forEach((_item,_index)=>{
+                _item.items.forEach((itemDS,indexDS)=>{
+                    if(itemDS.id!=item.id){
+                        itemDS.checked=false;
+                        itemDS.disabled=true;
+                    }
+                })
             })
         },
         getInspectByStore(storeId){
@@ -1830,18 +1964,22 @@ export default {
                 let obj={};
                 obj.ts=new Date().getTime();
                 obj.storeId=self.store.storeId,
-                obj.deviceId=self.channel.id;
+                
                 obj.subject=self.eventList[i].eventName;
-                obj.description=self.eventList[i].description;
+                obj.description=self.eventList[i].eventDes;
 
                 let commentTemp=[];
-                if(self.eventList[i].sourceObj!=null){
+                if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
                     let url=await self.upLoadFile(self.eventList[i].sourceObj);
                     let commentObj={
-                        mediaType:2,
+                        mediaType:self.eventList[i].sourceObj.mediaType,
                         url:url
                     }
                     commentTemp.push(commentObj);
+                    obj.deviceId=self.channel.id;
+                }
+                else{                        //通过加号创建的问题反馈
+                    obj.diviceId=-1;
                 }
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
@@ -1869,6 +2007,10 @@ export default {
                         isSuccess:false
                     };
                 }
+                if(self.playState){
+                    self.stopRealTime();
+                }
+                self.fullscreenLoading=false;
                 sessionStorage.setItem('reinspect_submit',JSON.stringify(routeData));
                 self.$router.push({name:"巡检提交事件",params:{data:routeData}});
             })
@@ -1942,6 +2084,7 @@ export default {
                 console.log(self.mpdurl); 
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
+                self.isPlayingFlag=1;
             }
             else{
                 self.showGuide=false;
@@ -1960,6 +2103,21 @@ export default {
             self.previewplayer = videojs(video);
             self.previewplayer.pause();
         },
+        async stopRealTimeVisPage(){
+            let self=this;
+            self.stopVideo();
+            const data = {
+                request: { 
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            let ret=await dashAPI.RealTime(0,data);
+            await dashAPI.Offline(self.sessionId);
+        },
         async stopRealTime(){
             let self=this;
             self.stopVideo();
@@ -1972,6 +2130,7 @@ export default {
                   streamType:'SubStream'
                 }
             };
+            self.isPlayingFlag=-1;
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
             //self.showVideo=false;
@@ -2011,6 +2170,7 @@ export default {
             self.mpdurl = url;
             console.log(self.mpdurl);
             if (url.ErrorCode==undefined&&url.length!=0) {
+                self.isPlayingFlag=1;
                 self.playVideo(self.mpdurl);
             }
             else{   //当前视频如果返回失败，需处于暂停状态
@@ -2154,6 +2314,8 @@ export default {
             self.editCount=0;
             self.showError=false;
             self.curDeviceId=-1;
+            self.showFeedBack=false;
+            self.eventList=[];
             if(self.playState){
                 self.stopRealTime();
             }
@@ -2986,6 +3148,7 @@ export default {
                     padding: 15px auto;
                     .item-content{
                         .feedbacks-content{
+
                             .feedbacks-details{
                                 
                                 text-align: left;
@@ -3006,6 +3169,7 @@ export default {
                                     margin-bottom: 15px;
                                     color: $tab;
                                     margin-left: 15px;
+                                    white-space:pre-wrap;
                                 }
                                 .icon-delete-event{
                                     position: absolute;
@@ -3017,8 +3181,17 @@ export default {
                                     border-radius: 50%;
 
                                 }
-                                .feedback-pic{
+                                .img-content{
+                                    position: relative;
+                                    width: 140px;
+                                    height: 100px;
                                     margin-left: 15px;
+                                    .start-icon{
+                                        position: absolute;
+                                        left: 35%;
+                                        top: 30%;
+                                        cursor: pointer;
+                                    }
                                 }
                                 .feedbacks-hr{
                                     border: 0.5px solid $border;
@@ -3170,7 +3343,7 @@ export default {
                             display:inline-block;
                             position: absolute;
                             @include point(right,10);
-                            @include point(top,10);
+                            // @include point(top,10);
                             font-size: 12px;
                             padding:2px 6px;
                             border-radius: 4px;
@@ -3255,6 +3428,13 @@ export default {
                     text-align: left;
                     @include point(height,450);
                     color: $black;
+                    .icon-info{
+                        color: #FF9803;
+                        font-size: 12px;
+                        display: block;
+                        @include point(margin,5);
+                        @include point(margin-left,15);
+                    }
                     .activeClass{
                         background-color: #FDE8EF !important;
                         color: $red;
@@ -3299,7 +3479,6 @@ export default {
                         cursor: pointer;
                         @include point(width,76);
                         @include point(padding,6);
-                        
                         span{
                             width: 100%;
                             display: block;

@@ -1,9 +1,10 @@
 import request from '@/common/request'
 import {serviceLogout} from '@/common/request'
+const version='v1.0';
 //account RESTful 
 export function loginByUsername(data){
     return request({
-        url:'/login',
+        url:`${version}/login`,
         method:'post',
         data
     })
@@ -11,14 +12,14 @@ export function loginByUsername(data){
 
 export function logout(){
     return serviceLogout({
-        url:'/logout',
+        url:`${version}/logout`,
         method:'post'
     })
 }
 
 export const getUserInfo=params=>{
     return request({
-        url:'/user/list',
+        url:`${version}/user/list`,
         method:'get',
         params
     })
@@ -26,20 +27,20 @@ export const getUserInfo=params=>{
 
 export const getAccountList=()=>{
     return request({
-        url:'/user/account/list',
+        url:`${version}/user/account/list`,
         method:'get'
     })
 }
 export function isLoginIn(){
     return request({
-        url:'/islogin',
+        url:`${version}/islogin`,
         method:'post'
     })
 }
 
 export const changeAccount=params=>{
     return request({
-        url:'/user/change/account',
+        url:`${version}/user/change/account`,
         method:'post',
         params
     })

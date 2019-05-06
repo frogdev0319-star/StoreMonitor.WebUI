@@ -2,7 +2,7 @@
     <div class="el-event-content" :style="{'height':windowHeight-138+'px'}">
        <div class="seacrh-content">
             <span class="select-title">按省份选择</span>
-             <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
+            <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
              class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
@@ -529,9 +529,9 @@ import PubSub from 'pubsub-js'
                 this.sizeNum=20;
             }
             await this.isLoginIn();
-            if(!this.timeid){
-                this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
-            }
+            // if(!this.timeid){
+            //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
+            // }
         },
         beforeRouteEnter(to, from, next){
             console.log(to);
@@ -623,7 +623,7 @@ import PubSub from 'pubsub-js'
             cursor: pointer;
             display:inline-block;
             position: relative;
-            border: 1px solid #DCDFE6;
+            // border: 1px solid #DCDFE6;
             top: 8px;
             span{
                 display: inline-block;
@@ -686,6 +686,7 @@ import PubSub from 'pubsub-js'
     .el-select >>> .el-input__inner{
         background: #F4F5F9 !important;
         border-radius: 0px !important;
+        border: 0 !important;
     }
     .el-input--small >>>.el-input__inner{
         background: #F4F5F9 !important;

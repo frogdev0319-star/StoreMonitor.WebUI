@@ -342,7 +342,7 @@ export default {
         },
         afterDeleteNape(){
             let self=this;
-            self.notify('当前巡检项已删除成功!','success',3000);
+            self.notify('巡检项删除成功!','success',3000);
             self.showDeleteContent=false;
             self.$emit('refreshList');
         },
@@ -383,7 +383,7 @@ export default {
                         }
                     }
                     else{
-                        self.notify('当前巡检项删除失败!','warning',3000);
+                        self.notify('巡检项删除失败!','warning',3000);
                         return false;
                     }
                 })
@@ -429,12 +429,12 @@ export default {
                 console.log(res.data)
                 let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
-                    self.notify('当前巡检项已删除成功!','success',3000);
+                    self.notify('巡检项删除成功!','success',3000);
                     self.showSingleDeleteContent=false;
                     self.$emit('refreshList');
                 }
                 else{
-                    self.notify('当前巡检项删除失败!','warning',3000);
+                    self.notify('巡检项删除失败!','warning',3000);
                     return false;
                 }
             })
@@ -691,15 +691,21 @@ export default {
                 // @include point(margin-left,40);
                 margin-left: 40px;
             }
+            
             .description-title{
                 float: left;
-                width: 38%;
+                width: 51%;
                 //margin-left: 12%;
+            }
+            @media screen and(min-width:1280px) and(max-width:1440px){
+                .description-title{
+                    width: 43%;
+                }
             }
             .score-title{
                 float: left;
                 width: 8%;
-                margin-left: 7%;
+                // margin-left: 7%;
             }
             .handle-title{
                 float: left;

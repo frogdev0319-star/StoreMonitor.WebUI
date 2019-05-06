@@ -1,18 +1,18 @@
 <template>
     <div class="report-container">
-        <img :src="reportImgSrc" alt="" class="report-img" :height="reportImgHeight"/>
+        <img :src="report.iconSrc" alt="" class="report-img" :height="reportImgHeight"/>
         <div class="el-header">
-            <img class="title-icon" :src="store.iconSrc"/>
-            <span class="report-title">{{store.name}}</span>
+            <img class="title-icon" :src="report.inspectSrc"/>
+            <span class="report-title">{{report.storeName+report.tagName}}</span>
             <div class="info-content">
                 <span class="info-label">提交人：</span>
-                <span class="info-value">{{store.assinger}}</span>
+                <span class="info-value">{{report.submitterName}}</span>
                 <span class="info-label">报告产生时间：</span>
-                <span class="info-value">{{store.date}}</span>
+                <span class="info-value">{{report.dateStr}}</span>
             </div>
         </div>
         <div class="el-acticle">
-            <p class="suggest">巡检建议：{{store.suggest}}</p>
+            <p class="suggest" v-if="suggest!=null&&suggest.length!=0">巡检建议：{{suggest}}</p>
             <el-row class="report-content" :gutter="40">
                 <el-col :span="8" class="radior-content">
                     <v-chart :options="options" class="chart-content" :auto-resize='true'/>
@@ -25,11 +25,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item,index) in data" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                                <td class="icon-td"><div class="icon-content"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua?'合格':'不合格'}}</div> <span class="item-name">{{item.name+'（'+item.count+'）'}}</span></div></td>
-                                <td><span>{{item.fine}}</span></td>
-                                <td><span>{{item.qualified}}</span></td>
-                                <td><span>{{item.unqualified}}</span></td>
+                            <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                                <td class="icon-td"><div class="icon-content"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua?'合格':'不合格'}}</div> <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div></td>
+                                <td><span>{{item.numOfExcellentItems}}</span></td>
+                                <td><span>{{item.numOfQualifiedItems}}</span></td>
+                                <td><span>{{item.numOfUnqualifiedItems}}</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -39,7 +39,7 @@
                 <el-col :span="8" v-for="(item,index) in tempList" :key="index" class="details-content">
                     <div class="details">
                         <div class="item-header">
-                            <i class="iconfont" :class="item.iconSrc"></i>
+                            <i class="iconfont icontemp" :class="item.iconSrc"></i>
                             <span class="title-lable">{{item.itemTitleName}}</span>
                             <div class="count-content">
                                 <span class="count">{{item.itemCount}}</span>
@@ -47,11 +47,13 @@
                             </div>
                         </div>
                         <div class="item-content">
-                            <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
-                                <div class="item-blag"></div>
-                                <span class="item-name">{{_item.name}}</span>
-                                <span class="item-des">{{_item.description}}</span>
-                            </div>
+                            <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                                <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
+                                    <div class="item-blag"></div>
+                                    <span class="item-name">{{index!=2?_item.name:_item.subject}}</span>
+                                    <span class="item-des">{{_item.description}}</span>
+                                </div>
+                            </el-scrollbar>
                         </div>
                     </div>
                 </el-col>
@@ -62,155 +64,34 @@
 <script>
 import ECharts from 'vue-echarts'
 import 'echarts/lib/chart/radar'
-import {getInspectReportList} from '../../api/inspect'
+import {getInspectReportList,getInspectReportInfo} from '../../api/inspect'
+import util from '@/common/util'
 export default {
     name:'InspectReport',
     components:{
         'v-chart': ECharts
     },
     computed:{
-        reportImgSrc(){
-            let src='';
-            switch(this.store.state){
-                case 0: src=require('../../../static/img/总评icon1.png');
-                case 1: src=require('../../../static/img/总评icon2.png');
-                case 2: src=require('../../../static/img/总评icon3.png');
-            }
-            return src;
-        },
         reportImgHeight(){
             return (this.varyWindowWidth/1920)*100;
         }
     },
     data(){
         return{
+            reportId:0,
             varyWindowWidth:window.innerWidth,
-            store:{
-                name:'西安5店远程巡检报告',
-                assinger:'小明',
-                date:'2018/10/17 10:20',
-                state:0,
-                suggest:'建议对门店整洁度，进行重点关注',
-                iconSrc:require('../../../static/img/监控icon.png'),
-            },
-            data:[
-                {
-                    name:'门店形象',
-                    count:12,
-                    fine:8,
-                    qualified:4,
-                    unqualified:0,
-                    isQua:true,
 
-                },
-                {
-                    name:'员工形象',
-                    count:4,
-                    fine:2,
-                    qualified:2,
-                    unqualified:0,
-                    isQua:true,
-                },
-                {
-                    name:'门店形象',
-                    count:3,
-                    fine:2,
-                    qualified:0,
-                    unqualified:1,
-                    isQua:false,
-                },
-                {
-                    name:'门店形象',
-                    count:4,
-                    fine:2,
-                    qualified:0,
-                    unqualified:2,
-                    isQua:false,
-                },
-                {
-                    name:'门店形象',
-                    count:4,
-                    fine:2,
-                    qualified:0,
-                    unqualified:2,
-                    isQua:false,
-                },
-               {
-                    name:'门店形象',
-                    count:3,
-                    fine:2,
-                    qualified:0,
-                    unqualified:1,
-                    isQua:false,
-                },
-            ],
-            tempList:[
-                {
-                    id:'0',
-                    itemTitleName:'重点关注项目',
-                    iconSrc:'',
-                    itemCount:12,
-                    itemList:[
-                        {
-                            id:'0',
-                            name:'24小时不断电'
-                        },
-                        {
-                            id:'1',
-                            name:'按要求张贴海报'
-                        },
-                        {
-                            id:'2',
-                            name:'24小时不断电'
-                        },
-                        {
-                            id:'3',
-                            name:'按要求张贴海报'
-                        },
-                        {
-                            id:'4',
-                            name:'24小时不断电'
-                        },
-                    ]
-                },
-                {
-                    id:'1',
-                    itemTitleName:'忽略问题',
-                    iconSrc:'',
-                    itemCount:1,
-                    itemList:[
-                        {
-                            id:'0',
-                            name:'24小时不断电'
-                        },
-                        {
-                            id:'1',
-                            name:'按要求张贴海报'
-                        },
-                        {
-                            id:'2',
-                            name:'24小时不断电'
-                        },
-                    ]
-                },
-                {
-                    id:'2',
-                    itemTitleName:'反馈问题',
-                    iconSrc:'',
-                    itemCount:1,
-                    itemList:[
-                        {
-                            id:'0',
-                            name:'24小时不断电',
-                            description:'24小时不断电24小时不断电按要求张贴海报'
-                        },
-                        {
-                            id:'1',
-                            name:'24小时不断电'
-                        },
-                    ]
-                }
-            ],
+            videoSrc:require('../../../static/img/监控icon.png'),
+            inspectSrc:require('../../../static/img/远程icon.png'),
+            insiteInspectSrc:require('../../../static/img/现场icon.png'),
+
+            inspectSrc1:require('../../../static/img/总评icon1.png'),
+            inspectSrc2:require('../../../static/img/总评icon2.png'),
+            inspectSrc3:require('../../../static/img/总评icon3.png'),
+            report:null,
+            suggest:'',
+            summary:[],
+            tempList:[],
             options:null,
             theaderList:[
                {
@@ -229,6 +110,77 @@ export default {
         }
     },
     methods:{
+        getRouterData(){
+            let self=this;
+            let routeData=JSON.parse(sessionStorage.getItem('report_data'));
+            let obj={};
+            obj.reportId=routeData.id;
+            obj.storeName=routeData.storeName;
+            obj.status=routeData.status;
+            obj.dateStr=util.getDateStr(routeData.ts);
+            obj.submitterName=routeData.submitterName;
+            obj.tagName=routeData.tagName;
+            switch(routeData.mode){
+                case 0: obj.inspectSrc=self.inspectSrc; break;
+                case 1: obj.inspectSrc=self.insiteInspectSrc; break;
+                default:obj.inspectSrc=self.videoSrc; break;
+            }
+            switch(routeData.status){
+                case 0: obj.iconSrc=self.inspectSrc1; break;
+                case 1: obj.iconSrc=self.inspectSrc3; break;
+                default:obj.iconSrc=self.inspectSrc2; break;
+            }
+            self.report=obj;
+        },
+        async getReportInfo(){
+            let self=this;
+            let reportId=self.report.reportId;
+            let temp=[];
+            temp.push(reportId);
+            let params={
+                reportIds:temp
+            };
+            getInspectReportInfo(params).then(res=>{
+                console.log(res);
+                let data=res.data[0].info;
+                self.suggest=data.comment;
+                let summary=data.summary;
+                let summaryTemp=[];
+                summary.forEach(item=>{
+                    let obj={};
+                    obj.groupId=item.groupId;
+                    obj.groupName=item.groupName;
+                    obj.count=item.numOfTotalItems;
+                    obj.isQua=item.result==1?true:false;
+                    obj.numOfExcellentItems=item.numOfExcellentItems;
+                    obj.numOfQualifiedItems=item.numOfQualifiedItems;
+                    obj.numOfUnqualifiedItems=item.numOfUnqualifiedItems;
+                    summaryTemp.push(obj);
+                })
+                self.summary=summaryTemp;
+                let tempArray=new Array(3);
+                tempArray[0]={
+                    itemTitleName:'重点关注项目',
+                    iconSrc:'icon-zhongxindingwei',
+                    itemCount:data.focalItems.length,
+                    itemList:data.focalItems
+                }
+                tempArray[1]={
+                    itemTitleName:'忽略项',
+                    iconSrc:'icon-hulve',
+                    itemCount:data.ignoredItems.length,
+                    itemList:data.ignoredItems
+                }
+                tempArray[2]={
+                    itemTitleName:'反馈问题',
+                    iconSrc:'icon-fankui',
+                    itemCount:data.feedback.length,
+                    itemList:data.feedback
+                }
+                self.tempList=tempArray;
+                self.getRadarOption();
+            })
+        },
         getRadarOption(){
             let self=this;
             let options={
@@ -278,12 +230,12 @@ export default {
             };
             let tempIndicator=[];
             let seriesValue=[];
-            self.data.forEach(item => {
+            self.summary.forEach(item => {
                 let obj={};
-                obj.name=item.name;
+                obj.name=item.groupName;
                 obj.max=item.count*2;
                 tempIndicator.push(obj);
-                seriesValue.push(item.fine*2+item.qualified);
+                seriesValue.push(item.numOfExcellentItems*2+item.numOfQualifiedItems);
             });
             let temp=[];
             let obj={value:seriesValue};
@@ -301,7 +253,9 @@ export default {
     },
     mounted(){
         let self=this;
-        self.getRadarOption();
+        self.getRouterData();
+        self.getReportInfo();
+        //self.getRadarOption();
     }
 }
 </script>
@@ -436,15 +390,22 @@ $suggestBack:#F1F6FE;
             }
             .details{
                 position: relative;
-                min-height: calc(320/1920*100vw);
+                height: calc(320/1920*100vw);
                 border:1px solid $border;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
                 .item-header{
+                    
                     position: relative;
                     background-color: $background;
                     height: calc(40/1920*100vw);
+                    line-height: calc(40/1920*100vw);
                     border-bottom: 1px solid $border;
                     padding-left: calc(20/1920*100vw);
+                    .icontemp{
+                        font-size: calc(18/1920*100vw);
+                        margin-right: calc(15/1920*100vw);
+                        color: $tab;
+                    }
                     .title-lable{
                         font-size: calc(14/1920*100vw);
                         font-weight: bold;
@@ -462,12 +423,13 @@ $suggestBack:#F1F6FE;
                     }
                 }
                 .item-content{
-
+                    padding-top: calc(20/1920*100vw);
+                    height:  calc(280/1920*100vw);
                     .item-details{
                         height: auto;
                         font-size: calc(14/1920*100vw);
                         padding-left: calc(30/1920*100vw);
-                        margin-top: calc(20/1920*100vw);
+                        padding-right: calc(20/1920*100vw);
                         margin-bottom:calc(30/1920*100vw);
                         color: #4b5262;
                         .item-blag{
@@ -503,5 +465,8 @@ $suggestBack:#F1F6FE;
     .echarts{
         width: 100%;
         height: 100%;
+    }
+    .el-menuscrollbar .el-scrollbar__wrap {
+        overflow-x: hidden;
     }
 </style>

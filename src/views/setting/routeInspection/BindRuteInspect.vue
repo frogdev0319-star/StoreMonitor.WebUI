@@ -689,7 +689,7 @@ $h1:#292e36;
             cursor: pointer;
             display:inline-block;
             position: relative;
-            border: 1px solid #DCDFE6;
+            // border: 1px solid #DCDFE6;
             top: 8px;
             span{
                 display: inline-block;
@@ -820,6 +820,7 @@ $h1:#292e36;
 .el-province .el-input__inner{
     border-radius: 0px !important;
     background-color: #F4F5F9 !important;
+    border :0 !important;
 }
 .el-select-dropdown__item{
     padding: 0 20px !important;

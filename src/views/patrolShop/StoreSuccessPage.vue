@@ -192,14 +192,14 @@ export default {
     beforeRouteLeave(to, from, next) {
         let self=this;
         clearInterval(self.timeid);
-        if(to.name=='门店监控'){
-            if(this.isSuccess==true){
-                to.meta.keepAlive = true;
-            }
-            else{
-                to.meta.keepAlive=true;
-            }
-        }
+        // if(to.name=='门店监控'){
+        //     if(this.isSuccess==true){
+        //         to.meta.keepAlive = true;
+        //     }
+        //     else{
+        //         to.meta.keepAlive=true;
+        //     }
+        // }
         next();
     }
 }
@@ -335,6 +335,9 @@ export default {
                             margin-left: 30px;
                             margin-top: 10px;
                             display: block;
+                            margin-right: 20px;
+                            white-space:pre-wrap;
+                            word-wrap:break-word;
                         }
                         .source-content{
                             min-height: 150px;

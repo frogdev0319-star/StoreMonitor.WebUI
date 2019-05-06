@@ -8,14 +8,18 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
+    // {
+    //   path:'/login',
+    //   name:'Login',
+    //   hidden: true,
+    //   component:LoginForm,
+    //   meta:{
+    //     requireAuth: false,
+    //   }
+    // },
     {
-      path:'/login',
-      name:'Login',
-      hidden: true,
-      component:LoginForm,
-      meta:{
-        requireAuth: false,
-      }
+      path:'*',
+      redirect: '/'
     },
     {
       path:'/',
@@ -110,13 +114,13 @@ export default new Router({
           isReadOnly:false,
         },
         {
-          path:'/reportdetails',
+          path:'/report',
           name:'巡检报告',
           component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
           hidden:true,
           children:[
             {
-              path:'/storemonitor/submit',
+              path:'/reportdetails',
               name:'报告详情',
               component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
             }
@@ -139,7 +143,7 @@ export default new Router({
           name:'事件管理',
           component:resolve=>require(['@/views/event/EventManage'],resolve),
           meta:{
-            keepAlive:true,  //the component is't to be cache.
+            keepAlive:false,  //the component is't to be cache.
             requireAuth: true,
           }
         },
@@ -159,7 +163,6 @@ export default new Router({
             }
           ]
         },
-       
       ]
     },
     {

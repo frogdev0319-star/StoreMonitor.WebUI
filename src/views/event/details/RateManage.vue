@@ -771,6 +771,12 @@ export default {
             }, 50);
         },
     },
+    // beforeRouteLeave (to, from, next) {
+    //     if(to.name=='事件管理'){
+    //         to.meta.keepAlive=true;
+    //     }
+    //     next();
+    // },
     mounted(){
         let self=this;
         self.getSessionData();  //获取session中存储的event信息
