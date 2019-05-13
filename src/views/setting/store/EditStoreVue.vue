@@ -276,8 +276,12 @@ export default {
                 };
                 
                 let resUpdateStore=null,resBindInspect=null;
-                if(self.curPerson.length!=0&&(self.userId!=self.curPerson)){  //如果没有修改负责人不执行
+                if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.userId!=self.curPerson))){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
+                }
+                else{
+                    self.notify('请选择门店负责人！','warning',3000);
+                    return false;
                 }
                 resBindInspect=await self.bindInspectItem(paramsInspec);
                 if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))

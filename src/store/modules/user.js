@@ -88,6 +88,10 @@ const user={
                 changeAccount(params).then(res=>{
                     if(res.errCode==0){
                         commit('Account_Changed',++user.state.accountChanged);
+                        //commit('SET_ACCOUNTID',params.)
+                        let accountId=params.accountId.toLowerCase();
+                        localStorage.setItem('oss_bucket',accountId);
+                        commit('SET_ACCOUNTID',accountId);
                     }
                     else{
                         commit('Account_Changed',0);

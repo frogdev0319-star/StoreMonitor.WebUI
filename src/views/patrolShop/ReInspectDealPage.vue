@@ -7,7 +7,7 @@
                 <p class="sucret-info" v-if="isSuccess">{{curSecond}}秒自动返回门店监控页面！</p>
             </div>
         </div>
-        <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
+        <div class="page-content" v-if="false" :style="{'min-height':varyWindowHeight-460+'px'}">
              <div class="details">
                 <span class="event-label">门店名称：</span>
                 <span>{{storeName}}</span>
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div class="page-err-btn" v-else>
+        <div class="page-err-btn" v-if="!isSuccess">
             <el-button size="mini" type="primary" @click="reTry" class="retry-btn">重新尝试</el-button>
         </div>
     </div>
@@ -53,7 +53,7 @@ export default {
     name:'ReInspectDealPage',
     data(){
         return{
-            isSuccess:true,
+            isSuccess:false,
             sucSrc:require('../../../static/img/succeed_icon.png'),
             errSrc:require('../../../static/img/failed_icon.png'),
             curSecond:10,
@@ -118,9 +118,7 @@ export default {
     },
     mounted(){
         let self=this;
-        
         self.getRouterData();
-        
         if(self.isSuccess){
             self.timeid=setInterval(function(){
                 self.getBackSecond();
@@ -135,17 +133,18 @@ export default {
             if(self.$route.params.data==undefined){
                 routeData=JSON.parse(sessionStorage.getItem('reinspect_submit'));
             }
-            self.isSuccess=routeData.isSuccess;
-            //self.isSuccess=false;
+            if(routeData!=null){
+                self.isSuccess=routeData.isSuccess;
+            }
             if(self.isSuccess){
                 self.$route.matched[2].name='提交成功';
-                self.storeName=routeData.store.storeName;
-                if(routeData.user.length!=0){
+                //self.storeName=routeData.store.storeName;
+                if(routeData!=null&&routeData.user.length!=0){
                     self.leader=routeData.user[0].userName;
                 }
-                self.tableData=routeData.submitResult;
-                self.ignoreList=routeData.ignoreTemp;
-                self.ignoreCount=routeData.ignoredItems.length;
+                //self.tableData=routeData.submitResult;
+                //self.ignoreList=routeData.ignoreTemp;
+                //self.ignoreCount=routeData.ignoredItems.length;
             }
             else{
                 self.$route.matched[2].name='提交失败';
@@ -164,7 +163,7 @@ export default {
         },
         reTry(){
             let self=this;
-            self.$router.push({name:"远程巡检"});
+            self.$router.push({name:"确认总结"});
         },
     }
 }
@@ -173,12 +172,12 @@ export default {
 .el-sucPage-content{
     width: 100%;
     height: 100%;
+    padding-top: 50px;
     .page-icon{
         margin-bottom: 40px;
         position: relative;
         .icon-content{
             margin:0 auto;
-            margin-top: 50px;
             .suc-icon{
                 height: 80px;
             }

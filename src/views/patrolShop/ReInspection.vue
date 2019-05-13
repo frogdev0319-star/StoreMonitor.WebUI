@@ -9,8 +9,8 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button class="el-submit" :size="varyWindowWidth>1680?'small':'mini'" @click="submit" v-loading.fullscreen.lock="fullscreenLoading" type="primary" v-if="showStoreUp">
-                    提交
+                <el-button class="el-submit" :size="varyWindowWidth>1680?'small':'mini'" @click="submit1"  type="primary" v-if="showStoreUp">
+                    确认总结
                 </el-button> 
             </div>
             <el-dialog title='编辑截图'
@@ -129,7 +129,7 @@
             :visible.sync="showFeedDialog3" :close-on-click-modal="false" v-if="showFeedDialog3" :width="860*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
-                    <div class="feed-canvas-content">
+                    <div class="feed-canvas-content" style="text-align:center">
                         <video  :width="520*percentHeight" :height="340*percentHeight" id="previewCutVideo" prload controls autoplay :src="feedBackVideoFileObj.src"></video>
                     </div>
                     <div class="event-content">
@@ -251,12 +251,12 @@
                                     <div class="dropdown-model" v-if="item.disabled"></div>
                                     <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
-                                            {{`评分：${item.itemScore}分`}}<i class="el-icon-arrow-down el-icon--right"></i>
+                                            {{`评分：${item.itemScoreTitle}`}}<i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <el-dropdown-menu slot="dropdown" class="score-menu" style="overflow-y:scroll;height:200px;">
+                                        <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="(itemDS,indexDS) in scoreList" 
-                                            :key="indexDS" @click.native="checkScore(item,itemDS)">{{itemDS.val}}</el-dropdown-item>
+                                            v-for="itemDS in scoreList" 
+                                            :key="itemDS.val" @click.native="checkScore(item,itemDS)">{{itemDS.scoreTitle}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
                                     <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)" v-if="!item.isIgnore"></i>
@@ -329,7 +329,7 @@
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
-                            <span class="icon-info">* 未绑定巡检项的门店，无法点击切换</span>
+                            <span class="icon-info" v-if="item.storeList.length!=0">* 未绑定巡检项的门店，无法点击切换</span>
                             <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
@@ -350,7 +350,7 @@
                                 v-model="serachVale" @keyup.enter.native="searchStore">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                             </el-input>
-                            <span class="icon-info" style="margin-bottom:15px">* 未绑定巡检项的门店，无法点击切换</span>
+                            <span class="icon-info" v-if="item.storeList.length!=0" style="margin-bottom:15px">* 未绑定巡检项的门店，无法点击切换</span>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
                                 <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
@@ -527,49 +527,17 @@ export default {
             userId:'',
             scoreList:[
                 {
-                    val:10,
-                    scoreTitle:'10分'
-                },
-                {
-                    val:9,
-                    scoreTitle:'9分'
-                },
-                {
-                    val:8,
-                    scoreTitle:'8分'
-                },
-                {
-                    val:7,
-                    scoreTitle:'7分'
-                },
-                {
-                    val:6,
-                    scoreTitle:'6分'
-                },
-                {
-                    val:5,
-                    scoreTitle:'5分'
-                },
-                {
-                    val:4,
-                    scoreTitle:'4分'
-                },
-                {
-                    val:3,
-                    scoreTitle:'3分'
-                },
-                {
                     val:2,
-                    scoreTitle:'2分'
+                    scoreTitle:'优良'
                 },
                 {
                     val:1,
-                    scoreTitle:'1分'
+                    scoreTitle:'合格'
                 },
                 {
                     val:0,
-                    scoreTitle:'0分'
-                }
+                    scoreTitle:'不合格'
+                },
             ],
             tempStoreList:[],  
             allInitStoreList:[],
@@ -599,7 +567,6 @@ export default {
             imageCanvasList:[],
             playState:false,
             editCount:0,
-            fullscreenLoading:false,
             ignoreTemp:[],
             fullScreen:false,
             appliedInspectList:[],
@@ -687,6 +654,15 @@ export default {
             if(val!=0){
                 self.changeBrand();
             }
+        },
+        realTimeSpeed(val,oldVal){
+            let self=this;
+            console.log(val);
+            if(val>=300){
+                self.stopRealTime();
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal=null;
+            }
         }
     },
     beforeRouteLeave(to, from, next){
@@ -707,11 +683,11 @@ export default {
         //     }
         // }
         self.isPlayingFlag=-1;
-        if(to.name!='巡检提交事件'){
+        if(to.name!='确认总结'){
             from.meta.keepAlive=false;
-            if(self.playState){
-                self.stopRealTime();
-            }
+        }
+        if(self.playState){
+            self.stopRealTime();
         }
         next();
     },
@@ -762,7 +738,7 @@ export default {
             self.accountId=localStorage.getItem('oss_bucket');
             //self.getInitStoreData();
             self.getFaStoreData();
-            
+            //self.videoEl=document.getElementById('previewVideo').children[0];
             self.getDeviceList();
         },
         checkFull(){
@@ -798,7 +774,7 @@ export default {
                     })
                 }) 
             })
-            
+
         },
         async getOssInfo(){
             let self=this;
@@ -819,7 +795,8 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            let bucketName=self.accountId;
+            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -926,11 +903,13 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
+            //let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
                 accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                bucket: self.accountId
+                bucket: 'viumo-'+self.accountId
+                //bucket:bucketName
             })
             let name=fileItem.fileName;
             return new Promise((resolve,reject)=>{
@@ -1348,8 +1327,8 @@ export default {
             let self=this;
             console.log(item);
             item.itemScore=itemDS.val;
-            
-            if(item.itemScore!=0){
+            item.itemScoreTitle=itemDS.scoreTitle;
+            if(item.itemScore!='--'){
                 if(self.inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                     self.inspectList[self.curGroupIndex].dealCount=self.inspectList[self.curGroupIndex].dealCount+1;
                 }
@@ -1838,7 +1817,7 @@ export default {
                     _item.disabled=true;
                 }
             })
-            self.inspectList.forEach((_item,_index)=>{
+            self.inspectList.slice(0,self.inspectList.length-1).forEach((_item,_index)=>{
                 _item.items.forEach((itemDS,indexDS)=>{
                     if(itemDS.id!=item.id){
                         itemDS.checked=false;
@@ -1877,7 +1856,8 @@ export default {
                             itemObj.groupId=item.groupId;
                             itemObj.subject=_item.subject;
                             itemObj.description=_item.description;
-                            itemObj.itemScore=0;
+                            itemObj.itemScore='--';
+                            itemObj.itemScoreTitle='--';
                             itemObj.deviceId=_item.deviceId;
                             itemObj.inspectInput='';
                             itemObj.inputCount=0;
@@ -1911,6 +1891,31 @@ export default {
             let self=this;
             self.noAllInspectObj.dialogCosed=false;
         },
+        async submit1(){
+            let self=this;
+            let temp=[];
+            let count=0;
+            let dealCount=0;
+            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
+            let inspectList=self.inspectList.slice(0,indexFeed);
+            
+            inspectList.forEach(item=>{
+                count=count+item.items.length;
+                dealCount=dealCount+item.dealCount;
+            })
+            if(dealCount<count){
+                self.noAllInspectObj.dialogCosed=true;
+                return false;
+            }
+            let obj={
+                inspect:inspectList,
+                event:self.eventList,
+                store:self.store,
+                channel:self.channel
+            }
+            sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
+            self.$router.push({name:"确认总结",params:{data:obj}});
+        },
         async submit(){
             let self=this;
             let temp=[];
@@ -1927,7 +1932,6 @@ export default {
                 self.noAllInspectObj.dialogCosed=true;
                 return false;
             }
-            self.fullscreenLoading=true;
             for(let i in inspectList){
                 for(let  j in inspectList[i].items){
                     let objItem={};
@@ -2010,7 +2014,6 @@ export default {
                 if(self.playState){
                     self.stopRealTime();
                 }
-                self.fullscreenLoading=false;
                 sessionStorage.setItem('reinspect_submit',JSON.stringify(routeData));
                 self.$router.push({name:"巡检提交事件",params:{data:routeData}});
             })
@@ -2062,6 +2065,8 @@ export default {
             if(self.channel==null){
                 return false;
             }
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             // if(!self.showVideo){
@@ -2085,6 +2090,10 @@ export default {
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
                 self.isPlayingFlag=1;
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal=window.setInterval(()=>{
+                    self.realTimeSpeed=self.realTimeSpeed+1;
+                },1000);
             }
             else{
                 self.showGuide=false;
@@ -2149,6 +2158,8 @@ export default {
                   streamType:'SubStream'
                 }
             };
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
             let url='';
             let ret=await dashAPI.RealTime(0,dataDis);
             await dashAPI.Offline(self.sessionId);
@@ -2172,6 +2183,11 @@ export default {
             if (url.ErrorCode==undefined&&url.length!=0) {
                 self.isPlayingFlag=1;
                 self.playVideo(self.mpdurl);
+                self.realTimeSpeed=0;
+
+                self.timerPlayReal=window.setInterval(()=>{
+                    self.realTimeSpeed=self.realTimeSpeed+1;
+                },1000);
             }
             else{   //当前视频如果返回失败，需处于暂停状态
                 self.showGuide=false;
@@ -3369,9 +3385,9 @@ export default {
                             @include point(top,12);
                             font-size: 12px;
                             margin-right: 20px;
-                            max-width: 80px;
+                            width: 96px;
                             height: 22px;
-                            @include point(width,76);
+                            // @include point(width,86);
                            
                             @include point(padding-left,10);
                             background-color: orange;
@@ -3599,6 +3615,11 @@ export default {
 }
 #storetab-content div#tab-2{
     width:33.33%;
+}
+.item-score .el-icon--right{
+    position: absolute !important;
+    right: 8px !important;
+    top: 6px !important;
 }
 </style>
 <style scoped>

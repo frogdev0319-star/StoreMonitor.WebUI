@@ -445,16 +445,9 @@ $suggestBack:#F1F6FE;
                             font-size: calc(12/1920*100vw);
                             margin-top: calc(10/1920*100vw);
                             margin-left: calc(35/1920*100vw);
+                            color: $tab;
                         }
                     }
-                }
-                .border-content{
-                    position: absolute;
-                    height: 60%;
-                    width: 1px;
-                    background-color: $border;
-                    right: calc(10/1920*100vw);
-                    top: calc(60/1920*100vw);
                 }
             }
         }

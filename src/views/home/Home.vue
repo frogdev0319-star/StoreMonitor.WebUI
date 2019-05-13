@@ -100,7 +100,7 @@
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="wrapperAll
                     ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}" v-if="!showHeader">
-                        <keep-alive>
+                        <keep-alive :max="1">
                             <router-view v-if="$route.meta.keepAlive"></router-view>
                         </keep-alive>
                         <router-view v-if="!$route.meta.keepAlive"></router-view>
@@ -110,7 +110,7 @@
                         <router-view></router-view> -->
                     </el-col>
                     <el-col class='wrapper-header' v-else>
-                        <keep-alive>
+                        <keep-alive  :max="1">
                             <router-view v-if="$route.meta.keepAlive"></router-view>
                         </keep-alive>
                         <router-view v-if="!$route.meta.keepAlive"></router-view>
@@ -151,7 +151,7 @@ export default {
             routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length),
             //wrapperAll:true,
             route:this.$route,
-            path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute',],
+            path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute'],
             wapper:false,
             curBrand:'',
             brandList:[],
@@ -164,17 +164,17 @@ export default {
             return (this.varyWindowWidth*70)/1920;
         },
         wrapperAll(){
-            let flag;
+            let flag=true;
             this.path.forEach(item=>{
                 flag=flag&&(this.$route.path!=item);
             })
-            if((this.$route.path=='/storemonitor/submit'||this.$route.path=='/reinspect/submit')&&this.wapper==true){
+            if((this.$route.path=='/storemonitor/submit')&&this.wapper==true){
                 flag=true;
             }
             return flag;
         },
         showBorder(){
-            if((this.$route.path!='/reinspection'&&this.$route.path!='/storemonitor'&&this.$route.path!='/rate')){
+            if((this.$route.path!='/reinspection'&&this.$route.path!='/storemonitor'&&this.$route.path!='/rate'&&this.$route.path!='/reinspect/confirmrein')){
                 return true;
             }
         },
@@ -296,7 +296,7 @@ export default {
                 }
             })
         },
-        changeAccount(accountId){
+        changeAccount(accountId){   //改account后存储
             let self=this;
             let params={
                 accountId:accountId
@@ -305,8 +305,6 @@ export default {
                 console.log(res);
                 if(res.errCode==0){
                     self.$route.meta.keepAlive=false;
-                    let accountId=accountId.toLowerCase();
-                    localStorage.setItem('oss_bucket',accountId);
                     self.getUserName();
                 }
             });
@@ -322,7 +320,7 @@ export default {
                         self.userName=item.userName.length>10?item.userName.substr(0,10)+'...':item.userName;
                         self.accountId=item.accountId;
                         let accountId=item.accountId.toLowerCase();
-                        localStorage.setItem('oss_bucket',accountId);
+                        localStorage.setItem('oss_bucket',accountId);  //初始进来存储
                         self.roleId=item.roleId;
                     }
                 })
@@ -624,7 +622,7 @@ export default {
                 @include point(margin,20);
                 border: solid #e3e9f4;
                 border-width: 0;
-                width:auto;
+                width:96.5%;
                 background: #fff;
                 @include point(margin-right,50);
             }
@@ -683,8 +681,8 @@ export default {
         }
         .sec-collapsed{
             margin-left:65px;
-            //width:95.5%;
-            width: auto;
+            width:95.5%;
+           // width: auto;
         }
         .sec-uncoll{
             margin-left:16.9%;

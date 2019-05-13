@@ -673,7 +673,7 @@ export default {
     async mounted(){
         let self=this;
         self.isREC=false;
-        self.videoEl=document.getElementById('previewVideo');
+        //self.videoEl=document.getElementById('previewVideo');
         document.onmouseup=self.mouseUpAction;
         //self.getPlayer();
         //初始化页面数据
@@ -718,6 +718,7 @@ export default {
             if(self.playState){
                 self.stopRealTime();
             }
+            //self.videoEl=document.getElementById('previewVideo').children[0];
             self.activeIndex='0';
             self.accountId=localStorage.getItem('oss_bucket');
             self.hideLast=false;
@@ -1266,7 +1267,8 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            let bucketName=self.accountId;
+            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -1276,11 +1278,13 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
+            //let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
                 accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                bucket: self.accountId
+                bucket: 'viumo-'+self.accountId
+                //bucket:bucketName
             })
             let name=fileItem.fileName;
             return new Promise((resolve,reject)=>{
@@ -1464,6 +1468,7 @@ export default {
                     let video=document.getElementById('previewVideo');
                     self.cutDialogcurTime=video.player.currentTime();
                 }
+                self.videoEl=document.getElementById('previewVideo').children[0];
                 self.canvasEl=document.getElementById('icanvas');
                 var ctx = self.canvasEl.getContext('2d');
                 ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
@@ -1607,13 +1612,76 @@ export default {
                 video.player.currentTime(self.cutDialogcurTime);
             }
         },
+        processInWebWorker(workerPath){
+            var blob = URL.createObjectURL(new Blob(['importScripts("' + workerPath + '");var now = Date.now;function print(text) {postMessage({"type" : "stdout","data" : text});};onmessage = function(event) {var message = event.data;if (message.type === "command") {var Module = {print: print,printErr: print,files: message.files || [],arguments: message.arguments || [],TOTAL_MEMORY: message.TOTAL_MEMORY || false};postMessage({"type" : "start","data" : Module.arguments.join(" ")});postMessage({"type" : "stdout","data" : "Received command: " +Module.arguments.join(" ") +((Module.TOTAL_MEMORY) ? ".  Processing with " + Module.TOTAL_MEMORY + " bits." : "")});var time = now();var result = ffmpeg_run(Module);var totalTime = now() - time;postMessage({"type" : "stdout","data" : "Finished processing (took " + totalTime + "ms)"});postMessage({"type" : "done","data" : result,"time" : totalTime});}};postMessage({"type" : "ready"});'], {
+                type: 'application/javascript'
+            }));
+
+            var worker = new Worker(blob);
+            URL.revokeObjectURL(blob);
+            return worker;
+        },
+        convertStreams(blob){
+            let self=this;
+            //let  workerPath = 'https://archive.org/download/ffmpeg_asm/ffmpeg_asm.js';
+            let  workerPath = './static/ffmpeg_asm.js';
+            return new Promise((resolve,reject)=>{
+                let worker=self.processInWebWorker(workerPath);
+                let aab;
+                var fileReader = new FileReader();
+                fileReader.onload = function() {
+                    aab = this.result;
+                    postMessage();
+                };
+                fileReader.readAsArrayBuffer(blob);
+
+                var postMessage = function() {
+                    worker.postMessage({
+                        type: 'command',
+                        arguments: '-i video.webm -c:v mpeg4 -b:v 6400k -strict experimental output.mp4'.split(' '),
+                        files: [
+                            {
+                                data: new Uint8Array(aab),
+                                name: 'video.webm'
+                            }
+                        ]
+                    });
+                };
+
+                worker.onmessage=function(event){
+                    var message=event.data;
+                    if(message.type=='ready'){
+                        console.log('realdy');
+                    }
+                    else if(message.type=='stdout'){
+                        console.log('stdout');
+                    }
+                    else if(message.type=='start'){
+                        console.log('start');
+                    }
+                    else if(message.type=='done'){
+                        console.log('done');
+                        var reslut=message.data[0];
+                        var blobMp4=new File([result.data],'test.mp4',{
+                            type:'video/mp4'
+                        });
+                        let blobRet=URL.createObjectURL(blobMp4);
+                        resolve(blobRet);
+                    }
+                }
+            })
+        },
         addVideoToList(){
             let self=this;
-            self.recorder.stopRecording(function(){
+            self.recorder.stopRecording(async function(){
                 self.isRecordingStarted=false;
                 self.isStoppedRecording=true;
                 var blob =self.recorder.getBlob();
+                //let blobRet= await self.convertStreams(blob);
+                console.log(blobRet);
                 let url=URL.createObjectURL(blob);
+                var blobRet=new File([url],{type:'video/mp4'});
+                var urlRet=URL.createObjectURL(blobRet);
                 let obj={};
                 obj.fileName=self.bucketImage+'/'+'event'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
                 obj.file=blob;

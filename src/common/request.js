@@ -6,9 +6,9 @@ import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-//let base='http://'+window.location.host;
-let base ='http://222.91.163.149:18081'
-
+let base='http://'+window.location.host; //上线地址
+//let base ='http://222.91.163.149:18081'  //本地开发地址
+//let base ='http://47.103.41.236:8081'  //测试地址
 
 
 let itempath='/storemonitor/api/'

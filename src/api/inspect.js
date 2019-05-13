@@ -145,3 +145,10 @@ export const getInspectReportInfo=data=>{
         data
     })
 }
+export const submitInspectItem1=data=>{
+    return request({
+        url:`${version2}/inspect/submit`,
+        method:'post',
+        data
+    })
+}

@@ -1057,7 +1057,8 @@ $h1:#292e36;
                 margin-right: 45px;
                 overflow: hidden;
                 display: inline-block;
-                width: 200px;
+                //width: 200px;
+                width: calc(300/1920*100vw);
             }
             .w3{
                 letter-spacing:0.3334em; /*如果需要y个字两端对齐，则为(x-y)/(y-1),这里是（4-3）/(3-1)=0.5em */

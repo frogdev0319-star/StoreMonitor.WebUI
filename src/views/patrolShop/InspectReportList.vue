@@ -95,8 +95,8 @@
                 </div>
                 <el-button size="mini" class="search-btn" @click="searchData" type="primary">搜索</el-button>
             </el-col>
-            <el-col :span="24" class="header-details">
-                <span class="choice-store"><i class="iconfont icon-tishi1"></i>已选门店：<span style="margin-left:20px;">{{storeStr}}</span></span>
+            <el-col :span="24" class="header-details1">
+                <span class="choice-store"><i class="iconfont icon-tishi1"></i>已选门店：<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
             </el-col>
         </el-col>
         <el-col :span="24" class="report-content">
@@ -685,6 +685,24 @@ $suggestBack:#F1F6FE;
         padding-top: calc(15/1920*100vw);
         padding-bottom: calc(15/1920*100vw);
         color: $black;
+        .header-details1{
+            text-align: left;
+            padding-left: calc(30/1920*100vw);
+            padding-right: calc(30/1920*100vw);
+            height: auto;
+            line-height: calc(26/1920*100vw);
+            span{
+                font-size: calc(14/1920*100vw);
+                margin-right: calc(20/1920*100vw);
+                margin-left: calc(20/1920*100vw);
+            }
+            .choice-store{
+                color: $tab;
+                i{
+                    margin-right: calc(15/1920*100vw);
+                }
+            }
+        }
         .header-details{
             text-align: left;
             padding-left: calc(30/1920*100vw);
@@ -716,12 +734,13 @@ $suggestBack:#F1F6FE;
                 width: calc(120/1920*100vw);
                 margin-left: calc(20/1920*100vw);
             }
-            .choice-store{
-                color: $tab;
-                i{
-                    margin-right: calc(15/1920*100vw);
-                }
-            }
+            
+            // .storename-str{
+            //     width: 100%;
+            //     white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+            //     overflow: hidden; //隐藏超出单元格的部分。
+            //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+            // }
         }
     }
     .report-content{

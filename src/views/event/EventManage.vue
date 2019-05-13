@@ -901,7 +901,7 @@ export default {
             type: 'datetime',
             range: '~',
             value: initDateStr,
-            btns: ['clear','confirm'],
+            btns: ['confirm'],
             max:util.getDateStr1(new Date().getTime()),
             /*ready: function(date){
                 console.log(date);

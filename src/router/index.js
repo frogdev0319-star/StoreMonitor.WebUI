@@ -70,6 +70,22 @@ export default new Router({
         {
           path:'/reinspection',
           name:'远程巡检',
+          component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
+          hidden:true,
+          meta:{
+            keepAlive:true
+          },
+          children:[
+            {
+              path:'/reinspect/confirmrein',
+              name:'确认总结',
+              component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
+            }
+          ]
+        },
+        {
+          path:'/reinspection',
+          name:'远程巡检',
           component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
           hidden:true,
           children:[
@@ -303,8 +319,8 @@ export default new Router({
         {
           path:'/other',
           name:'其他设置',
-          isReadOnly:false,
-          component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
+          isReadOnly:true,
+          component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
         }
       ]
     }
