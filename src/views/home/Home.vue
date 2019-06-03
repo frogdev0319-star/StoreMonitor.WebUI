@@ -734,9 +734,14 @@ export default {
     margin-right:calc(20/1920*100vw) !important;
     color: #fff !important;
 }
+.el-select-dropdown__item{
+  font-size: calc(24/1920*100vw) !important;
+  font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+}
 .options{
     padding-left: 20px;
-    font-size: calc(18/1920*100vw); 
+  font-size: calc(24/1920*100vw) !important;
+  font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
 }
 </style>
 
