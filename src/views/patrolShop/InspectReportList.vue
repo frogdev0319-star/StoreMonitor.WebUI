@@ -2,8 +2,8 @@
     <el-row id="el-containter">
         <el-col :span="24" class="report-header">
             <el-col :span="24" class="header-details">
-                <span>门店选择</span>
-                <el-select v-model="curCountry" clearable  placeholder="国家/地区" size="mini" 
+                <span>{{generateReportLang('selectStores')}}</span>
+                <el-select v-model="curCountry" clearable  :placeholder="generateReportLang('country')" size="mini"
                 class="el-province" @change="changeCountry" @clear="clearCountry">
                     <el-option
                     v-for="item in countryList"
@@ -12,7 +12,7 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <el-select v-model="curProvince" clearable  placeholder="区域一" size="mini" :disabled='curCountry.length==0'
+                <el-select v-model="curProvince" clearable  :placeholder="generateReportLang('regionI')" size="mini" :disabled='curCountry.length==0'
                 class="el-province" @change="changePro" @clear="cleaPro">
                     <el-option
                     v-for="item in provinceList"
@@ -21,7 +21,7 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <el-select v-model="curCity" clearable  placeholder="区域二" size="mini" :disabled='curProvince.length==0'
+                <el-select v-model="curCity" clearable  :placeholder="generateReportLang('regionII')" size="mini" :disabled='curProvince.length==0'
                 class="el-province" @change="changeCity" @clear="clearCity">
                     <el-option
                     v-for="item in cityList"
@@ -30,7 +30,7 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <el-select multiple collapse-tags v-model="curStore" clearable  placeholder="门店" size="mini" 
+                <el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"
                 class="el-province select-store" @change="changeStore" @clear="clearStore">
                     <el-option
                     v-for="item in storeDataList"
@@ -40,12 +40,12 @@
                     </el-option>
                 </el-select>
                 <div class="search-content" v-if="searchContent">
-                    <span>关键词</span>
-                    <el-input size="mini" v-model="searchInput" class="search-input" clearable="true"></el-input>
+                    <span>{{generateReportLang('keywords')}}</span>
+                    <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
                 </div>
             </el-col>
             <el-col :span="24" class="header-details">
-                <span>起止时间</span>
+                <span :class="lang== 'en'? 'en-span-class' : ''">{{generateReportLang('time')}}</span>
                 <el-date-picker
                     ref="datePicker"
                     v-model="dateValue"
@@ -66,11 +66,11 @@
                 </el-date-picker>
                 <el-tooltip class="item" effect="dark"
                     placement="bottom-end">
-                    <div slot="content">*最长搜索时间为一个月</div>
+                    <div slot="content">*{{generateReportLang('timePlaceholder')}}</div>
                     <i class="iconfont icon-bangzhu iconbangzhu"></i>
                 </el-tooltip>
-                <span>报表类型</span>
-                <el-select v-model="curReportType" clearable  placeholder="全部" size="mini" 
+                <span>{{generateReportLang('reportType')}}</span>
+                <el-select v-model="curReportType" clearable  :placeholder="generateReportLang('all')" size="mini"
                     class="el-province" @change="changeReportType" @clear="clearReportType">
                     <el-option
                     v-for="item in reportTypeList"
@@ -79,8 +79,8 @@
                     :value="item.mode">
                     </el-option>
                 </el-select>
-                <span>总评类型</span>
-                <el-select v-model="curAppraise" clearable  placeholder="全部" size="mini" 
+                <span>{{generateReportLang('resultType')}}</span>
+                <el-select v-model="curAppraise" clearable  :placeholder="generateReportLang('all')" size="mini"
                     class="el-province " @change="changeAppraise" @clear="clearAppraise">
                     <el-option
                     v-for="item in appraiseList"
@@ -90,13 +90,13 @@
                     </el-option>
                 </el-select>
                  <div class="search-content" v-if="!searchContent">
-                    <span>关键词</span>
-                    <el-input size="mini" v-model="searchInput" class="search-input" clearable="true"></el-input>
+                    <span>{{generateReportLang('keywords')}}</span>
+                    <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
                 </div>
-                <el-button size="mini" class="search-btn" @click="searchData" type="primary">搜索</el-button>
+                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{generateReportLang('search')}}</el-button>
             </el-col>
             <el-col :span="24" class="header-details1">
-                <span class="choice-store"><i class="iconfont icon-tishi1"></i>已选门店：<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
+                <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{generateReportLang('selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
             </el-col>
         </el-col>
         <el-col :span="24" class="report-content">
@@ -120,16 +120,16 @@
                             <i class="iconfont inspectIcon" :class="item.mode==0?'icon-yuanchengxunjian':'icon-xianchangxunjian'"></i>
                         </div>
                         <div class="item-content">
-                            <span class="assigner">提交人：{{item.submitterName}}</span>
+                            <span class="assigner">{{generateReportLang('submitter')}} {{item.submitterName}}</span>
                             <span class="datestr">{{item.datestr}}</span>
                         </div>
                     </div>
                 </el-col>
                 <el-col :span="24" class="el-pat">
-                    <el-pagination background small 
+                    <el-pagination background small
                         @current-change="currentChange"
-                    layout="jumper,total, prev, pager, next"  
-                    :page-size="sizeNum" :total="total" 
+                    layout="jumper,total, prev, pager, next"
+                    :page-size="sizeNum" :total="total"
                     :current-page="page"
                     class="el-pag">
                     </el-pagination>
@@ -143,6 +143,7 @@ import {getInspectReportList} from '@/api/inspect'
 import {getStoreList} from '@/api/store'
 import util from '@/common/util'
 import {Message} from 'element-ui'
+import {generateReportLang} from '@/api/i18n'
 export default {
     name:'InspectReportList',
     data(){
@@ -161,15 +162,15 @@ export default {
             sortTypeList:[
                 {
                     id:0,
-                    name:'按时间排序'
+                    name: this.$t('reportView.rankTime')
                 },
                 {
                     id:1,
-                    name:'按总评严重等级排序'
+                    name: this.$t('reportView.rankScore')
                 },
                 {
                     id:2,
-                    name:'按门店名称排序'
+                    name: this.$t('reportView.rankStore')
                 }
             ],
 
@@ -192,11 +193,11 @@ export default {
             },
             curReportType:'',
             reportTypeList:[
-                {'mode':0,'label':'远程巡检'},{'mode':1,'label':'现场巡检'}
+                {'mode':0,'label':this.$t('reportView.remotePatrol')},{'mode':1,'label':this.$t('reportView.onsitePatrol')}
             ],
             curAppraise:'',
             appraiseList:[
-                {'status':0,'label':'立即督导'},{'status':1,'label':'待改善'},{'status':2,'label':'合格'}
+                {'status':0,'label':this.$t('reportView.dangerous')},{'status':1,'label':this.$t('reportView.improve')},{'status':2,'label':this.$t('reportView.pass')}
             ],
             storeStr:'',
             total: 0,
@@ -205,6 +206,7 @@ export default {
             storeDataList:[],
             storeIdList:[],  //存放当前选中的门店id
             poperClass:'date-picker-poper',
+            lang: this.$i18n.locale
         }
     },
     computed:{
@@ -234,6 +236,7 @@ export default {
         // }
     },
     methods:{
+        generateReportLang,
         changeBrand(){
             let self=this;
             self.curCountry='';
@@ -513,7 +516,7 @@ export default {
             })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
-        }, 
+        },
         clearStore(){
             let self=this;
 
@@ -539,10 +542,10 @@ export default {
             console.log(val);
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-            
+
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
                 Message({
-                    message:'当前选择时间范围最大为一个月，已调整！',
+                    message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
                 })
@@ -613,7 +616,7 @@ export default {
             else{
                 self.params.like={};
             }
-            
+
             self.params.filter={page:0,size:self.sizeNum};
             self.getReportList(self.params);
         },
@@ -632,7 +635,7 @@ export default {
             let self=this;
             console.log(item.routeObj);
             sessionStorage.setItem('report_data',JSON.stringify(item.routeObj));
-            self.$router.push({name:"报告详情",params:{data:item.routeObj}});
+            self.$router.push({name:"reportDetails",params:{data:item.routeObj}});
         },
         notify(msg,type,time) {
             this.$message({
@@ -643,7 +646,7 @@ export default {
         },
     },
     beforeRouteEnter (to, from, next) {
-        if(from.name!='报告详情'&&from.path!='/'){
+        if(from.name!='reportDetails'&&from.path!='/'){
             to.meta.keepAlive=false;
         }
         else{
@@ -654,6 +657,7 @@ export default {
         });
     },
     mounted(){
+        console.log(this.sortTypeList);
         let self=this;
         if(self.varyWindowWidth<1600){
             self.searchContent=true;
@@ -720,6 +724,16 @@ $suggestBack:#F1F6FE;
                 margin-right: calc(20/1920*100vw);
                 margin-left: calc(20/1920*100vw);
             }
+            @media screen and(max-width: 1366px){
+              .en-span-class{
+                margin-right: 60px;
+              }
+            }
+            @media screen and(min-width: 1366px){
+              .en-span-class{
+                margin-right: 75px;
+              }
+            }
             .el-province{
                 width: calc(180/1920*100vw);
                 margin-right: calc(15/1920*100vw);
@@ -734,7 +748,10 @@ $suggestBack:#F1F6FE;
                 width: calc(120/1920*100vw);
                 margin-left: calc(20/1920*100vw);
             }
-            
+            .en-search-btn{
+              width: calc(120/1920*100vw);
+              margin-left: calc(20/1920*100vw);
+            }
             // .storename-str{
             //     width: 100%;
             //     white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
@@ -797,7 +814,7 @@ $suggestBack:#F1F6FE;
                         color: $black;
                     }
                     .inspect{
-                        
+
                         font-size: calc(12/1920*100vw);
                         color: $tab;
                     }

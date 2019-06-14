@@ -6,7 +6,7 @@
     border-bottom: 1px solid #FB4C5D;
     width: 87%;
     margin-bottom: 30px;
-    
+
 }
 .tabName-input ::-webkit-input-placeholder{
     color: #EAEDF2 !important;
@@ -75,6 +75,7 @@ input:disabled{
 }
 #storetab-content.el-tabs__active-bar{
     height: 4px !important;
+    width: 33.33% !important;
     background-color: #f31d65 !important;
 }
 #storetab-content.el-tabs__item{
@@ -83,7 +84,7 @@ input:disabled{
 #storetab-content.el-tabs__item.is-active{
     font-weight: bold !important;
     color: #f31d65 !important;
-} 
+}
 #storetab-content.el-tabs__item:hover{
     color: #f31d65 !important;
 }
@@ -113,6 +114,63 @@ input:disabled{
 }
 #storetab-content div#tab-2{
     width:33.33%;
+}
+
+/*远程巡店及门店监控tab页英文样式*/
+#en-storetab-content .el-tabs__nav-scroll{
+  width: 100%;
+}
+#en-storetab-content.el-tabs__active-bar{
+  height: 4px !important;
+  background-color: #f31d65 !important;
+}
+#en-storetab-content.el-tabs__item{
+  color:#7d8cad !important;
+}
+#en-storetab-content.el-tabs__item.is-active{
+  font-weight: bold !important;
+  color: #f31d65 !important;
+}
+#en-storetab-content.el-tabs__item:hover{
+  color: #f31d65 !important;
+}
+
+@media screen and (min-width: 1366px){
+  #en-storetab-content .el-tabs__nav.is-top{
+    margin-left: 5%;
+    width: 90%;
+  }
+
+  #en-storetab-content div#tab-0{
+    width:33.33%;
+  }
+  #en-storetab-content div#tab-1{
+    width:33.33%;
+  }
+  #en-storetab-content div#tab-2{
+    width:33.33%;
+  }
+}
+@media screen and (max-width: 1366px){
+  #en-storetab-content .el-tabs__nav.is-top{
+    margin-left: 0;
+    width: 100%;
+  }
+  #en-storetab-content div#tab-0{
+    width:33.33%;
+  }
+  #en-storetab-content div#tab-1{
+    width:33.33%;
+  }
+  #en-storetab-content div#tab-2{
+    width:33.33%;
+  }
+  span.el-tabs__nav-prev{
+    visibility: hidden;
+  }
+  .el-tabs__nav-next{
+    visibility: hidden;
+  }
 }
 .el-textarea__inner{
     font-family: 'Microsoft YaHei';

@@ -3,11 +3,11 @@
         <el-col :span="24" class="storeEdit-header">
             <div class="store-title ">
                 <span>{{storeTitle}}</span>
-                <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary'>提交</el-button>
+                <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary'>{{generateStoreLang('mySubmit')}}</el-button>
             </div>
             <div class="store-info">
-                <span style="margin-right:20px;"><strong>负责人</strong></span>
-                <el-select v-model="curPerson" placeholder="请选择" size="mini"
+                <span style="margin-right:20px;"><strong>{{generateStoreLang('solver')}}</strong></span>
+                <el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"
                 class="el-schedule" @change="changePerson">
                     <el-option
                     v-for="item in personList"
@@ -16,9 +16,9 @@
                     :value="item.userId">
                     </el-option>
                 </el-select>
-                <strong style="margin-right:20px;">联系方式</strong><span style="min-width:100px;display:inline-block;">{{phone}}</span>
-                <span style="margin-right:20px;"><strong>巡检排程</strong></span>
-                <el-select v-model="schedule" placeholder="请选择" size="mini" class="el-schedule" :disabled=true>
+                <strong style="margin-right:20px;">{{generateStoreLang('contact')}}</strong><span style="min-width:100px;display:inline-block;">{{phone}}</span>
+                <span style="margin-right:20px;"><strong>{{generateStoreLang('routeSchedule')}}</strong></span>
+                <el-select v-model="schedule" :placeholder="generateStoreLang('selectPlaceholder')" size="mini" class="el-schedule" :disabled=true>
                     <el-option
                     v-for="item in scheduleList"
                     :key="item.value"
@@ -28,14 +28,14 @@
                 </el-select>
             </div>
             <div class="store-handle">
-                <span style="font-size:14px;font-weight:bold;">关联巡检表</span>
+                <span style="font-size:14px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
                 <span style="font-size:14px;">{{curTag}}</span>
             </div>
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
             <div class="el-table-title tabTitle">
-                <span class="name-title">巡检名称</span>
-                <span class="schedule-title">关联通道</span>
+                <span class="name-title">{{generateStoreLang('patrolName')}}</span>
+                <span class="schedule-title">{{generateStoreLang('bindChanel')}}</span>
             </div>
             <!-- <div v-if="scheduleData.length!=0"> -->
                 <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index" >
@@ -72,6 +72,8 @@ import {getUserInfo} from '@/api/login'
 import {getDeviceList} from '@/api/device'
 import {checkOutInspectItem,bindInspectItem} from '@/api/inspect'
 import {updateStoreInfo} from '@/api/store'
+import {generateStoreLang} from '@/api/i18n'
+
 export default {
     name:'EditStoreVue',
     data(){
@@ -118,7 +120,7 @@ export default {
     },
     mounted(){
         let self=this;
-        
+
         self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
         let storeId=self.store.storeId;
         self.storeTitle=self.store.name;
@@ -127,10 +129,11 @@ export default {
         self.phone=self.store.phone;
         self.getChannelByStore(storeId);
         self.getNapeByStore(storeId);
-        
+
         self.getUserList();
     },
     methods:{
+        generateStoreLang,
         getChannelByStore(storeId){
             let self=this;
             let params={storeId:storeId};
@@ -256,40 +259,40 @@ export default {
             if(self.scheduleData.length==0){
                 let resUpdateStore=null;
                 if(self.curPerson==null||self.curPerson.length==0){
-                    self.notify('请选择门店负责人！','warning',3000);
+                    self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
                     return false;
                 }
                 if(self.curPerson.length!=0&&(self.userId!=self.curPerson)){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
                 }
                 if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
-                     self.notify('提交成功！','success',3000);
+                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
                 }
             }
             else{
                 if((count!=0&&(count!=countChannel))||countChannel==0){
-                    self.notify('请选择全部通道后提交！','warning',3000);
+                    self.notify(this.$t('storeView.selectAllChanels'),'warning',3000);
                     return false;
                 }
                 let paramsInspec={
                     items:temp
                 };
-                
+
                 let resUpdateStore=null,resBindInspect=null;
                 if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.userId!=self.curPerson))){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
                 }
                 else{
-                    self.notify('请选择门店负责人！','warning',3000);
+                    self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
                     return false;
                 }
                 resBindInspect=await self.bindInspectItem(paramsInspec);
                 if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
                 ||(resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
-                    self.notify('提交成功！','success',3000);
+                    self.notify(this.$t('storeView.successSubmit'),'success',3000);
                 }
                 else{
-                    self.notify('提交失败！','warning',3000);
+                    self.notify(this.$t('storeView.failSubmit'),'warning',3000);
                     return false;
                 }
             }

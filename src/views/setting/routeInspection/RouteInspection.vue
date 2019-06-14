@@ -2,20 +2,20 @@
     <el-row class="el-route-container">
         <el-col :span="24" class="el-route-header">
             <el-col :span="7" class="el-route-btns">
-                <span class="bind-title">已绑定{{storeNum}}家门店</span>
-                <el-button size="mini" @click="bindStore" class="el-bind-btn" 
+                <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
+                <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' "
                 :disabled="elTableData[Number(activeName)].routeData.length==0">
                     <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
-                    <span>巡检表绑定</span>
+                    <span>{{generateInsSettingLang('bindList')}}</span>
                 </el-button>
 
-                <el-button v-for="(item,index) in btnList" 
-                :key="index" size="mini" @click="handleNape(index,item)" class="el-handle-btn">
+                <el-button v-for="(item,index) in btnList"
+                :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
                 <!-- <a :href="downLoadSrc" :download='fileName' class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a> -->
-                <el-dialog title='导入'
+                <el-dialog :title= "generateInsSettingLang('import')"
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -24,29 +24,30 @@
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
                         <hr style="border: 0.5px solid #f31d65;"/>
-                        <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
+                        <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
                                 <el-radio-button style="margin-left:10px;" class="radio-btn"
-                                v-for="(item,key) in radioList" :key="key" 
+                                v-for="(item,key) in radioList" :key="key"
                                 :label="item.label"></el-radio-button>
                             </el-radio-group>
                         </div>
                         <div class="tabName-input-content">
-                            <input type="text" v-model="tabNameInput" class="tabName-input" placeholder="请输入巡检表名称" v-if="checkValue=='新增巡检表'">
+                            <input type="text" v-model="tabNameInput" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')"
+                                   v-if="checkValue== this.addPatrol">
                         </div>
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">取 消</el-button>
-                       
-                        <a href="javascript:;" class="a-upload" @click="checkBeforeImport">选择文件
+                        <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+
+                        <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{generateInsSettingLang('select')}}
                             <!-- <div class="file-sliver"  v-if="hideUpload"> -->
                                 <input  id="upload" type="file" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                             <!-- </div> -->
                         </a>
                     </div>
                 </el-dialog>
-                <el-dialog title='提示'
+                <el-dialog :title="generateInsSettingLang('prompt')"
                 :visible.sync="showConfirmImport" v-if="showConfirmImport"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -57,18 +58,18 @@
                         <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>此操作将会清空当前页面已有巡检项，是否继续?</span>
+                            <span>{{generateInsSettingLang('clearInfo')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">取 消</el-button>
-                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">确 认</el-button>
+                        <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">{{generateInsSettingLang('prompt')}}</el-button>
                     </div>
                 </el-dialog>
             </el-col>
             <el-col :span="18" class="el-route-tabs">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" :closable="index!=0&&index!=1?true:false" >
+                <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-patrltabs-content': ''">
+                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :closable="index!=0&&index!=1?true:false" >
                         <div v-if="item.routeData">
                             <route-detail :ref="curIndex" :route-data="item.routeData" :down-src="downLoadSrc"
                              :tab-name="item.label" @refreshList="getTagList"></route-detail>
@@ -86,6 +87,7 @@ import {inpectRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
+import {generateInsSettingLang} from '@/api/i18n'
 export default {
     name:'RouteInspection',
     components:{
@@ -97,7 +99,7 @@ export default {
             radioList:[
                 {
                     'value':'1',
-                    'label':'远程巡检'
+                    'label': '远程巡检'
                 },
                 {
                     'value':'2',
@@ -123,34 +125,37 @@ export default {
                     id:0,
                     iconClass:'iconfont icon-daoru',
                     name:'import',
-                    btnTitle:'导入',
+                    btnTitle: this.$t('insSettingView.import'),
                     enabled:true,
                 },
                 {
                     id:0,
                     iconClass:'iconfont icon-daochu',
                     name:'export',
-                    btnTitle:'导出',
+                    btnTitle: this.$t('insSettingView.export'),
                     enabled:true,
                 },
                 {
                     id:0,
                     iconClass:'iconfont icon-xiazai',
                     name:'download',
-                    btnTitle:'下载',
+                    btnTitle: this.$t('insSettingView.download'),
                     enabled:true,
                 }
             ],
 
             allData:[],
-            tagList:['远程巡检','现场巡检'],
+            tagList:['远程巡检', '现场巡检'],
             curData:[],
             loading:null,
-            fileName:'店铺标准-巡检表示例',
+            fileName:this.$t('insSettingView.patrolExample'),
+            lang: this.$i18n.locale,
+            taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')]
         }
     },
+
     computed:{
-        ...mapGetters({accountChanged:'accountChanged'})
+        ...mapGetters({accountChanged:'accountChanged'}),
     },
     watch:{
         accountChanged(val,oldVal){
@@ -163,7 +168,7 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {
-            if(from.name=='巡检项设置'){
+            if(from.name=='itemSetting'){
                 to.meta.keepAlive=false;
             }
             else{
@@ -179,6 +184,19 @@ export default {
         self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
     },
     methods:{
+        generateInsSettingLang,
+        getLang(index){
+          console.log(index)
+          if(index === 0){
+            return this.$t('insSettingView.remotePatrol')
+          }
+          else if(index === 1){
+            return this.$t('insSettingView.onsitePatrol')
+          }
+          else{
+            return ''
+          }
+        },
         initData(){
             let self=this;
             switch(Number(self.activeName)){
@@ -192,7 +210,7 @@ export default {
             inpectRESTful.downLoadTemplate().then(res=>{
                 console.log(res);
                 let blob = new Blob([res],{
-                    type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
                 });
                 let objectUrl = URL.createObjectURL(blob);
                 let url=objectUrl;
@@ -208,7 +226,7 @@ export default {
             inpectRESTful.downLoadTemplate().then(res=>{
                 console.log(res);
                 let blob = new Blob([res],{
-                    type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+                    type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
                 });
                 let objectUrl = URL.createObjectURL(blob);
                 let url=objectUrl;
@@ -233,7 +251,7 @@ export default {
                     console.log(err.message);
                     //self.loading.close();
                 })
-                        
+
             })
         },
         async getTagList(){
@@ -266,7 +284,7 @@ export default {
                                 objChild.name=itemChild.subject;
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
                                 //objChild.score=itemChild.itemScore+'分';
-                                objChild.score=itemChild.itemScore+'分';
+                                objChild.score=itemChild.itemScore + " " + this.$t('insSettingView.score');
                                 tempChild.push(objChild);
                             })
                             _obj.itemData=tempChild;
@@ -344,7 +362,7 @@ export default {
                 index=0;
                 mode=0;  //远程巡检 mode 0
             }
-            else if(self.checkValue=='现场巡检'){ 
+            else if(self.checkValue=='现场巡检'){
                 index=1;
                 mode=1;  //现场巡检  mode 1
             }
@@ -404,14 +422,14 @@ export default {
                 let resItem=await self.addItem(paramsItem);
                 let codeItem=resItem.errMsg;
                 if(codeItem!=null&&codeItem=='Success'){
-                    self.notify('模板导入成功!','success',3000);
+                    self.notify(this.$t('insSettingView.importSuss'),'success',3000);
                 }
                 else{
-                    self.notify('模板导入失败!','warning',3000);
+                    self.notify(this.$t('insSettingView.importFail'),'warning',3000);
                 }
             }
             else{
-                self.notify('模板导入失败!','warning',3000);
+                self.notify(this.$t('insSettingView.importFail'),'warning',3000);
             }
             self.showImportContent=false;
             self.getTagList();
@@ -424,7 +442,7 @@ export default {
             let self=this;
             let arr=[];
             if(self.elTableData[Number(self.activeName)].routeData.length==0){
-                self.notify('当前巡检表为空，请新增巡检项后进行操作！','warning',3000);
+                self.notify(this.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             self.elTableData[Number(self.activeName)].routeData.forEach(item=>{
@@ -434,14 +452,15 @@ export default {
             });
             console.log(arr);
             if(arr.length==0){
-                self.notify('请新增巡检项后进行操作！','warning',3000);
+                //self.notify('请新增巡检项后进行操作！','warning',3000);
+                self.notify(this.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
-            self.$router.push({name:'门店绑定',params:self.activeName});
+            self.$router.push({name:'bindStore',params:self.activeName});
         },
-        
+
         changeValue(obj){
             let self=this;
             self.tabNameInput='';
@@ -470,7 +489,7 @@ export default {
                 default:
                 this.checkValue='新增巡检表';break;
             }
-            
+
         },
         async importItem(){
             let self=this;
@@ -495,10 +514,10 @@ export default {
             let self=this;
             if(self.checkValue=='新增巡检表'&&(self.tabNameInput==null||self.tabNameInput.trim().length==0)){
                 self.hideUpload=true;
-                self.notify('请输入自定义巡检表名称!','warning',3000);
+                self.notify(this.$t('insSettingView.enterSelfListName'),'warning',3000);
                 return false;
             }
-           
+
             else{
                 self.hideUpload=false;
             }
@@ -506,6 +525,7 @@ export default {
         getBindStoreList(){
             let self=this;
             let tagName=self.elTableData[Number(self.activeName)].label;
+            console.log(tagName)
             let params={tagName:tagName};
             inpectRESTful.getInspectBindList(params).then(res=>{
                 console.log(res.data.errMsg);
@@ -572,7 +592,7 @@ export default {
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
                     if(!outdata[0].hasOwnProperty('检查分类')){
-                        _this.notify('当前模板错误，请更换模板重新导入！','warning',3000);
+                        _this.notify(_this.$t('insSettingView.templateError'),'warning',3000);
                         return false;
                     }
                     let arr=outdata;
@@ -606,23 +626,23 @@ export default {
                     })
 
                     if(flaggroupLength){
-                        _this.notify('excel中检查类别列中文本长度不能超过10个字，请检查！','warning',3000);
+                        _this.notify(_this.$t('insSettingView.excelLongCategory'),'warning',3000);
                         return false;
                     }
                     if(flaggroupRex){
-                        _this.notify('excel中检查类别列中不能含有非法字符，请检查！','warning',3000);
+                        _this.notify(_this.$t('insSettingView.excelIllegalCategory'),'warning',3000);
                         return false;
                     }
                     if(flagItemName){
-                        _this.notify('excel中检查项目名称列不能为空，请检查！','warning',3000);
+                        _this.notify(_this.$t('insSettingView.excelEmpty'),'warning',3000);
                         return false;
                     }
                     if(flagItemLength){
-                        _this.notify('excel中检查项目名称不能超过25个字，请检查！','warning',3000);
+                        _this.notify(_this.$t('insSettingView.excelLongItem'),'warning',3000);
                         return false;
                     }
                     if(flagItemRex){
-                        _this.notify('excel中检查项目名称中不能含有非法字符，请检查！','warning',3000);
+                        _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
                         return false;
                     }
 
@@ -636,7 +656,7 @@ export default {
                         }
                     }
                     _this.addAllData(dataArry);
-                    
+
                 }
                 reader.readAsArrayBuffer(f);
             }
@@ -668,7 +688,7 @@ export default {
         export2Excel() {
             var that = this;
             require.ensure([], () => {
-                const { export_json_to_excel } = require('@/excel/Export2Excel'); 
+                const { export_json_to_excel } = require('@/excel/Export2Excel');
                 const tHeader = ['检查分类','检查项目名称','项目分值', "检查项目详细说明（选填，不填为空）",]; // 导出的表头名
                 const filterVal = ['gourpname','napename','score','napedep',]; // 导出的表头字段名
                 console.log(that.activeName);
@@ -701,8 +721,21 @@ export default {
                 })
                 const list = excelData;
                 const data = that.formatJson(filterVal, list);
-
-                export_json_to_excel(tHeader, data, `[${that.elTableData[Number(that.activeName)].label}]`);// 导出的表格名称，根据需要自己命名
+                let fileName = '';
+                switch (Number(that.activeName)) {
+                  case 0: {
+                    fileName = `[${that.$t('insSettingView.remotePatrol')}]`;
+                    break;
+                  }
+                  case 1:{
+                    fileName = `[${that.$t('insSettingView.onsitePatrol')}]`;
+                    break;
+                  }
+                  default:{
+                    fileName = `[${that.elTableData[Number(that.activeName)].label}]`
+                  }
+                }
+                export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
             })
         },
         formatJson(filterVal, jsonData) {
@@ -719,12 +752,12 @@ export default {
 }
 </script>
 <style>
-@import '../../../assets/css/importfile.css'; 
+@import '../../../assets/css/importfile.css';
 </style>
 <style lang="scss" scoped>
     $mainColor:#f31d65;
     *{
-        font-family: Microsoft YaHei;
+        font-family: Arial, Microsoft YaHei;
     }
     @function rem($val){
         @return $val/16+rem;
@@ -749,6 +782,7 @@ export default {
             }
         }
     }
+
     .el-route-container{
         margin: 20px 15px 15px 15px;
         .el-route-header{
@@ -768,8 +802,13 @@ export default {
                     color:#A2AEBC;
                     font-size: 12px;
                 }
+                .en-bind-title{
+                  @include point(margin-right,0);
+                  color:#A2AEBC;
+                  font-size: 12px;
+                }
                 .el-bind-btn{
-                    background-color: $mainColor; 
+                    background-color: $mainColor;
                     color: #fff;
                     border-color: $mainColor;
                     position: relative;
@@ -780,13 +819,26 @@ export default {
                         opacity: 0.6;
                     }
                 }
+                .en-el-bind-btn{
+                  background-color: $mainColor;
+                  color: #fff;
+                  border-color: $mainColor;
+                  position: relative;
+                  border-radius: 0px;
+                  @include point(margin-right,15);
+                  font-size: 12px;
+                  width:120px;
+                  &:disabled{
+                    opacity: 0.6;
+                  }
+                }
                 .downLoad-btn{
                     margin-left: 0px !important;
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
                     padding: 2px 5px !important;
-                    
+
                     position: relative;
                     top: 3px;
                     display: inline-block;
@@ -830,9 +882,57 @@ export default {
                     &:focus{
                         background-color: #FEE4E7;
                     }
-                }     
+                }
+              .en-el-handle-btn{
+                margin-left: 0px !important;
+                border-color: $mainColor !important;
+                color: $mainColor !important;
+                border-radius: 0px;
+                padding: 3px 5px !important;
+                position: relative;
+                top: 3px;
+                border-right: 0;
+                @media screen and (min-width: 1366px){
+                  @include point(width, 90);
+                }
+                @media screen and (max-width: 1366px){
+                  @include point(width, 120);
+                }
+                span{
+                  position: relative;
+                  @include point(bottom,3);
+                }
+                &:last-child{
+                  border-right: 1px solid;
+                }
+
+                &:hover{
+                  background-color: #FEE4E7;
+                }
+                &:focus{
+                  background-color: #FEE4E7;
+                }
+              }
             }
         }
+    }
+
+    #en-patrltabs-content /deep/ .el-tabs__item {
+      padding: 0 0;
+      font-size: 14px;
+      width: 160px;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    #en-patrltabs-content /deep/ .is-active {
+      border-bottom: 4px solid #f31d65;
+
+    }
+
+    #en-patrltabs-content /deep/ .el-tabs__active-bar{
+      height: 0 !important;
     }
     .el-dropbtn{
         position: relative;
@@ -852,5 +952,7 @@ export default {
         @include point(height,73);
         width: 100%;
     }
+
+
 </style>
 

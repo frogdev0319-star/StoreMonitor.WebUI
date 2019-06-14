@@ -9,14 +9,14 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button class="el-submit" :size="varyWindowWidth>1680?'small':'mini'" @click="submit1"  type="primary" v-if="showStoreUp">
-                    确认总结
-                </el-button> 
+                <el-button :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" @click="submit1"  type="primary" v-if="showStoreUp">
+                  {{generatePatrolLang('confirmSum')}}
+                </el-button>
             </div>
-            <el-dialog title='编辑截图'
+            <el-dialog :title="generatePatrolLang('edit')"
             :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-                    <hr class="dialog-hr"/> 
+                    <hr class="dialog-hr"/>
                         <div class='icon-right' v-if="showPenBtn" id="iconR">
                             <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
                             <transition name='fadepen'>
@@ -28,26 +28,26 @@
                             </div>
                             </transition>
                         </div>
-                     <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)" 
+                     <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
                     @mousemove="mouseMoveAction($event)"></canvas>
                     <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
                     'margin-left':47*percentHeight+'px'}">
-                        <div class="content" @click="cancelEditCanvas"> 
-                            <img :src="clearIconSrc" class="icon-clear" height="22px"/> 
-                            <span>清除</span>
+                        <div class="content" @click="cancelEditCanvas">
+                            <img :src="clearIconSrc" class="icon-clear" height="22px"/>
+                            <span>{{generatePatrolLang('clear')}}</span>
                         </div>
                         <div class="content" @click="confirmEditCanvas">
-                            <img :src="removeIconSrc" class="icon-clear" height="22px"/> 
-                            <span>撤销</span>
+                            <img :src="removeIconSrc" class="icon-clear" height="22px"/>
+                            <span>{{generatePatrolLang('cancel')}}</span>
                         </div>
                     </div>
                 </div>
                 <div slot="footer">
-                    <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取 消</el-button>
-                    <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
+                    <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
                 </div>
             </el-dialog>
-            <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+            <el-dialog  :title="generatePatrolLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
             v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content">
                     <hr class="dialog-hr"/>
@@ -55,7 +55,7 @@
                     </video>
                 </div>
             </el-dialog>
-            <el-dialog title='查看'
+            <el-dialog :title="generatePatrolLang('view')"
                 :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" :width="680*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -64,24 +64,24 @@
                     </div>
                 </div>
             </el-dialog>
-            <el-dialog title='问题反馈'
+            <el-dialog :title="generatePatrolLang('feedbacks')"
                 :visible.sync="showFeedDialog1" :close-on-click-modal="false" v-if="showFeedDialog1" :width="480*percentHeight+'px'" top=12%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
                     <div class="dialog-event-content">
-                        <span class="event-title">问题名称</span>
+                        <span class="event-title">{{generatePatrolLang('name')}}</span>
                         <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
-                        <span class="event-title">问题描述</span>
+                        <span class="event-title">{{generatePatrolLang('description')}}</span>
                         <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
-                    <el-button id="cancelBtn" @click="showFeedDialog1 = false" size="mini">取 消</el-button>
-                    <el-button id="confirmBtn" @click="confirmAddFeedBack1" size="mini" type="primary">确 认</el-button>
+                    <el-button id="cancelBtn" @click="showFeedDialog1 = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack1" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
                 </div>
             </el-dialog>
-            <el-dialog title='问题反馈'
+            <el-dialog :title= "generatePatrolLang('feedbacks')"
             :visible.sync="showFeedDialog2" :close-on-click-modal="false" v-if="showFeedDialog2" :width="860*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -97,35 +97,35 @@
                             </div>
                             </transition>
                         </div>
-                        <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)" 
+                        <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)"
                         @mousemove="mouseMoveAction($event)"></canvas>
                         <div class="cancel-content" v-if="showCancelContent" :style="{'width':520*percentHeight+'px',
                         'margin-left':47*percentHeight+'px'}">
-                            <div class="content" @click="cancelEditCanvas"> 
-                                <img :src="clearIconSrc" class="icon-clear" height="22px"/> 
-                                <span>清除</span>
+                            <div class="content" @click="cancelEditCanvas">
+                                <img :src="clearIconSrc" class="icon-clear" height="22px"/>
+                                <span>{{generatePatrolLang('clear')}}</span>
                             </div>
                             <div class="content" @click="confirmEditCanvas">
-                                <img :src="removeIconSrc" class="icon-clear" height="22px"/> 
-                                <span>撤销</span>
+                                <img :src="removeIconSrc" class="icon-clear" height="22px"/>
+                                <span>{{generatePatrolLang('cancel')}}</span>
                             </div>
                         </div>
                     </div>
                     <div class="event-content">
-                        <span class="event-title">问题名称</span>
+                        <span class="event-title">{{generatePatrolLang('name')}}</span>
                         <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
-                        <span class="event-title">问题描述</span>
+                        <span class="event-title">{{generatePatrolLang('description')}}</span>
                         <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
-                    <el-button id="cancelBtn" @click="showFeedDialog2 = false" size="mini">取 消</el-button>
-                    <el-button id="confirmBtn" @click="confirmAddFeedBack2" size="mini" type="primary">确 认</el-button>
+                    <el-button id="cancelBtn" @click="showFeedDialog2 = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack2" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
                 </div>
             </el-dialog>
 
-            <el-dialog title='问题反馈'
+            <el-dialog :title="generatePatrolLang('feedbacks')"
             :visible.sync="showFeedDialog3" :close-on-click-modal="false" v-if="showFeedDialog3" :width="860*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -133,16 +133,16 @@
                         <video  :width="520*percentHeight" :height="340*percentHeight" id="previewCutVideo" prload controls autoplay :src="feedBackVideoFileObj.src"></video>
                     </div>
                     <div class="event-content">
-                        <span class="event-title">问题名称</span>
+                        <span class="event-title">{{generatePatrolLang('name')}}</span>
                         <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
-                        <span class="event-title">问题描述</span>
+                        <span class="event-title">{{generatePatrolLang('description')}}</span>
                         <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                        maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
-                    <el-button id="cancelBtn" @click="showFeedDialog3 = false" size="mini">取 消</el-button>
-                    <el-button id="confirmBtn" @click="confirmAddFeedBack3" size="mini" type="primary">确 认</el-button>
+                    <el-button id="cancelBtn" @click="showFeedDialog3 = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack3" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
                 </div>
             </el-dialog>
 
@@ -156,18 +156,19 @@
                     <div class="num-content">
                         <span class="guide-num">2</span>
                         <span class="guide-title">
-                            点击作为取证截图！
+                            {{generatePatrolLang('takeSnapshot')}}
                         </span>
                     </div>
                     <img :src="arrows2Src" alt="arrow2"/>
                     <div class="iconright-content">
-                        <div class="iconright">
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                            <span>抓拍</span>
+                            <span>{{generatePatrolLang('snapshot')}}</span>
                         </div>
-                        <div class="iconright">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"></i>
-                            <span>录像</span>
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+                            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;margin-left: -14px;"></i>
+                            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+                          <span>{{generatePatrolLang('record')}}</span>
                         </div>
                     </div>
                 </div>
@@ -191,21 +192,22 @@
                             <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
                         </div>
                         <div class="screen-content">
-                            <i class="iconfont iconscreen" 
+                            <i class="iconfont iconscreen"
                             :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
                             <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
                         </div>
                     </div>
                     <transition name='fade'>
-                        <div class="iconright" v-if="showModelContent" @click="cutPicture">
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent" @click="cutPicture">
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                            <span>抓拍</span>
+                            <span>{{generatePatrolLang('snapshot')}}</span>
                         </div>
                     </transition>
                     <transition name="fade">
-                        <div class="iconright1" v-if="showModelContent" @click="getVideo">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"></i>
-                            <span>录像</span>
+                        <div :class="lang== 'en'? 'en-iconright1' : 'iconright'" v-if="showModelContent" @click="getVideo">
+                            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
+                            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+                            <span>{{generatePatrolLang('record')}}</span>
                         </div>
                     </transition>
                     <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
@@ -218,26 +220,26 @@
                     <div class="num-content">
                         <span class="guide-num">1</span>
                         <span class="guide-title">
-                            点击巡检标题，开始远程巡检！
+                            {{generatePatrolLang('startPatrol')}}
                         </span>
                     </div>
                     <img :src="arrows1Src" alt="arrow1"/>
                 </div>
                 <el-row class="inspect-header">
                     <el-col :span="8">
-                        <span style="margin-left:35px;">巡检类别</span>
+                        <span style="margin-left:35px;">{{generatePatrolLang('category')}}</span>
                     </el-col>
                     <el-col :span="16" v-if="!showFeedBack">
-                        <span style="margin-left:35px;">巡检项目</span>
+                        <span style="margin-left:35px;">{{generatePatrolLang('items')}}</span>
                     </el-col>
                 </el-row>
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                             <div :style="{'height':varyWindowHeight*0.38-40+'px'}" style="background-color:#f4f5f9">
-                                <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
+                                <div v-for="(item,index) in inspectList" :key="index" class="inspect-details"
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
-                                    <span v-if="item.items!=undefined">{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
+                                    <span v-if="item.items!=undefined" :title="`${item.groupName}（${item.dealCount}/${item.items.length}）`">{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
                                     <span v-else>{{item.groupName}}</span>
                                 </div>
                             </div>
@@ -247,20 +249,21 @@
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div :style="{'height':varyWindowHeight*0.32+'px'}" v-if="!showFeedBack">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
-                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'" :style="item.checked?{'font-weight':'bold'}:{}">{{`${index+1}. ${item.subject}`}}</span>
+                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'"
+                                          :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
                                     <div class="dropdown-model" v-if="item.disabled"></div>
                                     <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
-                                            {{`评分：${item.itemScoreTitle}`}}<i class="el-icon-arrow-down el-icon--right"></i>
+                                            {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}<i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
                                         <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="itemDS in scoreList" 
+                                            v-for="itemDS in scoreList"
                                             :key="itemDS.val" @click.native="checkScore(item,itemDS)">{{itemDS.scoreTitle}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
                                     <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)" v-if="!item.isIgnore"></i>
-                                    <span class="ignored-icon" v-else>已忽略</span>
+                                    <span class="ignored-icon" v-else>{{generatePatrolLang('ignored')}}</span>
                                     <div class="icon-clicked" v-if="item.checked"></div>
                                     <div class="details-content" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span>{{item.description}}</span>
@@ -279,13 +282,13 @@
                                         </div>
                                     </div>
                                     <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                        maxlength="300" v-model="item.inspectInput" placeholder="请输入处理评论文字" :disabled="item.disabled"></el-input>
+                        maxlength="300" v-model="item.inspectInput" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled"></el-input>
                                 </div>
                             </div>
                             <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else-if="showFeedBackInfo">
                                 <div id="feedback-content">
-                                    <span class="feedback-info">方式一：点击右下方新增按钮，进行意见反馈创建！</span>
-                                    <span class="feedback-info">方式二：通过视频截图进行创建！</span>
+                                    <span class="feedback-info">{{generatePatrolLang('methodI')}}</span>
+                                    <span class="feedback-info">{{generatePatrolLang('methodII')}}</span>
                                 </div>
                                 <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70"/>
                                 <img :src="plusSrc" alt="plusSrc"  class="plus-icon" @click="addFeedBack"/>
@@ -298,7 +301,7 @@
                                             <span class="feedback-eventname">{{`${index+1}. ${item.eventName}`}}</span>
                                             <span class="feedback-eventdes">{{item.eventDes}}</span>
                                             <div class="img-content" v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
-                                                <img :src="item.sourceObj.src" 
+                                                <img :src="item.sourceObj.src"
                                             :width="item.sourceObj.width" :height="item.sourceObj.height" class="feedback-pic" @click="openOuter(item.sourceObj)"/>
                                             </div>
                                             <div class="img-content" v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1">
@@ -316,27 +319,27 @@
                 </el-row>
                 <el-row class="inspect-content" v-else>
                     <div class="inspect-empty">
-                        <span>暂无巡检项</span>
+                        <span>{{generatePatrolLang('noItems')}}</span>
                     </div>
                 </el-row>
             </div>
         </el-col>
         <el-col :span="8" class="rside" v-if="!showSpread">
             <div class="el-header-title">
-                <span>选择门店</span>
+                <span>{{generatePatrolLang('selectStrore')}}</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content" :style="showFeedBack?{'height':'50%'}:{}">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" :style="showFeedBack?{'height':'50%'}:{}">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
-                            <span class="icon-info" v-if="item.storeList.length!=0">* 未绑定巡检项的门店，无法点击切换</span>
+                            <span class="icon-info" v-if="item.storeList.length!=0">* {{generatePatrolLang('cannotSwitch')}}</span>
                             <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
                             </span> -->
-                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''" 
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''"
                             :style="!_item.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}" @click="clickStore(item,index,_item,_index)">
-                                <el-tooltip class="item" effect="dark" :content="_item.name" 
+                                <el-tooltip class="item" effect="dark" :content="_item.name"
                                     placement="bottom">
                                     <span>{{_item.name}}</span>
                                 </el-tooltip>
@@ -346,17 +349,18 @@
                             <el-input
                                 size="small"
                                 class="el-search-input"
-                                placeholder="请输入关键字搜索门店"
+                                :placeholder="generatePatrolLang('keywords')"
+                                style="width:240px"
                                 v-model="serachVale" @keyup.enter.native="searchStore">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                             </el-input>
-                            <span class="icon-info" v-if="item.storeList.length!=0" style="margin-bottom:15px">* 未绑定巡检项的门店，无法点击切换</span>
+                            <span class="icon-info" v-if="item.storeList.length!=0" style="margin-bottom:15px">* {{generatePatrolLang('cannotSwitch')}}</span>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
                                 <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
                                     <!-- <span v-if="itemDs.hasInspect">{{itemDs.name}}</span> -->
-                                    <el-tooltip class="item" effect="dark" :content="itemDs.name" 
+                                    <el-tooltip class="item" effect="dark" :content="itemDs.name"
                                     placement="bottom">
                                     <span>{{itemDs.name}}</span>
                                     </el-tooltip>
@@ -369,7 +373,7 @@
             <div class="channelbar-content" v-if="showFeedBack">
                 <hr class="rside-hr"/>
                 <div class="channel-content">
-                    <span>区域列表</span>
+                    <span>{{generatePatrolLang('zoneList')}}</span>
                     <div class="channels-srollbar">
                         <div class="arrow-content">
                             <i @click="lastBar" class="el-icon-arrow-left icon-arrow" v-if="hideLast"></i>
@@ -404,6 +408,8 @@ import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import {getCookie} from '@/common/auth';
 import RecordRTC from '../../../static/RecordRTC.js'
 import {validateInput} from '@/common/validate'
+import {generatePatrolLang} from '@/api/i18n'
+
 export default {
     name:'ReInspection',
     components:{
@@ -423,13 +429,13 @@ export default {
                 storeName:'西安5店',
                 storeTitle:'西安5店远程巡检',
                 storeUp:false,
-                storeUptitle:'点击关注'
+                storeUptitle: this.$t('remotePatrol.clickToStar')
             },
             showFeedDialog1:false,
             showFeedDialog2:false,
             showFeedDialog3:false,
             arrows1Src:require('../../../static/img/arrows3_pic.png'),
-            arrows2Src:require('../../../static/img/arrows2_pic.png'), 
+            arrows2Src:require('../../../static/img/arrows2_pic.png'),
             plusSrc:require('../../../static/img/plus_icon.png'),
             clearIconSrc:require('../../../static/img/清除.png'),
             removeIconSrc:require('../../../static/img/撤销.png'),
@@ -441,8 +447,8 @@ export default {
             serachVale:'',
             varyWindowHeight:window.innerHeight,
             varyWindowWidth:window.innerWidth,
-            showDate:true, 
-            playDate:new Date(), 
+            showDate:true,
+            playDate:new Date(),
             channel:null,
             penList:[
                 {
@@ -505,15 +511,15 @@ export default {
             showSpread:false,
             tabList:[
                 {
-                    label:'关注',
+                    label: this.$t('remotePatrol.star'),
                     storeList:[]
                 },
                 {
-                    label:'最近访问',
+                    label: this.$t('remotePatrol.visited'),
                     storeList:[]
                 },
                 {
-                    label:'全部门店',
+                    label: this.$t('remotePatrol.allStores'),
                     storeList:[]
                 }
             ],
@@ -528,18 +534,18 @@ export default {
             scoreList:[
                 {
                     val:2,
-                    scoreTitle:'优良'
+                    scoreTitle: this.$t('remotePatrol.good')
                 },
                 {
                     val:1,
-                    scoreTitle:'合格'
+                    scoreTitle: this.$t('remotePatrol.pass')
                 },
                 {
                     val:0,
-                    scoreTitle:'不合格'
+                    scoreTitle: this.$t('remotePatrol.failed')
                 },
             ],
-            tempStoreList:[],  
+            tempStoreList:[],
             allInitStoreList:[],
             sessionId:'',
             inspectList:[],
@@ -572,32 +578,32 @@ export default {
             appliedInspectList:[],
 
             changeStoreObj:{
-                title:'确认',
-                showInfo:'本次巡店尚未完成，确认是否切换当前门店？',
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmSwitch'),
                 isWarning:true,
                 dialogCosed:false
             },
             ignoreInspectObj:{
-                title:'确认',
-                showInfo:'确认是否忽略当前巡检项？',
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmIgnore'),
                 isWarning:true,
                 dialogCosed:false
             },
             noBindDeviceObj:{
-                title:'提示',
-                showInfo:'当前门店的巡检项未绑定设备！',
+                title: this.$t('remotePatrol.prompt'),
+                showInfo: this.$t('remotePatrol.notBindCamera'),
                 isWarning:false,
                 dialogCosed:false
             },
             noAllInspectObj:{
-                title:'提示',
-                showInfo:'当前尚有未完成巡检项，请完成后进行提交！',
+                title: this.$t('remotePatrol.prompt'),
+                showInfo: this.$t('remotePatrol.incompleteInfo'),
                 isWarning:false,
                 dialogCosed:false
             },
             noStoreUser:{
-                title:'提示',
-                showInfo:'当前门店未绑定负责人，是否继续！',
+                title: this.$t('remotePatrol.prompt'),
+                showInfo: this.$t('remotePatrol.notSolver'),
                 isWarning:true,
                 dialogCosed:false
             },
@@ -617,8 +623,8 @@ export default {
             startTimeCutVideo:0,
             endTImeCutVideo:0,
             isREC:false,
-            startIcon:require('../../../static/img/pic_play_icon.png'),    
-            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
+            startIcon:require('../../../static/img/pic_play_icon.png'),
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
 
             eventList:[],
             channelBtns:[],
@@ -631,6 +637,7 @@ export default {
             showAddFeedBackBtn:true,
             timerPlayReal:null,
             isPlayingFlag:-1,
+            lang: this.$i18n.locale
         }
     },
     computed:{
@@ -683,7 +690,7 @@ export default {
         //     }
         // }
         self.isPlayingFlag=-1;
-        if(to.name!='确认总结'){
+        if(to.name!='confirmSum'){
             from.meta.keepAlive=false;
         }
         if(self.playState){
@@ -728,6 +735,7 @@ export default {
         })
     },
     methods:{
+        generatePatrolLang,
         changeBrand(){
             let self=this;
             if(self.playState){
@@ -746,7 +754,7 @@ export default {
             if(isFull === undefined)
             {
                 isFull = false;
-            } 
+            }
             return isFull;
         },
         anchorLinkTo () {
@@ -772,7 +780,7 @@ export default {
                             resolve(accountId);
                         }
                     })
-                }) 
+                })
             })
 
         },
@@ -824,7 +832,7 @@ export default {
                 sourceObj:srcObj
             }
             if(self.eventName.trim().length==0){
-                self.notify('事件名称不能为空！','warning',3000);
+                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
             self.eventList.push(obj);
@@ -850,7 +858,7 @@ export default {
                 sourceObj:srcObj
             }
             if(self.eventName.trim().length==0){
-                self.notify('事件名称不能为空！','warning',3000);
+                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
             self.eventList.push(obj);
@@ -865,7 +873,7 @@ export default {
                 sourceObj:null
             }
             if(self.eventName.trim().length==0){
-                self.notify('事件名称不能为空！','warning',3000);
+                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
             self.eventList.push(obj);
@@ -922,11 +930,11 @@ export default {
                     // 上传完成
                     const url = self.getFileUrl(results.name);
                     console.log(url);
-                    resolve(url); 
+                    resolve(url);
                 })
                 .catch((err) => {
-                    console.log(err) 
-                }) 
+                    console.log(err)
+                })
             })
         },
         getDeviceList(){
@@ -1049,9 +1057,9 @@ export default {
             var context = drawing_elem.getContext("2d");
             var center_x = drawing_elem.width / 2;
             var center_y = drawing_elem.height / 2;
-            var rad = Math.PI*2/100; 
-            
-            
+            var rad = Math.PI*2/100;
+
+
             // 绘制背景圆圈
             function backgroundCircle(){
                 context.beginPath();
@@ -1062,7 +1070,7 @@ export default {
                 context.globalAlpha = 0.5;
                 context.fill();
             }
- 
+
             //绘制运动圆环
             function foregroundCircle(n){
                 context.save();
@@ -1077,7 +1085,7 @@ export default {
                 context.closePath();
                 context.restore();
             }
- 
+
             //绘制文字
             function text(n){
                 context.save();
@@ -1087,10 +1095,15 @@ export default {
                 context.font='bold '+font_size+'px Helvetica';
                 var textStr='';
                 if(n==100){
-                    textStr='录制成功';
+                  if(self.lang == 'en'){
+                    textStr= self.$t('storeMonitor.recordSucc').substring(0, 9) + '...' ;
+                  }
+                  else{
+                    textStr= self.$t('storeMonitor.recordSucc');
+                  }
                 }
                 else{
-                    textStr='正在录制';
+                    textStr= self.$t('remotePatrol.recording');
                 }
                 var text_width = context.measureText(textStr).width;
                 context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
@@ -1120,7 +1133,7 @@ export default {
             let self=this;
             console.log(self.curGroupIndex);
             if(self.sourceList.length>=5){
-                self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
+                self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
                 return false;
             }
             if(self.fullScreen){
@@ -1167,7 +1180,7 @@ export default {
             else{
                 self.showCancelContent=false;
                 if(self.sourceList.length>=5){
-                    self.notify('每个巡检项最多上传5个资源文件！','warning',3000);
+                    self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
                     return false;
                 }
                 self.showCutDialog=true;
@@ -1424,7 +1437,7 @@ export default {
             }
             let data;
             switch(Number(self.activeIndex)){
-                case 0: data=await self.getFaStoreList(); 
+                case 0: data=await self.getFaStoreList();
                     console.log(data);
                     if(data.errCode==0){
                         let storeData=data.data;
@@ -1493,7 +1506,7 @@ export default {
                         obj.storeName=storeData[0].name;
                         obj.storeTitle=storeData[0].name;
                         obj.storeUp=true;
-                        obj.storeUpTitle='已关注';
+                        obj.storeUpTitle= this.$t('remotePatrol.stared');
                         self.store=obj;
                         self.showStoreUp=true;
                         let curStoreId=storeData[0].storeId;
@@ -1585,7 +1598,7 @@ export default {
                     console.log(res);
                     if(res.errCode==0){
                         self.store.storeUp=true;
-                        self.store.storeUpTitle='已关注';
+                        self.store.storeUpTitle= this.$t('remotePatrol.stared');
                         self.getStoreList();
                         self.tabList[2].storeList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
@@ -1613,7 +1626,7 @@ export default {
                 deleteFavoriteStore(params).then(res=>{
                     if(res.errCode==0){
                         self.store.storeUp=false;
-                        self.store.storeUpTitle='点击关注';
+                        self.store.storeUpTitle=this.$t('remotePatrol.clickToStar');
                         self.getStoreList();
                         self.tabList[2].storeList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
@@ -1669,7 +1682,7 @@ export default {
                 self.curItemIndex=0;
                 self.inspectItemList=item.items;
                 self.showFeedBack=false;
-    
+
                 item.isClick=true;
                 this.$nextTick(()=>{
                     self.anchorLinkTo();
@@ -1726,7 +1739,7 @@ export default {
             self.curItemIndex=index;
             self.curItem=item;
             if(item.isIgnore){
-                self.notify('该项已被忽略！','warning',3000);
+                self.notify( this.$t('remotePatrol.ignoredItem'),'warning',3000);
                 return false;
             }
             if(item.deviceId==-1){
@@ -1776,9 +1789,9 @@ export default {
                 return false;
             }
             self.sourceList=[];
-            
+
             let obj={};
-            
+
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
@@ -1898,7 +1911,7 @@ export default {
             let dealCount=0;
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
             let inspectList=self.inspectList.slice(0,indexFeed);
-            
+
             inspectList.forEach(item=>{
                 count=count+item.items.length;
                 dealCount=dealCount+item.dealCount;
@@ -1914,7 +1927,7 @@ export default {
                 channel:self.channel
             }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
-            self.$router.push({name:"确认总结",params:{data:obj}});
+            self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         async submit(){
             let self=this;
@@ -1923,7 +1936,7 @@ export default {
             let dealCount=0;
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
             let inspectList=self.inspectList.slice(0,indexFeed);
-            
+
             inspectList.forEach(item=>{
                 count=count+item.items.length;
                 dealCount=dealCount+item.dealCount;
@@ -1963,12 +1976,12 @@ export default {
             }
             let feedEventList=[];
             console.log(self.eventList);
-            
+
             for(let i in self.eventList){
                 let obj={};
                 obj.ts=new Date().getTime();
                 obj.storeId=self.store.storeId,
-                
+
                 obj.subject=self.eventList[i].eventName;
                 obj.description=self.eventList[i].eventDes;
 
@@ -2015,9 +2028,9 @@ export default {
                     self.stopRealTime();
                 }
                 sessionStorage.setItem('reinspect_submit',JSON.stringify(routeData));
-                self.$router.push({name:"巡检提交事件",params:{data:routeData}});
+                self.$router.push({name:"submitEvent",params:{data:routeData}});
             })
-            
+
         },
         spreadContent(){
             let self=this;
@@ -2038,7 +2051,7 @@ export default {
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
             setTimeout(() => {
-                self.showModelContent=false;
+                self.showModelContent=true;
                 self.showInfoContent=false;
             }, 3000);
         },
@@ -2074,7 +2087,7 @@ export default {
             // }
             self.sessionId=sessionId;
             const data = {
-                request: { 
+                request: {
                   method: 'connection',
                   sessionID:self.sessionId,
                   streamingProtocol:this.protocal,
@@ -2086,7 +2099,7 @@ export default {
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
             console.log(self.mpdurl);
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
-                console.log(self.mpdurl); 
+                console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
                 self.isPlayingFlag=1;
@@ -2116,7 +2129,7 @@ export default {
             let self=this;
             self.stopVideo();
             const data = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -2131,7 +2144,7 @@ export default {
             let self=this;
             self.stopVideo();
             const data = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -2150,7 +2163,7 @@ export default {
             let self=this;
             self.stopVideo();
             const dataDis = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -2167,7 +2180,7 @@ export default {
             self.sessionId=sessionId;
             let data=null;
             data = {
-                request: { 
+                request: {
                     method: 'connection',
                     sessionID: sessionId,
                     streamingProtocol:this.protocal,
@@ -2177,7 +2190,7 @@ export default {
                 }
             };
             url=await dashAPI.RealTime(1,data);
-            
+
             self.mpdurl = url;
             console.log(self.mpdurl);
             if (url.ErrorCode==undefined&&url.length!=0) {
@@ -2223,10 +2236,10 @@ export default {
             ele.style.height = "100%";
             if (ele.requestFullscreen) {
                 ele.requestFullscreen();
-            } 
+            }
             else if (ele .mozRequestFullScreen) {
                 ele.mozRequestFullScreen();
-            } 
+            }
             else if (ele .webkitRequestFullScreen) {
                 ele.webkitRequestFullScreen();
             }
@@ -2242,10 +2255,10 @@ export default {
             ele.style.height = "auto";
             if (de.exitFullscreen) {
                 de.exitFullscreen();
-            } 
+            }
             else if (de.mozCancelFullScreen) {
                 de.mozCancelFullScreen();
-            } 
+            }
             else if (de.webkitCancelFullScreen) {
                 de.webkitCancelFullScreen();
             }
@@ -2344,10 +2357,10 @@ export default {
             self.channel=null;
             self.getChannelByStore(_item);
             if(_item.favorite){
-                obj.storeUpTitle='已关注';
+                obj.storeUpTitle= this.$t('remotePatrol.stared');
             }
             else{
-                obj.storeUpTitle='点击关注';
+                obj.storeUpTitle= this.$t('remotePatrol.clickToStar');
             }
             self.store=obj;
             let curStoreId='';
@@ -2613,7 +2626,7 @@ export default {
         }
         .canvas-content{
             position: relative;
-            
+
             .dialog-hr{
                 border: 0.5px solid ;
                 border-color: rgba(251,76,93,0.3);
@@ -2710,7 +2723,7 @@ export default {
                 }
             }
             .icon-right{
-                width: 80px;
+                width: 120px;
                 height: auto;
                 position: absolute;
                 right: 30px;
@@ -2750,7 +2763,7 @@ export default {
                     }
                     #white{
                         background-color: white;
-                    }   
+                    }
                     #yellow{
                         background-color: yellow;
                     }
@@ -2801,7 +2814,7 @@ export default {
                     }
                     .storeUp-content{
                         height:22px;
-                        width: 86px;
+                        width: 105px;
                         text-align: center;
                     }
                 }
@@ -2811,7 +2824,8 @@ export default {
                     }
                     .storeUp-content{
                         height:auto;
-                        width: 72px;
+                        text-align: center;
+                        width: 100px;
                     }
                 }
                 .nocoll{
@@ -2855,15 +2869,30 @@ export default {
                     @include point(right,20);
                     @include point(width,90);
                     color: #fff;
+                    padding: 9px 6px;
+                }
+                .en-el-submit{
+                    position: absolute;
+                    @include point(right,20);
+                    @include point(width,120);
+                    color: #fff;
+                    padding: 9px 6px;
                 }
                 @media screen and(min-width: 1366px){
                     .el-submit{
                         top: 30%;
                     }
+                    .en-el-submit{
+                      top: 30%;
+                    }
                 }
                 @media screen and(max-width: 1366px){
                     .el-submit{
                         top: 20%;
+                    }
+                    .en-el-submit{
+                      top: 20%;
+                      width: 145px;
                     }
                 }
             }
@@ -2894,13 +2923,13 @@ export default {
                 .guide-rside{
                     position: absolute;
                     top: 30%;
-                    right: 30px;
+                    right: 20px;
                     width: 260px;
                     img{
                         @include point(height,42);
                         position: relative;
                         right: 5%;
-                        top: 20px;
+                        top: 35px;
                     }
                     .num-content{
                         @include arrow-icon;
@@ -2930,6 +2959,26 @@ export default {
                                 margin-left: 12px;
                                 vertical-align:middle;
                             }
+                        }
+                        .en-iconright{
+                          width: 108px;
+                          text-align: center;
+                          margin-top: 30px;
+                          height: 32px;
+                          line-height: 30px;
+                          border-radius: 4px;
+                          padding: 0 6px;
+                          background-color: rgba($color: #24293d, $alpha: 0.6);
+                          .iconpaizhao{
+                            color: #fff;
+                            vertical-align:middle;
+                          }
+                          span{
+                            color: #fff;
+                            font-size: 12px;
+                            margin-left: 12px;
+                            vertical-align:middle;
+                          }
                         }
                     }
                 }
@@ -2971,11 +3020,21 @@ export default {
                             font-size:12px;
                         }
                     }
+                    .en-iconright{
+                      span{
+                        font-size:12px;
+                      }
+                    }
                      .iconright1{
                         span{
                             font-size:12px;
                         }
                     }
+                  .en-iconright1{
+                    span{
+                      font-size:12px;
+                    }
+                  }
                 }
                 @media screen and(min-width: 1366px){
                     #channelName{
@@ -2986,10 +3045,20 @@ export default {
                             font-size:14px;
                         }
                     }
+                    .en-iconright{
+                      span{
+                        font-size:14px;
+                      }
+                    }
                     .iconright1{
                         span{
                             font-size:14px;
                         }
+                    }
+                    .en-iconright1{
+                      span{
+                        font-size:14px;
+                      }
                     }
                 }
                 #previewVideo{
@@ -3001,8 +3070,8 @@ export default {
                     color: #fff;
                     z-index: 10;
                     display: block;
-                    width:-webkit-calc(100% - 30px); 
-                    width:-moz-calc(100% - 30px); 
+                    width:-webkit-calc(100% - 30px);
+                    width:-moz-calc(100% - 30px);
                     width:calc(100% - 30px);
                     height: 40px;
                     line-height: 40px;
@@ -3074,6 +3143,33 @@ export default {
                         margin-left: 10px;
                     }
                 }
+              .en-iconright{
+                padding: 0 6px;
+                width: 115px;
+                height: 32px;
+                line-height: 30px;
+                position: absolute;
+                z-index: 900;
+                right: 20px;
+                margin-bottom: 40px;
+                border-radius: 4px;
+                background-color: rgba($color: #24293d, $alpha: 0.6);
+                top: 40%;
+                span{
+                  // font-size: 12px;
+                  margin-left: 15px;
+                  color: #fff;
+                  margin-right: 35px;
+                  cursor: pointer;
+                  vertical-align:middle;
+                }
+                .iconpaizhao{
+                  color: #fff;
+                  cursor: pointer;
+                  vertical-align:middle;
+                  margin-left: 10px;
+                }
+              }
                 .iconright1{
                     padding: 0 6px;
                     width: 80px;
@@ -3100,6 +3196,32 @@ export default {
                         margin-left: 10px;
                     }
                 }
+              .en-iconright1{
+                padding: 0 6px;
+                width: 115px;
+                height: 32px;
+                line-height: 30px;
+                position: absolute;
+                z-index: 900;
+                right: 20px;
+                margin-bottom: 40px;
+                border-radius: 4px;
+                background-color: rgba($color: #24293d, $alpha: 0.6);
+                top: 56%;
+                span{
+                  margin-left: 12px;
+                  color: #fff;
+                  margin-right: 32px;
+                  cursor: pointer;
+                  vertical-align:middle;
+                }
+                .iconpaizhao{
+                  color: #fff;
+                  cursor: pointer;
+                  vertical-align:middle;
+                  margin-left: 10px;
+                }
+              }
             }
             .el-inspect{
                 border-left: 1px solid $border;
@@ -3149,15 +3271,25 @@ export default {
                      .inspect-header{
                         height: 40px;
                         line-height: 40px;
+                        span{
+                          margin-left: 16px !important;
+                        }
                     }
                     .inspect-details{
                         height: 40px;
                         line-height: 40px;
                         font-size: 12px;
+                        span{
+                          width: 100%;
+                          display: block;
+                          white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+                          overflow: hidden; //隐藏超出单元格的部分。
+                          text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                        }
                     }
                     .guide-lside{
                         top: 10px;
-                        right:2%;
+                        right:0;
                     }
                 }
                 .inspect-content{
@@ -3166,7 +3298,7 @@ export default {
                         .feedbacks-content{
 
                             .feedbacks-details{
-                                
+
                                 text-align: left;
                                 @include point(margin-top,15);
                                 @include point(margin-bottom,15);
@@ -3249,6 +3381,13 @@ export default {
                         &:last-child{
                             margin-bottom: 15px;
                         }
+                        span{
+                          width: 100%;
+                          display: block;
+                          white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+                          overflow: hidden; //隐藏超出单元格的部分。
+                          text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+                        }
                     }
                     .noraml-title{
                         cursor: pointer;
@@ -3280,6 +3419,11 @@ export default {
                         @media screen and(max-width:1366px) {
                             .titles{
                                 font-size: 12px;
+                                width: 50%;
+                                display: inline-block;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
                             }
                             .details-content{
                                 @include point(font-size,12);
@@ -3288,6 +3432,11 @@ export default {
                         @media screen and(min-width:1366px) {
                             .titles{
                                 font-size: 14px;
+                                width: 65%;
+                                display: inline-block;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
                             }
                             .details-content{
                                 font-size: 12px;
@@ -3342,8 +3491,8 @@ export default {
                         }
                         .des-input{
                             margin-left: 15px;
-                            width:-webkit-calc(100% - 20px); 
-                            width:-moz-calc(100% - 20px); 
+                            width:-webkit-calc(100% - 20px);
+                            width:-moz-calc(100% - 20px);
                             width:calc(100% - 20px);
                             margin-top: 15px;
                         }
@@ -3366,6 +3515,7 @@ export default {
                             color: #fff;
                             background-color: $black;
                             cursor: not-allowed;
+                            max-width: 58px;
                         }
                         .dropdown-model{
                             position: absolute;
@@ -3388,7 +3538,7 @@ export default {
                             width: 96px;
                             height: 22px;
                             // @include point(width,86);
-                           
+
                             @include point(padding-left,10);
                             background-color: orange;
                             line-height: 22px;
@@ -3402,7 +3552,7 @@ export default {
                         .score-menu{
                             max-height: 160px;
                             overflow: hidden;
-                           
+
                         }
                     }
                     .inspect-empty{
@@ -3425,17 +3575,17 @@ export default {
                 text-align: left;
                 position: relative;
                 color:$black;
-                font-size: 16px; 
+                font-size: 16px;
                 @include point(height,60);
                 @include point(line-height,60);
-                border-bottom: 1px solid $border;              
+                border-bottom: 1px solid $border;
                 @include point(padding-left,10);
                 span{
                     display: block;
                     @include point(margin-left,25);
                 }
             }
-            #storetab-content{
+            #storetab-content, #en-storetab-content{
                 margin-top: 10px;
                 @include point(margin-left,15);
                 @include point(margin-right,15);
@@ -3518,7 +3668,7 @@ export default {
                     border: 0.5px solid $border;
                 }
                 .channel-content{
-                    width: 100%;     
+                    width: 100%;
                     overflow: hidden;
                     margin-top: 10px;
                     span{
@@ -3575,17 +3725,15 @@ export default {
 #storetab-content .el-tabs__nav-scroll{
     width: 100%;
 }
-#storetab-content.el-tabs__active-bar{
-    height: 4px !important;
-    background-color: #f31d65 !important;
-}
+
+
 #storetab-content.el-tabs__item{
     color:#7d8cad !important;
 }
 #storetab-content.el-tabs__item.is-active{
     font-weight: bold !important;
     color: #f31d65 !important;
-} 
+}
 #storetab-content.el-tabs__item:hover{
     color: #f31d65 !important;
 }
@@ -3595,6 +3743,7 @@ export default {
         margin-left: 10%;
         width: 80%;
     }
+
 }
 @media screen and (max-width: 1366px){
     #storetab-content .el-tabs__nav.is-top{
@@ -3621,6 +3770,10 @@ export default {
     right: 8px !important;
     top: 6px !important;
 }
+#storetab-content .el-tabs__active-bar .is-top{
+  width: 115px !important;
+}
+
 </style>
 <style scoped>
 .el-search-input.el-input--small >>>.el-input__inner{
@@ -3635,8 +3788,9 @@ export default {
 </style>
 
 <style>
-@import '../../assets/css/importfile.css'; 
+@import '../../assets/css/importfile.css';
 @import '../../assets/css/videoBar.css';
+@import '../../assets/css/tabsItem.css';
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }

@@ -4,7 +4,8 @@
             <div class="icon-content">
                 <img class='suc-icon' :src='isSuccess?sucSrc:errSrc'/>
                 <p :class="isSuccess?'sucInfo':'errInfo'">{{retInfo}}</p>
-                <p class="sucret-info" v-if="isSuccess">{{curSecond}}秒自动返回门店监控页面！</p>
+                <p class="sucret-info" v-if="isSuccess && lang != 'en'">{{curSecond}}s{{generatePatrolLang('return')}}</p>
+                <p class="sucret-info" v-if="isSuccess && lang == 'en'">{{generatePatrolLang('return')}} {{curSecond}}s !</p>
             </div>
         </div>
         <div class="page-content" v-if="false" :style="{'min-height':varyWindowHeight-460+'px'}">
@@ -25,7 +26,7 @@
                     <div class="item-cols" style="width:20%;">
                         <span class="icon-span" :style="item.result==0?{'background-color':'#FDBA40'}:{'background-color':'#6097F3'}">{{item.result==0?'不合格':'合格'}}</span>
                     </div>
-                    <div class="item-cols" style="width:20%;"> 
+                    <div class="item-cols" style="width:20%;">
                         <span>{{item.score}}</span>
                     </div>
                     <div class="item-cols" style="">
@@ -44,12 +45,14 @@
             </div>
         </div>
         <div class="page-err-btn" v-if="!isSuccess">
-            <el-button size="mini" type="primary" @click="reTry" class="retry-btn">重新尝试</el-button>
+            <el-button size="mini" type="primary" @click="reTry" class="retry-btn">{{curSecond}}s{{generatePatrolLang('tryAgain')}}</el-button>
         </div>
     </div>
 </template>
 <script>
-export default {
+  import {generatePatrolLang} from '@/api/i18n'
+
+  export default {
     name:'ReInspectDealPage',
     data(){
         return{
@@ -87,6 +90,7 @@ export default {
             timeid:0,
             inspectItemList:[],
             varyWindowHeight:window.innerHeight,
+            lang: this.$i18n.locale
         }
     },
     computed:{
@@ -94,11 +98,11 @@ export default {
             let msg='';
             if(this.isSuccess){
                 if(this.leader!=undefined&&this.leader.length!=0){
-                    msg=`已将不合格项抄送至${this.leader}！`;
+                    msg=`${this.$t('remotePatrol.copyFail')}${this.leader}！`;
                 }
             }
             else{
-                msg= `提交失败！`;
+                msg= `${this.$t('remotePatrol.sentFail')}`;
             }
             return msg;
         }
@@ -106,7 +110,7 @@ export default {
     beforeRouteLeave(to, from, next) {
         let self=this;
         clearInterval(self.timeid);
-        if(to.name=='远程巡检'){
+        if(to.name=='remotePatrol'){
             if(this.isSuccess==true){
                 to.meta.keepAlive = false;
             }
@@ -126,6 +130,7 @@ export default {
         }
     },
     methods:{
+        generatePatrolLang,
         getRouterData(){
             let self=this;
             let routeData=self.$route.params.data;
@@ -158,12 +163,12 @@ export default {
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                self.$router.push({name:'远程巡检'});
+                self.$router.push({name:'remotePatrol'});
             }
         },
         reTry(){
             let self=this;
-            self.$router.push({name:"确认总结"});
+            self.$router.push({name:"confirmSum"});
         },
     }
 }
@@ -250,7 +255,7 @@ export default {
                         margin-left: 30px;
                         color: #94a4b4;
                     }
-                    
+
                 }
             }
             .data-rows{

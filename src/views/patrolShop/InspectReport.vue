@@ -5,9 +5,9 @@
             <img class="title-icon" :src="report.inspectSrc"/>
             <span class="report-title">{{report.storeName+report.tagName}}</span>
             <div class="info-content">
-                <span class="info-label">提交人：</span>
+                <span class="info-label">{{generateReportLang('submitter')}}</span>
                 <span class="info-value">{{report.submitterName}}</span>
-                <span class="info-label">报告产生时间：</span>
+                <span class="info-label">{{generateReportLang('generateTime')}}</span>
                 <span class="info-value">{{report.dateStr}}</span>
             </div>
         </div>
@@ -26,7 +26,9 @@
                         </thead>
                         <tbody>
                             <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                                <td class="icon-td"><div class="icon-content"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua?'合格':'不合格'}}</div> <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div></td>
+                                <td class="icon-td"><div class="icon-content"><div class="icon-blag"
+                                   :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">
+                                  {{item.isQua? pass: failed}}</div> <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div></td>
                                 <td><span>{{item.numOfExcellentItems}}</span></td>
                                 <td><span>{{item.numOfQualifiedItems}}</span></td>
                                 <td><span>{{item.numOfUnqualifiedItems}}</span></td>
@@ -43,7 +45,7 @@
                             <span class="title-lable">{{item.itemTitleName}}</span>
                             <div class="count-content">
                                 <span class="count">{{item.itemCount}}</span>
-                                <span class="blag">个</span>
+                                <span class="blag">{{generateReportLang('unit')}}</span>
                             </div>
                         </div>
                         <div class="item-content">
@@ -66,6 +68,8 @@ import ECharts from 'vue-echarts'
 import 'echarts/lib/chart/radar'
 import {getInspectReportList,getInspectReportInfo} from '../../api/inspect'
 import util from '@/common/util'
+import {generateReportLang} from '@/api/i18n'
+
 export default {
     name:'InspectReport',
     components:{
@@ -95,21 +99,24 @@ export default {
             options:null,
             theaderList:[
                {
-                    name:'项目',
+                    name: this.$t('reportView.items'),
                },
                {
-                   name:'优良项'
+                   name: this.$t('reportView.goodItem')
                },
                {
-                   name:'合格项'
+                   name: this.$t('reportView.passItem')
                },
                {
-                   name:'不合格项'
+                   name: this.$t('reportView.failedItem')
                }
-            ]
+            ],
+          pass: this.$t('reportView.pass'),
+          failed: this.$t('reportView.failed')
         }
     },
     methods:{
+        generateReportLang,
         getRouterData(){
             let self=this;
             let routeData=JSON.parse(sessionStorage.getItem('report_data'));
@@ -160,19 +167,19 @@ export default {
                 self.summary=summaryTemp;
                 let tempArray=new Array(3);
                 tempArray[0]={
-                    itemTitleName:'重点关注项目',
+                    itemTitleName: this.$t('reportView.notableItem'),
                     iconSrc:'icon-zhongxindingwei',
                     itemCount:data.focalItems.length,
                     itemList:data.focalItems
                 }
                 tempArray[1]={
-                    itemTitleName:'忽略项',
+                    itemTitleName: this.$t('reportView.ignoredItem'),
                     iconSrc:'icon-hulve',
                     itemCount:data.ignoredItems.length,
                     itemList:data.ignoredItems
                 }
                 tempArray[2]={
-                    itemTitleName:'反馈问题',
+                    itemTitleName: this.$t('reportView.feedbacks'),
                     iconSrc:'icon-fankui',
                     itemCount:data.feedback.length,
                     itemList:data.feedback
@@ -322,7 +329,7 @@ $suggestBack:#F1F6FE;
             color: $qualified;
             padding-left: calc(30/1920*100vw);
             border: 1px solid #a0c1f8;
-            
+
         }
         .report-content{
             margin-top: calc(30/1920*100vw);
@@ -394,7 +401,7 @@ $suggestBack:#F1F6FE;
                 border:1px solid $border;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
                 .item-header{
-                    
+
                     position: relative;
                     background-color: $background;
                     height: calc(40/1920*100vw);

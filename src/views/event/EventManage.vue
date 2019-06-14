@@ -1,8 +1,8 @@
 <template>
     <div class="el-event-content" :style="{'height':windowHeight-118+'px'}">
        <div class="el-date">
-            <span class="date-title">起止时间</span>
-            <el-date-picker v-if="false"
+            <span class="date-title">{{generateEventLang('time')}}</span>
+            <el-date-picker
                 ref="datePicker"
                 v-model="dateValue"
                 type="datetimerange"
@@ -19,18 +19,18 @@
                 @change="dateChange"
                 :default-time="defaultTime">
             </el-date-picker>
-            <input type="text" id="dateinput" v-model="dateInputStr" readonly @focus="getNewestDate">
+            <!--<input type="text" id="dateinput" v-model="dateInputStr" readonly @focus="getNewestDate">-->
             <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
                 placement="bottom-end">
-                <div slot="content">*最长搜索时间为一个月</div>
+                <div slot="content">*{{generateEventLang('timePlaceholder')}}</div>
                 <i class="iconfont icon-bangzhu iconbangzhu"></i>
             </el-tooltip>
-            <span class="date-title" 
-            style="margin-left:30px;margin-right:20px;">处理状态</span>
-            <el-select v-model="value" placeholder="请选择" 
+            <span class="date-title"
+            style="margin-left:30px;margin-right:20px;">{{generateEventLang('status')}}</span>
+            <el-select v-model="value" placeholder="请选择"
             class="el-select-content" size="small" @change="selectChange" :popper-class="selectpoperClass">
                 <el-option
-                v-for="(item) in states" 
+                v-for="(item) in states"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
@@ -45,16 +45,16 @@
             </el-input>
        </div>
         <div class="el-table-content">
-            <el-button type="primary" size="mini" class="export-btn" @click="export2Excel">
+            <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel">
-                </i>导出报表
+                </i>{{generateEventLang('exportReport')}}
             </el-button>
-            <el-tabs v-model="activeName" @tab-click="handleClick" id="tabs-content">
-                <el-tab-pane v-for="(item,index) in tableDataList" 
+            <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
+                <el-tab-pane v-for="(item,index) in tableDataList"
                 :key="index" :label="`${item.label} （${item.eventCount}）`">
                     <div class="el-table-panel">
-                        <el-table 
-                            :data="item.tableData" 
+                        <el-table
+                            :data="item.tableData"
                             :highlight-current-row="true"
                             empty-text='没有事件数据'
                             align='left'
@@ -70,14 +70,14 @@
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
-                                        <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >未处理</span>
-                                        <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >已处理</span>
-                                        <span class="icon-span" style="background-color:#6097F3;" v-else>已结案</span>       
+                                        <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >{{generateEventLang('pending')}}</span>
+                                        <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >{{generateEventLang('handled')}}</span>
+                                        <span class="icon-span" style="background-color:#6097F3;" v-else>{{generateEventLang('closed')}}</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column
                                     prop="subject"
-                                    label="事件名称"
+                                    :label="generateEventLang('name')"
                                     min-width="220"
                                     sortable='custom'
                                     align="left">
@@ -93,8 +93,8 @@
                             </el-table-column>
                             <el-table-column
                                 prop="option"
-                                label="操作"
-                                min-width="60"
+                                :label= "generateEventLang('operation')"
+                                min-width="80"
                                 align="left">
                                 <template slot-scope="scope">
                                     <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
@@ -103,18 +103,18 @@
                             <div slot="empty">
                                 <div>
                                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">暂无事件</span>
-                                </div> 
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{generateEventLang('noEvents')}}</span>
+                                </div>
                             </div>
                         </el-table>
                     </div>
                     <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:13%;margin-bottom:0px;">
-                        <el-pagination background small 
+                        <el-pagination background small
                             :page-sizes="[10, 20, 50, 100]"
                             @size-change="sizeChange"
                             @current-change="currentChange"
                             :current-page="item.page"
-                        layout="jumper,total, prev, pager, next,sizes"  
+                        layout="jumper,total, prev, pager, next,sizes"
                         :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;">
                         </el-pagination>
                     </div>
@@ -133,6 +133,7 @@ import {Message} from 'element-ui'
 import {getCookie} from '@/common/auth';
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
+import {generateEventLang} from '@/api/i18n'
 export default {
     name: "ExceptEvent",
     data(){
@@ -145,14 +146,14 @@ export default {
                 }
             },
             toolTipClass: 'page-login-toolTipClass',
-            states:[{value: 0,label: '全部'},{value: 1,label: '未处理'}, {value: 2,label: '已处理'}, {value: 3,label: '已结案'}],
+            states:[{value: 0,label: this.$t('eventView.all')},{value: 1,label: this.$t('eventView.pending')}, {value: 2,label: this.$t('eventView.handled')}, {value: 3,label: this.$t('eventView.closed')}],
             curState:'',
             value:0,
             serachVale:'',
             serachData:'',
             tableDataList:[
                 {
-                    label:'待处理事件',
+                    label: this.$t('eventView.pendingEve'),
                     eventCount:0,
                     tableData:[],
                     total:0,
@@ -160,7 +161,7 @@ export default {
                     page:1
                 },
                 {
-                    label:'我创建事件',
+                    label: this.$t('eventView.myEvent'),
                     eventCount:0,
                     tableData:[],
                     total:0,
@@ -168,7 +169,7 @@ export default {
                     page:1
                 },
                 {
-                    label:'全部事件',
+                    label: this.$t('eventView.allEvents'),
                     eventCount:0,
                     tableData:[],
                     total:0,
@@ -182,20 +183,20 @@ export default {
             insiteInspectSrc:require('../../../static/img/现场icon.png'),
             tableInfoData:[
                 {
-                    "prop":"storeName",
-                    "label":"所属门店",
+                    "prop": "storeName",
+                    "label": this.$t('eventView.stores'),
                     "sortable":'custom',
                     "width":160
                 },
                 {
                     "prop":"assignerName",
-                    "label":"提报人",
+                    "label": this.$t('eventView.submitter'),
                     "sortable":'custom',
                     "width":120
                 },
                 {
                     "prop":"ts",
-                    "label":"提报时间",
+                    "label": this.$t('eventView.submitTime'),
                     "sortable":'custom',
                     "width":140
                 }
@@ -207,12 +208,13 @@ export default {
             params:{},
             fileName:'数据详情'+'.xlsx',
             exportDataList:[],  //需要导出的数据
-            exportDataHeader:['事件名称','所属门店','提报人','提报时间'], //需要导出数据的表头
+            exportDataHeader:[this.$t('eventView.name'),this.$t('eventView.stores'),this.$t('eventView.submitter'),this.$t('eventView.submitTime')], //需要导出数据的表头
             windowHeight:window.innerHeight,
             userId:'',
             poperClass:'date-picker-poper',
             selectpoperClass:'select-poper',
             defaultTime:[],
+            lang: this.$i18n.locale
         }
 
     },
@@ -240,6 +242,7 @@ export default {
         }
     },
     methods:{
+        generateEventLang,
         /*focusDate(val){
             let self=this;
             console.log(val);
@@ -257,10 +260,10 @@ export default {
             let nowHour=new Date().getHours()<10?'0'+(new Date().getHours()):(new Date().getHours());
             let nowMin=new Date().getMinutes()<10?'0'+(new Date().getMinutes()):(new Date().getMinutes());
             let nowSec=new Date().getSeconds()<10?'0'+(new Date().getSeconds()):(new Date().getSeconds());
-            
+
             let endFullYear=new Date(endStr).getFullYear();
             let endMonth=new Date(endStr).getMonth()+1<10?('0'+(new Date(endStr).getMonth()+1)):new Date(endStr).getMonth()+1;
-            let endDate=new Date(endStr).getDate()<10?'0'+new Date(endStr).getDate():new Date(endStr).getDate(); 
+            let endDate=new Date(endStr).getDate()<10?'0'+new Date(endStr).getDate():new Date(endStr).getDate();
             if(todayFullYear==endFullYear&&todayMonth==endMonth&&todayDate==endDate){  //截至日期选的是今天
                 //dateRet=startStr
             }
@@ -275,7 +278,7 @@ export default {
 
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
                 Message({
-                    message:'当前选择时间范围最大为一个月，已调整！',
+                    message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
                 })
@@ -305,11 +308,11 @@ export default {
             let tabIndex=Number(self.activeName);
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-            
+
 
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
                 Message({
-                    message:'当前选择时间范围最大为一个月，已调整！',
+                    message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
                 })
@@ -345,7 +348,7 @@ export default {
                     self.params.clause={"status":-1,"assignee":self.userId};
                 }
                 break;
-                case 1: 
+                case 1:
                 if(selectValue==0){
                     self.params.clause={"status":[0,1,2],"assigner":self.userId};
                 }
@@ -469,7 +472,7 @@ export default {
             else{
                 status=val-1;
             }
-            
+
             self.getEventCount(start,end,status);
         },
         searchEventList(flag){
@@ -550,7 +553,7 @@ export default {
             }
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             self.getEventList(self.params);
-            
+
             //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
             //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
             let dateval=self.dateInputStr;
@@ -573,7 +576,7 @@ export default {
             this.event=row;
             sessionStorage.setItem('event',JSON.stringify(this.event));
             sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-            this.$router.push({name:"事件详情",params:{event:this.event}});
+            this.$router.push({name:"eventDetails",params:{event:this.event}});
         },
         toEventDetail(row){
             console.log(row);
@@ -581,7 +584,7 @@ export default {
             this.event=row;
             sessionStorage.setItem('event',JSON.stringify(this.event));
             sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-            this.$router.push({name:"事件详情",params:{event:this.event}});
+            this.$router.push({name:"eventDetails",params:{event:this.event}});
         },
         sortChange(col){
             console.log(col);
@@ -636,7 +639,7 @@ export default {
                     }
                 }
             }
-            
+
             eventRESTful.getEventList(params).then((res)=>{
                 let data=res.data.content;
                 let temp=[];
@@ -712,7 +715,7 @@ export default {
                 "clause":{
                     "status":status
                 },
-                
+
             };
             if(typeof(status)=='number'){  //只有是数值类型时才带
                 params.clause.status=status;
@@ -745,12 +748,12 @@ export default {
                     console.log(res);
                     let size=res.data.totalElements;
                     resolve(size);
-                }) 
+                })
                 .catch((error) => {
                     reject(error);
                 })
             })
-            
+
         },
         async getExportData(){
             let self=this;
@@ -784,9 +787,9 @@ export default {
             console.log(tabIndex);
             let label='';
             switch(tabIndex){
-                case 0: label='待处理';break;
-                case 1: label='我创建';break;
-                case 2: label='全部';break;
+                case 0: label=this.$t('eventView.pendingEve');break;
+                case 1: label=this.$t('eventView.myEvent');break;
+                case 2: label=this.$t('eventView.all');break;
                 default: console.error('error tab pages！');break;
             }
             let fileName=label+'-'+util.getCurDateStr();
@@ -799,20 +802,20 @@ export default {
                 let tabIndex=Number(that.activeName);
                 if(that.tableDataList[tabIndex].tableData.length==0){
                     Message({
-                        message:'暂无数据！',
+                        message: this.$t('eventView.noEvents'),
                         type:'warning',
                         duration:3*1000
                     })
                     return false;
                 }
                 require.ensure([], async() => {
-                    const { export_json_to_excel } = require('@/excel/Export2Excel'); 
+                    const { export_json_to_excel } = require('@/excel/Export2Excel');
                     const tHeader = that.exportDataHeader; // 导出的表头名
                     const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
                     console.log(that.activeName);
                     let curData=await that.getExportData();
                     const data = that.formatJson(filterVal, curData);
-                    
+
                     export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
                 })
             }
@@ -921,7 +924,7 @@ export default {
         });
     },
     beforeRouteLeave (to, from, next) {
-        if(to.name=='事件详情'){
+        if(to.name=='eventDetails'){
             if(!from.meta.keepAlive){
                 from.meta.keepAlive=true;
             }
@@ -933,7 +936,7 @@ export default {
         next();
     },
     beforeRouteEnter (to, from, next) {
-        if(from.name!='事件详情'&&from.path!='/'){
+        if(from.name!='eventDetails'&&from.path!='/'){
             to.meta.keepAlive=false;
         }
         else{
@@ -953,7 +956,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../assets/css/textstyle.css';
-@import '../../assets/css/importfile.css'; 
+@import '../../assets/css/importfile.css';
 $red:#f31d65;
 $black:#182752;
 $border:#e3e9f4;
@@ -1037,7 +1040,15 @@ $h1:#292e36;
             border-color: $red;
             z-index: 990;
         }
-        .table-content{
+      .en-export-btn{
+        position: absolute;
+        @include point(right,20);
+        background-color: $red;
+        border-color: $red;
+        z-index: 990;
+      }
+
+      .table-content{
             width:96%;
             @include point(margin-left,15);
             @include point(margin-right,15);
@@ -1049,7 +1060,17 @@ $h1:#292e36;
             border-right: 0;
         }
     }
-    
+    #tabs-content /deep/  .el-tabs__nav-scroll{
+      margin-left:40px;
+    }
+    #tabs-content  /deep/ .el-tabs__header{
+      margin-bottom:0px !important;
+    }
+
+    #tabs-content  /deep/ .el-tabs__active-bar{
+      height: 4px !important;
+      background-color: #f31d65 !important;
+    }
 }
 .el-select-content{
     @include point(width,120);
@@ -1076,6 +1097,7 @@ $h1:#292e36;
 </style>
 <style>
  @import '../../assets/css/pagination.css';
+ @import '../../assets/css/tabsItem.css';
     .layui-laydate .layui-this{
         background-color:#f31d65 !important;
     }
@@ -1091,16 +1113,17 @@ $h1:#292e36;
         color: #f31d65 !important;
         border: 1px solid #f31d65 !important;
     }
-    #tabs-content .el-tabs__nav-scroll{
-        margin-left:40px;
-    }
-    #tabs-content .el-tabs__header{
-        margin-bottom:0px !important;
-    }
-    .el-tabs__active-bar{
-        height: 4px !important;
-        background-color: #f31d65 !important;
-    }
+    /*#tabs-content .el-tabs__nav-scroll{*/
+        /*margin-left:40px;*/
+    /*}*/
+    /*#tabs-content .el-tabs__header{*/
+        /*margin-bottom:0px !important;*/
+    /*}*/
+
+    /*.el-tabs__active-bar{*/
+        /*height: 4px !important;*/
+        /*background-color: #f31d65 !important;*/
+    /*}*/
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }
@@ -1128,5 +1151,15 @@ $h1:#292e36;
     .el-table--border::after, .el-table--group::after{
         width: 0 !important;
     }
+     @media screen and (min-width: 1366px){
+       .en-export-btn{
+       width: 160px
+       }
+     }
+     @media screen and (max-width: 1366px){
+       .en-export-btn{
+         width: 140px;
+       }
+     }
 </style>
 

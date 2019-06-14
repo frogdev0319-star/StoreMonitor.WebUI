@@ -1,6 +1,6 @@
 <template>
     <el-row class="login-container" :style="{'min-height':varyWindowHeight}">
-        <el-col :span="16" class="lside" 
+        <el-col :span="16" class="lside"
         :style="{'min-height':varyWindowHeight}">
             <!--图片上方的字跟logo-->
             <div class="model">
@@ -38,7 +38,7 @@
                 <span class="svg-container">
                     <i class="iconfont icon-yonghu icons"></i>
                 </span>
-                <el-input 
+                <el-input
                     class="el-login-input"
                     v-model="loginForm.username"
                     :placeholder="login.username"
@@ -113,7 +113,7 @@ export default {
             }
         }
         return{
-            
+
             login:{
                 username:'username',
                 password:'password',
@@ -175,7 +175,7 @@ export default {
                     label:'English'
                 }
             ],
-               
+
             rememberUserName:false,
             loginForm:{
                 // username:'axazhang.bo@advantech.com.cn',
@@ -467,37 +467,37 @@ $red:#fb4c5d;
 
         }
         #list{
-            position: absolute; 
+            position: absolute;
             z-index: 1;
             img{
                 float: left;
             }
         }
-        #buttons { 
-            position: absolute; 
-            height: 10px; 
-            width: 120px; 
-            z-index: 3; 
+        #buttons {
+            position: absolute;
+            height: 10px;
+            width: 120px;
+            z-index: 3;
             @include point(bottom,100);
             left: 50%;
         }
-        #buttons span { 
-            cursor: pointer; 
-            float: left; 
-            width: 8px; 
-            height: 8px; 
-            border-radius: 4px; 
-            background: #4E5262; 
+        #buttons span {
+            cursor: pointer;
+            float: left;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background: #4E5262;
             margin-right: 15px;
             display: block;
         }
-        #buttons .on {  
+        #buttons .on {
             background: $red;
             width: 26px;
-            border-radius: 10px; 
+            border-radius: 10px;
         }
         #footer{
-            position: absolute; 
+            position: absolute;
             @include point(bottom,30);
             @include point(left,60);
             z-index: 4;
@@ -518,14 +518,14 @@ $red:#fb4c5d;
         float: right;
         height: 100%;
         margin:0;
-        background-color:$red; 
+        background-color:$red;
         position: relative;
         .login-title-content{
             width: 28%;
             height: 28%;
             @include point(min-height,180);
             @include point(margin-top,20);
-            background-color: #EE626E;
+           // background-color: #EE626E;
             position: relative;
             color: $fff;
             @include point(font-size,44);
@@ -611,7 +611,7 @@ $red:#fb4c5d;
                 @include point(width,65);
             }
         }
-            
+
     }
 }
 </style>

@@ -4,10 +4,11 @@
             <div class="icon-content">
                 <img class='suc-icon' :src='isSuccess?sucSrc:errSrc'/>
                 <p :class="isSuccess?'sucInfo':'errInfo'">{{retInfo}}</p>
-                <p class="sucret-info" v-if="isSuccess">{{curSecond}}秒自动返回门店监控页面！</p>
+                <p class="sucret-info" v-if="isSuccess && lang !== 'en'">{{curSecond}}{{generateStoreMonitorLang('return')}}</p>
+                 <p class="sucret-info" v-if="isSuccess && lang == 'en'">{{generateStoreMonitorLang('return')}} {{curSecond}}s!</p>
             </div>
         </div>
-        <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+        <el-dialog  :title="generateStoreMonitorLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
             v-if="dialogCommentVideo" :width="720*percentHeight+'px'" height=300px top=5%>
             <div class="canvas-content">
                 <hr class="dialog-hr"/>
@@ -17,19 +18,21 @@
         </el-dialog>
         <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
             <div class="details">
-                <span class="event-label">门店名称：</span>
+                <span :class="lang==='en'? 'en-event-label':'event-label'">{{generateStoreMonitorLang('storeName')}}：</span>
                 <span>{{storeName}}</span>
             </div>
             <div class="details">
-                <span class="event-label">问题名称：</span>
+                <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 75px;">{{generateStoreMonitorLang('eventTitle')}}:</span>
+                <span class="event-label" v-else >{{generateStoreMonitorLang('eventTitle')}}：</span>
                 <span>{{eventName}}</span>
             </div>
             <div class="details">
-                <span class="event-label">问题状态：</span>
-                <span class="icon-span">未处理</span>
+              <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 60px;">{{generateStoreMonitorLang('eventStatus')}}:</span>
+              <span class="event-label" v-else >{{generateStoreMonitorLang('eventStatus')}}：</span>
+              <span class="icon-span">{{generateStoreMonitorLang('untreated')}}</span>
             </div>
             <div class="details">
-                <span class="event-label">问题描述：</span>
+                <span :class="lang==='en'? 'en-event-label':'event-label'">{{generateStoreMonitorLang('description')}}:</span>
                 <div v-for="(item,index) in commentList" :key="index" class="comment-details">
                     <div class="circle-content" :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}">
                         <div class="circle"></div>
@@ -57,18 +60,20 @@
                 </div>
             </div>
              <div class="details" v-if="showLeader">
-                <span class="event-label" style="margin-right:30px;">抄送：</span>
+               <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 65px;">{{generateStoreMonitorLang('copy')}}:</span>
+               <span class="event-label" v-else  style="margin-right:30px;">{{generateStoreMonitorLang('copy')}}：</span>
                 <span>{{leader}}</span>
             </div>
         </div>
         <div class="page-err-btn" v-else>
-            <el-button size="mini" type="primary" @click="reTry" class="retry-btn">重新尝试</el-button>
+            <el-button size="mini" type="primary" @click="reTry" class="retry-btn">{{generateStoreMonitorLang('tryAgain')}}</el-button>
         </div>
     </div>
 </template>
 <script>
 import {addEvent,addComment} from '@/api/event'
 import PubSub from 'pubsub-js';
+import {generateStoreMonitorLang} from '@/api/i18n'
 export default {
     name:'StoreSuccessPage',
     data(){
@@ -76,8 +81,8 @@ export default {
             isSuccess:false,
             sucSrc:require('../../../static/img/succeed_icon.png'),
             errSrc:require('../../../static/img/failed_icon.png'),
-            sucInfo:'问题提交成功！',
-            errInfo:'提交失败！',
+            sucInfo: this.$t('storeMonitor.submitSucc'),
+            errInfo: this.$t('storeMonitor.submitFail'),
             curSecond:10,
             storeName:'西安6店',
             eventName:'水吧问题2',
@@ -88,10 +93,11 @@ export default {
             routeData:null,
             timeid:0,
             varyWindowHeight:window.innerHeight,
-            startIcon:require('../../../static/img/pic_play_icon.png'),    
-            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
+            startIcon:require('../../../static/img/pic_play_icon.png'),
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
             dialogCommentVideo:false,
-            curVideoSrc:''
+            curVideoSrc:'',
+            lang: this.$i18n.locale
         }
     },
     computed:{
@@ -108,6 +114,7 @@ export default {
         },
     },
     methods:{
+        generateStoreMonitorLang,
         getRouterData(){
             let self=this;
             let routeData=self.$route.params.data;
@@ -143,7 +150,7 @@ export default {
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                self.$router.push({name:'门店监控',params:{flag:self.isSuccess}});
+                self.$router.push({name:'storeMonitor',params:{flag:self.isSuccess}});
             }
         },
         playCutVideo(item,index){
@@ -165,7 +172,7 @@ export default {
         },
         reTry(){
             let self=this;
-            self.$router.push({name:"门店监控",params:{flag:self.isSuccess}});
+            self.$router.push({name:"storeMonitor",params:{flag:self.isSuccess}});
         },
         notify(msg,type,time) {
             this.$message({
@@ -283,6 +290,10 @@ export default {
                     font-weight: bold;
                     margin-right: 10px;
                 }
+                .en-event-label{
+                  font-weight: bold;
+                  margin-right: 10px;
+                }
                 .icon-span{
                     display:inline-block;
                     width:68px;
@@ -305,7 +316,7 @@ export default {
                         width: 22px;
                         height: 22px;
                         position: absolute;
-                        left: 89px;
+                        left: 130px;
                         top: 0px;
                         z-index: 1;
                     }
@@ -313,7 +324,7 @@ export default {
                         width: 14px;
                         height: 14px;
                         border-radius: 50%;
-                        -moz-border-radius: 50%;      
+                        -moz-border-radius: 50%;
                         -webkit-border-radius: 50%;
                         position: relative;
                         top: 4px;
@@ -321,12 +332,12 @@ export default {
                         background-color: #FB4C5D;
                     }
                     .lside{
-                        width: 99px;
+                        width: 140px;
                         float: left;
                         min-height: 150px;
                     }
                     .rside{
-                        width:calc(100% - 100px);
+                        width:calc(100% - 150px);
                         border-left: 1px solid #ddd;
                         float: left;
                         position: relative;
@@ -375,5 +386,5 @@ export default {
     }
 </style>
 <style>
-@import '../../assets/css/importfile.css'; 
+@import '../../assets/css/importfile.css';
 </style>

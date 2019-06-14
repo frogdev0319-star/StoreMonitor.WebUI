@@ -2,8 +2,8 @@
     <div class="el-bind-device">
         <div class="el-bind-header">
             <div class="seacrh-content">
-                <span>按省份选择</span>
-                  <el-select v-model="curProvince" placeholder="省份" clearable size="mini" class="el-province" 
+                <span>{{generateStoreLang('provinceTitle')}}</span>
+                  <el-select v-model="curProvince" :placeholder="generateStoreLang('provincePlaceholder')" clearable size="mini" class="el-province"
                   @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
@@ -20,9 +20,9 @@
                     :disabled='showPopoVer'
                     v-model="showCityContent"
                     trigger="click">
-                        <div class="city-panel" @mouseleave="showCityContent=false"> 
+                        <div class="city-panel" @mouseleave="showCityContent=false">
                             <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                                style="margin-right:10px;"></el-checkbox>全部</p>
+                                style="margin-right:10px;"></el-checkbox>{{generateStoreLang('all')}}</p>
                             <div class="city-details" v-for="(item,index) in cityList" :key="index">
                                 <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
                                 <span>{{item.cityName}}</span>
@@ -31,28 +31,32 @@
                     <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
                 </el-popover>
 
-                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">{{generateStoreLang('searchButton')}}</el-button>
 
                 <el-input
                     size="small"
                     class="el-search-input"
                     :clearable=true
-                    placeholder="请输入关键词搜索门店"
+                    :placeholder= "generateInsSettingLang('searchPlaceholder')"
                     v-model="serachVale" @keyup.enter.native="searchStoreInput">
-                    <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo" 
+                    <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
                     style="position:relative;top:6px;left:6px;font-size:18px;"></i>
                 </el-input>
             </div>
              <hr class="el-header-hr"/>
-            <p class="el-header-title">请选择{{tabName}}表，需要关联的门店</p>
-            <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}表共有{{totalCount}}家门店,已绑定{{storeCount}}家门店</p>
-           
+            <!--<p class="el-header-title">请选择{{tabName}}表，需要关联的门店</p>-->
+            <p class="el-header-title" v-if="lang==='en'">{{generateInsSettingLang('bindStores')}}</p>
+            <p class="el-header-title" v-else >{{generateInsSettingLang('selectStore')}}{{tabName}}{{generateInsSettingLang('needBind')}}</p>
+            <p class="choice-device" v-if="lang=='en'"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{totalCount}} {{generateInsSettingLang('total')}}
+               {{storeCount}} {{generateInsSettingLang('bind')}}</p>
+          <p class="choice-device" v-else><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}{{generateInsSettingLang('total')}}{{totalCount}}
+            {{generateInsSettingLang('bindStore')}},{{generateInsSettingLang('bindWith')}}{{storeCount}}{{generateInsSettingLang('bindStore')}}</p>
         </div>
         <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.56+'px'}">
             <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                 <div class="el-all-checkbox" v-if="storeList.length!=0">
                     <el-checkbox  v-model="allData" @change="choiceAll"></el-checkbox>
-                    <span class="all-device-title">关联至所有门店</span>
+                    <span class="all-device-title">{{generateInsSettingLang('relateAllStores')}}</span>
                 </div>
                 <div class="device-group" v-for="(item,index) in storeList" :key="index">
                     <div class="device-all-checkbox">
@@ -70,7 +74,8 @@
         </div>
         <div class="el-bind-footer">
             <div class="el-btn-content">
-                <el-button :disabled="storeList.length==0" class="btn" size="mini"  @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>确认绑定</el-button>
+                <el-button :disabled="storeList.length==0" :class="lang=='en'? 'en-btn': 'btn'" size="mini"  @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>
+                  {{generateInsSettingLang('confirmBound')}}</el-button>
             </div>
         </div>
     </div>
@@ -79,12 +84,16 @@
 import api from '@/api/index'
 import {getStoreList} from '@/api/store'
 import {applyItemInspectItem,UnapplyInspectItem,getInspectBindList} from '@/api/inspect'
+import {generateStoreLang} from '@/api/i18n'
+import {generateInsSettingLang} from '@/api/i18n'
+
 export default {
     name:'BindRuteInspect',
     data(){
         return{
             allData:false,
             tabName:'',
+            tabNameLang: '',
             storeCount:0,
             totalCount:0,
             storeList:[],
@@ -103,16 +112,19 @@ export default {
             storeData:[],
             napeIdList:[],
             serachVale:'',
-            curCitys:'城市',
+            curCitys: this.$t('storeView.cityPlaceholder'),
             showPopoVer:true,
+            lang: this.$i18n.locale
         }
     },
     methods:{
-        //切换省份
+        generateStoreLang,
+        generateInsSettingLang,
+      //切换省份
         changePro(val){
             let self=this;
             self.getCityByProvince(val);
-            self.curCitys='城市';
+            self.curCitys= this.$t('storeView.cityPlaceholder');
             self.multeCityList.length=0;
             self.allCityChecked=false;
         },
@@ -120,13 +132,13 @@ export default {
             let self=this;
             self.cityList=[];
             self.showCityContent=false;
-            self.curCitys='城市';
+            self.curCitys = this.$t('storeView.cityPlaceholder');
             self.multeCityList.length=0;
         },
         choiceCity(){
             let self=this;
             if(self.curProvince.length==0){
-                self.notify('请选择省份！','warning',3000);
+                self.notify(this.$t('storeView.selectProviceInfo'),'warning',3000);
                 self.showPopoVer=true;
                 return false;
             }
@@ -140,7 +152,7 @@ export default {
             let str='';
             let temp=[];
             if(!val){
-                self.curCitys='城市';
+                self.curCitys= this.$t('storeView.cityPlaceholder');
                 self.multeCityList=[];
                 self.cityList.forEach(item=>{
                     item.checked=val;
@@ -173,7 +185,7 @@ export default {
                 if(_item.checked){
                     str=str+_item.cityName+';';
                     temp.push(_item.cityName);
-                    
+
                 }
             })
             if(temp.length!=0){
@@ -191,7 +203,7 @@ export default {
                 self.allCityChecked=false;
             }
             if(temp.length==0){
-                self.curCitys='城市';
+                self.curCitys = this.$t('storeView.cityPlaceholder');
             }
             self.multeCityList=temp;
         },
@@ -410,7 +422,7 @@ export default {
                     if(temp.map(x=>x.cityName).indexOf(obj.cityName)==-1){
                         temp.push(obj);
                     }
-                    
+
                 }
             })
             self.cityList=temp;
@@ -567,10 +579,11 @@ export default {
             if(flag){
                 let bindIdList=await self.getBindStoreList();
                 self.storeCount=bindIdList.length;
-                self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
+                //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
+                self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`,'success',3000);
             }
             else{
-                self.notify('绑定失败!','warning',3000);
+                self.notify(this.$t('insSettingView.bindFail'),'warning',3000);
                 return false;
             }
         },
@@ -591,15 +604,29 @@ export default {
         InitData(){
             let self=this;
             let name='';
+            let nameLang = '';
             switch(Number(sessionStorage.getItem('TabName'))){
-                case 0: name="远程巡检";break;
-                case 1: name="现场巡检";break;
-                default: name="test";break;
+                case 0: {
+                  name = "远程巡检";
+                  nameLang = this.$t('insSettingView.remotePatrol');
+                  break
+                };
+                case 1: {
+                  name = "现场巡检";
+                  nameLang = this.$t('insSettingView.onsitePatrol');
+                  break
+                };
+                default: {
+                  name="test";
+                  nameLang = "test";
+                  break
+                };
             }
             self.tabName= name;
+            self.tabNameLang = nameLang; //转化为多语言的表名
             self.getProvinceList();
             self.searchStore();
-            
+
         },
         notify(msg,type,time) {
             this.$message({
@@ -620,7 +647,7 @@ export default {
     padding: 0;
     margin:0;
     text-align: left;
-    font-family: 'Microsoft YaHei';
+    font-family: Arial, Microsoft YaHei;
 }
 $red:#f31d65;
 $black:#182752;
@@ -697,9 +724,9 @@ $h1:#292e36;
                 color: #C0C4CC;
                 margin-left: 15px;
                 @include point(width,130);
-                white-space: nowrap; 
-                overflow: hidden; 
-                text-overflow: ellipsis; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .icon-input{
                 position: absolute;
@@ -737,8 +764,8 @@ $h1:#292e36;
         @include point(margin-top,15);
         @include point(margin-bottom,20);
         @include point(margin-right,20);
-        border:0.5px solid #e3e9f4; 
-        
+        border:0.5px solid #e3e9f4;
+
     }
     .choice-device{
         @include point(margin-right,30);
@@ -804,10 +831,17 @@ $h1:#292e36;
             @include point(margin-top,15);
             @include point(margin-bottom,15);
             .btn{
-                @include point(width,90);
-                min-width: 100px;
-                background-color: #f31d65; 
-                color: #fff;
+              @include point(width,90);
+              min-width: 100px;
+              background-color: #f31d65;
+              color: #fff;
+            }
+            .en-btn{
+              @include point(width,90);
+              min-width: 160px;
+              background-color: #f31d65;
+              color: #fff;
+              text-align: center;
             }
         }
     }

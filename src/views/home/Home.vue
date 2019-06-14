@@ -4,7 +4,8 @@
             <el-col class="header">
                 <el-col :span="10" class="logo-content" :class="collapsed?'logo-collapse-width':'logo-width'">
                     <img :src="imgSrc" alt="logo" id="imgLogo" @click="routerHome">
-                    <span class="sys-name" v-if="!collapsed" @click="routerHome">{{appName}}</span>
+                  <span class="sys-name" v-if="!collapsed" @click="routerHome">{{generateRoute('title')}}</span>
+                    <!--<span class="sys-name" v-if="!collapsed" @click="routerHome">{{$t('navbar.title')}}</span>-->
                 </el-col>
                 <el-col :span="1" class="el-traggle-content">
                     <i class="iconfont icon-zhankai icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
@@ -12,11 +13,11 @@
                 </el-col>
                 <el-col :span="10">
                     <el-breadcrumb separator="|" class="breadcrumb-inner">
-                        <el-breadcrumb-item 
-                        v-for="(item,index) in breadList" 
+                        <el-breadcrumb-item
+                        v-for="(item,index) in breadList"
                         :key="item.path" class="breadcrumb-item" :to="{ path:item.path}"
                         v-if="index!=0" >
-                            <span :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ item.name }}</span>
+                            <span :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ generateRoute(item.name) }}</span>
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
@@ -26,23 +27,23 @@
                         <el-badge is-dot class="item"></el-badge>
                     </div>
                     <el-dropdown class="el-user-drop" >
-                        <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right" 
+                        <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right"
                         style="margin-left:6px;cursor:pointer;"></i></span>
                         <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
                         <el-dropdown-menu slot="dropdown" class="dropdown" style="margin-top:0px;">
-                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>我的</el-dropdown-item>
-                            <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">退出登录</el-dropdown-item>
+                            <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>{{generateRoute('my')}}</el-dropdown-item>
+                            <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">{{generateRoute('logOut')}}</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-col>
             </el-col>
-            <el-col class="main" :span="24" 
+            <el-col class="main" :span="24"
             :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit'||$route.path=='/datacenter')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
                 <aside :class="collapsed?'aside-collapse-width':'aside-width'">
                     <div class="brand-panel" v-if="!collapsed">
-                        <span class="brand-label">品牌</span>
-                        <el-select v-model="accountId" placeholder="请选择" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
+                        <span class="brand-label">{{generateRoute('brand')}}</span>
+                        <el-select v-model="accountId" :placeholder="generateRoute('select')" class="brand-list" @change='changeAccount' :disabled="brandDisabled">
                             <el-option
                             class="options"
                             v-for="(item,index) in brandList" :key="index"
@@ -53,50 +54,52 @@
                     </div>
                     <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <el-menu :default-active="$route.path"
-                        class="el-menu-vertical-demo" 
+                        class="el-menu-vertical-demo"
                         text-color="#eee"
                         background-color="#222538"
-                        @open="handleopen" @close="handleclose" @select="handleselect" 
+                        @open="handleopen" @close="handleclose" @select="handleselect"
                         router :collapse="collapsed" :unique-opened="true"
                     id="nav-menu"
                     :collapse-transition="false" style="border:0px;min-height:800px;">
                         <template v-for="(item,index) in routerList">
                             <template v-if="!item.hidden">
                             <!--只有一个节点-->
-                            <el-menu-item  v-if="item.leaf&&item.children.length>0" id="groupSubItem" class="submenu-item"
-                                :key="index"  :index="item.children[0].path" 
+                            <el-menu-item  v-if="item.leaf&&item.children.length>0" :id="lang=='en'? 'en-groupSubItem': 'groupSubItem'" class="submenu-item"
+                                :key="index"  :index="item.children[0].path"
                                 :disabled="item.isReadOnly"
                                 style="text-align:left;">
-                                <i :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                                <span>{{collapsed?'':item.children[0].name}}</span>
+                                <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                                <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                                  <span>{{collapsed?'': generateRoute(item.children[0].name)}}</span>
                             </el-menu-item>
                             <!--多级节点 :disabled="item.name=='巡店管理'"-->
                         <el-submenu class="el-submenu-content" :key="index" :index="index+''"
                         v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
                             <template slot="title">
-                            <i :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}">
-                            </i><span class="el-submenu-group">{{item.name}}</span>
+                            <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                            <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                              <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'">{{generateRoute(item.name)}}</span>
                             </template>
-                            <el-menu-item id="childSubItem" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                            <el-menu-item :id="lang=='en'?'en-childSubItem':'childSubItem'" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                              v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                            :key="child.path" v-if="!child.hidden" style="padding-left: 26px;color:#a0a4ad;height:">
+                            :key="child.path" v-if="!child.hidden" style="padding-left: 26px;color:#a0a4ad;">
                                 <template>
-                                    <div class="icon-content">
+                                    <div :class="lang=='en' ? 'en-icon-content': 'icon-content'">
                                         <div class="tag-icon"></div>
                                     </div>
-                                    <span >{{child.name}}</span>
-                                    <div v-if="child.name=='门店管理'&&showTag" 
+                                    <span >{{generateRoute(child.name)}}</span>
+                                    <div v-if="child.name=='storeManage'&&showTag"
                                     style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
                                 </template>
                             </el-menu-item>
                         </el-submenu>
                             </template>
                         </template>
-                        
-                    </el-menu> 
+
+                    </el-menu>
                     </el-scrollbar>
                 </aside>
-            
+
                 <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
                     <el-col :class="wrapperAll
                     ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}" v-if="!showHeader">
@@ -123,7 +126,7 @@
                             <p style="text-align:left;">Version 1.0.1&copy; 2018-2019 Storeviu Corp. All rights reserved</p>
                         </footer>
                     </el-col>
-                   
+
                 </section>
             </el-col>
         </el-row>
@@ -135,8 +138,9 @@ import {mapGetters,mapMutations,mapActions} from 'vuex';
 import {getUserInfo,getAccountList} from '@/api/login'
 import PubSub from 'pubsub-js';
 import {getCookie} from '@/common/auth';
+import { generateRoute } from '@/api/i18n'
 export default {
-   
+
     name:"Home",
     data(){
         return{
@@ -157,6 +161,7 @@ export default {
             brandList:[],
             accountId:'',
             roleId:0,
+            lang: this.$i18n.locale
         }
     },
     computed:{
@@ -216,13 +221,14 @@ export default {
         }
     },
     methods:{
+        generateRoute,
         clickCollapse(){
             this.collapsed=!this.collapsed;
         },
         handleopen(index) {
           console.log('handleopen');
           switch(Number(index)){
-               case 1: 
+               case 1:
                document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#f31d65';
                document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#222538';break;
                case 5:
@@ -292,6 +298,7 @@ export default {
                 let data=res.data;
                 if(res.errCode==0){
                     self.brandList=data;
+                    console.log(self.brandList)
                     //self.curBrand=self.accountId;
                 }
             })
@@ -324,7 +331,7 @@ export default {
                         self.roleId=item.roleId;
                     }
                 })
-            }) 
+            })
         }
     },
     created(){
@@ -385,7 +392,7 @@ export default {
         margin: 0px;
         padding:0px;
         border: 0;
-        font-family:Microsoft YaHei;
+        font-family:Arial, Microsoft YaHei;
     }
     .navIcon{
         display:inline-block;
@@ -393,6 +400,20 @@ export default {
         font-size: 25px;
         color:#fff;
         @include point(margin-left,25);
+    }
+    .en-navIcon{
+      display:inline-block;
+      @include point(width,45);
+      font-size: 25px;
+      color:#fff;
+      @media screen  and(min-width:1366px){
+          @include point(margin-left,25);
+          @include point(width,45);
+      }
+      @media screen  and(max-width:1366px){
+        @include point(margin-left,0);
+        @include point(width,35);
+      }
     }
     .container{
         position: absolute;
@@ -535,7 +556,7 @@ export default {
                     @include point(width,170);
                     @include point(margin-left,50);
                     text-align: center;
-                    
+
                 }
             }
             .brand-title{
@@ -563,6 +584,18 @@ export default {
                 @include point(margin-left,25);
                 @include point(margin-right,10);
             }
+            .en-icon-content{
+              float:left;
+              @include point(margin-left,25);
+              @media screen and (min-width: 1366px){
+                @include point(width,35);
+                @include point(margin-right,10);
+              }
+              @media screen and (max-width: 1366px){
+                @include point(width,25);
+                @include point(margin-right,10);
+              }
+            }
             .tag-icon{
                 width: 10px;
                 height: 10px;
@@ -586,8 +619,14 @@ export default {
                     @include point(margin-left,4);
                     //font-size: 16px;
                 }
+                .en-el-submenu-group{
+                  @include point(margin-left,0);
+                }
                 @media screen  and(min-width:1366px){
                     .el-submenu-group{
+                        font-size: 16px;
+                    }
+                    .en-el-submenu-group{
                         font-size: 16px;
                     }
                     #groupSubItem.submenu-item{
@@ -597,24 +636,57 @@ export default {
                             font-size: 16px;
                         }
                     }
+                    #en-groupSubItem.submenu-item{
+                      @include point(height,52);
+                      @include point(line-height,52);
+                      span{
+                        font-size: 16px;
+                      }
+                    }
                 }
                  @media screen  and(max-width:1366px){
                     .el-submenu-group{
                         @include point(font-size,16);
                     }
+
                     #groupSubItem.submenu-item{
                         @include point(height,52);
                         @include point(line-height,52);
+                        span{
+                          @include point(font-size,16);
+                        }
                     }
-                    span{
-                        @include point(font-size,16);
-                    }
+                     #en-groupSubItem.submenu-item {
+                       @include point(height, 52);
+                       @include point(line-height, 52);
+                       span {
+                         @include point(font-size, 14);
+                       }
+                     }
+                   .en-el-submenu-group{
+                     @include point(font-size,14);
+                     span{
+                       @include point(font-size,14);
+                     }
+                   }
                 }
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
                     @include point(height,45);
                     @include point(line-height,45);
+                }
+                #en-childSubItem.submenu-item{
+                  position: relative;
+                  min-width: auto !important;
+                  @include point(height,45);
+                  @include point(line-height,45);
+                  @media screen and(max-width:1366px){
+                    padding-left: 2px !important;
+                    span{
+                      @include point(font-size,14);
+                    }
+                  }
                 }
             }
             .content-wrapper-all{

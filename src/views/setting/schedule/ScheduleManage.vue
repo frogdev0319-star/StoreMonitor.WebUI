@@ -1,16 +1,16 @@
 <template>
     <el-row class="el-schedule-container">
         <el-col :span="24" class="el-header">
-            <span>排程</span>
+            <span>{{generateScheduleLang('schedule')}}</span>
         </el-col>
         <el-col :span="24" class="el-content">
             <el-col :span="8" class="schedule-group">
                 <div class="title-content">
-                    <i class="iconfont icon-wenjian icontitle"></i><span class="level2">排程名称</span>
-                    <el-button size="mini" @click="addSchedule" class="title-btn" type="primary"><i class="el-icon-plus"></i><span>添加排程</span></el-button>
+                    <i class="iconfont icon-wenjian icontitle"></i><span class="level2">{{generateScheduleLang('scheduleName')}}</span>
+                    <el-button size="mini" @click="addSchedule" :class="lang=='en'? 'add-btn':'title-btn'" type="primary"><i class="el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span></el-button>
                 </div>
                 <div class="group-items group-title">
-                   <div v-for="(item,index) in groupList" 
+                   <div v-for="(item,index) in groupList"
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
@@ -18,8 +18,8 @@
                         <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
                         <div class="iconcontent" v-if="item.showEdit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
-                                <i class="iconfont icon-bianji" 
-                                style="font-size: 20px;cursor:pointer;margin-right:10px;" 
+                                <i class="iconfont icon-bianji"
+                                style="font-size: 20px;cursor:pointer;margin-right:10px;"
                                  @click="editGroup(index,item)"></i>
                                 <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
                                   @click="deleteGroup(index, item)"></i>
@@ -36,7 +36,7 @@
                     </div>
                </div>
                <div class="group-add" v-if="showAddGroup">
-                   <el-input size="mini" class="groupName-input input-details" placeholder="输入类别名" v-model="groupNameInput"></el-input>
+                   <el-input size="mini" class="groupName-input input-details" :placeholder="generateScheduleLang('inputPlaceholder')" v-model="groupNameInput"></el-input>
                     <div class="iconcontent">
                         <div class="iconlised" style="background-color:#FB4C5D" @click="confirmAddGroup">
                             <i class="el-icon-check"></i>
@@ -49,29 +49,30 @@
             </el-col>
             <el-col :span="16" class="schedule-content">
                 <div class="schedule-title">
-                   <span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}详情</span>
-                   <el-button size="mini" @click="saveSchedule" class="title-btn" type="primary">保 存</el-button>
+                   <span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}{{generateScheduleLang('details')}}</span>
+                   <el-button size="mini" @click="saveSchedule" class="title-btn" type="primary">{{generateScheduleLang('save')}}</el-button>
                 </div>
                 <div class="scheule-info">
                     <div class="scheule-choice">
-                        <el-radio v-model="radioDate" label="1">按天设置</el-radio>
-                        <el-radio v-model="radioDate" label="2">按时间设置</el-radio>
+                        <el-radio v-model="radioDate" label="1">{{generateScheduleLang('settingOnDay')}}</el-radio>
+                        <el-radio v-model="radioDate" label="2">{{generateScheduleLang('settingOnHou')}}</el-radio>
                     </div>
                     <div v-if="radioDate=='1'" class="radio-date">
-                        <span style="margin-right:15px;">选择月份</span>
+                        <span style="margin-right:15px;">{{generateScheduleLang('selectMonth')}}</span>
                         <el-date-picker
                         class="el-date"
                         v-model="modeMonth" size="mini"
                         type="month"
                         :clearable=false
-                        placeholder="选择月" @change="changeMonth">
+                        placeholder="generateScheduleLang('selectMonth')" @change="changeMonth">
                         </el-date-picker>
-                        <span style="margin-left:30px;margin-right:20px;">日期</span>
+                        <span style="margin-left:30px;margin-right:20px;">{{generateScheduleLang('date')}}</span>
                         <el-input size="mini" class="show-dateStr"  v-model="modeDate"></el-input>
                         <div class="date-content">
                             <div class="date-header">
                                 <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
-                                <span>{{curYear}}年{{curMonth}}月</span>
+                                <span v-if="this.lang !== 'en'">{{curYear}}{{generateScheduleLang('year')}}{{curMonth}}{{generateScheduleLang('month')}}</span>
+                                <span v-else>{{curMonth}}/{{curYear}}</span>
                                 <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>
 
                             </div>
@@ -87,22 +88,22 @@
                                 </div>
                                 <div class="schedule-tag">
                                 </div>
-                                <span style="margin-left:20px;color:#94a4b4;font-size:14px;">已设排程</span>
+                                <span style="margin-left:20px;color:#94a4b4;font-size:14px;">{{generateScheduleLang('scheduleSet')}}</span>
                                 <div class="all-month">
-                                     <el-checkbox v-model="allMonth"></el-checkbox><span class="allMonth-title">应用至所有月份</span>
+                                     <el-checkbox v-model="allMonth"></el-checkbox><span class="allMonth-title">{{generateScheduleLang('applyToAllMon')}}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div v-else class="rside-content">
                         <div class="day-deatil">
-                            <span class="day-title">按天选择</span>
+                            <span class="day-title">{{generateScheduleLang('selectOnDay')}}</span>
                             <div class="city-content" @click="choiceWeek">
                                 <div class="input-arrow-panel"></div>
-                                    <el-input v-model="weekValue" size="mini" id="elCity" placeholder="城市" :readonly=true></el-input>
+                                    <el-input v-model="weekValue" size="mini" id="elCity" :placeholder="generateScheduleLang('city')" :readonly=true></el-input>
                                     <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                             </div>
-                            <div class="week-panel" v-if="showWeekContent"> 
+                            <div class="week-panel" v-if="showWeekContent">
                                 <div class="week-details" v-for="(item,index) in weekList" :key="index">
                                     <el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>
                                     <span>{{item.name}}</span>
@@ -110,30 +111,32 @@
                             </div>
                         </div>
                         <div class="rside-deatil">
-                            <span>开始时间</span>
+                            <span v-if="lang=='en'" style="margin-right: 75px;">{{generateScheduleLang('startTime')}}</span>
+                            <span v-else>{{generateScheduleLang('startTime')}}</span>
                             <el-time-picker class="date-picker"
                                 v-model="startTime"
-                                format='HH:mm'     
-                                value-format="HH:mm" 
+                                format='HH:mm'
+                                value-format="HH:mm"
                                 size="mini"
                                 :picker-options="{
                                     format: 'HH:mm'
                                 }">
                             </el-time-picker>
-                            <span style="margin-left:10px;">时</span>
+                            <span style="margin-left:10px;">{{generateScheduleLang('hour')}}</span>
                         </div>
                         <div class="rside-deatil">
-                            <span>结束时间</span>
+                            <span v-if="lang=='en'" style="margin-right: 80px;">{{generateScheduleLang('endTime')}}</span>
+                            <span v-else>{{generateScheduleLang('endTime')}}</span>
                             <el-time-picker class="date-picker"
                                 v-model="endTime"
-                                format='HH:mm'     
-                                value-format="HH:mm" 
+                                format='HH:mm'
+                                value-format="HH:mm"
                                 size="mini"
                                 :picker-options="{
                                     format: 'HH:mm'
                                 }">
                             </el-time-picker>
-                            <span style="margin-left:10px;">时</span>
+                            <span style="margin-left:10px;">{{generateScheduleLang('hour')}}</span>
                         </div>
                     </div>
                 </div>
@@ -143,6 +146,8 @@
 </template>
 <script>
 import util from '@/common/util'
+import {generateScheduleLang} from '@/api/i18n'
+
 export default {
     name:'ScheduleManage',
     data(){
@@ -175,47 +180,48 @@ export default {
             curYear:new Date().getFullYear(),
             curMonth:new Date().getMonth()+1,
             curDay:new Date().getDate(),
-            weekTitles:[
-                '日','一','二','三','四','五','六'
-            ],
+            // weekTitles:[
+            //     '日','一','二','三','四','五','六'
+            // ],
+            weekTitles:this.$t('scheduleView.week'),
             weekList:[
                 {
                     'checked':false,
-                    'name':'周一',
+                    'name': this.$t('scheduleView.mon'),
                     'value':'Mon',
                 },
                 {
                     'checked':false,
-                    'name':'周二',
+                    'name': this.$t('scheduleView.tues'),
                     'value':'Tue',
-                }, 
+                },
                 {
                     'checked':false,
-                    'name':'周三',
+                    'name': this.$t('scheduleView.wed'),
                     'value':'Wed',
-                }, 
+                },
                 {
                     'checked':false,
-                    'name':'周四',
+                    'name': this.$t('scheduleView.thur'),
                     'value':'Thur',
-                }, 
+                },
                 {
                     'checked':false,
-                    'name':'周五',
+                    'name': this.$t('scheduleView.fri'),
                     'value':'Fri',
-                }, 
+                },
                 {
                     'checked':false,
-                    'name':'周六',
+                    'name':this.$t('scheduleView.sat'),
                     'value':'Sat',
-                }, 
+                },
                 {
                     'checked':false,
-                    'name':'周日',
+                    'name':this.$t('scheduleView.sun'),
                     'value':'Sun',
                 }
             ],
-            weekValue:'每天',
+            weekValue:this.$t('scheduleView.everyDay'),
             weekDays:[],
             curStartIndex:0,
             allMonth:false,
@@ -223,9 +229,12 @@ export default {
             startTime:'',
             endTime:'',
             groupIndex:0,
+            groupNameInput:'',
+            lang: this.$i18n.locale
         }
     },
     methods:{
+        generateScheduleLang,
         addSchedule(){
             this.showAddGroup=true;
         },
@@ -286,7 +295,7 @@ export default {
             if(dateStr.length!=0){
                 self.weekValue=dateStr;
                 if(count==self.weekList.length){
-                    self.weekValue='每天';
+                    self.weekValue = this.$t('scheduleView.everyDay');
                 }
             }
         },
@@ -342,7 +351,7 @@ export default {
                         obj.showBack=false;
                     }
                     obj.showOp=false;
-                   
+
                     obj.data=datenew[i]=1+(i-curWeek);
                 }
                 temp.push(obj);
@@ -365,7 +374,7 @@ export default {
         getEditGroup(index,item){
             let self=this;
             item.showEdit=true;
-            
+
             self.groupList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.showEdit=false;
@@ -399,6 +408,7 @@ export default {
     },
     mounted(){
         this.getWeekDay();
+        console.log(this.lang)
     }
 }
 </script>
@@ -443,6 +453,24 @@ export default {
         @include point(font-size,20);
         @include point(margin-left,15);
     }
+    .add-btn{
+      position: absolute;
+      @include point(right,15);
+      @include point(top,16);
+      color: #fff;
+      @include point(width,120);
+      font-size: 14px;
+      span{
+        @include point( margin-left,15);
+      }
+      @media screen and (min-width: 1366px){
+        @include point(width,120);
+      }
+      @media screen and (max-width: 1366px){
+        @include point(width,160);
+        font-size: 12px;
+      }
+    }
     .title-btn{
         position: absolute;
         @include point(right,15);
@@ -453,7 +481,12 @@ export default {
         span{
             @include point( margin-left,15);
         }
+        @media screen and (max-width: 1366px){
+          font-size: 12px;
+          @include point(width,120);
+        }
     }
+
     .iconcontent{
         position: absolute;
         right: 10px;
@@ -519,7 +552,7 @@ export default {
                     }
                 }
                 .group-items{
-                    
+
                     .groupItem{
                         @include point(height,50);
                         position: relative;
@@ -571,7 +604,7 @@ export default {
                     }
                 }
             }
-            
+
             .schedule-content{
                 position: relative;
                 .schedule-title{
@@ -676,6 +709,7 @@ export default {
                     .rside-content{
                         position: relative;
                         text-align: left;
+                        margin-left: 10px;
                         .city-content{
                             display: inline-block;
                             position: relative;
@@ -728,7 +762,7 @@ export default {
                             top: 18px;
                             span{
                                 margin-right: 12px;
-                            } 
+                            }
                         }
                         .rside-deatil{
                             padding-left: 30px;
@@ -737,17 +771,25 @@ export default {
                             font-size: 14px;
                             span{
                                 margin-right: 12px;
-                            } 
+                            }
                             .date-picker{
                                 width: 200px;
                             }
+                            .en-span-title{
+                              width: 138px;
+                              text-align: right;
+                              /* display: block; */
+                              float: left;
+                              clear: both;
+                            }
                         }
                     }
-                    
+
                 }
             }
         }
     }
+
 </style>
 <style>
 .scheule-info .el-radio__label{
@@ -785,4 +827,7 @@ export default {
 .el-time-panel__btn.confirm:hover{
     color: #FB4C5D;
 }
+  .showDrap{
+
+  }
 </style>

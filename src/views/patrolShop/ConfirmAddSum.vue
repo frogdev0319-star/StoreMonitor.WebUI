@@ -2,15 +2,15 @@
     <el-row class="sum-content">
         <el-col :span="24" class="sum-submit">
             <div class="submit-header">
-                <span>本次巡检总评</span>
-                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="sum-btn" type="primary" @click="submit" v-if="inspectList.length!=0">提交</el-button>
+                <span>{{generatePatrolLang('summary')}}</span>
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="sum-btn" type="primary" @click="submit" v-if="inspectList.length!=0">{{generatePatrolLang('submit')}}</el-button>
             </div>
             <div class="submit-content">
                 <div class="submit-radio">
                     <span class="el-radio-details" v-for="(item,index) in radioList" :key="index" @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
                 </div>
-                <span class="sug-label"><span>*</span>本次巡检建议</span>
-                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input" placeholder="写下本次巡检的结论建议吧~"></el-input>
+                <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
+                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input" :placeholder="generatePatrolLang('adviceInfo')"></el-input>
             </div>
         </el-col>
         <el-col :span="24" class="sum-data">
@@ -19,7 +19,7 @@
                     <hr class="divider-hr"/>
                 </el-col>
                 <el-col :span="2">
-                    <span class="divider-text">巡检预览</span>
+                    <span class="divider-text">{{generatePatrolLang('preview')}}</span>
                 </el-col>
                  <el-col :span="11">
                      <hr class="divider-hr"/>
@@ -27,7 +27,7 @@
             </el-row>
             <div class="table-content">
                 <div class="table-header">
-                    <span><span class="store-name">门店名称：</span>{{store.storeName}}</span>
+                    <span><span class="store-name">{{generatePatrolLang('storeName')}}</span>{{store.storeName}}</span>
                 </div>
                 <table class="table table-bordered">
                     <thead>
@@ -38,7 +38,7 @@
                     <tbody>
                         <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
                             <td><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
-                            <td class="icon-td"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua?'合格':'不合格'}}</div></td>
+                            <td class="icon-td"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua? pass : fail }}</div></td>
                             <td><span>{{item.numOfExcellentItems}}</span></td>
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
                             <td><span>{{item.numOfUnqualifiedItems}}</span></td>
@@ -54,7 +54,7 @@
                             <span class="title-lable">{{item.itemTitleName}}</span>
                             <div class="count-content">
                                 <span class="count">{{item.itemCount}}</span>
-                                <span class="blag">个</span>
+                                <span class="blag">{{generatePatrolLang('unit')}}</span>
                             </div>
                         </div>
                         <div class="item-content">
@@ -78,26 +78,41 @@ import {submitInspectItem1} from '@/api/inspect'
 import util from '@/common/util'
 import {getCookie} from '@/common/auth'
 import {getUserInfo} from '@/api/login'
+import {generatePatrolLang} from '@/api/i18n'
+
 export default {
     name:'ConfirmAddSum',
     data(){
         return{
-            radioList:[{'name':'合格','isActive':false},{'name':'待改善','isActive':false},{'name':'立即督导','isActive':false}],
+            radioList:[
+              {
+                'name': this.$t('remotePatrol.qualified'),
+                'isActive':false
+              },
+              {
+                'name':this.$t('remotePatrol.improve'),
+                'isActive':false
+              },
+              {
+                'name':this.$t('remotePatrol.dangerous'),
+                'isActive':false
+              }
+            ],
             theaderList:[
                 {
-                    name:'项目',
+                    name: this.$t('remotePatrol.item'),
                 },
                 {
-                   name:'单组是否合格'
+                   name: this.$t('remotePatrol.groupPerfor')
                 },
                 {
-                    name:'优良'
+                    name: this.$t('remotePatrol.good')
                 },
                 {
-                   name:'合格'
+                   name: this.$t('remotePatrol.pass')
                 },
                 {
-                   name:'不合格'
+                   name: this.$t('remotePatrol.failed')
                 }
             ],
             suggest:'',
@@ -114,9 +129,12 @@ export default {
             accountId:'',
             curSumIndex:0,
             varyWindowWidth:window.innerWidth,
+            pass: this.$t('remotePatrol.pass'),
+            fail: this.$t('remotePatrol.failed')
         }
     },
     methods:{
+        generatePatrolLang,
         getFileUrl(fileName){
             let self=this;
             //let bucketName='viumo-'+self.accountId;
@@ -149,11 +167,11 @@ export default {
                     // 上传完成
                     const url = self.getFileUrl(results.name);
                     console.log(url);
-                    resolve(url); 
+                    resolve(url);
                 })
                 .catch((err) => {
-                    console.log(err) 
-                }) 
+                    console.log(err)
+                })
             })
         },
         clickSum(item,index){
@@ -178,7 +196,7 @@ export default {
                 }
             })
             if(!flag){
-                self.notify('请选择巡检总评！','warning',3000);
+                self.notify(self.$t('remotePatrol.summaryInfo'),'warning',3000);
                 return false;
             }
             let temp=[];
@@ -213,12 +231,12 @@ export default {
             }
             let feedEventList=[];
             console.log(self.eventList);
-            
+
             for(let i in self.eventList){
                 let obj={};
                 obj.ts=new Date().getTime();
                 obj.storeId=self.store.storeId,
-                
+
                 obj.subject=self.eventList[i].eventName;
                 obj.description=self.eventList[i].eventDes;
 
@@ -265,7 +283,7 @@ export default {
                         isSuccess:false
                     };
                 }
-                self.$router.push({name:"巡检提交事件",params:{data:routeData}});
+                self.$router.push({name:"submitEvent",params:{data:routeData}});
             })
         },
         getRouteData(){
@@ -330,13 +348,13 @@ export default {
                 feedBackTemp.push(objFeedBack);
             })
             tempList[0]={
-                itemTitleName:'忽略项',
+                itemTitleName: self.$t('remotePatrol.ignored'),
                 iconSrc:'icon-hulve',
                 itemCount:ignoreTemp.length,
                 itemList:ignoreTemp
             }
             tempList[1]={
-                itemTitleName:'问题反馈',
+                itemTitleName:self.$t('remotePatrol.feedbacks'),
                 iconSrc:'icon-fankui',
                 itemCount:feedBackTemp.length,
                 itemList:feedBackTemp
@@ -357,7 +375,7 @@ export default {
                             resolve(accountId);
                         }
                     })
-                }) 
+                })
             })
         },
         async getOssInfo(){
@@ -470,7 +488,7 @@ $h1:#292e36;
                     text-align: center;
                     margin-right: calc(20/1920*100vw);
                 }
-                
+
             }
             .sug-label{
                 font-size: calc(12/1920*100vw);
@@ -481,7 +499,7 @@ $h1:#292e36;
                 }
             }
         }
-        
+
     }
     .sum-data{
         padding: calc(40/1920*100vw);

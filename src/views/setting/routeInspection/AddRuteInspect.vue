@@ -1,9 +1,9 @@
 <template>
     <el-row class="el-addrute" :style="{'min-height':varyWindowHeight-120+'px'}">
         <el-col :span="24" class="el-rute-title">
-            <span class="tab-name" v-if="!showEditTab">{{tabName}}<i class="iconfont icon-bianji icon-tabname"
+            <span class="tab-name" v-if="!showEditTab">{{tabNameLang}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></span>
-            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" placeholder="输入巡检表名" v-model="tabName"></el-input>
+            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="tabName"></el-input>
             <div class="iconcontent" v-if="showEditTab">
                 <div class="iconlised" @click="confirmEditTab">
                     <i class="el-icon-check"></i>
@@ -13,17 +13,17 @@
                 </div>
             </div>
         </el-col>
-       <el-col :span="7" class="el-rute-group">
+       <el-col :span="lang=='en'&& varyWindowWidth < 1440? 9: 7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
                    <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
                    <div class="btn-content">
-                       <el-button class="rute-btn" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span style='margin-left:5px;'>添加巡检类别</span></el-button>
+                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span style='margin-left:5px;'>{{generateInsSettingLang('addCategory')}}</span></el-button>
                    </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="group-items group-title" :style="{'max-height':varyDivHeight+'px'}">
-                   <div v-for="(item,index) in groupList" 
+                   <div v-for="(item,index) in groupList"
                    :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
@@ -31,8 +31,8 @@
                         <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input" v-if="item.isEdit"></el-input>
                         <div v-if="item.showEdit" class="show-edit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
-                                <i class="iconfont icon-bianji" 
-                                style="font-size: 20px;cursor:pointer;margin-right:10px;" 
+                                <i class="iconfont icon-bianji"
+                                style="font-size: 20px;cursor:pointer;margin-right:10px;"
                                  @click="editGroup(index,item)"></i>
                                 <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
                                   @click="deleteGroup(index, item)"></i>
@@ -48,7 +48,7 @@
                         </div>
                     </div>
                     <div class="group-add" v-if="showAddGroup">
-                        <el-input  size="mini" maxlength="10" class="groupName-input" placeholder="输入类别名" v-model="groupNameInput"></el-input>
+                        <el-input  size="mini" maxlength="10" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" @click="confirmAddGroup">
                                     <i class="el-icon-check"></i>
@@ -60,42 +60,42 @@
                     </div>
                </div>
                </el-scrollbar>
-        
+
            </div>
        </el-col>
-       <el-col :span="17" class="el-rute-nape">
+       <el-col :span="lang=='en'&& varyWindowWidth < 1440? 15: 17"class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
-                    <span  v-if="groupList.length!=0" class="item-title level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
+                    <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
                     <div class="btn-content" v-if="groupList.length!=0">
-                        <el-button class="rute-btn" size="mini" @click="addNape"><i class="el-icon-plus"></i><span>新增巡检项</span></el-button>
-                        <el-button class="rute-btn" size="mini" @click="deleteNape"><i class="iconfont icon-shanchu"></i><span>删除巡检项</span></el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape"><i class="el-icon-plus"></i><span>{{generateInsSettingLang('addInsItem')}}</span></el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape"><i class="iconfont icon-shanchu"></i><span>{{generateInsSettingLang('deleteInsItem')}}</span></el-button>
                     </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="nape-items-title" v-if="napeList.length!=0">
                        <div class="nape-name-title">
-                           <span>巡检名称</span>
+                           <span>{{generateInsSettingLang('inspectName')}}</span>
                        </div>
                        <div class="nape-dep-title">
-                           <span>巡检项需求描述</span>
+                           <span>{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
                        <div class="nape-handle-title">
-                           <span>操作</span>
+                           <span>{{generateInsSettingLang('operation')}}</span>
                        </div>
                    </div>
-                   <div class="nape-items-data" 
-                   v-for="(item,index) in napeList" 
+                   <div class="nape-items-data"
+                   v-for="(item,index) in napeList"
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" v-if="item.isClick"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" placeholder="输入巡检项描述" v-if="item.isClick"></el-input>
+                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" placeholder="generateInsSettingLang('description')" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -110,7 +110,7 @@
                            <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"  @click="handleDelete(index, item)"></i>
                        </div>
                    </div>
-                    <el-dialog title='确认删除'
+                    <el-dialog :title="generateInsSettingLang('confirmDelete')"
                     :visible.sync="showDeleteItem" v-if="showDeleteItem"
                     :append-to-body='true'
                     :close-on-click-modal="false"
@@ -119,19 +119,19 @@
                     left="40vh">
                         <div  style="overflow:hidden;">
                             <hr style="border: 0.5px solid #f31d65;"/>
-                            
+
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                                 <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                <span>确认是否删除当前巡检项?</span>
+                                <span>{{generateInsSettingLang('confirmCurDel')}}</span>
                             </p>
                         </div>
                         <div slot="footer" class="dialog-footer">
-                            <el-button class="file-cancel-btn" @click="showDeleteItem = false" size="mini" style="">取 消</el-button>
-                            <el-button class="file-confirm-btn" @click="confirmDeleteItem" size="mini" type="primary">确 认</el-button>
+                            <el-button class="file-cancel-btn" @click="showDeleteItem = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                            <el-button class="file-confirm-btn" @click="confirmDeleteItem" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                         </div>
                     </el-dialog>
 
-                     <el-dialog title='确认删除'
+                     <el-dialog :title="generateInsSettingLang('confirmDelete')"
                     :visible.sync="showDeleteGroup" v-if="showDeleteGroup"
                     :append-to-body='true'
                     :close-on-click-modal="false"
@@ -140,24 +140,24 @@
                     left="40vh">
                         <div  style="overflow:hidden;">
                             <hr style="border: 0.5px solid #f31d65;"/>
-                            
+
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
                                 <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                <span>确认是否删除当前巡检类别及其巡检项?</span>
+                                <span>{{generateInsSettingLang('deleteGroup')}}</span>
                             </p>
                         </div>
                         <div slot="footer" class="dialog-footer">
-                            <el-button class="file-cancel-btn" @click="showDeleteGroup = false" size="mini" style="">取 消</el-button>
-                            <el-button class="file-confirm-btn" @click="confirmDeleteGroup" size="mini" type="primary">确 认</el-button>
+                            <el-button class="file-cancel-btn" @click="showDeleteGroup = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                            <el-button class="file-confirm-btn" @click="confirmDeleteGroup" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                         </div>
                     </el-dialog>
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" placeholder="输入巡检项名称" ></el-input>
+                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" ></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input maxlength="70" type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" placeholder="输入巡检项描述"></el-input>
+                           <el-input maxlength="70" type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -181,11 +181,13 @@ import util from '@/common/util'
 import {validateInput} from '@/common/validate'
 import {inpectRESTful} from '@/api/index'
 import PubSub from 'pubsub-js'
+import {generateInsSettingLang} from '@/api/i18n'
+
 export default {
     name:'AddRuteInspect',
     data(){
         return{
-            groupTitle:'巡检类别',
+            groupTitle: this.$t('insSettingView.category'),
             tabName:'',
             groupList:[],
             groupNameTemp:'',  //临时存放
@@ -207,7 +209,9 @@ export default {
             curItemId:'',
             varyWindowHeight:window.innerHeight,
             varyWindowWidth:window.innerWidth,
-            bindStoreList:[]
+            bindStoreList:[],
+            lang: this.$i18n.locale,
+            tabNameLang: this.$route.params.tabNameLang
         }
     },
     computed:{
@@ -224,6 +228,7 @@ export default {
         }
     },
     methods:{
+        generateInsSettingLang,
         editTabName(){
             let self=this;
             //self.showEditTab=true;
@@ -252,16 +257,16 @@ export default {
         clickItem(index,item){
             let self=this;
         },
-        
+
         confirmEditGroup(index,item){
             let self=this;
             let temp=[];
             if(item.groupName==null||item.groupName.length==0){
-                self.notify('类别名称不能为空！','warning',3000);
+                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(item.groupName)){
-                self.notify('当前输入含有非法字符！','warning',3000);
+                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let obj={
@@ -277,11 +282,11 @@ export default {
                 console.log(res);
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify('修改成功!','success',3000);
+                    self.notify(this.$t('insSettingView.editSuss'),'success',3000);
                     item.isEdit=false;
                 }
                 else{
-                    self.notify('修改失败!','warning',3000);
+                    self.notify(this.$t('insSettingView.editFail'),'warning',3000);
                     return false;
                 }
             })
@@ -306,11 +311,11 @@ export default {
             let self=this;
             let temp=[];
             if(self.groupNameInput.trim().length==0){
-                self.notify('类别名称不能为空！','warning',3000);
+                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(self.groupNameInput)){
-                self.notify('当前输入含有非法字符！','warning',3000);
+                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let mode=0;
@@ -348,14 +353,14 @@ export default {
                     self.groupNameInput='';
                     self.showAddGroup=false;
                     self.refreshData(self.groupList.length-1);
-                    self.notify('添加成功!','success',3000);
+                    self.notify(this.$t('insSettingView.addSuss'),'success',3000);
                     // setTimeout(function(){
                     //     PubSub.publish('change-color',{showTag:true});
                     // },1000)
-                   
+
                 }
                 else{
-                    self.notify('添加失败!','warning',3000);
+                    self.notify(this.$t('insSettingView.addFail'),'warning',3000);
                     return false;
                 }
             })
@@ -368,7 +373,7 @@ export default {
         getEditGroup(index,item){
             let self=this;
             item.showEdit=true;
-            
+
             self.groupList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.showEdit=false;
@@ -425,7 +430,7 @@ export default {
             if(idItemArr.length==0){   //当前分组下无巡检项
                 let errMsg= await self.deleteGroupData(idGroupArr);
                 if(errMsg!=undefined&&errMsg=='Success'){
-                    self.notify('删除成功！','success',3000);
+                    self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
                     if(self.groupList.length==1){
                         self.groupList=[];
                         self.napeList=[];
@@ -435,7 +440,7 @@ export default {
                         console.log(self.groupIndex);
                         self.refreshData(self.groupIndex==0?self.groupIndex:self.groupIndex-1);
                     }
-                    
+
                 }
             }
             else{
@@ -443,7 +448,7 @@ export default {
                 if(errMsgItem!=undefined&&errMsgItem=='Success'){
                     let errMsgGroup=await self.deleteGroupData(idGroupArr);
                     if(errMsgGroup!=undefined&&errMsgGroup=='Success'){
-                        self.notify('删除成功！','success',3000);
+                        self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
                         //刷新页面
                         if(self.groupList.length==1){
                             self.groupList=[];
@@ -456,12 +461,12 @@ export default {
                         }
                     }
                     else{
-                        self.notify('删除失败！','warning',3000);
+                        self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
                         return false;
                     }
                 }
                 else{
-                    self.notify('删除失败！','warning',3000);
+                    self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
             }
@@ -482,7 +487,7 @@ export default {
                 }
             })
             if(count==0){
-                self.notify('请勾选需要删除的巡检项!','warning',3000);
+                self.notify(this.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
             }
             self.showDeleteItem=true;
@@ -504,14 +509,14 @@ export default {
             }
             let errMsg=await self.deleteItemData(idArr);
             if(errMsg!=undefined&&errMsg=='Success'){
-                self.notify('删除成功！','success',3000);
+                self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
                 self.showDeleteItem=false;
                 //刷新页面,删除页面上在后台已经删除的数据
                 self.refreshData(self.groupIndex);
                 self.groupList[self.groupIndex].groupNum-=idArr.length;
             }
             else{
-                self.notify('删除失败！','warning',3000);
+                self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
                 return false;
             }
         },
@@ -519,11 +524,11 @@ export default {
             let self=this;
             let temp=[];
             if(item.napeName.trim().length==0){
-                self.notify('巡检项名称不能为空！','warning',3000);
+                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(item.napeName)||validateInput(item.napeDep)){
-                self.notify('当前输入含有非法字符！','warning',3000);
+                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let obj={
@@ -540,12 +545,12 @@ export default {
                 console.log(res);
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify('修改成功!','success',3000);
+                    self.notify(this.$t('deviceView.editSuss'),'success',3000);
                     item.isClick=false;
                     self.refreshData(self.groupIndex);
                 }
                 else{
-                    self.notify('修改失败!','warning',3000);
+                    self.notify(this.$t('deviceView.editFail'),'warning',3000);
                     return false;
                 }
             })
@@ -560,11 +565,11 @@ export default {
             let self=this;
             let temp=[];
             if(self.newNapeName.trim().length==0){
-                self.notify('巡检项名称不能为空！','warning',3000);
+                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
-                self.notify('当前输入含有非法字符！','warning',3000);
+                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let objItem={
@@ -617,7 +622,7 @@ export default {
                         let res=resApply;
                         console.log(res);
                     })
-                    self.notify('添加成功!','success',3000);
+                    self.notify(this.$t('insSettingView.addSuss'),'success',3000);
                     setTimeout(function(){
                         console.log(self.tabName);
                         if(self.tabName=='远程巡检'){
@@ -626,7 +631,7 @@ export default {
                     },1000)
                 }
                 else{
-                    self.notify('添加失败!','warning',3000);
+                    self.notify(this.$t('insSettingView.addFail'),'warning',3000);
                     return false;
                 }
             })
@@ -653,7 +658,7 @@ export default {
             self.deleteItemFlag='S';
             self.curItemId=item.id;
         },
-        
+
         getAllData(){
             return new Promise((resolve,reject)=>{
                 inpectRESTful.getInspectItemList().then(res=>{
@@ -721,7 +726,7 @@ export default {
             })
             self.napeList=temp;
         },
-        
+
         initData(){
             let self=this;
             self.tabName=sessionStorage.getItem('GroupName');
@@ -782,30 +787,30 @@ export default {
         @media screen and (min-width:1366px){
             .tab-name{
                 font-size: 18px;
-            } 
+            }
             .icon-tabname{
                 font-size:18px;
             }
             .iconlised{
                 @include point(height,20);
                 @include point(line-height,20);
-            } 
+            }
             .iconrised{
                 @include point(height,20);
                 @include point(line-height,20);
-            }  
+            }
         }
         @media screen and (max-width:1366px){
             .tab-name{
                 @include point(font-size,18);
-            }  
+            }
             .icon-tabname{
                 @include point(font-size,18);
-            } 
+            }
             .iconlised{
                 height: 20px;
                 line-height: 20px;
-            } 
+            }
             .iconrised{
                 height: 20px;
                 line-height: 20px;
@@ -817,7 +822,7 @@ export default {
             padding: 1px 6px;
             border: 1px solid $border;
             cursor: pointer;
-           
+
         }
         .el-rute-title{
             width: 100%;
@@ -846,10 +851,27 @@ export default {
             background-color: $red;
             color: #fff;
             font-size: 12px;
-            width: 120px;
             .el-icon-plus{
                 font-size:16px;
             }
+        }
+        .en-rute-btn{
+          background-color: $red;
+          color: #fff;
+          font-size: 12px;
+          .el-icon-plus{
+            font-size:16px;
+          }
+        }
+        @media screen and (min-width: 1366px) {
+          .en-rute-btn{
+            @include point(width,105)
+          }
+        }
+        @media screen and (max-width: 1366px) {
+          .en-rute-btn{
+            width: 125px;
+          }
         }
         .iconcontent{
             @include point(margin-left,20);
@@ -884,6 +906,24 @@ export default {
                 word-wrap: break-word;
                 width: 60%;
                 cursor: pointer;
+            }
+            .en-item-title {
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              display: inline-block;
+              word-wrap: break-word;
+              cursor: pointer;
+              @media screen and (max-width: 1366px) {
+                .en-item-title {
+                  width: 55%;
+                }
+              }
+              @media screen and (min-width: 1366px) {
+                .en-item-title {
+                  width: 60%;
+                }
+              }
             }
             .icontitle{
                 @include point(margin-right,10);
@@ -925,7 +965,7 @@ export default {
                         max-width: 60%;
                         float: left;
                         @include point(margin-left,20);
-                        
+
                     }
                     span{
                         float: left;
@@ -1001,7 +1041,7 @@ export default {
                     position: relative;
                     left: 20%;
                 }
-                
+
             }
             .nape-dep-title{
                 width: 50%;
@@ -1045,7 +1085,7 @@ export default {
                     float: left;
                     @include point(margin-left,10);
                     @include point(margin-bottom,10);
-                   
+
                 }
                 .nape-name-data{
                     width: 36%;

@@ -1,8 +1,8 @@
 <template>
     <div class="el-event-content" :style="{'height':windowHeight-138+'px'}">
        <div class="seacrh-content">
-            <span class="select-title">按省份选择</span>
-            <el-select v-model="curProvince" clearable  placeholder="省份" size="mini" 
+            <span class="select-title">{{generateStoreLang('provinceTitle')}}</span>
+            <el-select v-model="curProvince" clearable  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
              class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
@@ -18,9 +18,9 @@
                 :disabled='showPopoVer'
                 v-model="showCityContent"
                 trigger="click">
-                    <div class="city-panel" @mouseleave="showCityContent=false"> 
+                    <div class="city-panel" @mouseleave="showCityContent=false">
                         <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                            style="margin-right:10px;"></el-checkbox>全部</p>
+                            style="margin-right:10px;"></el-checkbox>{{generateStoreLang('all')}}</p>
                         <div class="city-details" v-for="(item,index) in cityList" :key="index">
                             <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
                             <span>{{item.cityName}}</span>
@@ -29,7 +29,7 @@
                 <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
             </el-popover>
 
-            <el-button :size="varyWindowWidth>1680?'small':'mini'"  class="el-search-btn" @click="searchStore" type="primary">搜索</el-button>
+            <el-button :size="varyWindowWidth>1680?'small':'mini'"  :class="lang=='en'? 'en-el-search-btn': 'el-search-btn'" @click="searchStore" type="primary">{{generateStoreLang('searchButton')}}</el-button>
             <el-input
                 size="small"
                 class="el-search-input"
@@ -39,10 +39,10 @@
             </el-input>
        </div>
         <div class="el-table-content">
-            <el-table 
-            :data="tableData" 
+            <el-table
+            :data="tableData"
             :highlight-current-row="true"
-            empty-text='没有门店信息'
+            :empty-text="generateStoreLang('noStoreData')"
             align='left'
             border
             stripe
@@ -55,10 +55,10 @@
                     header-align="center"
                     align="center">
                         <template slot-scope="scope" v-if="scope.row.showTag">
-                        <span class="icon-span" style="background-color:#6097F4;" 
-                        v-if="scope.row.bindDevice" ><i class="iconfont icon-yichangshijianliebiaocopy"></i> 已关联</span>
-                        <span class="icon-span" style="background-color:#FEA316;" 
-                        v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> 未关联</span>       
+                        <span class="icon-span" style="background-color:#6097F4;"
+                        v-if="scope.row.bindDevice" ><i class="iconfont icon-yichangshijianliebiaocopy"></i> {{generateStoreLang('binded')}}</span>
+                        <span class="icon-span" style="background-color:#FEA316;"
+                        v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> {{generateStoreLang('unbinded')}}</span>
                     </template>
                 </el-table-column>
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
@@ -66,7 +66,7 @@
             </el-table-column>
             <el-table-column
                 prop="napeTable"
-                label="关联巡检表"
+                :label="generateStoreLang('bindInspectList')"
                 min-width="160"
                 align="left">
                 <template slot-scope="scope">
@@ -88,15 +88,15 @@
                 </template>
             </el-table-column>
             <el-table-column prop="schedue"
-                label="巡检排程"
+                :label="generateStoreLang('routeSchedule')"
                 min-width="120"
                 align="left">
 
             </el-table-column>
             <el-table-column
                 prop="option"
-                label="操作"
-                min-width="60"
+                :label="generateStoreLang('operation')"
+                min-width="90"
                 align="left">
                 <template slot-scope="scope">
                     <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
@@ -105,17 +105,17 @@
             <div slot="empty">
                 <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无门店数据</span>
-                </div> 
+                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{generateStoreLang('noStoreData')}}</span>
+                </div>
             </div>
         </el-table>
             <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">
-              <el-pagination background small 
+              <el-pagination background small
                 :page-sizes="[10, 20, 50, 100]"
                 @size-change="sizeChange"
                 @current-change="currentChange"
-              layout="jumper,total, prev, pager, next,sizes"  
-              :page-size="sizeNum" :total="total" 
+              layout="jumper,total, prev, pager, next,sizes"
+              :page-size="sizeNum" :total="total"
               :current-page="page"
               style="float:right;margin-top:15px;">
               </el-pagination>
@@ -131,6 +131,8 @@ import {getInspectBindCount} from '@/api/inspect'
 import {getStoreList} from '@/api/store'
 import {isLoginIn} from '@/api/login'
 import PubSub from 'pubsub-js'
+import {generateStoreLang} from '@/api/i18n'
+
     export default {
         name: "StoreManage",
         data(){
@@ -138,19 +140,19 @@ import PubSub from 'pubsub-js'
                 tableInfoData:[
                      {
                         "prop":"name",
-                        "label":"门店名称",
+                        "label":this.$t('storeView.storeName'),
                         "sortable":'custom',
                         "width":160
                     },
                     {
                         "prop":"userName",
-                        "label":"负责人",
+                        "label":this.$t('storeView.solver'),
                         "sortable":'custom',
                         "width":120
                     },
                     {
                         "prop":"phone",
-                        "label":"联系方式",
+                        "label":this.$t('storeView.contact'),
                         "sortable":false,
                         "width":160
                     },
@@ -177,6 +179,7 @@ import PubSub from 'pubsub-js'
                 isChecked:false,
                 curCitys:'城市',
                 showPopoVer:true,
+                lang: this.$i18n.locale
             }
         },
         watch:{
@@ -204,10 +207,11 @@ import PubSub from 'pubsub-js'
             ...mapGetters({accountChanged:'accountChanged'})
         },
         methods:{
+            generateStoreLang,
             changePro(val){
                 let self=this;
                 self.getCityByProvince(val);
-                self.curCitys='城市';
+                self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.multeCityList.length=0;
                 self.allCityChecked=false;
             },
@@ -215,13 +219,13 @@ import PubSub from 'pubsub-js'
                 let self=this;
                 self.cityList=[];
                 self.showCityContent=false;
-                self.curCitys='城市';
+                self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.multeCityList.length=0;
             },
             choiceCity(){
                 let self=this;
                 if(self.curProvince.length==0){
-                    self.notify('请选择省份！','warning',3000);
+                    self.notify(this.$t('storeView.selectProviceInfo'),'warning',3000);
                     self.showPopoVer=true;
                     return false;
                 }
@@ -235,7 +239,8 @@ import PubSub from 'pubsub-js'
                 let str='';
                 let temp=[];
                 if(!val){
-                    self.curCitys='城市';
+                    //self.curCitys='城市'
+                    self.curCitys=this.$t('storeView.cityPlaceholder');
                     self.multeCityList=[];
                     self.cityList.forEach(item=>{
                         item.checked=val;
@@ -269,7 +274,7 @@ import PubSub from 'pubsub-js'
                     if(_item.checked){
                         str=str+_item.cityName+';';
                         temp.push(_item.cityName);
-                        
+
                     }
                 })
                 if(temp.length!=0){
@@ -287,7 +292,8 @@ import PubSub from 'pubsub-js'
                     self.allCityChecked=false;
                 }
                 if(temp.length==0){
-                    self.curCitys='城市';
+                    //self.curCitys='城市';
+                    self.curCitys=this.$t('storeView.cityPlaceholder');
                 }
                 self.multeCityList=temp;
             },
@@ -317,8 +323,8 @@ import PubSub from 'pubsub-js'
                 else{
                     self.params.clause={};
                 }
-                
-                
+
+
                 self.getStoreList(self.params);
             },
             sizeChange(val){
@@ -384,7 +390,8 @@ import PubSub from 'pubsub-js'
                 let self=this;
                 self.params={};
                 self.curProvince='';
-                self.curCitys='城市';
+                //self.curCitys='城市';
+                self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.serachVale='';
                 self.multeCityList=[];
             },
@@ -450,7 +457,8 @@ import PubSub from 'pubsub-js'
                 let self=this;
                 self.params.clause={};
                 self.curProvince='';
-                self.curCitys='城市';
+                //self.curCitys='城市';
+                self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.page=1;
                 if(self.serachVale.length!=0){
                     self.params.like={
@@ -461,7 +469,7 @@ import PubSub from 'pubsub-js'
                 else{
                     self.params.like={};
                 }
-                
+
                 self.getStoreList(self.params);
             },
             sortChange(column){
@@ -479,12 +487,12 @@ import PubSub from 'pubsub-js'
             toEventDetail(row){
                 let self=this;
                 sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
-                self.$router.push({name:'门店详情',params:row});
+                self.$router.push({name:'storeDetail',params:row});
             },
             rowClickItem(row,column,event){
                 let self=this;
                 sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
-                self.$router.push({name:'门店详情',params:row});
+                self.$router.push({name:'storeDetail',params:row});
             },
             getStoreData(params){
                 let self=this;
@@ -519,7 +527,7 @@ import PubSub from 'pubsub-js'
                     duration:time
                 });
             },
-           
+
         },
         async  mounted(){
             let self=this;
@@ -550,7 +558,7 @@ import PubSub from 'pubsub-js'
 </script>
 
 <style lang="scss" scoped>
-@import '../../../assets/css/textStyle.css'; 
+@import '../../../assets/css/textStyle.css';
 @function rem($val){
     @return $val/16+rem;
 }
@@ -615,6 +623,14 @@ import PubSub from 'pubsub-js'
             position: relative;
             @include point(bottom,1);
         }
+        .en-el-search-btn{
+          @include point(width,90);
+          text-align: center;
+          @include point(margin-left,15);
+          color: #fff;
+          position: relative;
+          @include point(bottom,1);
+        }
         .city-input{
             @include point(width,160);
             height: 28px;
@@ -631,9 +647,9 @@ import PubSub from 'pubsub-js'
                 color: #C0C4CC;
                 margin-left: 15px;
                 @include point(width,130);
-                white-space: nowrap; 
-                overflow: hidden; 
-                text-overflow: ellipsis; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .icon-input{
                 position: absolute;
@@ -668,7 +684,7 @@ import PubSub from 'pubsub-js'
         }
         .icon-span{
             display:inline-block;
-            width: 72px;
+            width: 92px;
             height:22px;
             color:white;
             padding-left:5px;

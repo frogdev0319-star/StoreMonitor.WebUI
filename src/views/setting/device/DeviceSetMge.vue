@@ -3,7 +3,7 @@
         <el-col :span="24" class="el-btns">
             <div style="display:inline-block;" v-if="activeName=='dash'">
                 <el-button @click="connectServer"  :size="varWindowWidth>1680?'small':'mini'" class="btns" type="primary">
-                    提交
+                    {{generateDeviceLang('submit')}}
                 </el-button>
             </div>
             <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-else>
@@ -11,37 +11,37 @@
                     v-if="false"
                     size="small"
                     class="el-search-input"
-                    v-model="serachVale" @keyup.enter.native="searchNVRList" placeholder='请输入关键词搜索'>
+                    v-model="serachVale" @keyup.enter.native="searchNVRList" :placeholder="generateDeviceLang('searchInfo')">
                     <i @click="searchNVRList"  slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:7px;left:6px;"></i>
                 </el-input>
-                 <el-button v-for="(item,index) in btnList" 
-                :key="index" size="mini" @click="handleNVR(index,item)" class="el-handle-btn" :disabled="index==2">
+                 <el-button v-for="(item,index) in btnList"
+                :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
                 </el-button>
             </div>
         </el-col>
         <el-col :span="24" class="el-tabPanels">
-            <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="流媒体服务" name="dash">
+            <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-devicetabs-content': ''">
+                <el-tab-pane :label="generateDeviceLang('mediaService')" name="dash">
                     <el-col :span="varWindowWidth<1540?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
                         <div class="details">
-                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>服务器IP</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{generateDeviceLang('serverIp')}}</span>
                             <el-input class="dash-input" v-model="dash.url" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>命令端口（http）</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{generateDeviceLang('port')}}</span>
                             <el-input class="dash-input" v-model="dash.httpCmdPort" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>命令端口（https）</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{generateDeviceLang('httpsPort')}}</span>
                             <el-input class="dash-input" v-model="dash.httpsCmdPort" size="mini"></el-input>
                         </div>
                         <div class="details">
-                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>数据端口</span>
+                            <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{generateDeviceLang('dataPort')}}</span>
                             <el-input class="dash-input" v-model="dash.dataPort" size="mini"></el-input>
                         </div>
-                        <el-dialog title='导入'
+                        <el-dialog :title="generateDeviceLang('import')"
                         id="importId"
                         :visible.sync="showImportContent" v-if="showImportContent"
                         :close-on-click-modal="false"
@@ -51,17 +51,17 @@
                         left="40vh">
                             <div class="dialog-content" style="overflow:hidden;width:100%;">
                                 <hr style="border: 0.5px solid #FB4C5D;"/>
-                                <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
+                                <p style="margin-left:26px;margin-bottom:0px;">{{generateDeviceLang('selectFilePos')}}</p>
                             </div>
                             <div slot="footer" class="dialog-footer">
-                                <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">取 消</el-button>
-                                <a href="javascript:;" class="a-upload" @click="checkBeforeImport">选择文件
-                                    <input  id="upload" type="file" @change="importfxx(this)"  
+                                <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
+                                <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{generateDeviceLang('selectFile')}}
+                                    <input  id="upload" type="file" @change="importfxx(this)"
                                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                                 </a>
                             </div>
                         </el-dialog>
-                        <el-dialog title='提示'
+                        <el-dialog  :title="generateDeviceLang('prompt')"
                         :visible.sync="showConfirmImport" v-if="showConfirmImport"
                         :append-to-body='true'
                         :close-on-click-modal="false"
@@ -70,40 +70,40 @@
                         left="40vh">
                             <div class="dialog-content" style="overflow:hidden;width:100%;">
                                 <hr style="border: 0.5px solid #FB4C5D;"/>
-                                
+
                                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                                     <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                    <span>此操作将会清空当前页面已有NVR及设备，是否继续?</span>
+                                    <span>{{generateDeviceLang('clearInfo')}}</span>
                                 </p>
                             </div>
                             <div slot="footer" class="dialog-footer">
-                                <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">取 消</el-button>
-                                <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">确 认</el-button>
+                                <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
+                                <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
                             </div>
                         </el-dialog>
                     </el-col>
                 </el-tab-pane>
-                <el-tab-pane label="视频管理" name="video">
-                    <el-col :span="8" class="lisde">
+                <el-tab-pane :label="generateDeviceLang('videoMangement')" name="video">
+                    <el-col :span="lang=='en' && varWindowWidth<1366? 9: 8" class="lisde">
                         <div class="nvr-title tabTitle">
-                            <div class="name-title titles">
-                                <span>NVR名称</span>
-                                <i class="icon-filter" 
+                            <div :class="lang=='en' ? 'en-name-title titles': 'name-title titles'">
+                                <span>{{generateDeviceLang('nvr')}}</span>
+                                <i class="icon-filter"
                                 :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}" @click="filterNVR"></i>
                             </div>
-                            <div class="store-title titles" >
-                                <span>所属门店</span>
+                            <div :class="lang=='en' ? 'en-store-title titles': 'store-title titles'" >
+                                <span>{{generateDeviceLang('store')}}</span>
                                 <i class="icon-filter"
                                 :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterStore"></i>
                             </div>
-                            <div class="count-title titles">
-                                <span>通道数</span>
+                            <div :class="lang=='en' ? 'en-count-title titles': 'count-title titles'" >
+                                <span>{{generateDeviceLang('channelNum')}}</span>
                             </div>
                         </div>
                         <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                             <div  :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
                                 <div class="nvr-data group-title"
-                                v-for="(item,index) in nvrData" 
+                                v-for="(item,index) in nvrData"
                                 :key="index"  :class="!item.isClick?'noraml-color':'active-color'" @click="clickNVR(index,item)">
                                     <div class="proper-flag" v-if="item.isClick"></div>
                                     <div class="name-data titles">
@@ -124,7 +124,7 @@
                                 style="text-align:right;margin-right:15px;"
                                 @size-change="sizeChange"
                                 @current-change="currentChange"
-                                :page-size="sizeNum" 
+                                :page-size="sizeNum"
                                 :total="total"
                                 :current-page="page"
                                 background
@@ -133,31 +133,31 @@
                             </el-pagination>
                         </div>
                     </el-col>
-                    
-                    <el-col :span="16" class="risde">
-                        <div class="nape-items-title tabTitle">
+
+                    <el-col :span="lang=='en' && varWindowWidth<1366? 15: 16" class="risde">
+                        <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
                             <div class="nape-name-title titles">
-                                <span>通道名称</span>
-                                <!-- <i class="icon-filter" 
+                                <span>{{generateDeviceLang('channelName')}}</span>
+                                <!-- <i class="icon-filter"
                                 :class="{'el-icon-arrow-down':channelFilter,'el-icon-arrow-up':!channelFilter}" @click="filterChannel"></i> -->
                             </div>
                             <div class="nape-dep-title titles">
-                                <span>NVR通道号</span>
-                                <!-- <i class="icon-filter" 
+                                <span>{{generateDeviceLang('nvrChannelNum')}}</span>
+                                <!-- <i class="icon-filter"
                                 :class="{'el-icon-arrow-down':channelNumFilter,'el-icon-arrow-up':!channelNumFilter}" @click="filterChannelNum"></i> -->
                             </div>
                             <div class="nape-handle-title titles">
-                                <span>操作</span>
+                                <span>{{generateDeviceLang('operation')}}</span>
                             </div>
                         </div>
                         <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                             <div  :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
                             <div class="nape-items-data" :style="item.isClick?{'background-color':'#FEE4E7'}:{}"
-                            v-for="(item,index) in channelList" 
+                            v-for="(item,index) in channelList"
                             :key="index">
                                 <div class="nape-name-data">
                                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" placeholder="输入巡检项名称" v-if="item.isClick"></el-input>
+                                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" :placeholder="generateDeviceLang('inputInspectName')" v-if="item.isClick"></el-input>
                                 </div>
                                 <div class="nape-dep-data">
                                     <span class="nape-dep">{{item.channelId}}</span>
@@ -171,7 +171,7 @@
                                         </div>
                                 </div>
                                 <div class="nape-items-handle">
-                                    <i class="iconfont icon-bianji" style="font-size: 20px;cursor:pointer;margin-right:10px;" 
+                                    <i class="iconfont icon-bianji" style="font-size: 20px;cursor:pointer;margin-right:10px;"
                                     @click="handleEdit(index,item)"></i>
                                 </div>
                             </div>
@@ -190,6 +190,8 @@ import {validateInput,validateURL,validatePort} from '@/common/validate'
 import {deviceRESTful} from '@/api/index'
 import {isLoginIn} from '@/api/login'
 import { mapMutations,mapGetters} from 'vuex'
+import {generateDeviceLang} from '@/api/i18n'
+
 export default {
     name:'DeviceSetMge',
     data(){
@@ -218,27 +220,28 @@ export default {
                     id:0,
                     iconClass:'iconfont icon-daoru',
                     name:'import',
-                    btnTitle:'导入',
+                    btnTitle: this.$t('insSettingView.import'),
                     enabled:true,
                 },
                 {
                     id:0,
                     iconClass:'iconfont icon-daochu',
                     name:'export',
-                    btnTitle:'导出',
+                    btnTitle: this.$t('insSettingView.export'),
                     enabled:true,
                 },
                 {
                     id:0,
                     iconClass:'iconfont icon-xiazai',
                     name:'download',
-                    btnTitle:'下载',
+                    btnTitle: this.$t('insSettingView.download'),
                     enabled:true,
                 }
             ],
-            varWindowWidth:window.innerWidth, 
+            varWindowWidth:window.innerWidth,
             varyWindowHeight:window.innerHeight,
-            curNVRItem:null
+            curNVRItem:null,
+            lang: this.$i18n.locale
         }
     },
     watch:{
@@ -267,6 +270,7 @@ export default {
         })
     },
     methods:{
+        generateDeviceLang,
         // 修改table tr行的背景色
         tableRowStyle({ row, rowIndex }) {
             return 'background-color: #FAFAFA;height:50px;font-size:14px; border-bottom: 1px solid #ddd;font-weight: bold;'
@@ -306,14 +310,17 @@ export default {
             let msg='';
             if(self.dash.url.toString().trim().length==0||self.dash.httpCmdPort.toString().trim().length==0
             ||self.dash.httpsCmdPort.toString().trim().length==0||self.dash.dataPort.toString().trim().length==0){
-                msg='当前配置项均为必填项！';
+                //msg='当前配置项均为必填项！';
+                msg=this.$t('deviceView.emptyInfo');
             }
             if(!validateURL(self.dash.url)){
-                msg='当前配置项中IP格式错误！';
+                //msg='当前配置项中IP格式错误！';
+                msg=this.$t('deviceView.ipErrorInfo');
             }
             if(validatePort(self.dash.httpCmdPort)
             ||validatePort(self.dash.httpsCmdPort)||validatePort(self.dash.dataPort)){
-                msg='当前配置项端口格式错误！';
+                //msg='当前配置项端口格式错误！';
+                msg=this.$t('deviceView.portErrorInfo');
             }
             return msg;
         },
@@ -353,28 +360,28 @@ export default {
                 deviceRESTful.addDashServer(params).then(res=>{
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
-                        self.notify('连接成功!','success',3000);
+                        self.notify(this.$t('deviceView.connectSuss'),'success',3000);
                         let url=self.getDashURL();
                         sessionStorage.setItem('DASH_URL',url);
                         self.$store.commit('SET_DASHURL', url);
                     }
                     else{
-                        self.notify('连接失败!','warning',3000);
+                        self.notify(this.$t('deviceView.connectFail'),'warning',3000);
                         return false;
                     }
                 })
             }
-            else{                          
+            else{
                 deviceRESTful.upateDashServer(params).then(res=>{
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
-                        self.notify('连接成功!','success',3000);
+                        self.notify(this.$t('deviceView.connectSuss'),'success',3000);
                         let url=self.getDashURL();
                         sessionStorage.setItem('DASH_URL',url);
                         self.$store.commit('SET_DASHURL', url); //修改后更新vuex中的url值
                     }
                     else{
-                        self.notify('连接失败!','warning',3000);
+                        self.notify(this.$t('deviceView.connectFail'),'warning',3000);
                         setTimeout(function(){
                             self.dash=data.data;
                         },1000)
@@ -578,11 +585,11 @@ export default {
             let res1= await self.addNVR(paramsNVR);
             let res2= await self.addDevice(paramsDevice);
             if(res1.errMsg=='Success'&&res2.errMsg=='Success'){
-                self.notify('模板导入成功!','success',3000);
+                self.notify(this.$t('deviceView.importSuss'),'success',3000);
                 self.showImportContent=false;
             }
             else{
-                self.notify('模板导入失败!','warning',3000);
+                self.notify(this.$t('deviceView.importFail'),'warning',3000);
                 self.showImportContent=false;
             }
             self.page=1;
@@ -636,7 +643,7 @@ export default {
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
                     if(!outdata[0].hasOwnProperty('StoreID')){
-                        _this.notify('当前模板错误，请更换模板重新导入！','warning',3000);
+                        _this.notify(this.$t('deviceView.templateError'),'warning',3000);
                         return false;
                     }
                     let arr=outdata;
@@ -681,7 +688,7 @@ export default {
         export2Excel() {
             var that = this;
             require.ensure([], async() => {
-                const { export_json_to_excel } = require('@/excel/Export2Excel'); 
+                const { export_json_to_excel } = require('@/excel/Export2Excel');
                 const tHeader = ['StoreID','所属门店', 'IVS ID','NVR名称','通道数','通道名称','通道序号']; // 导出的表头名
                 const filterVal = ['storeId','storeName','ivsId','nvrName','channelCount','channelName','channelNum']; // 导出的表头字段名
                 console.log(that.activeName);
@@ -702,15 +709,16 @@ export default {
                                 obj.channelNum=_item.channelId;
                                 excelData.push(obj);
                             }
-                            
+
                         })
                     })
                 }
-                
+
                 const list = excelData;
                 const data = that.formatJson(filterVal, list);
 
-                export_json_to_excel(tHeader, data, `看门店-设备管理导入示例`);// 导出的表格名称，根据需要自己命名
+                //export_json_to_excel(tHeader, data, `看门店-设备管理导入示例`);// 导出的表格名称，根据需要自己命名
+                export_json_to_excel(tHeader, data, this.$t('deviceView.importExample'));// 导出的表格名称，根据需要自己命名
             })
         },
         formatJson(filterVal, jsonData) {
@@ -748,11 +756,11 @@ export default {
                 console.log(res.data);
                 let errMsg=res.errMsg;
                 if(errMsg!=undefined&&errMsg=='Success'){
-                    self.notify('修改成功！','success',3000);
+                    self.notify(this.$t('deviceView.editSuss'),'success',3000);
                     self.curChannelItem.isClick=false;
                 }
                 else{
-                    self.notify('修改失败！','warning',3000);
+                    self.notify(this.$t('deviceView.editFail'),'warning',3000);
                 }
             })
             .then(async()=>{
@@ -796,7 +804,7 @@ export default {
                 else{
                     self.channelData=[];
                     self.channelList=[];
-                }   
+                }
             })
         },
         searchNVRList(){
@@ -858,7 +866,7 @@ export default {
             };
             self.getNVRList(params);       //获取NVR 数据信息
         },
-        
+
         notify(msg,type,time) {
             this.$message({
                 message: msg,
@@ -890,7 +898,7 @@ export default {
 
 </style>
 <style lang="scss" scoped>
-@import '../../../assets/css/importfile.css'; 
+@import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
 $mainColor:#f31d65;
 @function rem($val){
@@ -917,7 +925,7 @@ $mainColor:#f31d65;
     text-overflow: ellipsis;
 }
 *{
-    font-family: Microsoft YaHei;
+    font-family: Arial, Microsoft YaHei;
 }
 .noraml-color{
     color: #4b5262 !important;
@@ -956,8 +964,39 @@ $mainColor:#f31d65;
     &:focus{
         background-color: #FEE4E7;
     }
-}     
-.el-device{ 
+}
+.en-el-handle-btn{
+  margin-left: 0px !important;
+  border-color: $mainColor !important;
+  color: $mainColor !important;
+  border-radius: 0px;
+  padding: 3px 10px !important;
+  position: relative;
+  top: 3px;
+  @media screen and (min-width: 1366px){
+    @include point(width, 90);
+  }
+  @media screen and (max-width: 1366px){
+    @include point(width, 120);
+  }
+  span{
+    position: relative;
+    bottom: 3px;
+  }
+  &:first-child{
+    border-right-width: 0px;
+  }
+  &:last-child{
+    border-left-width: 0px;
+  }
+  &:hover{
+    background-color: #FEE4E7;
+  }
+  &:focus{
+    background-color: #FEE4E7;
+  }
+}
+.el-device{
     .el-btns{
         @include point(padding-top,10);
         @include point(padding-right,20);
@@ -1025,6 +1064,31 @@ $mainColor:#f31d65;
                 .count-title{
                     width: 15%;
                 }
+                @media screen and (min-width: 1366px) {
+                  .en-name-title{
+                    width: 30%;
+                  }
+                  .en-store-title{
+                    width: 35%;
+                  }
+                  .en-count-title{
+                    width: 25%;
+                  }
+                }
+                @media screen and (max-width: 1366px) {
+                  .en-name-title{
+                    font-size: 12px;
+                    width: 30%;
+                  }
+                  .en-store-title{
+                    width: 35%;
+                    font-size: 12px;
+                  }
+                  .en-count-title{
+                    width: 30%;
+                    font-size: 12px;
+                  }
+                }
             }
             .nvr-data{
                 @include titleStyle;
@@ -1068,7 +1132,7 @@ $mainColor:#f31d65;
                     border-style: solid;
                     border-color: #ddd;
                     @include point(line-height,21);
-                    @include point(height,21);          
+                    @include point(height,21);
                 }
                 .iconrised{
                     float: left;
@@ -1079,7 +1143,7 @@ $mainColor:#f31d65;
                     border-color: #ddd;
                     background-color: #fff;
                     @include point(line-height,21);
-                    @include point(height,21); 
+                    @include point(height,21);
                 }
             }
              padding:0 15px;
@@ -1096,13 +1160,31 @@ $mainColor:#f31d65;
                     width: 8%;
                 }
             }
+            .en-nape-items-title{
+              @include titleStyle;
+              @media screen and (min-width: 1366px) {
+                font-size: 14px;
+              }
+              @media screen and (max-width: 1366px) {
+                font-size: 12px;
+              }
+              .nape-name-title{
+                width: 36%;
+              }
+              .nape-dep-title{
+                width: 50%;
+              }
+              .nape-handle-title{
+                width: 10%;
+              }
+            }
             .nape-items-data{
                 overflow: hidden;
                 position: relative;
                 padding-left: 1%;
                 cursor: pointer;
                 font-size: 14px;
-                @include point(height,49); 
+                @include point(height,49);
                 @include point(line-height,49);
 
                 text-align: left;
@@ -1140,17 +1222,15 @@ $mainColor:#f31d65;
                     display: inline-block;
                 }
             }
-            
+
         }
     }
+
 }
 </style>
 <style>
 @import '../../../assets/css/pagination.css';
-.el-tabs__active-bar{
-    height: 4px !important;
-    background-color: #FB4C5D !important;
-}
+@import '../../../assets/css/tabsItem.css';
 
 #importId .el-dialog__body{
     padding-top:0px !important;

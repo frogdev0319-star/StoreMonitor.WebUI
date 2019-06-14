@@ -1,7 +1,7 @@
 import request from '@/common/request'
 import {serviceLogout} from '@/common/request'
 const version='v1.0';
-//account RESTful 
+//account RESTful
 export function loginByUsername(data){
     return request({
         url:`${version}/login`,

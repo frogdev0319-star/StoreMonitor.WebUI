@@ -4,10 +4,10 @@
             <div class="title-content">
                 <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" />
                 <span class="event-title">{{event.eventTitle}}</span>
-                <span class="event-score" v-if="event.score!=-1">得分：{{event.score}}分</span>
-                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-submit" @click="submit" v-if="showWinpBtn" type="primary">提交</el-button>
+                <span class="event-score" v-if="event.score!=-1">{{generateEventLang('scores')}} {{event.score}}</span>
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-submit" @click="submit" v-if="showWinpBtn" type="primary">{{generateEventLang('submit')}}</el-button>
             </div>
-            <el-dialog  title='查看' :visible.sync="dialogFormVisible" :close-on-click-modal="false" 
+            <el-dialog  :title="generateEventLang('view')" :visible.sync="dialogFormVisible" :close-on-click-modal="false"
             v-if="dialogFormVisible" width="850px" top=12% @close='closeRealTime' class='rate-video-dialog'>
                 <div class="video-dialog-content" style="overflow:hidden;" @mousemove="showControlInfo=true" @mouseleave="showControlInfo=false">
                     <hr class="dialog-hr"/>
@@ -20,7 +20,7 @@
                             </div>
                             <div class="iconrside">
                                 <div class="screen-content">
-                                    <i class="iconfont iconscreen" 
+                                    <i class="iconfont iconscreen"
                                     :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
                                     <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
                                 </div>
@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </el-dialog>
-            <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+            <el-dialog  :title="generateEventLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
             v-if="dialogCommentVideo" width="850px" top=12% @close='stopCommentVideo' class='rate-video-dialog'>
                 <div class="video-dialog-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -51,7 +51,7 @@
                 </div>
             </transition> -->
             <transition name="fade">
-                <el-dialog title='查看'
+                <el-dialog :title="generateEventLang('view')"
                 :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width=850px top=12%>
                 <div class="video-dialog-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -63,44 +63,45 @@
             </transition>
             <div class="storeInfo-content">
                 <div class="storeInfo-details">
-                    <dd><span class="w4">门店名称：</span></dd>
+                    <dd><span :class="lang=='en'? 'en-w4': 'w4'">{{generateEventLang('storeName')}}：</span></dd>
                     <span class="details-info">{{event.storeName}}</span>
                 </div>
                 <div class="storeInfo-details">
                     <div class="w3-content">
-                        <dd><span class="w3">提报人：</span></dd>
+                        <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('submitter')}}：</span></dd>
                         <span class="details-info">{{event.createor}}</span>
                     </div>
                     <div class="w3-content">
-                        <dd><span class="w3">负责人：</span></dd>
+                        <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('solver')}}：</span></dd>
                         <span class="details-info">{{event.assigneeName}}</span>
                     </div>
                 </div>
                 <div class="storeInfo-details">
-                    <dd><span class="w4">提报时间：</span></dd>
+                    <dd><span :class="lang=='en'? 'en-w4': 'w4'">{{generateEventLang('submitTime')}}：</span></dd>
                     <span class="details-info">{{event.createDate}}</span>
                 </div>
             </div>
             <div class="eventInfo-content">
-                <strong>事件详情：</strong>
+                <strong v-if="lang=='en'" style="margin-right: 28px">{{generateEventLang('eventDetails')}}:</strong>
+                <strong v-else>{{generateEventLang('eventDetails')}}：</strong>
                 <div class="content">
                     <div class="speech-content" v-if="showAudio">
-                        <div class="speech-info" @click="startSpeech"> 
+                        <div class="speech-info" @click="startSpeech">
                             <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
                         </div>
                         <audio :ref="audioRef" id="audio" @canplay="getDuration">
                             <source :src="audioSrc" type="audio/mpeg" />
-                        </audio> 
+                        </audio>
                         <span class="often-text">{{audioOftenText}}</span>
                     </div>
-                    
+
                     <pre  class="description">{{event.description}}</pre>
                     <div class="photo-content">
                         <div v-for="(item,index) in sourceList" :key="index" class="source-content">
                             <div v-if="item.mediaType==2" class="img-content">
                                 <!--图片资源-->
                                 <!-- :width="imgHeight*1.4+'px'" -->
-                                <img class="imgLittle imgInner" :src="item.url" :title="imgTitle" :onerror='deafultImg' 
+                                <img class="imgLittle imgInner" :src="item.url" :title="imgTitle" :onerror='deafultImg'
                                 :height="imgHeight+'px'" @click="openOuter(item,$event)"/>
                             </div>
                                 <!--视频资源-->
@@ -119,21 +120,21 @@
                 </div>
             </div>
             <div class="submit-content" :style="{'height':windowHeight*0.34+'px'}" v-show="showWinpBtn">
-                <span class="dealInfo-label">处理事件</span>
-                <span>选择处理方式</span>
+                <span class="dealInfo-label">{{generateEventLang('events')}}</span>
+                <span>{{generateEventLang('methods')}}</span>
                 <div class="btn-content">
                     <span v-for="(item,index) in subBtnList" :key="index" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
                         {{item.name}}
                     </span>
                 </div>
-                <span style="display:block;">添加处理信息</span>
+                <span style="display:block;">{{generateEventLang('addDetails')}}</span>
                 <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                    maxlength="300" v-model="eventDes" placeholder="请输入处理评论文字"></el-input>
+                    maxlength="300" v-model="eventDes" :placeholder="generateEventLang('describe')"></el-input>
             </div>
         </el-col>
         <el-col :span="8" class="rside">
             <div class="title-content" id="rside-title">
-                <span>处理详情</span>
+                <span>{{generateEventLang('details')}}</span>
             </div>
             <div class="deal-content" id="dealcontent">
                 <el-scrollbar style="height:100%;" class="el-menuscrollbar">
@@ -192,6 +193,7 @@ import {eventRESTful} from '@/api/index'
 import AudioVue from '@/components/AudioVue.vue'
 import $ from 'jquery';
 import {getDeviceList} from '@/api/device'
+import {generateEventLang} from  '@/api/i18n'
 export default {
     name:"RateManage",
     components:{
@@ -233,17 +235,18 @@ export default {
             showPhotoContent:false,
             deafultImg:'this.src="' + require('../../../../static/img/pic2.png') + '"',
             sessionId:'',
-            subBtnList:[{name:'处理',isActive:true},{name:'结案',isActive:false},{name:'追加',isActive:false}],
+            subBtnList:[{name:this.$t('eventView.handling'),isActive:true},{name:this.$t('eventView.closing'),isActive:false},{name:this.$t('eventView.adding'),isActive:false}],
             eventDes:'',
             videoSrc:require('../../../../static/img/监控icon.png'),
             inspectSrc:require('../../../../static/img/远程icon.png'),
             insiteInspectSrc:require('../../../../static/img/现场icon.png'),
-            startIcon:require('../../../../static/img/pic_play_icon.png'),    
-            videoImgSrc:require('../../../../static/img/image_videoThumbnail.png'),         
+            startIcon:require('../../../../static/img/pic_play_icon.png'),
+            videoImgSrc:require('../../../../static/img/image_videoThumbnail.png'),
             curStatus:null,
             fullScreen:false,
             showControlInfo:true,
             playState:false,
+            lang: this.$i18n.locale
         }
     },
     computed: {
@@ -269,7 +272,7 @@ export default {
                 height= this.varyWindowWidth*0.035;
             }
             else{
-                height=75; 
+                height=75;
             }
             return height;
         },
@@ -295,6 +298,7 @@ export default {
         }
     },
     methods:{
+        generateEventLang,
         onPlayerPlay(player){
             console.log(player);
         },
@@ -305,7 +309,7 @@ export default {
             if (!this.initialized) {
                 this.initialized = true
                 this.currentTech = this.player.techName_;
-                
+
             }
         },
         // record current time
@@ -339,7 +343,7 @@ export default {
                 this.previewplayer.src({src:item.url});
                 this.previewplayer.play();
             })
-            
+
         },
         openOuter(item,$ev){
             let self=this;
@@ -365,7 +369,7 @@ export default {
             console.log(sessionId);
             self.sessionId=sessionId;
             const data = {
-                request: { 
+                request: {
                   method: 'connection',
                   sessionID: sessionId,
                   streamingProtocol:this.protocal,
@@ -398,7 +402,7 @@ export default {
             let self=this;
             self.stopVideo();
             const data = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.curChannel.ivsId,
@@ -432,10 +436,10 @@ export default {
             ele.style.height = "100%";
             if (ele.requestFullscreen) {
                 ele.requestFullscreen();
-            } 
+            }
             else if (ele .mozRequestFullScreen) {
                 ele.mozRequestFullScreen();
-            } 
+            }
             else if (ele .webkitRequestFullScreen) {
                 ele.webkitRequestFullScreen();
             }
@@ -451,16 +455,16 @@ export default {
             ele.style.height = "auto";
             if (de.exitFullscreen) {
                 de.exitFullscreen();
-            } 
+            }
             else if (de.mozCancelFullScreen) {
                 de.mozCancelFullScreen();
-            } 
+            }
             else if (de.webkitCancelFullScreen) {
                 de.webkitCancelFullScreen();
             }
         },
-        myfun(){  
-            var div1=document.getElementsByClassName("lside");  
+        myfun(){
+            var div1=document.getElementsByClassName("lside");
             var div2=document.getElementsByClassName("rside");
             let height=div1[0].offsetHeight;
             div2[0].style.height=height+'px';
@@ -630,11 +634,12 @@ export default {
                         obj.description=item.description;
                         switch(item.status){
                             case 0: obj.showLabel=true;obj.spanStyle={'background-color':'#FCB83B'};
-                                obj.process='未处理'; break;
+                               // obj.process='未处理'; break;
+                                obj.process= this.$t('eventView.pending'); break;
                             case 1: obj.showLabel=true;obj.spanStyle={'background-color':'#434B5E'};
-                                obj.process='已处理'; break;
+                                obj.process= this.$t('eventView.handled'); break;
                             case 2: obj.showLabel=true;obj.spanStyle={'background-color':'#6097F4'};
-                                obj.process='已结案'; break;
+                                obj.process=this.$t('eventView.closed'); break;
                         }
                         if(item.status==2){
                             self.showWinpBtn=false;
@@ -649,7 +654,7 @@ export default {
                             let _temp=[];
                             let audioObj={};
                             item.attachment.forEach((_item,_index)=>{
-                                
+
                                 if(_item.mediaType==0){
                                     audioObj.audioSrc=_item.url;
                                     audioObj.audioRef='audioRef'+index;
@@ -698,7 +703,7 @@ export default {
                 console.log(res);
                 let errMsg=res.errMsg;
                 if(errMsg=='Success'){
-                    self.notify('提交成功！','success',3000);
+                    self.notify(this.$t('storeView.successSubmit'),'success',3000);
                     self.getCommentList();
                     self.eventDes='';
                     setTimeout(()=>{
@@ -708,7 +713,7 @@ export default {
                     },3000);
                 }
                 else{
-                    self.notify('提交失败！','warning',3000);
+                    self.notify(this.$t('storeView.failSubmit'),'warning',3000);
                     return false;
                 }
             })
@@ -718,7 +723,7 @@ export default {
             let status=0;
             let description=self.eventDes;
             if(description.trim().length==0){
-                self.notify('评论信息不能为空！','warning',3000);
+                self.notify(this.$t('eventView.emptyInfo'),'warning',3000);
                 return false;
             }
             if(self.subBtnList[0].isActive==true){
@@ -737,7 +742,7 @@ export default {
             if(isFull === undefined)
             {
                 isFull = false;
-            } 
+            }
             return isFull;
         },
         notify(msg,type,time) {
@@ -766,7 +771,7 @@ export default {
             alert();
             setTimeout(function () {
                 setTimeout(function () {
-　　　　　　　　　　　　console.log("恢复用户权限操作"); 
+　　　　　　　　　　　　console.log("恢复用户权限操作");
 　　　　　　　　　　}, 50)
             }, 50);
         },
@@ -791,9 +796,9 @@ export default {
                     self.getCommentDuration(_item);
                 });
             }, 0);
-            
+
         })
-        
+
         window.onresize=function(){
             if(!self.checkFull()){
                 self.fullScreen=false;
@@ -806,20 +811,20 @@ export default {
     created(){
         let self=this;
     },
-    updated(){ 
+    updated(){
         let self=this;
         self.commentList.forEach((item,index)=>{
             console.log(self.$refs);
         })
-    }, 
+    },
     beforeDestroy(){
         window.clearInterval(this.timeid);
-    } 
+    }
 }
 </script>
 <style lang="scss" scoped>
 @import '../../../assets/css/textstyle.css';
-@import '../../../assets/css/importfile.css'; 
+@import '../../../assets/css/importfile.css';
 $red:#f31d65;
 $black:#182752;
 $border:#e3e9f4;
@@ -997,11 +1002,11 @@ $h1:#292e36;
                             float: left;
                             margin-left: 30px;
                         }
-                        
+
                     }
                     .iconrside{
                         max-width: 500px;
-                        float: right; 
+                        float: right;
                         position: relative;
                         span{
                             font-size: 13px;
@@ -1053,6 +1058,11 @@ $h1:#292e36;
                 font-weight: bold;
                 float: left;
             }
+            .en-w4{
+              font-weight: bold;
+              float: left;
+              width: 105px
+            }
             .w3-content{
                 margin-right: 45px;
                 overflow: hidden;
@@ -1065,6 +1075,11 @@ $h1:#292e36;
                 margin-right:-0.3334em; /*同上*/
                 font-weight: bold;
                 float: left;
+            }
+            .en-w3{
+              font-weight: bold;
+              float: left;
+              width: 105px
             }
             .details-info{
                 margin-left: 15px;
@@ -1140,10 +1155,10 @@ $h1:#292e36;
                 text-align: left;
                 font-family:'Microsoft YaHei';
                 font-size: 12px;
-                white-space:pre-wrap; /* css3.0 */ 
-                white-space:-moz-pre-wrap; /* Firefox */ 
-                white-space:-pre-wrap; /* Opera 4-6 */ 
-                white-space:-o-pre-wrap; /* Opera 7 */ 
+                white-space:pre-wrap; /* css3.0 */
+                white-space:-moz-pre-wrap; /* Firefox */
+                white-space:-pre-wrap; /* Opera 4-6 */
+                white-space:-o-pre-wrap; /* Opera 7 */
                 word-wrap:break-word; /* Internet Explorer 5.5+ */
             }
             .speech-content{
@@ -1169,12 +1184,12 @@ $h1:#292e36;
             .photo-content{
                 overflow: hidden;
                 @include point(margin-top,15);
-                
+
                 .source-content{
                     float: left;
                     @include point(margin,5);
                     @include point(max-width,220);
-                
+
                     .img-content{
                         position: relative;
                         cursor: pointer;
@@ -1245,7 +1260,7 @@ $h1:#292e36;
                 width: 14px;
                 height: 14px;
                 border-radius: 50%;
-                -moz-border-radius: 50%;      
+                -moz-border-radius: 50%;
                 -webkit-border-radius: 50%;
                 position: relative;
                 top: 4px;
@@ -1324,7 +1339,7 @@ $h1:#292e36;
                             }
                         }
                     }
-                    
+
                     .description{
                         float: left;
                         text-align: left;
@@ -1332,10 +1347,10 @@ $h1:#292e36;
                         @include point(margin-left,20);
                         font-family:'Microsoft YaHei';
                         font-size: 12px;
-                        white-space:pre-wrap; /* css3.0 */ 
-                        white-space:-moz-pre-wrap; /* Firefox */ 
-                        white-space:-pre-wrap; /* Opera 4-6 */ 
-                        white-space:-o-pre-wrap; /* Opera 7 */ 
+                        white-space:pre-wrap; /* css3.0 */
+                        white-space:-moz-pre-wrap; /* Firefox */
+                        white-space:-pre-wrap; /* Opera 4-6 */
+                        white-space:-o-pre-wrap; /* Opera 7 */
                         word-wrap:break-word; /* Internet Explorer 5.5+ */
                     }
                     .source-content{

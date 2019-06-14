@@ -10,12 +10,12 @@
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
                 <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-submit" v-loading.fullscreen.lock="fullscreenLoading" v-if="showStoreUp"
-                            @click="submit" type="primary">提交</el-button>
+                            @click="submit" type="primary">{{generateStoreMonitorLang('submit')}}</el-button>
             </div>
-            <el-dialog title='编辑截图'
+            <el-dialog :title="generateStoreMonitorLang('edit')"
             :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5% @close="closeEdit">
                 <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-                    <hr class="dialog-hr"/> 
+                    <hr class="dialog-hr"/>
                     <transition name='fade'>
                         <div class='icon-right' v-if="showPenBtn" id="iconR">
                             <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
@@ -29,27 +29,27 @@
                             </transition>
                         </div>
                     </transition>
-                    <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)" 
+                    <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
                     @mousemove="mouseMoveAction($event)"></canvas>
                     <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
                     'margin-left':47*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas">
-                            <img :src="clearIconSrc" class="icon-clear" height="22px"/> 
-                            <span>清除</span>
+                            <img :src="clearIconSrc" class="icon-clear" height="22px"/>
+                            <span>{{generateStoreMonitorLang('clear')}}</span>
                         </div>
                         <div class="content" @click="confirmEditCanvas">
-                            <img :src="removeIconSrc" class="icon-clear" height="22px"/> 
-                            <span>撤销</span>
+                            <img :src="removeIconSrc" class="icon-clear" height="22px"/>
+                            <span>{{generateStoreMonitorLang('cancel')}}</span>
                         </div>
                     </div>
 
                 </div>
                 <div slot="footer">
-                    <el-button id="cancelBtn" @click="cancelEdit" size="mini">取 消</el-button>
-                    <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确 认</el-button>
+                    <el-button id="cancelBtn" @click="cancelEdit" size="mini">{{generateStoreMonitorLang('cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">{{generateStoreMonitorLang('confirm')}}</el-button>
                 </div>
             </el-dialog>
-            <el-dialog  title='查看' :visible.sync="dialogCommentVideo" :close-on-click-modal="false" 
+            <el-dialog  :title="generateStoreMonitorLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
             v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content">
                     <hr class="dialog-hr"/>
@@ -57,7 +57,7 @@
                     </video>
                 </div>
             </el-dialog>
-            <el-dialog title='查看'
+            <el-dialog :title="generateStoreMonitorLang('view')"
                 :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" :width="680*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -86,19 +86,19 @@
                         </div>
                         <div class="iconrside">
                             <div class="speed-content" v-if="playBackState">
-                                <span>倍速</span>
+                                <span>{{generateStoreMonitorLang('speed')}}</span>
                                 <el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" @change="adjustSpeed">
                                     <el-option
-                                    v-for="(item) in speedList" 
+                                    v-for="(item) in speedList"
                                     :key="item.value"
                                     :label="item.label"
                                     :value="item.value">
                                     </el-option>
                                 </el-select>
-                                <span>视频回退</span>
+                                <span>{{generateStoreMonitorLang('back')}}</span>
                                 <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" @change="adjustProcess" placeholder=' '>
                                     <el-option
-                                    v-for="(item) in backList" 
+                                    v-for="(item) in backList"
                                     :key="item.value"
                                     :label="item.label"
                                     :value="item.value">
@@ -106,7 +106,7 @@
                                 </el-select>
                             </div>
                             <div class="screen-content" v-if="showStoreUp">
-                                <i class="iconfont iconscreen" 
+                                <i class="iconfont iconscreen"
                                 :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
                                 <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
                             </div>
@@ -118,15 +118,15 @@
                         :max="durationTimeValue" class="mb-3 el-prog" height="0.2rem" style="margin-bottom:0px !important;"/>
                         <!-- <span class="duration">{{durationStr}}</span> -->
                     </div>
-                    
-                    <div class="iconright" v-if="showCutContent">
+
+                    <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showCutContent">
                         <div class="paizhao-content" @click="cutPicture">
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                            <span>抓拍</span>
+                            <span>{{generateStoreMonitorLang('snapshot')}}</span>
                         </div>
                         <div class="paizhao-content" @click="getVideo">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;"></i>
-                            <span style="margin-left:12px;">录像</span>
+                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;margin-left: -14px;"></i>
+                            <span style="margin-left:12px;">{{generateStoreMonitorLang('record')}}</span>
                         </div>
                         <div class="icon-drap-content">
                             <i class="iconfont icon-zhedie iconzhedie" @click="spreadContent" v-if="!showSpread"></i>
@@ -155,14 +155,14 @@
                                 <i class="iconfont icon-gongge iconscreen" @click="recoverScreen(item)"></i>
                             </div>
                         </div>
-                        <div class="iconright">
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
                             <div class="paizhao-content" @click="cutPicture(item)">
                                 <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                                <span>抓拍</span>
+                                <span>{{generateStoreMonitorLang('snapshot')}}</span>
                             </div>
                             <div class="sheying-content" @click="getVideo(item)">
                                 <i class="iconfont icon-luxiang iconpaizhao" style="font-size:20px;position:relative;top:3px;"></i>
-                                <span style="margin-left:14px;">录像</span>
+                                <span style="margin-left:14px;">{{generateStoreMonitorLang('record')}}</span>
                             </div>
                         </div>
                     </div>
@@ -173,7 +173,7 @@
             </div>
             <div class="el-event">
                 <div :class="corEvent?'event-lside':''">
-                    <span class="event-title">创建方式</span>
+                    <span class="event-title">{{generateStoreMonitorLang('createMothod')}}</span>
                     <div class="el-radio-content">
                         <div class="el-radio-details" v-for="(item,index) in evBtns" :key="index" :class="item.isActive?'activeClass':''" @click="clickEventBtn(item,index)">
                             <span>{{item.name}}</span>
@@ -181,12 +181,12 @@
                     </div>
                     <div class="lside-scrollbar">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <span class="event-title">问题名称</span>
+                            <span class="event-title">{{generateStoreMonitorLang('title')}}</span>
                             <el-input size="mini" class="name-input" maxlength="10" :disabled="corEvent" v-model="eventName"></el-input>
-                            <span v-if="!corEvent" class="event-title">问题描述</span>
-                            <span v-else class="event-title">问题描述</span>
+                            <span v-if="!corEvent" class="event-title">{{generateStoreMonitorLang('description')}}</span>
+                            <span v-else class="event-title">{{generateStoreMonitorLang('description')}}</span>
                             <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                            maxlength="300" v-model="eventDes" placeholder="请输入问题描述文字"></el-input>
+                            maxlength="300" v-model="eventDes" :placeholder="generateStoreMonitorLang('descPlaceholder')"></el-input>
                             <div class="source-content">
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
                                     <div class="img-content" v-if="item.mediaType==2">
@@ -199,7 +199,7 @@
                                         <img class="imgLittle" :src="videoImgSrc" :height="item.height"/>
                                     </div>
                                 </div>
-                                <span>*视频图片最多支持插入5个。</span>
+                                <span>*{{generateStoreMonitorLang('maximumAttach')}}</span>
                             </div>
                         </el-scrollbar>
                     </div>
@@ -207,11 +207,11 @@
                 <div class="right-line" v-if="corEvent" id="rightLine"></div>
                 <div v-if="corEvent" class="event-rside">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                        <span class="event-title cor-des">相关事件</span>
+                        <span class="event-title cor-des">{{generateStoreMonitorLang('relevantEvent')}}</span>
                         <div class="event-content">
                             <div class="event-details" v-for="(item,index) in eventList" :key="index">
                                 <el-radio v-model="curEvent" :label="item.id" @change="checkEvent">
-                                    <span class="event-name">{{item.name}}</span></el-radio>
+                                    <span class="event-name" :title="item.name">{{item.name}}</span></el-radio>
                                 <div class="event-date">
                                     <span class='date-year'>{{item.dateYear}}</span>
                                     <span class='date-day'>{{item.dateDay}}</span>
@@ -225,9 +225,9 @@
         </el-col>
         <el-col :span="8" class="rside" v-if="!showSpread">
             <div class="el-header-title">
-                <span>选择门店</span>
+                <span>{{generateStoreMonitorLang('selectStores')}}</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" id="storetab-content">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
@@ -235,32 +235,32 @@
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
                             </span> -->
-                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="store-name" :class="_item.isActive?'activeClass':''" 
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="store-name" :class="_item.isActive?'activeClass':''"
                              @click="clickStore(item,index,_item,_index)">
-                                <el-tooltip class="item" effect="dark" :content="_item.name" 
+                                <el-tooltip class="item" effect="dark" :content="_item.name"
                                     placement="bottom">
                                     <span>{{_item.name}}</span>
                                 </el-tooltip>
                             </div>
                         </div>
-                        
+
                         <div class="storeList-content" v-else>
                             <el-input
                                 size="small"
                                 class="el-search-input"
-                                placeholder="请输入关键字搜索门店"
+                                :placeholder="generateStoreMonitorLang('keywords')"
                                 v-model="serachVale" @keyup.enter.native="searchStore">
                                 <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;" ></i>
                             </el-input>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
-                                <!-- <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" 
+                                <!-- <span v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
                                     {{itemDs.name}}
                                 </span> -->
-                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :class="itemDs.isActive?'activeClass':''" 
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :class="itemDs.isActive?'activeClass':''"
                                 @click="clickStore(item,index,itemDs,indexDs)">
-                                    <el-tooltip class="item" effect="dark" :content="itemDs.name" 
+                                    <el-tooltip class="item" effect="dark" :content="itemDs.name"
                                         placement="bottom">
                                         <span>{{itemDs.name}}</span>
                                     </el-tooltip>
@@ -272,8 +272,8 @@
             </el-tabs>
             <hr class="rside-hr"/>
             <div class="channel-content">
-                <span>区域列表</span>
-                
+                <span>{{generateStoreMonitorLang('zoneList')}}</span>
+
                 <div class="channels-srollbar">
                     <div class="arrow-content">
                         <i @click="lastBar" class="el-icon-arrow-left icon-arrow" v-if="hideLast"></i>
@@ -291,9 +291,9 @@
             </div>
             <hr class="rside-hr" style="margin-top:0"/>
             <div class="time-content">
-                <span id="date-title">选择日期</span>
+                <span id="date-title">{{generateStoreMonitorLang('selectDate')}}</span>
                 <div class="date-picker-content">
-                    <span>播放时间</span>
+                    <span>{{generateStoreMonitorLang('playTime')}}</span>
                     <el-time-picker
                         class="time-picker"
                         v-model="curTime"
@@ -302,12 +302,13 @@
                         placeholder="任意时间点"
                         @change='changeDate'>
                     </el-time-picker>
-                    <el-button size="mini" class='backdate-btn' @click="backCurDate" type="primary">回到当前时间</el-button>
+                    <el-button size="mini" class='backdate-btn' @click="backCurDate" type="primary">{{generateStoreMonitorLang('backToNow')}}</el-button>
                 </div>
                 <div class="date-content">
                     <div class="date-header">
                         <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
-                        <span>{{curYear}}年{{curMonth}}月</span>
+                        <span v-if="lang !== 'en'">{{curYear}}年{{curMonth}}月</span>
+                        <span v-else>{{curMonth}}/{{curYear}}</span>
                         <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>
                     </div>
                     <div class="date-data">
@@ -315,7 +316,7 @@
                             {{item}}
                         </span>
                         <div class="date-details" v-for="(item,index) in weekDays">
-                            <div class="data" v-for="(_item,_index) in item" 
+                            <div class="data" v-for="(_item,_index) in item"
                             :key="_index" @click="checkDate(item,index,_item,_index)"
                              :style="_item.disabed?{'cursor': 'not-allowed','background-color':'#F5F7FA'}:{'cursor': 'pointer','background-color':'#fff'}">
                                 <span v-if=" _item.disabed"
@@ -345,6 +346,7 @@ import videojs from '../../../static/video.js'
 import {validateInput} from '@/common/validate'
 import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import DialogVue from '@/components/DialogVue.vue'
+import {generateStoreMonitorLang} from '@/api/i18n'
 // import GetVideoBtn from '@/components/GetVideoBtn.vue'
 import {getCookie} from '@/common/auth';
 import {indexedDB} from '@/common/util'
@@ -386,9 +388,9 @@ export default {
             serachVale:'',
             varyWindowHeight:window.innerHeight,
             varyWindowWidth:window.innerWidth,
-            showDate:true, 
-            playDate:new Date(), 
-            
+            showDate:true,
+            playDate:new Date(),
+
             currentTimeValue:0,
             durationTimeValue:0,
             currentStr:'0:00:00',
@@ -418,7 +420,7 @@ export default {
             ],
             curSpeed:'1 X',
             backList:[
-                
+
                 {
                     value:0,
                     label:'10s'
@@ -448,8 +450,8 @@ export default {
             penBtnSrc:require('../../../static/img/pen_btn.png'),
             clearIconSrc:require('../../../static/img/清除.png'),
             removeIconSrc:require('../../../static/img/撤销.png'),
-            startIcon:require('../../../static/img/pic_play_icon.png'),    
-            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),  
+            startIcon:require('../../../static/img/pic_play_icon.png'),
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
             checkImgSrc:'',
             showOuter:false,
             showPenBtn:false,
@@ -476,26 +478,26 @@ export default {
 
             tabList:[
                 {
-                    label:'关注',
+                    label: this.$t('storeMonitor.star'),
                     storeList:[]
                 },
                 {
-                    label:'最近访问',
+                    label: this.$t('storeMonitor.visited'),
                     storeList:[]
                 },
                 {
-                    label:'全部门店',
+                    label: this.$t('storeMonitor.allStores'),
                     storeList:[]
                 }
             ],
-            tempStoreList:[],  
+            tempStoreList:[],
             allInitStoreList:[],
             curTime:new Date(),
             curDate:'',
             curYear:new Date().getFullYear(),
             curMonth:new Date().getMonth()+1,
             curDay:new Date().getDate(),
-            weekTitles:['一','二','三','四','五','六','日'],
+            weekTitles: this.$t('storeMonitor.week'),
             weekDays:[],
 
             startTs:0,
@@ -503,7 +505,7 @@ export default {
             sessionId:'',
             channel:{},
             isPlayingFlag:-1,   //判断当前是否正在播放实时视频
-            evBtns:[{'name':'创建问题','isActive':true},{'name':'关联问题','isActive':false}],
+            evBtns:[{'name': this.$t('storeMonitor.createProblem'),'isActive':true},{'name':this.$t('storeMonitor.relateProblem'),'isActive':false}],
             eventList:[],
             curEvent:'',
             eventName:'',
@@ -566,26 +568,26 @@ export default {
             accountId:'',
             userId:'',
             changeStoreObj:{
-                title:'确认',
-                showInfo:'问题尚未提交，切换后系统不再保存，是否确认切换？',
+                title:this.$t('storeMonitor.confirm'),
+                showInfo: this.$t('storeMonitor.switchInfo'),
                 isWarning:true,
                 dialogCosed:false
             },
             changeChannelObj:{
-                title:'确认',
-                showInfo:'问题尚未提交，切换后系统不再保存，是否确认切换？',
+                title: this.$t('storeMonitor.confirm'),
+                showInfo: this.$t('storeMonitor.switchInfo'),
                 isWarning:true,
                 dialogCosed:false
             },
             noBindDeviceObj:{
-                title:'提示',
-                showInfo:'当前门店未绑定设备！',
+                title: this.$t('storeMonitor.prompt'),
+                showInfo: this.$t('storeMonitor.notBindCamera'),
                 isWarning:false,
                 dialogCosed:false
             },
             noStoreUser:{
-                title:'提示',
-                showInfo:'当前门店未绑定负责人，是否继续！',
+                title: this.$t('storeMonitor.prompt'),
+                showInfo: this.$t('storeMonitor.notSolver'),
                 isWarning:true,
                 dialogCosed:false
             },
@@ -600,7 +602,8 @@ export default {
             timerPlayReal:null,
             realTimeSpeed:0,
             cutDialogcurTime:0,
-            
+            lang: this.$i18n.locale
+
         }
     },
     computed:{
@@ -640,7 +643,7 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         console.log(from);
-        if(from.name=='提交事件'){
+        if(from.name=='storeSubEvent'){
             to.meta.keepAlive=true;
         }
         else{
@@ -662,10 +665,10 @@ export default {
         self.isPlayingFlag=-1;
         self.timerPlayReal=null;
         self.timeid=null;
-        if(self.playState){ 
+        if(self.playState){
             self.stopRealTime();
         }
-        if(to.name!='提交事件'){
+        if(to.name!='storeSubEvent'){
             from.meta.keepAlive=false;
         }
         next();
@@ -712,6 +715,7 @@ export default {
         })
     },
     methods:{
+        generateStoreMonitorLang,
         changeBrand(){
             let self=this;
             self.clearEvent();
@@ -824,7 +828,7 @@ export default {
             }
             let data;
             switch(Number(self.activeIndex)){
-                case 0: data=await self.getFaStoreList(); 
+                case 0: data=await self.getFaStoreList();
                     if(data.errCode==0){
                         let storeData=data.data;
                         self.tabList[0].storeList=getStoreTemp(storeData);
@@ -891,7 +895,7 @@ export default {
                     obj.storeTitle=storeData[0].name;
                     obj.userName=storeData[0].userName;
                     obj.storeUp=true;
-                    obj.storeUpTitle='已关注';
+                    obj.storeUpTitle= self.$t('storeMonitor.stared');
                     self.store=obj;
                     self.showStoreUp=true;
                     let curStoreId=storeData[0].storeId;
@@ -967,7 +971,7 @@ export default {
                 addFavoriteStore(params).then(res=>{
                     if(res.errCode==0){
                         self.store.storeUp=true;
-                        self.store.storeUpTitle='已关注';
+                        self.store.storeUpTitle= self.$t('storeMonitor.stared');
                         self.getStoreList();
                         self.tabList[2].storeList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
@@ -995,7 +999,7 @@ export default {
                 deleteFavoriteStore(params).then(res=>{
                     if(res.errCode==0){
                         self.store.storeUp=false;
-                        self.store.storeUpTitle='点击关注';
+                        self.store.storeUpTitle= self.$t('storeMonitor.clickToStar');
                         self.getStoreList();
                         self.tabList[2].storeList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
@@ -1046,7 +1050,7 @@ export default {
                     resolve(data);
                 })
             })
-            
+
         },
         async clickEventBtn(item,index){
             let self=this;
@@ -1100,7 +1104,7 @@ export default {
             let state=self.playBackState;
             self.stopVideo();
             const data = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -1120,7 +1124,7 @@ export default {
             let sessionId= await dashAPI.Online();
             self.sessionId=sessionId;
             let dataonLine={
-                request: { 
+                request: {
                     method: 'connection',
                     sessionID: sessionId,
                     streamingProtocol:this.protocal,
@@ -1156,7 +1160,7 @@ export default {
             console.log(sessionId);
             self.sessionId=sessionId;
             let data= {
-                request: { 
+                request: {
                     method: 'connection',
                     sessionID: sessionId,
                     streamingProtocol:this.protocal,
@@ -1296,11 +1300,11 @@ export default {
                 .then((results) => {
                     // 上传完成
                     const url = self.getFileUrl(results.name);
-                    resolve(url); 
+                    resolve(url);
                 })
                 .catch((err) => {
-                    console.log(err) 
-                }) 
+                    console.log(err)
+                })
             })
         },
         openOuter(item){
@@ -1318,15 +1322,15 @@ export default {
         async submit(){
             let self=this;
             if(self.eventName.trim().length==0){
-                self.notify('问题名称不能为空！','warning',3000);
+                self.notify(self.$t('storeMonitor.emptyTitle'),'warning',3000);
                 return false;
             }
             if(validateInput(self.eventName)){
-                self.notify('问题名称中不能含非法字符！','warning',3000);
+                self.notify(self.$t('storeMonitor.illegalStr'),'warning',3000);
                 return false;
             }
             if(validateInput(self.eventDes)){
-                self.notify('描述中不能含非法字符！','warning',3000);
+                self.notify(self.$t('storeMonitor.illegalDesc'),'warning',3000);
                 return false;
             }
             let tempFileUrl=[];
@@ -1391,10 +1395,10 @@ export default {
                             fileList:tempFileUrl
                         },
                         user:notifiedTo,
-                        ts:curTs                     
+                        ts:curTs
                     }
                     sessionStorage.setItem('store_submit',JSON.stringify(routeData));
-                    self.$router.push({name:"提交事件",params:{data:routeData}});
+                    self.$router.push({name:"storeSubEvent",params:{data:routeData}});
                 })
             }
             else{
@@ -1435,10 +1439,10 @@ export default {
                             description:self.eventDes.trim(),
                             fileList:tempFileUrl
                         },
-                        ts:curTs              
+                        ts:curTs
                     }
                     sessionStorage.setItem('store_submit',JSON.stringify(routeData));
-                    self.$router.push({name:"提交事件",params:{data:routeData}});
+                    self.$router.push({name:"storeSubEvent",params:{data:routeData}});
                 })
             }
         },
@@ -1454,7 +1458,8 @@ export default {
             let self=this;
             self.showCancelContent=false;
             if(self.sourceList.length>=5){
-                self.notify('最多上传5个资源！','warning',3000);
+                //self.notify('最多上传5个资源！','warning',3000);
+                self.notify(self.$t('storeMonitor.maximumAttach'),'warning',3000);
                 return false;
             }
             if(self.fullScreen){
@@ -1519,7 +1524,7 @@ export default {
             //self.showCutModel=true;
             self.showPenBtn=true;
             self.showCancelContent=true;  //每次鼠标弹起后显示可以取消的框
-            
+
             if(self.flag!=0&&self.canvasEl!=''){
                 let imgObj=new Image();
                 imgObj.src=self.canvasEl.toDataURL("image/jpeg");
@@ -1694,7 +1699,8 @@ export default {
         getVideo(...val){
             let self=this;
             if(self.sourceList.length>=5){
-                self.notify('最多上传5个资源！','warning',3000);
+                //self.notify('最多上传5个资源！','warning',3000);
+                self.notify(self.$t('storeMonitor.maximumAttach'),'warning',3000);
                 return false;
             }
             if(self.fullScreen){
@@ -1725,7 +1731,7 @@ export default {
             }
             else{
                 self.endTImeCutVideo=new Date().getTime();
-                
+
                 if((self.endTImeCutVideo-self.startTimeCutVideo)/1000>11){
                     clearTimeout(self.timeVideo);
                     self.showGetVideo=false;
@@ -1773,9 +1779,9 @@ export default {
             var context = drawing_elem.getContext("2d");
             var center_x = drawing_elem.width / 2;
             var center_y = drawing_elem.height / 2;
-            var rad = Math.PI*2/100; 
-            
-            
+            var rad = Math.PI*2/100;
+
+
             // 绘制背景圆圈
             function backgroundCircle(){
                 context.beginPath();
@@ -1786,7 +1792,7 @@ export default {
                 context.globalAlpha = 0.5;
                 context.fill();
             }
- 
+
             //绘制运动圆环
             function foregroundCircle(n){
                 context.save();
@@ -1801,7 +1807,7 @@ export default {
                 context.closePath();
                 context.restore();
             }
- 
+
             //绘制文字
             function text(n){
                 context.save();
@@ -1811,10 +1817,15 @@ export default {
                 context.font='bold '+font_size+'px Helvetica';
                 var textStr='';
                 if(n==100){
-                    textStr='录制成功';
+                    if(self.lang == 'en'){
+                      textStr= self.$t('storeMonitor.recordSucc').substring(0, 9) + '...' ;
+                    }
+                    else{
+                      textStr= self.$t('storeMonitor.recordSucc');
+                    }
                 }
                 else{
-                    textStr='正在录制';
+                    textStr= self.$t('storeMonitor.recording');
                 }
                 var text_width = context.measureText(textStr).width;
                 context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
@@ -1840,7 +1851,7 @@ export default {
                 }
             }, 100);
         },
-        
+
         async playVideo(url) {
             let self=this;
             console.log('playvideo enter!');
@@ -1882,7 +1893,7 @@ export default {
                 self.curSpeed='1 X';
                 self.curBack='';
                 data= {
-                    request: { 
+                    request: {
                         method: 'connection',
                         sessionID: sessionId,
                         streamingProtocol:this.protocal,
@@ -1902,7 +1913,7 @@ export default {
             }
             else{   //播放实时视频
                 data = {
-                    request: { 
+                    request: {
                         method: 'connection',
                         sessionID: sessionId,
                         streamingProtocol:this.protocal,
@@ -1946,7 +1957,7 @@ export default {
             let self=this;
             self.stopVideo();
             const data = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -1962,7 +1973,7 @@ export default {
             let self=this;
             self.stopVideo();
             const data = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -1983,7 +1994,7 @@ export default {
         async stopHDash(){
             let self=this;
             const data = {
-                request: { 
+                request: {
                     method: 'disconnection',
                     sessionID: self.sessionId,
                     IVSID:self.channel.ivsId,
@@ -2065,10 +2076,10 @@ export default {
             ele.style.height = "100%";
             if (ele.requestFullscreen) {
                 ele.requestFullscreen();
-            } 
+            }
             else if (ele .mozRequestFullScreen) {
                 ele.mozRequestFullScreen();
-            } 
+            }
             else if (ele .webkitRequestFullScreen) {
                 ele.webkitRequestFullScreen();
             }
@@ -2084,10 +2095,10 @@ export default {
             ele.style.height = "auto";
             if (de.exitFullscreen) {
                 de.exitFullscreen();
-            } 
+            }
             else if (de.mozCancelFullScreen) {
                 de.mozCancelFullScreen();
-            } 
+            }
             else if (de.webkitCancelFullScreen) {
                 de.webkitCancelFullScreen();
             }
@@ -2187,10 +2198,10 @@ export default {
             obj.userName=_item.userName;
             //切换门店的时候暂停当前播放的视频
             if(_item.favorite){
-                obj.storeUpTitle='已关注';
+                obj.storeUpTitle = this.$t('storeMonitor.stared');
             }
             else{
-                obj.storeUpTitle='点击关注';
+                obj.storeUpTitle= this.$t('storeMonitor.clickToStar');
             }
             self.store=obj;
             let tabIndex=Number(self.activeIndex);
@@ -2354,7 +2365,7 @@ export default {
             let self=this;
             self.stopVideo();
             const dataDis = {
-                request: { 
+                request: {
                   method: 'disconnection',
                   sessionID: self.sessionId,
                   IVSID:self.channel.ivsId,
@@ -2377,7 +2388,7 @@ export default {
                 self.sessionId=sessionId;
                 let data=null;
                 data= {
-                    request: { 
+                    request: {
                         method: 'connection',
                         sessionID: sessionId,
                         streamingProtocol:this.protocal,
@@ -2397,7 +2408,7 @@ export default {
                 self.sessionId=sessionId;
                 let data=null;
                 data = {
-                    request: { 
+                    request: {
                         method: 'connection',
                         sessionID: sessionId,
                         streamingProtocol:this.protocal,
@@ -2462,7 +2473,7 @@ export default {
             }
             else{
                 self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-            }  
+            }
         },
         getIndexById(id){
             let self=this;
@@ -2615,7 +2626,7 @@ export default {
             for(let i=0;i<datenew.length;i++){
                 let obj={};
                 obj.showBack=false;
-                
+
                 if(i<curWeek){
                     obj.showOp=true;
                     obj.data=forWardDayNum-(curWeek-1-i);
@@ -2632,7 +2643,7 @@ export default {
                         indexTemp=i;
                     }
                     obj.showOp=false;
-                   
+
                     obj.data=datenew[i]=1+(i-curWeek);
                 }
                 temp.push(obj);
@@ -2680,7 +2691,7 @@ export default {
             if(isFull === undefined)
             {
                 isFull = false;
-            } 
+            }
             return isFull;
         },
         notify(msg,type,time) {
@@ -2809,7 +2820,7 @@ export default {
                     }
                     .storeUp-content{
                         height:26px;
-                        width: 100px;
+                        width: 114px;
                         text-align: center;
                     }
                 }
@@ -2819,7 +2830,8 @@ export default {
                     }
                     .storeUp-content{
                         height:auto;
-                        width: 86px;
+                        text-align: center;
+                        width: 114px;
                     }
                 }
                 .storeUp-content{
@@ -2956,7 +2968,7 @@ export default {
                         }
                         #white{
                             background-color: white;
-                        }   
+                        }
                         #yellow{
                             background-color: yellow;
                         }
@@ -3063,7 +3075,7 @@ export default {
                             margin-left: 15px;
                         }
                     }
-                    
+
                     .icon-footer{
                         width: 100%;
                         position: absolute;
@@ -3083,7 +3095,7 @@ export default {
                                 float: left;
                                 margin-left: 30px;
                             }
-                            
+
                         }
                         @media screen and(min-width:1366px){
                             .iconrside{
@@ -3097,7 +3109,7 @@ export default {
                         }
                         .iconrside{
                             max-width: 500px;
-                            float: right; 
+                            float: right;
                             position: relative;
                             span{
                                 font-size: 13px;
@@ -3124,7 +3136,7 @@ export default {
                                     bottom: 3px;
                                 }
                             }
-                            
+
                         }
                     }
                     .iconright{
@@ -3135,7 +3147,7 @@ export default {
                         .paizhao-content{
                             cursor: pointer;
                             margin-top: 30px;
-                            width: 92px;
+                            width: 105px;
                             text-align: center;
                             border-radius: 4px;
                             background-color: rgba($color: #24293d, $alpha: 0.6);
@@ -3163,6 +3175,42 @@ export default {
                             }
                         }
                     }
+                  .en-iconright{
+                    position: absolute;
+                    right:20px;
+                    height: 30%;
+                    top: 30%;
+                    .paizhao-content{
+                      cursor: pointer;
+                      margin-top: 30px;
+                      width: 120px;
+                      text-align: center;
+                      border-radius: 4px;
+                      background-color: rgba($color: #24293d, $alpha: 0.6);
+                      padding: 4px;
+                    }
+                    .iconpaizhao{
+                      color: #fff;
+                      vertical-align:middle;
+                    }
+                    span{
+                      color: #fff;
+                      font-size: 12px;
+                      margin-left: 15px;
+                      vertical-align:middle;
+                    }
+                    .icon-drap-content{
+                      height: 40px;
+                      position: absolute;
+                      right: 0px;
+                      background-color: #34374A;
+                      line-height: 40px;
+                      .iconzhedie{
+                        color: #ddd;
+                        cursor: pointer;
+                      }
+                    }
+                  }
                 }
             }
             .video-gongge-content{
@@ -3241,7 +3289,7 @@ export default {
                                 color: #fff;
                                 cursor: pointer;
                             }
-                        } 
+                        }
                     }
                     .videos{
                         @include point(min-width,240);
@@ -3257,7 +3305,7 @@ export default {
                 @include point(margin,20);
                 padding-left: 20px;
                 margin-top: 0;
-                @media screen and(min-width:1466px){
+                @media screen and(max-width:1366px){
                     .cor-des{
                         font-weight: bold;
                         margin-left:10px !important;
@@ -3268,9 +3316,14 @@ export default {
                     .event-name{
                         margin-left: 10px;
                         font-size: 14px;
+                        width: 75%;
+                        display: inline-block !important;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
                     }
                 }
-                @media screen and(min-width:1466px){
+                @media screen and(min-width:1366px){
                     .cor-des{
                         font-weight: bold;
                         margin-left:0px !important;
@@ -3281,6 +3334,11 @@ export default {
                     .event-name{
                         margin-left: 0px;
                         font-size: 12px;
+                        width: 75%;
+                        display: inline-block !important;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
                     }
                 }
                 .event-title{
@@ -3306,6 +3364,9 @@ export default {
                         @include point(width,90);
                         @include point(padding,6);
                         text-align: center;
+                      @media screen and(max-width: 1366px) {
+                        @include point(width, 130);
+                      }
                     }
                     .activeClass{
                         background-color: #FDE8EF !important;
@@ -3319,7 +3380,7 @@ export default {
                     height: 460px;
                 }
                 .right-line{
-                    width:1px; 
+                    width:1px;
                     min-height:340px;
                     position: relative;
                     top: 50px;
@@ -3333,8 +3394,8 @@ export default {
                 .event-rside{
                     position: relative;
                     top: 50px;
-                    width:-webkit-calc(40% - 16px); 
-                    width:-moz-calc(40% - 16px); 
+                    width:-webkit-calc(40% - 16px);
+                    width:-moz-calc(40% - 16px);
                     width:calc(40% - 16px);
                     height: 360px;
                     float: right;
@@ -3369,7 +3430,7 @@ export default {
                                 width:80%;
                             }
                         }
-                        
+
                     }
                 }
                 .name-input{
@@ -3428,7 +3489,7 @@ export default {
             @include point(margin-right,20);
             @media screen and(max-width: 1366px){
                 .el-header-title{
-                    font-size: 14px; 
+                    font-size: 14px;
                 }
                 .channel-content{
                     font-size: 14px;
@@ -3439,7 +3500,7 @@ export default {
             }
             @media screen and(min-width: 1366px){
                 .el-header-title{
-                    font-size: 16px; 
+                    font-size: 16px;
                 }
                 .channel-content{
                     font-size: 16px;
@@ -3454,14 +3515,14 @@ export default {
                 color:$black;
                 @include point(height,60);
                 @include point(line-height,60);
-                border-bottom: 1px solid $border;              
+                border-bottom: 1px solid $border;
                 @include point(padding-left,10);
                 span{
                     display: block;
                     @include point(margin-left,25);
                 }
             }
-            #storetab-content{
+            #storetab-content, #en-storetab-content{
                 margin-top: 10px;
                 @include point(padding-left,15);
                 @include point(padding-right,15);
@@ -3498,7 +3559,7 @@ export default {
                         cursor: pointer;
                         @include point(width,90);
                         @include point(padding,6);
-                        
+
                         span{
                             width: 100%;
                             display: block;
@@ -3522,7 +3583,7 @@ export default {
                 border: 0.5px solid $border;
             }
             .channel-content{
-                width: 100%;     
+                width: 100%;
                 overflow: hidden;
                 margin-top: 10px;
                 span{
@@ -3563,7 +3624,7 @@ export default {
                         }
                     }
                 }
-                
+
             }
             .time-content{
                 #date-title{
@@ -3594,7 +3655,7 @@ export default {
                             line-height: 12px;
                             border-radius: 3px !important;
                         }
-                    }   
+                    }
                 }
                 @media screen and (max-width: 1366px){
                     .date-picker-content{
@@ -3616,6 +3677,7 @@ export default {
                             @include point(right,10);
                             font-size: 12px;
                             line-height: 12px;
+                            width: 96px;
                         }
                     }
                 }
@@ -3779,13 +3841,14 @@ export default {
 </style>
 
 <style>
-@import '../../assets/css/importfile.css'; 
-@import '../../assets/css/videoBar.css'; 
+@import '../../assets/css/importfile.css';
+@import '../../assets/css/videoBar.css';
+@import '../../assets/css/tabsItem.css';
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
         font-family: 'Microsoft YaHei';
     }
-    
+
 </style>

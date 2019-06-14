@@ -8,15 +8,15 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
-    // {
-    //   path:'/login',
-    //   name:'Login',
-    //   hidden: true,
-    //   component:LoginForm,
-    //   meta:{
-    //     requireAuth: false,
-    //   }
-    // },
+    {
+      path:'/login',
+      name:'Login',
+      hidden: true,
+      component:LoginForm,
+      meta:{
+        requireAuth: false,
+      }
+    },
     {
       path:'*',
       redirect: '/'
@@ -29,7 +29,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name: '总览',
+      name: 'overview',
       redirect:'/reinspection',
       component: Home,
       hidden: false,
@@ -40,7 +40,7 @@ export default new Router({
       children:[
         {
           path:'/allscan',
-          name:'总览',
+          name:'overview',
           component:resolve=>require(['@/views/allscan/AllScan'],resolve),
           meta:{
             requireAuth: true,
@@ -50,7 +50,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name:'巡店管理',
+      name:'patrolManage',
       component:Home,
       iconCls:'iconfont icon-menu-xundian',
       styles:'font-size:22px',
@@ -59,7 +59,7 @@ export default new Router({
       children:[
         {
           path:'/reinspection',
-          name:'远程巡检',
+          name:'remotePatrol',
           component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
           meta:{
             requireAuth: true,
@@ -69,7 +69,7 @@ export default new Router({
         },
         {
           path:'/reinspection',
-          name:'远程巡检',
+          name:'remotePatrol',
           component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
           hidden:true,
           meta:{
@@ -78,27 +78,27 @@ export default new Router({
           children:[
             {
               path:'/reinspect/confirmrein',
-              name:'确认总结',
+              name:'confirmSum',
               component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
             }
           ]
         },
         {
           path:'/reinspection',
-          name:'远程巡检',
+          name:'remotePatrol',
           component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
           hidden:true,
           children:[
             {
               path:'/reinspect/submit',
-              name:'巡检提交事件',
+              name:'submitEvent',
               component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
             }
           ]
         },
         {
           path:'/storemonitor',
-          name:'门店监控',
+          name:'storeMonitor',
           component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
           meta:{
             requireAuth: true,
@@ -108,20 +108,20 @@ export default new Router({
         },
         {
           path:'/storemonitor',
-          name:'门店监控',
+          name:'storeMonitor',
           component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
           hidden:true,
           children:[
             {
               path:'/storemonitor/submit',
-              name:'提交事件',
+              name:'storeSubEvent',
               component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
             }
           ]
         },
         {
           path:'/report',
-          name:'巡检报告',
+          name:'reports',
           component:resolve=>require(['@/views/patrolShop/InspectReportList'],resolve),
           meta:{
             requireAuth: true,
@@ -131,13 +131,13 @@ export default new Router({
         },
         {
           path:'/report',
-          name:'巡检报告',
+          name:'reports',
           component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
           hidden:true,
           children:[
             {
               path:'/reportdetails',
-              name:'报告详情',
+              name:'reportDetails',
               component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
             }
           ]
@@ -146,7 +146,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name:'事件管理',
+      name:'eventManage',
       component:Home,
       iconCls:'iconfont icon-shijian',
       styles:'font-size:22px',
@@ -156,7 +156,7 @@ export default new Router({
       children:[
         {
           path:'/event',
-          name:'事件管理',
+          name:'eventManage',
           component:resolve=>require(['@/views/event/EventManage'],resolve),
           meta:{
             keepAlive:false,  //the component is't to be cache.
@@ -165,7 +165,7 @@ export default new Router({
         },
         {
           path:'/event',
-          name:'事件管理',
+          name:'eventManage',
           component:resolve=>require(['@/views/event/details/RateManage'],resolve),
           meta:{
             requireAuth: false,
@@ -173,9 +173,9 @@ export default new Router({
           children:[
             {
               path:'/rate',
-              name:'事件详情',
+              name:'eventDetails',
               component:resolve=>require(['@/views/event/details/RateManage'],resolve),
-              
+
             }
           ]
         },
@@ -183,7 +183,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name:'统计分析',
+      name:'statistics',
       component:Home,
       iconCls:'iconfont icon-tongjifenxi',
       styles:'font-size:22px',
@@ -193,7 +193,7 @@ export default new Router({
       children:[
         {
           path:'/statistical',
-          name:'统计分析',
+          name:'statistics',
           component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve),
           meta:{
             requireAuth: true,
@@ -203,7 +203,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name:'数据中心',
+      name:'dataCenter',
       component:Home,
       iconCls:'iconfont icon-menu-shujuzhongxin',
       styles:'font-size:22px',
@@ -213,7 +213,7 @@ export default new Router({
       children:[
         {
           path:'/datacenter',
-          name:'数据中心',
+          name:'dataCenter',
           component:resolve=>require(['@/views/datacenter/DataCenter'],resolve),
           meta:{
             requireAuth: true,
@@ -223,7 +223,7 @@ export default new Router({
     },
     {
       path: '/home',
-      name:'系统设定',
+      name:'systemSetting',
       iconCls:'iconfont icon-button',
       styles:'font-size:22px',
       component:Home,
@@ -232,7 +232,7 @@ export default new Router({
       children:[
         {
           path:'/routeinspection',
-          name:'巡检配置',
+          name:'inspectSetting',
           component:resolve=>require(['@/views/setting/routeInspection/RouteInspection'],resolve),
           hidden:false,
           meta:{
@@ -242,7 +242,7 @@ export default new Router({
         },
         {
           path:'/routeinspection',
-          name:'巡检配置',
+          name:'inspectSetting',
           component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve),
           hidden:true,
           meta:{
@@ -251,14 +251,14 @@ export default new Router({
           children:[
             {
               path:'/addroute',
-              name:'巡检项设置',
+              name:'itemSetting',
               component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve)
             }
           ]
         },
         {
           path:'/routeinspection',
-          name:'巡检配置',
+          name:'inspectSetting',
           component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve),
           hidden:true,
           meta:{
@@ -267,14 +267,14 @@ export default new Router({
           children:[
             {
               path:'/bindroute',
-              name:'门店绑定',
+              name:'bindStore',
               component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve)
             }
           ]
         },
         {
           path:'/device',
-          name:'设备管理',
+          name:'deviceManage',
           component:resolve=>require(['@/views/setting/device/DeviceSetMge'],resolve),
           meta:{
             requireAuth: true,
@@ -282,7 +282,7 @@ export default new Router({
         },
         {
           path:'/storemanage',
-          name:'门店管理',
+          name:'storeManage',
           component:resolve=>require(['@/views/setting/store/StoreManage'],resolve),
           hidden:false,
           meta:{
@@ -292,7 +292,7 @@ export default new Router({
         },
         {
           path:'/storemanage',
-          name:'门店管理',
+          name:'storeManage',
           component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve),
           hidden:true,
           meta:{
@@ -301,15 +301,15 @@ export default new Router({
           children:[
             {
               path:'/storedetail',
-              name:'门店详情',
+              name:'storeDetail',
               component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve)
             }
           ]
         },
         {
           path:'/schedule',
-          name:'排程配置',
-          isReadOnly:true,
+          name:'scheduleManage',
+          isReadOnly:false,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{
@@ -318,7 +318,7 @@ export default new Router({
         },
         {
           path:'/other',
-          name:'其他设置',
+          name:'otherSetting',
           isReadOnly:true,
           component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
         }

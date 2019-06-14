@@ -2,16 +2,19 @@ import axios from 'axios'
 import {Message,MessageBox,} from 'element-ui'
 import store from '@/store'
 import router from '@/router'
+import i18n from '@/lang'
 import {getToken} from '@/common/auth.js'
 
 //create an axios instance
 
-let base='http://'+window.location.host; //上线地址
-//let base ='http://222.91.163.149:18081'  //本地开发地址
-//let base ='http://47.103.41.236:8081'  //测试地址
+// let base='http://'+window.location.host; //上线地址
+// let base ='http://222.91.163.149:18081'  //本地开发地址
+let base ='http://47.103.41.236:8081'  //测试地址
 
 
 let itempath='/storemonitor/api/'
+let lang = i18n.locale
+
 //配置
 axios.defaults.withCredentials = true;
 const service=axios.create({
@@ -95,12 +98,22 @@ serviceAxios.interceptors.response.use(
                     })
                 })
             })
-            
+
         }
         else if(errCode===500&&errMsg=='No authority'){
             router.push('/home');
+            let msg = '';
+            if(lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(lang === 'zh'){
+              msg = '无操作权限！'
+            }
+            else{
+              msg = '無操作權限！'
+            }
             Message({
-                message:'无操作权限!',
+                message: msg,
                 type:'error',
                 duration:5*1000
             })
@@ -116,7 +129,7 @@ service.interceptors.request.use(
                 'token':getToken(),
                 'Accept':'application/json',
                 'Content-Type':'application/json;charset=UTF-8',
-                
+
             }
         }
         return config;
@@ -154,15 +167,35 @@ service.interceptors.response.use(
             }
             else if(errCode===500&&errMsg=='No authority'){
                 router.push('/home');
+                let msg = '';
+                if(lang ==='en'){
+                  msg = 'No authority'
+                }
+                else if(lang === 'zh'){
+                  msg = '无操作权限！'
+                }
+                else{
+                  msg = '無操作權限！'
+                }
                 Message({
-                    message:'无操作权限!',
+                    message: msg,
                     type:'error',
                     duration:5*1000
                 })
             }
             if(err.response.status!=undefined&&err.response.status==404){
+                let msg = '';
+                if(lang ==='en'){
+                  msg = 'Server exception, please refresh and try again!'
+                }
+                else if(lang === 'zh'){
+                  msg = '服务器异常，请刷新后重试！'
+                }
+                else{
+                  msg = '服務器異常，請刷新後重試！'
+                }
                 Message({
-                    message:'服务器异常，请刷新后重试!',
+                    message: msg,
                     type:'error',
                     duration:5*1000
                 })
@@ -171,14 +204,24 @@ service.interceptors.response.use(
         else if(err.request){
             if(err.request.readyState==4&&err.request.status==0){
                 console.log(err.request);
+                let msg = '';
+                if(lang ==='en'){
+                  msg = 'Network error, please check network connection status!'
+                }
+                else if(lang === 'zh'){
+                  msg = '网络异常，请检查网络连接状况！'
+                }
+                else{
+                  msg = '網絡異常，請檢查網絡連接狀況！'
+                }
                 Message({
-                    message:'网络异常，请检查网络连接状况!',
+                    message: msg,
                     type:'error',
                     duration:5*1000
                 })
             }
         }
-        
+
         return Promise.reject(err);
     }
 )
@@ -191,7 +234,7 @@ service.interceptors.request.use(
                 'token':getToken(),
                 'Accept':'application/json',
                 'Content-Type':'application/json;charset=UTF-8',
-                
+
             }
         }
         return config;

@@ -9,13 +9,14 @@
             </p>
         </div>
         <div slot="footer" class="dialog-footer">
-            <el-button class="cancel-btn" @click="cancle" size="mini" v-if="isWarning">取 消</el-button>
-            <el-button class="confirm-btn" @click="confirm" size="mini" type="primary">确 认</el-button>
+            <el-button class="cancel-btn" @click="cancle" size="mini" v-if="isWarning">{{generatePatrolLang('cancel')}}</el-button>
+            <el-button class="confirm-btn" @click="confirm" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
         </div>
     </el-dialog>
 </template>
 <script>
-export default {
+  import {generatePatrolLang} from '@/api/i18n'
+  export default {
     name:'DialogVue',
     props:{
         dialogTitle:String,
@@ -31,6 +32,7 @@ export default {
         let self=this;
     },
     methods:{
+        generatePatrolLang,
         confirm(ev){
             let self=this;
             console.log(ev.target);
@@ -74,7 +76,7 @@ export default {
     .el-dialog__title{
         font-size: 14px !important;
         color: #303133 !important;
-        float: left !important; 
+        float: left !important;
     }
     .cancel-btn{
         @include point(width,76);

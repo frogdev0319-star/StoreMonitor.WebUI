@@ -2,25 +2,26 @@
     <div class="detail-container" style="height:auto;" :style="{'min-height':varyWindowWidth*0.70+'px'}">
         <el-row>
             <el-col :span="24" class="detail-title">
-               
-                <span class="title-title " v-if="routeData.length!=0">{{tabName}}共分{{typeNum}}大类，{{itemNum}}个巡检项目</span>
+
+                <span class="title-title " v-if="routeData.length!=0">{{tabNameLang}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
+                  {{itemNum}} {{generateInsSettingLang('item')}}</span>
                 <div class="route-btns">
                      <el-button
-                    class="el-delete-btn" 
+                    :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
                     @click="deleteNapes"
                     size="mini" :disabled="routeData.length==0">
                         <i style="margin-right:8px;" class="iconfont icon-shanchu"></i>
-                        <span>删除巡检项</span>
+                        <span>{{generateInsSettingLang('deleteItem')}}</span>
                     </el-button>
                      <el-button
-                    class="el-set-btn" 
+                    :class="lang=='en'? 'en-el-set-btn':'el-set-btn'"
                     @click="setItem"
                     size="mini" :disabled="routeData.length==0">
                         <i style="margin-right:8px;" class="iconfont icon-button"></i>
-                        <span>巡检项设置</span>
+                        <span>{{generateInsSettingLang('setItem')}}</span>
                     </el-button>
                 </div>
-                <el-dialog title='确认删除'
+                <el-dialog :title="generateInsSettingLang('confirmDelete')"
                 :visible.sync="showDeleteContent" v-if="showDeleteContent"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -31,16 +32,16 @@
                         <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>确认是否删除当前勾选巡检项?</span>
+                            <span>{{generateInsSettingLang('confirmSelecDel')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showDeleteContent = false" size="mini">取 消</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" type="primary">确 认</el-button>
+                        <el-button class="file-cancel-btn" @click="showDeleteContent = false" size="mini">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
 
-                <el-dialog title='确认删除'
+                <el-dialog :title="generateInsSettingLang('confirmDelete')"
                 :visible.sync="showSingleDeleteContent" v-if="showSingleDeleteContent"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -51,12 +52,12 @@
                         <hr style="border: 0.5px solid #f31d65;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>确认是否删除当前巡检项?</span>
+                            <span>{{generateInsSettingLang('confirmCurDel')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showSingleDeleteContent = false" size="mini" style="">取 消</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmDeleteSingle" size="mini" type="primary">确 认</el-button>
+                        <el-button class="file-cancel-btn" @click="showSingleDeleteContent = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmDeleteSingle" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
 
@@ -65,12 +66,12 @@
                 <div v-for="(item,index) in routeData" :key="index" class="data-content" v-if="routeData.length!=0">
                     <div class="header-content tabTitle" v-if="index==0">
                         <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
-                        <span class="name-title">巡检名称</span>
-                        <span class="description-title">巡检项要求描述</span>
-                        <span class="score-title">项目分值</span>
-                        <span class="handle-title">操作</span>
+                        <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
+                        <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
+                        <span class="score-title">{{generateInsSettingLang('score')}}</span>
+                        <span class="handle-title">{{generateInsSettingLang('operation')}}</span>
                     </div>
-                   
+
                     <div class="table-header-title">
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
                         <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
@@ -87,10 +88,10 @@
                                     <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"></el-checkbox>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="name" label="巡检名称" width="300px"></el-table-column>
-                            <el-table-column prop="description" label="巡检项需求描述" min-width='40%'></el-table-column>
-                            <el-table-column prop="score" label="项目分值" min-width="8%"></el-table-column>
-                            <el-table-column prop="handle" label="操作" min-width="10%">
+                            <el-table-column prop="name" :label="generateInsSettingLang('inspectName')" width="300px"></el-table-column>
+                            <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='40%'></el-table-column>
+                            <el-table-column prop="score" :label="generateInsSettingLang('score')" min-width="8%"></el-table-column>
+                            <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="10%">
                                 <template slot-scope="scope">
                                         <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
                                     </template>
@@ -101,10 +102,11 @@
                 <div class="data-empty" v-if="routeData.length==0">
                     <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
                     <p class="empty-title">
-                        请先<a :href="downSrc" :download='fileName' class="downLoad-btn">下载巡检表模板</a>进行编辑，再点击<span @click="emptyImport">导入</span>按钮~
+                      {{generateInsSettingLang('please')}}<a :href="downSrc" :download='fileName' class="downLoad-btn">{{ generateInsSettingLang('downloadInfo')}}</a>
+                      {{generateInsSettingLang('toEdit')}}<span @click="emptyImport">{{generateInsSettingLang('thenImport')}}</span>{{ generateInsSettingLang('waveline')}}
                     </p>
                 </div>
-                <el-dialog title='导入'
+                <el-dialog :title="generateInsSettingLang('import')"
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -113,23 +115,24 @@
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;">
                         <hr style="border: 0.5px solid #f31d65;"/>
-                        <p style="margin-left:26px;margin-bottom:0px;">请选择导入文件的位置</p>
+                        <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
                                 <el-radio-button style="margin-left:10px;" class="elradio"
-                                v-for="(item,key) in radioList" :key="key" 
+                                v-for="(item,key) in radioList" :key="key"
                                 :label="item.label"></el-radio-button>
                             </el-radio-group>
                         </div>
                         <div class="tabName-input-content">
-                            <input type="text" v-model="tabNameInput" class="tabName-input" placeholder="请输入巡检表名称" v-if="checkValue=='新增巡检表'">
+                            <input type="text" v-model="tabNameInput" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')"
+                                   v-if="checkValue == this.addPatrol">
                         </div>
-                        
+
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">取 消</el-button>
-                       
-                        <a href="javascript:;" class="a-upload" @click="checkBeforeImport">选择文件
+                        <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+
+                        <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{generateInsSettingLang('select')}}
                             <!-- <div style="background-color:transparent" v-if="tabNameInput.length==0&&checkValue=='新增巡检表'"> -->
                                 <input id="upload" type="file" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                             <!-- </div> -->
@@ -144,12 +147,14 @@
 import api from '@/api/index'
 import {inpectRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
+import {generateInsSettingLang} from '@/api/i18n'
+
 export default {
     name:'RouteDetail',
     props:{
         routeData:Array,
         tabName:String,
-        downSrc:String
+        downSrc:String,
     },
     data(){
         return{
@@ -163,11 +168,11 @@ export default {
             radioList:[
                 {
                     'value':'1',
-                    'label':'远程巡检'
+                    'label': '远程巡检'
                 },
                 {
                     'value':'2',
-                    'label':'现场巡检'
+                    'label': '现场巡检'
                 },
             ],
             checkValue:'',
@@ -175,7 +180,8 @@ export default {
             varyWindowWidth:window.innerHeight,
             allchecked:false,
             curDeleteId:'',
-            fileName:'店铺标准-巡检表示例',
+            fileName: this.$t('insSettingView.patrolExample'),
+            lang: this.$i18n.locale,
         }
     },
     computed:{
@@ -193,8 +199,20 @@ export default {
     mounted(){
         let self=this;
         self.getNum();
+        self.initLang();
+
     },
     methods:{
+        generateInsSettingLang,
+        initLang(){
+          let self = this;
+          if(self.tabName=='远程巡检'){
+             self.tabNameLang = this.$t('insSettingView.remotePatrol')
+          }
+          else if(self.tabName=='现场巡检'){
+             self.tabNameLang = this.$t('insSettingView.onsitePatrol')
+          }
+        },
         getNum(){
             let self=this;
             if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
@@ -253,7 +271,7 @@ export default {
                 item.checked=true;    //最上方的全选为勾选状态
             }
             else{
-                item.checked=false; 
+                item.checked=false;
             }
             let arrCheckedItem=[];
             let count=0;
@@ -261,7 +279,7 @@ export default {
                 count+=_item.itemData.length;
                 _item.itemData.forEach(itemS=>{
                     if(itemS.checked){
-                        
+
                         arrCheckedItem.push(itemS);
                     }
                 })
@@ -318,7 +336,7 @@ export default {
                 self.getNum();
             }
         },
-        
+
         deleteNapes(){
             let self=this;
             let arr=[];
@@ -335,14 +353,14 @@ export default {
             });
             console.log(arr);
             if(arr.length==0&&countGroup==0){
-                self.notify('请勾选要删除的巡检项类别或巡检项!','warning',3000);
+                self.notify(this.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
             }
             self.showDeleteContent=true;
         },
         afterDeleteNape(){
             let self=this;
-            self.notify('巡检项删除成功!','success',3000);
+            self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
             self.$emit('refreshList');
         },
@@ -383,7 +401,7 @@ export default {
                         }
                     }
                     else{
-                        self.notify('巡检项删除失败!','warning',3000);
+                        self.notify(this.$t('insSettingView.deleteFail') ,'warning',3000);
                         return false;
                     }
                 })
@@ -394,7 +412,7 @@ export default {
                         self.afterDeleteNape();
                     }
                     else{
-                        self.notify('当前巡检项删除失败!','warning',3000);
+                        self.notify(this.$t('insSettingView.deleteFail') ,'warning',3000);
                         return false;
                     }
                 })
@@ -405,7 +423,7 @@ export default {
             inpectRESTful.downLoadTemplate().then(res=>{
                 console.log(res);
                 let blob = new Blob([res],{
-               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型 
+               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
             });
                 let objectUrl = URL.createObjectURL(blob);
                 self.downLoadSrc=objectUrl;
@@ -429,12 +447,12 @@ export default {
                 console.log(res.data)
                 let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
-                    self.notify('巡检项删除成功!','success',3000);
+                    self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
                     self.showSingleDeleteContent=false;
                     self.$emit('refreshList');
                 }
                 else{
-                    self.notify('巡检项删除失败!','warning',3000);
+                    self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
             })
@@ -447,7 +465,7 @@ export default {
             let self=this;
             sessionStorage.setItem('NapeItem',JSON.stringify(self.routeData));
             sessionStorage.setItem('GroupName',self.tabName);
-            self.$router.push({name:"巡检项设置",params:{routeData:self.routeData}});
+            self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang}});
             console.log(self.routeData);
         },
 
@@ -460,11 +478,11 @@ export default {
 
         emptyImport(){
             this.showImportContent=true;
-            
+
         },
         checkBeforeImport(){
             let self=this;
-            if(self.checkValue=='新增巡检表'&&(self.tabNameInput==null||self.tabNameInput.trim().length==0)){
+            if(self.checkValue==self.addPatrol &&(self.tabNameInput==null||self.tabNameInput.trim().length==0)){
                 self.notify('请输入自定义巡检表名称!','warning',3000);
                 return false;
             }
@@ -502,7 +520,7 @@ export default {
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
                     if(!outdata[0].hasOwnProperty('检查分类')){
-                        _this.notify('当前模板错误，请更换模板重新导入！','warning',3000);
+                        _this.notify(this.$t('insSettingView.templateError'),'warning',3000);
                         return false;
                     }
                     let arr=outdata;
@@ -569,19 +587,19 @@ export default {
                                 let data=res.data;
                                 if(code!=null&&code=='Success'){
                                     console.log(res.data);
-                                    _this.notify('模板导入成功!','success',3000);
+                                    _this.notify(this.$t('insSettingView.importSuss'),'success',3000);
                                     _this.showImportContent=false;
                                     //_this.refreshData();
                                     _this.$emit('refreshList');
                                 }
                                 else{
-                                    _this.notify('模板导入失败!','warning',3000);
+                                    _this.notify(this.$t('insSettingView.importFail') ,'warning',3000);
                                     return false;
                                 }
                             })
                         }
                         else{
-                            _this.notify('模板导入失败!','warning',3000);
+                            _this.notify(this.$t('insSettingView.importFail'),'warning',3000);
                             return false;
                         }
                     })
@@ -605,7 +623,7 @@ export default {
 }
 </script>
 <style>
-@import '../../../assets/css/importfile.css'; 
+@import '../../../assets/css/importfile.css';
 </style>
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
@@ -642,7 +660,7 @@ export default {
                 opacity: 0.6;
             }
             .el-delete-btn{
-                background-color: #fff; 
+                background-color: #fff;
                 border-color:  $mainColor;
                 color: $mainColor;
                 border-radius: 0px;
@@ -652,8 +670,25 @@ export default {
                     opacity: 0.6;
                 }
             }
+            .en-el-delete-btn{
+              background-color: #fff;
+              border-color:  $mainColor;
+              color: $mainColor;
+              border-radius: 0px;
+              @include point(margin-right,8);
+              font-size: 12px;
+              @media screen and (min-width: 1366px){
+                @include point(width, 105);
+              }
+              @media screen and (max-width: 1366px){
+                @include point(width, 140);
+              }
+              &:disabled{
+                opacity: 0.6;
+              }
+            }
             .el-set-btn{
-                background-color: $mainColor; 
+                background-color: $mainColor;
                 border-color:  $mainColor;
                 color: #fff;
                 border-radius: 0px;
@@ -661,6 +696,22 @@ export default {
                 &:disabled{
                     opacity: .6;
                 }
+            }
+            .en-el-set-btn{
+              background-color: $mainColor;
+              border-color:  $mainColor;
+              color: #fff;
+              border-radius: 0px;
+              font-size: 12px;
+              @media screen and (min-width: 1366px){
+                @include point(width, 105);
+              }
+              @media screen and (max-width: 1366px){
+                @include point(width, 140);
+              }
+              &:disabled{
+                opacity: .6;
+              }
             }
         }
     }
@@ -691,7 +742,7 @@ export default {
                 // @include point(margin-left,40);
                 margin-left: 40px;
             }
-            
+
             .description-title{
                 float: left;
                 width: 51%;
