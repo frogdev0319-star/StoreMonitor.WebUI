@@ -2,6 +2,8 @@ import axiosA from 'axios'
 import {getDashServerInfo} from './device.js'
 import {Message} from 'element-ui'
 import store from '../store/index.js';
+import i18n from '@/lang'
+
 axiosA.defaults.withCredentials = false
 
 function getDashInfo(){
@@ -16,7 +18,7 @@ function getDashInfo(){
             resolve(dash);
         })
     })
-    
+
 }
 async function getBaseURL(){
     let dash;
@@ -101,8 +103,22 @@ async function ajax4dash({method,url,data}){
         ret=res;
     }).catch((err) => {
         console.log(err);
+        let msg = '';
+        let lang = i18n.locale;
+        if(lang == 'zh'){
+          msg = 'Dash视频服务器请求异常，请刷新后重试！';
+        }
+        else if(lang == 'en'){
+          msg = 'Dash video server request exception, please refresh and try again!';
+        }
+        else if(lang == 'zhtw'){
+          msg = 'Dash視頻服務器請求異常，請刷新後重試！';
+        }
+        else{
+          msg = 'Dash视频服务器请求异常，请刷新后重试！';
+        }
         Message({
-            message:'Dash视频服务器请求异常，请刷新后重试！',
+            message: msg,
             type:'error',
             duration:5*1000
         })

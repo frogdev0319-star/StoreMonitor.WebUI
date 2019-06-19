@@ -46,8 +46,7 @@
        </div>
         <div class="el-table-content">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-               <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel">
-                </i>{{generateEventLang('exportReport')}}
+              <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel"></i><span>{{generateEventLang('exportReport')}}</span>
             </el-button>
             <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
                 <el-tab-pane v-for="(item,index) in tableDataList"
@@ -319,6 +318,9 @@ export default {
                 start=end-3600*24*30*1000;
                 self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
             }
+            else{
+              self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
+            }
             self.serachData='';
             self.tableDataList[tabIndex].page=1;
             self.params.like={};
@@ -339,6 +341,7 @@ export default {
             console.log(val.index);
             let selectValue=self.value;
             let tabIndex=Number(val.index);
+
             switch(tabIndex){
                 case 0:
                 if(selectValue==0||selectValue==1){
@@ -373,14 +376,17 @@ export default {
             }
             //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
             //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            let dateval=self.dateInputStr;
-            let startStr=dateval.split('~')[0];
-            let endStr=dateval.split('~')[1];
-            let start=new Date(startStr).getTime();
-            let end=new Date(endStr).getTime();
+            let dateval=self.dateValue;
+            console.log(dateval)
+            let startStr=dateval[0];
+            let endTime = dateval[1];
+            let endStr= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
 
-            self.params.beginTs=start;
-            self.params.endTs=end;
+            // let start=new Date(startStr).getTime();
+            // let end=new Date(endStr).getTime();
+
+            self.params.beginTs=startStr;
+            self.params.endTs=endStr;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             this.getEventList(this.params);
         },
@@ -1046,6 +1052,21 @@ $h1:#292e36;
         background-color: $red;
         border-color: $red;
         z-index: 990;
+        @media screen and (min-width: 1366px){
+          width: 160px;
+          span{
+            position: relative;
+            @include point(bottom, 1)
+          }
+        }
+        @media screen and (max-width: 1366px){
+          width: 140px;
+          span{
+            position: relative;
+            @include point(bottom, 1)
+          }
+
+        }
       }
 
       .table-content{
@@ -1151,15 +1172,6 @@ $h1:#292e36;
     .el-table--border::after, .el-table--group::after{
         width: 0 !important;
     }
-     @media screen and (min-width: 1366px){
-       .en-export-btn{
-       width: 160px
-       }
-     }
-     @media screen and (max-width: 1366px){
-       .en-export-btn{
-         width: 140px;
-       }
-     }
+
 </style>
 

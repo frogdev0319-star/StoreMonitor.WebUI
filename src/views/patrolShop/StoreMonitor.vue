@@ -1271,8 +1271,8 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            //let bucketName='viumo-'+self.accountId;
-            let bucketName='viumo-aaoompqqpjy4';
+            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -1282,7 +1282,8 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            let bucketName='viumo-aaoompqqpjy4';
+            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -2708,7 +2709,7 @@ export default {
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
     *{
-        font-family: 'Microsoft YaHei';
+        font-family: Arial, Microsoft YaHei;
     }
     $red:#f31d65;
     $black:#182752;
@@ -3837,6 +3838,7 @@ export default {
     padding-left:30px;
     color:#425262;
     letter-spacing: 0px;
+     width: 235px;
 }
 </style>
 

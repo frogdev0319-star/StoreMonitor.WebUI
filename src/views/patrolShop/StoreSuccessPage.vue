@@ -139,10 +139,12 @@ export default {
                 self.showLeader=false;
             }
             if(self.isSuccess){
-                self.$route.matched[2].name='提交成功';
+                //self.$route.matched[2].name='提交成功';
+                self.$route.matched[2].name= self.$t('storeView.successSubmit');
             }
             else{
-                self.$route.matched[2].name='提交失败';
+                //self.$route.matched[2].name='提交失败';
+                self.$route.matched[2].name= self.$t('storeView.failSubmit');
             }
         },
         getBackSecond(){

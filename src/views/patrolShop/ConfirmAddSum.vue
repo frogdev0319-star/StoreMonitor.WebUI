@@ -27,7 +27,11 @@
             </el-row>
             <div class="table-content">
                 <div class="table-header">
-                    <span><span class="store-name">{{generatePatrolLang('storeName')}}</span>{{store.storeName}}</span>
+                    <span>
+                      <span v-if="lang=='en' "class="en-store-name">{{generatePatrolLang('storeName')}}:</span>
+                      <span v-else class="store-name">{{generatePatrolLang('storeName')}}：</span>
+                      {{store.storeName}}
+                    </span>
                 </div>
                 <table class="table table-bordered">
                     <thead>
@@ -130,15 +134,16 @@ export default {
             curSumIndex:0,
             varyWindowWidth:window.innerWidth,
             pass: this.$t('remotePatrol.pass'),
-            fail: this.$t('remotePatrol.failed')
+            fail: this.$t('remotePatrol.failed'),
+            lang: this.$i18n.locale
         }
     },
     methods:{
         generatePatrolLang,
         getFileUrl(fileName){
             let self=this;
-            //let bucketName='viumo-'+self.accountId;
-            let bucketName='viumo-aaoompqqpjy4';
+            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -148,7 +153,8 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-          let bucketName='viumo-aaoompqqpjy4';
+            let bucketName = 'viumo-'+self.accountId
+            //let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -529,6 +535,9 @@ $h1:#292e36;
                     color: $tab;
                     .store-name{
                         color: $black;
+                    }
+                    .en-store-name{
+                      margin-right: 20px;
                     }
                 }
             }

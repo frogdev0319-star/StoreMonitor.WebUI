@@ -13,7 +13,7 @@
                 </div>
             </div>
         </el-col>
-       <el-col :span="lang=='en'&& varyWindowWidth < 1440? 9: 7" class="el-rute-group">
+       <el-col :span="lang=='en'&& varyWindowWidth < 1366? 9: 7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
                    <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
@@ -63,7 +63,7 @@
 
            </div>
        </el-col>
-       <el-col :span="lang=='en'&& varyWindowWidth < 1440? 15: 17"class="el-rute-nape">
+       <el-col :span="lang=='en'&& varyWindowWidth < 1366? 15: 17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
                     <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
@@ -81,7 +81,7 @@
                        <div class="nape-dep-title">
                            <span>{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
-                       <div class="nape-handle-title">
+                       <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'">
                            <span>{{generateInsSettingLang('operation')}}</span>
                        </div>
                    </div>
@@ -95,7 +95,7 @@
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" placeholder="generateInsSettingLang('description')" v-if="item.isClick"></el-input>
+                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -245,7 +245,13 @@ export default {
             item.isClick=true;
             self.groupIndex=index;
             self.curGroup=item;
-            self.napeTitle=`${item.groupName}类别巡检项`;
+            if(self.lang == 'en'){
+              self.napeTitle= `${self.$t('insSettingView.itemsOfCate')} ${item.groupName}`;
+            }
+            else{
+              self.napeTitle=`${item.groupName} ${self.$t('insSettingView.itemsOfCate')}`;
+            }
+            //self.napeTitle=`${item.groupName}类别巡检项`;
             self.showAddNape=false;
             self.groupList.forEach((_item,_index)=>{
                 if(index!=_index){
@@ -706,7 +712,13 @@ export default {
             self.groupList[index].isClick=true;
             self.curGroup=self.groupList[index];
             self.groupIndex=index;
-            self.napeTitle=`${self.groupList[index].groupName}类别巡检项`;
+            //self.napeTitle=`${self.groupList[index].groupName}类别巡检项`;
+            if(self.lang == 'en'){
+              self.napeTitle= `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
+            }
+            else{
+              self.napeTitle=`${self.groupList[index].groupName} ${self.$t('insSettingView.itemsOfCate')}`;
+            }
             self.getNapeList(index,self.groupList[index]);
         },
         getNapeList(index,item){
@@ -865,12 +877,20 @@ export default {
         }
         @media screen and (min-width: 1366px) {
           .en-rute-btn{
-            @include point(width,105)
+            @include point(width,105);
+            span{
+              position: relative;
+              bottom: 1px
+            }
           }
         }
         @media screen and (max-width: 1366px) {
           .en-rute-btn{
             width: 125px;
+            span{
+              position: relative;
+              bottom: 1px
+            }
           }
         }
         .iconcontent{
@@ -915,14 +935,10 @@ export default {
               word-wrap: break-word;
               cursor: pointer;
               @media screen and (max-width: 1366px) {
-                .en-item-title {
-                  width: 55%;
-                }
+                width: 50%;
               }
               @media screen and (min-width: 1366px) {
-                .en-item-title {
-                  width: 60%;
-                }
+                width: 60%;
               }
             }
             .icontitle{
@@ -1057,6 +1073,14 @@ export default {
                 span{
                     position: relative;
                     left: 20%;
+                }
+            }
+            .en-nape-handle-title{
+                width: 10%;
+                display: inline-block;
+                span{
+                  position: relative;
+                  left: 10%;
                 }
             }
             .nape-items-title{

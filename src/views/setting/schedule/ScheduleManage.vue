@@ -103,7 +103,7 @@
                                     <el-input v-model="weekValue" size="mini" id="elCity" :placeholder="generateScheduleLang('city')" :readonly=true></el-input>
                                     <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                             </div>
-                            <div class="week-panel" v-if="showWeekContent">
+                            <div :class="lang==='en' ? 'en-week-panel':'week-panel'" v-if="showWeekContent">
                                 <div class="week-details" v-for="(item,index) in weekList" :key="index">
                                     <el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>
                                     <span>{{item.name}}</span>
@@ -753,6 +753,24 @@ export default {
                                     font-size: 14px;
                                 }
                             }
+                        }
+                        .en-week-panel{
+                          position: absolute;
+                          margin-top: 3px;
+                          left: 173px;
+                          width: 188px;
+                          height: auto;
+                          z-index: 980;
+                          background-color: #fff;
+                          border: 1px solid #ddd;
+                          padding: 5px;
+                          .week-details{
+                            padding: 2px 10px;
+                            span{
+                              margin-left: 10px;
+                              font-size: 14px;
+                            }
+                          }
                         }
                         .day-deatil{
                             padding-left: 30px;

@@ -8,15 +8,15 @@ import AuthRedirect from '@/views/login/AuthRedirect'
 Vue.use(Router)
 export default new Router({
   routes: [
-    {
-      path:'/login',
-      name:'Login',
-      hidden: true,
-      component:LoginForm,
-      meta:{
-        requireAuth: false,
-      }
-    },
+    // {
+    //   path:'/login',
+    //   name:'Login',
+    //   hidden: true,
+    //   component:LoginForm,
+    //   meta:{
+    //     requireAuth: false,
+    //   }
+    // },
     {
       path:'*',
       redirect: '/'
@@ -309,7 +309,7 @@ export default new Router({
         {
           path:'/schedule',
           name:'scheduleManage',
-          isReadOnly:false,
+          isReadOnly:true,
           component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
           meta:{

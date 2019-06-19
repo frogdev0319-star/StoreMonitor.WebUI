@@ -975,14 +975,19 @@ $mainColor:#f31d65;
   top: 3px;
   @media screen and (min-width: 1366px){
     @include point(width, 90);
+    span{
+      position: relative;
+      bottom: 5px;
+    }
   }
   @media screen and (max-width: 1366px){
     @include point(width, 120);
+    span{
+      position: relative;
+      bottom: 5px;
+    }
   }
-  span{
-    position: relative;
-    bottom: 3px;
-  }
+
   &:first-child{
     border-right-width: 0px;
   }

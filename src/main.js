@@ -4,7 +4,7 @@ import App from './App'
 import router from './router'
 import './assets/font/iconfont.css'
 import ElementUI from 'element-ui';
-import locale from 'element-ui/lib/locale/lang/en' // lang i18n
+// import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 import '../theme/index.css'
 import Cookies from 'js-cookie'
 import 'video.js/dist/video-js.css'
@@ -24,7 +24,7 @@ Vue.config.productionTip = false
 
 // import i18n from 'vue-i18n'
 // Vue.use(VueI18n)
-Vue.use(ElementUI, { locale })
+// Vue.use(ElementUI, { locale })
 
 Vue.use(ElementUI, {
   size: 'medium', // set element-ui default size
@@ -39,7 +39,7 @@ function getLoginURL(){
       console.log(res.data.loginURL);
       let url=res.data.loginURL;
       resolve(url);
-    })  
+    })
   })
 }
 async function setURL(){

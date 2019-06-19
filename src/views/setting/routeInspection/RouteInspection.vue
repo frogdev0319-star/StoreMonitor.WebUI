@@ -284,7 +284,13 @@ export default {
                                 objChild.name=itemChild.subject;
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
                                 //objChild.score=itemChild.itemScore+'分';
-                                objChild.score=itemChild.itemScore + " " + this.$t('insSettingView.score');
+                                if(self.lang == 'en'){
+                                  objChild.score=itemChild.itemScore ;
+                                }
+                                else{
+                                  objChild.score=itemChild.itemScore + " " + this.$t('insSettingView.scores');
+                                }
+
                                 tempChild.push(objChild);
                             })
                             _obj.itemData=tempChild;
@@ -831,6 +837,20 @@ export default {
                   &:disabled{
                     opacity: 0.6;
                   }
+                  @media screen and (min-width: 1366px){
+                    @include point(width, 90);
+                    span{
+                      position: relative;
+                      @include point(bottom,1);
+                    }
+                  }
+                  @media screen and (max-width: 1366px){
+                    span{
+                      position: relative;
+                      @include point(bottom, 2)
+                    }
+                  }
+
                 }
                 .downLoad-btn{
                     margin-left: 0px !important;
@@ -894,14 +914,19 @@ export default {
                 border-right: 0;
                 @media screen and (min-width: 1366px){
                   @include point(width, 90);
+                  span{
+                    position: relative;
+                    @include point(bottom,3);
+                  }
                 }
                 @media screen and (max-width: 1366px){
                   @include point(width, 120);
+                  span{
+                    position: relative;
+                    @include point(bottom,5);
+                  }
                 }
-                span{
-                  position: relative;
-                  @include point(bottom,3);
-                }
+
                 &:last-child{
                   border-right: 1px solid;
                 }
@@ -917,6 +942,9 @@ export default {
         }
     }
 
+    #en-patrltabs-content /deep/ .el-tabs__nav-scroll {
+      height: 40px;
+    }
     #en-patrltabs-content /deep/ .el-tabs__item {
       padding: 0 0;
       font-size: 14px;

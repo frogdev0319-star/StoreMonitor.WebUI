@@ -200,6 +200,7 @@ export default {
     items : 'Items',
     feedbacks: 'Feedbacks',
     unit: '',
+    advice: 'Advice: ',
   },
 
   // event Management page language
@@ -308,7 +309,8 @@ export default {
     category: 'Inspection Category',
     searchPlaceholder: 'Enter keywords to search stores',
     addSuss: 'Successfully added',
-    addFail: 'Failed to add'
+    addFail: 'Failed to add',
+    itemsOfCate: 'Inspection items of '
   },
   // Device Management page language
   deviceView:{
@@ -371,7 +373,7 @@ export default {
     selectPlaceholder: 'Please select',
     selectSolverPlaceholder: 'Please select solver',
     failSubmit: 'Failed to sent',
-    successSubmit: 'Successfully sent!',
+    successSubmit: 'Successfully sent',
     all: 'All'
   },
   //Schedule Management page language

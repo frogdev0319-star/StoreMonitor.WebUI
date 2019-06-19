@@ -157,6 +157,10 @@ export default {
             inspectSrc1:require('../../../static/img/总评icon1.png'),
             inspectSrc2:require('../../../static/img/总评icon2.png'),
             inspectSrc3:require('../../../static/img/总评icon3.png'),
+            inspectSrc4:require('../../../static/img/总评icon4.png'),
+            inspectSrc5:require('../../../static/img/总评icon5.png'),
+            inspectSrc6:require('../../../static/img/总评icon6.png'),
+            inspectSrc7:require('../../../static/img/总评icon7.png'),
             reportList:[],
             curSortType:0,
             sortTypeList:[
@@ -271,9 +275,60 @@ export default {
                     obj.mode=item.mode;
 
                     switch(item.status){
-                        case 0: obj.iconSrc=self.inspectSrc1; break;
-                        case 1: obj.iconSrc=self.inspectSrc3; break;
-                        default:obj.iconSrc=self.inspectSrc2; break;
+
+                      /**
+                       * 根据语言和类型返回图片形式
+                       */
+                      case 0: {
+                          // 立即督导
+                          if(self.lang == 'zh'){
+                            obj.iconSrc=self.inspectSrc1;
+                          }
+                          else if(self.lang == 'en'){
+                            obj.iconSrc=self.inspectSrc4;
+                          }
+                          else if(self.lang == 'zhtw'){
+                            obj.iconSrc=self.inspectSrc7;
+                          }
+                          else {
+                            obj.iconSrc=self.inspectSrc1;
+                          }
+                          break;
+                        }
+                        case 1: {
+                          // 待改善
+                          if(self.lang == 'zh'){
+                            obj.iconSrc=self.inspectSrc3;
+                          }
+                          else if(self.lang == 'en'){
+                            obj.iconSrc=self.inspectSrc6;
+                          }
+                          else if(self.lang == 'zhtw'){
+                            obj.iconSrc=self.inspectSrc3;
+                          }
+                          else {
+                            obj.iconSrc=self.inspectSrc3;
+                          }
+                          break;
+                        }
+
+                        default:{
+                          //合格
+                          obj.iconSrc=self.inspectSrc2;
+                          if(self.lang == 'zh'){
+                            obj.iconSrc=self.inspectSrc2;
+                          }
+                          else if(self.lang == 'en'){
+                            obj.iconSrc=self.inspectSrc4;
+                          }
+                          else if(self.lang == 'zhtw'){
+                            obj.iconSrc=self.inspectSrc2;
+                          }
+                          else {
+                            obj.iconSrc=self.inspectSrc2;
+                          }
+                          break;
+                        }
                     }
                     temp.push(obj);
                 });

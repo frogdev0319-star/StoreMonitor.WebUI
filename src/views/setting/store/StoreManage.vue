@@ -56,9 +56,9 @@
                     align="center">
                         <template slot-scope="scope" v-if="scope.row.showTag">
                         <span class="icon-span" style="background-color:#6097F4;"
-                        v-if="scope.row.bindDevice" ><i class="iconfont icon-yichangshijianliebiaocopy"></i> {{generateStoreLang('binded')}}</span>
+                              v-if="scope.row.bindDevice" ><i class="iconfont icon-yichangshijianliebiaocopy"></i> <span>{{generateStoreLang('binded')}}</span></span>
                         <span class="icon-span" style="background-color:#FEA316;"
-                        v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> {{generateStoreLang('unbinded')}}</span>
+                              v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> <span>{{generateStoreLang('unbinded')}}</span></span>
                     </template>
                 </el-table-column>
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
@@ -690,6 +690,11 @@ import {generateStoreLang} from '@/api/i18n'
             padding-left:5px;
             padding-right:5px;
             font-size: 12px;
+            span{
+              position: relative;
+              @include point(bottom, 1);
+            }
+
         }
     }
 }

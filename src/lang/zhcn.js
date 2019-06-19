@@ -202,7 +202,8 @@ export default {
     onsitePatrol: '现场巡检',
     items : '项目',
     feedbacks: '反馈问题',
-    unit: '个'
+    unit: '个',
+    advice: '巡检建议：',
   },
 
   // event Management page language
@@ -316,7 +317,8 @@ export default {
     addFail: '添加失败',
     stared: '已关注',
     clickToStar: '点击关注',
-    needBind: '表，需要关联的门店'
+    needBind: '表，需要关联的门店',
+    itemsOfCate: '类别巡检项'
   },
 
   //Device Management page language

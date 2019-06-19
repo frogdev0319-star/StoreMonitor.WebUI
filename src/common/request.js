@@ -9,8 +9,8 @@ import {getToken} from '@/common/auth.js'
 
 // let base='http://'+window.location.host; //上线地址
 // let base ='http://222.91.163.149:18081'  //本地开发地址
-let base ='http://47.103.41.236:8081'  //测试地址
-
+// let base ='http://47.103.41.236:8081'  //测试地址
+let base='http://172.21.81.117:8081'
 
 let itempath='/storemonitor/api/'
 let lang = i18n.locale
@@ -154,8 +154,18 @@ service.interceptors.response.use(
                 //router.push('/login');
                 let url=sessionStorage.getItem('LoginURL');
                 window.location.href=url;
+                let msg = '';
+                if(lang ==='en'){
+                  msg = 'The login information is abnormal, please sign in again!'
+                }
+                else if(lang === 'zh'){
+                  msg = '登录信息异常，请重新登录！'
+                }
+                else{
+                  msg = '登錄信息異常，請重新登錄！'
+                }
                 Message({
-                    message:'登录信息异常，请重新登录!',
+                    message: msg,
                     type:'error',
                     duration:5*1000
                 })

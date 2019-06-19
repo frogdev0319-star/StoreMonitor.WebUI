@@ -67,11 +67,11 @@
                     <span class="details-info">{{event.storeName}}</span>
                 </div>
                 <div class="storeInfo-details">
-                    <div class="w3-content">
+                    <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'">
                         <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('submitter')}}：</span></dd>
                         <span class="details-info">{{event.createor}}</span>
                     </div>
-                    <div class="w3-content">
+                    <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'">
                         <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('solver')}}：</span></dd>
                         <span class="details-info">{{event.assigneeName}}</span>
                     </div>
@@ -1069,6 +1069,19 @@ $h1:#292e36;
                 display: inline-block;
                 //width: 200px;
                 width: calc(300/1920*100vw);
+            }
+            .en-w3-content{
+              margin-right: 45px;
+              overflow: hidden;
+              display: inline-block;
+              //width: 200px;
+              @media screen and (max-width: 1366px){
+                width: calc(230/1366*100vw);
+              }
+              @media screen and (min-width: 1366px){
+                width: calc(300/1920*100vw);
+              }
+
             }
             .w3{
                 letter-spacing:0.3334em; /*如果需要y个字两端对齐，则为(x-y)/(y-1),这里是（4-3）/(3-1)=0.5em */

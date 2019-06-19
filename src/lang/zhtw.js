@@ -157,7 +157,7 @@ export default {
     prompt: '提示',
     notSolver: '當前門店未綁定負責人，是否繼續？',
     emptyTitle: '問題名稱不能為空！',
-    recording: '录制成功',
+    recording: '正在錄制',
     recordSucc: '錄製成功',
     return: '後自動返回遠端巡檢頁面！',
     storeName: '門店名稱：',
@@ -203,7 +203,8 @@ export default {
     onsitePatrol: '現場巡檢',
     items : '項目',
     feedbacks: '回饋問題',
-    unit: '個'
+    unit: '個',
+    advice: '巡檢建議：',
   },
 
   // event Management page language
@@ -218,8 +219,8 @@ export default {
     allEvents: '全部事件',
     name: '事件名稱',
     stores: '所屬門店',
-    submitter: '提報人：',
-    submitTime: '提報時間：',
+    submitter: '提報人',
+    submitTime: '提報時間',
     operation: '操作',
     eventDetails: '事件詳情',
     solver: '負責人',
@@ -288,6 +289,7 @@ export default {
     deleteSuss: '巡檢項刪除成功！',
     deleteFail: '巡檢項刪除失敗！',
     selectProviceInfo: '按省份選擇',
+    selectStore:'请选择',
     bindStores: '绑定门店',
     total: '表共有',
     bind: '已綁定',
@@ -314,7 +316,8 @@ export default {
     searchPlaceholder: '請輸入關鍵詞搜索門店',
     addSuss: '添加成功',
     addFail: '添加失敗',
-    needBind: '表，需要關聯的門店'
+    needBind: '表，需要關聯的門店',
+    itemsOfCate: '類別巡檢項'
   },
 
   //Device Management page language

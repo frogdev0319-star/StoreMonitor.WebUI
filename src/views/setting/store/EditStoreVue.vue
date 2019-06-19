@@ -125,6 +125,7 @@ export default {
         let storeId=self.store.storeId;
         self.storeTitle=self.store.name;
         self.userId=self.store.userId;
+        console.log(self.store.napeTable)
         self.curTag=self.store.napeTable;
         self.phone=self.store.phone;
         self.getChannelByStore(storeId);

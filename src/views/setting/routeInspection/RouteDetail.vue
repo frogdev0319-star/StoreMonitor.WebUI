@@ -69,7 +69,7 @@
                         <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
                         <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
                         <span class="score-title">{{generateInsSettingLang('score')}}</span>
-                        <span class="handle-title">{{generateInsSettingLang('operation')}}</span>
+                        <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
                     </div>
 
                     <div class="table-header-title">
@@ -686,6 +686,10 @@ export default {
               &:disabled{
                 opacity: 0.6;
               }
+               span{
+                 position: relative;
+                 @include point(bottom, 2)
+               }
             }
             .el-set-btn{
                 background-color: $mainColor;
@@ -711,6 +715,10 @@ export default {
               }
               &:disabled{
                 opacity: .6;
+              }
+              span{
+                position: relative;
+                @include point(bottom, 2)
               }
             }
         }
@@ -750,7 +758,7 @@ export default {
             }
             @media screen and(min-width:1280px) and(max-width:1440px){
                 .description-title{
-                    width: 43%;
+                    width: 41%;
                 }
             }
             .score-title{
@@ -762,6 +770,16 @@ export default {
                 float: left;
                 width: 4%;
                 margin-left: 1%;
+            }
+            .en-handle-title{
+              float: left;
+              width: 4%;
+              @media screen and (min-width: 1366px){
+                margin-left: 1%;
+              }
+              @media screen and (max-width: 1366px){
+                margin-left: 0;
+              }
             }
         }
         .table-header-title{

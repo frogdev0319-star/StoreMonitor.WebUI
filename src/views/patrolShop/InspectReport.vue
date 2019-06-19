@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="el-acticle">
-            <p class="suggest" v-if="suggest!=null&&suggest.length!=0">巡检建议：{{suggest}}</p>
+            <p class="suggest" v-if="suggest!=null&&suggest.length!=0">{{generateReportLang('advice')}}{{suggest}}</p>
             <el-row class="report-content" :gutter="40">
                 <el-col :span="8" class="radior-content">
                     <v-chart :options="options" class="chart-content" :auto-resize='true'/>
@@ -92,6 +92,10 @@ export default {
             inspectSrc1:require('../../../static/img/总评icon1.png'),
             inspectSrc2:require('../../../static/img/总评icon2.png'),
             inspectSrc3:require('../../../static/img/总评icon3.png'),
+            inspectSrc4:require('../../../static/img/总评icon4.png'),
+            inspectSrc5:require('../../../static/img/总评icon5.png'),
+            inspectSrc6:require('../../../static/img/总评icon6.png'),
+            inspectSrc7:require('../../../static/img/总评icon7.png'),
             report:null,
             suggest:'',
             summary:[],
@@ -112,7 +116,8 @@ export default {
                }
             ],
           pass: this.$t('reportView.pass'),
-          failed: this.$t('reportView.failed')
+          failed: this.$t('reportView.failed'),
+          lang: this.$i18n.locale
         }
     },
     methods:{
@@ -133,9 +138,70 @@ export default {
                 default:obj.inspectSrc=self.videoSrc; break;
             }
             switch(routeData.status){
-                case 0: obj.iconSrc=self.inspectSrc1; break;
-                case 1: obj.iconSrc=self.inspectSrc3; break;
-                default:obj.iconSrc=self.inspectSrc2; break;
+                // case 0: {
+                //   obj.iconSrc=self.inspectSrc1;
+                //   break;
+                // }
+                // case 1: {
+                //   obj.iconSrc=self.inspectSrc3;
+                //   break;
+                // }
+                // default:{
+                //   obj.iconSrc=self.inspectSrc2;
+                //   break;
+                // }
+              /**
+               * 根据语言和类型返回图片形式
+               */
+              case 0: {
+                // 立即督导
+                if(self.lang == 'zh'){
+                  obj.iconSrc=self.inspectSrc1;
+                }
+                else if(self.lang == 'en'){
+                  obj.iconSrc=self.inspectSrc4;
+                }
+                else if(self.lang == 'zhtw'){
+                  obj.iconSrc=self.inspectSrc7;
+                }
+                else {
+                  obj.iconSrc=self.inspectSrc1;
+                }
+                break;
+              }
+              case 1: {
+                // 待改善
+                if(self.lang == 'zh'){
+                  obj.iconSrc=self.inspectSrc3;
+                }
+                else if(self.lang == 'en'){
+                  obj.iconSrc=self.inspectSrc6;
+                }
+                else if(self.lang == 'zhtw'){
+                  obj.iconSrc=self.inspectSrc3;
+                }
+                else {
+                  obj.iconSrc=self.inspectSrc3;
+                }
+                break;
+              }
+
+              default:{
+                //合格
+                if(self.lang == 'zh'){
+                  obj.iconSrc=self.inspectSrc2;
+                }
+                else if(self.lang == 'en'){
+                  obj.iconSrc=self.inspectSrc4;
+                }
+                else if(self.lang == 'zhtw'){
+                  obj.iconSrc=self.inspectSrc2;
+                }
+                else {
+                  obj.iconSrc=self.inspectSrc2;
+                }
+                break;
+              }
             }
             self.report=obj;
         },

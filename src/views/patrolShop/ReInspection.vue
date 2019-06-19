@@ -204,7 +204,7 @@
                         </div>
                     </transition>
                     <transition name="fade">
-                        <div :class="lang== 'en'? 'en-iconright1' : 'iconright'" v-if="showModelContent" @click="getVideo">
+                        <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
                             <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
                             <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                             <span>{{generatePatrolLang('record')}}</span>
@@ -803,8 +803,8 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            //let bucketName='viumo-'+self.accountId;
-            let bucketName='viumo-aaoompqqpjy4';
+            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -911,7 +911,8 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            let bucketName='viumo-aaoompqqpjy4';
+            let bucketName = 'viumo-'+self.accountId
+            //let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -2720,6 +2721,13 @@ export default {
                         @include point(top,3);
                         margin-right: 15px;
                     }
+                    @media screen and(max-width: 1366px){
+                      span{
+                        position: relative;
+                        @include point(bottom, 4)
+                      }
+                    }
+
                 }
             }
             .icon-right{
@@ -2746,7 +2754,7 @@ export default {
                         position: absolute;
                         margin: auto 0;
                         top: 4px;
-                        left: 20%;
+                        left: 34%;
                         margin-left: 4px;
                         z-index: 3;
                         cursor: pointer;
@@ -2758,7 +2766,7 @@ export default {
                         height: 24px;
                         position: absolute;
                         margin: auto 0;
-                        left: 20%;
+                        left: 34%;
                         z-index: 3;
                     }
                     #white{
@@ -2860,7 +2868,7 @@ export default {
                     bottom: 2px;
                     span{
                         font-size: 12px;
-                        vertical-align: middle;
+                        /*vertical-align: middle;*/
                         margin-left: 4px;
                     }
                 }
@@ -3289,7 +3297,7 @@ export default {
                     }
                     .guide-lside{
                         top: 10px;
-                        right:0;
+                        right:3%;
                     }
                 }
                 .inspect-content{

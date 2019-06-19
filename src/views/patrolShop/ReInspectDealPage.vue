@@ -142,7 +142,8 @@
                 self.isSuccess=routeData.isSuccess;
             }
             if(self.isSuccess){
-                self.$route.matched[2].name='提交成功';
+                //self.$route.matched[2].name='提交成功';
+                self.$route.matched[2].name= self.$t('storeView.successSubmit');
                 //self.storeName=routeData.store.storeName;
                 if(routeData!=null&&routeData.user.length!=0){
                     self.leader=routeData.user[0].userName;
@@ -152,7 +153,8 @@
                 //self.ignoreCount=routeData.ignoredItems.length;
             }
             else{
-                self.$route.matched[2].name='提交失败';
+                //self.$route.matched[2].name='提交失败';
+                self.$route.matched[2].name=self.$t('storeView.failSubmit');
                 if(self.isSuccess==false){
                     PubSub.publish('success-page',{changeStyle:true});
                 }
