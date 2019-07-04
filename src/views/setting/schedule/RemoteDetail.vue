@@ -51,7 +51,7 @@
             <div :style="{height:varyWindowHeight}">
               <el-col :span="24" class="header-details">
                 <span>排程类型</span>
-                <el-select v-model="item.mode" clearable  placeholder="选择类型" size="mini" :disabled="isDisabled"
+                <el-select v-model="item.mode" clearable  placeholder="选择类型" size="mini" :disabled="isDisabled" @change="searchStore"
                            class="el-type" >
                   <el-option
                     v-for="itemType in typeList"
@@ -197,21 +197,21 @@
             <el-col style="margin-top: 65px;">
               <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
                 <div  class="el-all-checkbox" v-if="storeList.length!=0">
-                  <el-checkbox v-model="allData" @change="choiceAll" style="margin-right: 20px"></el-checkbox>
+                  <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll" style="margin-right: 20px"></el-checkbox>
                   <span class="all-device-title">关联至所有门店</span>
                 </div>
                 <div class="device-group" v-for="(item,index) in storeList" :key="index">
                   <div class="device-all-checkbox" style="float: left;">
                     <div style="display: block">
-                      <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)" style="margin-right: 20px"></el-checkbox>
+                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)" style="margin-right: 20px"></el-checkbox>
                       <span class="group-name">{{item.cityName}}</span>
                     </div>
                   </div>
                   <div class="device-content" style="clear: left;margin-left: 60px;text-align: left">
                     <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index" style="margin-top: 20px;">
-                      <el-checkbox v-model="_item.checked"
+                      <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
                                    @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
-                      <span class="device-name">{{_item.name}}</span>
+                      <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
                     </div>
                   </div>
                 </div>
@@ -273,6 +273,7 @@
         varyWindowHeight:window.innerHeight,
         varyWindowWidth:window.innerWidth,
         allData:false,
+        allDisabled: false,
         storeList:[],
         tempStoreList :[],
         showAddTime: false,
@@ -617,6 +618,7 @@
         scheduleSelf: [], //自定义排程格式（月份和日期数组）
         notifyTime: '', //执行时间
         dueDays: -1, //执行时效
+        hasBoundStoreIds: [] //已经绑定过周、月模式的门店id
       }
     },
 
@@ -1284,20 +1286,58 @@
         })
         console.log(temp);
         let groupTemp = [];
+        let mode = self.paneList[Number(self.activeName)].mode;
+        console.log(mode + "..." + mode);
         temp.forEach(item => {
           let groupObj = {};
           groupObj.province = item.province;
           groupObj.cityName = item.city;
           let _temp = [];
           let _tempCount = 0;
+          let _tempDisCount = 0;
           item.store.forEach(_item => {
             let _obj = {};
-            if (bindStoreId.indexOf(_item.storeId) == -1) {
-              _obj.checked = false;
+            // if (bindStoreId.indexOf(_item.storeId) == -1) {
+            //   _obj.checked = false;
+            //   _obj.disabled = false;
+            // }
+            // else {
+            //   _obj.checked = true;
+            //   _obj.disabled = false;
+            //   _tempCount++;
+            // }
+            if(mode === 3){
+              if (bindStoreId.indexOf(_item.storeId) == -1) {
+                _obj.checked = false;
+                _obj.disabled = false;
+              }
+              else {
+                _obj.checked = true;
+                _obj.disabled = false;
+                _tempCount++;
+              }
             }
-            else {
-              _obj.checked = true;
-              _tempCount++;
+            else{
+              if (bindStoreId.indexOf(_item.storeId) != -1) {
+                _obj.checked = true;
+                _obj.disabled = false;
+                _tempCount++;
+              }
+              else {
+                // 周月模式下，剩下的商店id 要看有没有绑定周月模式，若绑定，则不可用，
+                if(self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
+                  _obj.checked = false;
+                  _obj.disabled = false;
+                }
+                else{
+                  _obj.checked = false;
+                  _obj.disabled = true;
+                  _tempDisCount++;
+                }
+                // _obj.checked = true;
+                // _obj.disable = false;
+                // _tempCount++;
+              }
             }
             _obj.storeId = _item.storeId;
             _obj.name = _item.storeName;
@@ -1308,6 +1348,20 @@
           }
           else {
             groupObj.checked = false;
+          }
+
+          if (_tempDisCount + _tempCount == item.store.length) {
+            groupObj.checked = true;
+          }
+          else{
+            groupObj.checked = false;
+          }
+          if (_tempDisCount == item.store.length) {
+            groupObj.disabled = true;
+            groupObj.checked = false;
+          }
+          else{
+            groupObj.disabled = false;
           }
           groupObj.itemData = _temp;
           groupTemp.push(groupObj);
@@ -1320,11 +1374,30 @@
             count++;
           }
         })
+        let disCount = 0; //禁用数目
+        self.storeList.forEach(item => {
+          if (item.disabled) {
+            disCount++;
+          }
+        })
         if (count == self.storeList.length) {
           self.allData = true;
         }
         else {
           self.allData = false;
+        }
+        if(count + disCount == self.storeList.length){
+          self.allData = true;
+        }
+        if (disCount == self.storeList.length) {
+          self.allDisabled = true;
+        }
+        else {
+          self.allDisabled = false;
+        }
+        let totalConut = disCount + count; //禁用加勾选数目
+        if(totalConut == self.storeList.length){
+          self.allDisabled = false;
         }
       },
       getBindStoreList() {
@@ -1379,14 +1452,16 @@
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
         if(self.selectTab == self.scheduleName){
           scheId = await self.addScheduleService();
+          self.paneList[Number(self.activeName)].schId = scheId;
           self.scheduleName = ''
         }
         else{
-          scheId = self.scheduleId;
+          scheId = self.paneList[Number(self.activeName)].schId;
         }
         let storeIdChecked=[];
         let storeIdUnchecked=[];
         let count=0;
+        let mode = self.paneList[Number(self.activeName)].mode;
         self.storeList.forEach(item=>{
           count+=item.itemData.length;
           item.itemData.forEach(_item=>{
@@ -1395,6 +1470,7 @@
             }
             else{
               storeIdUnchecked.push(_item.storeId);
+              console.log(self.hasBoundStoreIds);
             }
           })
         })
@@ -1458,10 +1534,10 @@
         if(self.selectTab != self.scheduleName){
           self.updateScheduleInfo();
         }
-        //self.getScheduleList();
         self.dayArray = this.paneList[Number(self.activeName)].dayArray;
         console.log(self.dayArray)
-        self.searchStore();
+        //self.searchStore();
+        self.getHasBoundStroeIds();
       },
       deleteMonthAndDays(index) {
         console.log(index)
@@ -1510,12 +1586,17 @@
         }
       },
       choiceAll(val){
+        console.log(val)
         let self=this;
         self.storeList.forEach(item=>{
-          item.checked=val;
-          item.itemData.forEach(_item=>{
-            _item.checked=val;
-          })
+          if(!item.disabled){
+            item.checked=val;
+            item.itemData.forEach(_item=>{
+              if(!_item.disabled){
+                _item.checked=val;
+              }
+            })
+          }
         })
       },
       choiceAllGroup(item){
@@ -1523,7 +1604,10 @@
         console.log(item);
         let obj=item;
         item.itemData.forEach(item=>{
-          item.checked=obj.checked;
+          if(!item.disabled){
+            item.checked=obj.checked;
+          }
+          //item.checked=obj.checked;
         })
         let arr=[];
         self.storeList.forEach(_item=>{
@@ -1531,7 +1615,13 @@
             arr.push(_item);
           }
         })
-        if(self.storeList.length==arr.length){
+        let disArr=[];
+        self.storeList.forEach(_item=>{
+          if(_item.disabled){
+            disArr.push(_item);
+          }
+        })
+        if(self.storeList.length==arr.length + disArr.length){
           self.allData=true;
         }
         else{
@@ -1547,11 +1637,23 @@
             count++;
           }
         })
-        if(count==item.itemData.length){
+        let disCount = 0;
+        item.itemData.forEach(itemS=>{
+          if(itemS.disabled){
+            disCount++;
+          }
+        })
+        if(count + disCount==item.itemData.length){
           item.checked=true;
         }
         else{
           item.checked=false;
+        }
+        if(disCount == item.itemData.length){
+          item.disabled = true;
+        }
+        else{
+          item.disabled = false;
         }
         let length=0, countItem=0;
         self.storeList.forEach(_item=>{
@@ -1655,12 +1757,46 @@
           if(self.isFirstLoad == true){
             self.isFirstLoad = false;
             self.dayArray = this.paneList[Number(self.activeName)].dayArray;
+            self.selectTab = this.paneList[Number(self.activeName)].name;
             console.log(self.dayArray)
             self.echoMonthAndWeek() //回显初次加载时选择的月和周
             self.searchStore();
           }
           console.log(self.paneList);
+          self.getHasBoundStroeIds();
         }
+      },
+      getHasBoundStroeIds(){
+        let self = this;
+        self.hasBoundStoreIds = [];
+        self.paneList.forEach(item=>{
+          let sheduleId = item.schId;
+          let mode = item.mode;
+          console.log(sheduleId + '....' + mode)
+          //获取绑定周、月模式商店的id
+          if (mode !== 3) {
+            let params = {};
+            params.scheduleId = sheduleId;
+            return new Promise((resolve, reject) => {
+              getScheduleBindList(params).then(res => {
+                console.log(res);
+                let errMsg = res.errMsg;
+                let data = res.data;
+                console.log(data);
+                data.forEach(_item=>{
+                  if(self.hasBoundStoreIds.indexOf(_item) == -1){
+                    self.hasBoundStoreIds.push(_item);
+                  }
+                  else{
+                    // do nothing
+                  }
+                })
+                resolve(data);
+              })
+            })
+          }
+        })
+        console.log(self.hasBoundStoreIds)
       },
       secondsToHour(second){
         //秒数转化为时分秒
@@ -1823,7 +1959,7 @@
             self.enable = self.paneList[0].enable;
             self.notifyTime = self.paneList[0].notifyTime;
             console.log(self.scheduleId)
-            self.searchStore();
+            self.getHasBoundStroeIds()
             resolve(data);
           })
 
@@ -1832,6 +1968,7 @@
       initData(){
         let self = this;
         self.activeName = '0';
+        self.selectTab = self.paneList[0].name;
         // let tabIndex = Number(self.activeName);
         // self.curType = (self.paneList[tabIndex].mode).toString();
         // self.timeArray = self.paneList[tabIndex].timeArray;

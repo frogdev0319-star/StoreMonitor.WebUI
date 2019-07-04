@@ -16,7 +16,7 @@
           <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index">
           </el-tab-pane>
           <remote-detail v-if="activePatrol == '0'" ref="remoteHandle" v-on:sendActiveName = "changeActiveName"></remote-detail>
-          <onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle"></onsite-detail>
+          <onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>
         </el-tabs>
       </el-col>
     </div>
