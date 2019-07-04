@@ -59,3 +59,18 @@
   height: 0 !important;
 }
 
+
+#el-schedule-tabs /deep/ .el-tabs__item {
+  padding: 0 0;
+  font-size: 16px;
+  font-family: "Microsoft YaHei";
+  font-weight: bold;
+  width: 160px;
+}
+#el-schedule-tabs /deep/ .is-active {
+  border-bottom: 4px solid #f31d65;
+}
+
+#el-schedule-tabs /deep/ .el-tabs__active-bar{
+  height: 0 !important;
+}

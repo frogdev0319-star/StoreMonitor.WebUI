@@ -12,12 +12,12 @@
                     <i class="iconfont icon-shouqi icon-collapse" @click="clickCollapse" v-else></i>
                 </el-col>
                 <el-col :span="10">
-                    <el-breadcrumb separator="|" class="breadcrumb-inner">
+                    <el-breadcrumb separator="|" class="breadcrumb-inner" >
                         <el-breadcrumb-item
                         v-for="(item,index) in breadList"
                         :key="item.path" class="breadcrumb-item" :to="{ path:item.path}"
                         v-if="index!=0" >
-                            <span :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ generateRoute(item.name) }}</span>
+                            <span  :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ generateRoute(item.name) }}</span>
                         </el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
@@ -73,26 +73,43 @@
                                   <span>{{collapsed?'': generateRoute(item.children[0].name)}}</span>
                             </el-menu-item>
                             <!--多级节点 :disabled="item.name=='巡店管理'"-->
-                        <el-submenu class="el-submenu-content" :key="index" :index="index+''"
-                        v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
-                            <template slot="title">
-                            <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                            <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                              <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'">{{generateRoute(item.name)}}</span>
-                            </template>
-                            <el-menu-item :id="lang=='en'?'en-childSubItem':'childSubItem'" class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                             v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                            :key="child.path" v-if="!child.hidden" style="padding-left: 26px;color:#a0a4ad;">
-                                <template>
-                                    <div :class="lang=='en' ? 'en-icon-content': 'icon-content'">
-                                        <div class="tag-icon"></div>
-                                    </div>
-                                    <span >{{generateRoute(child.name)}}</span>
-                                    <div v-if="child.name=='storeManage'&&showTag"
-                                    style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
-                                </template>
-                            </el-menu-item>
-                        </el-submenu>
+                              <el-submenu class="el-submenu-content" :key="index" :index="index+''"
+                                v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
+                                  <template slot="title">
+                                  <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                                  <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                                    <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'">{{generateRoute(item.name)}}</span>
+                                  </template>
+                                  <el-menu-item :id="lang=='en'?'en-childSubItem':'childSubItem'" class="submenu-item" :style="groupHeight+'px'"
+                                   v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
+                                  :key="child.path" v-if="!child.hidden && !child.threeChild" style="padding-left: 26px;color:#a0a4ad;">
+                                      <template>
+                                          <div :class="lang=='en' ? 'en-icon-content': 'icon-content'">
+                                              <div class="tag-icon"></div>
+                                          </div>
+                                          <span >{{generateRoute(child.name)}}</span>
+                                          <div v-if="child.name=='storeManage'&&showTag"
+                                          style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
+                                      </template>
+                                  </el-menu-item>
+                                  <el-submenu  class="three-child el-submenu-group"  :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                                        :index="child.path"  :disabled="child.isReadOnly"
+                                        :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
+                                      <template slot="title">
+                                        <div :class="lang=='en' ? 'en-icon-content': 'icon-content'">
+                                          <div class="tag-icon"></div>
+                                        </div>
+                                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" style="font-size: 14px">{{generateRoute(child.name)}}</span>
+                                      </template>
+                                        <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                                                      v-for="grandChild in child.children" :index="grandChild.path"  :disabled="child.isReadOnly"
+                                                      :key="grandChild.path" >
+                                          <template>
+                                            <span >{{generateRoute(grandChild.name)}}</span>
+                                          </template>
+                                        </el-menu-item>
+                                  </el-submenu>
+                              </el-submenu>
                             </template>
                         </template>
 
@@ -161,7 +178,8 @@ export default {
             brandList:[],
             accountId:'',
             roleId:0,
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            title: ''
         }
     },
     computed:{
@@ -259,7 +277,42 @@ export default {
         getBread(){
             this.breadList=[];
             //this.breadList=this.$route.matched;
-            let matched=this.$route.matched.filter(x=>x.name);
+            let currentRoute = this.$route.fullPath; //当前路由
+            let matched = this.$route.matched.filter(x=>x.name);
+            console.log(matched)
+            if(matched.length > 2 && matched[1].name == 'scheduleManage'){
+              //巡检设置
+              if(matched[2].tempName == undefined){
+                matched[2].tempName = `${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.'+ matched[2].name)}${this.$t('route.rightBracket')}`
+                matched[2].name = matched[2].tempName
+              }
+              else{
+                matched[2].name = matched[2].tempName
+              }
+              matched.splice(1,1);
+            }
+            else{
+
+            }
+            // if(currentRoute == '/pointCheck'){
+            //   //point check
+            //   matched.unshift(`${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.pointCheck')}${this.$t('route.rightBracket')}`)
+            //   matched.unshift('schedule')
+            // }
+            // else if(currentRoute == '/lpsSechedule'){
+            //   //lps schedule
+            //   matched.unshift(`${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.lpsSechedule')}${this.$t('route.rightBracket')}`)
+            //   matched.unshift('schedule')
+            // }
+            // else if(currentRoute == '/patrolSechedule'){
+            //   // patrol schedule
+            //   matched.unshift(`${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.patrolSechedule')}${this.$t('route.rightBracket')}`)
+            //   matched.unshift('schedule')
+            // }
+            // else{
+            //
+            // }
+            //matched=this.$route.matched.filter(x=>x.name);
             const first=matched[1];
             this.breadList=matched;
         },
@@ -332,7 +385,10 @@ export default {
                     }
                 })
             })
-        }
+        },
+      updateTitle(){
+          document.title = this.$t('route.meta')
+      }
     },
     created(){
         let self=this;
@@ -353,6 +409,8 @@ export default {
     mounted(){
         this.getUserName();
         this.getAccountList();
+        this.updateTitle();
+        console.log(this.$router.options.routes)
     },
 }
 </script>
@@ -670,6 +728,17 @@ export default {
                      }
                    }
                 }
+              .three-child /deep/ .el-submenu__title {
+                padding-left: 20px !important;
+                text-align: left;
+                position: relative;
+                min-width: auto !important;
+                height: 2.8125rem;
+                line-height: 2.8125rem;
+              }
+              .three-child /deep/ .el-menu{
+                text-align: center !important;
+              }
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
@@ -690,7 +759,8 @@ export default {
                 }
             }
             .content-wrapper-all{
-                height: 93%;
+                height: auto;
+                min-height: 90%;
                 @include point(margin,20);
                 border: solid #e3e9f4;
                 border-width: 0;
@@ -744,6 +814,7 @@ export default {
         .aside-width{
             width: 16.9%;
             background-color: #222538;
+            /*overflow: scroll;*/
         }
         .aside-collapse-width{
             width:$collapseWidth;
@@ -754,12 +825,34 @@ export default {
         .sec-collapsed{
             margin-left:65px;
             width:95.5%;
+            height: auto;
            // width: auto;
         }
         .sec-uncoll{
             margin-left:16.9%;
+            height: auto;
             width:83.1%;
         }
+      .menu li{
+        margin-left: 80px;
+        text-align: center;
+      }
+    }
+    .el-collapse-item__content{
+      padding-bottom: 0px !important;
+    }
+    .el-submenu__icon-arrow{
+      margin-right:calc(20/1920*100vw) !important;
+      color: #fff !important;
+    }
+    .el-select-dropdown__item{
+      font-size: calc(24/1920*100vw) !important;
+      font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    }
+    .options{
+      padding-left: 20px;
+      font-size: calc(24/1920*100vw) !important;
+      font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
     }
 </style>
 <style>
@@ -799,21 +892,6 @@ export default {
     margin-right: 35px !important;
     color: #fff !important;
 }
-.el-collapse-item__content{
-    padding-bottom: 0px !important;
-}
-.el-submenu__icon-arrow{
-    margin-right:calc(20/1920*100vw) !important;
-    color: #fff !important;
-}
-.el-select-dropdown__item{
-  font-size: calc(24/1920*100vw) !important;
-  font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
-}
-.options{
-    padding-left: 20px;
-  font-size: calc(24/1920*100vw) !important;
-  font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
-}
+
 </style>
 

@@ -1,148 +1,150 @@
 <template>
-    <el-row class="el-schedule-container">
-        <el-col :span="24" class="el-header">
-            <span>{{generateScheduleLang('schedule')}}</span>
-        </el-col>
-        <el-col :span="24" class="el-content">
-            <el-col :span="8" class="schedule-group">
-                <div class="title-content">
-                    <i class="iconfont icon-wenjian icontitle"></i><span class="level2">{{generateScheduleLang('scheduleName')}}</span>
-                    <el-button size="mini" @click="addSchedule" :class="lang=='en'? 'add-btn':'title-btn'" type="primary"><i class="el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span></el-button>
-                </div>
-                <div class="group-items group-title">
-                   <div v-for="(item,index) in groupList"
-                   :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
-                   :class="item.isClick?'noraml-color':'noraml-groupColor'">
-                        <div class="proper-flag" v-if="item.isClick"></div>
-                        <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}</span>
-                        <el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>
-                        <div class="iconcontent" v-if="item.showEdit">
-                            <div class="nape-items-handle" v-if="!item.isEdit">
-                                <i class="iconfont icon-bianji"
-                                style="font-size: 20px;cursor:pointer;margin-right:10px;"
-                                 @click="editGroup(index,item)"></i>
-                                <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
-                                  @click="deleteGroup(index, item)"></i>
-                            </div>
-                        </div>
-                        <div class="iconcontent">
-                            <div class="iconlised" style="background-color:#f31d65" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
-                                <i class="el-icon-check"></i>
-                            </div>
-                            <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
-                                <i class="el-icon-close"></i>
-                            </div>
-                        </div>
-                    </div>
-               </div>
-               <div class="group-add" v-if="showAddGroup">
-                   <el-input size="mini" class="groupName-input input-details" :placeholder="generateScheduleLang('inputPlaceholder')" v-model="groupNameInput"></el-input>
-                    <div class="iconcontent">
-                        <div class="iconlised" style="background-color:#FB4C5D" @click="confirmAddGroup">
-                            <i class="el-icon-check"></i>
-                        </div>
-                        <div class="iconrised" @click="cancelAddGroup">
-                            <i class="el-icon-close"></i>
-                        </div>
-                    </div>
-               </div>
-            </el-col>
-            <el-col :span="16" class="schedule-content">
-                <div class="schedule-title">
-                   <span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}{{generateScheduleLang('details')}}</span>
-                   <el-button size="mini" @click="saveSchedule" class="title-btn" type="primary">{{generateScheduleLang('save')}}</el-button>
-                </div>
-                <div class="scheule-info">
-                    <div class="scheule-choice">
-                        <el-radio v-model="radioDate" label="1">{{generateScheduleLang('settingOnDay')}}</el-radio>
-                        <el-radio v-model="radioDate" label="2">{{generateScheduleLang('settingOnHou')}}</el-radio>
-                    </div>
-                    <div v-if="radioDate=='1'" class="radio-date">
-                        <span style="margin-right:15px;">{{generateScheduleLang('selectMonth')}}</span>
-                        <el-date-picker
-                        class="el-date"
-                        v-model="modeMonth" size="mini"
-                        type="month"
-                        :clearable=false
-                        placeholder="generateScheduleLang('selectMonth')" @change="changeMonth">
-                        </el-date-picker>
-                        <span style="margin-left:30px;margin-right:20px;">{{generateScheduleLang('date')}}</span>
-                        <el-input size="mini" class="show-dateStr"  v-model="modeDate"></el-input>
-                        <div class="date-content">
-                            <div class="date-header">
-                                <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
-                                <span v-if="this.lang !== 'en'">{{curYear}}{{generateScheduleLang('year')}}{{curMonth}}{{generateScheduleLang('month')}}</span>
-                                <span v-else>{{curMonth}}/{{curYear}}</span>
-                                <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>
+  <router-view></router-view>
+    <!--<el-row class="el-schedule-container">-->
+      <!--<router-view></router-view>-->
+        <!--<el-col :span="24" class="el-header">-->
+            <!--<span>{{generateScheduleLang('schedule')}}</span>-->
+        <!--</el-col>-->
+        <!--<el-col :span="24" class="el-content">-->
+            <!--<el-col :span="8" class="schedule-group">-->
+                <!--<div class="title-content">-->
+                    <!--<i class="iconfont icon-wenjian icontitle"></i><span class="level2">{{generateScheduleLang('scheduleName')}}</span>-->
+                    <!--<el-button size="mini" @click="addSchedule" :class="lang=='en'? 'add-btn':'title-btn'" type="primary"><i class="el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span></el-button>-->
+                <!--</div>-->
+                <!--<div class="group-items group-title">-->
+                   <!--<div v-for="(item,index) in groupList"-->
+                   <!--:key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"-->
+                   <!--:class="item.isClick?'noraml-color':'noraml-groupColor'">-->
+                        <!--<div class="proper-flag" v-if="item.isClick"></div>-->
+                        <!--<span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}</span>-->
+                        <!--<el-input size="mini" v-model="item.groupName" class="nape-input input-details" v-if="item.isEdit"></el-input>-->
+                        <!--<div class="iconcontent" v-if="item.showEdit">-->
+                            <!--<div class="nape-items-handle" v-if="!item.isEdit">-->
+                                <!--<i class="iconfont icon-bianji"-->
+                                <!--style="font-size: 20px;cursor:pointer;margin-right:10px;"-->
+                                 <!--@click="editGroup(index,item)"></i>-->
+                                <!--<i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"-->
+                                  <!--@click="deleteGroup(index, item)"></i>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="iconcontent">-->
+                            <!--<div class="iconlised" style="background-color:#f31d65" @click="confirmEditGroup(index,item)" v-if="item.isEdit">-->
+                                <!--<i class="el-icon-check"></i>-->
+                            <!--</div>-->
+                            <!--<div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">-->
+                                <!--<i class="el-icon-close"></i>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+               <!--</div>-->
+               <!--<div class="group-add" v-if="showAddGroup">-->
+                   <!--<el-input size="mini" class="groupName-input input-details" :placeholder="generateScheduleLang('inputPlaceholder')" v-model="groupNameInput"></el-input>-->
+                    <!--<div class="iconcontent">-->
+                        <!--<div class="iconlised" style="background-color:#FB4C5D" @click="confirmAddGroup">-->
+                            <!--<i class="el-icon-check"></i>-->
+                        <!--</div>-->
+                        <!--<div class="iconrised" @click="cancelAddGroup">-->
+                            <!--<i class="el-icon-close"></i>-->
+                        <!--</div>-->
+                    <!--</div>-->
+               <!--</div>-->
+            <!--</el-col>-->
+            <!--<el-col :span="16" class="schedule-content">-->
+                <!--<div class="schedule-title">-->
+                   <!--<span v-if="groupList.length!=0" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}{{generateScheduleLang('details')}}</span>-->
+                   <!--<el-button size="mini" @click="saveSchedule" class="title-btn" type="primary">{{generateScheduleLang('save')}}</el-button>-->
+                <!--</div>-->
+                <!--<div class="scheule-info">-->
+                    <!--<div class="scheule-choice">-->
+                        <!--<el-radio v-model="radioDate" label="1">{{generateScheduleLang('settingOnDay')}}</el-radio>-->
+                        <!--<el-radio v-model="radioDate" label="2">{{generateScheduleLang('settingOnHou')}}</el-radio>-->
+                    <!--</div>-->
+                    <!--<div v-if="radioDate=='1'" class="radio-date">-->
+                        <!--<span style="margin-right:15px;">{{generateScheduleLang('selectMonth')}}</span>-->
+                        <!--<el-date-picker-->
+                        <!--class="el-date"-->
+                        <!--v-model="modeMonth" size="mini"-->
+                        <!--type="month"-->
+                        <!--:clearable=false-->
+                        <!--placeholder="generateScheduleLang('selectMonth')" @change="changeMonth">-->
+                        <!--</el-date-picker>-->
+                        <!--<span style="margin-left:30px;margin-right:20px;">{{generateScheduleLang('date')}}</span>-->
+                        <!--<el-input size="mini" class="show-dateStr"  v-model="modeDate"></el-input>-->
+                        <!--<div class="date-content">-->
+                            <!--<div class="date-header">-->
+                                <!--<i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>-->
+                                <!--<span v-if="this.lang !== 'en'">{{curYear}}{{generateScheduleLang('year')}}{{curMonth}}{{generateScheduleLang('month')}}</span>-->
+                                <!--<span v-else>{{curMonth}}/{{curYear}}</span>-->
+                                <!--<i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>-->
 
-                            </div>
-                            <div class="date-data">
-                                <span class="date-title" v-for="(item,index) in weekTitles" :key="index">
-                                    {{item}}
-                                </span>
-                                <div class="date-details" v-for="item in weekDays">
-                                    <div class="data" v-for="(_item,_index) in item" :key="_index">
-                                        <span :class="_item.showBack?'opColor':'noramlColor'"
-                                        :style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>
-                                    </div>
-                                </div>
-                                <div class="schedule-tag">
-                                </div>
-                                <span style="margin-left:20px;color:#94a4b4;font-size:14px;">{{generateScheduleLang('scheduleSet')}}</span>
-                                <div class="all-month">
-                                     <el-checkbox v-model="allMonth"></el-checkbox><span class="allMonth-title">{{generateScheduleLang('applyToAllMon')}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else class="rside-content">
-                        <div class="day-deatil">
-                            <span class="day-title">{{generateScheduleLang('selectOnDay')}}</span>
-                            <div class="city-content" @click="choiceWeek">
-                                <div class="input-arrow-panel"></div>
-                                    <el-input v-model="weekValue" size="mini" id="elCity" :placeholder="generateScheduleLang('city')" :readonly=true></el-input>
-                                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                            </div>
-                            <div :class="lang==='en' ? 'en-week-panel':'week-panel'" v-if="showWeekContent">
-                                <div class="week-details" v-for="(item,index) in weekList" :key="index">
-                                    <el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>
-                                    <span>{{item.name}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="rside-deatil">
-                            <span v-if="lang=='en'" style="margin-right: 75px;">{{generateScheduleLang('startTime')}}</span>
-                            <span v-else>{{generateScheduleLang('startTime')}}</span>
-                            <el-time-picker class="date-picker"
-                                v-model="startTime"
-                                format='HH:mm'
-                                value-format="HH:mm"
-                                size="mini"
-                                :picker-options="{
-                                    format: 'HH:mm'
-                                }">
-                            </el-time-picker>
-                            <span style="margin-left:10px;">{{generateScheduleLang('hour')}}</span>
-                        </div>
-                        <div class="rside-deatil">
-                            <span v-if="lang=='en'" style="margin-right: 80px;">{{generateScheduleLang('endTime')}}</span>
-                            <span v-else>{{generateScheduleLang('endTime')}}</span>
-                            <el-time-picker class="date-picker"
-                                v-model="endTime"
-                                format='HH:mm'
-                                value-format="HH:mm"
-                                size="mini"
-                                :picker-options="{
-                                    format: 'HH:mm'
-                                }">
-                            </el-time-picker>
-                            <span style="margin-left:10px;">{{generateScheduleLang('hour')}}</span>
-                        </div>
-                    </div>
-                </div>
-            </el-col>
-        </el-col>
-    </el-row>
+                            <!--</div>-->
+                            <!--<div class="date-data">-->
+                                <!--<span class="date-title" v-for="(item,index) in weekTitles" :key="index">-->
+                                    <!--{{item}}-->
+                                <!--</span>-->
+                                <!--<div class="date-details" v-for="item in weekDays">-->
+                                    <!--<div class="data" v-for="(_item,_index) in item" :key="_index">-->
+                                        <!--<span :class="_item.showBack?'opColor':'noramlColor'"-->
+                                        <!--:style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="schedule-tag">-->
+                                <!--</div>-->
+                                <!--<span style="margin-left:20px;color:#94a4b4;font-size:14px;">{{generateScheduleLang('scheduleSet')}}</span>-->
+                                <!--<div class="all-month">-->
+                                     <!--<el-checkbox v-model="allMonth"></el-checkbox><span class="allMonth-title">{{generateScheduleLang('applyToAllMon')}}</span>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--<div v-else class="rside-content">-->
+                        <!--<div class="day-deatil">-->
+                            <!--<span class="day-title">{{generateScheduleLang('selectOnDay')}}</span>-->
+                            <!--<div class="city-content" @click="choiceWeek">-->
+                                <!--<div class="input-arrow-panel"></div>-->
+                                    <!--<el-input v-model="weekValue" size="mini" id="elCity" :placeholder="generateScheduleLang('city')" :readonly=true></el-input>-->
+                                    <!--<i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
+                            <!--</div>-->
+                            <!--<div :class="lang==='en' ? 'en-week-panel':'week-panel'" v-if="showWeekContent">-->
+                                <!--<div class="week-details" v-for="(item,index) in weekList" :key="index">-->
+                                    <!--<el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>-->
+                                    <!--<span>{{item.name}}</span>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="rside-deatil">-->
+                            <!--<span v-if="lang=='en'" style="margin-right: 75px;">{{generateScheduleLang('startTime')}}</span>-->
+                            <!--<span v-else>{{generateScheduleLang('startTime')}}</span>-->
+                            <!--<el-time-picker class="date-picker"-->
+                                <!--v-model="startTime"-->
+                                <!--format='HH:mm'-->
+                                <!--value-format="HH:mm"-->
+                                <!--size="mini"-->
+                                <!--:picker-options="{-->
+                                    <!--format: 'HH:mm'-->
+                                <!--}">-->
+                            <!--</el-time-picker>-->
+                            <!--<span style="margin-left:10px;">{{generateScheduleLang('hour')}}</span>-->
+                        <!--</div>-->
+                        <!--<div class="rside-deatil">-->
+                            <!--<span v-if="lang=='en'" style="margin-right: 80px;">{{generateScheduleLang('endTime')}}</span>-->
+                            <!--<span v-else>{{generateScheduleLang('endTime')}}</span>-->
+                            <!--<el-time-picker class="date-picker"-->
+                                <!--v-model="endTime"-->
+                                <!--format='HH:mm'-->
+                                <!--value-format="HH:mm"-->
+                                <!--size="mini"-->
+                                <!--:picker-options="{-->
+                                    <!--format: 'HH:mm'-->
+                                <!--}">-->
+                            <!--</el-time-picker>-->
+                            <!--<span style="margin-left:10px;">{{generateScheduleLang('hour')}}</span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</el-col>-->
+        <!--</el-col>-->
+    <!--</el-row>-->
 </template>
 <script>
 import util from '@/common/util'

@@ -63,7 +63,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">{{generateInsSettingLang('prompt')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
             </el-col>
@@ -980,7 +980,13 @@ export default {
         @include point(height,73);
         width: 100%;
     }
-
+    .el-search-input{
+      @include point(width,200);
+      @include point(margin-right,20);
+      position:absolute;
+      right: 0px;
+      top: 3px;
+    }
 
 </style>
 

@@ -2,6 +2,7 @@
 export default {
   // 导航栏
   route: {
+    meta: '看門店',
     title: '看門店管理系統',
     brand: '品牌',
     overview: '總覽',
@@ -32,6 +33,11 @@ export default {
     bindStore: '門店綁定',
     storeDetail: '門店詳情',
     operPerm: '無操作權限',
+    pointCheck: '點檢排程',
+    lpsSechedule: '防損排程',
+    patrolSechedule: '巡檢排程',
+    leftBracket: '（',
+    rightBracket: '）'
   },
 
   //remote Patrol page language
@@ -388,6 +394,7 @@ export default {
     schedule: '排程',
     scheduleName: '排程名稱',
     addSchedule: '添加排程',
+    delete: '刪除',
     details:'詳情',
     settingOnDay: '按天設置',
     settingOnHou: '按時間設置',
@@ -422,5 +429,25 @@ export default {
     thur:'周四',
     fri: '周五',
     sat: '周六',
+    cancel: '取消',
+    confirm: '確認',
+    saveInfo: '此操作將會刪除排程信息，是否繼續？',
+    scheduleType: '排程類型',
+    exectionTime: '執行時間',
+    selectTime: '請選擇時間',
+    bindStore: '綁定門店',
+    hasBind: '已綁定',
+    stores: '家門店',
+    searchInfo: '請輸入關鍵詞搜索門店',
+    bindAllStore: '關聯至所有門店',
+    saveAndApply: '保存並套用',
+    confirmBind: '套用排程會覆蓋至關聯門店，確認綁定？',
+    daily: '日模式',
+    weekly: '周模式',
+    monthly: '月模式',
+    everyMonth: '每月',
+    execDays: '執行日期',
+    enable: '啟用',
+    prompt: '提示'
   }
 }

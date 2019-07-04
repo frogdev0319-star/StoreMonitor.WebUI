@@ -28,7 +28,7 @@
             <div class="table-content">
                 <div class="table-header">
                     <span>
-                      <span v-if="lang=='en' "class="en-store-name">{{generatePatrolLang('storeName')}}:</span>
+                      <span v-if="lang=='en' "class="en-store-name">{{generatePatrolLang('storeName')}}: </span>
                       <span v-else class="store-name">{{generatePatrolLang('storeName')}}：</span>
                       {{store.storeName}}
                     </span>
@@ -335,7 +335,7 @@ export default {
                         }
                     }
                 })
-                if(numOfExcellent>0){
+                if(numOfUnqualified>0){
                     obj.isQua=false;
                 }
                 else{

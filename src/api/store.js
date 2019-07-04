@@ -29,7 +29,7 @@ export const addFavoriteStore=data=>{
         url:`${version}/favorite/add`,
         method:'post',
         data
-    }) 
+    })
 }
 
 export const deleteFavoriteStore=data=>{
@@ -37,5 +37,5 @@ export const deleteFavoriteStore=data=>{
         url:`${version}/favorite/delete`,
         method:'post',
         data
-    }) 
+    })
 }

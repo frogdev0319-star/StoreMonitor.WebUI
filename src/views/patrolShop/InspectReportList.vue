@@ -786,7 +786,7 @@ $suggestBack:#F1F6FE;
             }
             @media screen and(min-width: 1366px){
               .en-span-class{
-                margin-right: 75px;
+                //margin-right: 75px;
               }
             }
             .el-province{

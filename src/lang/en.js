@@ -1,6 +1,7 @@
 export default {
   //導航欄
   route: {
+    meta: 'ViuMo',
     title: 'ViuMo',
     brand: 'Brand',
     overview: 'Overview',
@@ -30,7 +31,12 @@ export default {
     itemSetting: 'Item Settings',
     bindStore: 'Bind Stores',
     storeDetail: 'Store Details',
-    operPerm: 'No operation permission'
+    operPerm: 'No operation permission',
+    pointCheck: 'Check Schedule',
+    lpsSechedule: 'LPS Schedule',
+    patrolSechedule: 'Patrol Schedule',
+    leftBracket: '(',
+    rightBracket: ')'
   },
   //remote Patrol page language
   remotePatrol:{
@@ -381,6 +387,7 @@ export default {
     schedule: 'Schedule',
     scheduleName: 'Schedule Name',
     addSchedule: 'Add Schedules',
+    delete: 'Delete',
     details:'Details',
     settingOnDay: 'Settings based on day',
     settingOnHou: 'Settings based on hour',
@@ -411,10 +418,30 @@ export default {
     sun: 'Sunday',
     mon: 'Monday',
     tues: 'Tuesday',
-    wed: 'Wedsday',
+    wed: 'Wednesday',
     thur:'Thursday',
     fri: 'Friday',
-    sat: 'Saterday',
+    sat: 'Saturday',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    saveInfo: 'This will delete the schedule,continue?',
+    scheduleType: 'Schedule Type',
+    exectionTime: 'Execution Time',
+    selectTime: 'Please select time',
+    bindStore: 'Bind Stores',
+    hasBind: 'Have bound ',
+    stores: ' stores',
+    searchInfo: 'Please enter keyword to search',
+    bindAllStore: 'Relate to all stores',
+    saveAndApply: 'Save And Apply',
+    confirmBind: 'Apply schedules will cover related stores, continue to bind?',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    everyMonth: 'Every Month',
+    execDays: 'Execution Date',
+    enable: 'Enable',
+    prompt: 'Prompt'
   }
 
 }

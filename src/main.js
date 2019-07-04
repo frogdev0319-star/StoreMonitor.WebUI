@@ -20,6 +20,10 @@ import store from './store/index.js';
 import i18n from './lang'
 import $ from 'jquery';
 import jquery from 'jquery';
+import moment from 'moment';
+import elCascaderMulti from 'el-cascader-multi';
+Vue.use(elCascaderMulti)
+Vue.prototype.$moment = moment;//赋值使用
 Vue.config.productionTip = false
 
 // import i18n from 'vue-i18n'

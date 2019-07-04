@@ -5,18 +5,19 @@ import Home from '@/views/home/Home'
 import Login from '@/views/login/Login'
 import LoginForm from '@/views/login/LoginForm'
 import AuthRedirect from '@/views/login/AuthRedirect'
+
 Vue.use(Router)
 export default new Router({
   routes: [
-    // {
-    //   path:'/login',
-    //   name:'Login',
-    //   hidden: true,
-    //   component:LoginForm,
-    //   meta:{
-    //     requireAuth: false,
-    //   }
-    // },
+    {
+      path:'/login',
+      name:'Login',
+      hidden: true,
+      component:LoginForm,
+      meta:{
+        requireAuth: false,
+      }
+    },
     {
       path:'*',
       redirect: '/'
@@ -309,12 +310,31 @@ export default new Router({
         {
           path:'/schedule',
           name:'scheduleManage',
-          isReadOnly:true,
-          component:resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
+          isReadOnly:false,
+          component: resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
           hidden:false,
+          threeChild : true,
           meta:{
+            keepAlive:true,  //the component is't to be cache.
             requireAuth:true
           },
+          children:[
+            {
+              path:'/pointCheck',
+              name:'pointCheck',
+              component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve)
+            },
+            {
+              path:'/lpsSechedule',
+              name:'lpsSechedule',
+              component:resolve=>require(['@/views/setting/schedule/LpsSechedule'],resolve)
+            },
+            {
+              path:'/patrolSechedule',
+              name:'patrolSechedule',
+              component:resolve=>require(['@/views/setting/schedule/PatrolSechedule'],resolve)
+            },
+          ]
         },
         {
           path:'/other',
