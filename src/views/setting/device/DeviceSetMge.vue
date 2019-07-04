@@ -84,7 +84,7 @@
                     </el-col>
                 </el-tab-pane>
                 <el-tab-pane :label="generateDeviceLang('videoMangement')" name="video">
-                    <el-col :span="lang=='en' && varWindowWidth<1366? 9: 8" class="lisde">
+                    <el-col :span="lang=='en' && varWindowWidth<1920? 9: 8" class="lisde">
                         <div class="nvr-title tabTitle">
                             <div :class="lang=='en' ? 'en-name-title titles': 'name-title titles'">
                                 <span>{{generateDeviceLang('nvr')}}</span>
@@ -134,7 +134,7 @@
                         </div>
                     </el-col>
 
-                    <el-col :span="lang=='en' && varWindowWidth<1366? 15: 16" class="risde">
+                    <el-col :span="lang=='en' && varWindowWidth<1920? 15: 16" class="risde">
                         <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
                             <div class="nape-name-title titles">
                                 <span>{{generateDeviceLang('channelName')}}</span>
