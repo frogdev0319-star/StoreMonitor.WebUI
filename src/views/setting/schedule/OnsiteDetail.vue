@@ -167,7 +167,9 @@
             <hr class="el-header-hr"/>
             <div class="el-bind-header" style="position: relative;top: 20px;">
                 <span class="el-header-title" style="left: 10px;font-size: 14px;margin-top: 10px;
-    margin-bottom: 10px;">绑定门店</span>
+              margin-bottom: 10px;">绑定门店</span>
+              <span class="el-header-title" style="left: 100px;font-size: 14px;margin-top: 10px;
+              margin-bottom: 10px; color:#FEA316">提示：现场巡检，因考虑路程人力因素，请合理安排巡检任务。</span>
               <span class="choice-device"><i class="iconfont icon-tishi1"
                                              style="margin-right:10px;color:#93A2B6;"></i>已绑定{{storeCount}}家门店</span>
               <el-input
@@ -1239,7 +1241,13 @@
         }
         let totalConut = disCount + count; //禁用加勾选数目
         if(totalConut == self.storeList.length){
-          self.allDisabled = false;
+          if(count> 0 ){
+            self.allDisabled = false;
+            self.allData = true;
+          }else{
+            self.allDisabled = true;
+            self.allData = false;
+          }
         }
       },
       getBindStoreList() {
@@ -1291,10 +1299,13 @@
         let scheId;
         let self = this;
         self.showBindDialog = false;
+        let isAdd = false; //判断是否是新增排程
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
         if(self.selectTab == self.scheduleName){
+          isAdd = true; //新增
           scheId = await self.addScheduleService();
           self.paneList[Number(self.activeName)].schId = scheId;
+          self.scheduleId = scheId;
           self.scheduleName = ''
         }
         else{
@@ -1365,6 +1376,7 @@
         if(flag){
           let bindIdList=await self.getBindStoreList();
           self.storeCount = bindIdList.length;
+          console.log(bindIdList.length + "......");
           //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
           self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`,'success',3000);
         }
@@ -1373,7 +1385,8 @@
           return false;
         }
 
-        if(self.selectTab != self.scheduleName){
+        if(!isAdd){
+          //不是增加排程，则更新排程
           self.updateScheduleInfo();
         }
         self.dayArray = this.paneList[Number(self.activeName)].dayArray;

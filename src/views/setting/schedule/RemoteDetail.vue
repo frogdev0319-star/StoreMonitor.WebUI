@@ -1396,8 +1396,17 @@
           self.allDisabled = false;
         }
         let totalConut = disCount + count; //禁用加勾选数目
+        // if(totalConut == self.storeList.length){
+        //   self.allDisabled = false;
+        // }
         if(totalConut == self.storeList.length){
-          self.allDisabled = false;
+          if(count> 0 ){
+            self.allDisabled = false;
+            self.allData = true;
+          }else{
+            self.allDisabled = true;
+            self.allData = false;
+          }
         }
       },
       getBindStoreList() {
@@ -1449,11 +1458,14 @@
         let scheId;
         let self = this;
         self.showBindDialog = false;
+        let isAdd = false;
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
         if(self.selectTab == self.scheduleName){
+          isAdd = true;
           scheId = await self.addScheduleService();
           self.paneList[Number(self.activeName)].schId = scheId;
           self.scheduleName = ''
+          self.scheduleId = scheId;
         }
         else{
           scheId = self.paneList[Number(self.activeName)].schId;
@@ -1531,7 +1543,7 @@
           return false;
         }
 
-        if(self.selectTab != self.scheduleName){
+        if(!isAdd){
           self.updateScheduleInfo();
         }
         self.dayArray = this.paneList[Number(self.activeName)].dayArray;
