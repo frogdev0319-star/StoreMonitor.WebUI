@@ -22,7 +22,7 @@
           <hr style="border: 0.5px solid #f31d65;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
             <span>{{generateScheduleLang('scheduleName')}}</span>
-            <el-input v-model="scheduleName" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"
+            <el-input v-model="scheduleName" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini" ref="scheduleName"
                       class="el-schedule-name"></el-input>
           </p>
         </div>
@@ -245,157 +245,157 @@
           {
             'checked': false,
             value: 1,
-            name: '1'
+            name: '1号'
           },
           {
             'checked': false,
             value: 2,
-            name: '2'
+            name: '2号'
           },
           {
             'checked': false,
             value: 3,
-            name: '3'
+            name: '3号'
           },
           {
             'checked': false,
             value: 4,
-            name: '4'
+            name: '4号'
           },
           {
             'checked': false,
             value: 5,
-            name: '5'
+            name: '5号'
           },
           {
             'checked': false,
             value: 6,
-            name: '6'
+            name: '6号'
           },
           {
             'checked': false,
             value: 7,
-            name: '7'
+            name: '7号'
           },
           {
             'checked': false,
             value: 8,
-            name: '8'
+            name: '8号'
           },
           {
             'checked': false,
             value: 9,
-            name: '9'
+            name: '9号'
           },
           {
             'checked': false,
             value: 10,
-            name: '10'
+            name: '10号'
           },
           {
             'checked': false,
             value: 11,
-            name: '11'
+            name: '11号'
           },
           {
             'checked': false,
             value: 12,
-            name: '12'
+            name: '12号'
           },
           {
             'checked': false,
             value: 13,
-            name: '13'
+            name: '13号'
           },
           {
             'checked': false,
             value: 14,
-            name: '14'
+            name: '14号'
           },
           {
             'checked': false,
             value: 15,
-            name: '15'
+            name: '15号'
           },
           {
             'checked': false,
             value: 16,
-            name: '16'
+            name: '16号'
           },
           {
             'checked': false,
             value: 17,
-            name: '17'
+            name: '17号'
           },
           {
             'checked': false,
             value: 18,
-            name: '18'
+            name: '18号'
           },
           {
             'checked': false,
             value: 19,
-            name: '19'
+            name: '19号'
           },
           {
             'checked': false,
             value: 20,
-            name: '20'
+            name: '20号'
           },
           {
             'checked': false,
             value: 21,
-            name: '21'
+            name: '21号'
           },
           {
             'checked': false,
             value: 22,
-            name: '22'
+            name: '22号'
           },
           {
             'checked': false,
             value: 23,
-            name: '23'
+            name: '23号'
           },
           {
             'checked': false,
             value: 24,
-            name: '24'
+            name: '24号'
           },
           {
             'checked': false,
             value: 25,
-            name: '25'
+            name: '25号'
           },
           {
             'checked': false,
             value: 26,
-            name: '26'
+            name: '26号'
           },
           {
             'checked': false,
             value: 27,
-            name: '27'
+            name: '27号'
           },
           {
             'checked': false,
             value: 28,
-            name: '28'
+            name: '28号'
           },
           {
             'checked': false,
             value: 29,
-            name: '29'
+            name: '29号'
           },
           {
             'checked': false,
             value: 30,
-            name: '30'
+            name: '30号'
           },
           {
             'checked': false,
             value: 31,
-            name: '31'
+            name: '31号'
           },
         ],
         value: '',
@@ -553,7 +553,7 @@
           self.monthList.forEach(item => {
             selectedMonth.forEach(_item=>{
               if(item.value == _item){
-                dateStr = dateStr + item.name + ',';
+                dateStr = dateStr + item.value + ',';
                 item.checked = true;
                 count++;
               }
@@ -606,7 +606,7 @@
         let selectedMonths = [];
         self.monthList.forEach(item => {
           if (item.checked) {
-            daysStr = daysStr  + item.name + ',';
+            daysStr = daysStr  + item.value + ',';
             selectedMonths.push(item.value);
             count++;
           }
@@ -714,6 +714,11 @@
 
       async addSchedule() {
         let self = this;
+        if(self.scheduleName == ''){
+          self.notify('请输入排程名称！','warning',3000);
+          self.$refs.scheduleName.focus();
+          return false;
+        }
         self.showAddDialog = false;
         let scheduleInfo = {
           name: self.scheduleName,
@@ -1421,45 +1426,50 @@
       deleteSchedule(){
         let self = this;
         self.showDeleteDialog = false;
-        let scheduleIds = [];
-        scheduleIds.push(self.scheduleId);
-        let params = {};
-        params.scheduleIds = scheduleIds;
-
-        return new Promise((resolve, reject) => {
-          deleteScheduleService(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
-            let data = res.errCode;
-            console.log(data);
-            if(data == 0){
-              self.notify('删除成功','warning',3000);
-            }
-            else{
-              self.notify('删除失败','warning',3000);
-            }
-            //刷新页面
-            self.paneList.splice(Number(self.activeName), 1);
-            self.activeName = '0'
-            self.scheduleId = self.paneList[0].schId;
-            // self.curType = (self.paneList[0].mode).toString();
-            // console.log(typeof(self.curType))
-            //self.timeArray = self.paneList[0].timeArray;
-            self.dayArray =  self.paneList[0].dayArray;
-            self.echoMonthAndWeek();
-            self.scheduleId = self.paneList[0].schId;
-            //self.enable = self.paneList[0].enable;
-            console.log(self.scheduleId)
-            self.getHasBoundStroeIds()
-            resolve(data);
+        if(self.scheduleId == 0){
+          //还没有新增排程
+          self.initData();
+        }
+        else{
+          let scheduleIds = [];
+          scheduleIds.push(self.scheduleId);
+          let params = {};
+          params.scheduleIds = scheduleIds;
+          console.log(params.scheduleIds);
+          return new Promise((resolve, reject) => {
+            deleteScheduleService(params).then(res => {
+              console.log(res);
+              let errMsg = res.errMsg;
+              let data = res.errCode;
+              console.log(data);
+              if(data == 0){
+                self.notify('删除成功','warning',3000);
+              }
+              else{
+                self.notify('删除失败','warning',3000);
+              }
+              //刷新页面
+              self.initData();
+              resolve(data);
+            })
           })
-
-        })
+        }
       },
-      getMaxLength(){
+      initData(){
         let self = this;
-        console.log(self.paneList)
-      }
+        self.paneList.splice(Number(self.activeName), 1);
+        self.activeName = '0'
+        self.scheduleId = self.paneList[0].schId;
+        // self.curType = (self.paneList[0].mode).toString();
+        // console.log(typeof(self.curType))
+        //self.timeArray = self.paneList[0].timeArray;
+        self.dayArray =  self.paneList[0].dayArray;
+        self.echoMonthAndWeek();
+        self.scheduleId = self.paneList[0].schId;
+        //self.enable = self.paneList[0].enable;
+        console.log(self.scheduleId)
+        self.getHasBoundStroeIds()
+      },
     },
     mounted(){
       let self = this;

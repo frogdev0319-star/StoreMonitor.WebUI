@@ -14,7 +14,7 @@
           <hr style="border: 0.5px solid #f31d65;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
             <span>排程名称</span>
-            <el-input v-model="scheduleName" clearable placeholder="请输入排程名称" size="mini"
+            <el-input v-model="scheduleName" clearable placeholder="请输入排程名称" size="mini" ref="scheduleName"
                       class="el-schedule-name"></el-input>
           </p>
         </div>
@@ -773,7 +773,7 @@
         self.echoMonthAndWeek();
         self.scheduleId = self.paneList[tabIndex].schId;
         //self.enable = self.paneList[tabIndex].enable;
-        this.$emit('sendActiveName', self.activeName)
+        self.$emit('sendActiveName', self.activeName)
         self.searchStore();
       },
 
@@ -797,7 +797,7 @@
           self.monthList.forEach(item => {
             selectedMonth.forEach(_item=>{
               if(item.value == _item){
-                dateStr = dateStr + item.name + ',';
+                dateStr = dateStr + item.value + ',';
                 item.checked = true;
                 count++;
               }
@@ -817,7 +817,7 @@
           self.monthList.forEach(item => {
             selectedMonth.forEach(_item=>{
               if(item.value == _item){
-                dateStr = dateStr + item.name + ',';
+                dateStr = dateStr + item.value + ',';
                 item.checked = true;
                 count++;
               }
@@ -844,7 +844,7 @@
         let selectedMonths = [];
         self.monthList.forEach(item => {
           if (item.checked) {
-            daysStr = daysStr  + item.name + ',';
+            daysStr = daysStr  + item.value + ',';
             selectedMonths.push(item.value);
             count++;
           }
@@ -1024,6 +1024,12 @@
 
       async addSchedule() {
         let self = this;
+        if(self.scheduleName == ''){
+          self.notify('请输入排程名称！','warning',3000);
+          self.$refs.scheduleName.focus();
+          return false;
+        }
+
         self.showAddDialog = false;
         let addInfo = {
           name: self.scheduleName,
@@ -1057,7 +1063,7 @@
         })
         self.monthValue = '';
         console.log(self.paneList)
-
+        self.$emit('sendActiveName', self.activeName)
       },
       async searchStoreInput() {
         let self = this;
@@ -1784,58 +1790,50 @@
       deleteSchedule(){
         let self = this;
         self.showDeleteDialog = false;
-        let scheduleIds = [];
-        scheduleIds.push(self.scheduleId);
-        let params = {};
-        params.scheduleIds = scheduleIds;
+        if(self.scheduleId == 0){
+          self.initData();
+        }
+        else{
+          let scheduleIds = [];
+          scheduleIds.push(self.scheduleId);
+          let params = {};
+          params.scheduleIds = scheduleIds;
 
-        return new Promise((resolve, reject) => {
-          deleteScheduleService(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
-            let data = res.errCode;
-            console.log(data);
-            if(data == 0){
-              self.notify('删除成功','warning',3000);
-            }
-            else{
-              self.notify('删除失败','warning',3000);
-            }
-            //刷新页面
-            self.paneList.splice(Number(self.activeName), 1);
-            self.activeName = '0'
-            self.scheduleId = self.paneList[0].schId;
-            self.curType = (self.paneList[0].mode).toString();
-            console.log(typeof(self.curType))
-            self.timeArray = self.paneList[0].timeArray;
-            self.dayArray =  self.paneList[0].dayArray;
-            self.echoMonthAndWeek();
-            self.scheduleId = self.paneList[0].schId;
-            self.enable = self.paneList[0].enable;
-            self.notifyTime = self.paneList[0].notifyTime;
-            console.log(self.scheduleId)
-            self.getHasBoundStroeIds()
-            resolve(data);
+          return new Promise((resolve, reject) => {
+            deleteScheduleService(params).then(res => {
+              console.log(res);
+              let errMsg = res.errMsg;
+              let data = res.errCode;
+              console.log(data);
+              if(data == 0){
+                self.notify('删除成功','warning',3000);
+              }
+              else{
+                self.notify('删除失败','warning',3000);
+              }
+              //刷新页面
+              self.initData()
+              resolve(data);
+            })
           })
+        }
 
-        })
       },
       initData(){
         let self = this;
-        self.activeName = '0';
-        self.selectTab = self.paneList[0].name;
-        // let tabIndex = Number(self.activeName);
-        // self.curType = (self.paneList[tabIndex].mode).toString();
-        // self.timeArray = self.paneList[tabIndex].timeArray;
-        // self.dayArray =  self.paneList[tabIndex].dayArray;
-        // self.echoMonthAndWeek();
-        // self.scheduleId = self.paneList[tabIndex].schId;
-        // self.selectTab = self.paneList[tabIndex].name;
-        // self.enable = self.paneList[tabIndex].enable;
-        // self.selfMonth = self.paneList[tabIndex].selfMonth;
-        // self.notifyTime = self.paneList[tabIndex].notifyTime;
-        // self.dueDays = self.paneList[tabIndex].dueDays;
-        // console.log(self.enable)
+        self.paneList.splice(Number(self.activeName), 1);
+        self.activeName = '0'
+        self.scheduleId = self.paneList[0].schId;
+        self.curType = (self.paneList[0].mode).toString();
+        console.log(typeof(self.curType))
+        self.timeArray = self.paneList[0].timeArray;
+        self.dayArray =  self.paneList[0].dayArray;
+        self.echoMonthAndWeek();
+        self.scheduleId = self.paneList[0].schId;
+        self.enable = self.paneList[0].enable;
+        self.notifyTime = self.paneList[0].notifyTime;
+        console.log(self.scheduleId)
+        self.getHasBoundStroeIds()
       },
       /**
        * 获取指定月份的第一天和最后一天的秒数
