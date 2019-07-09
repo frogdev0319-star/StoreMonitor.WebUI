@@ -39,13 +39,8 @@ function getQueryString() {
     else{
       lang = 'zh'
     }
-    console.log(lang)
     return lang;
   }
-
-  console.log("@@@@@@@@@@@")
-  console.log(searchStr);
-  console.log("!!!!!!!!!!!!!")
 }
 
 const lang = getQueryString()

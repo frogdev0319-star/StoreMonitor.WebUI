@@ -3,7 +3,7 @@
     <div class="el-schedule-header">
       <el-col :span="7" class="el-schedule-btns">
       </el-col>
-      <el-dialog title='增加排程'
+      <el-dialog :title="generateScheduleLang('addSchedule')"
                  :visible.sync="showAddDialog" v-if="showAddDialog"
                  :append-to-body='true'
                  :close-on-click-modal="false"
@@ -13,17 +13,17 @@
         <div class="dialog-content" style="overflow:hidden;width:100%;">
           <hr style="border: 0.5px solid #f31d65;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <span>排程名称</span>
-            <el-input v-model="scheduleName" clearable placeholder="请输入排程名称" size="mini" ref="scheduleName"
+            <span>{{generateScheduleLang('scheduleName')}}</span>
+            <el-input v-model="scheduleName" clearable :placeholder="generateScheduleLang('inputPlaceholder')" size="mini" ref="scheduleName"
                       class="el-schedule-name"></el-input>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini" style="">取 消</el-button>
-          <el-button class="file-confirm-btn" @click="addSchedule" size="mini" type="primary">确 认</el-button>
+          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
+          <el-button class="file-confirm-btn" @click="addSchedule" size="mini" type="primary">{{generateScheduleLang('confirm')}}</el-button>
         </div>
       </el-dialog>
-      <el-dialog title='删除排程'
+      <el-dialog :title="generateScheduleLang('delete')"
                  :visible.sync="showDeleteDialog" v-if="showDeleteDialog"
                  :append-to-body='true'
                  :close-on-click-modal="false"
@@ -34,23 +34,23 @@
           <hr style="border: 0.5px solid #f31d65;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
             <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-            <span>此操作将会清空删除排程信息及绑定的门店，是否继续?</span>
+            <span>{{generateScheduleLang('saveInfo')}}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" @click="showDeleteDialog = false" size="mini" style="">取 消</el-button>
+          <el-button class="file-cancel-btn" @click="showDeleteDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
           <el-button class="file-confirm-btn" @click="deleteSchedule" size="mini"
-                     type="primary">确 认
+                     type="primary">{{generateScheduleLang('confirm')}}
           </el-button>
         </div>
       </el-dialog>
       <el-col :span="18" class="el-schedule-tabs">
-        <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-patrltabs-content': 'patrltabs-content'">
+        <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
           <el-tab-pane v-for="(item,index) in paneList" :name="index.toString()"
                        :key="index" :label="`${item.name}`">
             <div :style="{height:varyWindowHeight}">
               <el-col :span="24" class="header-details">
-                <span>排程类型</span>
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
                 <el-select v-model="item.mode" clearable  placeholder="选择类型" size="mini" :disabled="isDisabled" @change="searchStore"
                            class="el-type" >
                   <el-option
@@ -60,15 +60,15 @@
                     :value="itemType.value">
                   </el-option>
                 </el-select>
-                <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">仅执行一次</el-checkbox>
+                <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">{{generateScheduleLang('execOnce')}}</el-checkbox>
                 <div class="day-detail" v-if="item.mode == 2">
-                  <span class="day-title">选择日期</span>
+                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
                   <div class="month-content" @click="choiceMonthly">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" placeholder="每月" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
-                  <div class="month-panel" v-if="showMonthContent">
+                  <div :class="lang=='en'? 'en-month-panel':'month-panel'" v-if="showMonthContent">
                     <div class="month-details" v-for="(itemMonth) in monthList" :key=" 'details-'+ itemMonth.value">
                       <el-checkbox v-model="itemMonth.checked" @change="changeMonthlyItem(itemMonth)"></el-checkbox>
                       <span>{{itemMonth.name}}</span>
@@ -77,21 +77,21 @@
                 </div>
               </el-col>
               <el-col :span="24" class="header-details" v-if="item.mode== 3" v-for="(_item, _index) in item.schedule" :key="'mode3'+_index">
-                <span>选择月份</span>
-                <el-select v-model="_item.month" clearable  placeholder="选择月份" size="mini" @change="monthChange(_index)">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
+                <el-select v-model="_item.month" clearable  :placeholder="generateScheduleLang('selectMonth')" size="mini" @change="monthChange(_index)">
                   <el-option v-for="itemMonth in selfMonthList" :key="itemMonth.value"
                              :label="itemMonth.name"
                              :value="itemMonth.value">
                   </el-option>
                 </el-select>
                 <div class="day-detail">
-                  <span>选择日期</span>
+                  <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceSelfMonth(_index)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" placeholder="每月" :readonly=true></el-input>
+                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
-                  <div class="self-month-panel" v-if="_item.showMonthContent">
+                  <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="_item.showMonthContent">
                     <div class="month-details" v-for="(itemDay,indexs) in monthList" :key="indexs">
                       <el-checkbox v-model="itemDay.checked" @change="changeSelfMonthItem(_index)"></el-checkbox>
                       <span>{{itemDay.name}}</span>
@@ -104,21 +104,21 @@
                 </div>
               </el-col>
               <el-col :span="24" class="header-details" v-if="showAddMonth && item.mode == 3">
-                <span>选择月份</span>
-                <el-select v-model="selfMonth" clearable  placeholder="选择月份" size="mini" @change="monthChange(-1)">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
+                <el-select v-model="selfMonth" clearable  :placeholder="generateScheduleLang('selectMonth')" size="mini" @change="monthChange(-1)">
                   <el-option v-for="itemList in selfMonthList" :key="itemList.value"
                              :label="itemList.name"
                              :value="itemList.value">
                   </el-option>
                 </el-select>
                 <div class="day-detail">
-                  <span>选择日期</span>
+                  <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceMonth">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" placeholder="每月" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
-                  <div class="self-month-panel" v-if="showMonthContent">
+                  <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="showMonthContent">
                     <div class="month-details" v-for="(it,ind) in monthList" :key="ind">
                       <el-checkbox v-model="it.checked" @change="changeMonthItem(it)"></el-checkbox>
                       <span>{{it.name}}</span>
@@ -132,7 +132,7 @@
               </el-col>
               <el-col :span="24" class="header-details"
                       :key="index">
-                <span>提醒时间</span>
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('notifyTime')}}</span>
                 <el-time-select
                   class="time-select"
                   v-model="item.notifyTime"
@@ -141,18 +141,18 @@
                   step: '00:15',
                   end: '23:59'
                 }"
-                  placeholder="选择时间"
+                  :placeholder="generateScheduleLang('selectTime')"
                   size="mini"
                 >
                 </el-time-select>
                 <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
                             placement="bottom-end">
-                  <div slot="content">任务有效期内，每天同一时间进行推送</div>
+                  <div slot="content">{{generateScheduleLang('notifyInfo')}}</div>
                   <i class="iconfont icon-bangzhu iconbangzhu"></i>
                 </el-tooltip>
               </el-col>
-              <el-col :span="24" class="header-details" v-if="item.mode == 3">
-                <span>执行时效</span>
+              <el-col :span="24" class="header-details">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('dueDays')}}</span>
                 <el-select v-model="item.dueDays" clearable  placeholder="选择执行时效" size="mini"
                            class="el-type" >
                   <el-option
@@ -167,16 +167,15 @@
             <hr class="el-header-hr"/>
             <div class="el-bind-header" style="position: relative;top: 20px;">
                 <span class="el-header-title" style="left: 10px;font-size: 14px;margin-top: 10px;
-              margin-bottom: 10px;">绑定门店</span>
-              <span class="el-header-title" style="left: 100px;font-size: 14px;margin-top: 10px;
-              margin-bottom: 10px; color:#FEA316">提示：现场巡检，因考虑路程人力因素，请合理安排巡检任务。</span>
+    margin-bottom: 10px;">{{generateScheduleLang('bindStore')}}</span>
+              <span class="el-prompt-title">{{generateScheduleLang('promptInfo')}}</span>
               <span class="choice-device"><i class="iconfont icon-tishi1"
-                                             style="margin-right:10px;color:#93A2B6;"></i>已绑定{{storeCount}}家门店</span>
+                                             style="margin-right:10px;color:#93A2B6;"></i>{{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}</span>
               <el-input
                 size="small"
                 class="el-search-input"
                 :clearable=true
-                placeholder="请输入关键词搜索门店"
+                :placeholder="generateScheduleLang('searchInfo')"
                 v-model="serachVale" @keyup.enter.native="searchStoreInput">
                 <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
                    style="position:relative;top:6px;left:6px;font-size:18px;"></i>
@@ -186,7 +185,7 @@
               <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
                 <div  class="el-all-checkbox" v-if="storeList.length!=0">
                   <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll" style="margin-right: 20px"></el-checkbox>
-                  <span class="all-device-title">关联至所有门店</span>
+                  <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
                 </div>
                 <div class="device-group" v-for="(item,index) in storeList" :key="index">
                   <div class="device-all-checkbox" style="float: left;">
@@ -205,7 +204,7 @@
                 </div>
               </div>
               <div style="float: left;margin: 30px 0px 30px 20px;font-size: 14px;">
-                <span style="margin-right: 70px">启用</span>
+                <span style="margin-right: 70px">{{generateScheduleLang('enable')}}</span>
                 <el-switch
                   v-model="item.enable"
                   active-color="#13ce66"
@@ -215,7 +214,7 @@
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" @click="bindScheduleBtn"><i
-                    class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>保存并套用
+                    class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>{{generateScheduleLang('saveAndApply')}}
                   </el-button>
                 </div>
               </div>
@@ -223,7 +222,7 @@
 
           </el-tab-pane>
         </el-tabs>
-        <el-dialog title='提示'
+        <el-dialog :title="generateScheduleLang('prompt')"
                    :visible.sync="showBindDialog" v-if="showBindDialog"
                    :append-to-body='true'
                    :close-on-click-modal="false"
@@ -234,13 +233,13 @@
             <hr style="border: 0.5px solid #f31d65;"/>
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
               <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-              <span>套用排程会覆盖至关联门店，确认绑定？</span>
+              <span>{{generateScheduleLang('confirmBind')}}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" @click="showBindDialog = false" size="mini" style="">取 消</el-button>
+            <el-button class="file-cancel-btn" @click="showBindDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
             <el-button class="file-confirm-btn" @click="bindSchedule" size="mini"
-                       type="primary">确 认
+                       type="primary">{{generateScheduleLang('confirm')}}
             </el-button>
           </div>
         </el-dialog>
@@ -274,157 +273,157 @@
           {
             'checked': false,
             value: 1,
-            name: '1号'
+            name: '1'
           },
           {
             'checked': false,
             value: 2,
-            name: '2号'
+            name: '2'
           },
           {
             'checked': false,
             value: 3,
-            name: '3号'
+            name: '3'
           },
           {
             'checked': false,
             value: 4,
-            name: '4号'
+            name: '4'
           },
           {
             'checked': false,
             value: 5,
-            name: '5号'
+            name: '5'
           },
           {
             'checked': false,
             value: 6,
-            name: '6号'
+            name: '6'
           },
           {
             'checked': false,
             value: 7,
-            name: '7号'
+            name: '7'
           },
           {
             'checked': false,
             value: 8,
-            name: '8号'
+            name: '8'
           },
           {
             'checked': false,
             value: 9,
-            name: '9号'
+            name: '9'
           },
           {
             'checked': false,
             value: 10,
-            name: '10号'
+            name: '10'
           },
           {
             'checked': false,
             value: 11,
-            name: '11号'
+            name: '11'
           },
           {
             'checked': false,
             value: 12,
-            name: '12号'
+            name: '12'
           },
           {
             'checked': false,
             value: 13,
-            name: '13号'
+            name: '13'
           },
           {
             'checked': false,
             value: 14,
-            name: '14号'
+            name: '14'
           },
           {
             'checked': false,
             value: 15,
-            name: '15号'
+            name: '15'
           },
           {
             'checked': false,
             value: 16,
-            name: '16号'
+            name: '16'
           },
           {
             'checked': false,
             value: 17,
-            name: '17号'
+            name: '17'
           },
           {
             'checked': false,
             value: 18,
-            name: '18号'
+            name: '18'
           },
           {
             'checked': false,
             value: 19,
-            name: '19号'
+            name: '19'
           },
           {
             'checked': false,
             value: 20,
-            name: '20号'
+            name: '20'
           },
           {
             'checked': false,
             value: 21,
-            name: '21号'
+            name: '21'
           },
           {
             'checked': false,
             value: 22,
-            name: '22号'
+            name: '22'
           },
           {
             'checked': false,
             value: 23,
-            name: '23号'
+            name: '23'
           },
           {
             'checked': false,
             value: 24,
-            name: '24号'
+            name: '24'
           },
           {
             'checked': false,
             value: 25,
-            name: '25号'
+            name: '25'
           },
           {
             'checked': false,
             value: 26,
-            name: '26号'
+            name: '26'
           },
           {
             'checked': false,
             value: 27,
-            name: '27号'
+            name: '27'
           },
           {
             'checked': false,
             value: 28,
-            name: '28号'
+            name: '28'
           },
           {
             'checked': false,
             value: 29,
-            name: '29号'
+            name: '29'
           },
           {
             'checked': false,
             value: 30,
-            name: '30号'
+            name: '30'
           },
           {
             'checked': false,
             value: 31,
-            name: '31号'
+            name: '31'
           },
         ],
         value: '',
@@ -438,18 +437,18 @@
         typeList:[
           {
             value: 2,
-            label: '月模式'
+            label: this.$t('scheduleView.monthly')
           },
           {
             value: 3,
-            label: '自定义'
+            label: this.$t('scheduleView.userDefined')
           }
         ],
         monthDays: [],
         showDrap: false,
         showMonthDrap: false,
         showMonthContent: false,
-        monthValue: '每月',
+        monthValue: this.$t('scheduleView.everyMonth'),
         weekDays:[],
         showWeekContent:false,
         showAddDialog:false,
@@ -544,19 +543,19 @@
         dueDaysList: [
           {
             value: 1,
-            name: '当天'
+            name: this.$t('scheduleView.today')
           },
           {
             value: 2,
-            name: '2天'
+            name: `2${this.$t('scheduleView.days')}`
           },
           {
             value: 3,
-            name: '3天'
+            name: `3${this.$t('scheduleView.days')}`
           },
           {
             value: 7,
-            name: '7天'
+            name: `7${this.$t('scheduleView.days')}`
           },
         ],
         execOnce: false, //是否执行一次
@@ -574,157 +573,157 @@
           {
             'checked': false,
             value: 1,
-            name: '1号'
+            name: '1'
           },
           {
             'checked': false,
             value: 2,
-            name: '2号'
+            name: '2'
           },
           {
             'checked': false,
             value: 3,
-            name: '3号'
+            name: '3'
           },
           {
             'checked': false,
             value: 4,
-            name: '4号'
+            name: '4'
           },
           {
             'checked': false,
             value: 5,
-            name: '5号'
+            name: '5'
           },
           {
             'checked': false,
             value: 6,
-            name: '6号'
+            name: '6'
           },
           {
             'checked': false,
             value: 7,
-            name: '7号'
+            name: '7'
           },
           {
             'checked': false,
             value: 8,
-            name: '8号'
+            name: '8'
           },
           {
             'checked': false,
             value: 9,
-            name: '9号'
+            name: '9'
           },
           {
             'checked': false,
             value: 10,
-            name: '10号'
+            name: '10'
           },
           {
             'checked': false,
             value: 11,
-            name: '11号'
+            name: '11'
           },
           {
             'checked': false,
             value: 12,
-            name: '12号'
+            name: '12'
           },
           {
             'checked': false,
             value: 13,
-            name: '13号'
+            name: '13'
           },
           {
             'checked': false,
             value: 14,
-            name: '14号'
+            name: '14'
           },
           {
             'checked': false,
             value: 15,
-            name: '15号'
+            name: '15'
           },
           {
             'checked': false,
             value: 16,
-            name: '16号'
+            name: '16'
           },
           {
             'checked': false,
             value: 17,
-            name: '17号'
+            name: '17'
           },
           {
             'checked': false,
             value: 18,
-            name: '18号'
+            name: '18'
           },
           {
             'checked': false,
             value: 19,
-            name: '19号'
+            name: '19'
           },
           {
             'checked': false,
             value: 20,
-            name: '20号'
+            name: '20'
           },
           {
             'checked': false,
             value: 21,
-            name: '21号'
+            name: '21'
           },
           {
             'checked': false,
             value: 22,
-            name: '22号'
+            name: '22'
           },
           {
             'checked': false,
             value: 23,
-            name: '23号'
+            name: '23'
           },
           {
             'checked': false,
             value: 24,
-            name: '24号'
+            name: '24'
           },
           {
             'checked': false,
             value: 25,
-            name: '25号'
+            name: '25'
           },
           {
             'checked': false,
             value: 26,
-            name: '26号'
+            name: '26'
           },
           {
             'checked': false,
             value: 27,
-            name: '27号'
+            name: '27'
           },
           {
             'checked': false,
             value: 28,
-            name: '28号'
+            name: '28'
           },
           {
             'checked': false,
             value: 29,
-            name: '29号'
+            name: '29'
           },
           {
             'checked': false,
             value: 30,
-            name: '30号'
+            name: '30'
           },
           {
             'checked': false,
             value: 31,
-            name: '31号'
+            name: '31'
           },
         ];
         console.log(index)
@@ -771,6 +770,8 @@
         //   //self.selfMonth = self.paneList[tabIndex].selfMonth;
         // }
         self.echoMonthAndWeek();
+        self.showMonthContent = false;
+        self.showWeekContent = false;
         self.scheduleId = self.paneList[tabIndex].schId;
         //self.enable = self.paneList[tabIndex].enable;
         self.$emit('sendActiveName', self.activeName)
@@ -806,7 +807,7 @@
           if (dateStr.length != 0) {
             self.monthValue = dateStr;
             if (count == self.monthList.length) {
-              self.monthValue = '每月';
+              self.monthValue = self.$t('scheduleView.everyMonth');
             }
           }
         }
@@ -826,7 +827,7 @@
           if (dateStr.length != 0) {
             self.monthValue = dateStr;
             if (count == self.monthList.length) {
-              self.monthValue = '每月';
+              self.monthValue = self.$t('scheduleView.everyMonth');
             }
           }
         }
@@ -894,7 +895,7 @@
           actPanList.schedule[index].day = daysArray.slice(0,daysArray.length-1); //去除最后一个逗号
           console.log(actPanList.schedule[index].monthValue)
           if (count == self.monthList.length) {
-            actPanList.schedule[index].monthValue = '全月';
+            actPanList.schedule[index].monthValue = self.$t('scheduleView.everyMonth');
           }
         }
       },
@@ -941,7 +942,7 @@
         if (daysStr.length != 0) {
           self.monthValue = daysStr;
           if (count == self.monthList.length) {
-            self.monthValue = '全月';
+            self.monthValue = self.$t('scheduleView.everyMonth');
           }
         }
         self.hasSelectMonth = true;
@@ -1025,7 +1026,7 @@
       async addSchedule() {
         let self = this;
         if(self.scheduleName == ''){
-          self.notify('请输入排程名称！','warning',3000);
+          self.notify( self.$t('scheduleView.inputName'),'warning',3000);
           self.$refs.scheduleName.focus();
           return false;
         }
@@ -1626,6 +1627,28 @@
           console.log(self.paneList);
           self.getHasBoundStroeIds();
         }
+        else if(data.length == 0){
+          console.log(self.paneList)
+          let addInfo = {
+            name: '现场巡检排程一',
+            mode: 2,
+            schId: 0,
+            enable: 0,
+            to: -1,
+            dayArray: [],
+            timeArray: ['8:00'],
+            dueDays: 1,
+            schedule: [{month: '', day: [], monthValue: '', showMonthContent: false}],
+            notifyTime: '',
+            execOnce: false
+          };
+          self.paneList.push(addInfo);
+          self.scheduleName = "现场巡检排程一";
+          self.selectTab = "现场巡检排程一";
+          self.scheduleId = 0;
+          self.isDisabled = false;
+          self.searchStore();
+        }
       },
       getHasBoundStroeIds(){
         let self = this;
@@ -1806,10 +1829,10 @@
               let data = res.errCode;
               console.log(data);
               if(data == 0){
-                self.notify('删除成功','warning',3000);
+                self.notify(self.$t('scheduleView.deleteSuss'),'warning',3000);
               }
               else{
-                self.notify('删除失败','warning',3000);
+                self.notify(self.$t('scheduleView.deleteFail'),'warning',3000);
               }
               //刷新页面
               self.initData()
@@ -1931,7 +1954,6 @@
 
   .dialog-content{
     width: 100%;
-    text-align: center;
     span{
       font-size: 14px;
       margin-right: 20px;
@@ -1960,10 +1982,17 @@
           height: calc(58 / 1920 * 100vw);
           line-height: calc(50 / 1920 * 100vw);
           position: relative;
-          span {
+          #span {
             font-size: calc(14 / 1920 * 100vw);
             margin-right: calc(40 / 1920 * 100vw);
             margin-left: calc(20 / 1920 * 100vw);
+          }
+          #en-span {
+            font-size: calc(14 / 1920 * 100vw);
+            margin-right: calc(40 / 1920 * 100vw);
+            margin-left: calc(20 / 1920 * 100vw);
+            display: inline-block;
+            width: 95px;
           }
           .search-content {
             display: inline-block;
@@ -2009,9 +2038,8 @@
               top: 18px;
             }
             .icon-input{
-              position: absolute;
-              right: 10px;
-              top: 18px;
+              position: relative;
+              right: 25px;
             }
           }
           .month-content{
@@ -2036,15 +2064,15 @@
               top: 18px;
             }
             .icon-input{
-              position: absolute;
-              right: 10px;
-              top: 18px;
+              position: relative;
+              right: 25px;
             }
           }
           .month-panel{
             position: absolute;
             margin-top: 3px;
-            left: 170px;
+            /*left: 170px;*/
+            right: 17px;
             width: 188px;
             height: 150px;
             z-index: 980;
@@ -2059,12 +2087,16 @@
                 margin-left: 10px;
                 font-size: 14px;
               }
+              .el-checkbox{
+                margin-right: 0;
+              }
             }
           }
-          .self-month-panel{
+          .en-month-panel{
             position: absolute;
             margin-top: 3px;
-            left: 170px;
+            /*left: 210px;*/
+            right: 17px;
             width: 188px;
             height: 150px;
             z-index: 980;
@@ -2078,6 +2110,55 @@
               span{
                 margin-left: 10px;
                 font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
+              }
+            }
+          }
+          .self-month-panel{
+            position: absolute;
+            margin-top: 3px;
+            /*left: 170px;*/
+            width: 188px;
+            height: 150px;
+            z-index: 980;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow: auto;
+            .month-details{
+              padding: 2px 10px;
+              @include point(height,24);
+              span{
+                margin-left: 10px;
+                font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
+              }
+            }
+          }
+          .en-self-month-panel{
+            position: absolute;
+            margin-top: 3px;
+            /*left: 210px;*/
+            width: 188px;
+            height: 150px;
+            z-index: 980;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow: auto;
+            .month-details{
+              padding: 2px 10px;
+              @include point(height,24);
+              span{
+                margin-left: 10px;
+                font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
               }
             }
           }
@@ -2111,7 +2192,8 @@
           .self-panel{
             position: absolute;
             margin-top: 3px;
-            left: 122px;
+            /*left: 122px;*/
+            right: 17px;
             width: 188px;
             height: 150px;
             z-index: 980;
@@ -2126,13 +2208,17 @@
                 margin-left: 10px;
                 font-size: 14px;
               }
+              .el-checkbox{
+                margin-right: 0;
+              }
             }
           }
 
           .week-panel{
             position: absolute;
             margin-top: 3px;
-            left: 172px;
+            /*left: 172px;*/
+            right: 17px;
             width: 188px;
             height: 150px;
             z-index: 980;
@@ -2147,9 +2233,35 @@
                 margin-left: 10px;
                 font-size: 14px;
               }
+              .el-checkbox{
+                margin-right: 0;
+              }
             }
           }
-
+          .en-week-panel{
+            position: absolute;
+            margin-top: 3px;
+            /*left: 210px;*/
+            right: 17px;
+            width: 188px;
+            height: 150px;
+            z-index: 980;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow: auto;
+            .week-details{
+              padding: 2px 10px;
+              @include point(height,24);
+              span{
+                margin-left: 10px;
+                font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
+              }
+            }
+          }
 
 
           @media screen and(max-width: 1366px) {
@@ -2203,7 +2315,7 @@
       }
 
       .el-bind-content {
-        // @include point(height, 450);
+        @include point(max-height, 450);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
@@ -2212,7 +2324,7 @@
         .el-all-checkbox {
           margin: 20px auto 20px 15px;
           @include point(margin-left, 15);
-          position: absolute;
+          float: left;
           .all-device-title {
             @include point(margin-left, 0);
             font-size: 14px;
@@ -2220,6 +2332,7 @@
         }
 
         .device-group {
+          clear: both;
           width: 100%;
           @include point(margin-top, 40);
           @include point(margin-bottom, 20);
@@ -2262,15 +2375,12 @@
           @include point(margin-bottom,15);
           .btn{
             @include point(width,90);
-            min-width: 100px;
+            min-width: 160px;
             background-color: #f31d65;
             color: #fff;
           }
         }
       }
-      .bind-title{
-
-      };
       .el-header-title{
         font-size: 14px;
         font-weight: bold;
@@ -2279,6 +2389,28 @@
         top: 5px;
         display: inline;
         color: $black;
+      }
+      .el-prompt-title{
+        font-size: 14px;
+        position: absolute;
+        top: 5px;
+        display: inline;
+        left: 100px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color:#FEA316;
+        @media screen and (max-width: 1440px){
+          width: 500px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis ;
+        }
+        @media screen and (max-width: 1280px){
+          width: 450px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis ;
+        }
       }
       .el-header-hr {
         @include point(margin-bottom, 16);

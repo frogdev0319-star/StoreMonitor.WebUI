@@ -53,7 +53,7 @@
         </div>
       </el-dialog>
       <el-col :span="18" class="el-schedule-tabs">
-        <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-patrltabs-content': ''">
+        <el-tabs v-model="activeName" @tab-click="handleClick" id='patrltabs-content'>
           <el-tab-pane v-for="(paneItem,index) in paneList" :name="index.toString()"
                        :key="index" :label="`${paneItem.name}`">
             <div :style="{height:varyWindowHeight}">
@@ -245,157 +245,157 @@
           {
             'checked': false,
             value: 1,
-            name: '1号'
+            name: '1'
           },
           {
             'checked': false,
             value: 2,
-            name: '2号'
+            name: '2'
           },
           {
             'checked': false,
             value: 3,
-            name: '3号'
+            name: '3'
           },
           {
             'checked': false,
             value: 4,
-            name: '4号'
+            name: '4'
           },
           {
             'checked': false,
             value: 5,
-            name: '5号'
+            name: '5'
           },
           {
             'checked': false,
             value: 6,
-            name: '6号'
+            name: '6'
           },
           {
             'checked': false,
             value: 7,
-            name: '7号'
+            name: '7'
           },
           {
             'checked': false,
             value: 8,
-            name: '8号'
+            name: '8'
           },
           {
             'checked': false,
             value: 9,
-            name: '9号'
+            name: '9'
           },
           {
             'checked': false,
             value: 10,
-            name: '10号'
+            name: '10'
           },
           {
             'checked': false,
             value: 11,
-            name: '11号'
+            name: '11'
           },
           {
             'checked': false,
             value: 12,
-            name: '12号'
+            name: '12'
           },
           {
             'checked': false,
             value: 13,
-            name: '13号'
+            name: '13'
           },
           {
             'checked': false,
             value: 14,
-            name: '14号'
+            name: '14'
           },
           {
             'checked': false,
             value: 15,
-            name: '15号'
+            name: '15'
           },
           {
             'checked': false,
             value: 16,
-            name: '16号'
+            name: '16'
           },
           {
             'checked': false,
             value: 17,
-            name: '17号'
+            name: '17'
           },
           {
             'checked': false,
             value: 18,
-            name: '18号'
+            name: '18'
           },
           {
             'checked': false,
             value: 19,
-            name: '19号'
+            name: '19'
           },
           {
             'checked': false,
             value: 20,
-            name: '20号'
+            name: '20'
           },
           {
             'checked': false,
             value: 21,
-            name: '21号'
+            name: '21'
           },
           {
             'checked': false,
             value: 22,
-            name: '22号'
+            name: '22'
           },
           {
             'checked': false,
             value: 23,
-            name: '23号'
+            name: '23'
           },
           {
             'checked': false,
             value: 24,
-            name: '24号'
+            name: '24'
           },
           {
             'checked': false,
             value: 25,
-            name: '25号'
+            name: '25'
           },
           {
             'checked': false,
             value: 26,
-            name: '26号'
+            name: '26'
           },
           {
             'checked': false,
             value: 27,
-            name: '27号'
+            name: '27'
           },
           {
             'checked': false,
             value: 28,
-            name: '28号'
+            name: '28'
           },
           {
             'checked': false,
             value: 29,
-            name: '29号'
+            name: '29'
           },
           {
             'checked': false,
             value: 30,
-            name: '30号'
+            name: '30'
           },
           {
             'checked': false,
             value: 31,
-            name: '31号'
+            name: '31'
           },
         ],
         value: '',
@@ -518,7 +518,8 @@
         self.dayArray =  self.paneList[tabIndex].dayArray;
         self.echoMonthAndWeek();
         self.scheduleId = self.paneList[tabIndex].schId;
-
+        self.showMonthContent = false;
+        self.showWeekContent = false;
         self.searchStore();
       },
       echoMonthAndWeek(){
@@ -715,7 +716,7 @@
       async addSchedule() {
         let self = this;
         if(self.scheduleName == ''){
-          self.notify('请输入排程名称！','warning',3000);
+          self.notify(self.$t('scheduleView.inputName'),'warning',3000);
           self.$refs.scheduleName.focus();
           return false;
         }
@@ -860,9 +861,6 @@
                 _obj.disabled = true;
                 _tempDisCount++;
               }
-              // _obj.checked = true;
-              // _obj.disable = false;
-              // _tempCount++;
             }
             _obj.storeId = _item.storeId;
             _obj.name = _item.storeName;
@@ -1259,9 +1257,8 @@
             self.paneList.push(tempScheduleData);
           })
           //self.paneList.push(tempScheduleData);
+
           if(self.isFirstLoad == true){
-            //self.timeArray = self.paneList[0].timeArray
-            //self.enable = self.paneList[0].enable;
             self.selectTab  = self.paneList[0].name;
             self.scheduleId =  self.paneList[0].schId;
             //获取所有排程绑定的所有门店
@@ -1274,6 +1271,26 @@
           //self.timeArray = self.paneList[0].timeArray
           console.log(self.paneList);
           self.getHasBoundStroeIds();
+
+        }
+        else if(data.length == 0){
+          console.log(self.paneList)
+          let scheduleInfo = {
+            name: "点检计划一",
+            mode: 0,
+            schId: 0,
+            dayArray: [],
+            timeArray: ['8:00'],
+            enable: false,
+            to: -1,
+            dueDays: 1,
+          };
+          self.paneList.push(scheduleInfo);
+          self.scheduleName = "点检计划一";
+          self.selectTab = "点检计划一";
+          self.scheduleId = 0;
+          self.isDisabled = false;
+          self.searchStore();
         }
       },
       getHasBoundStroeIds(){
@@ -1443,10 +1460,10 @@
               let data = res.errCode;
               console.log(data);
               if(data == 0){
-                self.notify('删除成功','warning',3000);
+                self.notify(self.$t('scheduleView.deleteSuss'),'warning',3000);
               }
               else{
-                self.notify('删除失败','warning',3000);
+                self.notify(self.$t('scheduleView.deleteFail'),'warning',3000);
               }
               //刷新页面
               self.initData();
@@ -1507,7 +1524,6 @@
 
   .dialog-content{
     width: 100%;
-    text-align: center;
     span{
       font-size: 14px;
       margin-right: 20px;
@@ -1577,7 +1593,7 @@
               background-color: #f0f5f8;
             }
             .el-input{
-              width: 220px;
+              width: 200px;
             }
             .input-arrow-panel{
               width: 200px;
@@ -1589,9 +1605,9 @@
               top: 18px;
             }
             .icon-input{
-              position: absolute;
-              right: 10px;
-              top: 18px;
+              position: relative;
+              right: 25px;
+              top: 1px;
             }
           }
           .month-content{
@@ -1616,15 +1632,15 @@
               top: 18px;
             }
             .icon-input{
-              position: absolute;
-              right: 10px;
-              top: 18px;
+              position: relative;
+              right: 25px;
+              top: 1px;
             }
           }
           .month-panel{
             position: absolute;
             margin-top: 3px;
-            left: 170px;
+            right: 17px;
             width: 188px;
             height: 150px;
             z-index: 980;
@@ -1639,12 +1655,15 @@
                 margin-left: 10px;
                 font-size: 14px;
               }
+              .el-checkbox{
+                margin-right: 0;
+              }
             }
           }
           .week-panel{
             position: absolute;
             margin-top: 3px;
-            left: 172px;
+            right: 17px;
             width: 188px;
             height: 150px;
             z-index: 980;
@@ -1658,6 +1677,9 @@
               span{
                 margin-left: 10px;
                 font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
               }
             }
           }
@@ -1712,7 +1734,7 @@
       }
 
       .el-bind-content {
-        // @include point(height, 450);
+        @include point(height, 450);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
@@ -1721,7 +1743,7 @@
         .el-all-checkbox {
           margin: 20px auto 20px 15px;
           @include point(margin-left, 15);
-          position: absolute;
+          float: left;
           .all-device-title {
             @include point(margin-left, 0);
             font-size: 14px;
@@ -1730,6 +1752,7 @@
 
         .device-group {
           width: 100%;
+          clear: both;
           @include point(margin-top, 40);
           @include point(margin-bottom, 20);
 
@@ -2022,6 +2045,24 @@
       }
     }
 
+    #patrltabs-content /deep/ .el-tabs__nav-scroll{
+      height: 40px;
+    }
+    #patrltabs-content /deep/ .el-tabs__item {
+      padding: 0 0;
+      font-size: 14px;
+      width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+    }
+    #patrltabs-content /deep/ .is-active {
+      border-bottom: 4px solid #f31d65;
+    }
+
+    #patrltabs-content /deep/ .el-tabs__active-bar{
+      height: 0 !important;
+    }
   }
 
 </style>

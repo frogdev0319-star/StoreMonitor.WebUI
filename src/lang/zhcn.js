@@ -410,6 +410,7 @@ export default {
     saveInfo: '此操作将会删除排程信息，是否继续？',
     scheduleType: '排程类型',
     selectMonth: '选择月份',
+    selectDate: '选择日期',
     date: '日期',
     year: '年',
     month: '月',
@@ -426,6 +427,7 @@ export default {
     daily: '日模式',
     weekly: '周模式',
     monthly: '月模式',
+    userDefined: '自定义',
     everyMonth: '每月',
     execDays: '执行日期',
     city: '城市',
@@ -450,6 +452,18 @@ export default {
     fri: '周五',
     sat: '周六',
     enable: '启用',
-    prompt: '提示'
+    prompt: '提示',
+    execOnce: '仅执行一次',
+    notifyTime: '提醒时间',
+    notifyInfo: '任务有效期内，每天同一时间进行推送',
+    dueDays: '执行时效',
+    today: '当天',
+    days: '天',
+    remotePatrol: '远程巡检',
+    onsitePatrol: '现场巡检',
+    deleteSuss: '删除成功！',
+    deleteFail: '删除失败！',
+    inputName: '请输入排程名称！',
+    promptInfo: '提示：因考虑路程人力因素，请合理安排巡检任务。'
   }
 }

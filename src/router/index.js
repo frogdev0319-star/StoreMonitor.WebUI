@@ -324,11 +324,11 @@ export default new Router({
               name:'pointCheck',
               component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve)
             },
-            {
-              path:'/lpsSechedule',
-              name:'lpsSechedule',
-              component:resolve=>require(['@/views/setting/schedule/LpsSechedule'],resolve)
-            },
+            // {
+            //   path:'/lpsSechedule',
+            //   name:'lpsSechedule',
+            //   component:resolve=>require(['@/views/setting/schedule/LpsSechedule'],resolve)
+            // },
             {
               path:'/patrolSechedule',
               name:'patrolSechedule',

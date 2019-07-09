@@ -92,14 +92,14 @@
                                           style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
                                       </template>
                                   </el-menu-item>
-                                  <el-submenu  class="three-child el-submenu-group"  :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                                  <el-submenu  class="three-child el-submenu-group" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                                         :index="child.path"  :disabled="child.isReadOnly"
                                         :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
                                       <template slot="title">
                                         <div :class="lang=='en' ? 'en-icon-content': 'icon-content'">
                                           <div class="tag-icon"></div>
                                         </div>
-                                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" style="font-size: 14px">{{generateRoute(child.name)}}</span>
+                                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" style="font-size: 14px">{{generateRoute(child.name)}}</span>
                                       </template>
                                         <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                                                       v-for="grandChild in child.children" :index="grandChild.path"  :disabled="child.isReadOnly"
@@ -735,6 +735,12 @@ export default {
                 min-width: auto !important;
                 height: 2.8125rem;
                 line-height: 2.8125rem;
+                @media screen and (min-width: 1280px){
+                  padding-left: 20px !important;
+                }
+                /*@media screen and (max-width: 1280px){*/
+                  /*padding-left: 0 !important;*/
+                /*}*/
               }
               .three-child /deep/ .el-menu{
                 text-align: center !important;

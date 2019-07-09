@@ -2,18 +2,20 @@
   <el-row class="el-schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
     <div class="el-schedule-header">
       <el-col :span="7" class="el-schedule-btns">
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-add-btn':'el-add-btn'"
+        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'"
                    @click="addScheduleButton">
           <i style="margin-right:18px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
         </el-button>
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-delete-btn':'el-delete-btn'"
-                   @click="deleteScheduleButton" :disabled="Number(activeName) == 0? true: false">
+        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
+                   @click="deleteScheduleButton"
+                   :disabled="Number(activeName) == 0? true: false"
+        >
           <i style="margin-right:18px;font-size:16px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
         </el-button>
       </el-col>
       <el-col :span="18" class="el-schedule-tabs">
-        <el-tabs v-model="activePatrol" @tab-click="changePatrol">
-          <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index">
+        <el-tabs v-model="activePatrol" @tab-click="changePatrol" id="patrol-content">
+          <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index" >
           </el-tab-pane>
           <remote-detail v-if="activePatrol == '0'" ref="remoteHandle" v-on:sendActiveName = "changeActiveName"></remote-detail>
           <onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>
@@ -47,7 +49,7 @@
         showSelfMonth: false,
         newTime: '',
         scheduleList: ['点检排程一'],
-        patrolList: [{flag: 0, tag: '远程巡检'}, {flag: 1, tag: '现场巡检'}],
+        patrolList: [{flag: 0, tag: this.$t('scheduleView.remotePatrol')}, {flag: 1, tag: this.$t('scheduleView.onsitePatrol')}],
         paneList: [],
         timeArray: ['08:00'], //选中的执行时间
         lang: this.$i18n.locale,
@@ -409,6 +411,44 @@
     #{$poi}:checkRem($val);
   }
 
+  .en-el-add-btn{
+    background-color: $mainColor;
+    color: #fff;
+    border-color: $mainColor;
+    position: relative;
+    @include point(margin-right,15);
+    //@include point(width, 120);
+    font-size: 12px;
+    &:disabled{
+      opacity: 0.6;
+    }
+    @media screen and (min-width: 1680px){
+      @include point(width, 120);
+    }
+    @media screen and (max-width: 1680px){
+      width: 160px;
+    }
+  }
+
+  .en-el-delete-btn{
+    background-color: $mainColor;
+    color: #fff;
+    border-color: $mainColor;
+    position: relative;
+    @include point(margin-right, 15);
+    // @include point(width, 120);
+    font-size: 12px;
+    &:disabled {
+      opacity: 0.6;
+    }
+    @media screen and (min-width: 1680px){
+      @include point(width, 120);
+    }
+    @media screen and (max-width: 1680px){
+      width: 160px;
+    }
+  }
+
   .el-schedule-container{
     margin: 20px 15px 15px 15px;
     height: calc(180 / 1920 * 100vw);
@@ -457,10 +497,15 @@
           border-color: $mainColor;
           position: relative;
           @include point(margin-right, 15);
-          @include point(width, 98);
           font-size: 12px;
           &:disabled {
             opacity: 0.6;
+          }
+          @media screen and (min-width: 1680px){
+            @include point(width, 98);
+          }
+          @media screen and (max-width: 1680px){
+            width: 120px;
           }
         }
         .el-delete-btn {
@@ -469,14 +514,36 @@
           border-color: $mainColor;
           position: relative;
           @include point(margin-right, 15);
-          @include point(width, 98);
           font-size: 12px;
-
           &:disabled {
             opacity: 0.6;
           }
+          @media screen and (min-width: 1680px){
+            @include point(width, 98);
+          }
+          @media screen and (max-width: 1680px){
+            width: 120px;
+          }
         }
       }
+    }
+    #patrol-content /deep/ .el-tabs__nav-scroll{
+      height: 40px;
+    }
+    #patrol-content /deep/ .el-tabs__item {
+      padding: 0 0;
+      font-size: 14px;
+      width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+    }
+    #patrol-content /deep/ .is-active {
+      border-bottom: 4px solid #f31d65;
+    }
+
+    #patrol-content /deep/ .el-tabs__active-bar{
+      height: 0 !important;
     }
   }
 
