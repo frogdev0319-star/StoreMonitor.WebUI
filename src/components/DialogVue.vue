@@ -1,5 +1,5 @@
 <template>
-    <el-dialog :title='dialogTitle'
+    <el-dialog :title='dialogTitle' style="text-align: left"
         :visible.sync="dialogClosed" :close-on-click-modal="false" v-if="dialogClosed"  width="28%" top="35vh" @close='cancle'>
         <div class="dialog-content">
             <hr style="border: 0.5px solid #f31d65;"/>

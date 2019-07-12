@@ -430,6 +430,7 @@ export default {
     thur:'周四',
     fri: '周五',
     sat: '周六',
+    all: '全選',
     cancel: '取消',
     confirm: '確認',
     saveInfo: '此操作將會刪除排程信息，是否繼續？',

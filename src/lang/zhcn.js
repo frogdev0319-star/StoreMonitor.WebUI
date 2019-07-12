@@ -451,6 +451,7 @@ export default {
     thur:'周四',
     fri: '周五',
     sat: '周六',
+    all: '全选',
     enable: '启用',
     prompt: '提示',
     execOnce: '仅执行一次',

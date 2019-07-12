@@ -76,7 +76,10 @@
                     <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('everyDay')" :readonly=true></el-input>
                     <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
-                  <div class="week-panel" v-if="showWeekContent">
+                  <div class="week-panel" v-if="showWeekContent" @mouseleave="showWeekContent=false">
+                    <div class="week-details">
+                      <el-checkbox v-model="checkAllWeek" @change="allWeekChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
+                    </div>
                     <div class="week-details" v-for="(item,index) in weekList" :key="index">
                       <el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>
                       <span>{{item.name}}</span>
@@ -90,7 +93,10 @@
                     <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
-                  <div class="month-panel" v-if="showMonthContent">
+                  <div class="month-panel" v-if="showMonthContent" @mouseleave="showMonthContent=false">
+                    <div class="month-details">
+                      <el-checkbox v-model="checkAllMonth" @change="allMonthChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
+                    </div>
                     <div class="month-details" v-for="(item,index) in monthList" :key="index">
                       <el-checkbox v-model="item.checked" @change="changeMonthItem(item)"></el-checkbox>
                       <span>{{item.name}}</span>
@@ -132,7 +138,7 @@
                   :placeholder= "generateScheduleLang('selectTime')"
                   size="mini">
                 </el-time-select>
-                <span class="delete-time-btn" size="mini" @click="deleteCurTime" style="margin: 0 20px 0 30px"><i class="el-icon-error" ></i></span>
+                <span class="delete-time-btn" size="mini" @click="deleteCurTime(-1)" style="margin: 0 20px 0 30px"><i class="el-icon-error" ></i></span>
                 <el-button class="time-btn" size="mini" @click="addTime"><i class="el-icon-plus"></i></el-button>
               </el-col>
             </div>
@@ -214,6 +220,8 @@
             </el-button>
           </div>
         </el-dialog>
+        <dialog-vue :dialog-title='selectWeekObj.title' :show-info='selectWeekObj.showInfo' :is-warning='selectWeekObj.isWarning' :dialog-closed='selectWeekObj.dialogClosed' @confirmed='noWeekDialog' @canceled='cancelNoWeek'></dialog-vue>
+        <dialog-vue :dialog-title='selectMonthObj.title' :show-info='selectMonthObj.showInfo' :is-warning='selectMonthObj.isWarning' :dialog-closed='selectMonthObj.dialogClosed' @confirmed='noMonthDialog' @canceled='cancelNoMonth'></dialog-vue>
       </el-col>
     </div>
   </el-row>
@@ -224,9 +232,13 @@
   import {generateScheduleLang} from '@/api/i18n'
   import {getScheduleBindList, addNewSchedule, getScheduleListService, bindScheduleAndStore, unbindScheduleAndStore, updateSchedule,deleteScheduleService} from '@/api/schedule'
   import {getStoreList} from '@/api/store'
+  import DialogVue from '@/components/DialogVue.vue'
 
   export default {
     name: "PointCheckSch",
+    components:{
+      DialogVue
+    },
     data(){
       return {
         varyWindowHeight:window.innerHeight,
@@ -481,23 +493,112 @@
         isDisabled: true,
         showBindDialog: false,
         dataModel: [],
-        hasBoundStoreIds: [] //已经绑定过周、月模式的门店id
+        hasBoundStoreIds: [], //已经绑定过周、月模式的门店id
+        selectWeekObj:{
+          title:'提示',
+          showInfo:'请选择周模式下的执行日期！',
+          isWarning:false,
+          dialogClosed:false
+        },
+        selectMonthObj:{
+          title:'提示',
+          showInfo:'请选择月模式下的执行日期！',
+          isWarning:false,
+          dialogClosed:false
+        },
+        checkAllWeek: false,
+        checkAllMonth: false
       }
     },
 
     methods: {
       generateScheduleLang,
+      noWeekDialog(val){
+        let self=this;
+        self.selectWeekObj.dialogClosed=false;
+      },
+      cancelNoWeek(val){
+        let self=this;
+        self.selectWeekObj.dialogClosed=false;
+      },
+      noMonthDialog(){
+        let self=this;
+        self.selectMonthObj.dialogClosed=false;
+      },
+      cancelNoMonth(val){
+        let self=this;
+        self.selectMonthObj.dialogClosed=false;
+      },
       addScheduleButton() {
-        self = this;
+        let self = this;
         self.showAddDialog = true;
+        self.scheduleName = '';
       },
       deleteScheduleButton() {
-        self = this;
+        let self = this;
         self.showDeleteDialog = true;
       },
       bindScheduleBtn(){
-        self = this;
-        self.showBindDialog = true;
+        let self = this;
+        let tabIndex = Number(self.activeName);
+        let mode = self.paneList[tabIndex].mode;
+        if(mode == 1 && self.selectWeek.length == 0 ){
+          //周模式
+          self.selectWeekObj.dialogClosed=true;
+          return false;
+        }
+        else if(mode == 2 && self.selectMonth.length == 0){
+          //月模式
+          self.selectMonthObj.dialogClosed=true;
+          return false;
+        }
+        else{
+          self.showBindDialog = true;
+        }
+      },
+      allWeekChecked(val){
+        let self = this;
+        console.log(val);
+        let selectedWeek = [];
+        if(val){
+          self.weekList.forEach(item=>{
+            item.checked = true;
+            selectedWeek.push(item.value)
+          })
+        }
+        else{
+          self.weekList.forEach(item=>{
+            item.checked = false
+          })
+        }
+        self.weekValue = val ? this.$t('scheduleView.everyDay') : '';
+        self.selectWeek = val ? selectedWeek: [] ;
+        console.log(self.weekValue);
+        console.log(self.selectWeek)
+      },
+      allMonthChecked(val){
+        /**
+         * 选择所有的日期
+         * @type {default.methods}
+         */
+        let self = this;
+        console.log(val);
+        let selectedDates = [];
+        if(val){
+          self.monthList.forEach(item=>{
+            item.checked = true;
+            selectedDates.push(item.value)
+          })
+        }
+        else{
+          self.monthList.forEach(item=>{
+            item.checked = false
+          })
+        }
+        self.monthValue = val ? self.$t('scheduleView.everyMonth') : '';
+        self.selectMonth = val ? selectedDates: [] ;
+        console.log(self.monthValue);
+        console.log(self.selectMonth)
       },
       handleClick(val) {
         console.log(val)
@@ -513,8 +614,6 @@
         })
         self.monthValue = '';
         self.weekValue = '';
-        // self.curType = (self.paneList[tabIndex].mode).toString();
-        // self.timeArray = self.paneList[tabIndex].timeArray;
         self.dayArray =  self.paneList[tabIndex].dayArray;
         self.echoMonthAndWeek();
         self.scheduleId = self.paneList[tabIndex].schId;
@@ -543,7 +642,11 @@
           if (dateStr.length != 0) {
             self.weekValue = dateStr;
             if (count == self.weekList.length) {
-              self.weekValue = this.$t('scheduleView.everyDay');
+              self.weekValue = self.$t('scheduleView.everyDay');
+              self.checkAllWeek = true;
+            }
+            else{
+              self.checkAllWeek = false;
             }
           }
         }
@@ -562,9 +665,17 @@
           })
           if (dateStr.length != 0) {
             self.monthValue = dateStr;
-            if (count == self.weekList.length) {
-              self.monthValue = this.$t('scheduleView.everyMonth');
+            if (count == self.monthList.length) {
+              self.monthValue = self.$t('scheduleView.everyMonth');
+              self.checkAllMonth= true;
             }
+            else{
+              self.checkAllMonth= false;
+            }
+          }
+          else{
+            self.monthValue = '';
+            self.checkAllMonth= false;
           }
         }
       },
@@ -591,8 +702,16 @@
         if (dateStr.length != 0) {
           self.weekValue = dateStr;
           if (count == self.weekList.length) {
-            self.weekValue = this.$t('scheduleView.everyDay');
+            self.weekValue = self.$t('scheduleView.everyDay');
+            self.checkAllWeek = true;
           }
+          else{
+            self.checkAllWeek = false;
+          }
+        }
+        else{
+          self.weekValue = '';
+          self.checkAllWeek = false;
         }
       },
       choiceMonth(){
@@ -618,8 +737,16 @@
         if (daysStr.length != 0) {
           self.monthValue = daysStr;
           if (count == self.monthList.length) {
-            self.monthValue = '全月';
+            self.monthValue = self.$t('scheduleView.everyMonth');
+            self.checkAllMonth = true;
           }
+          else{
+            self.checkAllMonth = false;
+          }
+        }
+        else {
+          self.monthValue = '';
+          self.checkAllMonth = false;
         }
       },
       addScheduleService() {
@@ -750,6 +877,8 @@
         })
         self.monthValue = '';
         self.weekValue = '';
+        self.selectWeek = [];
+        self.selectMonth = [];
         console.log(self.paneList)
 
       },
@@ -1072,7 +1201,12 @@
       deleteCurTime(index) {
         console.log(index)
         let self = this;
-        self.paneList[Number(self.activeName)].timeArray.splice(index, 1); //删除时间
+        if(index == -1){
+          self.showAddTime = false;
+        }
+        else{
+          self.paneList[Number(self.activeName)].timeArray.splice(index, 1); //删除时间
+        }
       },
       changTime() {
         let self = this;
@@ -1487,10 +1621,15 @@
         console.log(self.scheduleId)
         self.getHasBoundStroeIds()
       },
+      hiddenMonthPanel(){
+        let self = this;
+        self.showMonthContent = false
+      }
     },
     mounted(){
       let self = this;
       self.getScheduleList();
+      //self.hiddenPanel();
     }
 
   }
@@ -1621,6 +1760,9 @@
             }
             .el-input{
               width: 200px;
+              /deep/ .el-input__inner{
+                padding-right: 20px;
+              }
             }
             .input-arrow-panel{
               width: 200px;
@@ -1734,7 +1876,7 @@
       }
 
       .el-bind-content {
-        @include point(height, 450);
+        @include point(max-height, 450);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;

@@ -423,6 +423,7 @@ export default {
     thur:'Thur.',
     fri: 'Fri.',
     sat: 'Sat.',
+    all: 'All',
     cancel: 'Cancel',
     confirm: 'Confirm',
     saveInfo: 'This will delete the schedule,continue?',

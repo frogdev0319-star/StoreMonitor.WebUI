@@ -820,6 +820,7 @@ export default {
         .aside-width{
             width: 16.9%;
             background-color: #222538;
+            margin-top: -0.5px;
             /*overflow: scroll;*/
         }
         .aside-collapse-width{
@@ -827,6 +828,7 @@ export default {
             max-width: 65px;
             overflow: hidden !important;
             background-color: #222538;
+            margin-top: -0.5px;
         }
         .sec-collapsed{
             margin-left:65px;
