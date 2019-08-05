@@ -92,20 +92,20 @@
                                           style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
                                       </template>
                                   </el-menu-item>
-                                  <el-submenu  class="three-child el-submenu-group" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                                  <el-submenu  :class="lang== 'en' ? 'three-child el-submenu-group' : 'zh-three-child'" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                                         :index="child.path"  :disabled="child.isReadOnly"
                                         :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
                                       <template slot="title">
                                         <div :class="lang=='en' ? 'en-icon-content': 'icon-content'">
                                           <div class="tag-icon"></div>
                                         </div>
-                                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" style="font-size: 14px">{{generateRoute(child.name)}}</span>
+                                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" class="third-title">{{generateRoute(child.name)}}</span>
                                       </template>
                                         <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                                                       v-for="grandChild in child.children" :index="grandChild.path"  :disabled="child.isReadOnly"
                                                       :key="grandChild.path" >
                                           <template>
-                                            <span >{{generateRoute(grandChild.name)}}</span>
+                                            <span class="third-child-span">{{generateRoute(grandChild.name)}}</span>
                                           </template>
                                         </el-menu-item>
                                   </el-submenu>
@@ -686,6 +686,9 @@ export default {
                     }
                     .en-el-submenu-group{
                         font-size: 16px;
+                        span{
+                          font-size: 16px;
+                        }
                     }
                     #groupSubItem.submenu-item{
                         @include point(height,52);
@@ -701,10 +704,14 @@ export default {
                         font-size: 16px;
                       }
                     }
+                  .third-title{
+                    font-size: 14px;
+                  }
                 }
                  @media screen  and(max-width:1366px){
                     .el-submenu-group{
-                        @include point(font-size,16);
+                      font-size: 16px;
+                        /*<!--@include point(font-size,16);-->*/
                     }
 
                     #groupSubItem.submenu-item{
@@ -727,6 +734,12 @@ export default {
                        @include point(font-size,14);
                      }
                    }
+                   .third-child-span{
+                     font-size: 10px;
+                   }
+                   .third-title{
+                     font-size: 14px;
+                   }
                 }
               .three-child /deep/ .el-submenu__title {
                 padding-left: 20px !important;
@@ -738,6 +751,9 @@ export default {
                 @media screen and (min-width: 1280px){
                   padding-left: 20px !important;
                 }
+                @media screen and (max-width: 1280px){
+                  padding-left: 0px !important;
+                }
                 /*@media screen and (max-width: 1280px){*/
                   /*padding-left: 0 !important;*/
                 /*}*/
@@ -745,11 +761,36 @@ export default {
               .three-child /deep/ .el-menu{
                 text-align: center !important;
               }
+              .zh-three-child /deep/ .el-submenu__title {
+                padding-left: 20px !important;
+                text-align: left;
+                position: relative;
+                min-width: auto !important;
+                height: 2.8125rem;
+                line-height: 2.8125rem;
+                @media screen and (min-width: 1280px){
+                  padding-left: 26px !important;
+                }
+                @media screen and (max-width: 1280px){
+                  padding-left: 25px !important;
+                }
+                /*@media screen and (max-width: 1280px){*/
+                /*padding-left: 0 !important;*/
+                /*}*/
+              }
+              .zh-three-child /deep/ .el-menu{
+                text-align: center !important;
+              }
                 #childSubItem.submenu-item{
                     position: relative;
                     min-width: auto !important;
                     @include point(height,45);
                     @include point(line-height,45);
+                    @media screen and(max-width:1366px){
+                      span{
+                        @include point(font-size,16);
+                      }
+                    }
                 }
                 #en-childSubItem.submenu-item{
                   position: relative;
@@ -759,7 +800,7 @@ export default {
                   @media screen and(max-width:1366px){
                     padding-left: 2px !important;
                     span{
-                      @include point(font-size,14);
+                      @include point(font-size,12);
                     }
                   }
                 }

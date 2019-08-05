@@ -6,7 +6,7 @@
                 <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary'>{{generateStoreLang('mySubmit')}}</el-button>
             </div>
             <div class="store-info">
-                <span style="margin-right:20px;"><strong>{{generateStoreLang('solver')}}</strong></span>
+                <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
                 <el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"
                 class="el-schedule" @change="changePerson">
                     <el-option
@@ -101,6 +101,8 @@ export default {
             scheduleData:[],
             alleList:[],
             userId:'',
+            supervisorId: '',
+            supervisorName: '',
             varyWindowHeight:window.innerHeight,
             varyWindowWidth:window.innerWidth
         }
@@ -125,6 +127,8 @@ export default {
         let storeId=self.store.storeId;
         self.storeTitle=self.store.name;
         self.userId=self.store.userId;
+        self.supervisorId = self.store.supervisorId;
+        self.supervisorName = self.store.supervisorName;
         console.log(self.store.napeTable)
         self.curTag=self.store.napeTable;
         self.phone=self.store.phone;
@@ -187,7 +191,7 @@ export default {
                             _obj.id=_item.id;
                             _obj.subject=_item.subject;
                             _obj.channelvalue=_item.deviceId==-1?'':
-                                    self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
+                            self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
                             _obj.isClick=false,
                             _temp.push(_obj);
                         }
@@ -216,18 +220,20 @@ export default {
             getUserInfo(params).then(res=>{
                 console.log(res);
                 let temp=res.data;
-                if(self.userId!=null&&self.userId.length!=0){
-                    if(temp.map(x=>x.userId).indexOf(self.userId)==-1){
+                if(self.supervisorId!=null&&self.supervisorId.length!=0){
+                    if(temp.map(x=>x.userId).indexOf(self.supervisorId)==-1){
                         let obj={
-                            userId:self.store.userId,
-                            userName:self.store.userName,
+                            userId:self.store.supervisorId,
+                            userName:self.store.supervisorId,
                             phoneNumber:self.store.phone
                         }
                         temp.push(obj);
                     }
                 }
                 self.personList=temp;
-                self.curPerson=self.userId;
+              console.log(self.personList);
+              //self.curPerson=self.userId;
+                self.curPerson = self.supervisorId;
             })
         },
         async submitData(){
@@ -253,7 +259,8 @@ export default {
                 "store": [
                     {
                         "storeId": self.store.storeId,
-                        "userId": self.curPerson
+                        //"userId": self.curPerson
+                        "supervisorId": self.curPerson
                     }
                 ]
             };
@@ -263,7 +270,7 @@ export default {
                     self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
                     return false;
                 }
-                if(self.curPerson.length!=0&&(self.userId!=self.curPerson)){  //如果没有修改负责人不执行
+                if(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson)){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
                 }
                 if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
@@ -280,7 +287,7 @@ export default {
                 };
 
                 let resUpdateStore=null,resBindInspect=null;
-                if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.userId!=self.curPerson))){  //如果没有修改负责人不执行
+                if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson))){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
                 }
                 else{

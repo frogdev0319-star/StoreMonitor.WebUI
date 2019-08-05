@@ -20,7 +20,8 @@ const user={
         },
         accountChanged:0,
         accountId:'',
-        cachePath:[""]
+        cachePath:[""],
+        isEzviz: false,
     },
     mutations:{
         SET_CODE: (state, code) => {
@@ -58,6 +59,9 @@ const user={
         },
         newCachePath(state,msg){
             state.cachePath=msg
+        },
+        SET_ISEZVIZ: (state, isEzviz)=>{
+          state.isEzviz  = isEzviz
         }
     },
     actions:{
@@ -92,6 +96,12 @@ const user={
                         let accountId=params.accountId.toLowerCase();
                         localStorage.setItem('oss_bucket',accountId);
                         commit('SET_ACCOUNTID',accountId);
+                        if(res.data.ezvizAppKey != ''){
+                          commit('SET_ISEZVIZ', true)
+                        }
+                        else{
+                          commit('SET_ISEZVIZ', false)
+                        }
                     }
                     else{
                         commit('Account_Changed',0);

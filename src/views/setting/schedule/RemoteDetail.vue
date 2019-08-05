@@ -170,6 +170,7 @@
                   <div slot="content">{{generateScheduleLang('notifyInfo')}}</div>
                   <i class="iconfont icon-bangzhu iconbangzhu"></i>
                 </el-tooltip>
+                <el-checkbox v-model="item.ifNotifyOneDay">{{generateScheduleLang('notifyOneDayBefore')}}</el-checkbox>
               </el-col>
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('dueDays')}}</span>
@@ -276,6 +277,8 @@
   import {getStoreList} from '@/api/store'
   import DialogVue from '@/components/DialogVue.vue'
   import Nape from "../../../api/ApiPath";
+  import util from '@/common/util'
+
   export default {
     name: "RemoteDetail",
     components:{
@@ -1239,6 +1242,13 @@
         self.paneList[tabIndex].to =  params.to;
         params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
+        let ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
+        if(ifNotifyOneDay){
+          params.aheadNotification = 86400; //提前一天的秒数
+        }
+        else{
+          params.aheadNotification = 0; //不提前通知
+        }
         let tempSchedule = [];
         //日模式
         if(params.mode == 0){
@@ -1360,7 +1370,8 @@
           dueDays: 1,
           schedule: [{month: '', day: [], monthValue: '', showMonthContent: false}],
           notifyTime: '',
-          execOnce: false
+          execOnce: false,
+          ifNotifyOneDay: false,
         };
         self.paneList.push(addInfo);
         let pane = self.paneList;
@@ -1390,29 +1401,58 @@
       async searchStoreInput() {
         let self = this;
         let params = {};
-        if (self.serachVale.length != 0) {
-          params = {
-            like: {
-              "name": self.serachVale,
-              "userName": self.serachVale
-            },
-            filter: {
-              page: 0,
-              size: 1000
+        console.log(self.tempStoreList)
+        let tempStoreList=self.tempStoreList;
+        let getStore2Temp=data=>{
+          let cityList=[];
+          data.forEach(item=>{
+            if(cityList.map(x=>x.city).indexOf(item.city)==-1){
+              let obj={
+                city:item.city,
+                province:item.province
+              }
+              cityList.push(obj);
             }
-          };
+          })
+          let storeListTemp=[];
+          for(let i=0;i<cityList.length;i++){
+            let temp=[];
+            let obj={};
+            for(let j=0;j<data.length;j++){
+              if(cityList[i].city==data[j].city){
+                let obj={};
+                obj.storeId=data[j].storeId;
+                obj.name=data[j].name;
+                obj.city=data[j].city;
+                obj.checked = data[j].checked;
+                obj.disabled = data[j].disabled;
+                console.log(obj)
+                temp.push(obj);
+              }
+            }
+            obj.cityName=cityList[i].city;
+            obj.province = cityList[i].province;
+            obj.itemData=temp;
+            storeListTemp.push(obj);
+          }
+          return storeListTemp;
         }
-        else {
-          params = {
-            filter: {
-              page: 0,
-              size: 1000
-            }
+        let temp=[];
+        let tempArray=[];
+        let tempStore=[];
+        tempStoreList.forEach((_item,_index)=>{
+          _item.itemData.forEach((itemDs,indexDs)=>{
+            temp.push(util.getPinyinList(itemDs.name));
+            tempStore.push(itemDs);
+          })
+        })
+        for(var i=0;i<temp.length;i++){
+          if(temp[i][0].indexOf(self.serachVale.trim())!=-1||
+            temp[i][1].indexOf(self.serachVale.trim())!=-1){
+            tempArray.push(tempStore[i]);
           }
         }
-        let resData = await self.getStoreData(params);
-        let data = resData.content;
-        self.getStoreByCity(data);
+        self.storeList=getStore2Temp(tempArray);
 
         let count = 0;
         self.storeList.forEach(item => {
@@ -1422,8 +1462,7 @@
         })
         if (count == self.storeList.length) {
           self.allData = true;
-        }
-        else {
+        } else {
           self.allData = false;
         }
       },
@@ -1525,6 +1564,8 @@
             }
             _obj.storeId = _item.storeId;
             _obj.name = _item.storeName;
+            _obj.city = item.city;
+            _obj.province = item.province;
             _temp.push(_obj);
           })
           if (_tempCount == item.store.length) {
@@ -1902,6 +1943,14 @@
             tempScheduleData.enable = _item.enable;
             tempScheduleData.notifyTime = self.secondsToHour(_item.notifyTime);
             tempScheduleData.from = self.$moment(_item.from).format('YYYY'); //从from获取年
+            let aheadNotification = _item.aheadNotification; //是否提前一天通知
+
+            if(aheadNotification == 86400){
+              tempScheduleData.ifNotifyOneDay = true;
+            }
+            else{
+              tempScheduleData.ifNotifyOneDay = false;
+            }
             tempScheduleData.dueDays = _item.dueDays;
             tempScheduleData.execOnce = (_item.to == -1) ? false: true;
             let tempSchedules = _item.schedule;
@@ -1974,7 +2023,8 @@
             dueDays: 1,
             schedule: [{month: '', day: [], monthValue: '', showMonthContent: false}],
             notifyTime: '',
-            execOnce: false
+            execOnce: false,
+            ifNotifyOneDay: false,
           };
           self.paneList.push(addInfo);
           self.scheduleName = "远程巡检排程一";
@@ -2045,7 +2095,13 @@
         params.enable = Number(self.paneList[tabIndex].enable);
         params.mode = self.paneList[tabIndex].mode;
         let execOnce = self.paneList[tabIndex].execOnce;
-
+        let ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
+        if(ifNotifyOneDay){
+          params.aheadNotification = 86400; //提前一天的秒数
+        }
+        else{
+          params.aheadNotification = 0; //不提前通知
+        }
         params.from = self.paneList[tabIndex].from;
         let year = self.$moment(params.from).format('YYYY'); //年self.paneList[tabIndex].from; //年
         params.to =  -1;

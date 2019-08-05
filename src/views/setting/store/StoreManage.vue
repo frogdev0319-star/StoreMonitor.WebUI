@@ -145,8 +145,9 @@ import {generateStoreLang} from '@/api/i18n'
                         "width":160
                     },
                     {
-                        "prop":"userName",
-                        "label":this.$t('storeView.solver'),
+                        // "prop":"userName",
+                        "prop":"supervisorName",
+                        "label":this.$t('storeView.supervisor'),
                         "sortable":'custom',
                         "width":120
                     },
@@ -411,6 +412,7 @@ import {generateStoreLang} from '@/api/i18n'
                 self.storeData=data.data;
                 let temp=[];
                 self.storeData.content.forEach(item=>{
+                  console.log(item)
                     let obj={};
                     if(item.appliedInspect.indexOf('远程巡检')==-1){
                         obj.showTag=false;
@@ -423,6 +425,8 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.name=item.name;
                     obj.userName=item.userName;
                     obj.userId=item.userId;
+                    obj.supervisorName = item.supervisorName; //督导名称
+                    obj.supervisorId = item.supervisorId; //督导编号
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
                     obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
@@ -435,6 +439,7 @@ import {generateStoreLang} from '@/api/i18n'
                 };
                 let tempStoreId=temp.map(x=>x.storeId);
                 self.tableData=temp;
+                console.log(self.tableData)
                 self.total=self.storeData.totalElements;
                 if(paramsGetBind.storeIds.length!=0){
                     getInspectBindCount(paramsGetBind).then(res=>{

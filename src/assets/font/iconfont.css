@@ -6,6 +6,14 @@
   url('iconfont.ttf?t=1556420847017') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
   url('iconfont.svg?t=1556420847017#iconfont') format('svg'); /* iOS 4.1- */
 }
+@font-face {font-family: "iconfont";
+  src: url('iconfont-warning.eot?t=1564891870407'); /* IE9 */
+  src: url('iconfont-warning.eot?t=1564891870407#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAALgAAsAAAAABmwAAAKVAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCCcAp0gQkBNgIkAwgLBgAEIAWEbQcxG7AFEdWLfbI/QpTDdODjSIrUqGEqa5/9WQdNOnPGHd3Pc7iULEHZf4CbglYgAQAAAACC57+1330zu/txt0wiEbprI4qFSEic7hrJC/+2e9sfbDeVUo7CCAtE2lyqnLDNgnUJHAuGj4XSwT1kx/9bry7CSlABLSGlvbL2AALgP3DIzW9nbgvQQigBIuIbSCjLWgZ9gWbVimZCrO0FQFosUtfB0B/3Tv88//dBRr3zLpcxBo01+WOAcSAFONaiRVCMDWMXvMD9EMCFCNKQuv31ERIDe5gAMhGDhiyEMDBY1gnBaphrIKuYOKnjP4CV6PfyYyOCwtTYdV3jOwfjnZNHv7EAIQwCWmwCGkgDDJC+xlQHQhitcUkFMXCsaoH30QdO5Kg2hP11dqUbAGFQ/kwKT/moogoAA9pDDJA16VrQbt3r9/j2l8fW3j2W9n7zB0OQYmq9iu2YdUcV26JyBid+nsC5096/qKc18A7N81TD+1gVYP+MgSYYILD1vV/YsOxfAoCr7P9IPcwDTjt2C/wgnbEIcrWhsu3K0Oz2iFLEqE4sgVLuxWb7fLifava/m5zghP89eRyEZ6BxIg41yDQwcSUPLJyoBBdSaVzsii+TCDEKSGEKgODFOSg8uACNF5eoQd6BSQB/YOElgAsD4rumKwnCxU4mLeTQfGC0ZeFdl3Ti6huFl0xzXhUxz8RNjOJ6sSpnD1QQLzGheQ0bEY+eyxz34DDKshIrLhOysriLVNvl0jc9aWHLHDqQSQs5NB8YbVn4oLl0Kt+/UXjJNHfw6uLPxE3sHNeL1QD0oC8G8R7lkeY1bEQ8ei5z3INelGUlVs29ErKyuE9IVNul08gP1S+2N+Z/twWADtiWlnK6CkksQtAlAA==') format('woff2'),
+  url('iconfont-warning.woff?t=1564891870407') format('woff'),
+  url('iconfont-warning.ttf?t=1564891870407') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  url('iconfont-warning.svg?t=1564891870407#iconfont') format('svg'); /* iOS 4.1- */
+}
 
 .iconfont {
   font-family: "iconfont" !important;
@@ -13,6 +21,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-jinggao:before {
+  content: "\e616";
 }
 
 .icon-iconfontstart:before {
@@ -197,5 +209,9 @@
 
 .icon-hulvewenti:before {
   content: "\e656";
+}
+
+.icon-jinggao:before {
+  content: "\e616";
 }
 

@@ -17,24 +17,32 @@ export default{
                     let obj={};
                     obj.token=paramsArray[0].substr(paramsArray[0].indexOf('=')+1);
                     obj.userId=paramsArray[1].substr(paramsArray[1].indexOf('=')+1);
-                    obj.lang=paramsArray[2].substr(paramsArray[2].indexOf('=')+1);
+                    //obj.appKey =paramsArray[2].substr(paramsArray[2].indexOf('=')+1);
+                   // obj.lang=paramsArray[3].substr(paramsArray[3].indexOf('=')+1);
                     this.$store.commit('SET_TOKEN',obj.token);
-                    setCookie(TokenKey,obj.token);
-                    setCookie('UserId',obj.userId);
-                    let lang = 'en'
-                    if(obj.lang === 'zh-CN'){
-                      lang = 'zh'
-                    }
-                    else if(obj.lang ==='en-US'){
-                      lang = 'en'
-                    }
-                    else if(obj.lang === 'zh-TW'){
-                      lang = 'zhtw'
+                    //setCookie(AppKey,obj.appKey);
+                    if(obj.appKey != ''){
+                      this.$store.commit('SET_ISEZVIZ',true);
                     }
                     else{
-                      lang = 'en'
+                      this.$store.commit('SET_ISEZVIZ',false);
                     }
-                    setCookie('lang', lang)
+                    setCookie(TokenKey,obj.token);
+                    setCookie('UserId',obj.userId);
+                    // let lang = 'en'
+                    // if(obj.lang === 'zh-CN'){
+                    //   lang = 'zh'
+                    // }
+                    // else if(obj.lang ==='en-US'){
+                    //   lang = 'en'
+                    // }
+                    // else if(obj.lang === 'zh-TW'){
+                    //   lang = 'zhtw'
+                    // }
+                    // else{
+                    //   lang = 'en'
+                    // }
+                    // setCookie('lang', lang)
                 }
             }
             window.location.href=window.location.origin+window.location.pathname+'#/home';

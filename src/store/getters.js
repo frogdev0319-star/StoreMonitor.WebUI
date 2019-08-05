@@ -6,7 +6,8 @@ const getters={
     status:state=>state.user.status,
     roles:state=>state.user.roles,
     setting:state=>state.user.setting,
-    accountChanged:state=>state.user.accountChanged
+    accountChanged:state=>state.user.accountChanged,
+    isEzviz: state=>state.user.isEzviz
 }
 
 export default getters

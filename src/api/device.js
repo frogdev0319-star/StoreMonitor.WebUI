@@ -72,3 +72,17 @@ export const updateDevice=data=>{
         data
     })
 }
+export const updateNVR=data=>{
+  return request({
+    url:`${version}/device/nvr/update`,
+    method:'post',
+    data
+  })
+}
+export const attachImageToDevice=data=>{
+  return request({
+    url:`${version}/device/attach/image`,
+    method:'post',
+    data
+  })
+}
