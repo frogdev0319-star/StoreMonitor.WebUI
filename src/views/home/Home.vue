@@ -105,7 +105,7 @@
                                                       v-for="grandChild in child.children" :index="grandChild.path"  :disabled="child.isReadOnly"
                                                       :key="grandChild.path" >
                                           <template>
-                                            <span class="third-child-span">{{generateRoute(grandChild.name)}}</span>
+                                            <span :class="lang=='en' ? 'third-child-span' : 'zh-third-child-span'">{{generateRoute(grandChild.name)}}</span>
                                           </template>
                                         </el-menu-item>
                                   </el-submenu>
@@ -674,7 +674,7 @@ export default {
                     }
                 }
                 .el-submenu-group{
-                    @include point(margin-left,4);
+                    @include point(margin-left,0);
                     //font-size: 16px;
                 }
                 .en-el-submenu-group{
@@ -685,9 +685,9 @@ export default {
                         font-size: 16px;
                     }
                     .en-el-submenu-group{
-                        font-size: 16px;
+                        font-size: 14px;
                         span{
-                          font-size: 16px;
+                          font-size: 14px;
                         }
                     }
                     #groupSubItem.submenu-item{
@@ -701,13 +701,128 @@ export default {
                       @include point(height,52);
                       @include point(line-height,52);
                       span{
-                        font-size: 16px;
+                        font-size: 14px;
                       }
                     }
                   .third-title{
                     font-size: 14px;
                   }
                 }
+              @media screen  and(max-width:1920px){
+                .el-submenu-group{
+                  font-size: 16px;
+                  /*<!--@include point(font-size,16);-->*/
+                }
+
+                #groupSubItem.submenu-item{
+                  @include point(height,52);
+                  @include point(line-height,52);
+                  span{
+                    font-size:16px
+                  }
+                }
+                #en-groupSubItem.submenu-item {
+                  @include point(height, 52);
+                  @include point(line-height, 52);
+                  span {
+                    font-size: 16px;
+                  }
+                }
+                .en-el-submenu-group{
+                  font-size: 16px;
+                  span{
+                    font-size: 16px;
+                  }
+                }
+                .third-child-span{
+                  font-size: 10px;
+                  display: inline-block;
+                  /*padding-left: 50px;*/
+                }
+                .zh-third-child-span{
+                  font-size: 10px;
+                  display: inline-block;
+                }
+                .third-title{
+                  font-size: 14px;
+                }
+              }
+              @media screen  and(max-width:1680px){
+                .el-submenu-group{
+                  @include point(font-size,13);
+                  /*<!--@include point(font-size,16);-->*/
+                }
+
+                #groupSubItem.submenu-item{
+                  @include point(height,52);
+                  @include point(line-height,52);
+                  span{
+                    @include point(font-size,13);
+                  }
+                }
+                #en-groupSubItem.submenu-item {
+                  @include point(height, 52);
+                  @include point(line-height, 52);
+                  span {
+                    @include point(font-size, 13);
+                  }
+                }
+                .en-el-submenu-group{
+                  @include point(font-size,13);
+                  span{
+                    @include point(font-size,13);
+                  }
+                }
+                .third-child-span{
+                  font-size: 10px;
+                  display: inline-block;
+                  padding-left: 40px;
+                }
+                .zh-third-child-span{
+                  font-size: 14px;
+                }
+                .third-title{
+                  font-size: 14px;
+                }
+              }
+              @media screen  and(max-width:1440px){
+                .el-submenu-group{
+                  @include point(font-size,14);
+                  /*<!--@include point(font-size,16);-->*/
+                }
+
+                #groupSubItem.submenu-item{
+                  @include point(height,52);
+                  @include point(line-height,52);
+                  span{
+                    @include point(font-size,14);
+                  }
+                }
+                #en-groupSubItem.submenu-item {
+                  @include point(height, 52);
+                  @include point(line-height, 52);
+                  span {
+                    @include point(font-size, 14);
+                  }
+                }
+                .en-el-submenu-group{
+                  @include point(font-size,14);
+                  span{
+                    @include point(font-size,14);
+                  }
+                }
+                .third-child-span{
+                  font-size: 10px;
+                  display: inline-block;
+                  padding-left: 40px;
+                }
+                .zh-third-child-span{
+                  @include point(font-size,14);
+                }
+                .third-title{
+                  font-size: 14px;
+                }
+              }
                  @media screen  and(max-width:1366px){
                     .el-submenu-group{
                       font-size: 16px;
@@ -737,10 +852,54 @@ export default {
                    .third-child-span{
                      font-size: 10px;
                    }
+                   .zh-third-child-span{
+                     @include point(font-size,14);
+                     font-size: 14px;
+                   }
                    .third-title{
                      font-size: 14px;
                    }
                 }
+              @media screen  and(max-width:1280px){
+                .el-submenu-group{
+                  @include point(font-size,16);
+                  .third-title{
+                    font-size: 12px;
+                  }
+                }
+
+                #groupSubItem.submenu-item{
+                  @include point(height,52);
+                  @include point(line-height,52);
+                  span{
+                    @include point(font-size,16);
+                  }
+                }
+                #en-groupSubItem.submenu-item {
+                  @include point(height, 52);
+                  @include point(line-height, 52);
+                  span {
+                    @include point(font-size, 14);
+                  }
+                }
+                .en-el-submenu-group{
+                  @include point(font-size,14);
+                  span{
+                    @include point(font-size,14);
+                  }
+                  .third-title{
+                    font-size: 12px;
+                  }
+                }
+                .third-child-span{
+                  font-size: 10px;
+                  padding-left: 0px;
+                }
+                .zh-third-child-span{
+                  @include point(font-size, 14);
+                }
+
+              }
               .three-child /deep/ .el-submenu__title {
                 padding-left: 20px !important;
                 text-align: left;
@@ -748,15 +907,15 @@ export default {
                 min-width: auto !important;
                 height: 2.8125rem;
                 line-height: 2.8125rem;
-                @media screen and (min-width: 1280px){
-                  padding-left: 20px !important;
+                @media screen and (min-width: 1440px){
+                  padding-left: 27px !important;
+                }
+                @media screen and (min-width: 1280px) and(max-width: 1440px){
+                  padding-left: 26px !important;
                 }
                 @media screen and (max-width: 1280px){
-                  padding-left: 0px !important;
+                  padding-left: 2px !important;
                 }
-                /*@media screen and (max-width: 1280px){*/
-                  /*padding-left: 0 !important;*/
-                /*}*/
               }
               .three-child /deep/ .el-menu{
                 text-align: center !important;
@@ -774,9 +933,6 @@ export default {
                 @media screen and (max-width: 1280px){
                   padding-left: 25px !important;
                 }
-                /*@media screen and (max-width: 1280px){*/
-                /*padding-left: 0 !important;*/
-                /*}*/
               }
               .zh-three-child /deep/ .el-menu{
                 text-align: center !important;
