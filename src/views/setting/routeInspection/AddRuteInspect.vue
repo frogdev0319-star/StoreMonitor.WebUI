@@ -268,11 +268,11 @@ export default {
             let self=this;
             let temp=[];
             if(item.groupName==null||item.groupName.length==0){
-                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
+                self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(item.groupName)){
-                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
+                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let obj={
@@ -288,11 +288,11 @@ export default {
                 console.log(res);
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify(this.$t('insSettingView.editSuss'),'success',3000);
+                    self.notify(self.$t('insSettingView.editSuss'),'success',3000);
                     item.isEdit=false;
                 }
                 else{
-                    self.notify(this.$t('insSettingView.editFail'),'warning',3000);
+                    self.notify(self.$t('insSettingView.editFail'),'warning',3000);
                     return false;
                 }
             })
@@ -317,11 +317,11 @@ export default {
             let self=this;
             let temp=[];
             if(self.groupNameInput.trim().length==0){
-                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
+                self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(self.groupNameInput)){
-                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
+                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let mode=0;
@@ -359,14 +359,14 @@ export default {
                     self.groupNameInput='';
                     self.showAddGroup=false;
                     self.refreshData(self.groupList.length-1);
-                    self.notify(this.$t('insSettingView.addSuss'),'success',3000);
+                    self.notify(self.$t('insSettingView.addSuss'),'success',3000);
                     // setTimeout(function(){
                     //     PubSub.publish('change-color',{showTag:true});
                     // },1000)
 
                 }
                 else{
-                    self.notify(this.$t('insSettingView.addFail'),'warning',3000);
+                    self.notify(self.$t('insSettingView.addFail'),'warning',3000);
                     return false;
                 }
             })
@@ -436,7 +436,7 @@ export default {
             if(idItemArr.length==0){   //当前分组下无巡检项
                 let errMsg= await self.deleteGroupData(idGroupArr);
                 if(errMsg!=undefined&&errMsg=='Success'){
-                    self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
+                    self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                     if(self.groupList.length==1){
                         self.groupList=[];
                         self.napeList=[];
@@ -454,7 +454,7 @@ export default {
                 if(errMsgItem!=undefined&&errMsgItem=='Success'){
                     let errMsgGroup=await self.deleteGroupData(idGroupArr);
                     if(errMsgGroup!=undefined&&errMsgGroup=='Success'){
-                        self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
+                        self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                         //刷新页面
                         if(self.groupList.length==1){
                             self.groupList=[];
@@ -467,12 +467,12 @@ export default {
                         }
                     }
                     else{
-                        self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
+                        self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                         return false;
                     }
                 }
                 else{
-                    self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
+                    self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
             }
@@ -493,7 +493,7 @@ export default {
                 }
             })
             if(count==0){
-                self.notify(this.$t('insSettingView.selectItems'),'warning',3000);
+                self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
             }
             self.showDeleteItem=true;
@@ -515,14 +515,14 @@ export default {
             }
             let errMsg=await self.deleteItemData(idArr);
             if(errMsg!=undefined&&errMsg=='Success'){
-                self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
+                self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                 self.showDeleteItem=false;
                 //刷新页面,删除页面上在后台已经删除的数据
                 self.refreshData(self.groupIndex);
                 self.groupList[self.groupIndex].groupNum-=idArr.length;
             }
             else{
-                self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
+                self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                 return false;
             }
         },
@@ -530,11 +530,11 @@ export default {
             let self=this;
             let temp=[];
             if(item.napeName.trim().length==0){
-                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
+                self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(item.napeName)||validateInput(item.napeDep)){
-                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
+                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let obj={
@@ -551,12 +551,12 @@ export default {
                 console.log(res);
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify(this.$t('deviceView.editSuss'),'success',3000);
+                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
                     item.isClick=false;
                     self.refreshData(self.groupIndex);
                 }
                 else{
-                    self.notify(this.$t('deviceView.editFail'),'warning',3000);
+                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
                     return false;
                 }
             })
@@ -571,11 +571,11 @@ export default {
             let self=this;
             let temp=[];
             if(self.newNapeName.trim().length==0){
-                self.notify(this.$t('insSettingView.titleEmpty'),'warning',3000);
+                self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
             if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
-                self.notify(this.$t('insSettingView.illegalStr'),'warning',3000);
+                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
             let objItem={
@@ -628,7 +628,7 @@ export default {
                         let res=resApply;
                         console.log(res);
                     })
-                    self.notify(this.$t('insSettingView.addSuss'),'success',3000);
+                    self.notify(self.$t('insSettingView.addSuss'),'success',3000);
                     setTimeout(function(){
                         console.log(self.tabName);
                         if(self.tabName=='远程巡检'){
@@ -637,7 +637,7 @@ export default {
                     },1000)
                 }
                 else{
-                    self.notify(this.$t('insSettingView.addFail'),'warning',3000);
+                    self.notify(self.$t('insSettingView.addFail'),'warning',3000);
                     return false;
                 }
             })

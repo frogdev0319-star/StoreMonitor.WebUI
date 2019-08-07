@@ -106,7 +106,7 @@
                   <div class="comment-data titles" :style="{visibility: (item.comment!= '') ? 'visible': 'hidden' }">
                     <el-tooltip effect="dark" :content="item.comment"
                                 placement="bottom">
-                      <span style="margin-left: 10%; color: #fea316;"><i class="iconfont icon-jinggao"></i></span>
+                      <span style="margin-left: 10%; color: #fea316;"><i class="iconfont icon-jinggao2"></i></span>
                     </el-tooltip>
                   </div>
                   <div class="name-data titles">

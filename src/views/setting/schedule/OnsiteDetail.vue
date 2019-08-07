@@ -1688,10 +1688,10 @@
           self.storeCount = bindIdList.length;
           console.log(bindIdList.length + "......");
           //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
-          self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
+          self.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
         }
         else {
-          self.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
+          self.notify(self.$t('insSettingView.bindFail'), 'warning', 3000);
           return false;
         }
 

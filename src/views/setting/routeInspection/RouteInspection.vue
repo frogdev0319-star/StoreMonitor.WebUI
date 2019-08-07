@@ -110,6 +110,7 @@ export default {
                 //     'label':'新增巡检表'
                 // }
             ],
+          addPatrol: '新增巡检表',
             downLoadSrc:'',
             curIndex:'id0',
             showBtnContent:false,
@@ -288,7 +289,7 @@ export default {
                                   objChild.score=itemChild.itemScore ;
                                 }
                                 else{
-                                  objChild.score=itemChild.itemScore + " " + this.$t('insSettingView.scores');
+                                  objChild.score=itemChild.itemScore + " " + self.$t('insSettingView.scores');
                                 }
 
                                 tempChild.push(objChild);
@@ -428,14 +429,14 @@ export default {
                 let resItem=await self.addItem(paramsItem);
                 let codeItem=resItem.errMsg;
                 if(codeItem!=null&&codeItem=='Success'){
-                    self.notify(this.$t('insSettingView.importSuss'),'success',3000);
+                    self.notify(self.$t('insSettingView.importSuss'),'success',3000);
                 }
                 else{
-                    self.notify(this.$t('insSettingView.importFail'),'warning',3000);
+                    self.notify(self.$t('insSettingView.importFail'),'warning',3000);
                 }
             }
             else{
-                self.notify(this.$t('insSettingView.importFail'),'warning',3000);
+                self.notify(self.$t('insSettingView.importFail'),'warning',3000);
             }
             self.showImportContent=false;
             self.getTagList();
@@ -448,7 +449,7 @@ export default {
             let self=this;
             let arr=[];
             if(self.elTableData[Number(self.activeName)].routeData.length==0){
-                self.notify(this.$t('insSettingView.emptyInfo'),'warning',3000);
+                self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             self.elTableData[Number(self.activeName)].routeData.forEach(item=>{
@@ -459,7 +460,7 @@ export default {
             console.log(arr);
             if(arr.length==0){
                 //self.notify('请新增巡检项后进行操作！','warning',3000);
-                self.notify(this.$t('insSettingView.emptyInfo'),'warning',3000);
+                self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             sessionStorage.setItem('TabName',self.activeName);
@@ -520,7 +521,7 @@ export default {
             let self=this;
             if(self.checkValue=='新增巡检表'&&(self.tabNameInput==null||self.tabNameInput.trim().length==0)){
                 self.hideUpload=true;
-                self.notify(this.$t('insSettingView.enterSelfListName'),'warning',3000);
+                self.notify(self.$t('insSettingView.enterSelfListName'),'warning',3000);
                 return false;
             }
 

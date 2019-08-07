@@ -125,7 +125,7 @@
                         </div>
                         <div class="tabName-input-content">
                             <input type="text" v-model="tabNameInput" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')"
-                                   v-if="checkValue == this.addPatrol">
+                                   v-if="checkValue == addPatrol">
                         </div>
 
                     </div>
@@ -176,6 +176,8 @@ export default {
                 },
             ],
             checkValue:'',
+            addPatrol: '自定义巡检表',
+            tabNameLang: '',
             tabNameInput:'',
             varyWindowWidth:window.innerHeight,
             allchecked:false,
@@ -207,10 +209,10 @@ export default {
         initLang(){
           let self = this;
           if(self.tabName=='远程巡检'){
-             self.tabNameLang = this.$t('insSettingView.remotePatrol')
+             self.tabNameLang = self.$t('insSettingView.remotePatrol')
           }
           else if(self.tabName=='现场巡检'){
-             self.tabNameLang = this.$t('insSettingView.onsitePatrol')
+             self.tabNameLang = self.$t('insSettingView.onsitePatrol')
           }
         },
         getNum(){
@@ -353,14 +355,14 @@ export default {
             });
             console.log(arr);
             if(arr.length==0&&countGroup==0){
-                self.notify(this.$t('insSettingView.selectItems'),'warning',3000);
+                self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
             }
             self.showDeleteContent=true;
         },
         afterDeleteNape(){
             let self=this;
-            self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
+            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
             self.$emit('refreshList');
         },
@@ -401,9 +403,10 @@ export default {
                         }
                     }
                     else{
-                        self.notify(this.$t('insSettingView.deleteFail') ,'warning',3000);
+                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
                         return false;
                     }
+                  self.allchecked = false;
                 })
             }
             else{
@@ -412,9 +415,10 @@ export default {
                         self.afterDeleteNape();
                     }
                     else{
-                        self.notify(this.$t('insSettingView.deleteFail') ,'warning',3000);
+                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
                         return false;
                     }
+                  self.allchecked = false;
                 })
             }
         },
@@ -447,12 +451,12 @@ export default {
                 console.log(res.data)
                 let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
-                    self.notify(this.$t('insSettingView.deleteSuss'),'success',3000);
+                    self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                     self.showSingleDeleteContent=false;
                     self.$emit('refreshList');
                 }
                 else{
-                    self.notify(this.$t('insSettingView.deleteFail'),'warning',3000);
+                    self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
             })
@@ -520,7 +524,7 @@ export default {
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
                     if(!outdata[0].hasOwnProperty('检查分类')){
-                        _this.notify(this.$t('insSettingView.templateError'),'warning',3000);
+                        _this.notify(_this.$t('insSettingView.templateError'),'warning',3000);
                         return false;
                     }
                     let arr=outdata;
@@ -587,19 +591,19 @@ export default {
                                 let data=res.data;
                                 if(code!=null&&code=='Success'){
                                     console.log(res.data);
-                                    _this.notify(this.$t('insSettingView.importSuss'),'success',3000);
+                                    _this.notify(_this.$t('insSettingView.importSuss'),'success',3000);
                                     _this.showImportContent=false;
                                     //_this.refreshData();
                                     _this.$emit('refreshList');
                                 }
                                 else{
-                                    _this.notify(this.$t('insSettingView.importFail') ,'warning',3000);
+                                    _this.notify(_this.$t('insSettingView.importFail') ,'warning',3000);
                                     return false;
                                 }
                             })
                         }
                         else{
-                            _this.notify(this.$t('insSettingView.importFail'),'warning',3000);
+                            _this.notify(_this.$t('insSettingView.importFail'),'warning',3000);
                             return false;
                         }
                     })

@@ -124,7 +124,7 @@ export default {
         changePro(val){
             let self=this;
             self.getCityByProvince(val);
-            self.curCitys= this.$t('storeView.cityPlaceholder');
+            self.curCitys= self.$t('storeView.cityPlaceholder');
             self.multeCityList.length=0;
             self.allCityChecked=false;
         },
@@ -132,13 +132,13 @@ export default {
             let self=this;
             self.cityList=[];
             self.showCityContent=false;
-            self.curCitys = this.$t('storeView.cityPlaceholder');
+            self.curCitys = self.$t('storeView.cityPlaceholder');
             self.multeCityList.length=0;
         },
         choiceCity(){
             let self=this;
             if(self.curProvince.length==0){
-                self.notify(this.$t('storeView.selectProviceInfo'),'warning',3000);
+                self.notify(self.$t('storeView.selectProviceInfo'),'warning',3000);
                 self.showPopoVer=true;
                 return false;
             }
@@ -152,7 +152,7 @@ export default {
             let str='';
             let temp=[];
             if(!val){
-                self.curCitys= this.$t('storeView.cityPlaceholder');
+                self.curCitys= self.$t('storeView.cityPlaceholder');
                 self.multeCityList=[];
                 self.cityList.forEach(item=>{
                     item.checked=val;
@@ -203,7 +203,7 @@ export default {
                 self.allCityChecked=false;
             }
             if(temp.length==0){
-                self.curCitys = this.$t('storeView.cityPlaceholder');
+                self.curCitys = self.$t('storeView.cityPlaceholder');
             }
             self.multeCityList=temp;
         },
@@ -580,10 +580,10 @@ export default {
                 let bindIdList=await self.getBindStoreList();
                 self.storeCount=bindIdList.length;
                 //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
-                self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`,'success',3000);
+                self.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.length} ${self.$t('insSettingView.storesBound')}`,'success',3000);
             }
             else{
-                self.notify(this.$t('insSettingView.bindFail'),'warning',3000);
+                self.notify(self.$t('insSettingView.bindFail'),'warning',3000);
                 return false;
             }
         },
@@ -608,12 +608,12 @@ export default {
             switch(Number(sessionStorage.getItem('TabName'))){
                 case 0: {
                   name = "远程巡检";
-                  nameLang = this.$t('insSettingView.remotePatrol');
+                  nameLang = self.$t('insSettingView.remotePatrol');
                   break
                 };
                 case 1: {
                   name = "现场巡检";
-                  nameLang = this.$t('insSettingView.onsitePatrol');
+                  nameLang = self.$t('insSettingView.onsitePatrol');
                   break
                 };
                 default: {
