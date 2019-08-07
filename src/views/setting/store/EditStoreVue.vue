@@ -122,7 +122,6 @@ export default {
     },
     mounted(){
         let self=this;
-
         self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
         let storeId=self.store.storeId;
         self.storeTitle=self.store.name;
@@ -287,16 +286,20 @@ export default {
                 };
 
                 let resUpdateStore=null,resBindInspect=null;
-                if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson))){  //如果没有修改负责人不执行
+                if(self.curPerson ==null ||self.curPerson.length==0 ){
+                  self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
+                  return false;
+                }
+                else if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson))){  //如果没有修改负责人不执行
                     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
                 }
-                else{
-                    self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
-                    return false;
-                }
+                //else{
+                    // self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
+                    // return false;
+               // }
                 resBindInspect=await self.bindInspectItem(paramsInspec);
                 if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
-                ||(resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
+                || (resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
                 }
                 else{
