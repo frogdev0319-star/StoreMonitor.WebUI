@@ -352,7 +352,7 @@ export default {
     deleteInfo: 'This operation will delete the current device and channel, continue?',
     deviceManage:'Device Management',
     channelSetting: 'Channel Number and Name setting',
-    noImage: 'No picture added',
+    noImage: 'No picture',
     editImage: 'Edit Image',
     deleteChannel: 'This operation will delete the current channel, continue?',
     inputChannelName: 'Please enter channel name',
@@ -393,7 +393,8 @@ export default {
     importFail: 'Failed to import!',
     templateError: 'Template format error, please try again!',
     editSuss: 'Successfully Edited!',
-    editFail: 'Failed to edit!'
+    editFail: 'Failed to edit!',
+    channelOrder: 'Channel Number ',
   },
   //Store Management page language
   storeView: {
@@ -500,7 +501,12 @@ export default {
     inputName: 'Please enter a schedule name!',
     promptInfo: 'Tips:In consideration of distance and manpower, please arrange the inspection task reasonably.',
     notifyOneDayBefore: 'Reminder at the same time in the day before tomorrow',
-    timeExist: 'Execution time already exists, please re-add'
+    timeExist: 'Execution time already exists, please re-add',
+    emptyName: 'The schedule name cannot be empty',
+    emptyNotifyTime: 'Reminder time cannot be empty',
+    emptyDate: 'The execution date cannot be empty',
+    emptyMonth: 'Month cannot be empty',
+    emptyTime: 'Execution time cannot be empty'
   }
 
 }

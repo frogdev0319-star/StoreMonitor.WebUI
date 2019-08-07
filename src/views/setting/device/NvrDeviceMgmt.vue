@@ -370,7 +370,7 @@
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
-                      <el-form-item prop="channelId" :label="generateDeviceLang('channelNum')">
+                      <el-form-item prop="channelId" :label="generateDeviceLang('channelOrder')">
                         <el-select v-model="addChannelData.channelId" :placeholder="generateDeviceLang('selectNvrChannel')" size="mini">
                           <el-option
                             v-for="numList in newChannelNumList"
@@ -1462,7 +1462,7 @@
               let attachRes = await self.attachImageToDevice(fm);
               console.log(attachRes)
               if(attachRes.errMsg == 'Success'){
-                self.notify(self.$t('deviceView.addSuccess'),'warning',3000);
+                self.notify(self.$t('deviceView.addSuccess'),'success',3000);
               }
               self.showAddChannelDialog =false;
             }

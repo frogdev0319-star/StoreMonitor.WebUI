@@ -356,10 +356,10 @@
       addScheduleButton() {
         let self = this;
         if (self.activePatrol == '0') {
-          self.$refs.remoteHandle.addScheduleButton();
+          self.$refs.remoteHandle.addSchedule();
         }
         else {
-          self.$refs.onsiteHandle.addScheduleButton();
+          self.$refs.onsiteHandle.addSchedule();
         }
 
       },

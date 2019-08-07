@@ -312,7 +312,7 @@
                   <div class="nape-picture-data">
                     <img v-if="item.tempUrl" :src="item.tempUrl" class="img-class">
                     <span v-else="!item.tempUrl" class="img-class" style="display: inline-block;background: #cccc;">
-                      <span style="font-size: 14px;color: #94a4b4;position: relative;left: 12px;">{{generateDeviceLang('noImage')}}</span>
+                      <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
                     <el-upload v-if="item.isClick"
                                class="upload-demo"
@@ -996,7 +996,8 @@
                   serialNumber:item["序列号"],
                   name:item["设备名称"],
                   channelCount:item["通道数"],
-                  storeId:item["StoreID"]
+                  storeId:item["StoreID"],
+                  validationCode: item['设备验证码'],
                 }
                 nvrDataTemp.push(obj);
               }
@@ -1004,7 +1005,8 @@
                 name:item["通道名称"],
                 storeId:item["StoreID"],
                 ivsId:item["序列号"],
-                channelId:item["通道序号"]
+                channelId:item["通道序号"],
+                vendor: 1
               }
               channelDataTemp.push(obj);
             })
@@ -1015,6 +1017,8 @@
             let params2={
               "device": channelDataTemp
             };
+            console.log(params1);
+            console.log(params2);
             _this.addAllData(params1,params2);
           }
           reader.readAsArrayBuffer(f);
@@ -1030,8 +1034,8 @@
         var that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const tHeader = ['StoreID','所属门店', '序列号','设备名称','设备型号','通道数','通道名称','通道序号']; // 导出的表头名
-          const filterVal = ['storeId','storeName','serialNumber','name','deviceModel','channelCount','channelName','channelNum']; // 导出的表头字段名
+          const tHeader = ['StoreID','所属门店', '序列号','设备名称','设备验证码','通道数','通道名称','通道序号']; // 导出的表头名
+          const filterVal = ['storeId','storeName','serialNumber','name', 'validationCode' ,'channelCount','channelName','channelNum']; // 导出的表头字段名
           console.log(that.activeName);
           let deviceData=await that.getAllDeviceData();
           let channelData=that.channelData;
@@ -1045,7 +1049,7 @@
                   obj.storeName=item.storeName;
                   obj.serialNumber=item.serialNumber;
                   obj.name=item.name;
-                  obj.deviceModel=item.deviceModel;
+                  obj.validationCode='';
                   obj.channelCount=item.channelCount;
                   obj.channelName=_item.name;
                   obj.channelNum=_item.channelId;
@@ -1450,7 +1454,7 @@
               let attachRes = await self.attachImageToDevice(fm);
               console.log(attachRes)
               if(attachRes.errMsg == 'Success'){
-                self.notify(self.$t('deviceView.addSuccess'),'warning',3000);
+                self.notify(self.$t('deviceView.addSuccess'),'success',3000);
               }
               self.showAddChannelDialog =false;
             }
@@ -2296,6 +2300,7 @@
               height: 90%;
               @include point(width, 80);
               vertical-align: middle;
+              text-align: center;
             }
             .upload-demo{
               position: absolute;

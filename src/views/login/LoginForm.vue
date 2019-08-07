@@ -227,7 +227,7 @@ export default {
                         let resData=res.data;
                         if(resData){
                             console.log(resData);
-                            self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId}});
+                            self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId, ezvizAppKey: resData.ezvizAppKey}});
                             //self.$router.push({path:self.redirect||'/'});
                             //setCookie('UserId',resData.userId);
                             //sessionStorage.setItem('UserId',resData.userId);

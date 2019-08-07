@@ -98,9 +98,11 @@ const user={
                         commit('SET_ACCOUNTID',accountId);
                         if(res.data.ezvizAppKey != ''){
                           commit('SET_ISEZVIZ', true)
+                          setCookie('isEzviz', true)
                         }
                         else{
                           commit('SET_ISEZVIZ', false)
+                          setCookie('isEzviz', false)
                         }
                     }
                     else{

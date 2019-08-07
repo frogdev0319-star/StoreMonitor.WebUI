@@ -403,7 +403,8 @@ export default {
     importFail: '模板导入失败',
     templateError: '当前模板错误，请更换模板重新导入！',
     editSuss: '修改成功!',
-    editFail: '修改失败!'
+    editFail: '修改失败!',
+    channelOrder: '通道号',
   },
 
   //Store Management page language
@@ -510,6 +511,11 @@ export default {
     inputName: '请输入排程名称！',
     promptInfo: '提示：因考虑路程人力因素，请合理安排巡检任务。',
     notifyOneDayBefore: '在前一天同一时间进行提醒',
-    timeExist: '执行时间已存在，请重新添加'
+    timeExist: '执行时间已存在，请重新添加',
+    emptyName: '排程名称不能为空',
+    emptyNotifyTime: '提醒时间不能为空',
+    emptyDate: '执行日期不能为空',
+    emptyMonth: '月份不能为空',
+    emptyTime: '执行时间不能为空'
   }
 }

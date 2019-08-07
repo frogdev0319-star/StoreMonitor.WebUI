@@ -50,8 +50,13 @@
                        :key="index" :label="`${item.name}`">
             <div :style="{height:varyWindowHeight}">
               <el-col :span="24" class="header-details">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
+                <el-input v-model="item.name" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                          class="el-type"></el-input>
+              </el-col>
+              <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-                <el-select v-model="item.mode" clearable  placeholder="选择类型" size="mini" :disabled="isDisabled" @change="searchStore"
+                <el-select v-model="item.mode" clearable  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
                            class="el-type" >
                   <el-option
                     v-for="itemType in typeList"
@@ -80,13 +85,20 @@
                 </div>
               </el-col>
               <el-col :span="24" class="header-details" v-if="item.mode== 3" v-for="(_item, _index) in item.schedule" :key="'mode3'+_index">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
-                <el-select v-model="_item.month" clearable  :placeholder="generateScheduleLang('selectMonth')" size="mini" @change="monthChange(_index)">
-                  <el-option v-for="itemMonth in selfMonthList" :key="itemMonth.value"
-                             :label="itemMonth.name"
-                             :value="itemMonth.value">
-                  </el-option>
-                </el-select>
+                <div class="self-detail">
+                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
+                  <div class="month-content" @click="choiceSelfDefineMonth(_index)">
+                    <div class="input-arrow-panel"></div>
+                    <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                  </div>
+                  <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="_item.showSelfDefineMonth" @mouseleave="_item.showSelfDefineMonth = false">
+                    <div class="month-details" v-for="(itemDay,indexs) in selfMonthList" :key="indexs">
+                      <el-checkbox v-model="itemDay.checked" @change="changeSelfDefineMonthItem(_index, indexs)" :disabled="itemDay.disabled"></el-checkbox>
+                      <span>{{itemDay.name}}</span>
+                    </div>
+                  </div>
+                </div>
                 <div class="day-detail">
                   <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceSelfMonth(_index)">
@@ -107,13 +119,20 @@
                 </div>
               </el-col>
               <el-col :span="24" class="header-details" v-if="showAddMonth && item.mode == 3">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
-                <el-select v-model="selfMonth" clearable  :placeholder="generateScheduleLang('selectMonth')" size="mini" @change="monthChange(-1)">
-                  <el-option v-for="itemList in selfMonthList" :key="itemList.value"
-                             :label="itemList.name"
-                             :value="itemList.value">
-                  </el-option>
-                </el-select>
+                <div class="self-detail">
+                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
+                  <div class="month-content" @click="choiceSelfDefineMonth(-1)">
+                    <div class="input-arrow-panel"></div>
+                    <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                  </div>
+                  <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="showSelfDefineMonth" @mouseleave="showSelfDefineMonth = false">
+                    <div class="month-details" v-for="(itemDay,indexs) in selfMonthList" :key="indexs">
+                      <el-checkbox v-model="itemDay.checked" @change="changeSelfDefineMonthItem(-1, indexs)" :disabled="itemDay.disabled"></el-checkbox>
+                      <span>{{itemDay.name}}</span>
+                    </div>
+                  </div>
+                </div>
                 <div class="day-detail">
                   <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceMonth">
@@ -129,8 +148,7 @@
                   </div>
                   <span class="delete-time-btn" size="mini" v-if="" style="margin: 0 20px 0 30px"
                         @click="deleteMonthAndDays(-1)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addTime"
-                             v-if="!showAddTime"><i class="el-icon-plus"></i></el-button>
+                  <el-button class="time-btn" size="mini" @click="addMonth"><i class="el-icon-plus"></i></el-button>
                 </div>
               </el-col>
               <el-col :span="24" class="header-details"
@@ -265,24 +283,24 @@
 
   export default {
     name: "OnsiteDetail",
-    components:{
+    components: {
       DialogVue
     },
-    data(){
+    data() {
       return {
-        varyWindowHeight:window.innerHeight,
-        varyWindowWidth:window.innerWidth,
-        allData:false,
+        varyWindowHeight: window.innerHeight,
+        varyWindowWidth: window.innerWidth,
+        allData: false,
         allDisabled: false,
-        storeList:[],
-        tempStoreList :[],
+        storeList: [],
+        tempStoreList: [],
         showAddTime: false,
         scheduleList: ['现场排程一'],
-        paneList:[],
+        paneList: [],
         timeArray: ['08:00'], //选中的执行时间
-        lang: this.$i18n.locale ,
+        lang: this.$i18n.locale,
         hasSelectMonth: false,
-        monthList:[
+        monthList: [
           {
             'checked': false,
             value: 1,
@@ -440,14 +458,14 @@
           },
         ],
         value: '',
-        input4:'',
-        checked:false,
+        input4: '',
+        checked: false,
         checkAll: false,
         isIndeterminate: true,
         checkAll1: false,
         activeName: '0',
         curType: 2,
-        typeList:[
+        typeList: [
           {
             value: 2,
             label: this.$t('scheduleView.monthly')
@@ -462,15 +480,15 @@
         showMonthDrap: false,
         showMonthContent: false,
         monthValue: this.$t('scheduleView.everyMonth'),
-        weekDays:[],
-        showWeekContent:false,
-        showAddDialog:false,
-        showDeleteDialog:false,
+        weekDays: [],
+        showWeekContent: false,
+        showAddDialog: false,
+        showDeleteDialog: false,
         scheduleName: '',
         storeCount: 0,
         serachVale: '',
         scheduleId: -1,
-        bindStoreId:[],
+        bindStoreId: [],
         selectTab: '',
         selectWeek: [],
         selectMonth: [],
@@ -481,61 +499,73 @@
         selfMonthList: [
           {
             'checked': false,
+            'disable': false,
             'name': '1',
             'value': '1',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '2',
             'value': '2',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '3',
             'value': '3',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '4',
             'value': '4',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '5',
             'value': '5',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '6',
             'value': '6',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '7',
             'value': '7',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '8',
             'value': '8',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '9',
             'value': '9',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '10',
             'value': '10',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '11',
             'value': '11',
           },
           {
             'checked': false,
+            'disable': false,
             'name': '12',
             'value': '12',
           },
@@ -576,58 +606,60 @@
         notifyTime: '', //执行时间
         dueDays: -1, //执行时效
         hasBoundStoreIds: [], //已经绑定过周、月模式的门店id
-        selectWeekObj:{
-          title:'提示',
-          showInfo:'请选择执行日期！',
-          isWarning:false,
-          dialogCosed:false
+        selectWeekObj: {
+          title: '提示',
+          showInfo: '请选择执行日期！',
+          isWarning: false,
+          dialogCosed: false
         },
-        selectTimeObj:{
-          title:'提示',
-          showInfo:'请选择提醒时间！',
-          isWarning:false,
-          dialogCosed:false
+        selectTimeObj: {
+          title: '提示',
+          showInfo: '请选择提醒时间！',
+          isWarning: false,
+          dialogCosed: false
         },
-        selectSelfMonthObj:{
-          title:'提示',
-          showInfo:'请选择自定义模式下的月份和日期！',
-          isWarning:false,
-          dialogCosed:false
+        selectSelfMonthObj: {
+          title: '提示',
+          showInfo: '请选择自定义模式下的月份和日期！',
+          isWarning: false,
+          dialogCosed: false
         },
-        checkAllMonth: false
+        checkAllMonth: false,
+        isAdd: false,
+        showSelfDefineMonth: false, //是否显示自定义月份框
       }
     },
 
     methods: {
       generateScheduleLang,
-      noWeekDialog(val){
-        let self=this;
-        self.selectWeekObj.dialogCosed=false;
+      noWeekDialog(val) {
+        let self = this;
+        self.selectWeekObj.dialogCosed = false;
       },
-      cancelNoWeek(val){
-        let self=this;
-        self.selectWeekObj.dialogCosed=false;
+      cancelNoWeek(val) {
+        let self = this;
+        self.selectWeekObj.dialogCosed = false;
       },
-      noTimeDialog(){
-        let self=this;
-        self.selectTimeObj.dialogCosed=false;
+      noTimeDialog() {
+        let self = this;
+        self.selectTimeObj.dialogCosed = false;
       },
-      cancelNoTime(val){
-        let self=this;
-        self.selectTimeObj.dialogCosed=false;
+      cancelNoTime(val) {
+        let self = this;
+        self.selectTimeObj.dialogCosed = false;
       },
-      noSelfMonthDialog(){
-        let self=this;
-        self.selectSelfMonthObj.dialogCosed=false;
+      noSelfMonthDialog() {
+        let self = this;
+        self.selectSelfMonthObj.dialogCosed = false;
       },
-      cancelNoSelfMonth(val){
-        let self=this;
-        self.selectSelfMonthObj.dialogCosed=false;
+      cancelNoSelfMonth(val) {
+        let self = this;
+        self.selectSelfMonthObj.dialogCosed = false;
       },
-      hiddenSelfMonthPanel(){
+      hiddenSelfMonthPanel() {
         let self = this;
         self.showMonthContent = false;
-        if(self.hasSelectMonth && !self.showMonthContent){
+        if (self.hasSelectMonth && !self.showMonthContent) {
           console.log('选择完毕')
           self.hasSelectMonth = false;
           let month = self.selfMonth;
@@ -635,9 +667,10 @@
           let obj = {};
           obj.month = month;
           obj.showMonthContent = false;
+          obj.showSelfDefineMonth = false;
           obj.monthValue = days;
           let daysArray = days.split(',');
-          obj.day = daysArray.slice(0,daysArray.length-1); //去除最后一个逗号
+          obj.day = daysArray.slice(0, daysArray.length - 1); //去除最后一个逗号
           let tabIndex = Number(self.activeName);
           let actPanList = self.paneList[tabIndex];
           actPanList.schedule.push(obj);
@@ -647,7 +680,7 @@
           self.monthValue = '';
         }
       },
-      monthChange(index){
+      monthChange(index) {
         let monthList = [
           {
             'checked': false,
@@ -808,18 +841,18 @@
         console.log(index)
         let self = this;
         let month = 0;
-        if(index == -1){
+        if (index == -1) {
           month = self.selfMonth;
         }
-        else{
+        else {
           month = self.paneList[Number(self.activeName)].schedule[index].month;
         }
         console.log(month)
         let year = self.$moment().format('YYYY');
-        let days = self.$moment([year, month-1]).daysInMonth();
+        let days = self.$moment([year, month - 1]).daysInMonth();
         console.log(days)
         self.monthList = monthList.splice(0, days);
-        console.log(self.monthList )
+        console.log(self.monthList)
       },
       addScheduleButton() {
         let self = this;
@@ -830,44 +863,59 @@
         let self = this;
         self.showDeleteDialog = true;
       },
-      bindScheduleBtn(){
+      bindScheduleBtn() {
         let self = this;
         let tabIndex = Number(self.activeName);
         let mode = self.paneList[tabIndex].mode;
         let notifyTime = self.paneList[tabIndex].notifyTime;
         let dayArray = self.dayArray;
-
+        let name = self.paneList[tabIndex].name;
+        let schedule = self.paneList[tabIndex].schedule;
+        console.log(schedule)
+        if (name == '') {
+          self.notify(self.$t('scheduleView.emptyName'), 'warning', 3000);
+          self.$refs.scheduleName[tabIndex].focus();
+          return false;
+        }
+        if (notifyTime == '') {
+          self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning', 3000);
+          return false;
+        }
         console.log(dayArray)
         console.log(self.selectWeek);
 
-        if( (mode==1 || mode==2) && (dayArray.length == 0) ){
-          self.selectWeekObj.dialogCosed=true;
-          return false;
-        }
-        else if(mode== 3){
-          let schedule = self.paneList[tabIndex].schedule[0];
-          console.log(schedule)
-          if(schedule.month == "" || schedule.day.length == 0 ){
-            self.selectSelfMonthObj.dialogCosed=true;
+        if (mode == 1 || mode == 2) {
+          //周模式
+          if (dayArray.length == 0) {
+            self.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
             return false;
           }
-          else if(notifyTime == ''){
-            self.selectTimeObj.dialogCosed=true;
+        }
+        if (mode == 3) {
+          //自定义模式
+          let lackMonth = false;
+          let lackDay = false;
+          schedule.forEach(item => {
+            if (item.month == '') {
+              lackMonth = true;
+            }
+            else if (item.day.length == 0) {
+              lackDay = true;
+            }
+          })
+          console.log(lackMonth + '..' + lackDay);
+          if (lackMonth) {
+            self.notify(self.$t('scheduleView.emptyMonth'), 'warning', 3000);
             return false;
           }
-          else{
-            self.showBindDialog = true;
+          else if (lackDay) {
+            self.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
+            return false;
           }
         }
-        else if(notifyTime == ''){
-          self.selectTimeObj.dialogCosed=true;
-          return false;
-        }
-        else{
-          self.showBindDialog = true;
-        }
+        self.showBindDialog = true;
       },
-      allMonthChecked(val){
+      allMonthChecked(val) {
         /**
          * 选择所有的日期
          * @type {default.methods}
@@ -875,19 +923,19 @@
         let self = this;
         console.log(val);
         let selectedDates = [];
-        if(val){
-          self.monthList.forEach(item=>{
+        if (val) {
+          self.monthList.forEach(item => {
             item.checked = true;
             selectedDates.push(item.value)
           })
         }
-        else{
-          self.monthList.forEach(item=>{
+        else {
+          self.monthList.forEach(item => {
             item.checked = false
           })
         }
         self.monthValue = val ? self.$t('scheduleView.everyMonth') : '';
-        self.selectMonth = val ? selectedDates: [] ;
+        self.selectMonth = val ? selectedDates : [];
         console.log(self.monthValue);
         console.log(self.selectMonth)
       },
@@ -899,12 +947,12 @@
         let tabIndex = Number(self.activeName);
         self.monthValue = '';
         self.selectMonth = [];
-        self.monthList.forEach(item=>{
+        self.monthList.forEach(item => {
           item.checked = false;
         })
         self.monthValue = '';
         self.selectMonth = [];
-        self.dayArray =  self.paneList[tabIndex].dayArray;
+        self.dayArray = self.paneList[tabIndex].dayArray;
         self.echoMonthAndWeek();
         self.showMonthContent = false;
         self.showWeekContent = false;
@@ -914,26 +962,26 @@
         self.searchStore();
       },
 
-      addMonth(){
+      addMonth() {
         let self = this;
         self.showAddMonth = true;
-        self.monthList.forEach(item=>{
+        self.monthList.forEach(item => {
           item.checked = false;
         })
       },
-      echoMonthAndWeek(){
+      echoMonthAndWeek() {
         let self = this;
         let type = self.paneList[Number(self.activeName)].mode;
         let dateStr = '';
         let count = 0;
 
-        if(type == 2){
+        if (type == 2) {
           let selectedMonth = self.dayArray;
           self.selectMonth = selectedMonth;
           console.log(selectedMonth + 'selectedMonth');
           self.monthList.forEach(item => {
-            selectedMonth.forEach(_item=>{
-              if(item.value == _item){
+            selectedMonth.forEach(_item => {
+              if (item.value == _item) {
                 dateStr = dateStr + item.value + ',';
                 item.checked = true;
                 count++;
@@ -954,13 +1002,13 @@
             self.checkAllMonth = false;
           }
         }
-        else if(type == 3){
+        else if (type == 3) {
           let selectedMonth = self.dayArray;
           self.selectMonth = selectedMonth;
           console.log(selectedMonth + 'selectedMonth');
           self.monthList.forEach(item => {
-            selectedMonth.forEach(_item=>{
-              if(item.value == _item){
+            selectedMonth.forEach(_item => {
+              if (item.value == _item) {
                 dateStr = dateStr + item.value + ',';
                 item.checked = true;
                 count++;
@@ -976,11 +1024,11 @@
         }
       },
 
-      choiceMonthly(){
+      choiceMonthly() {
         let self = this;
         self.showMonthContent = !self.showMonthContent;
       },
-      changeMonthlyItem(item){
+      changeMonthlyItem(item) {
         let self = this;
         console.log(item);
         let daysStr = "";
@@ -988,7 +1036,7 @@
         let selectedMonths = [];
         self.monthList.forEach(item => {
           if (item.checked) {
-            daysStr = daysStr  + item.value + ',';
+            daysStr = daysStr + item.value + ',';
             selectedMonths.push(item.value);
             count++;
           }
@@ -1003,38 +1051,120 @@
             self.monthValue = self.$t('scheduleView.everyMonth');
             self.checkAllMonth = true;
           }
-          else{
+          else {
             self.checkAllMonth = false;
           }
         }
-        else{
+        else {
           self.monthValue = '';
           self.checkAllMonth = false;
         }
       },
-
-      choiceSelfMonth(index){
+      //自定义模式下月份
+      choiceSelfDefineMonth(index) {
+        let self = this;
+        console.log(index);
+        let tabIndex = Number(self.activeName);
+        let actPanList = self.paneList[tabIndex];
+        self.selfMonthList.forEach(item => {
+          item.checked = false;
+          item.disabled = false;
+        })
+        if (index == -1) {
+          self.showSelfDefineMonth = true;
+          actPanList.schedule.forEach(item => {
+            self.selfMonthList.forEach(_item => {
+              if (item.month == _item.value) {
+                _item.disabled = true;
+              }
+              if (self.selfMonth == _item.value) {
+                _item.checked = true;
+              }
+            });
+          });
+        }
+        else {
+          let timeJsonList = actPanList.schedule[index];
+          console.log(actPanList.schedule);
+          console.log(timeJsonList.showSelfDefineMonth);
+          actPanList.schedule[index].showSelfDefineMonth = !actPanList.schedule[index].showSelfDefineMonth;
+          actPanList.schedule.forEach(_item => {
+            self.selfMonthList.forEach(item => {
+              if (_item.month == item.value) {
+                item.disabled = true;
+              }
+              if (item.value == timeJsonList.month) {
+                item.checked = true;
+                item.disabled = false;
+              }
+            });
+          });
+        }
+      },
+      //更新时间选择
+      changeSelfDefineMonthItem(index, monthIndex) {
+        let self = this;
+        console.log(monthIndex)
+        let tabIndex = Number(self.activeName);
+        let actPanList = self.paneList[tabIndex];
+        let timeJsonList = actPanList.schedule[index];
+        console.log(actPanList.schedule);
+        if (index != -1) {
+          self.selfMonthList.forEach(item => {
+            item.checked = false;
+          })
+          timeJsonList.month = self.selfMonthList[monthIndex].value;
+          self.selfMonthList[monthIndex].checked = true;
+          console.log(actPanList.schedule);
+        }
+        else {
+          //新增时间
+          self.selfMonthList.forEach(item => {
+            item.checked = false;
+          })
+          self.selfMonth = self.selfMonthList[monthIndex].value;
+          self.selfMonthList[monthIndex].checked = true;
+        }
+        //调用获取日期的函数
+        self.monthChange(index);
+      },
+      //增加时间
+      addDayTimeToList() {
+        let self = this;
+        self.showDayTimeContent = false;
+        let tabIndex = Number(self.activeName);
+        let actPanList = self.paneList[tabIndex];
+        let timeJsonList = actPanList.timeList;
+        let timeJson = {};
+        timeJson.time = self.dayTime;
+        timeJson.showTimeContent = false;
+        timeJsonList.push(timeJson);
+        self.dayTime = '';
+        self.showAddTime = false;
+        console.log(timeJsonList)
+      },
+      choiceSelfMonth(index) {
         let self = this;
         let tabIndex = Number(self.activeName);
         let actPanList = self.paneList[tabIndex];
         actPanList.schedule[index].showMonthContent = !actPanList.schedule[index].showMonthContent;
         self.monthList.forEach(item => {
           item.checked = false;
-          actPanList.schedule[index].monthValue.split(',').forEach(_item=>{
+          actPanList.schedule[index].monthValue.split(',').forEach(_item => {
             if (item.value == _item) {
               item.checked = true;
             }
           })
         })
       },
-      changeSelfMonthItem(index){
+      changeSelfMonthItem(index) {
         let self = this;
         let daysStr = "";
         let count = 0;
         let selectedMonths = [];
         self.monthList.forEach(item => {
           if (item.checked) {
-            daysStr = daysStr  + item.value + ',';
+            daysStr = daysStr + item.value + ',';
             selectedMonths.push(item.value);
             count++;
           }
@@ -1044,14 +1174,18 @@
         if (daysStr.length != 0) {
           actPanList.schedule[index].monthValue = daysStr;
           let daysArray = daysStr.split(',');
-          actPanList.schedule[index].day = daysArray.slice(0,daysArray.length-1); //去除最后一个逗号
+          actPanList.schedule[index].day = daysArray.slice(0, daysArray.length - 1); //去除最后一个逗号
           console.log(actPanList.schedule[index].monthValue)
           if (count == self.monthList.length) {
             actPanList.schedule[index].monthValue = self.$t('scheduleView.everyMonth');
           }
         }
+        else {
+          actPanList.schedule[index].monthValue = '';
+          actPanList.schedule[index].day = [];
+        }
       },
-      choiceMonth(){
+      choiceMonth() {
         let self = this;
         self.showMonthContent = !self.showMonthContent;
         // self.monthList.forEach(item => {
@@ -1060,14 +1194,14 @@
 
         //self.showMonthDrap = true;
       },
-      changeMonthItem(){
+      changeMonthItem() {
         let self = this;
         let daysStr = "";
         let count = 0;
         let selectedMonths = [];
         self.monthList.forEach(item => {
           if (item.checked) {
-            daysStr = daysStr  + item.value + ',';
+            daysStr = daysStr + item.value + ',';
             selectedMonths.push(item.value);
             count++;
           }
@@ -1094,29 +1228,30 @@
         let execOnce = self.paneList[tabIndex].execOnce;
         let year = self.$moment().format('YYYY'); //年
         params.from = self.$moment(year).startOf('year').valueOf();
-        params.to =  self.$moment(year).startOf('year').valueOf();
+        params.to = self.$moment(year).startOf('year').valueOf();
         self.paneList[tabIndex].from = params.from;
-        self.paneList[tabIndex].to =  params.to;
+        self.paneList[tabIndex].to = params.to;
+        self.paneList[tabIndex].modeDisabled = true;
         params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
         let ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
-        if(ifNotifyOneDay){
+        if (ifNotifyOneDay) {
           params.aheadNotification = 86400; //提前一天的秒数
         }
-        else{
+        else {
           params.aheadNotification = 0; //不提前通知
         }
         let tempSchedule = [];
-        if(params.mode == 2){
+        if (params.mode == 2) {
           //月模式
           let timeSelected = self.timeArray;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = selectedMonth;
-          selectedMonth.forEach(item=>{
+          selectedMonth.forEach(item => {
             console.log(item);
             let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
+            timeSelected.forEach(_item => {
               console.log(_item);
               let seconds = self.hourToSecond(_item);
               let obj = {};
@@ -1129,23 +1264,23 @@
           })
           console.log(tempSchedule);
         }
-        else if(params.mode = 3){
+        else if (params.mode = 3) {
           //自定义模式
-          if(execOnce){
+          if (execOnce) {
             //勾选，执行一次,当年最后一天的时间
             params.to = self.$moment().endOf('year').valueOf()
           }
-          else{
+          else {
             params.to = -1; //执行多次
           }
           let selfSche = self.paneList[tabIndex].schedule;
           console.log(selfSche);
           let selectedMonth = self.selectMonth; //选择的日期
-          selfSche.forEach(item=>{
+          selfSche.forEach(item => {
             let month = item.month; //选择的月份
             let days = item.day; //选择的日期数组
-            days.forEach(_item=>{
-              let dayOfYear = self.$moment([year, month-1, _item]).dayOfYear();
+            days.forEach(_item => {
+              let dayOfYear = self.$moment([year, month - 1, _item]).dayOfYear();
               let obj = {};
               obj.day = dayOfYear;
               tempSchedule.push(obj);
@@ -1169,12 +1304,7 @@
 
       async addSchedule() {
         let self = this;
-        if(self.scheduleName == ''){
-          self.notify( self.$t('scheduleView.inputName'),'warning',3000);
-          self.$refs.scheduleName.focus();
-          return false;
-        }
-
+        self.scheduleName = '新增排程';
         self.showAddDialog = false;
         let addInfo = {
           name: self.scheduleName,
@@ -1185,88 +1315,84 @@
           dayArray: [],
           timeArray: ['8:00'],
           dueDays: 1,
-          schedule: [{month: '', day: [], monthValue: '', showMonthContent: false}],
+          schedule: [{month: '', day: [], monthValue: '', showMonthContent: false, showSelfDefineMonth: false}],
           notifyTime: '',
           execOnce: false,
           ifNotifyOneDay: false,
+          modeDisabled: false
         };
         self.paneList.push(addInfo);
         let pane = self.paneList;
-        // self.showAddMonth = true;
-        // self.timeArray = ['8:00'];
-        // self.dayArray = [];
-        // self.curType = 1;
-        // self.weekValue = '每天',
-        // self.monthValue = '每月',
-        self.activeName = (pane.length -1).toString() ;
+        self.activeName = (pane.length - 1).toString();
         self.selectTab = self.scheduleName;
         self.scheduleId = 0;
         self.isDisabled = false;
         self.searchStore();
 
-        self.monthList.forEach(item=>{
+        self.monthList.forEach(item => {
           item.checked = false
         })
         self.monthValue = '';
         self.dayArray = [];
-        console.log(self.paneList)
+        self.isAdd = true,
+          console.log(self.paneList)
         self.$emit('sendActiveName', self.activeName)
       },
       async searchStoreInput() {
         let self = this;
         let params = {};
         console.log(self.tempStoreList)
-        let tempStoreList=self.tempStoreList;
-        let getStore2Temp=data=>{
-          let cityList=[];
-          data.forEach(item=>{
-            if(cityList.map(x=>x.city).indexOf(item.city)==-1){
-              let obj={
-                city:item.city,
-                province:item.province
+        let tempStoreList = self.tempStoreList;
+        let getStore2Temp = data => {
+          let cityList = [];
+          data.forEach(item => {
+            if (cityList.map(x => x.city).indexOf(item.city) == -1) {
+              let obj = {
+                city: item.city,
+                province: item.province
               }
               cityList.push(obj);
             }
           })
-          let storeListTemp=[];
-          for(let i=0;i<cityList.length;i++){
-            let temp=[];
-            let obj={};
-            for(let j=0;j<data.length;j++){
-              if(cityList[i].city==data[j].city){
-                let obj={};
-                obj.storeId=data[j].storeId;
-                obj.name=data[j].name;
-                obj.city=data[j].city;
+          let storeListTemp = [];
+          for (let i = 0; i < cityList.length; i++) {
+            let temp = [];
+            let obj = {};
+            for (let j = 0; j < data.length; j++) {
+              if (cityList[i].city == data[j].city) {
+                let obj = {};
+                obj.storeId = data[j].storeId;
+                obj.name = data[j].name;
+                obj.city = data[j].city;
                 obj.checked = data[j].checked;
                 obj.disabled = data[j].disabled;
                 console.log(obj)
                 temp.push(obj);
               }
             }
-            obj.cityName=cityList[i].city;
+            obj.cityName = cityList[i].city;
             obj.province = cityList[i].province;
-            obj.itemData=temp;
+            obj.itemData = temp;
             storeListTemp.push(obj);
           }
           return storeListTemp;
         }
-        let temp=[];
-        let tempArray=[];
-        let tempStore=[];
-        tempStoreList.forEach((_item,_index)=>{
-          _item.itemData.forEach((itemDs,indexDs)=>{
+        let temp = [];
+        let tempArray = [];
+        let tempStore = [];
+        tempStoreList.forEach((_item, _index) => {
+          _item.itemData.forEach((itemDs, indexDs) => {
             temp.push(util.getPinyinList(itemDs.name));
             tempStore.push(itemDs);
           })
         })
-        for(var i=0;i<temp.length;i++){
-          if(temp[i][0].indexOf(self.serachVale.trim())!=-1||
-            temp[i][1].indexOf(self.serachVale.trim())!=-1){
+        for (var i = 0; i < temp.length; i++) {
+          if (temp[i][0].indexOf(self.serachVale.trim()) != -1 ||
+            temp[i][1].indexOf(self.serachVale.trim()) != -1) {
             tempArray.push(tempStore[i]);
           }
         }
-        self.storeList=getStore2Temp(tempArray);
+        self.storeList = getStore2Temp(tempArray);
 
         let count = 0;
         self.storeList.forEach(item => {
@@ -1294,8 +1420,8 @@
       },
       async getStoreByCity(data) {
         let self = this;
-        let bindStoreId=await self.getBindStoreList();
-        self.storeCount=bindStoreId.length;
+        let bindStoreId = await self.getBindStoreList();
+        self.storeCount = bindStoreId.length;
         console.log(data);
         let cityList = [];
         data.forEach(item => {
@@ -1334,7 +1460,7 @@
           let _tempDisCount = 0;
           item.store.forEach(_item => {
             let _obj = {};
-            if(mode === 3){
+            if (mode === 3) {
               if (bindStoreId.indexOf(_item.storeId) == -1) {
                 _obj.checked = false;
                 _obj.disabled = false;
@@ -1345,7 +1471,7 @@
                 _tempCount++;
               }
             }
-            else{
+            else {
               if (bindStoreId.indexOf(_item.storeId) != -1) {
                 _obj.checked = true;
                 _obj.disabled = false;
@@ -1353,11 +1479,11 @@
               }
               else {
                 // 周月模式下，剩下的商店id 要看有没有绑定周月模式，若绑定，则不可用，
-                if(self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
+                if (self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
                   _obj.checked = false;
                   _obj.disabled = false;
                 }
-                else{
+                else {
                   _obj.checked = false;
                   _obj.disabled = true;
                   _tempDisCount++;
@@ -1380,14 +1506,14 @@
           if (_tempDisCount + _tempCount == item.store.length) {
             groupObj.checked = true;
           }
-          else{
+          else {
             groupObj.checked = false;
           }
           if (_tempDisCount == item.store.length) {
             groupObj.disabled = true;
             groupObj.checked = false;
           }
-          else{
+          else {
             groupObj.disabled = false;
           }
           groupObj.itemData = _temp;
@@ -1413,7 +1539,7 @@
         else {
           self.allData = false;
         }
-        if(count + disCount == self.storeList.length){
+        if (count + disCount == self.storeList.length) {
           self.allData = true;
         }
         if (disCount == self.storeList.length) {
@@ -1423,11 +1549,11 @@
           self.allDisabled = false;
         }
         let totalConut = disCount + count; //禁用加勾选数目
-        if(totalConut == self.storeList.length){
-          if(count> 0 ){
+        if (totalConut == self.storeList.length) {
+          if (count > 0) {
             self.allDisabled = false;
             self.allData = true;
-          }else{
+          } else {
             self.allDisabled = true;
             self.allData = false;
           }
@@ -1439,10 +1565,10 @@
         console.log(scheduleId)
         let params = {}
         params.scheduleId = scheduleId;
-        if(params.scheduleId == 0){
+        if (params.scheduleId == 0) {
           return [];
         }
-        else if(params.scheduleId == -1){
+        else if (params.scheduleId == -1) {
           console.log(self.paneList);
           params.scheduleId = self.paneList[0].schId;
         }
@@ -1462,16 +1588,16 @@
         self.showAddTime = true;
       },
 
-      bindScheduleToStore(params){
-        return new Promise((resolve,reject)=>{
-          bindScheduleAndStore(params).then(res=>{
+      bindScheduleToStore(params) {
+        return new Promise((resolve, reject) => {
+          bindScheduleAndStore(params).then(res => {
             resolve(res);
           })
         })
       },
-      unbindScheToStore(params){
-        return new Promise((resolve,reject)=>{
-          unbindScheduleAndStore(params).then(res=>{
+      unbindScheToStore(params) {
+        return new Promise((resolve, reject) => {
+          unbindScheduleAndStore(params).then(res => {
             resolve(res);
           })
         })
@@ -1484,91 +1610,92 @@
         self.showBindDialog = false;
         let isAdd = false; //判断是否是新增排程
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
-        if(self.selectTab == self.scheduleName){
-          isAdd = true; //新增
+        if (self.isAdd) {
+          isAdd = true;
           scheId = await self.addScheduleService();
           self.paneList[Number(self.activeName)].schId = scheId;
-          self.scheduleId = scheId;
           self.scheduleName = ''
+          self.scheduleId = scheId;
+          self.isAdd = false;
         }
-        else{
+        else {
           scheId = self.paneList[Number(self.activeName)].schId;
         }
-        let storeIdChecked=[];
-        let storeIdUnchecked=[];
-        let count=0;
+        let storeIdChecked = [];
+        let storeIdUnchecked = [];
+        let count = 0;
         let mode = self.paneList[Number(self.activeName)].mode;
-        self.storeList.forEach(item=>{
-          count+=item.itemData.length;
-          item.itemData.forEach(_item=>{
-            if(_item.checked){
+        self.storeList.forEach(item => {
+          count += item.itemData.length;
+          item.itemData.forEach(_item => {
+            if (_item.checked) {
               storeIdChecked.push(_item.storeId);
             }
-            else{
+            else {
               storeIdUnchecked.push(_item.storeId);
               console.log(self.hasBoundStoreIds);
             }
           })
         })
 
-        let tempchecked=[];
-        let obj={
-          scheduleId:scheId,
+        let tempchecked = [];
+        let obj = {
+          scheduleId: scheId,
           storeIds: storeIdChecked,
         };
         tempchecked.push(obj);
         console.log(tempchecked)
-        let paramsBind={
-          items:tempchecked
+        let paramsBind = {
+          items: tempchecked
         };
         console.log(paramsBind)
 
-        let tempUnchecked=[];
-        let unbindobj={
+        let tempUnchecked = [];
+        let unbindobj = {
           scheduleId: scheId,
           storeIds: storeIdUnchecked,
         };
         tempUnchecked.push(unbindobj);
 
-        let paramsUnBind={
-          items:tempUnchecked
+        let paramsUnBind = {
+          items: tempUnchecked
         };
         console.log(paramsUnBind)
-        let flag=false;
-        if(storeIdChecked.length==count){  //全部勾选，只有绑定操作
-          let resBind=await self.bindScheduleToStore(paramsBind);
+        let flag = false;
+        if (storeIdChecked.length == count) {  //全部勾选，只有绑定操作
+          let resBind = await self.bindScheduleToStore(paramsBind);
           console.log(resBind);
-          if(resBind.errMsg=='Success'&&resBind.errCode=='0'){
-            flag=true;
+          if (resBind.errMsg == 'Success' && resBind.errCode == '0') {
+            flag = true;
           }
         }
-        else if(storeIdUnchecked.length==count){ //全部取消勾选，只有解绑操作
-          let resUnBind=await self.unbindScheToStore(paramsUnBind);
+        else if (storeIdUnchecked.length == count) { //全部取消勾选，只有解绑操作
+          let resUnBind = await self.unbindScheToStore(paramsUnBind);
           console.log(resUnBind);
-          if(resUnBind.errMsg=='Success'&&resUnBind.errCode=='0'){
-            flag=true;
+          if (resUnBind.errMsg == 'Success' && resUnBind.errCode == '0') {
+            flag = true;
           }
         }
-        else{
-          let resBind=await self.bindScheduleToStore(paramsBind);
-          let resUnBind=await self.unbindScheToStore(paramsUnBind);
-          if(resBind.errMsg=='Success'&&resUnBind.errMsg=='Success'){
-            flag=true;
+        else {
+          let resBind = await self.bindScheduleToStore(paramsBind);
+          let resUnBind = await self.unbindScheToStore(paramsUnBind);
+          if (resBind.errMsg == 'Success' && resUnBind.errMsg == 'Success') {
+            flag = true;
           }
         }
-        if(flag){
-          let bindIdList=await self.getBindStoreList();
+        if (flag) {
+          let bindIdList = await self.getBindStoreList();
           self.storeCount = bindIdList.length;
           console.log(bindIdList.length + "......");
           //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
-          self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`,'success',3000);
+          self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
         }
-        else{
-          self.notify(this.$t('insSettingView.bindFail'),'warning',3000);
+        else {
+          self.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
           return false;
         }
 
-        if(!isAdd){
+        if (!isAdd) {
           //不是增加排程，则更新排程
           self.updateScheduleInfo();
         }
@@ -1580,10 +1707,10 @@
       deleteMonthAndDays(index) {
         console.log(index)
         let self = this;
-        if(index == -1){
+        if (index == -1) {
           self.showAddMonth = false;
         }
-        else{
+        else {
           self.paneList[Number(self.activeName)].schedule.splice(index, 1); //删除时间
         }
       },
@@ -1595,6 +1722,11 @@
       },
       async searchStore() {
         let self = this;
+        let mode = self.paneList[Number(self.activeName)].mode;
+        if (mode == 2) {
+          //月模式
+          self.monthList = self.monthList.slice(0, 28); // 月模式1-28号
+        }
         self.showCityContent = false;
         self.serachVale = '';
         let params = {};
@@ -1623,93 +1755,93 @@
           self.allData = false;
         }
       },
-      choiceAll(val){
+      choiceAll(val) {
         console.log(val)
-        let self=this;
-        self.storeList.forEach(item=>{
-          if(!item.disabled){
-            item.checked=val;
-            item.itemData.forEach(_item=>{
-              if(!_item.disabled){
-                _item.checked=val;
+        let self = this;
+        self.storeList.forEach(item => {
+          if (!item.disabled) {
+            item.checked = val;
+            item.itemData.forEach(_item => {
+              if (!_item.disabled) {
+                _item.checked = val;
               }
             })
           }
         })
       },
-      choiceAllGroup(item){
-        let self=this;
+      choiceAllGroup(item) {
+        let self = this;
         console.log(item);
-        let obj=item;
-        item.itemData.forEach(item=>{
-          if(!item.disabled){
-            item.checked=obj.checked;
+        let obj = item;
+        item.itemData.forEach(item => {
+          if (!item.disabled) {
+            item.checked = obj.checked;
           }
           //item.checked=obj.checked;
         })
-        let arr=[];
-        self.storeList.forEach(_item=>{
-          if(_item.checked){
+        let arr = [];
+        self.storeList.forEach(_item => {
+          if (_item.checked) {
             arr.push(_item);
           }
         })
-        let disArr=[];
-        self.storeList.forEach(_item=>{
-          if(_item.disabled){
+        let disArr = [];
+        self.storeList.forEach(_item => {
+          if (_item.disabled) {
             disArr.push(_item);
           }
         })
-        if(self.storeList.length==arr.length + disArr.length){
-          self.allData=true;
+        if (self.storeList.length == arr.length + disArr.length) {
+          self.allData = true;
         }
-        else{
-          self.allData=false;
+        else {
+          self.allData = false;
         }
       },
-      choiceAllDevice(index,item){
-        let self=this;
+      choiceAllDevice(index, item) {
+        let self = this;
         console.log(index);
-        let count=0;
-        item.itemData.forEach(itemS=>{
-          if(itemS.checked){
+        let count = 0;
+        item.itemData.forEach(itemS => {
+          if (itemS.checked) {
             count++;
           }
         })
         let disCount = 0;
-        item.itemData.forEach(itemS=>{
-          if(itemS.disabled){
+        item.itemData.forEach(itemS => {
+          if (itemS.disabled) {
             disCount++;
           }
         })
-        if(count + disCount==item.itemData.length){
-          item.checked=true;
+        if (count + disCount == item.itemData.length) {
+          item.checked = true;
         }
-        else{
-          item.checked=false;
+        else {
+          item.checked = false;
         }
-        if(disCount == item.itemData.length){
+        if (disCount == item.itemData.length) {
           item.disabled = true;
         }
-        else{
+        else {
           item.disabled = false;
         }
-        let length=0, countItem=0;
-        self.storeList.forEach(_item=>{
-          length+=_item.itemData.length;
-          _item.itemData.forEach(itemS=>{
-            if(itemS.checked){
+        let length = 0, countItem = 0;
+        self.storeList.forEach(_item => {
+          length += _item.itemData.length;
+          _item.itemData.forEach(itemS => {
+            if (itemS.checked) {
               countItem++;
             }
           })
         })
-        if(length==countItem){
-          self.allData=true;
+        if (length == countItem) {
+          self.allData = true;
         }
-        else{
-          self.allData=false;
+        else {
+          self.allData = false;
         }
       },
-      getScheduleFromDB(params){
+      getScheduleFromDB(params) {
         return new Promise((resolve, reject) => {
           getScheduleListService(params).then(res => {
             console.log(res);
@@ -1720,61 +1852,63 @@
           })
         })
       },
-      async getScheduleList(){
+      async getScheduleList() {
         //get point check schedule List
         let self = this;
         self.paneList = [];
         let params = {};
         params.category = 1; //onsite schedule
         let data = await self.getScheduleFromDB(params)
-        if(data.length!=0){
-          data.forEach(item=>{
+        if (data.length != 0) {
+          data.forEach(item => {
             let name = item.name; //排程名称
-            if(self.scheduleList.indexOf(name)==-1){
+            if (self.scheduleList.indexOf(name) == -1) {
               self.scheduleList.push(name);
             }
           })
-          let tempAllData=[];
+          let tempAllData = [];
           data.forEach(_item => {
             console.log(_item);
             let tempScheduleData = {};
             tempScheduleData.name = _item.name;
             tempScheduleData.mode = _item.mode;
+            tempScheduleData.modeDisabled = true;
             tempScheduleData.schId = _item.id; //排程id
             tempScheduleData.enable = _item.enable;
             tempScheduleData.notifyTime = self.secondsToHour(_item.notifyTime);
             tempScheduleData.from = self.$moment(_item.from).format('YYYY'); //从from获取年
             let aheadNotification = _item.aheadNotification; //是否提前一天通知
 
-            if(aheadNotification == 86400){
+            if (aheadNotification == 86400) {
               tempScheduleData.ifNotifyOneDay = true;
             }
-            else{
+            else {
               tempScheduleData.ifNotifyOneDay = false;
             }
             tempScheduleData.dueDays = _item.dueDays;
-            tempScheduleData.execOnce = (_item.to == -1) ? false: true;
+            tempScheduleData.execOnce = (_item.to == -1) ? false : true;
             let tempSchedules = _item.schedule;
             console.log(tempSchedules)
             let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly, 3 自定义
             let dayArray = []; //存放1，2两种类型选中的时间
             let timeArray = []; //存放3种类型的执行时间
             let scheduleSelf = []; //存放自定义的月份和时间
-            tempSchedules.forEach(sche=>{
+            tempSchedules.forEach(sche => {
               console.log(sche)
               let day = sche.day;
               dayArray.push(day)
-              if(mode == 3){
+              if (mode == 3) {
                 let tempArray = [];
-                dayArray.forEach(item=>{
+                dayArray.forEach(item => {
                   let monthDay = self.$moment([tempScheduleData.from]).dayOfYear(item).format('M-D');
                   tempArray.push(monthDay);
                 })
                 //将数组按照月份分组，日组成数组
                 console.log(tempArray)
                 scheduleSelf = self.formatMonthDay(tempArray);
-                scheduleSelf.forEach(_item=>{
+                scheduleSelf.forEach(_item => {
                   _item.showMonthContent = false; //时间选择面板默认不显示
+                  _item.showSelfDefineMonth = false;
                   _item.monthValue = _item.day.join(',');
                 })
                 // self.scheduleSelf = scheduleSelf;
@@ -1782,13 +1916,13 @@
                 tempScheduleData.schedule = scheduleSelf;
               }
               let period = sche.period;
-              period.forEach(periods=>{
+              period.forEach(periods => {
                 let from = periods.from;
                 let hours = self.secondsToHour(from);
-                if(timeArray.indexOf(hours) == -1){
+                if (timeArray.indexOf(hours) == -1) {
                   timeArray.push(self.secondsToHour(from));
                 }
-                else{
+                else {
 
                 }
               })
@@ -1800,7 +1934,7 @@
             self.paneList.push(tempScheduleData);
           })
           //self.paneList.push(tempScheduleData);
-          if(self.isFirstLoad == true){
+          if (self.isFirstLoad == true) {
             self.isFirstLoad = false;
             self.dayArray = this.paneList[Number(self.activeName)].dayArray;
             self.selectTab = this.paneList[Number(self.activeName)].name;
@@ -1811,7 +1945,7 @@
           console.log(self.paneList);
           self.getHasBoundStroeIds();
         }
-        else if(data.length == 0){
+        else if (data.length == 0) {
           console.log(self.paneList)
           let addInfo = {
             name: '现场巡检排程一',
@@ -1822,22 +1956,25 @@
             dayArray: [],
             timeArray: ['8:00'],
             dueDays: 1,
-            schedule: [{month: '', day: [], monthValue: '', showMonthContent: false}],
+            schedule: [{month: '', day: [], monthValue: '', showMonthContent: false, showSelfDefineMonth: false}],
             notifyTime: '',
-            execOnce: false
+            execOnce: false,
+            ifNotifyOneDay: false,
+            modeDisabled: false
           };
           self.paneList.push(addInfo);
           self.scheduleName = "现场巡检排程一";
           self.selectTab = "现场巡检排程一";
           self.scheduleId = 0;
           self.isDisabled = false;
+          self.isAdd = true;
           self.searchStore();
         }
       },
-      getHasBoundStroeIds(){
+      getHasBoundStroeIds() {
         let self = this;
         self.hasBoundStoreIds = [];
-        self.paneList.forEach(item=>{
+        self.paneList.forEach(item => {
           let sheduleId = item.schId;
           let mode = item.mode;
           console.log(sheduleId + '....' + mode)
@@ -1851,11 +1988,11 @@
                 let errMsg = res.errMsg;
                 let data = res.data;
                 console.log(data);
-                data.forEach(_item=>{
-                  if(self.hasBoundStoreIds.indexOf(_item) == -1){
+                data.forEach(_item => {
+                  if (self.hasBoundStoreIds.indexOf(_item) == -1) {
                     self.hasBoundStoreIds.push(_item);
                   }
-                  else{
+                  else {
                     // do nothing
                   }
                 })
@@ -1866,26 +2003,26 @@
         })
         console.log(self.hasBoundStoreIds)
       },
-      secondsToHour(second){
+      secondsToHour(second) {
         //秒数转化为时分秒
         let changedData = [parseInt(second / 60 / 60), second / 60 % 60].join(":")
           .replace(/\b(\d)\b/g, "0$1");
         return changedData;
       },
-      hourToSecond(hourStr){
+      hourToSecond(hourStr) {
         // 时间字符串转化为距离零点的秒数
         let hourArray = hourStr.split(':');
         let changedSec = Number(hourArray[0]) * 3600 + Number(hourArray[1]) * 60;
         return changedSec;
       },
-      notify(msg,type,time) {
+      notify(msg, type, time) {
         this.$message({
           message: msg,
           type: type,
-          duration:time
+          duration: time
         });
       },
-      updateScheduleInfo(){
+      updateScheduleInfo() {
         let params = {};
         let self = this;
         let tabIndex = Number(self.activeName);
@@ -1896,24 +2033,24 @@
         params.mode = self.paneList[tabIndex].mode;
         let execOnce = self.paneList[tabIndex].execOnce;
         let ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
-        if(ifNotifyOneDay){
+        if (ifNotifyOneDay) {
           params.aheadNotification = 86400; //提前一天的秒数
         }
-        else{
+        else {
           params.aheadNotification = 0; //不提前通知
         }
         params.from = self.paneList[tabIndex].from;
         let year = self.$moment(params.from).format('YYYY'); //年self.paneList[tabIndex].from; //年
-        params.to =  -1;
+        params.to = -1;
         params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
         let tempSchedule = [];
         //日模式
-        if(params.mode == 0){
+        if (params.mode == 0) {
           //日模式
           let tempPeriod = [];
           let timeSelect = self.timeArray;
-          timeSelect.forEach(item=>{
+          timeSelect.forEach(item => {
             let seconds = self.hourToSecond(item);
             let obj = {};
             obj.from = seconds;
@@ -1924,15 +2061,15 @@
             "period": tempPeriod
           });
         }
-        else if(params.mode == 1){
+        else if (params.mode == 1) {
           //周模式
           let timeSelected = self.timeArray;
           let selectedWeek = self.selectWeek;
           self.paneList[tabIndex].dayArray = self.selectWeek;
-          selectedWeek.forEach(item=>{
+          selectedWeek.forEach(item => {
             let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
+            timeSelected.forEach(_item => {
               let seconds = self.hourToSecond(_item);
               let obj = {};
               obj.from = seconds;
@@ -1944,16 +2081,16 @@
           })
           console.log(tempSchedule);
         }
-        else if(params.mode == 2){
+        else if (params.mode == 2) {
           //月模式
           let timeSelected = self.timeArray;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
-          selectedMonth.forEach(item=>{
+          selectedMonth.forEach(item => {
             console.log(item);
             let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
+            timeSelected.forEach(_item => {
               console.log(_item);
               let seconds = self.hourToSecond(_item);
               let obj = {};
@@ -1966,22 +2103,22 @@
           })
           console.log(tempSchedule);
         }
-        else if(params.mode = 3){
+        else if (params.mode = 3) {
           //自定义模式
-          if(execOnce){
+          if (execOnce) {
             //勾选，执行一次,当年最后一天的时间
             params.to = self.$moment().endOf('year').valueOf()
           }
-          else{
+          else {
             params.to = -1; //执行多次
           }
           let selfSche = self.paneList[tabIndex].schedule;
           let selectedMonth = self.selectMonth; //选择的日期
-          selfSche.forEach(item=>{
+          selfSche.forEach(item => {
             let month = Number(item.month); //选择的月份
             let days = item.day; //选择的日期数组
-            days.forEach(_item=>{
-              let dayOfYear = self.$moment([year, month-1, _item]).dayOfYear();
+            days.forEach(_item => {
+              let dayOfYear = self.$moment([year, month - 1, _item]).dayOfYear();
               let obj = {};
               obj.day = dayOfYear;
               obj.period = [];
@@ -2001,13 +2138,13 @@
         })
 
       },
-      deleteSchedule(){
+      deleteSchedule() {
         let self = this;
         self.showDeleteDialog = false;
-        if(self.scheduleId == 0){
+        if (self.scheduleId == 0) {
           self.initData();
         }
-        else{
+        else {
           let scheduleIds = [];
           scheduleIds.push(self.scheduleId);
           let params = {};
@@ -2019,11 +2156,11 @@
               let errMsg = res.errMsg;
               let data = res.errCode;
               console.log(data);
-              if(data == 0){
-                self.notify(self.$t('scheduleView.deleteSuss'),'warning',3000);
+              if (data == 0) {
+                self.notify(self.$t('scheduleView.deleteSuss'), 'warning', 3000);
               }
-              else{
-                self.notify(self.$t('scheduleView.deleteFail'),'warning',3000);
+              else {
+                self.notify(self.$t('scheduleView.deleteFail'), 'warning', 3000);
               }
               //刷新页面
               self.initData()
@@ -2033,7 +2170,7 @@
         }
 
       },
-      initData(){
+      initData() {
         let self = this;
         self.paneList.splice(Number(self.activeName), 1);
         self.activeName = '0'
@@ -2041,7 +2178,7 @@
         self.curType = (self.paneList[0].mode).toString();
         console.log(typeof(self.curType))
         self.timeArray = self.paneList[0].timeArray;
-        self.dayArray =  self.paneList[0].dayArray;
+        self.dayArray = self.paneList[0].dayArray;
         self.echoMonthAndWeek();
         self.scheduleId = self.paneList[0].schId;
         self.enable = self.paneList[0].enable;
@@ -2054,22 +2191,22 @@
        * @param month
        * @returns {number[]}
        */
-      getMonthFirstLastDay(month){
+      getMonthFirstLastDay(month) {
         var year = new Date().getFullYear();
-        var firstDay = new Date(year,month-1,1);//这个月的第一天
-        var currentMonth=firstDay.getMonth(); //取得月份数
-        var lastDay=new Date(firstDay.getFullYear(),currentMonth+1,0);//是0而不是-1
+        var firstDay = new Date(year, month - 1, 1);//这个月的第一天
+        var currentMonth = firstDay.getMonth(); //取得月份数
+        var lastDay = new Date(firstDay.getFullYear(), currentMonth + 1, 0);//是0而不是-1
         var firstDay = firstDay.getTime();
         var lastDay = lastDay.getTime(); //返回第一天和最后一天的秒数
-        return [firstDay,lastDay];
+        return [firstDay, lastDay];
       },
       /**
        * 从秒数里获得月份
        * @param second
        * @returns {number}
        */
-      getMonthFromSecond(second){
-        let month  = new Date(second).getMonth();
+      getMonthFromSecond(second) {
+        let month = new Date(second).getMonth();
         console.log(month);
         return Number(month) + 1;
       },
@@ -2078,42 +2215,39 @@
        * @param array
        * @returns {Array}
        */
-      formatMonthDay(array){
+      formatMonthDay(array) {
         let b = [];
         const map = {};
-        for(let i=0; i< array.length; i++){
+        for (let i = 0; i < array.length; i++) {
           console.log(array[i])
           var a = array[i].split('-');
-          let temp =  {}
+          let temp = {}
           temp.month = a[0];
           temp.day = a[1];
           b.push(temp)
         }
         console.log(b)
-        for(const o of b){
-          if(!map.hasOwnProperty(o.month)){
+        for (const o of b) {
+          if (!map.hasOwnProperty(o.month)) {
             map[o.month] = o;
             const val = map[o.month].day;
             map[o.month].day = [val];
-          }else{
+          } else {
             map[o.month].day.push(o.day);
           }
         }
         let arr = [];
-        for(let item in map){
+        for (let item in map) {
           arr.push(map[item]);
           console.log(arr)
         }
         return arr;
       }
     },
-
-    mounted(){
+    mounted() {
       let self = this;
       self.getScheduleList();
-
     }
-
   }
 </script>
 
@@ -2183,7 +2317,7 @@
             margin-right: calc(40 / 1920 * 100vw);
             margin-left: calc(20 / 1920 * 100vw);
             display: inline-block;
-            width: 95px;
+            width: 100px;
           }
           .search-content {
             display: inline-block;
@@ -2203,6 +2337,12 @@
           .day-detail{
             display: inline-block;
             padding-left: 50px;
+            height: 50px;
+            font-size: 14px;
+            position: relative;
+          }
+          .self-detail{
+            display: inline-block;
             height: 50px;
             font-size: 14px;
             position: relative;
@@ -2314,6 +2454,52 @@
             position: absolute;
             margin-top: 3px;
             /*left: 170px;*/
+            width: 188px;
+            height: 150px;
+            z-index: 980;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow: auto;
+            .month-details{
+              padding: 2px 10px;
+              @include point(height,24);
+              span{
+                margin-left: 10px;
+                font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
+              }
+            }
+          }
+          .self-def-panel{
+            position: absolute;
+            margin-top: 3px;
+            right: 16px;
+            width: 188px;
+            height: 150px;
+            z-index: 980;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow: auto;
+            .month-details{
+              padding: 2px 10px;
+              @include point(height,24);
+              span{
+                margin-left: 10px;
+                font-size: 14px;
+              }
+              .el-checkbox{
+                margin-right: 0;
+              }
+            }
+          }
+          .en-self-def-panel{
+            position: absolute;
+            margin-top: 3px;
+            right: 16px;
             width: 188px;
             height: 150px;
             z-index: 980;

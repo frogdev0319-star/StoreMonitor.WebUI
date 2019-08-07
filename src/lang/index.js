@@ -10,41 +10,6 @@ import {getCookie} from "../common/auth";
 
 Vue.use(VueI18n)
 
-function getQueryString() {
-  let searchStr =window.location.search;
-  let lang = 'zh';
-  if(searchStr == ""){
-    searchStr = window.location.hash;
-  }
-  if(searchStr.indexOf('?') === -1){
-    console.log("No parameters")
-    return lang;
-  }
-  else if(searchStr.indexOf('&') === -1){
-    console.log("Lack of parameters")
-    return lang;
-  }
-  else{
-    let langUrl = searchStr.split('&')[1].split('=')[1];
-    console.log(langUrl)
-    if(langUrl === 'zh-CN'){
-      lang = 'zh'
-    }
-    else if(langUrl ==='en-US'){
-      lang = 'en'
-    }
-    else if(langUrl === 'zh-TW'){
-      lang = 'zhtw'
-    }
-    else{
-      lang = 'zh'
-    }
-    return lang;
-  }
-}
-
-const lang = getQueryString()
-
 const messages = {
   en: {
     ...enLocale,

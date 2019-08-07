@@ -401,7 +401,8 @@ export default {
     importFail: '範本導入失敗！',
     templateError: '當前範本錯誤，請更換範本重新導入！',
     editSuss: '修改成功!',
-    editFail: '修改失敗!'
+    editFail: '修改失敗!',
+    channelOrder: '通道號',
   },
   //Store Management page language
   storeView: {
@@ -507,6 +508,11 @@ export default {
     inputName: '請輸入排程名稱！',
     promptInfo: '提示：因考慮路程人力因素，請合理安排巡檢任務。',
     notifyOneDayBefore: '在前壹天同壹時間進行提醒',
-    timeExist: '執行時間已存在，請重新添加'
+    timeExist: '執行時間已存在，請重新添加',
+    emptyName: '排程名稱不能為空',
+    emptyNotifyTime: '提醒時間不能為空',
+    emptyDate: '執行日期不能為空',
+    emptyMonth: '月份不能為空',
+    emptyTime: '執行時間不能為空'
   }
 }

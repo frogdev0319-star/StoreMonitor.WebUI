@@ -3,7 +3,7 @@
     <div class="el-schedule-header">
       <el-col :span="7" class="el-schedule-btns">
         <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'"
-                   @click="addScheduleButton">
+                   @click="addSchedule">
           <i style="margin-right:18px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
         </el-button>
         <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
@@ -11,26 +11,6 @@
           <i style="margin-right:18px;font-size:16px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
         </el-button>
       </el-col>
-      <el-dialog :title="generateScheduleLang('addSchedule')"
-                 :visible.sync="showAddDialog" v-if="showAddDialog"
-                 :append-to-body='true'
-                 :close-on-click-modal="false"
-                 width="28%"
-                 top="35vh"
-                 left="40vh">
-        <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #f31d65;"/>
-          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <span>{{generateScheduleLang('scheduleName')}}</span>
-            <el-input v-model="scheduleName" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini" ref="scheduleName"
-                      class="el-schedule-name"></el-input>
-          </p>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
-          <el-button class="file-confirm-btn" @click="addSchedule" size="mini" type="primary">{{generateScheduleLang('confirm')}}</el-button>
-        </div>
-      </el-dialog>
       <el-dialog :title="generateScheduleLang('delete')"
                  :visible.sync="showDeleteDialog" v-if="showDeleteDialog"
                  :append-to-body='true'
@@ -58,8 +38,13 @@
                        :key="index" :label="`${paneItem.name}`">
             <div :style="{height:varyWindowHeight}">
               <el-col :span="24" class="header-details">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
+                <el-input v-model="paneItem.name" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                          class="el-type"></el-input>
+              </el-col>
+              <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-                <el-select v-model="paneItem.mode" clearable  placeholder="选择类型" size="mini" :disabled="isDisabled" @change="searchStore"
+                <el-select v-model="paneItem.mode" clearable  placeholder="选择类型" size="mini" :disabled="paneItem.modeDisabled" @change="searchStore"
                            class="el-type" >
                   <el-option
                     v-for="item in typeList"
@@ -163,42 +148,44 @@
                   <el-button class="time-btn" size="mini" @click="addWeekDays(-1)"><i class="el-icon-plus"></i></el-button>
               </el-col>
               <!-- 日模式和月模式 -->
-              <el-col :span="24" class="header-details" v-if="timeItem.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeArray"
+              <el-col :span="24" class="header-details" v-if="paneItem.timeList.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeList"
                       :key="timeIndex">
-                <span  :id="lang=='en'? 'en-span': 'span'" :style="timeIndex==0 ? 'visibility: visable' :'visibility: hidden'">{{generateScheduleLang('exectionTime')}}</span>
-                <el-time-select
-                  class="time-select"
-                  v-model="paneItem.timeArray[timeIndex]"
-                  :picker-options="{
-                    start: '08:00',
-                    step: '00:15',
-                    end: '23:59'
-                  }"
-                  placeholder="选择时间"
-                  size="mini"
-                >
-                </el-time-select>
-                <span class="delete-time-btn" size="mini" v-if="paneItem.timeArray.length > 1" style="margin: 0 20px 0 30px"
+                <div class="day-detail">
+                  <span  :id="lang=='en'? 'en-span': 'span'" :style="timeIndex==0 ? 'visibility: visable' :'visibility: hidden'">{{generateScheduleLang('exectionTime')}}</span>
+                  <div class="day-content" @click="choiceDayTime(timeIndex)">
+                    <div class="input-arrow-panel"></div>
+                    <el-input v-model="timeItem.time" size="mini" id="elWeek" :placeholder="generateScheduleLang('exectionTime')" :readonly=true></el-input>
+                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                  </div>
+                  <div class="week-panel" v-if="timeItem.showTimeContent" @mouseleave="timeItem.showTimeContent=false">
+                    <div class="week-details" v-for="(timeIt,timeIn) in weeklyTimeArray" :key="'time'+ timeIn">
+                      <el-checkbox v-model="timeIt.checked" @change="changeDayTime(timeIndex, timeIn)" :disabled="timeIt.disabled"></el-checkbox>
+                      <span>{{timeIt.name}}</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="delete-time-btn" size="mini" v-if="paneItem.timeList.length > 1" style="margin: 0 20px 0 30px"
                       @click="deleteCurTime(timeIndex)"><i class="el-icon-error"></i></span>
-                <el-button class="time-btn" size="mini" @click="addTime" :style="paneItem.timeArray.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
-                           v-if="timeIndex == paneItem.timeArray.length-1 && !showAddTime"><i class="el-icon-plus"></i></el-button>
+                <el-button class="time-btn" size="mini" @click="addTime" :style="paneItem.timeList.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                           v-if="timeIndex == paneItem.timeList.length-1 && !showAddTime"><i class="el-icon-plus"></i></el-button>
               </el-col>
               <el-col v-if="showAddTime && paneItem.mode != 1" :span="24" class="header-details">
-                <span style="visibility: hidden;" :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
-                <el-time-select
-                  class="time-select"
-                  v-model="newTime"
-                  :picker-options="{
-                    start: '08:00',
-                    step: '00:15',
-                    end: '23:59'
-                  }"
-                  @change="changTime"
-                  :placeholder= "generateScheduleLang('selectTime')"
-                  size="mini">
-                </el-time-select>
-                <span class="delete-time-btn" size="mini" @click="deleteCurTime(-1)" style="margin: 0 20px 0 30px"><i class="el-icon-error" ></i></span>
-                <el-button class="time-btn" size="mini" @click="addTime"><i class="el-icon-plus"></i></el-button>
+                <div class="day-detail">
+                  <span style="visibility: hidden;" :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
+                  <div class="day-content" @click="choiceDayTime(-1)">
+                    <div class="input-arrow-panel"></div>
+                    <el-input v-model="dayTime" size="mini" id="elWeek" :placeholder="generateScheduleLang('exectionTime')" :readonly=true></el-input>
+                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                  </div>
+                  <div class="week-panel" v-if="showDayTimeContent" @mouseleave="addDayTimeToList">
+                    <div class="week-details" v-for="(timeIt,timeIn) in weeklyTimeArray" :key="'time'+ timeIn">
+                      <el-checkbox v-model="timeIt.checked" @change="changeDayTime(-1, timeIn)" :disabled="timeIt.disabled"></el-checkbox>
+                      <span>{{timeIt.name}}</span>
+                    </div>
+                  </div>
+                </div>
+                  <span class="delete-time-btn" size="mini" @click="deleteCurTime(-1)" style="margin: 0 20px 0 30px"><i class="el-icon-error" ></i></span>
+                  <el-button class="time-btn" size="mini" @click="addTime"><i class="el-icon-plus"></i></el-button>
               </el-col>
             </div>
             <hr class="el-header-hr"/>
@@ -279,6 +266,7 @@
             </el-button>
           </div>
         </el-dialog>
+        <dialog-vue :dialog-title='selectDayObj.title' :show-info='selectDayObj.showInfo' :is-warning='selectDayObj.isWarning' :dialog-closed='selectDayObj.dialogClosed' @confirmed='noTimeDialog' @canceled='cancelNoTime'></dialog-vue>
         <dialog-vue :dialog-title='selectWeekObj.title' :show-info='selectWeekObj.showInfo' :is-warning='selectWeekObj.isWarning' :dialog-closed='selectWeekObj.dialogClosed' @confirmed='noWeekDialog' @canceled='cancelNoWeek'></dialog-vue>
         <dialog-vue :dialog-title='selectMonthObj.title' :show-info='selectMonthObj.showInfo' :is-warning='selectMonthObj.isWarning' :dialog-closed='selectMonthObj.dialogClosed' @confirmed='noMonthDialog' @canceled='cancelNoMonth'></dialog-vue>
       </el-col>
@@ -454,21 +442,21 @@
             value: 28,
             name: '28'
           },
-          {
-            'checked': false,
-            value: 29,
-            name: '29'
-          },
-          {
-            'checked': false,
-            value: 30,
-            name: '30'
-          },
-          {
-            'checked': false,
-            value: 31,
-            name: '31'
-          },
+          // {
+          //   'checked': false,
+          //   value: 29,
+          //   name: '29'
+          // },
+          // {
+          //   'checked': false,
+          //   value: 30,
+          //   name: '30'
+          // },
+          // {
+          //   'checked': false,
+          //   value: 31,
+          //   name: '31'
+          // },
         ],
         value: '',
         input4:'',
@@ -561,6 +549,12 @@
         showBindDialog: false,
         dataModel: [],
         hasBoundStoreIds: [], //已经绑定过周、月模式的门店id
+        selectDayObj: {
+          title:'提示',
+          showInfo:'请选择执行时间',
+          isWarning:false,
+          dialogClosed:false
+        },
         selectWeekObj:{
           title:'提示',
           showInfo:'请选择周模式下的执行日期！',
@@ -569,7 +563,7 @@
         },
         selectMonthObj:{
           title:'提示',
-          showInfo:'请选择月模式下的执行日期！',
+          showInfo:'请选择执行时间！',
           isWarning:false,
           dialogClosed:false
         },
@@ -581,11 +575,22 @@
         weeklySchedule: [], //周模式下的执行天数和执行时间
         showAddWeek: false,
         showTimeContent: false,
+        showDayTimeContent: false,
+        dayTime: '',
+        isAdd: false,
       }
     },
 
     methods: {
       generateScheduleLang,
+      noTimeDialog(val){
+        let self=this;
+        self.selectDayObj.dialogClosed=false;
+      },
+      cancelNoTime(){
+        let self=this;
+        self.selectDayObj.dialogClosed=false;
+      },
       noWeekDialog(val){
         let self=this;
         self.selectWeekObj.dialogClosed=false;
@@ -602,33 +607,64 @@
         let self=this;
         self.selectMonthObj.dialogClosed=false;
       },
-      addScheduleButton() {
-        let self = this;
-        self.showAddDialog = true;
-        self.scheduleName = '';
-      },
+
       deleteScheduleButton() {
         let self = this;
         self.showDeleteDialog = true;
       },
-      bindScheduleBtn(){
+      async bindScheduleBtn(){
         let self = this;
         let tabIndex = Number(self.activeName);
         let mode = self.paneList[tabIndex].mode;
-        // if(mode == 1 && self.selectWeek.length == 0 ){
-        //   //周模式
-        //   self.selectWeekObj.dialogClosed=true;
-        //   return false;
-        // }
-        // else
-          if(mode == 2 && self.selectMonth.length == 0){
-          //月模式
-          self.selectMonthObj.dialogClosed=true;
+        let timeList = self.paneList[tabIndex].timeList;
+        let name = self.paneList[tabIndex].name;
+        let weekSchedule = self.paneList[tabIndex].weeklySchedule;
+        console.log(weekSchedule)
+        console.log(timeList);
+        if(name == ''){
+          self.notify(self.$t('scheduleView.emptyName'), 'warning',3000);
+          self.$refs.scheduleName[tabIndex].focus();
           return false;
         }
-        else{
-          self.showBindDialog = true;
+        if(mode == 0 && timeList[0].time == ''){
+          //日模式
+          self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
+          return false;
         }
+        if(mode == 1){
+          //周模式
+          let lackDay = false;
+          let lackTime = false;
+           weekSchedule.forEach( item =>{
+            if(item.dayArray.length == 0){
+              lackDay = true;
+            }
+            else if(item.timeArray.length == 0){
+              lackTime = true;
+            }
+          })
+          console.log(lackDay + '..' + lackTime);
+           if(lackDay){
+             self.notify(self.$t('scheduleView.emptyDate'), 'warning',3000);
+             return false;
+           }
+           else if(lackTime){
+             self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
+             return false;
+           }
+        }
+          if(mode == 2){
+            //月模式
+            if(self.selectMonth.length == 0){
+              self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
+              return false;
+            }
+            else if(timeList[0].time == ''){
+              self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
+              return false;
+            }
+        }
+        self.showBindDialog = true;
       },
       allWeekChecked(index){
         let self = this;
@@ -711,6 +747,7 @@
         self.monthList.forEach(item=>{
           item.checked = false;
         })
+        self.showAddTime = false;
         self.monthValue = '';
         self.weekValue = '';
         self.dayArray =  self.paneList[tabIndex].dayArray;
@@ -718,6 +755,7 @@
         self.scheduleId = self.paneList[tabIndex].schId;
         self.showMonthContent = false;
         self.showWeekContent = false;
+        self.showAddWeek = false;
         self.searchStore();
       },
       echoMonthAndWeek(){
@@ -725,31 +763,6 @@
         let type = self.paneList[Number(self.activeName)].mode;
         let dateStr = '';
         let count = 0;
-        // if(type == 1){
-        //   let selectedWeek = self.dayArray;
-        //   self.selectWeek = selectedWeek;
-        //   console.log(selectedWeek + 'selectedWeek');
-        //   self.weekList.forEach(item => {
-        //     selectedWeek.forEach(_item=>{
-        //       if(item.value == _item){
-        //         dateStr = dateStr + item.name + ',';
-        //         item.checked = true;
-        //         count++;
-        //       }
-        //     })
-        //   })
-        //   if (dateStr.length != 0) {
-        //     self.weekValue = dateStr;
-        //     if (count == self.weekList.length) {
-        //       self.weekValue = self.$t('scheduleView.everyDay');
-        //       self.checkAllWeek = true;
-        //     }
-        //     else{
-        //       self.checkAllWeek = false;
-        //     }
-        //   }
-        // }
-        // else
           if(type == 2){
           let selectedMonth = self.dayArray;
           console.log(selectedMonth + 'selectedMonth');
@@ -916,8 +929,7 @@
       hideTimePanel(){
         let self = this;
         self.showTimeContent = false;
-        self.showAddWeek = false;
-        if(self.weekValue.length > 0 && self.timeArray.length > 0){
+        if(self.weekValue.length > 0 ){
           let json = {};
           json.dayArray = self.selectWeek;
           json.day = json.dayArray.toString();//设置选择的天数
@@ -931,7 +943,93 @@
           self.selectWeek = [];
           self.weekValue = ''
           self.timeArray = [];
+          self.showAddWeek = false;
         }
+        else{
+          self.selectWeek = [];
+          self.weekValue = ''
+          self.timeArray = [];
+          self.weekList.forEach(item=>{
+            item.checked = false
+          })
+        }
+      },
+      //日、月模式修改日期
+      choiceDayTime(index){
+        let self = this;
+        console.log(index);
+        let tabIndex = Number(self.activeName);
+        let actPanList = self.paneList[tabIndex];
+        self.weeklyTimeArray.forEach(item=>{
+          item.checked = false;
+          item.disabled = false;
+        })
+        if(index == -1){
+          self.showDayTimeContent = true;
+          actPanList.timeList.forEach(item=>{
+            self.weeklyTimeArray.forEach(_item=>{
+              if(item.time == _item.value){
+                _item.disabled = true;
+              }
+            });
+          });
+        }
+        else{
+          let timeJsonList = actPanList.timeList[index];
+          console.log(actPanList.timeList);
+          timeJsonList.showTimeContent = !timeJsonList.showTimeContent;
+          actPanList.timeList.forEach(_item=>{
+            self.weeklyTimeArray.forEach(item => {
+              if(_item.time == item.value){
+                item.disabled = true;
+              }
+              if (item.value == timeJsonList.time) {
+                item.checked = true;
+                item.disabled = false;
+              }
+            });
+          });
+        }
+      },
+      //更新时间选择
+      changeDayTime(index, timeIndex){
+        let self = this;
+        console.log(timeIndex)
+        let tabIndex = Number(self.activeName);
+        let actPanList = self.paneList[tabIndex];
+        let timeJsonList = actPanList.timeList[index];
+        console.log(actPanList.timeList);
+        if(index != -1){
+          self.weeklyTimeArray.forEach(item=>{
+            item.checked = false;
+          })
+          timeJsonList.time = self.weeklyTimeArray[timeIndex].value;
+          self.weeklyTimeArray[timeIndex].checked = true;
+          console.log(actPanList.timeList);
+        }
+        else{
+          //新增时间
+          self.weeklyTimeArray.forEach(item=>{
+            item.checked = false;
+          })
+          self.dayTime = self.weeklyTimeArray[timeIndex].value;
+          self.weeklyTimeArray[timeIndex].checked = true;
+        }
+      },
+      //增加时间
+      addDayTimeToList(){
+        let self = this;
+        self.showDayTimeContent = false;
+        let tabIndex = Number(self.activeName);
+        let actPanList = self.paneList[tabIndex];
+        let timeJsonList = actPanList.timeList;
+        let timeJson = {};
+        timeJson.time = self.dayTime;
+        timeJson.showTimeContent = false;
+        timeJsonList.push(timeJson);
+        self.dayTime = '';
+        self.showAddTime = false;
+        console.log(timeJsonList)
       },
       changeWeekItem(index) {
         let self = this;
@@ -1050,10 +1148,11 @@
         if(params.mode == 0){
           //日模式
           let tempPeriod = [];
-          let timeSelect = self.paneList[tabIndex].timeArray;
+          let timeSelect = self.paneList[tabIndex].timeList;
           timeSelect.forEach(item=>{
             console.log(item);
-            let seconds = self.hourToSecond(item);
+            let time = item.time;
+            let seconds = self.hourToSecond(time);
             let obj = {};
             obj.from = seconds;
             tempPeriod.push(obj);
@@ -1090,7 +1189,7 @@
         }
         else if(params.mode == 2){
           //月模式
-          let timeSelected = self.paneList[tabIndex].timeArray;
+          let timeSelected = self.paneList[tabIndex].timeList;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
           selectedMonth.forEach(item=>{
@@ -1099,7 +1198,8 @@
             let tempSche = {};
             timeSelected.forEach(_item=>{
               console.log(_item);
-              let seconds = self.hourToSecond(_item);
+              let time = _item.time;
+              let seconds = self.hourToSecond(time);
               let obj = {};
               obj.from = seconds;
               timePeriod.push(obj);
@@ -1128,22 +1228,20 @@
 
       async addSchedule() {
         let self = this;
-        if(self.scheduleName == ''){
-          self.notify(self.$t('scheduleView.inputName'),'warning',3000);
-          self.$refs.scheduleName.focus();
-          return false;
-        }
-        self.showAddDialog = false;
+        self.scheduleName = '新增排程';
+        self.isAdd = true;
         let scheduleInfo = {
           name: self.scheduleName,
           mode: 0,
+          modeDisabled: false,
           schId: 0,
           dayArray: [],
           timeArray: ['8:00'],
           enable: false,
           to: -1,
           dueDays: 1,
-          weeklySchedule: [{dayArray:[], day: '', showWeekContent: false, showTimeContent: false, dateStr: '',timeArray:[]}]
+          weeklySchedule: [{dayArray:[], day: '', showWeekContent: false, showTimeContent: false, dateStr: '',timeArray:[]}],
+          timeList: [{time:'', showTimeContent: false}]
         };
         self.paneList.push(scheduleInfo);
         let pane = self.paneList;
@@ -1454,12 +1552,13 @@
         self.showBindDialog = false;
         let isAdd = false;
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
-        if(self.selectTab == self.scheduleName){
+        if(self.isAdd){
           isAdd = true;
           scheId = await self.addScheduleService();
           self.paneList[Number(self.activeName)].schId = scheId;
           self.scheduleId = scheId;
           self.scheduleName = '';
+          self.isAdd = false;
         }
         else{
           scheId = self.scheduleId;
@@ -1549,7 +1648,8 @@
           self.showAddTime = false;
         }
         else{
-          self.paneList[Number(self.activeName)].timeArray.splice(index, 1); //删除时间
+          self.paneList[Number(self.activeName)].timeList.splice(index, 1); //删除时间
+          console.log(self.paneList[Number(self.activeName)].timeList)
         }
       },
       changTime() {
@@ -1710,6 +1810,7 @@
             let tempScheduleData = {};
             tempScheduleData.name = _item.name;
             tempScheduleData.mode = _item.mode;
+            tempScheduleData.modeDisabled = true;
             tempScheduleData.schId = _item.id; //排程id
             tempScheduleData.scheduleInfo = _item;
             tempScheduleData.enable = Boolean(_item.enable);
@@ -1747,6 +1848,16 @@
             console.log(timeArray);
             console.log(dayArray);
             tempScheduleData.timeArray = timeArray;
+
+            let timeList = [];
+            timeArray.forEach(_item=>{
+              let timeJson = {};
+              timeJson.time = _item;
+              timeJson.showTimeContent = false;
+              timeList.push(timeJson);
+            })
+            tempScheduleData.timeList = timeList;
+            console.log(timeList);
             tempScheduleData.weeklySchedule = weeklySchedule;
             tempScheduleData.dayArray = dayArray;
             self.paneList.push(tempScheduleData);
@@ -1773,18 +1884,22 @@
           let scheduleInfo = {
             name: "点检计划一",
             mode: 0,
+            modeDisabled: false,
             schId: 0,
             dayArray: [],
             timeArray: ['8:00'],
             enable: false,
             to: -1,
             dueDays: 1,
+            weeklySchedule: [{dayArray:[], day: '', showWeekContent: false, showTimeContent: false, dateStr: '',timeArray:[]}],
+            timeList: [{time:'', showTimeContent: false}]
           };
           self.paneList.push(scheduleInfo);
           self.scheduleName = "点检计划一";
           self.selectTab = "点检计划一";
           self.scheduleId = 0;
           self.isDisabled = false;
+          self.isAdd = true;
           self.searchStore();
         }
       },
@@ -1893,10 +2008,11 @@
         if(mode == 0){
           //日模式
           let tempPeriod = [];
-          let timeSelect = self.paneList[tabIndex].timeArray;
+          let timeSelect = self.paneList[tabIndex].timeList;
           timeSelect.forEach(item=>{
             console.log(item);
-            let seconds = self.hourToSecond(item);
+            let time = item.time;
+            let seconds = self.hourToSecond(time);
             let obj = {};
             obj.from = seconds;
             tempPeriod.push(obj);
@@ -1933,7 +2049,7 @@
         }
         else if(mode == 2){
           //月模式
-          let timeSelected = self.paneList[tabIndex].timeArray;
+          let timeSelected = self.paneList[tabIndex].timeList;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
           selectedMonth.forEach(item=>{
@@ -1942,7 +2058,8 @@
             let tempSche = {};
             timeSelected.forEach(_item=>{
               console.log(_item);
-              let seconds = self.hourToSecond(_item);
+              let time = _item.time;
+              let seconds = self.hourToSecond(time);
               let obj = {};
               obj.from = seconds;
               timePeriod.push(obj);
@@ -2037,6 +2154,7 @@
           timeJson.value = item;
           timeJson.name = item;
           timeJson.checked = false;
+          timeJson.disabled = false;
           self.weeklyTimeArray.push(timeJson);
         })
         console.log(self.weeklyTimeArray)

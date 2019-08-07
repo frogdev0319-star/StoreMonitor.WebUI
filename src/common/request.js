@@ -10,7 +10,8 @@ import {getToken} from '@/common/auth.js'
 // let base='http://'+window.location.host; //上线地址
 // let base ='http://222.91.163.149:19085'  //本地开发地址
 // let base ='http://47.103.41.236:8081'  //测试地址
-let base='http://172.21.81.117:8081'
+let base = 'http://172.21.81.117:8081'
+// let base='http://172.21.81.176:19085'
 
 let itempath='/storemonitor/api/'
 let lang = i18n.locale
