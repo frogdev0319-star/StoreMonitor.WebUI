@@ -127,6 +127,7 @@ export default {
         self.storeTitle=self.store.name;
         self.userId=self.store.userId;
         self.supervisorId = self.store.supervisorId;
+      console.log(self.supervisorId)
         self.supervisorName = self.store.supervisorName;
         console.log(self.store.napeTable)
         self.curTag=self.store.napeTable;
@@ -274,6 +275,7 @@ export default {
                 }
                 if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
                      self.notify(this.$t('storeView.successSubmit'),'success',3000);
+                     self.supervisorId = self.curPerson;
                 }
             }
             else{
@@ -301,6 +303,7 @@ export default {
                 if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
                 || (resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
+                    self.supervisorId = self.curPerson;
                 }
                 else{
                     self.notify(this.$t('storeView.failSubmit'),'warning',3000);
