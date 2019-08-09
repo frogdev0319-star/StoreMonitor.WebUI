@@ -308,8 +308,6 @@ export default {
             let tabIndex=Number(self.activeName);
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-
-
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
                 Message({
                     message: this.$t('eventView.changeTimeRange'),
@@ -389,7 +387,6 @@ export default {
             self.params.beginTs=startStr;
             self.params.endTs=endStr;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-          console.log(self.params + 'handleClick');
             this.getEventList(this.params);
         },
         //点击状态搜索时，总共需要时间范围，状态
@@ -463,14 +460,14 @@ export default {
 
             //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
             //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            let dateval=self.dateInputStr;
-            let startStr=dateval.split('~')[0];
-            let endStr=dateval.split('~')[1];
-            let start=new Date(startStr).getTime();
-            let end=new Date(endStr).getTime();
+            let dateval=self.dateValue;
+            console.log(dateval)
+            let start=dateval[0];
+            let endTime = dateval[1];
+            let end = endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
 
-            self.params.beginTs=start;
-            self.params.endTs=end;
+            self.params.beginTs = start;
+            self.params.endTs = end;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             self.getEventList(self.params);
             let status=[];
@@ -564,12 +561,13 @@ export default {
 
             //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
             //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            let dateval=self.dateInputStr;
-            let startStr=dateval.split('~')[0];
-            let endStr=dateval.split('~')[1];
-            let start=new Date(startStr).getTime();
-            let end=new Date(endStr).getTime();
-
+            let dateval=self.dateValue;
+            console.log(dateval)
+            let start=dateval[0];
+            let endTime = dateval[1];
+            let end= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
+            console.log(start)
+          console.log(end)
             let status=[];
             let selectValue=self.value;
             switch(selectValue){
