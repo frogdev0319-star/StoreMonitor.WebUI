@@ -213,7 +213,8 @@ export default {
             poperClass:'date-picker-poper',
             selectpoperClass:'select-poper',
             defaultTime:[],
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            isFirstLoad: false, //是否首次加载
         }
 
     },
@@ -329,7 +330,7 @@ export default {
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
             let selectValue=self.value;
             let status=[];
-            self.getEventList(self.params);
+          self.getEventList(self.params);
             switch(selectValue){
                 case 0:status=[0,1,2];break;
                 default:status=selectValue-1;break;
@@ -388,6 +389,7 @@ export default {
             self.params.beginTs=startStr;
             self.params.endTs=endStr;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+          console.log(self.params + 'handleClick');
             this.getEventList(this.params);
         },
         //点击状态搜索时，总共需要时间范围，状态
@@ -889,7 +891,81 @@ export default {
             let dateStr=self.getInitDateStr();
             console.log(dateStr);
             //self.dateInputStr=dateStr;
+        },
+       initData(){
+        let self=this;
+        self.activeName = '0';
+        self.value = 0;
+        self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
+        self.serachVale='';
+         self.total= 0;
+           self.page=1;
+           self.sizeNum=10;
+           self.params={};
+         self.tableDataList = [
+           {
+             label: this.$t('eventView.pendingEve'),
+             eventCount:0,
+             tableData:[],
+             total:0,
+             sizeNum:10,
+             page:1
+           },
+           {
+             label: this.$t('eventView.myEvent'),
+             eventCount:0,
+             tableData:[],
+             total:0,
+             sizeNum:10,
+             page:1
+           },
+           {
+             label: this.$t('eventView.allEvents'),
+             eventCount:0,
+             tableData:[],
+             total:0,
+             sizeNum:10,
+             page:1
+           }
+         ],
+        self.getDeafultTime();
+        //await self.isLoginIn();
+        let windowHeight=window.innerHeight;
+        if(windowHeight>800){
+          self.tableHeight=770+'px';
         }
+        console.log(self.tableHeight);
+        self.getUserId();
+        self.getInitList();
+        let initDateStr=util.getDateStr1(new Date().getTime()-3600*1000*24)+' ~ '+util.getDateStr1(new Date().getTime());
+        self.dateInputStr=initDateStr;
+        var ins1=laydate.render({
+          elem: '#dateinput',
+          type: 'datetime',
+          range: '~',
+          value: initDateStr,
+          btns: ['confirm'],
+          max:util.getDateStr1(new Date().getTime()),
+          /*ready: function(date){
+              console.log(date);
+              console.log(self.dateInputStr);
+              let dateStr=self.getInitDateStr();
+              console.log(dateStr);
+              self.dateInputStr=dateStr;
+              ins1.config.value=dateStr;
+              //ins1.hint(dateStr); /*打开后的提示信息*/
+          //},
+          done: (value) => {
+            console.log(value);
+            self.dateInputStr = value;
+            self.dateChangeInput(value);
+            //ins1.hint(value);
+          }
+        });
+      }
+    },
+    created(){
+      this.isFirstLoad = true
     },
     async mounted(){
         let self=this;
@@ -929,33 +1005,49 @@ export default {
             }
         });
     },
-    beforeRouteLeave (to, from, next) {
-        if(to.name=='eventDetails'){
-            if(!from.meta.keepAlive){
-                from.meta.keepAlive=true;
-            }
-        }
-        else{
-            from.meta.keepAlive=false;
-            //this.$destroy();
-        }
-        next();
-    },
+    // beforeRouteLeave (to, from, next) {
+    //   console.log(this.params);
+    //     if(to.name=='eventDetails'){
+    //         if(!from.meta.keepAlive){
+    //             from.meta.keepAlive=true;
+    //
+    //         }
+    //       next();
+    //     }
+    //     else{
+    //         from.meta.keepAlive=false;
+    //       next()
+    //     }
+    // },
     beforeRouteEnter (to, from, next) {
-        if(from.name!='eventDetails'&&from.path!='/'){
-            to.meta.keepAlive=false;
-        }
-        else{
-            to.meta.keepAlive=true;
-        }
-        next(vm => {
-           console.log(vm);
-        });
+      if(from.name=='eventDetails'&& to.name == 'eventManage'){
+        to.meta.isBack = true;
+        next();
+      }
+      else{
+        to.meta.isBack = false;
+        next();
+      }
+        // if(from.name!='eventDetails'&&from.path!='/'){
+        //     to.meta.keepAlive=true;
+        // }
+        // else{
+        //     to.meta.keepAlive=true;
+        // }
+        // next(vm => {
+        //    console.log(vm);
+        // });
     },
     activated(){
         let self=this;
-        console.log(self.params);
-        self.getEventList(self.params);
+        if(!self.$route.meta.isBack || self.isFirstLoad){
+          self.initData();
+        }
+        else{
+          self.getEventList(self.params);
+        }
+      self.$route.meta.isBack = false;
+      self.isFirstLoad = false;
     }
 }
 </script>

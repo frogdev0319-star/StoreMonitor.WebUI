@@ -127,6 +127,7 @@ export default new Router({
           meta:{
             requireAuth: true,
             keepAlive:true,
+            isBack: false
           },
           isReadOnly:false,
         },
@@ -160,8 +161,9 @@ export default new Router({
           name:'eventManage',
           component:resolve=>require(['@/views/event/EventManage'],resolve),
           meta:{
-            keepAlive:false,  //the component is't to be cache.
+            keepAlive:true,  //the component is't to be cache.
             requireAuth: true,
+            isBack: false,
           }
         },
         {

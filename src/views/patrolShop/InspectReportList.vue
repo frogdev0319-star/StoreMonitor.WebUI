@@ -210,8 +210,12 @@ export default {
             storeDataList:[],
             storeIdList:[],  //存放当前选中的门店id
             poperClass:'date-picker-poper',
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            isFirstLoad: false
         }
+    },
+    created(){
+      this.isFirstLoad = true
     },
     computed:{
         iconSrcHeight(){
@@ -253,6 +257,19 @@ export default {
             self.storeList=[];
             self.searchInput='';
 
+        },
+        initData(){
+          let self=this;
+          self.varyWindowWidth = window.innerWidth;
+          if(self.varyWindowWidth<1600){
+            self.searchContent=true;
+          }
+          self.changeBrand();
+          self.defaultTime=[];
+          self.storeStr = '';
+          self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
+          self.reportList=[];
+          self.curSortType=0;
         },
         getReportList(params){
             let self=this;
@@ -701,15 +718,23 @@ export default {
         },
     },
     beforeRouteEnter (to, from, next) {
-        if(from.name!='reportDetails'&&from.path!='/'){
-            to.meta.keepAlive=false;
-        }
-        else{
-            to.meta.keepAlive=true;
-        }
-        next(vm => {
-           console.log(vm);
-        });
+      if(from.name=='reportDetails'&& to.name == 'reports'){
+        to.meta.isBack = true;
+        next();
+      }
+      else{
+        to.meta.isBack = false;
+        next();
+      }
+        // if(from.name!='reportDetails'&&from.path!='/'){
+        //     to.meta.keepAlive=false;
+        // }
+        // else{
+        //     to.meta.keepAlive=true;
+        // }
+        // next(vm => {
+        //    console.log(vm);
+        // });
     },
     mounted(){
         console.log(this.sortTypeList);
@@ -720,6 +745,19 @@ export default {
         //self.getDeafultTime();
         self.getRegionInfo();
         self.getInitReportList();
+    },
+    activated(){
+      let self=this;
+      if(!self.$route.meta.isBack || self.isFirstLoad){
+        self.initData();
+        self.getRegionInfo();
+        self.getInitReportList();
+      }
+      else{
+        //
+      }
+      self.$route.meta.isBack = false;
+      self.isFirstLoad = false;
     }
 }
 </script>
