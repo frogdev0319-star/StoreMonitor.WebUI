@@ -1889,7 +1889,7 @@ export default {
                     self.inspectList=temp;
                     let feedobj={
                         groupId:'feedBack',
-                        groupName:'问题反馈',
+                        groupName: self.$t('remotePatrol.feedbacks'), //问题反馈
                         isClick:false,
                     }
                     if(self.inspectList.length!=0){
