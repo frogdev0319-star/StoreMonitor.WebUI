@@ -88,8 +88,8 @@
                 </template>
             </el-table-column>
             <el-table-column prop="schedue"
-                :label="generateStoreLang('routeSchedule')"
-                min-width="120"
+                :label="generateStoreLang('bindSchedule')"
+                min-width="140"
                 align="left">
 
             </el-table-column>
@@ -142,7 +142,7 @@ import {generateStoreLang} from '@/api/i18n'
                         "prop":"name",
                         "label":this.$t('storeView.storeName'),
                         "sortable":'custom',
-                        "width":160
+                        "width":130
                     },
                     {
                         // "prop":"userName",
@@ -152,11 +152,18 @@ import {generateStoreLang} from '@/api/i18n'
                         "width":120
                     },
                     {
+                      "prop":"userName",
+                      "label":this.$t('storeView.solver'),
+                      "sortable": false,
+                      "width":100
+                    },
+                    {
                         "prop":"phone",
                         "label":this.$t('storeView.contact'),
                         "sortable":false,
-                        "width":160
+                        "width":120
                     },
+
                 ],
                 allCityChecked:false,
                 storeData:[],
@@ -468,7 +475,8 @@ import {generateStoreLang} from '@/api/i18n'
                 if(self.serachVale.length!=0){
                     self.params.like={
                         "name": self.serachVale,
-                        "userName": self.serachVale
+                       // "userName": self.serachVale,
+                        "supervisorName" : self.serachVale,
                     };
                 }
                 else{

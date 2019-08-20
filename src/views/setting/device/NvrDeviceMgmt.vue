@@ -1470,7 +1470,7 @@
               self.notify(self.$t('deviceView.addFailed'),'warning',3000);
               self.showAddChannelDialog=false;
             }
-            self.addChannelData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
+            self.addChannelData = {name: '', channelId: '', pictureUrl: '', file: ''};
             self.page=1;
             let params={
               "filter": {

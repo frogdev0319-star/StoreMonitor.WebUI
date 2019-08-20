@@ -367,6 +367,7 @@ export default {
     nvrChannelSetting: 'Channel Number and Name setting',
     selectNvrChannel: 'Please select channel order',
     addNvr: 'Add NVR',
+    deleteNvrInfo: 'This operation will delete the current NVR and channel, continue?',
     nvr : 'NVR',
     store: 'Store',
     channelNum: 'Channel Number',
@@ -411,7 +412,7 @@ export default {
     routeSchedule: 'Patrol Schedule',
     storeDetail: 'Store Details',
     bindChanel: 'Bind Channels',
-    selectStoreOwner: 'Please select problem solver',
+    selectStoreOwner: 'Please select supervisor',
     selectAllChanels: 'Please select all channels and submit!',
     storeName: 'Store Name',
     solver: 'Solver',
@@ -424,6 +425,7 @@ export default {
     successSubmit: 'Successfully sent',
     all: 'All',
     supervisor: 'Supervisor',
+    bindSchedule: 'Bind schedules'
   },
   //Schedule Management page language
   scheduleView:{

@@ -803,8 +803,9 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-'+self.accountId;
             //let bucketName='viumo-aaoompqqpjy4';
+            let bucketName = 'viumo-n3azju2aknpw';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -911,8 +912,9 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            let bucketName = 'viumo-'+self.accountId
+            //let bucketName = 'viumo-'+self.accountId
             //let bucketName='viumo-aaoompqqpjy4';
+            let bucketName = 'viumo-n3azju2aknpw';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id

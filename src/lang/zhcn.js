@@ -415,15 +415,15 @@ export default {
     searchButton: '搜索',
     binded: '已关联',
     unbinded: '未关联',
-    contact: '联系方式',
+    contact: '门店联系方式',
     bindInspectList:'关联巡检表',
     routeSchedule: '巡检排程',
     storeDetail: '门店详情',
     bindChanel: '关联通道',
-    selectStoreOwner: '请选择门店负责人',
+    selectStoreOwner: '请选择门店督导',
     selectAllChanels: '请选择全部通道后提交！',
     storeName:'门店名称',
-    solver: '负责人',
+    solver: '门店负责人',
     operation: '操作',
     noStoreData: '没有门店信息',
     selectProviceInfo: '请选择省份',
@@ -434,6 +434,7 @@ export default {
     successSubmit: '提交成功',
     all: '全部',
     supervisor: '督导',
+    bindSchedule: '绑定排程'
   },
   //Schedule Management page language
   scheduleView:{
