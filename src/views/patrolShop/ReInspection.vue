@@ -174,46 +174,53 @@
                 </div>
             </div>
             <div v-else>
+              <div v-if="!isEzviz">
                 <div class="errorVideo-model" v-if="showError">
-                    <span>{{errorText}}</span>
+                  <span>{{errorText}}</span>
                 </div>
                 <div class="video-content"  id="videoContent"
-                @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
-                    <div class="getvideo-content" v-if="showGetVideo">
-                        <div class="btn-graph">
-                            <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
-                        </div>
-                        <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
+                     @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
+                  <div class="getvideo-content" v-if="showGetVideo">
+                    <div class="btn-graph">
+                      <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
                     </div>
-                    <span id="channelName" v-if="showInfoContent">{{channel!=null?channel.channelName:''}}</span>
-                    <div class="icon-footer" v-if="showInfoContent">
-                        <div class="iconlside">
-                            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-                            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
-                        </div>
-                        <div class="screen-content">
-                            <i class="iconfont iconscreen"
-                            :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
-                            <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
-                        </div>
+                    <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
+                  </div>
+                  <span id="channelName" v-if="showInfoContent">{{channel!=null?channel.channelName:''}}</span>
+                  <div class="icon-footer" v-if="showInfoContent">
+                    <div class="iconlside">
+                      <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+                      <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
                     </div>
-                    <transition name='fade'>
-                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent" @click="cutPicture">
-                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                            <span>{{generatePatrolLang('snapshot')}}</span>
-                        </div>
-                    </transition>
-                    <transition name="fade">
-                        <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
-                            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
-                            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
-                            <span>{{generatePatrolLang('record')}}</span>
-                        </div>
-                    </transition>
-                    <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
-                        class="video-js vjs-fill">
-                    </video>
+                    <div class="screen-content">
+                      <i class="iconfont iconscreen"
+                         :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
+                      <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+                    </div>
+                  </div>
+                  <transition name='fade'>
+                    <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent" @click="cutPicture">
+                      <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                      <span>{{generatePatrolLang('snapshot')}}</span>
+                    </div>
+                  </transition>
+                  <transition name="fade">
+                    <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
+                      <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
+                      <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+                      <span>{{generatePatrolLang('record')}}</span>
+                    </div>
+                  </transition>
+                  <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
+                          class="video-js vjs-fill" >
+                  </video >
                 </div>
+              </div>
+              <ezviz-video v-else :channel-info="channel" :cur-device-id="curDeviceId" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
+                           :show-feed-dialog2="showFeedDialog2"
+                           @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback">
+
+              </ezviz-video>
             </div>
             <div class="el-inspect">
                 <div class="guide-lside" v-if="showGuide">
@@ -409,12 +416,14 @@ import {getCookie} from '@/common/auth';
 import RecordRTC from '../../../static/RecordRTC.js'
 import {validateInput} from '@/common/validate'
 import {generatePatrolLang} from '@/api/i18n'
+import EzvizVideo from '@/components/EzvizVideo.vue'
 
 export default {
     name:'ReInspection',
     components:{
         DialogVue,
-        ChannelIconBtn
+        ChannelIconBtn,
+        EzvizVideo
     },
     data(){
         return{
@@ -637,7 +646,10 @@ export default {
             showAddFeedBackBtn:true,
             timerPlayReal:null,
             isPlayingFlag:-1,
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            accessToken:'',
+            initEzviz: false,
+            sourceListLength: 0
         }
     },
     computed:{
@@ -652,7 +664,12 @@ export default {
         },
         ...mapGetters({
             accountChanged:'accountChanged'
-        })
+        }),
+        isEzviz() {
+          let self = this;
+          console.log(self.$store.state.user);
+          return self.$store.state.user.isEzviz
+        }
     },
     watch:{
         accountChanged(val,oldVal){
@@ -670,7 +687,7 @@ export default {
                 window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal=null;
             }
-        }
+        },
     },
     beforeRouteLeave(to, from, next){
         let self=this;
@@ -698,7 +715,7 @@ export default {
         }
         next();
     },
-    mounted(){
+    async mounted(){
         let self=this;
         document.onmouseup=self.mouseUpAction;
         self.isREC=false;
@@ -911,8 +928,8 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            let bucketName = 'viumo-'+self.accountId
-            //let bucketName='viumo-aaoompqqpjy4';
+            //let bucketName = 'viumo-'+self.accountId
+            let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -965,7 +982,7 @@ export default {
                 let tempId=self.getIndexById(self.curItemId);
                 console.log(tempId);
                 if(tempId!=null){
-                    self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
+                    self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList = self.sourceList;
                 }
                 else{
                     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
@@ -1777,11 +1794,17 @@ export default {
                     _item.isClick=false;
                 }
             })
-            if(self.playState){
+            if(!self.isEzviz){
+              //非萤石平台
+              if(self.playState){
                 self.stopAndRealTime();
+              }
+              else{
+                self.realTime();
+              }
             }
             else{
-                self.realTime();
+              //萤石云平台，切换摄像头
             }
         },
         clickItem(item,index){
@@ -1790,7 +1813,7 @@ export default {
                 return false;
             }
             self.sourceList=[];
-
+            self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
             let obj={};
 
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
@@ -1811,12 +1834,16 @@ export default {
                     self.showGuide=false;
 
                     if(item.deviceId!=self.curDeviceId){
+                      if(!self.isEzviz){
                         if(self.playState){
-                            self.stopAndRealTime();
+                          self.stopAndRealTime();
                         }
                         else{
-                            self.realTime();
+                          self.realTime();
                         }
+                      }
+                      else{
+                      }
                         self.curDeviceId=item.deviceId;
                     }
                 }
@@ -1887,7 +1914,7 @@ export default {
                     self.inspectList=temp;
                     let feedobj={
                         groupId:'feedBack',
-                        groupName:'问题反馈',
+                        groupName: self.$t('remotePatrol.feedbacks'), //问题反馈
                         isClick:false,
                     }
                     if(self.inspectList.length!=0){
@@ -2534,6 +2561,54 @@ export default {
                 duration:time
             });
         },
+      // 处理子组件发送过来的抓拍图片
+      editEzvizCanvas(src){
+          console.log(src)
+          let self=this;
+        self.sourceList = [];
+          let obj={};
+          obj.mediaType=2;
+          obj.src= src;
+          obj.height='100px';
+          obj.width='140px';
+          obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
+          obj.file=util.base64ToBlob(obj.src);
+          self.sourceList.push(obj);
+          console.log(self.curItemId);
+          let tempId=self.getIndexById(self.curItemId);
+          console.log(tempId);
+          if(tempId!=null){
+            self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+          }
+          else{
+            self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+          }
+          self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+          console.log(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList)
+        },
+      ezvizPictureFeedback(obj){
+          //处理反馈的抓拍图片
+        console.log(obj);
+        let self = this;
+        let srcObj=null;
+        let src = obj.src;
+        srcObj={
+          mediaType:2,
+          src:src,
+          height:'100px',
+          width:'140px',
+          fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
+          file:util.base64ToBlob(src)
+        }
+
+        let picObj={
+          eventName:self.eventName,
+          eventDes:self.eventDes,
+          sourceObj:srcObj,
+        }
+        self.eventList.push(picObj);
+        self.showFeedBackInfo=false;
+      }
     }
 }
 </script>
