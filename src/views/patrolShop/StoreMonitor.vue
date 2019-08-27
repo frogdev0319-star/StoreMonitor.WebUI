@@ -70,107 +70,113 @@
             <dialog-vue :dialog-title='changeChannelObj.title' :show-info='changeChannelObj.showInfo' :is-warning='changeChannelObj.isWarning' :dialog-closed='changeChannelObj.dialogCosed' @confirmed='changeChannelDialog' @canceled='cancelchangeChannel'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
-            <div class="video-content" v-if="!showgongge" id="videoContent" >
+            <div v-if="!isEzviz">
+              <div class="video-content" v-if="!showgongge" id="videoContent" >
                 <div class="getvideo-content" v-if="showGetVideo">
-                    <div class="btn-graph">
-                        <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
-                    </div>
-                    <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.288+'px'"></canvas>
+                  <div class="btn-graph">
+                    <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+                  </div>
+                  <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.288+'px'"></canvas>
                 </div>
                 <div class="video-model" v-if="showModelContent">
-                    <span id="channelName" v-if="showControlInfo">{{channel.channelName}}</span>
-                    <div class="icon-footer" v-if="showControlInfo">
-                        <div class="iconlside" v-if="showStoreUp">
-                            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-                            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
-                        </div>
-                        <div class="iconrside">
-                            <div class="speed-content" v-if="playBackState">
-                                <span>{{generateStoreMonitorLang('speed')}}</span>
-                                <el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" @change="adjustSpeed">
-                                    <el-option
-                                    v-for="(item) in speedList"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                    </el-option>
-                                </el-select>
-                                <span>{{generateStoreMonitorLang('back')}}</span>
-                                <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" @change="adjustProcess" placeholder=' '>
-                                    <el-option
-                                    v-for="(item) in backList"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                    </el-option>
-                                </el-select>
-                            </div>
-                            <div class="screen-content" v-if="showStoreUp">
-                                <i class="iconfont iconscreen"
-                                :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
-                                <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
-                            </div>
-                        </div>
+                  <span id="channelName" v-if="showControlInfo">{{channel.channelName}}</span>
+                  <div class="icon-footer" v-if="showControlInfo">
+                    <div class="iconlside" v-if="showStoreUp">
+                      <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+                      <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
                     </div>
-                    <div class="progress-content" v-if="playBackState">
-                        <!-- <span class="currentTime">{{currentStr}}</span> -->
-                        <b-progress :value="currentTimeValue" id="bprogress"
-                        :max="durationTimeValue" class="mb-3 el-prog" height="0.2rem" style="margin-bottom:0px !important;"/>
-                        <!-- <span class="duration">{{durationStr}}</span> -->
+                    <div class="iconrside">
+                      <div class="speed-content" v-if="playBackState">
+                        <span>{{generateStoreMonitorLang('speed')}}</span>
+                        <el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" @change="adjustSpeed" :popper-append-to-body="false">
+                          <el-option
+                            v-for="(item) in speedList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+                        <span>{{generateStoreMonitorLang('back')}}</span>
+                        <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" @change="adjustProcess" placeholder=' '>
+                          <el-option
+                            v-for="(item) in backList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+                      </div>
+                      <div class="screen-content" v-if="showStoreUp">
+                        <i class="iconfont iconscreen"
+                           :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
+                        <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+                      </div>
                     </div>
+                  </div>
+                  <div class="progress-content" v-if="playBackState">
+                    <!-- <span class="currentTime">{{currentStr}}</span> -->
+                    <b-progress :value="currentTimeValue" id="bprogress"
+                                :max="durationTimeValue" class="mb-3 el-prog" height="0.2rem" style="margin-bottom:0px !important;"/>
+                    <!-- <span class="duration">{{durationStr}}</span> -->
+                  </div>
 
-                    <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showCutContent">
-                        <div class="paizhao-content" @click="cutPicture">
-                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                            <span>{{generateStoreMonitorLang('snapshot')}}</span>
-                        </div>
-                        <div class="paizhao-content" @click="getVideo">
-                            <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;margin-left: -14px;"></i>
-                            <span style="margin-left:12px;">{{generateStoreMonitorLang('record')}}</span>
-                        </div>
-                        <div class="icon-drap-content">
-                            <i class="iconfont icon-zhedie iconzhedie" @click="spreadContent" v-if="!showSpread"></i>
-                            <i class="iconfont icon-close iconzhedie" @click="closeContent" v-else></i>
-                        </div>
+                  <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showCutContent">
+                    <div class="paizhao-content" @click="cutPicture">
+                      <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                      <span>{{generateStoreMonitorLang('snapshot')}}</span>
                     </div>
+                    <div class="paizhao-content" @click="getVideo">
+                      <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;margin-left: -14px;"></i>
+                      <span style="margin-left:12px;">{{generateStoreMonitorLang('record')}}</span>
+                    </div>
+                    <div class="icon-drap-content">
+                      <i class="iconfont icon-zhedie iconzhedie" @click="spreadContent" v-if="!showSpread"></i>
+                      <i class="iconfont icon-close iconzhedie" @click="closeContent" v-else></i>
+                    </div>
+                  </div>
                 </div>
                 <div class="errorVideo-model" v-else>
-                    <span>{{errorText}}</span>
+                  <span>{{errorText}}</span>
                 </div>
                 <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls"
-                    class="video-js vjs-fill">
+                        class="video-js vjs-fill">
                 </video>
-            </div>
-            <div class="video-gongge-content" v-else>
+              </div>
+              <div class="video-gongge-content" v-else>
                 <div class="video-details" v-for="(item,index) in videoSourceList" :key="index">
-                    <div class="video-model" v-if="item.showModelContent">
-                        <span class="channelName">{{item.channel.channelName}}</span>
-                        <div class="icon-footer">
-                            <div class="iconlside">
-                                <i class="iconfont icon-bofang1 iconplay" @click="realTime(item)" v-if="item.playState"></i>
-                                <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime(item)" v-else></i>
-                            </div>
-                            <div class="screen-content">
-                                <i class="iconfont icon-quanping iconscreen" @click="fullScreen(item)"></i>
-                                <i class="iconfont icon-gongge iconscreen" @click="recoverScreen(item)"></i>
-                            </div>
-                        </div>
-                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
-                            <div class="paizhao-content" @click="cutPicture(item)">
-                                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-                                <span>{{generateStoreMonitorLang('snapshot')}}</span>
-                            </div>
-                            <div class="sheying-content" @click="getVideo(item)">
-                                <i class="iconfont icon-luxiang iconpaizhao" style="font-size:20px;position:relative;top:3px;"></i>
-                                <span style="margin-left:14px;">{{generateStoreMonitorLang('record')}}</span>
-                            </div>
-                        </div>
+                  <div class="video-model" v-if="item.showModelContent">
+                    <span class="channelName">{{item.channel.channelName}}</span>
+                    <div class="icon-footer">
+                      <div class="iconlside">
+                        <i class="iconfont icon-bofang1 iconplay" @click="realTime(item)" v-if="item.playState"></i>
+                        <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime(item)" v-else></i>
+                      </div>
+                      <div class="screen-content">
+                        <i class="iconfont icon-quanping iconscreen" @click="fullScreen(item)"></i>
+                        <i class="iconfont icon-gongge iconscreen" @click="recoverScreen(item)"></i>
+                      </div>
                     </div>
-                    <video  height=83% width=90% :id="item.id" prload autoplay
-                        class="video-js vjs-fill videos">
-                    </video>
+                    <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+                      <div class="paizhao-content" @click="cutPicture(item)">
+                        <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                        <span>{{generateStoreMonitorLang('snapshot')}}</span>
+                      </div>
+                      <div class="sheying-content" @click="getVideo(item)">
+                        <i class="iconfont icon-luxiang iconpaizhao" style="font-size:20px;position:relative;top:3px;"></i>
+                        <span style="margin-left:14px;">{{generateStoreMonitorLang('record')}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <video  height=83% width=90% :id="item.id" prload autoplay
+                          class="video-js vjs-fill videos">
+                  </video>
                 </div>
+              </div>
             </div>
+            <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length"
+                         @confirmEzvizCanvas="editEzvizCanvas">
+
+            </ezviz-video>
             <div class="el-event">
                 <div :class="corEvent?'event-lside':''">
                     <span class="event-title">{{generateStoreMonitorLang('createMothod')}}</span>
@@ -352,11 +358,14 @@ import {getCookie} from '@/common/auth';
 import {indexedDB} from '@/common/util'
 import RecordRTC from '../../../static/RecordRTC.js'
 import { clearTimeout, setInterval, setTimeout, clearInterval } from 'timers';
+import EzvizVideo from '@/components/EzvizVideo.vue'
+
 export default {
     name:'StoreMoinitor',
     components:{
         ChannelIconBtn,
         DialogVue,
+        EzvizVideo
     },
     data(){
         return{
@@ -621,6 +630,11 @@ export default {
         }),
         corEvent:function(){
             return this.evBtns[1].isActive;
+        },
+        isEzviz() {
+          let self = this;
+          console.log(self.$store.state.user);
+          return self.$store.state.user.isEzviz
         }
     },
     watch:{
@@ -1271,8 +1285,9 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            let bucketName='viumo-'+self.accountId;
-            //let bucketName='viumo-aaoompqqpjy4';
+            //let bucketName='viumo-'+self.accountId;
+           // let bucketName='viumo-aaoompqqpjy4';
+            let bucketName=self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -1282,8 +1297,9 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-'+self.accountId;
             //let bucketName='viumo-aaoompqqpjy4';
+            let bucketName=self.oss.ossBucketName;
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -1370,6 +1386,7 @@ export default {
                 let params=obj;
                 addEvent(params).then(res=>{
                     self.fullscreenLoading=false;
+                    console.log(res.data)
                     let notifiedTo=res.data.notifiedTo;
                     if(res.errCode==0){
                         isSuccess=true;
@@ -2702,6 +2719,19 @@ export default {
                 duration:time
             });
         },
+      // 处理子组件发送过来的抓拍图片
+      editEzvizCanvas(src){
+        console.log(src)
+        let self=this;
+        let obj={};
+        obj.mediaType=2;
+        obj.src= src;
+        obj.height='100px';
+        obj.width='140px';
+        obj.fileName=self.bucketImage+'/'+'event'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.jpg';
+        obj.file=util.base64ToBlob(obj.src);
+        self.sourceList.push(obj);
+      },
     }
 }
 </script>

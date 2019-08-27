@@ -329,7 +329,7 @@ export default new Router({
             // {
             //   path:'/lpsSechedule',
             //   name:'lpsSechedule',
-            //   component:resolve=>require(['@/views/setting/schedule/LpsSechedule'],resolve)
+            //   component:resolve=>require(['@/components/EzvizVideo'],resolve)
             // },
             {
               path:'/patrolSechedule',

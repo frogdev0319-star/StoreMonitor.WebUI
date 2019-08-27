@@ -1228,7 +1228,7 @@
         let execOnce = self.paneList[tabIndex].execOnce;
         let year = self.$moment().format('YYYY'); //年
         params.from = self.$moment(year).startOf('year').valueOf();
-        params.to = self.$moment(year).startOf('year').valueOf();
+        params.to = self.$moment(year).endOf('year').valueOf();
         self.paneList[tabIndex].from = params.from;
         self.paneList[tabIndex].to = params.to;
         self.paneList[tabIndex].modeDisabled = true;
@@ -1244,22 +1244,12 @@
         let tempSchedule = [];
         if (params.mode == 2) {
           //月模式
-          let timeSelected = self.timeArray;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = selectedMonth;
           selectedMonth.forEach(item => {
             console.log(item);
-            let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item => {
-              console.log(_item);
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
             tempSche.day = Number(item);
-            tempSche.period = timePeriod;
             tempSchedule.push(tempSche)
           })
           console.log(tempSchedule);
@@ -2045,60 +2035,14 @@
         params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
         let tempSchedule = [];
-        //日模式
-        if (params.mode == 0) {
-          //日模式
-          let tempPeriod = [];
-          let timeSelect = self.timeArray;
-          timeSelect.forEach(item => {
-            let seconds = self.hourToSecond(item);
-            let obj = {};
-            obj.from = seconds;
-            tempPeriod.push(obj);
-          })
-          tempSchedule.push({
-            "day": 1,
-            "period": tempPeriod
-          });
-        }
-        else if (params.mode == 1) {
-          //周模式
-          let timeSelected = self.timeArray;
-          let selectedWeek = self.selectWeek;
-          self.paneList[tabIndex].dayArray = self.selectWeek;
-          selectedWeek.forEach(item => {
-            let timePeriod = [];
-            let tempSche = {};
-            timeSelected.forEach(_item => {
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
-            tempSche.day = Number(item);
-            tempSche.period = timePeriod;
-            tempSchedule.push(tempSche)
-          })
-          console.log(tempSchedule);
-        }
-        else if (params.mode == 2) {
+        if (params.mode == 2) {
           //月模式
-          let timeSelected = self.timeArray;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
           selectedMonth.forEach(item => {
             console.log(item);
-            let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item => {
-              console.log(_item);
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
             tempSche.day = Number(item);
-            tempSche.period = timePeriod;
             tempSchedule.push(tempSche)
           })
           console.log(tempSchedule);

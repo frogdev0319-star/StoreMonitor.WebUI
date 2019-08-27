@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!--<el-button @click="updateEzviz"></el-button>-->
     <ezviz-device-mgmt v-if="isEzviz"></ezviz-device-mgmt>
     <nvr-device-mgmt v-else></nvr-device-mgmt>
   </div>
@@ -23,13 +22,14 @@
       },
     computed: {
       isEzviz() {
+        console.log(this.$store.state.user);
         return this.$store.state.user.isEzviz
       }
     },
     watch:{
       isEzviz:function(old,newd){
         console.log(newd)
-        self.$nextTick();
+        //self.$nextTick();
       }
     },
     methods:{
@@ -40,14 +40,14 @@
     },
     created(){
       let self = this;
-      self.isEzviz = self.$store.state.user.isEzviz;
+      console.log(this.$store.state.user.isEzviz);
       console.log(self.isEzviz + 'created');
-      console.log(typeof(self.isEzviz) + 'created');
     },
     mounted(){
         let self = this;
-        self.isEzviz = this.$store.state.user.isEzviz;
-        console.log(typeof(self.isEzviz)  + 'mounted');
+        //self.isEzviz = this.$store.state.user.isEzviz;
+        console.log(this.$store.state.user);
+        console.log(self.isEzviz  + 'mounted');
     },
   }
 </script>

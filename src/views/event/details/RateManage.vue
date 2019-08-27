@@ -11,7 +11,7 @@
             v-if="dialogFormVisible" width="850px" top=12% @close='closeRealTime' class='rate-video-dialog'>
                 <div class="video-dialog-content" style="overflow:hidden;" @mousemove="showControlInfo=true" @mouseleave="showControlInfo=false">
                     <hr class="dialog-hr"/>
-                    <div class="video-content" id="videoContent">
+                    <div class="video-content" id="videoContent" v-if="!isEzviz">
                         <div id="channelName" v-if="showControlInfo"><span>{{curChannel.name}}</span></div>
                         <div class="icon-footer" v-if="showControlInfo">
                             <div class="iconlside">
@@ -30,6 +30,9 @@
                             class="video-js vjs-fill">
                         </video>
                     </div>
+                  <ezviz-video v-else :channel-info="curChannel" :is-event='isEvent' ref="ezvizVideo">
+
+                  </ezviz-video>
                 </div>
             </el-dialog>
             <el-dialog  :title="generateEventLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
@@ -194,10 +197,13 @@ import AudioVue from '@/components/AudioVue.vue'
 import $ from 'jquery';
 import {getDeviceList} from '@/api/device'
 import {generateEventLang} from  '@/api/i18n'
+import EzvizVideo from '@/components/EzvizVideo.vue'
+
 export default {
     name:"RateManage",
     components:{
-        AudioVue
+        AudioVue,
+        EzvizVideo
     },
     data(){
         return{
@@ -246,7 +252,8 @@ export default {
             fullScreen:false,
             showControlInfo:true,
             playState:false,
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            isEvent: true
         }
     },
     computed: {
@@ -295,7 +302,12 @@ export default {
             else{
                 return this.windowHeight*0.609;
             }
-        }
+        },
+      isEzviz() {
+        let self = this;
+        console.log(self.$store.state.user);
+        return self.$store.state.user.isEzviz
+      }
     },
     methods:{
         generateEventLang,
@@ -394,8 +406,13 @@ export default {
         },
         closeRealTime(){
             let self=this;
-            if(self.playState){
+            if(!self.isEzviz){
+              if(self.playState){
                 self.stopRealTime();
+              }
+            }
+            else{
+              self.$refs.ezvizVideo.stopRealTime();
             }
         },
         async stopRealTime(){

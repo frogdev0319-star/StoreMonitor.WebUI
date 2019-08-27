@@ -217,8 +217,8 @@
                 </div>
               </div>
               <ezviz-video v-else :channel-info="channel" :cur-device-id="curDeviceId" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
-                           :show-feed-dialog2="showFeedDialog2"
-                           @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback">
+                           :show-feed-dialog2="showFeedDialog2" :update-video-time="updateVideoTime"
+                           @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback" ref="ezvizVideo">
 
               </ezviz-video>
             </div>
@@ -649,7 +649,9 @@ export default {
             lang: this.$i18n.locale,
             accessToken:'',
             initEzviz: false,
-            sourceListLength: 0
+            sourceListLength: 0,
+            realTimeSpeed: 0,
+            updateVideoTime: false
         }
     },
     computed:{
@@ -724,7 +726,12 @@ export default {
         //self.getInitStoreData();
         self.getFaStoreData();
         self.getDeviceList();
-        self.looper();
+        if(!self.isEzviz){
+          self.looper();
+        }
+        else{
+          //
+        }
         window.onresize=function(){
             if(!self.checkFull()){
                 console.log('退出全屏');
@@ -737,19 +744,21 @@ export default {
          /**
          * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
          */
-        window.addEventListener("visibilitychange",()=>{
-            if(document.hidden){
-                if(self.playState){
-                    self.stopRealTimeVisPage();
-                    window.clearInterval(self.timerPlayReal);
-                }
-            }
-            else{
-                if(self.isPlayingFlag==1){
-                    self.realTime();
-                }
-            }
-        })
+         if(self.isEzviz){
+           window.addEventListener("visibilitychange",()=>{
+             if(document.hidden){
+               if(self.playState){
+                 self.stopRealTimeVisPage();
+                 window.clearInterval(self.timerPlayReal);
+               }
+             }
+             else{
+               if(self.isPlayingFlag==1){
+                 self.realTime();
+               }
+             }
+           })
+         }
     },
     methods:{
         generatePatrolLang,
@@ -765,14 +774,6 @@ export default {
             self.getFaStoreData();
             //self.videoEl=document.getElementById('previewVideo').children[0];
             self.getDeviceList();
-        },
-        checkFull(){
-            var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
-            if(isFull === undefined)
-            {
-                isFull = false;
-            }
-            return isFull;
         },
         anchorLinkTo () {
             let self=this;
@@ -820,8 +821,9 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-'+self.accountId;
             //let bucketName='viumo-aaoompqqpjy4';
+            let bucketName = self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -929,7 +931,8 @@ export default {
             self.percentage=0;
             let OSS = require('ali-oss');
             //let bucketName = 'viumo-'+self.accountId
-            let bucketName='viumo-aaoompqqpjy4';
+            //let bucketName='viumo-aaoompqqpjy4';
+            let bucketName = self.oss.ossBucketName;
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -1815,7 +1818,7 @@ export default {
             self.sourceList=[];
             self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
             let obj={};
-
+            self.updateVideoTime = false;
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
@@ -1832,7 +1835,7 @@ export default {
                     item.disabled=false;
                     self.showError=false;
                     self.showGuide=false;
-
+                    //萤石云处理
                     if(item.deviceId!=self.curDeviceId){
                       if(!self.isEzviz){
                         if(self.playState){
@@ -1843,6 +1846,8 @@ export default {
                         }
                       }
                       else{
+                        //萤石云平台
+                        //self.$refs.ezvizVideo.stopAndRealTime();
                       }
                         self.curDeviceId=item.deviceId;
                     }
@@ -2133,6 +2138,7 @@ export default {
                 self.isPlayingFlag=1;
                 window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal=window.setInterval(()=>{
+                  console.log(self.realTimeSpeed)
                     self.realTimeSpeed=self.realTimeSpeed+1;
                 },1000);
             }
@@ -2227,6 +2233,7 @@ export default {
                 self.realTimeSpeed=0;
 
                 self.timerPlayReal=window.setInterval(()=>{
+                    console.log(self.realTimeSpeed)
                     self.realTimeSpeed=self.realTimeSpeed+1;
                 },1000);
             }
@@ -2554,6 +2561,14 @@ export default {
                 }
             }
         },
+        checkFull(){
+          var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+          if(isFull === undefined)
+          {
+            isFull = false;
+          }
+          return isFull;
+        },
         notify(msg,type,time) {
             this.$message({
                 message: msg,
@@ -2602,8 +2617,8 @@ export default {
         }
 
         let picObj={
-          eventName:self.eventName,
-          eventDes:self.eventDes,
+          eventName:obj.eventName,
+          eventDes:obj.eventDes,
           sourceObj:srcObj,
         }
         self.eventList.push(picObj);

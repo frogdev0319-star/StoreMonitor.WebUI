@@ -1,51 +1,93 @@
 <template>
-  <div>
+  <div >
     <div class="errorVideo-model" v-if="showError">
       <span>{{errorMsg}}</span>
     </div>
-    <div class="video-content"  id="videoContent"
-         @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
-      <!-- 录像时的动画 -->
-      <div class="getvideo-content" v-if="showGetVideo">
-        <div class="btn-graph">
-          <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+    <div v-else>
+      <div class="video-content"  id="videoContent" ref="videoContent"
+           @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-if="!fullWindow"
+           v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0.8)">
+        <!-- 录像时的动画 -->
+        <div class="getvideo-content" v-if="showGetVideo">
+          <div class="btn-graph">
+            <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+          </div>
+          <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
         </div>
-        <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
-      </div>
-      <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
-      <div class="icon-footer" v-if="showInfoContent">
-        <div class="iconlside">
-          <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-          <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+        <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
+        <div class="icon-footer" v-if="showInfoContent">
+          <div class="iconlside">
+            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+          </div>
+          <div class="iconlside">
+            <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
+            <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
+          </div>
+          <div class="screen-content">
+            <i class="iconfont iconscreen"
+               :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
+            <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+          </div>
         </div>
-        <div class="iconlside">
-          <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
-          <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
-        </div>
-        <div class="screen-content">
-          <i class="iconfont iconscreen"
-             :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
-          <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
-        </div>
-      </div>
-      <transition name='fade'>
-        <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent" @click="cutPicture">
-          <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-          <span>抓拍</span>
-        </div>
-      </transition>
-      <transition name="fade">
-        <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
-          <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
-          <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
-          <span>录像</span>
-        </div>
-      </transition>
-      <div id="test">
+        <transition name='fade'>
+          <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent && !isEvent" @click="cutPicture">
+            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+            <span>抓拍</span>
+          </div>
+        </transition>
+        <transition name="fade">
+          <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent && !isEvent" @click="getVideo">
+            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
+            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+            <span>录像</span>
+          </div>
+        </transition>
         <div id="myPlayer" ref="myPlayer"></div>
       </div>
-
+      <!-- 全屏时 -->
+      <div class="video-content"  id="videoContent" ref="videoContent"
+           @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel"  v-else
+           v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0.8)">
+        <div class="getvideo-content" v-if="showGetVideo">
+          <div class="btn-graph">
+            <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+          </div>
+          <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
+        </div>
+        <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
+        <div class="icon-footer" v-if="showInfoContent">
+          <div class="iconlside">
+            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+          </div>
+          <div class="iconlside">
+            <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
+            <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
+          </div>
+          <div class="screen-content">
+            <i class="iconfont iconscreen"
+               :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
+            <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+          </div>
+        </div>
+        <transition name='fade'>
+          <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent && !isEvent" @click="cutPicture">
+            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+            <span>抓拍</span>
+          </div>
+        </transition>
+        <transition name="fade">
+          <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent && !isEvent" @click="getVideo">
+            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
+            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+            <span>录像</span>
+          </div>
+        </transition>
+        <div id="fullPlayer" ref="myPlayer"></div>
+      </div>
     </div>
+
     <el-dialog title="编辑截图"
                :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
       <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler" >
@@ -133,6 +175,7 @@
   import {getEzvizAccessToken} from '@/api/ezviz'
   import {generatePatrolLang} from '@/api/i18n'
   import {mapGetters} from 'vuex'
+  import { Loading } from 'element-ui';
 
   export default {
       name: "EzvizVideo",
@@ -150,6 +193,9 @@
         },
         showFeedBack: {
           type: Boolean
+        },
+        isEvent:{
+          type:Boolean
         }
       },
       data(){
@@ -170,10 +216,11 @@
             showGetVideo: false,
             lang: this.$i18n.locale,
             decoder: null,
+            fullDecoder: null,
             videoSpeed:0,
             videoSpeedId: 0,
             showgongge: false,
-            ifOpenSound: true,
+            ifOpenSound: false,
             showCutDialog:false,
             imageCanvas:new Image(),
             imageCanvasList:[],
@@ -203,18 +250,41 @@
             eventName: '',
             eventDes: '',
             showFeedDialog2:false,
+            timerPlayReal: null,
+            realTimeSpeed: 0,
+            initPlayerWidth: 0,
+            initPlayerHeight: 0,
+            isLoading: false
           }
       },
-      mounted(){
-        this.initVideo();
+      async mounted(){
+        let self=this;
+        let result = await self.getEzvizAccessToken();
+        if(result.errCode=='0' && result.data != {}){
+          self.accessToken = result.data.accessToken;
+        }
+        else{
+          self.accessToken = '';
+        }
+        self.initVideo();
+        window.addEventListener("resize", self.resizeFun, false);
+        /**
+         * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
+         */
+        window.addEventListener("visibilitychange",self.visibleChange, false)
       },
     beforeDestroy() {
       let self = this;
       console.log(self.playState)
+      window.clearInterval(self.timerPlayReal);
+      self.realTimeSpeed = 0;
       if(self.playState){
         self.decoder.closeSound();
         self.decoder.stop();
       }
+      // 清除增加屏幕大小变化时的监听器
+      window.removeEventListener('resize', self.resizeFun);
+      window.removeEventListener("visibilitychange",self.visibleChange)
     },
     watch: {
       accountChanged(val,oldVal){
@@ -229,16 +299,15 @@
         let self = this;
         self.showError = false;
         console.log('new:', newValue);
-        if( oldValue !== newValue){
-          if(self.playState){
-            self.decoder.stop();
-          }
-          self.$nextTick(()=> {
-            self.decoder = null;
-            console.log(self.$refs.myPlayer)
-            self.initVideo();
-          })
+        if(self.playState){
+          self.decoder.stop();
+          self.playState = false
         }
+        self.$nextTick(()=> {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer)
+          self.initVideo();
+        })
        // return newValue;
       },
       showFeedBack(newValue, old){
@@ -247,22 +316,62 @@
       showFeedDialog2(newValue, old){
         console.log(newValue + 'showFeedDialog2')
       },
+      stopVideoTime(val, oldVal){
+        console.log('触发定时器停止')
+        let self = this;
+        window.clearInterval(self.timerPlayReal)
+        self.realTimeSpeed = 0;
+        self.stopVideoTime = false;
+        self.timerPlayReal = null;
+        if (self.playState) {
+          self.timerPlayReal = window.setInterval(() => {
+            console.log(self.realTimeSpeed)
+            self.realTimeSpeed = self.realTimeSpeed + 1;
+            console.log(self.realTimeSpeed)
+          }, 1000);
+        }
+
+      },
       //监听父组件的数值变化
       channelId(newValue, old) {
         console.log("channelId")
         let self = this;
         self.showError = false;
-        if(newValue !== old){
-          if(self.playState) {
+        if(self.playState) {
+          self.decoder.stop();
+          self.playState = false
+        }
+        self.$nextTick(()=> {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer)
+          self.initVideo();
+        })
+      },
+      realTimeSpeed(val,oldVal){
+        let self=this;
+        console.log(val);
+        if(val>=300){
+          //五分钟停止视频
+          if(self.fullWindow){
+            if(self.ifOpenSound){
+              self.fullDecoder.closeSound();
+            }
+            self.fullDecoder.stop();
+          }
+          else{
+            if(self.ifOpenSound){
+              self.decoder.closeSound();
+            }
             self.decoder.stop();
           }
-          self.$nextTick(()=> {
-            self.decoder = null;
-            console.log(self.$refs.myPlayer)
-            self.initVideo();
-          })
+          window.clearInterval(self.timerPlayReal);
+          self.timerPlayReal=null;
+          self.playState = false;
+          self.showModelContent = false;
+          self.ifOpenSound = false;
         }
       },
+
     },
     computed:{
       graphBtnWidth:function(){
@@ -302,9 +411,42 @@
       ...mapGetters({
         accountChanged:'accountChanged'
       }),
+      isEzviz() {
+        let self = this;
+        console.log(self.$store.state.user);
+        return self.$store.state.user.isEzviz
+      }
     },
     methods: {
       generatePatrolLang,
+      visibleChange(){
+        console.log('子组件退出')
+        let self = this;
+        if(document.hidden){
+          if(self.playState){
+            self.decoder.stop(); //停止视频
+            //window.clearInterval(self.timerPlayReal);
+          }
+        }
+        else{
+          console.log(self.playState);
+          if(self.playState){
+            self.realTime()
+          }
+        }
+      },
+      resizeFun(){
+        let self = this;
+        console.log('屏幕大小变化');
+        if(!self.checkFull() && self.fullWindow){
+          console.log('退出全屏1111');
+          self.fullWindow=false;
+          var playerEle =  self.$refs.myPlayer;
+          playerEle.style.width = self.initPlayerWidth + 'px'; //动态设置HTML元素高度
+          playerEle.style.height = self.initPlayerHeight + 'px';
+          self.exitFullscreen()
+        }
+      },
       getEzvizAccessToken(){
         let self=this;
         return new Promise((resolve,reject)=>{
@@ -316,23 +458,30 @@
       },
       async initVideo() {
         let self = this
+        console.log("调用初始化方法")
+        self.showModelContent=false;
         //let o = document.getElementById("myPlayer");
         if(self.channelInfo==null){
           return;
         }
+        if(self.channelInfo.channelId == undefined){
+          return;
+        }
         else{
+          self.isLoading = true;
           let o = self.$refs.myPlayer;
           let width = o.offsetWidth;
           let height = o.offsetHeight;
+          self.initPlayerWidth = width;
+          self.initPlayerHeight = height;
           console.log(width);
           console.log(height)
           self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-          //self.videoUrl = 'ezopen://open.ys7.com/203751922/1.live'
-          let result = await getEzvizAccessToken();
-          if(result.errCode=='0' && result.data != {}){
-            self.accessToken = result.data.accessToken;
+          if(self.accessToken == ''){
+            self.notify('获取AccessToken失败', 'warning',3000)
+            return;
           }
-          //self.accessToken = 'ra.abvxj86rb8cccc06b7wsepo5b3wzozfk-3usr6odcnu-0h12gcz-bnbvmyif1'
+
           // 初始化视频方法
           self.decoder = new EZUIKit.EZUIPlayer({
             id: 'myPlayer',
@@ -351,25 +500,104 @@
       handleError(e){
         console.log('捕获到错误',e)
         let self = this;
+        self.isLoading = false;
         self.errorMsg = e.msg;
         self.showError = true;
+
+        if(self.playState){
+          if(!self.fullWindow){
+            if(self.ifOpenSound){
+              self.decoder.closeSound()
+            }
+            self.decoder.stop();
+          }
+          else{
+            if(self.ifOpenSound){
+              self.fullDecoder.closeSound()
+            }
+            self.fullDecoder.stop();
+          }
+        }
         self.playState = false;
-        // log(JSON.stringify(e),'error');
-        //alert(e)
+        self.ifOpenSound = false;
+        self.realTimeSpeed=0;
+        window.clearInterval(self.timerPlayReal);
+        self.timerPlayReal = null
       },
       handleSuccess(){
         console.log("播放成功回调函数，此处可执行播放成功后续动作");
 
         let self = this;
-        self.playState = true;
         self.showError = false;
         self.errorMsg = '';
+        self.realTimeSpeed=0;
+        //关闭声音
+        window.clearInterval(self.timerPlayReal);
+        self.timerPlayReal=window.setInterval(()=>{
+          console.log(self.realTimeSpeed)
+          self.realTimeSpeed=self.realTimeSpeed+1;
+          console.log(self.realTimeSpeed)
+        },1000);
+        setTimeout(() => {
+          self.playState = true;
+          self.isLoading = false;
+          self.showModelContent=true;
+          self.showInfoContent=false;
+          if(!self.ifOpenSound){
+            self.decoder.closeSound();
+            self.ifOpenSound = false
+          }
+        }, 3000);
+      },
+
+      handleFullWindowSuccess(){
+        console.log("全屏播放成功回调函数，此处可执行播放成功后续动作");
+
+        let self = this;
+        // self.playState = true;
+        self.showError = false;
+        self.errorMsg = '';
+        //非全屏时播放，全屏时也播放，同时定时器继续定时
+        if(self.playState){
+          self.realTimeSpeed=self.realTimeSpeed+1;
+          console.log(self.realTimeSpeed)
+        }
+
+        setTimeout(() => {
+          self.showModelContent=true;
+          self.showInfoContent=false;
+          self.isLoading = false;
+          if(!self.ifOpenSound){
+            self.decoder.closeSound();
+          }
+          //self.ifOpenSound = false
+        }, 3000);
+      },
+      handleExitFullScreenSuccess(){
+        console.log("退出全屏播放成功回调函数，此处可执行播放成功后续动作");
+
+        let self = this;
+        self.showError = false;
+        self.errorMsg = '';
+        //全屏时播放，非全屏时也播放，同时定时器继续定时
+        if(self.playState){
+          self.realTimeSpeed=self.realTimeSpeed+1;
+          console.log(self.realTimeSpeed)
+        }
+
+        setTimeout(() => {
+          self.isLoading = false;
+          self.showModelContent=true;
+          self.showInfoContent=false;
+          if(!self.ifOpenSound){
+            self.decoder.closeSound();
+          }
+        }, 3000);
       },
       controlScreen(){
         let self=this;
         if(!self.fullWindow){
           self.fullWindowScreen();
-          self.fullWindow=true;
           setTimeout(() => {
             self.showModelContent=false;
             self.showInfoContent=false;
@@ -385,10 +613,13 @@
         console.log(val);
         let self=this;
         self.fullWindow = true;
-        //self.showControls=true;
+        self.isLoading = true;
         var ele = document.getElementById('videoContent');
         ele.style.width = "100%";
         ele.style.height = "100%";
+        let width = self.varyWindowWidth;
+        let height = self.varyWindowHeight;
+
         if (ele.requestFullscreen) {
           ele.requestFullscreen();
         }
@@ -401,19 +632,28 @@
         else if(ele.msRequestFullscreen) {
           ele.msRequestFullscreen();
         }
-        //将视频也全屏播放
-        let o = document.getElementById("videoContent");
-        let width = o.offsetWidth;
-        let height = o.offsetHeight;
-        // self.decoder.resize(width, height);
-        self.decoder.resize(1920, 800);
+        self.resetVideoSize();
+
       },
       //退出全屏
       exitFullscreen() {
+        let self = this;
         var de = document;
+        self.fullWindow = false;
+        self.isLoading = true;
         var ele = document.getElementById('videoContent');
-        ele.style.width = "auto";
-        ele.style.height = "auto";
+        var playerEle =  self.$refs.myPlayer;
+        playerEle.style.width = self.initPlayerWidth + 'px'; //动态设置HTML元素高度
+        playerEle.style.height = self.initPlayerHeight + 'px';
+        self.$nextTick(()=>{
+          ele.style.width = self.initPlayerWidth + 'px';
+          ele.style.height = self.initPlayerHeight + 'px';
+          // playerEle.style.width = self.initPlayerWidth + 'px';
+          // playerEle.style.height = self.initPlayerHeight + 'px';
+        })
+        let width = ele.offsetWidth;
+        let height = ele.offsetHeight;
+
         if (de.exitFullscreen) {
           de.exitFullscreen();
         }
@@ -422,6 +662,67 @@
         }
         else if (de.webkitCancelFullScreen) {
           de.webkitCancelFullScreen();
+        }
+        self.exitFullScreenPlayer();
+      },
+      exitFullScreenPlayer(){
+        let self = this
+        if(self.playState){
+          if(self.ifOpenSound){
+            self.fullDecoder.closeSound();
+          }
+          self.fullDecoder.stop();
+          self.fullDecoder = null;
+        }
+
+        console.log(self.initPlayerWidth);
+        console.log(self.initPlayerHeight)
+        self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+
+        // 初始化视频方法
+        self.decoder = new EZUIKit.EZUIPlayer({
+          id: 'myPlayer',
+          autoplay: self.playState,
+          url: self.videoUrl,
+          accessToken: self.accessToken,
+          decoderPath: '../../static/ezuikit/',
+          width: self.initPlayerWidth,
+          height: self.initPlayerHeight,
+          handleError: self.handleError,
+          handleSuccess: self.handleExitFullScreenSuccess,
+        })
+      },
+      resetVideoSize(){
+        let self = this;
+        if(self.channelInfo==null){
+          return;
+        }
+        else{
+          self.decoder.closeSound();
+          self.decoder.stop();
+          self.decorder = null;
+          let o = document.getElementById('videoContent');
+          let  width = screen.width;
+          let height = screen.height;
+          let playerEle = self.$refs.myPlayer;
+          playerEle.style.width = screen.width + 'px'; //动态设置HTML元素高度
+          playerEle.style.height = screen.height + 'px';
+          console.log(width);
+          console.log(height)
+          console.log(self.playState)
+          self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+          // 初始化视频方法
+          self.fullDecoder = new EZUIKit.EZUIPlayer({
+            id: 'fullPlayer',
+            autoplay: self.playState,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: '../../static/ezuikit/',
+            width: width,
+            height: height,
+            handleError: self.handleError,
+            handleSuccess: self.handleFullWindowSuccess,
+          })
         }
       },
       gonggeScreen(){
@@ -447,40 +748,109 @@
       //关闭实时视频
       realTime(){
         let self = this;
-        self.initVideo();
-        self.playState =  true;
+        if(self.fullWindow){
+          self.initFullWindowVideo();
+        }
+        else{
+          self.initVideo();
+        }
+      },
+      initFullWindowVideo(){
+        let self = this;
+        if(self.channelInfo==null){
+          return;
+        }
+        else{
+          let o = document.getElementById('videoContent');
+          // o.style.width= width + 'px'
+          // o.style.height= height + 'px'
+          let  width = window.outerWidth;
+          let height = window.outerHeight;
+          console.log(width);
+          console.log(height)
+          self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+          // 初始化视频方法
+          self.fullDecoder = new EZUIKit.EZUIPlayer({
+            id: 'fullPlayer',
+            autoplay: true,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: '../../static/ezuikit/',
+            width: width,
+            height: height,
+            handleError: self.handleError,
+            handleSuccess: self.handleSuccess,
+          })
+        }
       },
       stopRealTime(){
         let self = this;
         if(self.playState){
-          self.decoder.closeSound();
-          self.decoder.stop();
-          self.decoder = null
+          if(self.fullWindow){
+            self.fullDecoder.closeSound();
+            self.fullDecoder.stop();
+            self.fullDecoder = null;
+          }
+          else{
+            self.decoder.closeSound();
+            self.decoder.stop();
+            self.decoder = null;
+          }
+
+          window.clearInterval(self.timerPlayReal)
+          self.realTimeSpeed = 0;
+          self.stopVideoTime = false;
+          self.timerPlayReal = null;
         }
+        self.ifOpenSound = false;
+        self.showModelContent=false;
+        self.showInfoContent=false;
         self.playState = false;
       },
       openSound(){
         let self = this;
         self.ifOpenSound = true;
-        self.decoder.openSound();
+        if(self.fullWindow){
+          self.fullDecoder.openSound();
+        }
+        else{
+          self.decoder.openSound();
+        }
       },
       closeSound(){
         let self = this;
         self.ifOpenSound = false;
-        self.decoder.closeSound();
+        if(self.fullWindow){
+          self.fullDecoder.closeSound();
+        }
+        else{
+          self.decoder.closeSound();
+        }
       },
       stopVideo(){
         let self = this;
         if (self.playState){
-          self.decoder.closeSound();
-          self.decoder.stop();
-          self.decoder = null;
+          if(self.fullWindow){
+            self.fullDecoder.closeSound();
+            self.fullDecoder.stop();
+            self.fullDecoder = null;
+          }
+          else{
+            self.decoder.closeSound();
+            self.decoder.stop();
+            self.decoder = null;
+          }
         }
       },
       cutPicture(){
         //截图
         let self = this;
-        self.decoder.capturePicture(0,'default');
+        if(self.fullWindow){
+          self.fullDecoder.capturePicture(0,'default');
+        }
+        else{
+          self.decoder.capturePicture(0,'default');
+        }
         self.imageCanvasList=[];
         if(self.fullWindow){
           self.exitFullscreen();
@@ -498,14 +868,14 @@
               self.imgSrc = sessionStorage.getItem('fileUrl');
               let img = document.getElementById('imgTest');
               html2canvas(img).then(function (canvas) {
-                ctx.drawImage(img, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
+                ctx.drawImage(img, 0, 0, 520*self.percentHeight,340*self.percentHeight);
                 var oGrayImg = icanvas.toDataURL('image/jpeg');
                 self.imageCanvas.src = oGrayImg;
                 let imgObj = new Image();
                 imgObj.src = oGrayImg;
                 self.imageCanvasList.push(imgObj);
               })
-            }, 1000)
+            }, 100)
           })
         }
         else {
@@ -568,6 +938,7 @@
           if(new Date().getTime() - startTime > 10000){
             clearInterval(interval);
             self.decoder.stopSave(0);
+            self.showGetVideo = false;
             return;
           }
         }, 100);
@@ -795,6 +1166,33 @@
         self.$emit('ezvizCutPictureFeedback', obj);
         self.showFeedDialog2=false;
       },
+      checkFull(){
+        var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+        if(isFull === undefined)
+        {
+          isFull = false;
+        }
+        return isFull;
+      },
+      notify(msg,type,time) {
+        this.$message({
+          message: msg,
+          type: type,
+          duration:time
+        });
+      },
+      stopAndRealTime() {
+        let self = this;
+        self.showError = false;
+        if (self.playState) {
+          self.decoder.stop();
+        }
+        self.$nextTick(() => {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer)
+          self.initVideo();
+        });
+      }
     }
   }
 </script>
@@ -846,7 +1244,7 @@
     @include point(min-width,500);
     @include point(min-height,408);
     background-color: #000;
-    margin-bottom: 0;
+    /*margin-bottom: 0;*/
     .getvideo-content{
       position: absolute;
       z-index: 930;

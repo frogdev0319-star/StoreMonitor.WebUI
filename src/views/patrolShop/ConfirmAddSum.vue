@@ -142,8 +142,9 @@ export default {
         generatePatrolLang,
         getFileUrl(fileName){
             let self=this;
-            let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-'+self.accountId;
             //let bucketName='viumo-aaoompqqpjy4';
+            let bucketName=self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -153,7 +154,8 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            let bucketName = 'viumo-'+self.accountId
+            //let bucketName = 'viumo-'+self.accountId;
+            let bucketName=self.oss.ossBucketName;
             //let bucketName='viumo-aaoompqqpjy4';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),

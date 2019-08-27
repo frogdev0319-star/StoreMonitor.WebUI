@@ -242,7 +242,7 @@
               </el-form>
             </div>
             <div slot="footer" class="dialog-footer">
-              <el-button class="file-cancel-btn" @click="showAddNvrDialog = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
+              <el-button class="file-cancel-btn" @click="cancelAddNvr" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
               <el-button class="file-confirm-btn" @click="addSingleNvr" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
             </div>
           </el-dialog>
@@ -393,11 +393,10 @@
                           ref="upload"
                           :show-file-list="false"
                           action=""
-                          :before-upload="beforeAvatarUpload"
-                          :on-remove="handleRemove"
-                          :on-change="handleChange"
                           :on-preview="handlePreview"
-                          :auto-upload="false"
+                          :on-remove="handleRemove"
+                          :before-upload="beforeAvatarUpload"
+                          :on-change="handleChange"
                           accept="image/png,image/jpg,image/jpeg"
                           list-type="picture"
                           :data="addChannelData">
@@ -416,7 +415,7 @@
                 </el-form>
               </div>
               <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" @click="showAddChannelDialog = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
+                <el-button class="file-cancel-btn" @click="cancelAddSingleChannel" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
                 <el-button class="file-confirm-btn" @click="addSingleChannel" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
               </div>
             </el-dialog>
@@ -595,6 +594,7 @@
         let self=this;
         if(val!=0){
           self.InitData();
+          self.getAllStoreList();
         }
       }
     },
@@ -647,6 +647,10 @@
               item.tempUrl = item.pictureUrl;
             }
           })
+          if(self.showAddChannelDialog){
+            self.addChannelData.pictureUrl = '';
+            self.addChannelData.file = '';
+          }
         }
         if (!isLt60K) {
           this.$message.error(this.$t('deviceView.imgSizeInfo'));
@@ -656,6 +660,10 @@
               item.tempUrl = item.pictureUrl;
             }
           })
+          if(this.showAddChannelDialog){
+            this.addChannelData.pictureUrl = '';
+            this.addChannelData.file = '';
+          }
         }
 
         return (isJPEG || isJPG || isPNG) && isLt60K;
@@ -1435,6 +1443,12 @@
           }
         });
       },
+      //取消增加单个NVR
+      cancelAddNvr(){
+        let self = this;
+        self.showAddNvrDialog=false;
+        self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
+      },
       //增加单个通道
       addSingleChannel(){
         let self = this;
@@ -1470,7 +1484,7 @@
               self.notify(self.$t('deviceView.addFailed'),'warning',3000);
               self.showAddChannelDialog=false;
             }
-            self.addChannelData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
+            self.addChannelData = {name: '', channelId: '', pictureUrl: '', file: ''};
             self.page=1;
             let params={
               "filter": {
@@ -1489,6 +1503,12 @@
             return false;
           }
         });
+      },
+      //取消增加单个NVR
+      cancelAddSingleChannel(){
+        let self = this;
+        self.showAddChannelDialog = false;
+        self.addChannelData = {name: '', channelId: '', pictureUrl: '', file: ''};
       },
       //为通道绑定图片
       attachImageToDevice(params){

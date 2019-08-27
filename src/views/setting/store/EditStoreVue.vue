@@ -6,30 +6,35 @@
                 <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary'>{{generateStoreLang('mySubmit')}}</el-button>
             </div>
             <div class="store-info">
-                <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
-                <el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"
-                class="el-schedule" @change="changePerson">
-                    <el-option
-                    v-for="item in personList"
-                    :key="item.userId"
-                    :label="item.userName"
-                    :value="item.userId">
-                    </el-option>
-                </el-select>
-                <strong style="margin-right:20px;">{{generateStoreLang('contact')}}</strong><span style="min-width:100px;display:inline-block;">{{phone}}</span>
-                <span style="margin-right:20px;"><strong>{{generateStoreLang('routeSchedule')}}</strong></span>
-                <el-select v-model="schedule" :placeholder="generateStoreLang('selectPlaceholder')" size="mini" class="el-schedule" :disabled=true>
-                    <el-option
-                    v-for="item in scheduleList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                    </el-option>
-                </el-select>
+              <strong style="margin-right:20px;">{{generateStoreLang('solver')}}</strong><span style="min-width:100px;display:inline-block;"><el-input v-model="userName" disabled size="mini" class='input'></el-input></span>
+                <strong style="margin-right:20px;">{{generateStoreLang('contact')}}</strong>
+              <span style="min-width:100px;display:inline-block;"><el-input v-model="phone" disabled size="mini" style="" class='input'></el-input></span>
+                <span style="font-size:14px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
+                <span style="font-size:14px; display:inline-block;"><el-input v-model="curTag" disabled size="mini" style="" class='input'></el-input></span>
+              <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
+              <el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"
+                         class="el-schedule">
+                <el-option
+                  v-for="item in personList"
+                  :key="item.userId"
+                  :label="item.userName"
+                  :value="item.userId">
+                </el-option>
+              </el-select>
             </div>
             <div class="store-handle">
-                <span style="font-size:14px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
-                <span style="font-size:14px;">{{curTag}}</span>
+              <el-col :span="24" class="header-details1">
+                <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{generateStoreLang('bindSchedule')}}<span class="storename-str" style="margin-left:20px;">{{schedule}}</span></span>
+              </el-col>
+              <!--<span style="margin-right:20px;font-size:14px;font-weight:bold;"><strong>{{generateStoreLang('routeSchedule')}}</strong></span>-->
+              <!--<el-select v-model="schedule" :placeholder="generateStoreLang('selectPlaceholder')" size="mini" class="el-schedule" :disabled=true>-->
+                <!--<el-option-->
+                  <!--v-for="item in scheduleList"-->
+                  <!--:key="item.value"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+                <!--</el-option>-->
+              <!--</el-select>-->
             </div>
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
@@ -104,7 +109,8 @@ export default {
             supervisorId: '',
             supervisorName: '',
             varyWindowHeight:window.innerHeight,
-            varyWindowWidth:window.innerWidth
+            varyWindowWidth:window.innerWidth,
+            userName: ''
         }
     },
     computed:{
@@ -126,8 +132,9 @@ export default {
         let storeId=self.store.storeId;
         self.storeTitle=self.store.name;
         self.userId=self.store.userId;
+        self.userName = self.store.userName;
         self.supervisorId = self.store.supervisorId;
-      console.log(self.supervisorId)
+        console.log(self.supervisorId)
         self.supervisorName = self.store.supervisorName;
         console.log(self.store.napeTable)
         self.curTag=self.store.napeTable;
@@ -342,6 +349,7 @@ export default {
 @import '../../../assets/css/textstyle.css';
     $red:#FB4C5D;
     $fff:#fff;
+    $tab:#7d8cad;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -384,19 +392,46 @@ export default {
                 font-size: 14px;
                 span{
                     width:auto;
-                    margin-right:30px;
+                    margin-right:20px;
                 }
+              @media screen and (max-width: 1680px){
+                span{
+                  width:auto;
+                  margin-right:10px;
+                }
+              }
                 .el-schedule{
                     @include point(width,140);
                     @include point(margin-right,25);
                 }
+                .input{
+                  @include point(width,140);
+                 // @include point(margin-right,25);
+                  border: none;
+                  /deep/ .el-input.is-disabled .el-input__inner{
+                    border: none;
+                    background-color: #f0f5f8 !important;
+                  }
+                }
             }
             .store-handle{
-                @include point(margin-top,20);
+              .header-details1{
                 text-align: left;
+                padding-right: calc(30/1920*100vw);
+                height: auto;
+                line-height: calc(40/1920*100vw);
                 span{
-                    @include point(margin-right,30);
+                  //font-size: calc(14/1920*100vw);
+                  font-size: 14px;
+                  margin-right: calc(20/1920*100vw);
                 }
+                .choice-store{
+                  color: $tab;
+                  i{
+                    margin-right: calc(15/1920*100vw);
+                  }
+                }
+              }
             }
         }
         .storeEdit-content{

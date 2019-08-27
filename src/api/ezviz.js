@@ -36,3 +36,10 @@ export const deleteEzivzDevice=data=>{
     data
   })
 }
+export const  getEzvizAccessToken=params=>{
+  return request({
+    url:`${version}/ezviz/token`,
+    method:'get',
+    params
+  })
+}

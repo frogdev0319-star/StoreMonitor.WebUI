@@ -219,7 +219,17 @@ export default {
             'name'
         ]),
         brandDisabled(){
-            return this.$route.matched.length!=2;
+            console.log(this.$route.matched);
+            let disabled = true;
+            if(this.$route.matched.length == 2){
+              disabled = false
+            }
+            else if(this.$route.matched.length == 3){
+              if(this.$route.matched[1].path == '/schedule'){
+                disabled = false;
+              }
+            }
+            return disabled;
         }
     },
     watch:{
