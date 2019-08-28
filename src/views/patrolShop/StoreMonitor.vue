@@ -173,7 +173,7 @@
                 </div>
               </div>
             </div>
-            <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length"
+            <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true"
                          @confirmEzvizCanvas="editEzvizCanvas">
 
             </ezviz-video>
@@ -700,7 +700,9 @@ export default {
         self.getInitStoreData();
         self.getFaStoreData();   //初始获取已关注门店的列表数据
         self.getWeekDay();
-        self.looper();
+        if(!self.isEzviz){
+          self.looper();
+        }
         window.onresize=function(){
             if(!self.checkFull()){
                 self.fullScreen=false;
@@ -2488,11 +2490,16 @@ export default {
                     _item.isClick=false;
                 }
             })
-            if(self.playState){ //切换前处于播放状态
+            if(!self.isEzviz){
+              if(self.playState){ //切换前处于播放状态
                 self.stopAndRealTime();
+              }
+              else{
+                self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+              }
             }
             else{
-                self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+              //萤石云处理
             }
         },
         getIndexById(id){

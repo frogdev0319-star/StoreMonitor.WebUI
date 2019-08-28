@@ -168,6 +168,7 @@ export default {
     eventStatus: 'Status',
     untreated: 'pending',
     tryAgain: 'Try again',
+    getAccessTokenError: 'Failed to get AccessToken'
   },
 
   //report management page language

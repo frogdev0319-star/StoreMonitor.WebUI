@@ -22,14 +22,14 @@ export default{
                     // obj.appKey =paramsArray[2].substr(paramsArray[2].indexOf('=')+1);
                     // //obj.lang=paramsArray[3].substr(paramsArray[3].indexOf('=')+1);
                     this.$store.commit('SET_TOKEN',obj.token);
-                    // if(obj.ezvizAppKey != ''){
-                    //   this.$store.commit('SET_ISEZVIZ',true);
-                    //   setCookie('isEzviz',true);
-                    // }
-                    // else{
-                    //   this.$store.commit('SET_ISEZVIZ',false);
-                    //   setCookie('isEzviz',false);
-                    // }
+                    if(obj.ezvizAppKey != ''){
+                      this.$store.commit('SET_ISEZVIZ',true);
+                      setCookie('isEzviz',true);
+                    }
+                    else{
+                      this.$store.commit('SET_ISEZVIZ',false);
+                      setCookie('isEzviz',false);
+                    }
                     setCookie(TokenKey,obj.token);
                     setCookie('UserId',obj.userId);
                     // let lang = 'en'

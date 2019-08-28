@@ -340,32 +340,32 @@
                       <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;color:#2c3e50"
                          @click="handleEdit(index,item)"></i>
                       <i class="iconfont icon-shanchu" style="cursor:pointer;margin-right:10px;color:#2c3e50"
-                         @click="showDeleteChannel=true"></i>
+                         @click="handleDelete(index, item)"></i>
                     </div>
                   </div>
-                  <el-dialog  :title="generateDeviceLang('prompt')"
-                              :visible.sync="showDeleteChannel" v-if="showDeleteChannel"
-                              :append-to-body='true'
-                              :close-on-click-modal="false"
-                              width="28%"
-                              top="35vh"
-                              left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;width:100%;">
-                      <hr style="border: 0.5px solid #FB4C5D;"/>
-
-                      <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                        <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                        <span style="margin: 20px;">{{generateDeviceLang('deleteChannel')}}</span>
-                      </p>
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                      <el-button class="file-cancel-btn" @click="showDeleteChannel = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
-                      <el-button class="file-confirm-btn" @click="deleteSingleChannel(index, item)" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
-                    </div>
-                  </el-dialog>
                 </div>
               </div>
             </el-scrollbar>
+            <el-dialog  :title="generateDeviceLang('prompt')"
+                        :visible.sync="showDeleteChannel" v-if="showDeleteChannel"
+                        :append-to-body='true'
+                        :close-on-click-modal="false"
+                        width="28%"
+                        top="35vh"
+                        left="40vh">
+              <div class="dialog-content" style="overflow:hidden;width:100%;">
+                <hr style="border: 0.5px solid #FB4C5D;"/>
+
+                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
+                  <span style="margin: 20px;">{{generateDeviceLang('deleteChannel')}}</span>
+                </p>
+              </div>
+              <div slot="footer" class="dialog-footer">
+                <el-button class="file-cancel-btn" @click="showDeleteChannel = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>
+                <el-button class="file-confirm-btn" @click="deleteSingleChannel()" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
+              </div>
+            </el-dialog>
             <el-dialog :title="generateDeviceLang('addChannel')"
                        :visible.sync="showAddChannelDialog" v-if="showAddChannelDialog"
                        :append-to-body='true'
@@ -603,6 +603,7 @@
         },
         showAddChannelDialog: false, //是否显示增加通道对话框
         file:'',
+        deleteChannelId: 0
       }
     },
     watch:{
@@ -658,9 +659,29 @@
         const isLt60K = file.size / 1024 < 60;
         if (!isJPG && !isJPEG && !isPNG) {
           this.$message.error(this.$t('deviceView.imgTypeInfo'));
+          this.file = '';
+          this.channelList.forEach(item=>{
+            if(item.isClick){
+              item.tempUrl = item.pictureUrl;
+            }
+          })
+          if(self.showAddChannelDialog){
+            self.addChannelData.pictureUrl = '';
+            self.addChannelData.file = '';
+          }
         }
         if (!isLt60K) {
           this.$message.error(this.$t('deviceView.imgSizeInfo'));
+          this.file = '';
+          this.channelList.forEach(item=>{
+            if(item.isClick){
+              item.tempUrl = item.pictureUrl;
+            }
+          })
+          if(self.showAddChannelDialog){
+            self.addChannelData.pictureUrl = '';
+            self.addChannelData.file = '';
+          }
         }
         return (isJPEG || isJPG || isPNG) && isLt60K;
       },
@@ -1491,13 +1512,18 @@
           })
         })
       },
+      handleDelete(index, item){
+        let self = this;
+        console.log(index);
+        self.showDeleteChannel=true;
+        self.deleteChannelId = item.id;
+      },
       //删除单个设备
-      deleteSingleChannel(index, item){
-        console.log(item)
+      deleteSingleChannel(){
         let self=this;
         self.showDeleteChannel = false;
         let idsArr = [];
-        idsArr.push(item.id);
+        idsArr.push(self.deleteChannelId);
         let obj={};
         obj.deviceIds = idsArr;
         let params = obj;

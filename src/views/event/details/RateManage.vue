@@ -31,7 +31,6 @@
                         </video>
                     </div>
                   <ezviz-video v-else :channel-info="curChannel" :is-event='isEvent' ref="ezvizVideo">
-
                   </ezviz-video>
                 </div>
             </el-dialog>

@@ -170,7 +170,8 @@ export default {
     eventTitle: '问题名称',
     eventStatus: '问题状态',
     untreated: '未处理',
-    tryAgain: '重新尝试'
+    tryAgain: '重新尝试',
+    getAccessTokenError: '获取AccessToken失败'
 
   },
   //report management page language

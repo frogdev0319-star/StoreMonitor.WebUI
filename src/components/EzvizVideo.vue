@@ -33,14 +33,14 @@
         <transition name='fade'>
           <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent && !isEvent" @click="cutPicture">
             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-            <span>抓拍</span>
+            <span>{{generatePatrolLang('snapshot')}}</span>
           </div>
         </transition>
         <transition name="fade">
           <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent && !isEvent" @click="getVideo">
             <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
             <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
-            <span>录像</span>
+            <span>{{generatePatrolLang('record')}}</span>
           </div>
         </transition>
         <div id="myPlayer" ref="myPlayer"></div>
@@ -74,21 +74,21 @@
         <transition name='fade'>
           <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent && !isEvent" @click="cutPicture">
             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-            <span>抓拍</span>
+            <span>{{generatePatrolLang('snapshot')}}</span>
           </div>
         </transition>
         <transition name="fade">
           <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent && !isEvent" @click="getVideo">
             <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
             <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
-            <span>录像</span>
+            <span>{{generatePatrolLang('record')}}</span>
           </div>
         </transition>
         <div id="fullPlayer" ref="myPlayer"></div>
       </div>
     </div>
 
-    <el-dialog title="编辑截图"
+    <el-dialog :title="generatePatrolLang('edit')"
                :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
       <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler" >
         <hr class="dialog-hr"/>
@@ -110,20 +110,20 @@
                     'margin-left':47*percentHeight+'px'}">
           <div class="content" @click="cancelEditCanvas">
             <img :src="clearIconSrc" class="icon-clear" height="22px"/>
-            <span>清空</span>
+            <span>{{generatePatrolLang('clear')}}</span>
           </div>
           <div class="content" @click="confirmEditCanvas">
             <img :src="removeIconSrc" class="icon-clear" height="22px"/>
-            <span>取消</span>
+            <span>{{generatePatrolLang('cancel')}}</span>
           </div>
         </div>
       </div>
       <div slot="footer">
-        <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">取消</el-button>
-        <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">确定</el-button>
+        <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
+        <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
       </div>
     </el-dialog>
-    <el-dialog title= "反馈"
+    <el-dialog :title= "generatePatrolLang('feedbacks')"
                :visible.sync="showFeedDialog2" :close-on-click-modal="false" v-if="showFeedDialog2" :width="860*percentHeight+'px'" height=300px top=5%>
       <div class="canvas-content" style="overflow:hidden;">
         <hr class="dialog-hr"/>
@@ -175,7 +175,6 @@
   import {getEzvizAccessToken} from '@/api/ezviz'
   import {generatePatrolLang} from '@/api/i18n'
   import {mapGetters} from 'vuex'
-  import { Loading } from 'element-ui';
 
   export default {
       name: "EzvizVideo",
@@ -195,6 +194,9 @@
           type: Boolean
         },
         isEvent:{
+          type:Boolean
+        },
+        isStoreMonitor:{
           type:Boolean
         }
       },
@@ -254,7 +256,8 @@
             realTimeSpeed: 0,
             initPlayerWidth: 0,
             initPlayerHeight: 0,
-            isLoading: false
+            isLoading: false,
+            lang: this.$i18n.locale,
           }
       },
       async mounted(){
@@ -266,7 +269,12 @@
         else{
           self.accessToken = '';
         }
-        self.initVideo();
+        if(!self.isStoreMonitor){
+          self.initVideo();
+        }
+        else{
+
+        }
         window.addEventListener("resize", self.resizeFun, false);
         /**
          * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
@@ -291,6 +299,7 @@
         console.log(val);
         let self=this;
         if(val!=0){
+          self.channelInfo = null
           self.stopVideo();
         }
       },
@@ -499,11 +508,13 @@
       },
       handleError(e){
         console.log('捕获到错误',e)
+        console.log(e.msg)
         let self = this;
         self.isLoading = false;
         self.errorMsg = e.msg;
         self.showError = true;
-
+        let retcode = e.retcode;
+        self.errorMsg = self.getErrorMsg(e);
         if(self.playState){
           if(!self.fullWindow){
             if(self.ifOpenSound){
@@ -523,6 +534,90 @@
         self.realTimeSpeed=0;
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null
+      },
+      getErrorMsg(err){
+        let self = this;
+        let retcode = err.retcode;
+        let msg = err.msg;
+        switch (retcode) {
+          case '10001':{
+            if(self.lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(self.lang === 'zh'){
+              msg = 'ezopen协议格式有误'
+            }
+            else{
+              msg = '無操作權限！'
+            }
+            break;
+          }
+          case '10002':{
+            if(self.lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(self.lang === 'zh'){
+              msg = 'accessToken异常或过期'
+            }
+            else{
+              msg = '無操作權限！'
+            }
+            break;
+          }
+          case '5402':{
+            if(self.lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(self.lang === 'zh'){
+              msg = '回放找不到录像文件'
+            }
+            else{
+              msg = '無操作權限！'
+            }
+            break;
+          }
+          case '10026':{
+            if(self.lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(self.lang === 'zh'){
+              msg = '设备数量超出个人版限制，当前设备无法操作请升级企业版'
+            }
+            else{
+              msg = '無操作權限！'
+            }
+            break;
+          }
+          case '20018':{
+            if(self.lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(self.lang === 'zh'){
+              msg = '该用户不拥有该设备'
+            }
+            else{
+              msg = '無操作權限！'
+            }
+            break;
+          }
+          case '9408':{
+            if(self.lang ==='en'){
+              msg = 'No authority'
+            }
+            else if(self.lang === 'zh'){
+              msg = '免费版并发数达到上限，请升级企业版使用多并发能力'
+            }
+            else{
+              msg = '無操作權限！'
+            }
+            break;
+          }
+          default:{
+            msg = err.msg;
+            break;
+          }
+        }
+        return msg;
       },
       handleSuccess(){
         console.log("播放成功回调函数，此处可执行播放成功后续动作");
