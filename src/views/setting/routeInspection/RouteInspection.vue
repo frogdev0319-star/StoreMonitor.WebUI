@@ -1,21 +1,22 @@
 <template>
     <el-row class="el-route-container">
         <el-col :span="24" class="el-route-header">
-            <el-col :span="7" class="el-route-btns">
-                <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
+          <el-col :span="7" class="el-route-btns">
+              <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
                 <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' "
                 :disabled="elTableData[Number(activeName)].routeData.length==0">
                     <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
                     <span>{{generateInsSettingLang('bindList')}}</span>
                 </el-button>
+            <input id="loadFile" type="file" ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
 
-                <el-button v-for="(item,index) in btnList"
+            <el-button v-for="(item,index) in btnList"
                 :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
-                </el-button>
-                <!-- <a :href="downLoadSrc" :download='fileName' class="downLoad-btn"><i class='iconfont icon-xiazai' style="font-size:24px;"></i><span>下载</span></a> -->
-                <el-dialog :title= "generateInsSettingLang('import')"
+            </el-button>
+
+            <el-dialog :title= "generateInsSettingLang('import')"
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -63,7 +64,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="showImportContent=true;showConfirmImport=false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmImportFile" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
             </el-col>
@@ -365,11 +366,11 @@ export default {
             let self=this;
             let index=0;
             let mode=0;
-            if(self.checkValue=='远程巡检'){
+            if(self.activeName=='0'){
                 index=0;
                 mode=0;  //远程巡检 mode 0
             }
-            else if(self.checkValue=='现场巡检'){
+            else if(self.activeName=='1'){
                 index=1;
                 mode=1;  //现场巡检  mode 1
             }
@@ -483,6 +484,11 @@ export default {
                }
             }
         },
+      confirmImportFile(){
+          let self = this;
+          self.showConfirmImport=false;
+          document.getElementById('loadFile').click()
+      },
         handleClick(tabObj){
             console.log(tabObj);
             let self=this;
@@ -498,24 +504,32 @@ export default {
             }
 
         },
-        async importItem(){
+         importItem(){
             let self=this;
-            let ret=await self.isLoginIn();
+            let ret= self.isLoginIn();
             console.log(ret);
-            if(ret.data!=undefined&&ret.data.isLogin){
-                if(self.elTableData[Number(self.activeName)].routeData.length!=0){
-                    self.showConfirmImport=true;
-                }
-                else{
-                    self.showImportContent=true;
-                }
-            }
-            else{
-                // self.$store.dispatch('LogOut').then(()=>{
-                //     self.$router.push('/login');
-                // })
-                window.location.href='https://portals.storeviu.com';
-            }
+           if(self.elTableData[Number(self.activeName)].routeData.length!=0){
+             self.showConfirmImport=true;
+           }
+           else{
+             //self.showImportContent=true;
+             document.getElementById('loadFile').click();
+           }
+            // if(ret.data!=undefined&&ret.data.isLogin){
+            //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){
+            //         self.showConfirmImport=true;
+            //     }
+            //     else{
+            //         //self.showImportContent=true;
+            //       document.getElementById('loadFile').click();
+            //     }
+            // }
+            // else{
+            //     // self.$store.dispatch('LogOut').then(()=>{
+            //     //     self.$router.push('/login');
+            //     // })
+            //     window.location.href='https://portals.storeviu.com';
+            // }
         },
         checkBeforeImport(){
             let self=this;

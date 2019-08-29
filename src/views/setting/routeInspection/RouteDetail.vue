@@ -103,8 +103,11 @@
                     <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
                     <p class="empty-title">
                       {{generateInsSettingLang('please')}}<a :href="downSrc" :download='fileName' class="downLoad-btn">{{ generateInsSettingLang('downloadInfo')}}</a>
-                      {{generateInsSettingLang('toEdit')}}<span @click="emptyImport">{{generateInsSettingLang('thenImport')}}</span>{{ generateInsSettingLang('waveline')}}
+                      {{generateInsSettingLang('toEdit')}}
+                      <span @click="emptyImport">{{generateInsSettingLang('thenImport')}}</span>
+                      {{ generateInsSettingLang('waveline')}}
                     </p>
+                      <input id="uploadFile" type="file"  style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                 </div>
                 <el-dialog :title="generateInsSettingLang('import')"
                 :visible.sync="showImportContent" v-if="showImportContent"
@@ -481,8 +484,9 @@ export default {
         },
 
         emptyImport(){
-            this.showImportContent=true;
-
+            //this.showImportContent=true;
+            let self = this;
+            document.getElementById("uploadFile").click();
         },
         checkBeforeImport(){
             let self=this;

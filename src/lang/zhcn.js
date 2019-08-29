@@ -172,12 +172,12 @@ export default {
     untreated: '未处理',
     tryAgain: '重新尝试',
     getAccessTokenError: '获取AccessToken失败',
-    partolError: 'ezopen协议格式有误',
-    accessTokenError: 'accessToken异常或过期',
-    noHistoryVideo: '回放找不到录像文件',
-    maxDeviceNum: '设备数量超出个人版限制，当前设备无法操作请升级企业版',
-    noDevice: '该用户不拥有该设备',
-    maxConcurrency: '免费版并发数达到上限，请升级企业版使用多并发能力',
+    partolError: '无效的设备，请联系管理员',
+    accessTokenError: '设备繁忙，请稍后重试',
+    noHistoryVideo: '回放时间段无录像',
+    maxDeviceNum: '设备连接数超限',
+    noDevice: '无效的设备，请联系管理员',
+    maxConcurrency: '同时上线设备超限',
 
   },
   //report management page language

@@ -11,7 +11,7 @@ import {getToken} from '@/common/auth.js'
 // let base ='http://222.91.163.149:19085'  //本地开发地址
 // let base ='http://47.103.41.236:8081'  //测试地址
 let base = 'http://172.21.81.117:8081' //本地
-//let base='http://172.21.81.176:19085' //测试
+// let base='http://172.21.81.176:19085' //测试
 // let base='http://13.76.227.211:8081' //新加坡preview
 // let base='http://47.103.135.242:8081' //阿里preview
 

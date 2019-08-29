@@ -169,12 +169,12 @@ export default {
     untreated: 'pending',
     tryAgain: 'Try again',
     getAccessTokenError: 'Failed to get AccessToken',
-    partolError: 'ezopen protocol format is incorrect',
-    accessTokenError: 'accessToken exception or expired',
-    noHistoryVideo: 'Playback cannot find video file',
-    maxDeviceNum: 'The number of devices exceeds the personal version limit, the current device cannot be operated, please upgrade the enterprise version',
-    noDevice: 'This user does not own the device',
-    maxConcurrency: 'Free version has reached the upper limit, please upgrade the enterprise version to use multiple concurrent capabilities',
+    partolError: 'Invalid device, please contact administrator',
+    accessTokenError: 'Busy device, please try again later',
+    noHistoryVideo: 'No video during playback time',
+    maxDeviceNum: 'Device connection limit exceeded',
+    noDevice: 'Invalid device, please contact administrator',
+    maxConcurrency: 'On-line device limit exceeded',
   },
 
   //report management page language

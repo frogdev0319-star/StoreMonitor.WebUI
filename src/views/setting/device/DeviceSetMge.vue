@@ -44,7 +44,6 @@
     },
     mounted(){
         let self = this;
-        //self.isEzviz = this.$store.state.user.isEzviz;
         console.log(this.$store.state.user);
         console.log(self.isEzviz  + 'mounted');
     },
