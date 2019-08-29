@@ -511,7 +511,7 @@
         console.log(e.msg)
         let self = this;
         self.isLoading = false;
-        self.errorMsg = e.msg;
+        // self.errorMsg = e.msg;
         self.showError = true;
         let retcode = e.retcode;
         self.errorMsg = self.getErrorMsg(e);
@@ -537,79 +537,31 @@
       },
       getErrorMsg(err){
         let self = this;
-        let retcode = err.retcode;
-        let msg = err.msg;
+        let retcode = err.code;
+        let msg = '';
         switch (retcode) {
           case '10001':{
-            if(self.lang ==='en'){
-              msg = 'No authority'
-            }
-            else if(self.lang === 'zh'){
-              msg = 'ezopen协议格式有误'
-            }
-            else{
-              msg = '無操作權限！'
-            }
+            msg = self.$t('storeMonitor.partolError');
             break;
           }
           case '10002':{
-            if(self.lang ==='en'){
-              msg = 'No authority'
-            }
-            else if(self.lang === 'zh'){
-              msg = 'accessToken异常或过期'
-            }
-            else{
-              msg = '無操作權限！'
-            }
+            msg = self.$t('storeMonitor.accessTokenError');
             break;
           }
           case '5402':{
-            if(self.lang ==='en'){
-              msg = 'No authority'
-            }
-            else if(self.lang === 'zh'){
-              msg = '回放找不到录像文件'
-            }
-            else{
-              msg = '無操作權限！'
-            }
+            msg = self.$t('storeMonitor.noHistoryVideo');
             break;
           }
           case '10026':{
-            if(self.lang ==='en'){
-              msg = 'No authority'
-            }
-            else if(self.lang === 'zh'){
-              msg = '设备数量超出个人版限制，当前设备无法操作请升级企业版'
-            }
-            else{
-              msg = '無操作權限！'
-            }
+            msg = self.$t('storeMonitor.maxDeviceNum');
             break;
           }
           case '20018':{
-            if(self.lang ==='en'){
-              msg = 'No authority'
-            }
-            else if(self.lang === 'zh'){
-              msg = '该用户不拥有该设备'
-            }
-            else{
-              msg = '無操作權限！'
-            }
+            msg = self.$t('storeMonitor.noDevice');
             break;
           }
           case '9408':{
-            if(self.lang ==='en'){
-              msg = 'No authority'
-            }
-            else if(self.lang === 'zh'){
-              msg = '免费版并发数达到上限，请升级企业版使用多并发能力'
-            }
-            else{
-              msg = '無操作權限！'
-            }
+            msg = self.$t('storeMonitor.maxConcurrency');
             break;
           }
           default:{
@@ -1328,8 +1280,9 @@
     span{
       position: absolute;
       top: 50%;
-      left: 45%;
+      left: 50%;
       font-size: 12px;
+      transform: translate(-50%, -50%);
     }
   }
   .video-content{

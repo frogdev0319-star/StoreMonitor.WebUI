@@ -29,7 +29,6 @@
     watch:{
       isEzviz:function(old,newd){
         console.log(newd)
-        //self.$nextTick();
       }
     },
     methods:{

@@ -260,7 +260,7 @@ export default {
                     temp.push(item.cityName);
                 }
             })
-            if(self.curProvince==0){
+            if(self.curProvince==null || self.curProvince==0){
                 params={
                     filter:{
                         page:0,

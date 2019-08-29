@@ -88,7 +88,7 @@
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
-                         @click="showAddNvrDialog= true">
+                         @click="showAddDialog">
                   <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
               </el-button>
             </div>
@@ -652,8 +652,9 @@
             self.addChannelData.pictureUrl = '';
             self.addChannelData.file = '';
           }
+          return (isJPEG || isJPG || isPNG)
         }
-        if (!isLt60K) {
+        else if (!isLt60K) {
           this.$message.error(this.$t('deviceView.imgSizeInfo'));
           this.file = '';
           this.channelList.forEach(item=>{
@@ -665,9 +666,9 @@
             this.addChannelData.pictureUrl = '';
             this.addChannelData.file = '';
           }
+          return isLt60K;
         }
-
-        return (isJPEG || isJPG || isPNG) && isLt60K;
+        //return (isJPEG || isJPG || isPNG) && isLt60K;
       },
 
       /**
@@ -1183,7 +1184,7 @@
           obj.name=self.curChannelItem.tempName;
           let params=obj;
           let attachRes = {};
-          deviceRESTful.updateDevice(params).then( async  res=>{
+          deviceRESTful.updateDevice(params).then( async res=>{
             console.log(res.data);
             let errMsg=res.errMsg;
             if(errMsg!=undefined&&errMsg=='Success'){
@@ -1193,6 +1194,7 @@
                 fm.append('id', self.curChannelItem.id);
                 fm.append('picture', self.file);
                 attachRes = await self.attachImageToDevice(fm);
+                console.log('调用完编辑图片')
                 console.log(attachRes)
               }
               else{
@@ -1558,6 +1560,11 @@
           }
         })
       },
+      showAddDialog(){
+        let self = this;
+        self.showAddNvrDialog = true;
+        self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
+      },
       confirmEditNvr(index,item){
         let self=this;
         console.log(item);
@@ -1653,6 +1660,7 @@
         self.newChannelNumList = spliceArray;
         self.showAddChannelDialog = true; //显示增加通道对话框
         console.log(spliceArray)
+        self.addChannelData = {name: '', channelId: '', pictureUrl: '', file: ''};
       },
       // json数组，按照指定的key排序
       getSortFun(sortBy) {

@@ -171,7 +171,13 @@ export default {
     eventStatus: '問題状态',
     untreated: '未处理',
     tryAgain: '重新嘗試',
-    getAccessTokenError: '獲取AccessToken失敗'
+    getAccessTokenError: '獲取AccessToken失敗',
+    partolError: 'ezopen協議格式有誤',
+    accessTokenError: 'accessToken異常或過期',
+    noHistoryVideo: '回放找不到錄像文件',
+    maxDeviceNum: '設備數量超出個人版限制，當前設備無法操作請升級企業版',
+    noDevice: '該用戶不擁有該設備',
+    maxConcurrency: '免費版並發數達到上限，請升級企業版使用多並發能力',
   },
 
   //report management page language
@@ -487,7 +493,7 @@ export default {
     stores: '家門店',
     searchInfo: '請輸入關鍵詞搜索門店',
     bindAllStore: '關聯至所有門店',
-    saveAndApply: '保存並套用',
+    saveAndApply: '保存',
     confirmBind: '套用排程會覆蓋至關聯門店，確認綁定？',
     daily: '日模式',
     weekly: '周模式',

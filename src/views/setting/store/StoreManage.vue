@@ -315,7 +315,7 @@ import {generateStoreLang} from '@/api/i18n'
                         temp.push(item.cityName);
                     }
                 })
-                if(self.curProvince.length!=0){
+                if(self.curProvince!= null && self.curProvince.length!=0){
                     if(temp.length!=0){
                         self.params.clause={
                             city:temp,

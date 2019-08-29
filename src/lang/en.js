@@ -168,7 +168,13 @@ export default {
     eventStatus: 'Status',
     untreated: 'pending',
     tryAgain: 'Try again',
-    getAccessTokenError: 'Failed to get AccessToken'
+    getAccessTokenError: 'Failed to get AccessToken',
+    partolError: 'ezopen protocol format is incorrect',
+    accessTokenError: 'accessToken exception or expired',
+    noHistoryVideo: 'Playback cannot find video file',
+    maxDeviceNum: 'The number of devices exceeds the personal version limit, the current device cannot be operated, please upgrade the enterprise version',
+    noDevice: 'This user does not own the device',
+    maxConcurrency: 'Free version has reached the upper limit, please upgrade the enterprise version to use multiple concurrent capabilities',
   },
 
   //report management page language
@@ -481,7 +487,7 @@ export default {
     stores: ' stores',
     searchInfo: 'Please enter keyword to search',
     bindAllStore: 'Relate to all stores',
-    saveAndApply: 'Save And Apply',
+    saveAndApply: 'Save',
     confirmBind: 'Apply schedules will cover related stores, continue to bind?',
     daily: 'Daily',
     weekly: 'Weekly',

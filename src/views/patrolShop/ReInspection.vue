@@ -647,7 +647,6 @@ export default {
             timerPlayReal:null,
             isPlayingFlag:-1,
             lang: this.$i18n.locale,
-            accessToken:'',
             initEzviz: false,
             sourceListLength: 0,
             realTimeSpeed: 0,

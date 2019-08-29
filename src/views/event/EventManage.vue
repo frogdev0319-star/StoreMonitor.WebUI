@@ -63,7 +63,8 @@
                             @sort-change='sortChange'
                             @row-click='rowClickItem'
                             style="border-left:1px solid #eee;"
-                            class="table-content">
+                            class="table-content"
+                        >
                                 <el-table-column
                                     min-width="80"
                                     header-align="center"
@@ -215,6 +216,7 @@ export default {
             defaultTime:[],
             lang: this.$i18n.locale,
             isFirstLoad: false, //是否首次加载
+            order: ''
         }
 
     },
@@ -340,7 +342,6 @@ export default {
             console.log(val.index);
             let selectValue=self.value;
             let tabIndex=Number(val.index);
-
             switch(tabIndex){
                 case 0:
                 if(selectValue==0||selectValue==1){
@@ -599,6 +600,7 @@ export default {
             self.tableDataList[tabIndex].page=1;
             let column=col.column;
             let order=col.order;
+            self.order = order;
             if(order=="ascending"){
                 self.params.order={
                     "direction":"asc",

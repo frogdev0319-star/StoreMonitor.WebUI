@@ -491,131 +491,171 @@ export default {
                 return false;
             }
         },
-        importfxx(obj) {
-            let _this = this;
-            let inputDOM = this.$refs.inputer;
-            // 通过DOM取文件数据
-            this.file = event.currentTarget.files[0];
-            var rABS = false; //是否将文件读取为二进制字符串
-            var f = this.file;
-            var reader = new FileReader();
-            FileReader.prototype.readAsBinaryString = function(f) {
-                var binary = "";
-                var rABS = false; //是否将文件读取为二进制字符串
-                var pt = this;
-                var wb; //读取完成的数据
-                var outdata;
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var bytes = new Uint8Array(reader.result);
-                    var length = bytes.byteLength;
-                    for(var i = 0; i < length; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                    }
-                    var XLSX = require('xlsx');
-                    if(rABS) {
-                        wb = XLSX.read(btoa(fixdata(binary)), { //手动转化
-                            type: 'base64'
-                        });
-                    } else {
-                        wb = XLSX.read(binary, {
-                            type: 'binary'
-                        });
-                    }
-                    outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
-                    if(!outdata[0].hasOwnProperty('检查分类')){
-                        _this.notify(_this.$t('insSettingView.templateError'),'warning',3000);
-                        return false;
-                    }
-                    let arr=outdata;
-                    let indexArry=[];
-                    let typeName=[];
-                    let flagItemName=false,flagItemRex=false,flagItemLength=false;
-                    arr.forEach((item,index)=>{
-                        if(item['检查分类']!=undefined&&item['检查分类'].length!=0){
-                            indexArry.push(index);
-                            typeName.push(item['检查分类']);
-                        }
-                    })
-                    let dataArry=[];
-                    for(var i=0;i<indexArry.length;i++){
-                        if(i<indexArry.length){
-                            dataArry[i]=outdata.slice(indexArry[i],indexArry[i+1]);
-                        }
-                        else{
-                            dataArry[i]=outdata.slice(indexArry[length-1],indexArry.length);
-                        }
-                    }
-                    let tempGroups=[];
-                    dataArry.forEach((item,index)=>{
-                        let obj={};
-                        obj.name=item[0]['检查分类'];
-                        //obj.mode=0;
-                        if(_this.tabName=='远程巡检'){
-                            obj.mode=0;
-                        }
-                        if(_this.tabName=='现场巡检'){
-                            obj.mode=1;
-                        }
-                        obj.tag=_this.checkValue;
-                        tempGroups.push(obj);
-                    })
-                    let params={
-                        "groups": tempGroups
-                    };
-                    inpectRESTful.addInspectGroup(params).then(res=>{
-                        let code=res.errMsg;
-                        let data=res.data;
-                        if(code!=null&&code=='Success'){
-                            console.log(res.data);
-                            let tempItems=[];
-                            dataArry.forEach((item,index)=>{
-                                let obj={};
-                                let temp=[];
-                                item.forEach((_item,_index)=>{
-                                    let _obj={};
-                                    _obj.subject=_item['检查项目名称'];
-                                    _obj.description=_item["检查项目详细说明（选填，不填为空）"];
-                                    _obj.itemScore=10;
-                                    temp.push(_obj);
-                                })
-                                obj.groupId=data[index];
-                                obj.items=temp;
-                                tempItems.push(obj);
-                            })
-                            let params={
-                                "request": tempItems
-                            };
-                            inpectRESTful.addInspectItem(params).then(res=>{
-                                let code=res.errMsg;
-                                let data=res.data;
-                                if(code!=null&&code=='Success'){
-                                    console.log(res.data);
-                                    _this.notify(_this.$t('insSettingView.importSuss'),'success',3000);
-                                    _this.showImportContent=false;
-                                    //_this.refreshData();
-                                    _this.$emit('refreshList');
-                                }
-                                else{
-                                    _this.notify(_this.$t('insSettingView.importFail') ,'warning',3000);
-                                    return false;
-                                }
-                            })
-                        }
-                        else{
-                            _this.notify(_this.$t('insSettingView.importFail'),'warning',3000);
-                            return false;
-                        }
-                    })
-                }
-                reader.readAsArrayBuffer(f);
+      importfxx(obj) {
+        let _this = this;
+        let inputDOM = this.$refs.inputer;
+        // 通过DOM取文件数据
+        this.file = event.currentTarget.files[0];
+        var rABS = false; //是否将文件读取为二进制字符串
+        var f = this.file;
+        var reader = new FileReader();
+        FileReader.prototype.readAsBinaryString = function(f) {
+          var binary = "";
+          var rABS = false; //是否将文件读取为二进制字符串
+          var pt = this;
+          var wb; //读取完成的数据
+          var outdata;
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var bytes = new Uint8Array(reader.result);
+            var length = bytes.byteLength;
+            for(var i = 0; i < length; i++) {
+              binary += String.fromCharCode(bytes[i]);
             }
+            var XLSX = require('xlsx');
             if(rABS) {
-                reader.readAsArrayBuffer(f);
+              wb = XLSX.read(btoa(fixdata(binary)), { //手动转化
+                type: 'base64'
+              });
             } else {
-                reader.readAsBinaryString(f);
+              wb = XLSX.read(binary, {
+                type: 'binary'
+              });
             }
-        },
+            outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
+            if(!outdata[0].hasOwnProperty('检查分类')){
+              _this.notify(_this.$t('insSettingView.templateError'),'warning',3000);
+              return false;
+            }
+            let arr=outdata;
+            let indexArry=[];
+            let typeName=[];
+            let flaggroupLength=false,flaggroupRex=false;
+            let flagItemName=false,flagItemRex=false,flagItemLength=false;
+            arr.forEach((item,index)=>{
+              if(item['检查分类']!=undefined&&item['检查分类'].length!=0){
+                indexArry.push(index);
+                typeName.push(item['检查分类']);
+                if(item['检查分类'].toString().trim().length>10){
+                  flaggroupLength=true;
+                }
+                if(validateInput(item['检查分类'])){
+                  flaggroupRex=true;
+                }
+              }
+              if(item['检查项目名称']==undefined||item['检查项目名称'].length==0){
+                flagItemName=true;
+              }
+              else{
+                if(item['检查项目名称'].toString().trim().length>25){
+                  flagItemLength=true;
+                }
+                if(validateInput(item['检查项目名称'])){
+                  flagItemRex=true;
+                }
+              }
+            })
+
+            if(flaggroupLength){
+              _this.notify(_this.$t('insSettingView.excelLongCategory'),'warning',3000);
+              return false;
+            }
+            if(flaggroupRex){
+              _this.notify(_this.$t('insSettingView.excelIllegalCategory'),'warning',3000);
+              return false;
+            }
+            if(flagItemName){
+              _this.notify(_this.$t('insSettingView.excelEmpty'),'warning',3000);
+              return false;
+            }
+            if(flagItemLength){
+              _this.notify(_this.$t('insSettingView.excelLongItem'),'warning',3000);
+              return false;
+            }
+            if(flagItemRex){
+              _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
+              return false;
+            }
+
+            let dataArry=[];
+            for(var i=0;i<indexArry.length;i++){
+              if(i<indexArry.length){
+                dataArry[i]=outdata.slice(indexArry[i],indexArry[i+1]);
+              }
+              else{
+                dataArry[i]=outdata.slice(indexArry[length-1],indexArry.length);
+              }
+            }
+            let tempGroups=[];
+            dataArry.forEach((item,index)=>{
+              let obj={};
+              obj.name=item[0]['检查分类'];
+              //obj.mode=0;
+              if(_this.tabName=='远程巡检'){
+                obj.mode=0;
+              }
+              if(_this.tabName=='现场巡检'){
+                obj.mode=1;
+              }
+              obj.tag=_this.checkValue;
+              tempGroups.push(obj);
+            })
+            let params={
+              "groups": tempGroups
+            };
+            inpectRESTful.addInspectGroup(params).then(res=>{
+              let code=res.errMsg;
+              let data=res.data;
+              if(code!=null&&code=='Success'){
+                console.log(res.data);
+                let tempItems=[];
+                dataArry.forEach((item,index)=>{
+                  let obj={};
+                  let temp=[];
+                  item.forEach((_item,_index)=>{
+                    let _obj={};
+                    _obj.subject=_item['检查项目名称'];
+                    _obj.description=_item["检查项目详细说明（选填，不填为空）"];
+                    _obj.itemScore=10;
+                    temp.push(_obj);
+                  })
+                  obj.groupId=data[index];
+                  obj.items=temp;
+                  tempItems.push(obj);
+                })
+                let params={
+                  "request": tempItems
+                };
+                inpectRESTful.addInspectItem(params).then(res=>{
+                  let code=res.errMsg;
+                  let data=res.data;
+                  if(code!=null&&code=='Success'){
+                    console.log(res.data);
+                    _this.notify(_this.$t('insSettingView.importSuss'),'success',3000);
+                    _this.showImportContent=false;
+                    //_this.refreshData();
+                    _this.$emit('refreshList');
+                  }
+                  else{
+                    _this.notify(_this.$t('insSettingView.importFail') ,'warning',3000);
+                    return false;
+                  }
+                })
+              }
+              else{
+                _this.notify(_this.$t('insSettingView.importFail'),'warning',3000);
+                return false;
+              }
+            })
+          }
+          reader.readAsArrayBuffer(f);
+        }
+        if(rABS) {
+          reader.readAsArrayBuffer(f);
+        } else {
+          reader.readAsBinaryString(f);
+        }
+      },
         notify(msg,type,time) {
             this.$message({
                 message: msg,

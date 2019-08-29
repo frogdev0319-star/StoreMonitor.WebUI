@@ -65,8 +65,8 @@
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
-                         @click="showAddNvrDialog= true">
-                  <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
+                         @click="showAddDialog">
+                <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -91,10 +91,10 @@
               <div :class="lang=='en' ? 'en-count-title titles': 'count-title titles'" >
                 <span>{{generateDeviceLang('deviceChannelNum')}}</span>
                 <!--<i class="icon-filter"-->
-                   <!--:class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterChannelNum"></i>-->
+                <!--:class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterChannelNum"></i>-->
               </div>
               <!--<div :class="lang=='en' ? 'en-operation-title titles': 'operation-title titles'" >-->
-                <!--<span>{{generateDeviceLang('operation')}}</span>-->
+              <!--<span>{{generateDeviceLang('operation')}}</span>-->
               <!--</div>-->
             </div>
             <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -265,7 +265,7 @@
               <span class="info-title">{{generateDeviceLang('channelSetting')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
                          @click="addNewChannel" :disabled="channelBtnDisabled">
-                  <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
+                <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
               </el-button>
             </div>
             <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
@@ -407,11 +407,10 @@
                           ref="upload"
                           :show-file-list="false"
                           action=""
-                          :before-upload="beforeAvatarUpload"
-                          :on-remove="handleRemove"
-                          :on-change="handleChange"
                           :on-preview="handlePreview"
-                          :auto-upload="false"
+                          :on-remove="handleRemove"
+                          :before-upload="beforeAvatarUpload"
+                          :on-change="handleChange"
                           accept="image/png,image/jpg,image/jpeg"
                           list-type="picture"
                           :data="addChannelData">
@@ -669,8 +668,9 @@
             self.addChannelData.pictureUrl = '';
             self.addChannelData.file = '';
           }
+          return (isJPEG || isJPG || isPNG)
         }
-        if (!isLt60K) {
+        else if (!isLt60K) {
           this.$message.error(this.$t('deviceView.imgSizeInfo'));
           this.file = '';
           this.channelList.forEach(item=>{
@@ -678,12 +678,12 @@
               item.tempUrl = item.pictureUrl;
             }
           })
-          if(self.showAddChannelDialog){
-            self.addChannelData.pictureUrl = '';
-            self.addChannelData.file = '';
+          if(this.showAddChannelDialog){
+            this.addChannelData.pictureUrl = '';
+            this.addChannelData.file = '';
           }
+          return isLt60K;
         }
-        return (isJPEG || isJPG || isPNG) && isLt60K;
       },
 
       /**
@@ -1551,6 +1551,11 @@
           }
         })
       },
+      showAddDialog(){
+        let self = this;
+        self.showAddNvrDialog = true;
+        self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1};
+      },
       confirmEditNvr(index,item){
         let self=this;
         console.log(item);
@@ -1644,6 +1649,8 @@
         self.newChannelNumList = spliceArray;
         self.showAddChannelDialog = true; //显示增加通道对话框
         console.log(spliceArray)
+        self.addChannelData = {name: '', channelId: '', pictureUrl: '', file: ''};
+
       },
       // json数组，按照指定的key排序
       getSortFun(sortBy) {
