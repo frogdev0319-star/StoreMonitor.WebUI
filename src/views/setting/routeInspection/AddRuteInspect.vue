@@ -732,7 +732,8 @@ export default {
                     napeNameShow:`${index+1}，${_item.subject}`,
                     napeDep:_item.description,
                     score:_item.itemScore,
-                    isClick:false
+                    isClick:false,
+                    checked: false
                 }
                 temp.push(obj);
             })
