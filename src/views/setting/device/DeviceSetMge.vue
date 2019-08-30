@@ -32,10 +32,7 @@
       }
     },
     methods:{
-      updateEzviz(){
-        this.$store.commit('SET_ISEZVIZ',false);
-        console.log(self.$store.state.user);
-      }
+
     },
     created(){
       let self = this;
