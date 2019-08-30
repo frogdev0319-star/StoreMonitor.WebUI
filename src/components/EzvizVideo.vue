@@ -498,6 +498,7 @@
             url: self.videoUrl,
             accessToken: self.accessToken,
             decoderPath: '../../static/ezuikit/',
+            decoderPath: './static/ezuikit/',
             width: width,
             height: height,
             handleError: self.handleError,
