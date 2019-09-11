@@ -216,9 +216,11 @@
                   </video >
                 </div>
               </div>
-              <ezviz-video v-else :channel-info="channel" :cur-device-id="curDeviceId" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
-                           :show-feed-dialog2="showFeedDialog2" :update-video-time="updateVideoTime"
-                           @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback" ref="ezvizVideo">
+              <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
+                           :show-feed-dialog2="showFeedDialog2"
+                           @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback"  @confirmEzvizVideoFeedback="ezvizVideoFeedback"
+                           ref="ezvizVideo"
+                           @emitEzvizVideo="confirmEzvizVideo">
 
               </ezviz-video>
             </div>
@@ -650,7 +652,6 @@ export default {
             initEzviz: false,
             sourceListLength: 0,
             realTimeSpeed: 0,
-            updateVideoTime: false
         }
     },
     computed:{
@@ -664,13 +665,11 @@ export default {
             return this.varyWindowHeight/758;
         },
         ...mapGetters({
-            accountChanged:'accountChanged'
+            accountChanged:'accountChanged',
         }),
-        isEzviz() {
-          let self = this;
-          console.log(self.$store.state.user);
-          return self.$store.state.user.isEzviz
-        }
+        ...mapGetters(
+          ['isEzviz']
+        ),
     },
     watch:{
         accountChanged(val,oldVal){
@@ -806,12 +805,12 @@ export default {
             let accountId=await self.getAccountId();
             console.log(accountId);
             self.accountId=localStorage.getItem('oss_bucket');
-            getStorageInfo().then(res=>{
-                console.log(res);
-                if(res.errCode==0){
-                    self.oss=res.data;
-                }
-            })
+            // getStorageInfo().then(res=>{
+            //     console.log(res);
+            //     if(res.errCode==0){
+            //         self.oss=res.data;
+            //     }
+            // })
         },
         getUpLoadBucketInfo(){
             let self=this;
@@ -822,8 +821,8 @@ export default {
             let self=this;
             //let bucketName='viumo-'+self.accountId;
             //let bucketName='viumo-aaoompqqpjy4';
-            let bucketName = self.oss.ossBucketName;
-            //let bucketName = 'viumo-n3azju2aknpw';
+            //let bucketName = self.oss.ossBucketName;
+            let bucketName = 'viumo-n3azju2aknpw';
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -932,8 +931,8 @@ export default {
             let OSS = require('ali-oss');
             //let bucketName = 'viumo-'+self.accountId
             //let bucketName='viumo-aaoompqqpjy4';
-            let bucketName = self.oss.ossBucketName;
-           // let bucketName = 'viumo-n3azju2aknpw';
+            //let bucketName = self.oss.ossBucketName;
+            let bucketName = 'viumo-n3azju2aknpw';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
@@ -1800,6 +1799,7 @@ export default {
             })
             if(!self.isEzviz){
               //非萤石平台
+              self.curDeviceId=item.id;
               if(self.playState){
                 self.stopAndRealTime();
               }
@@ -1819,7 +1819,6 @@ export default {
             self.sourceList=[];
             self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
             let obj={};
-            self.updateVideoTime = false;
             if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device!=null){
@@ -1848,7 +1847,6 @@ export default {
                       }
                       else{
                         //萤石云平台
-                        //self.$refs.ezvizVideo.stopAndRealTime();
                       }
                         self.curDeviceId=item.deviceId;
                     }
@@ -2577,11 +2575,13 @@ export default {
                 duration:time
             });
         },
-      // 处理子组件发送过来的抓拍图片
+      /**
+       * 处理子组件发送过来的抓拍图片
+       */
       editEzvizCanvas(src){
           console.log(src)
           let self=this;
-        self.sourceList = [];
+          self.sourceList = [];
           let obj={};
           obj.mediaType=2;
           obj.src= src;
@@ -2602,8 +2602,11 @@ export default {
           self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
           console.log(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList)
         },
+      /**
+       * 处理萤石云组件的截图反馈
+       * @param obj
+       */
       ezvizPictureFeedback(obj){
-          //处理反馈的抓拍图片
         console.log(obj);
         let self = this;
         let srcObj=null;
@@ -2624,6 +2627,51 @@ export default {
         }
         self.eventList.push(picObj);
         self.showFeedBackInfo=false;
+      },
+      /**
+       * 处理萤石云组件的视频反馈
+       * @param obj
+       */
+      ezvizVideoFeedback(ezvizObj){
+        console.log(ezvizObj);
+        let self = this;
+        let srcObj = {};
+        let tempSrcObj = ezvizObj.sourceObj;
+        srcObj.src = tempSrcObj.src;
+        srcObj.file = tempSrcObj.blob;
+        srcObj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+        srcObj.mediaType=1;
+        let videoObj={
+          eventName: ezvizObj.eventName,
+          eventDes: ezvizObj.eventDes,
+          sourceObj: srcObj,
+        }
+        self.eventList.push(videoObj);
+        self.showFeedBackInfo=false;
+      },
+      /**
+       * 处理萤石云视频录像
+       */
+      confirmEzvizVideo(blob){
+        let self = this;
+        let url=URL.createObjectURL(blob);
+        self.sourceList = [];
+        let obj={};
+        obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+        obj.file=blob;
+        obj.mediaType=1;
+        obj.src=url;
+        obj.height='100px';
+        self.sourceList.push(obj);
+        console.log(self.curItemId);
+        let tempId=self.getIndexById(self.curItemId);
+        console.log(tempId);
+        if(tempId!=null){
+          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+        }
+        else{
+          self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+        }
       }
     }
 }
