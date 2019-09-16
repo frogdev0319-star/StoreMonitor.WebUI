@@ -43,7 +43,7 @@
 
                         <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{generateInsSettingLang('select')}}
                             <!-- <div class="file-sliver"  v-if="hideUpload"> -->
-                                <input  id="upload" type="file" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                                <input  id="upload" type="file" @change="importfxx(this)" ref="loadFile"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                             <!-- </div> -->
                         </a>
                     </div>
@@ -181,9 +181,10 @@ export default {
     mounted(){
         let self=this;
         self.getTagList();
-        self.initData();
         let tabIndex=sessionStorage.getItem('TabIndex');
         self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+        self.initData();
+        self.getDownLoadURL();
     },
     methods:{
         generateInsSettingLang,
@@ -201,10 +202,11 @@ export default {
         },
         initData(){
             let self=this;
+            console.log(self.activeName + "activeName")
             switch(Number(self.activeName)){
                 case 0: self.checkValue='远程巡检'; break;
-                case 1: self.changeValue='现场巡检';break;
-                default:self.changeValue='新增巡检表';break;
+                case 1: self.checkValue='现场巡检';break;
+                default:self.checkValue='新增巡检表';break;
             }
         },
         downItem(){
@@ -233,8 +235,7 @@ export default {
                 let objectUrl = URL.createObjectURL(blob);
                 let url=objectUrl;
                 self.downLoadSrc=url;
-
-                window.open(self.downLoadSrc,'_self');
+                //window.open(self.downLoadSrc,'_self');
             })
         },
         getNapeList(){
@@ -647,22 +648,27 @@ export default {
                     })
 
                     if(flaggroupLength){
+                        _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelLongCategory'),'warning',3000);
                         return false;
                     }
                     if(flaggroupRex){
+                        _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelIllegalCategory'),'warning',3000);
                         return false;
                     }
                     if(flagItemName){
+                        _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelEmpty'),'warning',3000);
                         return false;
                     }
                     if(flagItemLength){
+                        _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelLongItem'),'warning',3000);
                         return false;
                     }
                     if(flagItemRex){
+                        _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
                         return false;
                     }
@@ -677,7 +683,7 @@ export default {
                         }
                     }
                     _this.addAllData(dataArry);
-
+                    _this.$refs.loadFile.value = '';
                 }
                 reader.readAsArrayBuffer(f);
             }

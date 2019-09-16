@@ -2,7 +2,6 @@
     <div class="detail-container" style="height:auto;" :style="{'min-height':varyWindowWidth*0.70+'px'}">
         <el-row>
             <el-col :span="24" class="detail-title">
-
                 <span class="title-title " v-if="routeData.length!=0">{{tabNameLang}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
                   {{itemNum}} {{generateInsSettingLang('item')}}</span>
                 <div class="route-btns">
@@ -107,7 +106,7 @@
                       <span @click="emptyImport">{{generateInsSettingLang('thenImport')}}</span>
                       {{ generateInsSettingLang('waveline')}}
                     </p>
-                      <input id="uploadFile" type="file"  style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                      <input id="uploadFile" type="file"  ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                 </div>
                 <el-dialog :title="generateInsSettingLang('import')"
                 :visible.sync="showImportContent" v-if="showImportContent"
@@ -561,22 +560,27 @@ export default {
             })
 
             if(flaggroupLength){
+              _this.$refs.loadFile.value = '';
               _this.notify(_this.$t('insSettingView.excelLongCategory'),'warning',3000);
               return false;
             }
             if(flaggroupRex){
+              _this.$refs.loadFile.value = '';
               _this.notify(_this.$t('insSettingView.excelIllegalCategory'),'warning',3000);
               return false;
             }
             if(flagItemName){
+              _this.$refs.loadFile.value = '';
               _this.notify(_this.$t('insSettingView.excelEmpty'),'warning',3000);
               return false;
             }
             if(flagItemLength){
+              _this.$refs.loadFile.value = '';
               _this.notify(_this.$t('insSettingView.excelLongItem'),'warning',3000);
               return false;
             }
             if(flagItemRex){
+              _this.$refs.loadFile.value = '';
               _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
               return false;
             }
@@ -635,18 +639,21 @@ export default {
                   let data=res.data;
                   if(code!=null&&code=='Success'){
                     console.log(res.data);
+                    _this.$refs.loadFile.value = '';
                     _this.notify(_this.$t('insSettingView.importSuss'),'success',3000);
                     _this.showImportContent=false;
                     //_this.refreshData();
                     _this.$emit('refreshList');
                   }
                   else{
+                    _this.$refs.loadFile.value = '';
                     _this.notify(_this.$t('insSettingView.importFail') ,'warning',3000);
                     return false;
                   }
                 })
               }
               else{
+                _this.$refs.loadFile.value = '';
                 _this.notify(_this.$t('insSettingView.importFail'),'warning',3000);
                 return false;
               }
