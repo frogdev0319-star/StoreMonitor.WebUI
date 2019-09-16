@@ -670,10 +670,10 @@ export default {
                 }
             }
             console.log(self.curReportType);
-            if(self.curReportType!==''){
+            if(self.curReportType!== null && self.curReportType!==''){
                 clause.mode=self.curReportType;
             }
-            if(self.curAppraise!==''){
+            if(self.curAppraise!== null && self.curAppraise!==''){
                 clause.status=self.curAppraise;
             }
             self.params.clause=clause;

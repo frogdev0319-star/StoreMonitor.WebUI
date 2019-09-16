@@ -1486,7 +1486,7 @@
 
       async addSchedule() {
         let self = this;
-        self.scheduleName = '新增排程';
+        self.scheduleName = self.$t('scheduleView.newSchedule');
         self.showAddDialog = false;
         let addInfo = {
           name: self.scheduleName,
@@ -2351,7 +2351,7 @@
               let data = res.errCode;
               console.log(data);
               if(data == 0){
-                self.notify(self.$t('scheduleView.deleteSuss'),'warning',3000);
+                self.notify(self.$t('scheduleView.deleteSuss'),'success',3000);
               }
               else{
                 self.notify(self.$t('scheduleView.deleteFail'),'warning',3000);

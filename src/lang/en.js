@@ -515,7 +515,8 @@ export default {
     emptyNotifyTime: 'Reminder time cannot be empty',
     emptyDate: 'The execution date cannot be empty',
     emptyMonth: 'Month cannot be empty',
-    emptyTime: 'Execution time cannot be empty'
+    emptyTime: 'Execution time cannot be empty',
+    newSchedule: 'New Schedule',
   }
 
 }

@@ -511,8 +511,8 @@ export default {
     days: '天',
     remotePatrol: '遠端巡檢',
     onsitePatrol: '現場巡檢',
-    deleteSuss: '巡檢項刪除成功！',
-    deleteFail: '巡檢項刪除失敗！',
+    deleteSuss: '刪除成功！',
+    deleteFail: '刪除失敗！',
     inputName: '請輸入排程名稱！',
     promptInfo: '提示：因考慮路程人力因素，請合理安排巡檢任務。',
     notifyOneDayBefore: '在前壹天同壹時間進行提醒',
@@ -521,6 +521,7 @@ export default {
     emptyNotifyTime: '提醒時間不能為空',
     emptyDate: '執行日期不能為空',
     emptyMonth: '月份不能為空',
-    emptyTime: '執行時間不能為空'
+    emptyTime: '執行時間不能為空',
+    newSchedule: '新增排程',
   }
 }

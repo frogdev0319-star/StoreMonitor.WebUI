@@ -178,7 +178,8 @@ export default {
     maxDeviceNum: '设备连接数超限',
     noDevice: '无效的设备，请联系管理员',
     maxConcurrency: '同时上线设备超限',
-
+    errorEncry: '调用查询设备是否加密失败',
+    errorVerifyCode: '调用验证设备密码失败',
   },
   //report management page language
   reportView:{
@@ -524,6 +525,7 @@ export default {
     emptyNotifyTime: '提醒时间不能为空',
     emptyDate: '执行日期不能为空',
     emptyMonth: '月份不能为空',
-    emptyTime: '执行时间不能为空'
+    emptyTime: '执行时间不能为空',
+    newSchedule: '新增排程',
   }
 }
