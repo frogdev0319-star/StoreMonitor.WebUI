@@ -2,7 +2,10 @@ import request from '@/common/request'
 import {serviceAxios} from '@/common/request'
 let base ="http://172.21.84.62:8085";
 let itempath='/storemonitor/api/v1.0'
-const version='v1.0';
+
+import Environment from '@/common/environment'
+const version = Environment.VERSION;
+//const version='v1.0';
 const version2='v2.0';
 //巡检项模块api
 export const getInspectGroupList=params=>{
@@ -61,7 +64,7 @@ export const bindInspectItem=data=>{
         method:'post',
         data
     })
-} 
+}
 export const checkOutInspectItem=params=>{
     return request({
         url:`${version}/inspect/checkout`,

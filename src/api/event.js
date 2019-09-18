@@ -1,5 +1,8 @@
 import request from '@/common/request'
-const version='v1.0';
+
+import Environment from '@/common/environment'
+const version = Environment.VERSION;
+
 export const getEventList=data=>{
     return request({
         url:`${version}/event/list`,
@@ -36,9 +39,10 @@ export const getEventCount=data=>{
     })
 }
 
-export const getStorageInfo=()=>{
+export const getStorageInfo=params=>{
     return request({
         url:`${version}/storage/info`,
-        method:'get'
+        method:'get',
+        params
     })
 }

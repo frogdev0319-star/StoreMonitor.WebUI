@@ -126,7 +126,8 @@
                       <span>{{generateStoreMonitorLang('snapshot')}}</span>
                     </div>
                     <div class="paizhao-content" @click="getVideo">
-                      <i class="iconfont icon-luxiang iconpaizhao" style="font-size:22px;margin-left: -14px;"></i>
+                      <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:22px;margin-left: -14px;"></i>
+                      <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:22px"></i>
                       <span style="margin-left:12px;">{{generateStoreMonitorLang('record')}}</span>
                     </div>
                     <div class="icon-drap-content">
@@ -173,8 +174,9 @@
                 </div>
               </div>
             </div>
-            <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true"
-                         @confirmEzvizCanvas="editEzvizCanvas">
+            <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true" :play-back="playBackState"
+                         :cur-time="playBackTime"
+                         @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo">
 
             </ezviz-video>
             <div class="el-event">
@@ -429,7 +431,6 @@ export default {
             ],
             curSpeed:'1 X',
             backList:[
-
                 {
                     value:0,
                     label:'10s'
@@ -611,8 +612,8 @@ export default {
             timerPlayReal:null,
             realTimeSpeed:0,
             cutDialogcurTime:0,
-            lang: this.$i18n.locale
-
+            lang: this.$i18n.locale,
+            playBackTime: 0,
         }
     },
     computed:{
@@ -747,6 +748,7 @@ export default {
             self.evBtns[1].isActive=false;
             self.getInitStoreData();
             self.getFaStoreData();
+            self.backCurDate();
         },
         getUpLoadBucketInfo(){
             let self=this;
@@ -786,11 +788,11 @@ export default {
             self.accountId=localStorage.getItem('oss_bucket');
             let userId=getCookie('UserId');
             self.userId=userId;
-            getStorageInfo().then(res=>{
-                if(res.errCode==0){
-                    self.oss=res.data;
-                }
-            })
+            // getStorageInfo().then(res=>{
+            //     if(res.errCode==0){
+            //         self.oss=res.data;
+            //     }
+            // })
         },
         clearEvent(){
             let self=this;
@@ -1212,6 +1214,7 @@ export default {
             self.curTime=d;
             let dstr=Number((d.getTime()+(1*60+1)*1000).toString().substr(0,10));
             self.startTs=dstr;
+            self.playBackTime = Number((d.getTime()).toString());
             self.currentTimeValue=0;
             self.playBackState=true;
             self.curSpeed='1 X';
@@ -1221,11 +1224,16 @@ export default {
                 self.timeid=null;
                 self.timeid=0;
             }
-            if(self.playState){  //切换时间的时候判断当前视频是否在播放
-               self.stopAndPlayHistoryVideo();
+            if(!self.isEzviz){
+              if(self.playState){  //切换时间的时候判断当前视频是否在播放
+                self.stopAndPlayHistoryVideo();
+              }
+              else{
+                self.playHistoryVideo();
+              }
             }
             else{
-                self.playHistoryVideo();
+
             }
         },
         afterCurDate(sindex,item){
@@ -1287,11 +1295,7 @@ export default {
         },
         getFileUrl(fileName){
             let self=this;
-            //let bucketName='viumo-'+self.accountId;
-           // let bucketName='viumo-aaoompqqpjy4';
-            let bucketName=self.oss.ossBucketName;
-            //let bucketName='viumo-aaoompqqpjy4';
-            //let bucketName = 'viumo-n3azju2aknpw';
+            let bucketName = self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -1301,15 +1305,11 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            //let bucketName='viumo-'+self.accountId;
-            //let bucketName='viumo-aaoompqqpjy4';
-            let bucketName=self.oss.ossBucketName;
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
                 accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                //bucket: 'viumo-'+self.accountId
-                bucket:bucketName
+                bucket: self.oss.ossBucketName
             })
             let name=fileItem.fileName;
             return new Promise((resolve,reject)=>{
@@ -1354,6 +1354,15 @@ export default {
                 self.notify(self.$t('storeMonitor.illegalDesc'),'warning',3000);
                 return false;
             }
+            let params = {};
+            params.storeId = self.store.storeId;
+            //上传文件时获取门店对应的BucketName
+            await getStorageInfo(params).then(res=>{
+              if(res.errCode==0){
+                self.oss = res.data;
+                console.log(self.oss)
+              }
+            })
             let tempFileUrl=[];
             for(let i=0;i<self.sourceList.length;i++){
                 let obj={};
@@ -2599,13 +2608,19 @@ export default {
             self.curYear=new Date().getFullYear();
             self.curMonth=new Date().getMonth()+1;
             self.getWeekDay();
-            if(self.store.storeId!=undefined){
+            if(!self.isEzviz){
+              if(self.store.storeId!=undefined){
                 if(self.playState){
-                    self.stopAndRealTime();
+                  self.stopAndRealTime();
                 }
                 else{
-                    self.realTime();
+                  self.realTime();
                 }
+              }
+            }
+            else{
+              //萤石云
+              self.playBackTime = 0;
             }
         },
         forWard(){
@@ -2730,7 +2745,7 @@ export default {
         },
       // 处理子组件发送过来的抓拍图片
       editEzvizCanvas(src){
-        console.log(src)
+        console.log('picture--'+ src)
         let self=this;
         let obj={};
         obj.mediaType=2;
@@ -2741,6 +2756,22 @@ export default {
         obj.file=util.base64ToBlob(obj.src);
         self.sourceList.push(obj);
       },
+
+      //处理子组件发送过来的录制视频
+      confirmEzvizVideo(blob){
+        console.log('video--')
+        let self=this;
+        console.log(blob)
+        let url = URL.createObjectURL(blob);
+        console.log(url)
+        let obj = {};
+        obj.fileName=self.bucketImage+'/'+'event'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+        obj.file= blob;
+        obj.mediaType=1;
+        obj.src= url;
+        obj.height='100px';
+        self.sourceList.push(obj);
+      }
     }
 }
 </script>

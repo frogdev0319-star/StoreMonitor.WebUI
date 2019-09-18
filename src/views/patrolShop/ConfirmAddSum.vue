@@ -142,10 +142,7 @@ export default {
         generatePatrolLang,
         getFileUrl(fileName){
             let self=this;
-            //let bucketName='viumo-'+self.accountId;
-            //let bucketName='viumo-aaoompqqpjy4';
-            let bucketName=self.oss.ossBucketName;
-            //let bucketName = 'viumo-n3azju2aknpw';
+            let bucketName = self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
@@ -155,17 +152,12 @@ export default {
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            //let bucketName = 'viumo-'+self.accountId;
-            let bucketName=self.oss.ossBucketName;
-            //let bucketName = 'viumo-'+self.accountId
-            //let bucketName='viumo-aaoompqqpjy4';
-            //let bucketName = 'viumo-n3azju2aknpw';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
                 accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
                 //bucket: 'viumo-'+self.accountId,
-                bucket: bucketName
+                bucket: self.oss.ossBucketName
             })
             let name=fileItem.fileName;
             return new Promise((resolve,reject)=>{
@@ -210,6 +202,15 @@ export default {
                 self.notify(self.$t('remotePatrol.summaryInfo'),'warning',3000);
                 return false;
             }
+            let storageParams = {};
+            storageParams.storeId = self.store.storeId;
+            //上传文件时获取门店对应的BucketName
+            await getStorageInfo(storageParams).then(res=>{
+              if(res.errCode==0){
+                self.oss = res.data;
+                console.log(self.oss)
+              }
+            })
             let temp=[];
             for(let i in inspectList){
                 for(let  j in inspectList[i].items){
@@ -394,12 +395,12 @@ export default {
             let accountId=await self.getAccountId();
             console.log(accountId);
             self.accountId=localStorage.getItem('oss_bucket');
-            getStorageInfo().then(res=>{
-                console.log(res);
-                if(res.errCode==0){
-                    self.oss=res.data;
-                }
-            })
+            // getStorageInfo().then(res=>{
+            //     console.log(res);
+            //     if(res.errCode==0){
+            //         self.oss=res.data;
+            //     }
+            // })
         },
         getUpLoadBucketInfo(){
             let self=this;

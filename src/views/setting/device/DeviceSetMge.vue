@@ -8,6 +8,8 @@
 <script>
   import NvrDeviceMgmt from '@/views/setting/device/NvrDeviceMgmt.vue'
   import EzvizDeviceMgmt from '@/views/setting/device/EzvizDeviceMgmt.vue'
+  import {getCookie} from "../../../common/auth";
+  import { mapMutations,mapGetters} from 'vuex'
 
   export default {
       name:'DeviceSetMge',
@@ -21,15 +23,19 @@
         }
       },
     computed: {
-      isEzviz() {
-        console.log(this.$store.state.user);
-        return this.$store.state.user.isEzviz
-      }
+      ...mapGetters(
+        ['isEzviz']
+      ),
+      // isEzviz() {
+      //   console.log(getCookie('isEzviz'));
+      //   let cookieEzviz = getCookie('isEzviz');
+      //   return this.$store.state.user.isEzviz
+      // },
     },
     watch:{
-      isEzviz:function(old,newd){
+      isEzviz:function(newd,old){
         console.log(newd)
-      }
+      },
     },
     methods:{
 
@@ -37,11 +43,13 @@
     created(){
       let self = this;
       console.log(this.$store.state.user.isEzviz);
+      console.log(getCookie('isEzviz'));
       console.log(self.isEzviz + 'created');
     },
     mounted(){
         let self = this;
         console.log(this.$store.state.user);
+        console.log(getCookie('isEzviz'));
         console.log(self.isEzviz  + 'mounted');
     },
   }

@@ -1,5 +1,7 @@
 import request from '@/common/request'
-const version='v1.0';
+import Environment from '@/common/environment'
+const version = Environment.VERSION;
+//const version='v1.0';
 export const getStoreList=data=>{
     return request({
         url:`${version}/store/list`,
@@ -29,7 +31,7 @@ export const addFavoriteStore=data=>{
         url:`${version}/favorite/add`,
         method:'post',
         data
-    }) 
+    })
 }
 
 export const deleteFavoriteStore=data=>{
@@ -37,5 +39,5 @@ export const deleteFavoriteStore=data=>{
         url:`${version}/favorite/delete`,
         method:'post',
         data
-    }) 
+    })
 }

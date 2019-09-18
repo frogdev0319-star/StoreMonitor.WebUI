@@ -1,6 +1,9 @@
 import request from '@/common/request'
 import {serviceLogout} from '@/common/request'
-const version='v1.0';
+import Environment from '@/common/environment'
+const version = Environment.VERSION;
+
+//const version='v1.0';
 //account RESTful
 export function loginByUsername(data){
     return request({

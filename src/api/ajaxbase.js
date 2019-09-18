@@ -90,7 +90,7 @@ async function ajax4dash({method,url,data}){
         baseURL:REST_BASEURL,
         timeout:30000,
     });
-    let ret=null;
+    let ret = null;
     await newAxios({
         method,
         url,
@@ -100,7 +100,7 @@ async function ajax4dash({method,url,data}){
             "Accept":"application/json"
         }
     }).then(res=>{
-        ret=res;
+        ret = res;
     }).catch((err) => {
         console.log(err);
         let msg = '';

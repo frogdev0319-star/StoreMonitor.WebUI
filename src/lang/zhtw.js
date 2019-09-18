@@ -178,6 +178,12 @@ export default {
     maxDeviceNum: '設備連接數超限',
     noDevice: '無效的設備，請聯繫管理員',
     maxConcurrency: '同時上線設備超限',
+    errorEncry: '調用查詢設備是否加密失敗',
+    errorVerifyCode: '調用驗證設備密碼失敗',
+    enterPassword: '請輸入視頻密碼',
+    contactInfo: '請聯系設備所有者獲取密碼進行查看',
+    initialCode : '初始密碼為機身標簽上的驗證碼（密碼區分大小寫）',
+    videoEncrypted: '視頻已加密'
   },
 
   //report management page language

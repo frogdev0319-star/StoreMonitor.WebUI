@@ -5,7 +5,6 @@ import axios from 'axios'
 import qs from 'qs'
 import axiosFile from 'axios'
 import Nape from '@/api/ApiPath'
-
 //let base='http://'+window.location.host;
 //let base ="http://172.21.84.62:8085";
 let base ='http://172.21.81.206:8085';
@@ -32,26 +31,26 @@ export const getStoreList1=()=>{
 
 //巡检项模块api
 export const getInspectGroupList=params=>{
-    return axios.get(`${base}${itempath}/inspect/group/list`,params); 
+    return axios.get(`${base}${itempath}/inspect/group/list`,params);
 };
 export const getInspectItemList=params=>{
-    return axios.get(`${base}${itempath}/inspect/item/list`,params); 
+    return axios.get(`${base}${itempath}/inspect/item/list`,params);
 }
 export const getInspectBindList=params=>{
-    return axios.post(`${base}${itempath}/inspect/item/bind/list`,params); 
+    return axios.post(`${base}${itempath}/inspect/item/bind/list`,params);
 }
 export const addInspectGroup=params=>{
-    return axios.post(`${base}${itempath}/inspect/group/add`,params); 
+    return axios.post(`${base}${itempath}/inspect/group/add`,params);
 }
 export const addInspectItem=params=>{
-    return axios.post(`${base}${itempath}/inspect/item/add`,params); 
+    return axios.post(`${base}${itempath}/inspect/item/add`,params);
 }
 export const applyItemInspectItem=params=>{
     return axios.post(`${base}${itempath}/inspect/item/apply`,params);
 }
 export const bindInspectItem=params=>{
     return axios.post(`${base}${itempath}/inspect/item/bind`,params);
-} 
+}
 export const checkOutInspectItem=params=>{
     return axios.get(`${base}${itempath}/inspect/checkout`,{params,params});
 }

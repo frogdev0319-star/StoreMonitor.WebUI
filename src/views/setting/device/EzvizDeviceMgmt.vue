@@ -310,7 +310,10 @@
                     </el-select>
                   </div>
                   <div class="nape-picture-data">
-                    <img v-if="item.tempUrl" :src="item.tempUrl" class="img-class">
+                    <span v-if="item.tempUrl">
+                       <img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">
+                        <img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">
+                    </span>
                     <span v-else="!item.tempUrl" class="img-class" style="display: inline-block;background: #cccc;">
                       <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
@@ -602,7 +605,8 @@
         },
         showAddChannelDialog: false, //是否显示增加通道对话框
         file:'',
-        deleteChannelId: 0
+        deleteChannelId: 0,
+        isUpdate: false
       }
     },
     watch:{
@@ -640,6 +644,8 @@
         console.log(this.addChannelData.pictureUrl);
       },
       handleEditChange(file, fileList) {
+        let self = this;
+        self.isUpdate = true;
         this.channelList.forEach(item=>{
           if(item.isClick){
             item.tempUrl = file.url;
@@ -652,9 +658,12 @@
         console.log(file);
       },
       beforeAvatarUpload (file) {
-        const isJPEG = file.name.split('.')[1] === 'jpeg';
-        const isJPG = file.name.split('.')[1] === 'jpg';
-        const isPNG = file.name.split('.')[1] === 'png';
+        let fileName = file.name.split('.');
+        let fileType = fileName[fileName.length-1];
+        console.log(fileType)
+        const isJPEG = fileType === 'jpeg';
+        const isJPG = fileType === 'jpg';
+        const isPNG = fileType === 'png';
         const isLt60K = file.size / 1024 < 60;
         if (!isJPG && !isJPEG && !isPNG) {
           this.$message.error(this.$t('deviceView.imgTypeInfo'));
@@ -1113,6 +1122,7 @@
       },
       cancelEdit(index,item){
         let self = this;
+        self.isUpdate = false;
         item.isClick=false;
         item.tempUrl = item.pictureUrl;
         self.file = '';
@@ -1126,6 +1136,7 @@
         let self=this;
         let obj={};
         if(item.id != 0){
+          self.isUpdate = false;
           obj.id=self.curChannelItem.id;
           obj.name=self.curChannelItem.tempName;
           let params=obj;

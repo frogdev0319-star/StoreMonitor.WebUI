@@ -32,20 +32,20 @@ export default{
                     }
                     setCookie(TokenKey,obj.token);
                     setCookie('UserId',obj.userId);
-                    // let lang = 'en'
-                    // if(obj.lang === 'zh-CN'){
-                    //   lang = 'zh'
-                    // }
-                    // else if(obj.lang ==='en-US'){
-                    //   lang = 'en'
-                    // }
-                    // else if(obj.lang === 'zh-TW'){
-                    //   lang = 'zhtw'
-                    // }
-                    // else{
-                    //   lang = 'en'
-                    // }
-                    // setCookie('lang', lang)
+                    let lang = 'en'
+                    if(obj.lang === 'zh-CN'){
+                      lang = 'zh'
+                    }
+                    else if(obj.lang ==='en-US'){
+                      lang = 'en'
+                    }
+                    else if(obj.lang === 'zh-TW'){
+                      lang = 'zhtw'
+                    }
+                    else{
+                      lang = 'en'
+                    }
+                    setCookie('lang', lang)
                 }
             }
             window.location.href=window.location.origin+window.location.pathname+'#/home';

@@ -166,7 +166,7 @@
                             <span>{{generatePatrolLang('snapshot')}}</span>
                         </div>
                         <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
-                            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;margin-left: -14px;"></i>
+                            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
                             <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                           <span>{{generatePatrolLang('record')}}</span>
                         </div>
@@ -206,7 +206,7 @@
                   </transition>
                   <transition name="fade">
                     <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
-                      <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
+                      <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;margin-left: -15px;"></i>
                       <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                       <span>{{generatePatrolLang('record')}}</span>
                     </div>
@@ -712,6 +712,8 @@ export default {
         }
         if(self.playState){
             self.stopRealTime();
+            window.clearInterval(self.timerPlayReal);
+            self.timerPlayReal=null;
         }
         next();
     },
@@ -742,28 +744,34 @@ export default {
          /**
          * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
          */
-         if(self.isEzviz){
            window.addEventListener("visibilitychange",()=>{
-             if(document.hidden){
-               if(self.playState){
-                 self.stopRealTimeVisPage();
-                 window.clearInterval(self.timerPlayReal);
+             console.log(self.isEzviz)
+             if(!self.isEzviz){
+               if(document.hidden){
+                 console.log("我暂时离开页面了");
+                 if(self.playState){  //当前播放的是实时视频
+                   self.stopRealTimeVisPage();
+                   window.clearInterval(self.timerPlayReal);
+                 }
+               }else{
+                 console.log("我进入页面了");
+                 console.log(self.isPlayingFlag);
+                 if(self.isPlayingFlag==1){
+                   self.realTime();
+                 }
                }
              }
-             else{
-               if(self.isPlayingFlag==1){
-                 self.realTime();
-               }
-             }
+
            })
-         }
-    },
+         },
     methods:{
         generatePatrolLang,
         changeBrand(){
             let self=this;
             if(self.playState){
                 self.stopRealTime();
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal = null
             }
             self.activeIndex='0';
             self.showGuide=true;
@@ -3273,13 +3281,14 @@ export default {
                     right: 20px;
                     margin-bottom: 40px;
                     border-radius: 4px;
+                    text-align: center;
                     background-color: rgba($color: #24293d, $alpha: 0.6);
                     top: 40%;
                     span{
                         // font-size: 12px;
-                        margin-left: 15px;
+                        margin-left: 12px;
                         color: #fff;
-                        margin-right: 35px;
+                        //margin-right: 35px;
                         cursor: pointer;
                         vertical-align:middle;
                     }
@@ -3287,12 +3296,11 @@ export default {
                         color: #fff;
                         cursor: pointer;
                         vertical-align:middle;
-                        margin-left: 10px;
                     }
                 }
               .en-iconright{
                 padding: 0 6px;
-                width: 115px;
+                width: 108px;
                 height: 32px;
                 line-height: 30px;
                 position: absolute;
@@ -3304,9 +3312,9 @@ export default {
                 top: 40%;
                 span{
                   // font-size: 12px;
-                  margin-left: 15px;
+                  margin-left: 12px;
                   color: #fff;
-                  margin-right: 35px;
+                  /*margin-right: 35px;*/
                   cursor: pointer;
                   vertical-align:middle;
                 }
@@ -3314,7 +3322,6 @@ export default {
                   color: #fff;
                   cursor: pointer;
                   vertical-align:middle;
-                  margin-left: 10px;
                 }
               }
                 .iconright1{
@@ -3329,10 +3336,11 @@ export default {
                     border-radius: 4px;
                     background-color: rgba($color: #24293d, $alpha: 0.6);
                     top: 56%;
+                    text-align: center;
                     span{
                         margin-left: 12px;
                         color: #fff;
-                        margin-right: 32px;
+                        //margin-right: 32px;
                         cursor: pointer;
                         vertical-align:middle;
                     }
@@ -3340,12 +3348,11 @@ export default {
                         color: #fff;
                         cursor: pointer;
                         vertical-align:middle;
-                        margin-left: 10px;
                     }
                 }
               .en-iconright1{
                 padding: 0 6px;
-                width: 115px;
+                width: 108px;
                 height: 32px;
                 line-height: 30px;
                 position: absolute;
@@ -3358,7 +3365,7 @@ export default {
                 span{
                   margin-left: 12px;
                   color: #fff;
-                  margin-right: 32px;
+                  //margin-right: 32px;
                   cursor: pointer;
                   vertical-align:middle;
                 }
@@ -3366,7 +3373,6 @@ export default {
                   color: #fff;
                   cursor: pointer;
                   vertical-align:middle;
-                  margin-left: 10px;
                 }
               }
             }

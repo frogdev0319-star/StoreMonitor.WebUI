@@ -175,6 +175,12 @@ export default {
     maxDeviceNum: 'Device connection limit exceeded',
     noDevice: 'Invalid device, please contact administrator',
     maxConcurrency: 'On-line device limit exceeded',
+    errorEncry: 'Failed to call the query device for encryption',
+    errorVerifyCode: 'Failed to call to verify device password',
+    enterPassword: 'Entering video password',
+    contactInfo: 'Please contact the device owner to get the password （PWD is case-sensitive）',
+    initialCode : 'Look for initial code on the device label',
+    videoEncrypted: 'Video is encrypted'
   },
 
   //report management page language

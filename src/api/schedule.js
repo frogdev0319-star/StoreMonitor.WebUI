@@ -1,5 +1,7 @@
 import request from '@/common/request'
-const version='v1.0';
+import Environment from '@/common/environment'
+const version = Environment.VERSION;
+//const version='v1.0';
 export const getScheduleBindList=params=>{
   return request({
     url:`${version}/schedule/bind/list`,

@@ -21,7 +21,7 @@ const user={
         accountChanged:0,
         accountId:'',
         cachePath:[""],
-        isEzviz: false,
+        isEzviz: getCookie('isEzviz') ? JSON.parse(getCookie('isEzviz')): false ,
     },
     mutations:{
         SET_CODE: (state, code) => {

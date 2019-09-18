@@ -30,7 +30,7 @@
                             class="video-js vjs-fill">
                         </video>
                     </div>
-                  <ezviz-video v-else :channel-info="curChannel" :is-event='isEvent' ref="ezvizVideo">
+                  <ezviz-video v-else :channel-info="channelInfo" :is-event='isEvent' ref="ezvizVideo">
                   </ezviz-video>
                 </div>
             </el-dialog>
@@ -252,7 +252,8 @@ export default {
             showControlInfo:true,
             playState:false,
             lang: this.$i18n.locale,
-            isEvent: true
+            isEvent: true,
+            channelInfo: {}
         }
     },
     computed: {
@@ -624,7 +625,12 @@ export default {
         checkVideo(){
             let self=this;
             self.dialogFormVisible=true;
-            self.realTime();
+            if(!self.isEzviz){
+              self.realTime();
+            }
+            else{
+              self.channelInfo = self.curChannel
+            }
         },
         getCommentList(){
             let self=this;
