@@ -110,7 +110,8 @@ export default {
     improve: '待改善',
     qualified: '合格',
     unit: '个',
-    summaryInfo: '请选择巡检总评！'
+    summaryInfo: '请选择巡检总评！',
+    allIgnored: '您已忽略所有巡检项，请重新评估'
   },
 
   // Store Monitor page language
@@ -183,8 +184,10 @@ export default {
     enterPassword: '请输入视频密码',
     contactInfo: '请联系设备所有者获取密码进行查看',
     initialCode : '初始密码为机身标签上的验证码（密码区分大小写）',
-    videoEncrypted: '视频已加密'
-  },
+    videoEncrypted: '视频已加密',
+    deviceOffline: '设备离线，播放失败',
+    lackParams: '缺少必要参数'
+},
   //report management page language
   reportView:{
     selectStores: '门店选择',

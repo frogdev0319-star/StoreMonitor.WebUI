@@ -20,7 +20,8 @@ let _Environments = {
     VERSION: version
   },
   Preview: {
-    BASE_URL: 'http://13.76.227.211:8081/storemonitor/api/',
+    //BASE_URL: 'http://13.76.227.211:8081/storemonitor/api/',
+    BASE_URL: 'http://47.103.135.242:8081/storemonitor/api/',
     USHOP_URL: 'https://preview.ushop-plus.com/',
     POST_URL: 'http://preview-pos.ushop-plus.com/',
     VERSION: version,
@@ -40,7 +41,7 @@ let _Environments = {
 }
 
 function getEnvironment() {
-  return _Environments.QA;
+  return _Environments.Debug_XA;
 }
 
 var Environment = getEnvironment()

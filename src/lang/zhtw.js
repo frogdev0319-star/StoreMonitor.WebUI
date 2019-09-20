@@ -110,7 +110,8 @@ export default {
     improve: '待改善',
     qualified: '合格',
     unit: '個',
-    summaryInfo: '請選擇巡檢總評！'
+    summaryInfo: '請選擇巡檢總評！',
+    allIgnored: '您已忽略所有巡檢項，請重新評估'
   },
 
   // Store Monitor page language
@@ -183,7 +184,9 @@ export default {
     enterPassword: '請輸入視頻密碼',
     contactInfo: '請聯系設備所有者獲取密碼進行查看',
     initialCode : '初始密碼為機身標簽上的驗證碼（密碼區分大小寫）',
-    videoEncrypted: '視頻已加密'
+    videoEncrypted: '視頻已加密',
+    deviceOffline: '設備離線，播放失敗',
+    lackParams: '缺少必要參數'
   },
 
   //report management page language

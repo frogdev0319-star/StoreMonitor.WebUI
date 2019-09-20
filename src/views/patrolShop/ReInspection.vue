@@ -150,6 +150,7 @@
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
+            <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
@@ -617,6 +618,12 @@ export default {
                 showInfo: this.$t('remotePatrol.notSolver'),
                 isWarning:true,
                 dialogCosed:false
+            },
+            allIgnoreObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.allIgnored'),
+              isWarning:false,
+              dialogCosed:false
             },
             recorder:null,
             videoCanvasSrc:'',
@@ -1944,21 +1951,37 @@ export default {
             let self=this;
             self.noAllInspectObj.dialogCosed=false;
         },
+        allIgnoreDialog(){
+          let self=this;
+          self.allIgnoreObj.dialogCosed=false;
+        },
+        cancelAllIgnore(){
+          let self=this;
+          self.allIgnoreObj.dialogCosed=false;
+        },
         async submit1(){
             let self=this;
             let temp=[];
             let count=0;
             let dealCount=0;
+            let ignoreCount = 0;
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
             let inspectList=self.inspectList.slice(0,indexFeed);
 
             inspectList.forEach(item=>{
                 count=count+item.items.length;
+                if(item.items.isIgnore){
+                  ignoreCount++;
+                }
                 dealCount=dealCount+item.dealCount;
             })
             if(dealCount<count){
                 self.noAllInspectObj.dialogCosed=true;
                 return false;
+            }
+            if(ignoreCount = count){
+              self.allIgnoreObj.dialogCosed=true;
+              return false;
             }
             let obj={
                 inspect:inspectList,
@@ -3063,7 +3086,8 @@ export default {
                 span{
                     position: absolute;
                     top: 50%;
-                    left: 45%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     font-size: 12px;
                 }
             }

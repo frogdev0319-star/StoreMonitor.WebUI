@@ -1740,6 +1740,7 @@ export default {
             }
             self.showGetVideo=true;
             self.videoSpeed=0;
+            self.videoEl=document.getElementById('previewVideo').children[0];
             self.$nextTick(()=>{
                 self.startTimeCutVideo=new Date().getTime();
                 self.computeFrame();

@@ -16,7 +16,7 @@
           <img :src="imgSrc" id="imgTest" :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'" style="display: none"/>
         </div>
         <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
-        <div class="icon-footer" v-if="showInfoContent">
+        <div class="icon-footer" v-if="showInfoContent|| playBackState">
           <div class="iconlside">
             <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
             <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
@@ -28,12 +28,14 @@
           <div class="iconrside">
             <div class="speed-content" v-if="playBackState">
               <span>{{$t('storeMonitor.back')}}</span>
-              <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" placeholder='请选择' @change="adjustProcess">
+              <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
                 <el-option
                   v-for="(item) in backList"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
+                  :value="item.value"
+                  @click.native="adjustProcess(item.value, item.label)"
+                >
                 </el-option>
               </el-select>
             </div>
@@ -80,12 +82,14 @@
             <div class="iconrside">
               <div class="speed-content" v-if="playBackState">
                 <span>{{$t('storeMonitor.back')}}</span>
-                <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" placeholder='请选择' @change="adjustProcess" :popper-append-to-body="false">
+                <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder='' :popper-append-to-body="false">
                   <el-option
                     v-for="(item) in backList"
                     :key="item.value"
                     :label="item.label"
-                    :value="item.value">
+                    :value="item.value"
+                    @click.native="adjustProcess(item.value, item.label)"
+                  >
                   </el-option>
                 </el-select>
               </div>
@@ -244,7 +248,6 @@
 <script>
   import  EZUIKit from '../../static/ezuikit/ezuikit.js'
   import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword} from '@/api/ezviz'
-  import util from '@/common/util'
   import {generatePatrolLang} from '@/api/i18n'
   import {mapGetters} from 'vuex'
   import qs from 'qs'
@@ -458,7 +461,7 @@
         console.log(newValue)
         console.log(old)
         self.videoPassword = '';
-        if(newValue== undefined){
+        if(newValue == undefined){
           return false;
         }
         //stop video
@@ -494,8 +497,12 @@
       },
       curTime(newValue, oldValue){
         console.log("curTime")
-
         let self = this;
+        if(!self.id || !self.ivsId){
+          self.showError = true;
+          self.errorMsg = self.$t('storeMonitor.lackParams')
+          return;
+        }
         self.showError = false;
         self.times = 0;
         console.log('new:', newValue);
@@ -606,6 +613,9 @@
       async checkIfEncry(){
         let self = this;
         let obj={};
+        if(self.accessToken == ''){
+          return;
+        }
         obj.accessToken= self.accessToken;// token
         obj.deviceSerial= self.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
@@ -758,7 +768,10 @@
       },
       getErrorMsg(err){
         let self = this;
-        let retcode = err.code;
+        let retcode = err.code ;
+        if(!retcode){
+          retcode = err.retcode;
+        }
         let msg = '';
         switch (retcode) {
           case '10001':{
@@ -781,8 +794,12 @@
             msg = self.$t('storeMonitor.noDevice');
             break;
           }
-          case '9048':{
+          case 9048:{
             msg = self.$t('storeMonitor.maxConcurrency');
+            break;
+          }
+          case 5451:{
+            msg = self.$t('storeMonitor.deviceOffline');
             break;
           }
           default:{
@@ -794,7 +811,6 @@
       },
       handleSuccess(){
         console.log("播放成功回调函数，此处可执行播放成功后续动作");
-
         let self = this;
         self.showError = false;
         self.errorMsg = '';
@@ -901,7 +917,6 @@
         console.log(val);
         let self=this;
         self.fullWindow = true;
-        self.isLoading = true;
         var ele = document.getElementById('videoContent');
         ele.style.width = "100%";
         ele.style.height = "100%";
@@ -927,7 +942,6 @@
         let self = this;
         var de = document;
         self.fullWindow = false;
-        self.isLoading = true;
         var ele = document.getElementById('videoContent');
         var playerEle =  self.$refs.myPlayer;
         playerEle.style.width = self.initPlayerWidth + 'px'; //动态设置HTML元素高度
@@ -960,43 +974,47 @@
           }
           self.fullDecoder.stop();
           self.fullDecoder = null;
-        }
-        console.log(self.initPlayerWidth);
-        console.log(self.initPlayerHeight)
-        if(self.playBack){
-          self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
-          self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-          console.log('历史视频')
-          self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-          console.log('历史视频' + self.videoUrl)
+          self.isLoading = true;
+          console.log(self.initPlayerWidth);
+          console.log(self.initPlayerHeight)
+          if(self.playBack){
+            self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
+            self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
+            console.log('历史视频')
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            console.log('历史视频' + self.videoUrl)
+          }
+          else{
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+          }
+          // 初始化视频方法
+          self.decoder = new EZUIKit.EZUIPlayer({
+            id: 'myPlayer',
+            autoplay: self.playState,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            //decoderPath: '../../static/ezuikit/',
+            decoderPath: './static/ezuikit/',
+            width: self.initPlayerWidth,
+            height: self.initPlayerHeight,
+            handleError: self.handleError,
+            handleSuccess: self.handleExitFullScreenSuccess,
+          })
         }
         else{
-          self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+          // do nothing
         }
-        // 初始化视频方法
-        self.decoder = new EZUIKit.EZUIPlayer({
-          id: 'myPlayer',
-          autoplay: self.playState,
-          url: self.videoUrl,
-          accessToken: self.accessToken,
-          //decoderPath: '../../static/ezuikit/',
-          decoderPath: './static/ezuikit/',
-          width: self.initPlayerWidth,
-          height: self.initPlayerHeight,
-          handleError: self.handleError,
-          handleSuccess: self.handleExitFullScreenSuccess,
-        })
-
       },
       resetVideoSize(){
         let self = this;
         if(self.channelInfo==null){
           return;
         }
-        else{
+        else if(self.playState){
           self.decoder.closeSound();
           self.decoder.stop();
           self.decorder = null;
+          self.isLoading = true;
           let  width = screen.width;
           let height = screen.height;
           let playerEle = self.$refs.myPlayer;
@@ -1028,6 +1046,9 @@
             handleError: self.handleError,
             handleSuccess: self.handleFullWindowSuccess,
           })
+        }
+        else{
+          // do nothing
         }
       },
       gonggeScreen(){
@@ -1070,10 +1091,14 @@
           let o = document.getElementById('videoContent');
           // o.style.width= width + 'px'
           // o.style.height= height + 'px'
-          let  width = window.outerWidth;
-          let height = window.outerHeight;
+          let width = screen.width;
+          let height = screen.height;
+          let playerEle = self.$refs.myPlayer;
+          playerEle.style.width = screen.width + 'px'; //动态设置HTML元素高度
+          playerEle.style.height = screen.height + 'px';
           console.log(width);
           console.log(height)
+          self.isLoading = true;
           if(self.playBack){
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
@@ -1108,6 +1133,7 @@
             self.fullDecoder = null;
           }
           else{
+            console.log('关闭声音')
             self.decoder.closeSound();
             self.decoder.stop();
             self.decoder = null;
@@ -1122,6 +1148,8 @@
         self.showModelContent=false;
         self.showInfoContent=false;
         self.playState = false;
+        self.curBack = '';
+        self.currentTimeValue = 0;
       },
       openSound(){
         let self = this;
@@ -1167,16 +1195,11 @@
         else{
           self.decoder.capturePicture(0,'default');
         }
-        if(self.playBack && !self.fullWindow){
-          //非全屏下直接停止视频
-          self.stopRealTime();
-        }
+        // if(self.playBack && !self.fullWindow){
+        //   //非全屏下直接停止视频
+        //   self.stopRealTime();
+        // }
         self.imageCanvasList=[];
-        if(self.fullWindow){
-          self.exitFullscreen();
-          self.fullWindow=false;
-          self.clickSnapshot = true;
-        }
         if(self.showFeedBack){
           self.showFeedDialog2=true;
           self.eventName='';
@@ -1188,6 +1211,12 @@
             setTimeout(() => {
               self.imgSrc = sessionStorage.getItem('fileUrl');
               let img = document.getElementById('imgTest');
+              self.stopRealTime();
+              if(self.fullWindow){
+                self.exitFullscreen();
+                self.fullWindow=false;
+                self.clickSnapshot = true;
+              }
               html2canvas(img).then(function (canvas) {
                 ctx.drawImage(img, 0, 0, 520*self.percentHeight,340*self.percentHeight);
                 var oGrayImg = icanvas.toDataURL('image/jpeg');
@@ -1212,7 +1241,13 @@
             let img = new Image();
             setTimeout(() => {
               self.imgSrc = sessionStorage.getItem('fileUrl');
+              self.stopRealTime();
               let img = document.getElementById('imgTest');
+              if(self.fullWindow){
+                self.exitFullscreen();
+                self.fullWindow=false;
+                self.clickSnapshot = true;
+              }
               html2canvas(img).then(function (canvas) {
                 ctx.drawImage(img, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
                 var oGrayImg = icanvas.toDataURL('image/jpeg');
@@ -1664,9 +1699,10 @@
        * 快进快退实现
        * @param val
        */
-      adjustProcess(val){
+      adjustProcess(val, label){
         console.log(val);
         let self = this;
+        self.curBack = label;
         var callback = function(iTime){
           console.log("iTime",iTime);
           switch(val){
@@ -1706,6 +1742,11 @@
         else{
           self.decoder.getOSDTime(callback);
         }
+      },
+      //快进快退出现时，显示按钮，否则下拉框不能点击
+      changeInfoContent(val){
+        let self = this;
+        self.showInfoContent = val;
       },
       /**
        * 输入密码后，验证输入的密码是否正确，不正确继续提示输入视频验证码
@@ -1850,6 +1891,21 @@
       transform: translate(-50%, -50%);
     }
   }
+  #cancelBtn{
+    @include point(width,76);
+    @include point(margin-right,20);
+    background-color: #EAEDF2 !important;
+    color: #708090 !important;
+    font-size: 12px;
+    line-height: 12px;
+  }
+  #confirmBtn{
+    @include point(width,76);
+    // margin-right: 15px;
+    @include point(margin-right,20);
+    font-size: 12px;
+    line-height: 12px;
+  }
   .video-model{
     height: 100%;
     width: 100%;
@@ -1962,7 +2018,7 @@
       position: absolute;
       bottom: 0px;
       color: #fff;
-      overflow: hidden;
+      /*overflow: hidden;*/
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
@@ -2358,5 +2414,8 @@
   .prog .progress-bar{
     background-color: #FB4C5D;
     height: 100%;
+  }
+  #videoContent .el-loading-mask{
+    z-index: 900
   }
 </style>

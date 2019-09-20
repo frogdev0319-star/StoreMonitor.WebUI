@@ -108,7 +108,8 @@ export default {
     improve: 'Improve',
     qualified: 'Qualified',
     unit: '',
-    summaryInfo: 'Please select overall summary!'
+    summaryInfo: 'Please select overall summary!',
+    allIgnored: 'All inspection items are ignored, please re-evaluate'
   },
   // Store Monitor page language
   storeMonitor:{
@@ -180,7 +181,9 @@ export default {
     enterPassword: 'Entering video password',
     contactInfo: 'Please contact the device owner to get the password （PWD is case-sensitive）',
     initialCode : 'Look for initial code on the device label',
-    videoEncrypted: 'Video is encrypted'
+    videoEncrypted: 'Video is encrypted',
+    deviceOffline: 'Device offline',
+    lackParams: 'Lack of necessary parameters'
   },
 
   //report management page language

@@ -900,50 +900,55 @@ $suggestBack:#F1F6FE;
                     width: calc(120/1920*100vw);
                     margin-left: calc(20/1920*100vw);
                     text-align: left;
+                    width: calc(100% - 40/1920*100vw);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     .name{
                         font-size: calc(18/1920*100vw);
                         font-weight: bold;
                         display: block;
                         color: $black;
-                    }
-                    .inspect{
-
-                        font-size: calc(12/1920*100vw);
-                        color: $tab;
-                    }
+                        overflow: hidden;
+                        text-overflow: ellipsis
                 }
-            }
-            .item-icon{
-                text-align: left;
-                padding-left: calc(20/1920*100vw);
-            }
-            .inspectIcon{
-                font-size: calc(60/1920*100vw);
-                color: $border;
-            }
-            .item-content{
-                text-align: left;
-                padding-left: calc(20/1920*100vw);
-                position: absolute;
-                bottom: 0;
-                span{
-                    font-size: calc(14/1920*100vw);
+                .inspect{
+                    font-size: calc(12/1920*100vw);
                     color: $tab;
-                    display: block;
-                    margin-bottom: calc(15/1920*100vw);
                 }
             }
         }
-    }
-    .el-pat{
-        position: absolute;
-        height: calc(30/1920*100vw);
-        bottom: calc(10/1920*100vw);
-        .el-pag{
+        .item-icon{
+            text-align: left;
+            padding-left: calc(20/1920*100vw);
+        }
+        .inspectIcon{
+            font-size: calc(60/1920*100vw);
+            color: $border;
+        }
+        .item-content{
+            text-align: left;
+            padding-left: calc(20/1920*100vw);
             position: absolute;
-            right: calc(20/1920*100vw);
+            bottom: 0;
+            span{
+                font-size: calc(14/1920*100vw);
+                color: $tab;
+                display: block;
+                margin-bottom: calc(15/1920*100vw);
+            }
         }
     }
+}
+.el-pat{
+    position: absolute;
+    height: calc(30/1920*100vw);
+    bottom: calc(10/1920*100vw);
+    .el-pag{
+        position: absolute;
+        right: calc(20/1920*100vw);
+    }
+}
 }
 </style>
 <style scoped>
