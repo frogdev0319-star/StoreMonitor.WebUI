@@ -41,9 +41,9 @@
 
                     </div>
                     <div class="rside">
-                        <span class="event-name">
-                            {{item.eventDes}}
-                        </span>
+                        <div class="event-name">
+                          <span>{{item.eventDes}}</span>
+                        </div>
                         <div class="source-content">
                             <div class="source-details" v-for="(_item,_index) in sourceList" :key="_index">
                                 <div class="img-content" v-if="_item.mediaType==2">
@@ -345,7 +345,7 @@ export default {
                         position: relative;
                         bottom: 10px;
                         .event-name{
-                            margin-left: 30px;
+                            margin-left: 20px;
                             margin-top: 10px;
                             display: block;
                             margin-right: 20px;

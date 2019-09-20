@@ -1970,16 +1970,19 @@ export default {
 
             inspectList.forEach(item=>{
                 count=count+item.items.length;
-                if(item.items.isIgnore){
-                  ignoreCount++;
-                }
                 dealCount=dealCount+item.dealCount;
+                var items = item.items;
+                items.forEach((it)=>{
+                  if(it.isIgnore){
+                    ignoreCount++;
+                  }
+                })
             })
             if(dealCount<count){
                 self.noAllInspectObj.dialogCosed=true;
                 return false;
             }
-            if(ignoreCount = count){
+            if(ignoreCount == count){
               self.allIgnoreObj.dialogCosed=true;
               return false;
             }

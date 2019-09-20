@@ -1,11 +1,6 @@
 
 let version = 'v1.0';
 
-//let base = 'http://172.21.81.117:8081' //本地
-// let base='http://172.21.81.176:19085' //测试
-// let base='http://13.76.227.211:8081' //新加坡preview
-// let base='http://47.103.135.242:8081' //阿里preview
-
 let _Environments = {
   Debug_XA: {
     BASE_URL: 'http://172.21.81.117:8081/storemonitor/api/',
@@ -27,7 +22,7 @@ let _Environments = {
     VERSION: version,
   },
   Stable: {
-    BASE_URL: 'http://portals.storeviu.com.cn:8081/storemonitor/api/',
+    BASE_URL: 'http://47.103.41.236:8081/storemonitor/api/',
     USHOP_URL: 'https://portals.ushop-plus.com/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version,
@@ -41,7 +36,7 @@ let _Environments = {
 }
 
 function getEnvironment() {
-  return _Environments.Debug_XA;
+  return _Environments.QA;
 }
 
 var Environment = getEnvironment()

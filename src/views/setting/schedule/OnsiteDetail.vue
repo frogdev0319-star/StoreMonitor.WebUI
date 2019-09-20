@@ -227,10 +227,7 @@
               </div>
               <div style="float: left;margin: 30px 0px 30px 20px;font-size: 14px;">
                 <span style="margin-right: 70px">{{generateScheduleLang('enable')}}</span>
-                <el-switch
-                  v-model="item.enable"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949">
+                <el-switch v-model="item.enable">
                 </el-switch>
               </div>
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
@@ -1228,7 +1225,7 @@
         let execOnce = self.paneList[tabIndex].execOnce;
         let year = self.$moment().format('YYYY'); //年
         params.from = self.$moment(year).startOf('year').valueOf();
-        params.to = self.$moment(year).endOf('year').valueOf();
+        params.to = -1;
         self.paneList[tabIndex].from = params.from;
         self.paneList[tabIndex].to = params.to;
         self.paneList[tabIndex].modeDisabled = true;
@@ -1611,6 +1608,10 @@
         else {
           scheId = self.paneList[Number(self.activeName)].schId;
         }
+        if (!isAdd) {
+          //不是增加排程，则更新排程
+          await self.updateScheduleInfo();
+        }
         let storeIdChecked = [];
         let storeIdUnchecked = [];
         let count = 0;
@@ -1685,10 +1686,6 @@
           return false;
         }
 
-        if (!isAdd) {
-          //不是增加排程，则更新排程
-          self.updateScheduleInfo();
-        }
         self.dayArray = this.paneList[Number(self.activeName)].dayArray;
         console.log(self.dayArray)
         //self.searchStore();
@@ -2220,7 +2217,6 @@
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
   }
-
   .dialog-content{
     width: 100%;
     span{

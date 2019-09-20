@@ -1921,7 +1921,7 @@
     @include point(min-width,500);
     @include point(min-height,408);
     background-color: #000;
-    /*margin-bottom: 0;*/
+    margin-bottom: 0;
     .getvideo-content{
       position: absolute;
       z-index: 930;

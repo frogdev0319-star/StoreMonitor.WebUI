@@ -229,9 +229,7 @@
               <div style="float: left;margin: 30px 0px 30px 20px;font-size: 14px;">
                 <span style="margin-right: 70px">{{generateScheduleLang('enable')}}</span>
                 <el-switch
-                  v-model="paneItem.enable"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949">
+                  v-model="paneItem.enable">
                 </el-switch>
               </div>
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
@@ -1563,6 +1561,9 @@
         else{
           scheId = self.scheduleId;
         }
+        if(!isAdd){
+          await self.updateScheduleInfo();
+        }
         let storeIdChecked=[];
         let storeIdUnchecked=[];
         let count=0;
@@ -1632,10 +1633,6 @@
         else{
           self.notify(this.$t('insSettingView.bindFail'),'warning',3000);
           return false;
-        }
-
-        if(!isAdd){
-          self.updateScheduleInfo();
         }
         self.dayArray = this.paneList[Number(self.activeName)].dayArray;
         console.log(self.dayArray)
