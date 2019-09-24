@@ -126,7 +126,7 @@
                     <span>{{item.store}}</span>
                   </div>
                   <div class="count-data titles">
-                    <span v-if="!item.isEditing">{{item.channelNum}}</span>
+                    <span v-if="!item.isEditing">{{item.channelCount}}{{$t('deviceView.unit')}}</span>
                     <el-select v-model="item.channelCount" :placeholder="generateDeviceLang('inputNvrNumber')" size="mini" class="nvr-select" v-if="item.isEditing">
                       <el-option
                         v-for="numList in editNvrChannelNumList"
@@ -492,67 +492,67 @@
         channelNumList: [
           {
             value: 1,
-            label: '1' + this.$t('deviceView.unit')
+            label: '1 ' + this.$t('deviceView.unit')
           },
           {
             value: 2,
-            label: '2' + this.$t('deviceView.unit')
+            label: '2 ' + this.$t('deviceView.unit')
           },
           {
             value: 3,
-            label: '3'+ this.$t('deviceView.unit')
+            label: '3 '+ this.$t('deviceView.unit')
           },
           {
             value: 4,
-            label: '4' + this.$t('deviceView.unit')
+            label: '4 ' + this.$t('deviceView.unit')
           },
           {
             value: 5,
-            label: '5'+ this.$t('deviceView.unit')
+            label: '5 '+ this.$t('deviceView.unit')
           },
           {
             value: 6,
-            label: '6'+ this.$t('deviceView.unit')
+            label: '6 '+ this.$t('deviceView.unit')
           },
           {
             value: 7,
-            label: '7'+ this.$t('deviceView.unit')
+            label: '7 '+ this.$t('deviceView.unit')
           },
           {
             value: 8,
-            label: '8'+ this.$t('deviceView.unit')
+            label: '8 '+ this.$t('deviceView.unit')
           },
           {
             value: 9,
-            label: '9'+ this.$t('deviceView.unit')
+            label: '9 '+ this.$t('deviceView.unit')
           },
           {
             value: 10,
-            label: '10'+ this.$t('deviceView.unit')
+            label: '10 '+ this.$t('deviceView.unit')
           },
           {
             value: 11,
-            label: '11'+ this.$t('deviceView.unit')
+            label: '11 '+ this.$t('deviceView.unit')
           },
           {
             value: 12,
-            label: '12'+ this.$t('deviceView.unit')
+            label: '12 '+ this.$t('deviceView.unit')
           },
           {
             value: 13,
-            label: '13'+ this.$t('deviceView.unit')
+            label: '13 '+ this.$t('deviceView.unit')
           },
           {
             value: 14,
-            label: '14'+ this.$t('deviceView.unit')
+            label: '14 '+ this.$t('deviceView.unit')
           },
           {
             value: 15,
-            label: '15'+ this.$t('deviceView.unit')
+            label: '15 '+ this.$t('deviceView.unit')
           },
           {
             value: 16,
-            label: '16'+ this.$t('deviceView.unit')
+            label: '16 '+ this.$t('deviceView.unit')
           }
         ],
         storeDataList:[],
@@ -1270,7 +1270,7 @@
               obj.store=item.storeName;
               obj.storeId=item.storeId;
               obj.channelCount = item.channelCount;
-              obj.channelNum=item.channelCount+'个';
+              obj.channelNum=item.channelCount + self.$t('deviceView.unit');
               obj.isEditing = false;
               if(index==0){
                 obj.isClick=true;
@@ -1668,9 +1668,14 @@
             }
           })
         })
-        self.newChannelNumList = spliceArray;
+        let deepArray = JSON.parse(JSON.stringify(spliceArray))
+        deepArray.forEach(item=>{
+          item.label = item.label.split(' ')[0]
+        })
+        console.log(deepArray);
+        self.newChannelNumList = deepArray;
+
         self.showAddChannelDialog = true; //显示增加通道对话框
-        console.log(spliceArray)
         self.addChannelData = {name: '', channelId: '', pictureUrl: '', file: ''};
       },
       // json数组，按照指定的key排序
@@ -1927,22 +1932,22 @@
           }
           @media screen and (min-width: 1366px) {
             .en-name-title{
-              width: 25%;
+              width: 30%;
             }
             .en-store-title{
-              width: 35%;
+              width: 30%;
             }
             .en-count-title{
-              width: 27%;
+              width: 30%;
             }
           }
           @media screen and (max-width: 1366px) {
             .en-name-title{
               font-size: 12px;
-              width: 25%;
+              width: 30%;
             }
             .en-store-title{
-              width: 35%;
+              width: 30%;
               font-size: 12px;
             }
             .en-count-title{
@@ -2094,16 +2099,16 @@
           @include titleStyle;
           font-size: 14px;
           .nape-name-title{
-            width: 36%;
+            width: 30%;
           }
           .nape-dep-title{
-            width: 28%;
+            width: 26%;
           }
           .nape-picture-title{
-            width: 20%;
+            width: 25%;
           }
           .nape-handle-title{
-            width: 10%;
+            width: 15%;
           }
         }
         .en-nape-items-title{
@@ -2115,16 +2120,16 @@
             font-size: 12px;
           }
           .nape-name-title{
-            width: 34%;
-          }
-          .nape-dep-title{
             width: 30%;
           }
+          .nape-dep-title{
+            width: 26%;
+          }
           .nape-picture-title{
-            width: 20%;
+            width: 25%;
           }
           .nape-handle-title{
-            width: 10%;
+            width: 15%;
           }
         }
         .nape-items-data{
@@ -2138,7 +2143,7 @@
 
           text-align: left;
           .nape-input{
-            @include point(width,220);
+            @include point(width,180);
             margin-left: 13%;
             position: relative;
             bottom: 2px;
@@ -2150,7 +2155,6 @@
             width: 30%;
             display: inline-block;
             position: relative;
-            margin-right: 6%;
             span{
               margin-left: 20%;
               position: relative;
@@ -2169,7 +2173,7 @@
             }
           }
           .nape-picture-data{
-            width: 18%;
+            width:25%;
             height: 100%;
             display: inline-block;
             position: relative;
@@ -2181,7 +2185,7 @@
             }
             .upload-demo{
               position: absolute;
-              top: 18px;
+              bottom: 0;
               @include point(width, 80);
               /deep/ .el-upload{
                 width: 100%;
@@ -2190,19 +2194,23 @@
                 width: 100%;
                 @include point(height,20);
                 opacity: 0.5;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+              }
+              /deep/ .el-button--mini{
+                padding: 7px;
               }
               @media screen and (max-width: 1280px){
-                top: 16px;
                 .edit-picture{
                   position: relative;
-                  bottom: 5px;
+                  bottom: 4px;
                 }
               }
             }
           }
           .nape-items-handle{
-            width: 10%;
-            margin-left: 2%;
+            width: 12%;
             display: inline-block;
           }
         }
