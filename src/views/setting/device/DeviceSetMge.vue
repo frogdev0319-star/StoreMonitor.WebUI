@@ -26,11 +26,6 @@
       ...mapGetters(
         ['isEzviz']
       ),
-      // isEzviz() {
-      //   console.log(getCookie('isEzviz'));
-      //   let cookieEzviz = getCookie('isEzviz');
-      //   return this.$store.state.user.isEzviz
-      // },
     },
     watch:{
       isEzviz:function(newd,old){

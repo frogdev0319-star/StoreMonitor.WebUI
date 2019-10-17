@@ -184,7 +184,7 @@ export default {
         let tabIndex=sessionStorage.getItem('TabIndex');
         self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
         self.initData();
-        //self.getDownLoadURL();
+        self.getDownLoadURL();
     },
     methods:{
         generateInsSettingLang,

@@ -48,6 +48,15 @@ export const  getEzvizAccessToken=params=>{
     params
   })
 }
+
+export const getEzvizAccountList=data=> {
+  return request({
+    url: `${version}/ezviz/account/list`,
+    method: 'post',
+    data
+  })
+}
+
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 const instance = axios.create({
   baseURL: 'https://open.ys7.com/api/',
@@ -141,3 +150,4 @@ export async function updateDevicePassword(data){
   })
   return ret;
 }
+

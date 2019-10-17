@@ -203,7 +203,7 @@ export default {
         },
         showHeader(){
             let flag=false;
-            if((this.$route.path=='/report')){
+            if((this.$route.path=='/report' || this.$route.path == '/patrolOverview' || this.$route.path == '/eventOverview')){
                 flag= true;
             }
             return flag;

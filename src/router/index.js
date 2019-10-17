@@ -31,22 +31,24 @@ export default new Router({
     {
       path: '/home',
       name: 'overview',
-      redirect:'/reinspection',
+      redirect: '/reinspection',
       component: Home,
       hidden: false,
       iconCls:'iconfont icon-zonglan',
       styles:'font-size:22px',
-      leaf:true, //没有子节点
-      isReadOnly:true,
+      leaf:false, //没有子节点
+      isReadOnly:false,
       children:[
         {
-          path:'/allscan',
-          name:'overview',
+          path:'/patrolOverview',
+          name:'patrolOverview',
           component:resolve=>require(['@/views/allscan/AllScan'],resolve),
-          meta:{
-            requireAuth: true,
-          }
-        }
+        },
+        {
+          path:'/eventOverview',
+          name:'eventOverview',
+          component:resolve=>require(['@/views/allScan/TestOne'],resolve),
+        },
       ]
     },
     {

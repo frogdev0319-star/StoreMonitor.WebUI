@@ -1,6 +1,8 @@
 import { format } from "url";
 import ConvertPinyin from '@/common/getpinyin'
 import i18n from '@/lang/index'
+import moment from 'moment';
+
 export default {
     //获取一小时前数据的日期格式化
     getOneHourTime(para){
@@ -56,7 +58,7 @@ export default {
         result=years+'/'+month+'/'+day+' '+hour+':'+min;
         return result;
     },
-    getDaysCount(){   
+    getDaysCount(){
         var date=new Date();
         var month=date.getMonth();
         date.setMonth(month+1);
@@ -150,7 +152,7 @@ export default {
     },
     /**
      * 将当前数组中的汉字转换为其对应的拼音
-     * @param {需要转换的数组} temp 
+     * @param {需要转换的数组} temp
      */
     getPinyinList(str){
         let temp=[];
@@ -623,7 +625,7 @@ export default {
         var ab = new ArrayBuffer(bytes.length);
         // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
         var ia = new Uint8Array(ab);
-        
+
         for (var i = 0; i < bytes.length; i++) {
             ia[i] = bytes.charCodeAt(i);
         }
@@ -632,17 +634,17 @@ export default {
             type: mime
         });
     },
-    piPx() {  
-        return new Promise(function (resolve, reject) {  
-          window.onload = function () {  
-            resolve(BMap)  
-          }  
-          let script = document.createElement('script');  
-          script.type = 'text/javascript';  
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js';  
-          script.onerror = reject;  
-          document.head.appendChild(script);  
-        })  
+    piPx() {
+        return new Promise(function (resolve, reject) {
+          window.onload = function () {
+            resolve(BMap)
+          }
+          let script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js';
+          script.onerror = reject;
+          document.head.appendChild(script);
+        })
     },
     init(){
         let self=this;
@@ -652,7 +654,7 @@ export default {
             /*
             createObjectStore 相当于创建一个表
             "geo" 相当于表名
-            keyPath 索引 primary key 
+            keyPath 索引 primary key
             */
             let obStore=db.createObjectStore('recentstore',{keyPath:'id'});
             obStore.createIndex("storeId","storeId",{unique:false});
@@ -690,7 +692,177 @@ export default {
                 reject(e);
             }
         })
+    },
+    /**
+     * 获取两个日期间的所有月份
+     * @param start
+     * @param end
+     * @returns {Array}
+     */
+
+    getMonthBetween(start,end){
+      var result = [];
+      var s = start.split("-");
+      var e = end.split("-");
+      var min = new Date();
+      var max = new Date();
+      min.setFullYear(s[0],s[1]);
+      max.setFullYear(e[0],e[1]);
+      var curr = min;
+      while(curr <= max){
+        var month = curr.getMonth();
+        var str=curr.getFullYear()+"-"+(month);
+        var s=curr.getFullYear()+"-0";
+        if(str==s){
+          str=curr.getFullYear()+"-12";
+        }
+        result.push(str);
+        curr.setMonth(month+1);
+      }
+      var arr = []
+      var newArr = []
+      for(var i=0;i<result.length;i++){
+        arr.push(result[i].split('-'))
+      }
+      for(var i=0;i<arr.length;i++){
+        if (arr[i][1]==="12") {
+          arr[i][0] = arr[i][0]-1
+        }
+      }
+      for(var i = 0;i<arr.length;i++){
+        newArr.push(arr[i][0]+'/'+arr[i][1])
+      }
+
+      for(let i=0;i<newArr.length;i++){
+        if(newArr[i].length === 6){
+          newArr[i]= newArr[i].slice(0, 5) + '0' + newArr[i].slice(5);
+        }
+      }
+      // for(let i=0;i<newArr.length;i++){
+      //   let temp = newArr[i];
+      //   let startDay = ''
+      //   let endDay = ''
+      //   if(i==0){
+      //     startDay = moment(start).format('MM/DD')
+      //     endDay = moment(temp).endOf('month').format('MM/DD')
+      //   }
+      //   else if(i==newArr.length-1){
+      //     startDay = moment(temp).startOf('month').format('MM/DD')
+      //     endDay = moment(end).format('MM/DD')
+      //   }
+      //   else{
+      //     startDay = moment(temp).startOf('month').format('MM/DD')
+      //     endDay = moment(temp).endOf('month').format('MM/DD')
+      //   }
+      //   newArr[i] = startDay + '-' + endDay;
+      // }
+      return newArr;
+  },
+
+    /**
+     * 获取两个日期中的周的起止日期
+     * @param time
+     * @param end
+     * @returns {any[]}
+     */
+    getWeek(time,end){
+    let begin='';
+    begin+=time.getFullYear()+'-';          // 获取年份。
+    begin+=(time.getMonth()+1)+"-";         // 获取月份。
+    begin+= time.getDate();
+    Date.prototype.format=function (){
+      let yyyy=this.getFullYear();          // 获取年份。
+      let MM=(this.getMonth()+1);
+      let dd = this.getDate();
+      if(MM<10){
+        MM ='0'+MM
+      }
+      if(dd<10){
+        dd ='0'+dd
+      }
+      let  s= MM+'/'+dd;
+      return(s);
     }
+    var dateAllArr = new Array();
+    var ab = begin.split("-");
+    var ae = end.split("-");
+    var db = new Date();
+    db.setUTCFullYear(ab[0], ab[1]-1, ab[2]);
+    var de = new Date();
+    de.setUTCFullYear(ae[0], ae[1]-1, ae[2]);
+    var unixDb=db.getTime();
+    var unixDe=de.getTime();
+    for(var k=unixDb;k<=unixDe;){
+      // 周一至周日的字符串push
+      dateAllArr.push((new Date(parseInt(k))).format().toString()+'-'+(new Date(parseInt(k+6*24*60*60*1000))).format().toString());
+      k=k+7*24*60*60*1000;
+    }
+    return dateAllArr;
+
+  },
+    /**
+     * 判断时间是否为一周的开始日期，并返回一周的开始日期
+     * @param start
+     * @returns {number}
+     */
+    judgeStart(start){
+      let startTime = new Date(start);
+      let  oweek =startTime.getDay();
+
+      let mSeconds = startTime.getTime();
+      switch(oweek){
+        case 0:
+          return mSeconds-6*24*60*60*1000;
+          break;
+        case  1:
+          return mSeconds;
+          break;
+        case 2:
+          return mSeconds-1*24*60*60*1000;
+          break;
+        case 3:
+          return mSeconds-2*24*60*60*1000;
+          break;
+        case 4:
+          return mSeconds-3*24*60*60*1000;
+          break;
+        case 5:
+          return mSeconds-4*24*60*60*1000;
+          break;
+        case 6:
+          return mSeconds-5*24*60*60*1000;
+          break;
+
+      }
+  },
+  isDot(num) {
+    var result = (num.toString()).indexOf(".");
+    return result != -1;
+  },
+
+  groupArrayOnSize(array, size) {
+    //获取数组的长度，如果你传入的不是数组，那么获取到的就是undefined
+    const length = array.length
+    //判断不是数组，或者size没有设置，size小于1，就返回空数组
+    if (!length || !size || size < 1) {
+      return []
+    }
+    //核心部分
+    let index = 0 //用来表示切割元素的范围start
+    let resIndex = 0 //用来递增表示输出数组的下标
+
+    //根据length和size算出输出数组的长度，并且创建它。
+    let result = new Array(Math.ceil(length / size))
+    //进行循环
+    while (index < length) {
+      //循环过程中设置result[0]和result[1]的值。该值根据array.slice切割得到。
+      result[resIndex++] = array.slice(index, (index += size))
+    }
+    //输出新数组
+    console.log(result)
+
+    return result
+  }
 }
 class indexedDB{
     init(){
@@ -701,7 +873,7 @@ class indexedDB{
             /*
             createObjectStore 相当于创建一个表
             "geo" 相当于表名
-            keyPath 索引 primary key 
+            keyPath 索引 primary key
             */
             let obStore=db.createObjectStore('recentstore',{keyPath:'id'});
             obStore.createIndex("storeId","storeId",{unique:false});

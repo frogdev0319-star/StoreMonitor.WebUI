@@ -161,6 +161,9 @@ export default {
             inspectSrc5:require('../../../static/img/总评icon5.png'),
             inspectSrc6:require('../../../static/img/总评icon6.png'),
             inspectSrc7:require('../../../static/img/总评icon7.png'),
+            inspectSrc8:require('../../../static/img/总评icon8.png'),
+            inspectSrc9:require('../../../static/img/总评icon9.png'),
+            inspectSrc10:require('../../../static/img/总评icon10.png'),
             reportList:[],
             curSortType:0,
             sortTypeList:[
@@ -201,7 +204,10 @@ export default {
             ],
             curAppraise:'',
             appraiseList:[
-                {'status':0,'label':this.$t('reportView.dangerous')},{'status':1,'label':this.$t('reportView.improve')},{'status':2,'label':this.$t('reportView.pass')}
+                {'status':0,'label':this.$t('reportView.dangerous')},
+                {'status':1,'label':this.$t('reportView.improve')},
+                {'status':2,'label':this.$t('reportView.pass')},
+                {'status':3,'label':this.$t('reportView.good')},
             ],
             storeStr:'',
             total: 0,
@@ -329,14 +335,13 @@ export default {
                           break;
                         }
 
-                        default:{
+                      case 2:{
                           //合格
-                          obj.iconSrc=self.inspectSrc2;
                           if(self.lang == 'zh'){
                             obj.iconSrc=self.inspectSrc2;
                           }
                           else if(self.lang == 'en'){
-                            obj.iconSrc=self.inspectSrc4;
+                            obj.iconSrc=self.inspectSrc5;
                           }
                           else if(self.lang == 'zhtw'){
                             obj.iconSrc=self.inspectSrc2;
@@ -346,6 +351,22 @@ export default {
                           }
                           break;
                         }
+                      default :{
+                        //good
+                        if(self.lang == 'zh'){
+                          obj.iconSrc=self.inspectSrc8;
+                        }
+                        else if(self.lang == 'en'){
+                          obj.iconSrc=self.inspectSrc9;
+                        }
+                        else if(self.lang == 'zhtw'){
+                          obj.iconSrc=self.inspectSrc10;
+                        }
+                        else {
+                          obj.iconSrc=self.inspectSrc8;
+                        }
+                        break;
+                      }
                     }
                     temp.push(obj);
                 });

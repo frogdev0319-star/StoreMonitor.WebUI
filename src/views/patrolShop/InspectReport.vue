@@ -38,8 +38,8 @@
                 </el-col>
             </el-row>
             <el-row class="row-footer">
-                <el-col :span="8" v-for="(item,index) in tempList" :key="index" class="details-content">
-                    <div class="details">
+                <el-col :span="isInsiteInspect? 6 : 8" v-for="(item,index) in tempList" :key="index" class="details-content">
+                    <div class="details" v-if="index < 3">
                         <div class="item-header">
                             <i class="iconfont icontemp" :class="item.iconSrc"></i>
                             <span class="title-lable">{{item.itemTitleName}}</span>
@@ -58,6 +58,17 @@
                             </el-scrollbar>
                         </div>
                     </div>
+                  <div class="details" v-else>
+                    <div class="item-header">
+                      <i class="iconfont icontemp" :class="item.iconSrc"></i>
+                      <span class="title-lable">{{item.itemTitleName}}</span>
+                    </div>
+                    <div class="item-content item-img">
+                      <div class="item-details" style="height:100%;" >
+                        <img :src="item.itemList">
+                      </div>
+                    </div>
+                  </div>
                 </el-col>
             </el-row>
         </div>
@@ -96,6 +107,9 @@ export default {
             inspectSrc5:require('../../../static/img/总评icon5.png'),
             inspectSrc6:require('../../../static/img/总评icon6.png'),
             inspectSrc7:require('../../../static/img/总评icon7.png'),
+            inspectSrc8:require('../../../static/img/总评icon8.png'),
+            inspectSrc9:require('../../../static/img/总评icon9.png'),
+            inspectSrc10:require('../../../static/img/总评icon10.png'),
             report:null,
             suggest:'',
             summary:[],
@@ -117,7 +131,8 @@ export default {
             ],
           pass: this.$t('reportView.pass'),
           failed: this.$t('reportView.failed'),
-          lang: this.$i18n.locale
+          lang: this.$i18n.locale,
+          isInsiteInspect: false
         }
     },
     methods:{
@@ -134,71 +149,87 @@ export default {
             obj.tagName=routeData.tagName;
             switch(routeData.mode){
                 case 0: obj.inspectSrc=self.inspectSrc; break;
-                case 1: obj.inspectSrc=self.insiteInspectSrc; break;
+                case 1: obj.inspectSrc=self.insiteInspectSrc; self.isInsiteInspect = true; break;
                 default:obj.inspectSrc=self.videoSrc; break;
             }
-            switch(routeData.status){
-                // case 0: {
-                //   obj.iconSrc=self.inspectSrc1;
-                //   break;
-                // }
-                // case 1: {
-                //   obj.iconSrc=self.inspectSrc3;
-                //   break;
-                // }
-                // default:{
-                //   obj.iconSrc=self.inspectSrc2;
-                //   break;
-                // }
+            switch(routeData.status) {
+              // case 0: {
+              //   obj.iconSrc=self.inspectSrc1;
+              //   break;
+              // }
+              // case 1: {
+              //   obj.iconSrc=self.inspectSrc3;
+              //   break;
+              // }
+              // default:{
+              //   obj.iconSrc=self.inspectSrc2;
+              //   break;
+              // }
               /**
                * 根据语言和类型返回图片形式
                */
               case 0: {
                 // 立即督导
-                if(self.lang == 'zh'){
-                  obj.iconSrc=self.inspectSrc1;
+                if (self.lang == 'zh') {
+                  obj.iconSrc = self.inspectSrc1;
                 }
-                else if(self.lang == 'en'){
-                  obj.iconSrc=self.inspectSrc4;
+                else if (self.lang == 'en') {
+                  obj.iconSrc = self.inspectSrc4;
                 }
-                else if(self.lang == 'zhtw'){
-                  obj.iconSrc=self.inspectSrc7;
+                else if (self.lang == 'zhtw') {
+                  obj.iconSrc = self.inspectSrc7;
                 }
                 else {
-                  obj.iconSrc=self.inspectSrc1;
+                  obj.iconSrc = self.inspectSrc1;
                 }
                 break;
               }
               case 1: {
                 // 待改善
-                if(self.lang == 'zh'){
-                  obj.iconSrc=self.inspectSrc3;
+                if (self.lang == 'zh') {
+                  obj.iconSrc = self.inspectSrc3;
                 }
-                else if(self.lang == 'en'){
-                  obj.iconSrc=self.inspectSrc6;
+                else if (self.lang == 'en') {
+                  obj.iconSrc = self.inspectSrc6;
                 }
-                else if(self.lang == 'zhtw'){
-                  obj.iconSrc=self.inspectSrc3;
+                else if (self.lang == 'zhtw') {
+                  obj.iconSrc = self.inspectSrc3;
                 }
                 else {
-                  obj.iconSrc=self.inspectSrc3;
+                  obj.iconSrc = self.inspectSrc3;
                 }
                 break;
               }
 
-              default:{
+              case 2: {
                 //合格
-                if(self.lang == 'zh'){
-                  obj.iconSrc=self.inspectSrc2;
+                if (self.lang == 'zh') {
+                  obj.iconSrc = self.inspectSrc2;
                 }
-                else if(self.lang == 'en'){
-                  obj.iconSrc=self.inspectSrc4;
+                else if (self.lang == 'en') {
+                  obj.iconSrc = self.inspectSrc5;
                 }
-                else if(self.lang == 'zhtw'){
-                  obj.iconSrc=self.inspectSrc2;
+                else if (self.lang == 'zhtw') {
+                  obj.iconSrc = self.inspectSrc2;
                 }
                 else {
-                  obj.iconSrc=self.inspectSrc2;
+                  obj.iconSrc = self.inspectSrc2;
+                }
+                break;
+              }
+              default: {
+                //good
+                if (self.lang == 'zh') {
+                  obj.iconSrc = self.inspectSrc8;
+                }
+                else if (self.lang == 'en') {
+                  obj.iconSrc = self.inspectSrc9;
+                }
+                else if (self.lang == 'zhtw') {
+                  obj.iconSrc = self.inspectSrc10;
+                }
+                else {
+                  obj.iconSrc = self.inspectSrc8;
                 }
                 break;
               }
@@ -231,24 +262,33 @@ export default {
                     summaryTemp.push(obj);
                 })
                 self.summary=summaryTemp;
-                let tempArray=new Array(3);
+                let tempArray = [];
+                self.isInsiteInspect ? tempArray=new Array(4): tempArray=new Array(3);
                 tempArray[0]={
-                    itemTitleName: this.$t('reportView.notableItem'),
+                    itemTitleName: self.$t('reportView.notableItem'),
                     iconSrc:'icon-zhongxindingwei',
                     itemCount:data.focalItems.length,
                     itemList:data.focalItems
                 }
                 tempArray[1]={
-                    itemTitleName: this.$t('reportView.ignoredItem'),
+                    itemTitleName: self.$t('reportView.ignoredItem'),
                     iconSrc:'icon-hulve',
                     itemCount:data.ignoredItems.length,
                     itemList:data.ignoredItems
                 }
                 tempArray[2]={
-                    itemTitleName: this.$t('reportView.feedbacks'),
+                    itemTitleName: self.$t('reportView.feedbacks'),
                     iconSrc:'icon-fankui',
                     itemCount:data.feedback.length,
                     itemList:data.feedback
+                }
+                if(self.isInsiteInspect){
+                  tempArray[3]={
+                    itemTitleName: self.$t('reportView.signature'),
+                    iconSrc:'icon-fankui',
+                    itemCount: '',
+                    itemList: data.signature.content
+                  }
                 }
                 self.tempList=tempArray;
                 self.getRadarOption();
@@ -520,8 +560,15 @@ $suggestBack:#F1F6FE;
                             margin-left: calc(35/1920*100vw);
                             color: $tab;
                         }
+                        img{
+                          height: 100%;
+                          width: 100%;
+                        }
                     }
                 }
+              .item-img{
+                padding-bottom:calc(20/1920*100vw);
+              }
             }
         }
     }

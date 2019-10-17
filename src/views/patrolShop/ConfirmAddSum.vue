@@ -7,10 +7,12 @@
             </div>
             <div class="submit-content">
                 <div class="submit-radio">
-                    <span class="el-radio-details" v-for="(item,index) in radioList" :key="index" @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
+                    <span class="el-radio-details" v-for="(item,index) in radioList" :key="index"
+                          @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
-                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input" :placeholder="generatePatrolLang('adviceInfo')"></el-input>
+                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input"
+                          :placeholder="generatePatrolLang('adviceInfo')"></el-input>
             </div>
         </el-col>
         <el-col :span="24" class="sum-data">
@@ -88,19 +90,28 @@ export default {
     name:'ConfirmAddSum',
     data(){
         return{
-            radioList:[
+            radioList:[],
+            resultList: [
               {
-                'name': this.$t('remotePatrol.qualified'),
+                'label': 3,
+                'name':this.$t('remotePatrol.good'),
                 'isActive':false
               },
               {
+                'label': 2,
+                'name':this.$t('remotePatrol.pass'),
+                'isActive':false
+              },
+              {
+                'label': 1,
                 'name':this.$t('remotePatrol.improve'),
                 'isActive':false
               },
               {
+                'label': 0,
                 'name':this.$t('remotePatrol.dangerous'),
                 'isActive':false
-              }
+              },
             ],
             theaderList:[
                 {
@@ -185,7 +196,7 @@ export default {
                     _item.isActive=false;
                 }
             })
-            self.curSumIndex=index;
+            self.curSumIndex=item.label;
         },
         async submit(){
             let self=this;
@@ -269,11 +280,12 @@ export default {
                 feedEventList.push(obj);
             }
 
-            switch(self.curSumIndex){
-                case 0: status=2; break;
-                case 1: status=1; break;
-                case 2: status=0; break;
-            }
+            // switch(self.curSumIndex){
+            //     case 0: status=2; break;
+            //     case 1: status=1; break;
+            //     case 2: status=0; break;
+            // }
+            status = self.curSumIndex;
             let params={
                 status:status,
                 comment:self.suggest.trim(),
@@ -316,6 +328,11 @@ export default {
             let ignoreTemp=[];
             let feedBackTemp=[];
             let tempList=[];
+            let totalExcellent = 0;
+            let totalQualified=0;
+            let totalUnqualified=0;
+            let totalIgnore = 0;
+            let totalItems = 0;
             inspectList.forEach((item,index)=>{
                 let obj={};
                 obj.groupId=item.groupId;
@@ -325,6 +342,7 @@ export default {
                 let numOfQualified=0;
                 let numOfUnqualified=0;
                 let numIgnore=0;
+                totalItems += obj.count;
                 item.items.forEach((_item,_index)=>{
                     if(_item.isIgnore){
                         numIgnore++;
@@ -350,8 +368,28 @@ export default {
                 obj.numOfExcellentItems=numOfExcellent;
                 obj.numOfQualifiedItems=numOfQualified;
                 obj.numOfUnqualifiedItems=numOfUnqualified;
+                totalExcellent += numOfExcellent;
+                totalQualified += numOfQualified;
+                totalUnqualified += numOfUnqualified
+                totalIgnore += numIgnore;
                 summary.push(obj);
             })
+          console.log(totalIgnore);
+          console.log(totalExcellent);
+          console.log(totalQualified);
+          console.log(totalUnqualified)
+          console.log(totalItems)
+          let totalScoreItems = totalItems - totalIgnore
+            if(totalUnqualified > 0){
+              self.radioList = self.resultList.slice(2)
+              totalUnqualified/totalScoreItems >= 0.3 ? self.curSumIndex = 0: self.curSumIndex = 1;
+              self.curSumIndex == 0 ? self.radioList[1].isActive = true: self.radioList[0].isActive = true;
+            }
+            else{
+              self.radioList = self.resultList.slice(0,2)
+              totalExcellent/totalScoreItems >= 0.8 ? self.curSumIndex = 3: self.curSumIndex = 2;
+              self.curSumIndex == 3 ? self.radioList[0].isActive = true : self.radioList[1].isActive = true;
+            }
             self.summary=summary;
             eventList.forEach((item,index)=>{
                 let objFeedBack={};

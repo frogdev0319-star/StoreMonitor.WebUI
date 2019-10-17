@@ -393,12 +393,7 @@
         self.accessToken = '';
       }
       if(!self.isStoreMonitor){
-        if(self.isEvent){
-          self.checkIfEncry();
-        }
-        else{
-          self.initVideo();
-        }
+        self.checkIfEncry();
       }
       else{
 
@@ -820,7 +815,6 @@
         self.timerPlayReal=window.setInterval(()=>{
           console.log(self.realTimeSpeed)
           self.realTimeSpeed=self.realTimeSpeed+1;
-          console.log(self.realTimeSpeed)
           if(self.playBack){
             self.getProcess();
           }
@@ -1662,17 +1656,7 @@
         let duration=300;
         self.durationTimeValue=duration;
         self.currentTimeValue= self.times;
-        let getTimeStr=function(val){
-          let hour=0;
-          let minute=0;
-          let second=0;
-          hour=parseInt(val/3600);
-          minute=parseInt((val-hour*60)/60)<10?'0'+parseInt((val-hour*60)/60):parseInt((val-hour*60)/60);
-          second=parseInt(val%60)<10?'0'+parseInt(val%60):parseInt(val%60);
-          return hour+':'+minute+':'+second;
-        }
         var callback = function(iTime){
-          console.log("iTime",iTime);
           self.startTs = iTime
           console.log("iTime", iTime);
           console.log("self.startTs", self.startTs);
@@ -1683,17 +1667,14 @@
         else{
           self.fullDecoder.getOSDTime(callback);
         }
-        self.currentStr=getTimeStr(self.times);
-        self.durationStr=getTimeStr(duration);
-        if(self.times>=duration){
+        if(self.times >= duration){
           self.decoder.stop();
+          self.currentTimeValue = 0;
           self.times = 0;
-          // self.startTs = self.startTs + 5*60;
-          window.clearInterval(self.timeid);
-          self.timeid=null;
-          self.timeid=0;
+          self.playState = false;
+          window.clearInterval(self.timerPlayReal);
+          self.timerPlayReal=null;
         }
-
       },
       /**
        * 快进快退实现
