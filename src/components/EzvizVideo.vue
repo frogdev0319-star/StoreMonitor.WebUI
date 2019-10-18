@@ -777,10 +777,6 @@
             msg = self.$t('storeMonitor.accessTokenError');
             break;
           }
-          case '5402':{
-            msg = self.$t('storeMonitor.noHistoryVideo');
-            break;
-          }
           case '10026':{
             msg = self.$t('storeMonitor.maxDeviceNum');
             break;
@@ -795,6 +791,10 @@
           }
           case 5451:{
             msg = self.$t('storeMonitor.deviceOffline');
+            break;
+          }
+          case 5402:{
+            msg = self.$t('storeMonitor.noHistoryVideo');
             break;
           }
           default:{

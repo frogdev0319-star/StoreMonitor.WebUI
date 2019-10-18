@@ -20,7 +20,7 @@
         unlink-panels
       >
       </el-date-picker>
-      <el-tooltip class="item" :popper-class="elTooltipClass"
+      <el-tooltip class="item"
                   placement="bottom-end">
         <div slot="content">{{$t('overview.dataRangeTips')}}</div>
         <i class="iconfont icon-bangzhu iconbangzhu"></i>
@@ -73,7 +73,7 @@
               <div class="item-ranking" :class="`item-ranking-${index}`">0{{index+1}}</div>
               <div class="region-name" >{{item.region}}</div>
               <div class="item-titles">
-                <el-tooltip placement="bottom" :key="index">
+                <el-tooltip placement="bottom" :key="index" :popper-class="elTooltipClass">
                   <div slot="content">{{item.region}}<br/>{{item.firstName}}: {{item.firstNum}}<br/>{{item.secondName}}: {{item.secondNum}}</div>
                   <div class="process-list">
                     <el-progress :percentage="item.firstPercent" :stroke-width="10" :color="item.firstColor"  :show-text="false" :class="item.firstNum > 0 ? 'item-process': 'region-process'"></el-progress>
@@ -2721,8 +2721,15 @@
     height: 150px  !important;
   }
 
+  .el-tooltip-class.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
+    border-bottom-color: rgba(50,50,50,0.7);
+  }
+  .el-tooltip-class.el-tooltip__popper[x-placement^='bottom'] .popper__arrow:after {
+    border-bottom-color: rgba(50,50,50,0.7);
+  }
+
   .el-tooltip-class{
-    background: red !important;
+    background: rgba(50,50,50,0.7) !important;
   }
   @media screen and (max-width:1680px){
     .process-panel .el-progress-circle{
