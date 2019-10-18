@@ -292,7 +292,9 @@ export default {
     unit: '個',
     advice: '巡檢建議：',
     good: '優秀',
-    signature: '簽名'
+    signature: '簽名',
+    excellent: '優秀',
+    qualified: '合格'
   },
 
   // event Management page language

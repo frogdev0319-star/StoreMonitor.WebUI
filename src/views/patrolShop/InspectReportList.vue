@@ -207,8 +207,8 @@ export default {
             appraiseList:[
                 {'status':0,'label':this.$t('reportView.dangerous')},
                 {'status':1,'label':this.$t('reportView.improve')},
-                {'status':2,'label':this.$t('reportView.pass')},
-                {'status':3,'label':this.$t('reportView.good')},
+                {'status':2,'label':this.$t('reportView.qualified')},
+                {'status':3,'label':this.$t('reportView.excellent')},
             ],
             storeStr:'',
             total: 0,
@@ -658,8 +658,8 @@ export default {
                 start=end-3600*24*30*1000;
                 self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
             }
-            self.params.beginTs=start;
-            self.params.endTs=end;
+            // self.params.beginTs=start;
+            // self.params.endTs=end;
             // self.getReportList(self.params);
         },
         changeReportType(val){
@@ -683,7 +683,16 @@ export default {
         },
         searchData(){
             let self=this;
+
             console.log(self.params);
+            let val = self.dateValue;
+            console.log(val);
+          let start=typeof(val[0])==='object'?val[0].getTime():val[0];
+            let end=typeof(val[1])==='object'?val[1].getTime():val[1];
+            self.params.beginTs=start;
+            self.params.endTs=end;
+
+
             // if(self.curCountry.length!=0){
             //     self.params.clause=
             // }

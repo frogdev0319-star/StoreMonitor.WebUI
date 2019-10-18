@@ -290,7 +290,9 @@ export default {
     unit: '',
     advice: 'Advice: ',
     good: 'Good',
-    signature: 'Signature'
+    signature: 'Signature',
+    excellent: 'Excellent',
+    qualified: 'Qualified'
   },
 
   // event Management page language

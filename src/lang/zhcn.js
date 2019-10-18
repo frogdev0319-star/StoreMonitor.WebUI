@@ -292,6 +292,8 @@ export default {
     advice: '巡检建议：',
     good: '优秀',
     signature: '签名',
+    excellent: '优秀',
+    qualified: '合格'
   },
 
   // event Management page language
