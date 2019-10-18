@@ -144,6 +144,7 @@ import {getStoreList} from '@/api/store'
 import util from '@/common/util'
 import {Message} from 'element-ui'
 import {generateReportLang} from '@/api/i18n'
+import {mapGetters} from 'vuex'
 export default {
     name:'InspectReportList',
     data(){
@@ -227,7 +228,8 @@ export default {
         iconSrcHeight(){
             return (this.varyWindowWidth/1920)*50;
         },
-        // defaultTime(){
+        ...mapGetters({accountChanged:'accountChanged'})
+      // defaultTime(){
         //     let date=new Date();
         //     let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
         //     let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
@@ -248,6 +250,17 @@ export default {
         //     }
         //     return size;
         // }
+    },
+    watch:{
+      accountChanged(val,oldVal){
+        console.log(val);
+        let self=this;
+        if(val!=0){
+          self.initData();
+          self.getRegionInfo();
+          self.getInitReportList();
+        }
+      }
     },
     methods:{
         generateReportLang,
