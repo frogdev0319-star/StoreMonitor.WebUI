@@ -120,14 +120,14 @@
                   <div class="proper-flag" v-if="item.isClick"></div>
                   <div class="name-data titles">
                     <span v-if="!item.isEditing">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.name" class="nvr-input" :placeholder="generateDeviceLang('inputNvrName')" v-if="item.isEditing"></el-input>
+                    <el-input size="mini" maxlength='15' v-model="item.tempDeviceName" class="nvr-input" :placeholder="generateDeviceLang('inputNvrName')" v-if="item.isEditing"></el-input>
                   </div>
                   <div class="store-data titles">
                     <span>{{item.store}}</span>
                   </div>
                   <div class="count-data titles">
-                    <span v-if="!item.isEditing">{{item.channelCount}}{{$t('deviceView.unit')}}</span>
-                    <el-select v-model="item.channelCount" :placeholder="generateDeviceLang('inputNvrNumber')" size="mini" class="nvr-select" v-if="item.isEditing">
+                    <span v-if="!item.isEditing">{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>
+                    <el-select v-model="item.tempChannelCount" :placeholder="generateDeviceLang('inputNvrNumber')" size="mini" class="nvr-select" v-if="item.isEditing">
                       <el-option
                         v-for="numList in editNvrChannelNumList"
                         :key="numList.value"
@@ -590,7 +590,9 @@
         showAddChannelDialog: false, //是否显示增加通道对话框
         file:'',
         deleteChannelId: 0,
-        isUpdate: false
+        isUpdate: false,
+        nvrNameTemp: '',
+        nvrChannelCountTemp: 0,
       }
     },
     watch:{
@@ -701,6 +703,7 @@
         let self=this;
         item.isClick=true;
         self.curNVRItem=item;
+        self.nvrChannelCountTemp = item.channelCount;
         self.getChannelListByNVR(item.ivsId);
         self.nvrData.forEach((_item,_index)=>{
           if(index!=_index){
@@ -1179,6 +1182,7 @@
         self.isUpdate = false;
         item.isClick=false;
         item.tempUrl = item.pictureUrl;
+        item.tempName = item.name;
         self.file = '';
         if(item.id == 0){
           //删除最后一个通道
@@ -1193,6 +1197,10 @@
           self.isUpdate = false;
           obj.id=self.curChannelItem.id;
           obj.name=self.curChannelItem.tempName;
+          if(obj.name.trim().length == 0){
+            self.notify(self.$t('deviceView.channelNameEmpty'),'warning',3000);
+            return false;
+          }
           let params=obj;
           let attachRes = {};
           deviceRESTful.updateDevice(params).then( async res=>{
@@ -1267,9 +1275,11 @@
               let obj={};
               obj.ivsId=item.ivsId;
               obj.name=item.name;
+              obj.tempDeviceName = item.name;
               obj.store=item.storeName;
               obj.storeId=item.storeId;
               obj.channelCount = item.channelCount;
+              obj.tempChannelCount = item.channelCount;
               obj.channelNum=item.channelCount + self.$t('deviceView.unit');
               obj.isEditing = false;
               if(index==0){
@@ -1581,9 +1591,13 @@
         console.log(item);
         let obj={};
         obj.ivsId = item.ivsId;
-        obj.name  = item.name;
+        obj.name  = item.tempDeviceName;
         obj.storeId = item.storeId;
-        obj.channelCount = item.channelCount;
+        obj.channelCount = item.tempChannelCount;
+        if(obj.name.trim().length==0){
+          self.notify(self.$t('deviceView.nvrNameEmpty'),'warning',3000);
+          return false;
+        }
         let arr = [];
         arr.push(obj);
         let params = {};
@@ -1609,6 +1623,8 @@
       cancelEditNvr(index,item){
         let self = this;
         item.isEditing = false;
+        item.tempDeviceName = item.name;
+        item.tempChannelCount = item.channelCount;
       },
       //删除单个NVR
       async deleteSingleNVR(){

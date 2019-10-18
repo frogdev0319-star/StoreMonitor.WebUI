@@ -486,6 +486,9 @@ export default {
     editSuss: '修改成功!',
     editFail: '修改失敗!',
     channelOrder: '通道號',
+    nvrNameEmpty: 'NVR 名稱不能為空',
+    channelNameEmpty: '通道名稱不能為空',
+    deviceNameEmpty: '設備名稱不能為空'
   },
   //Store Management page language
   storeView: {

@@ -234,7 +234,7 @@
                   </div>
                   <div class="name-data titles">
                     <span v-if="!item.isEditing">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.name" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>
+                    <el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>
                   </div>
                   <div class="model-data titles">
                     <span>{{item.deviceModel}}</span>
@@ -243,8 +243,8 @@
                     <span>{{item.store}}</span>
                   </div>
                   <div class="count-data titles">
-                    <span v-if="!item.isEditing">{{item.channelCount}}{{$t('deviceView.unit')}}</span>
-                    <el-select v-model="item.channelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" class="nvr-select" v-if="item.isEditing">
+                    <span v-if="!item.isEditing">{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>
+                    <el-select v-model="item.tempChannelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" class="nvr-select" v-if="item.isEditing">
                       <el-option
                         v-for="numList in editNvrChannelNumList"
                         :key="numList.value"
@@ -767,7 +767,9 @@
             'label': '个人账号',
             'value': 1
           }
-        ]
+        ],
+        deviceNameTemp: '',
+        channelCountTemp: 0,
       }
     },
     watch:{
@@ -877,6 +879,7 @@
         let self=this;
         item.isClick=true;
         self.curNVRItem=item;
+        self.channelCountTemp = item.channelCount;
         console.log(item.serialNumber)
         self.getChannelListByDevice(item.serialNumber);
         self.nvrData.forEach((_item,_index)=>{
@@ -1286,6 +1289,7 @@
         self.isUpdate = false;
         item.isClick=false;
         item.tempUrl = item.pictureUrl;
+        item.tempName = item.name;
         self.file = '';
         if(item.id == 0){
           //删除最后一个通道
@@ -1300,6 +1304,10 @@
           self.isUpdate = false;
           obj.id=self.curChannelItem.id;
           obj.name=self.curChannelItem.tempName;
+          if(obj.name.trim().length == 0){
+            self.notify(self.$t('deviceView.channelNameEmpty'),'warning',3000);
+            return false;
+          }
           let params=obj;
           let attachRes = {};
           deviceRESTful.updateDevice(params).then( async  res=>{
@@ -1373,12 +1381,13 @@
               let obj={};
               console.log(item)
               obj.serialNumber=item.serialNumber;
-              obj.vali
               obj.name=item.name;
+              obj.tempNvrName = item.name;
               obj.store=item.storeName;
               obj.storeId=item.storeId;
               obj.deviceModel=item.deviceModel;
               obj.channelCount = item.channelCount;
+              obj.tempChannelCount = item.channelCount;
               obj.channelNum=item.channelCount+'个';
               obj.comment = item.comment; //错误提示信息
               console.log(obj.comment);
@@ -1733,8 +1742,12 @@
         console.log(item);
         let obj={};
         obj.serialNumber = item.serialNumber;
-        obj.name  = item.name;
-        obj.channelCount = item.channelCount;
+        obj.name  = item.tempNvrName;
+        obj.channelCount = item.tempChannelCount;
+        if(obj.name.trim().length==0){
+          self.notify(self.$t('deviceView.deviceNameEmpty'),'warning',3000);
+          return false;
+        }
         obj.syncToEzviz = false;
         let params = obj;
         console.log(params);
@@ -1758,6 +1771,8 @@
       cancelEditNvr(index,item){
         let self = this;
         item.isEditing = false;
+        item.tempNvrName = item.name;
+        item.tempChannelCount = item.channelCount;
       },
       //删除单个NVR
       async deleteSingleNVR(){

@@ -480,6 +480,9 @@ export default {
     editSuss: 'Successfully Edited!',
     editFail: 'Failed to edit!',
     channelOrder: 'Channel Number ',
+    nvrNameEmpty: 'NVR name may not be empty',
+    channelNameEmpty: 'Channel name may not be empty',
+    deviceNameEmpty: 'Device name may not be empty'
   },
   //Store Management page language
   storeView: {
