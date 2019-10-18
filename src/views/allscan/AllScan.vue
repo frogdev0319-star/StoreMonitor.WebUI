@@ -20,7 +20,7 @@
         unlink-panels
       >
       </el-date-picker>
-      <el-tooltip class="item" effect="dark"
+      <el-tooltip class="item" :popper-class="elTooltipClass"
                   placement="bottom-end">
         <div slot="content">{{$t('overview.dataRangeTips')}}</div>
         <i class="iconfont icon-bangzhu iconbangzhu"></i>
@@ -50,9 +50,9 @@
             <div class="region-content">
               <div class="region-result-panel">
                 <v-chart  :options="storeOptions"  class="result-content" :auto-resize='true' ref="storeChart"/>
-                <i @click="previousGroup" class="el-icon-arrow-left icon-arrow"></i>
+                <i @click="previousGroup" class="el-icon-arrow-left icon-arrow" v-if="showPreviousGroup"></i>
                 <div v-if="regionChartEmpty" class="empty-text">{{$t('overview.noData')}}</div>
-                <i @click="nextGroup" class="el-icon-arrow-right icon-arrow"></i>
+                <i @click="nextGroup" class="el-icon-arrow-right icon-arrow" v-if="showNextGroup"></i>
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@
             </div>
             <div class="pct-nums">
               <div class="content-labels" :class="lang='en'? 'en-labels': ''"  v-for="(item, index) in itemsPerArray" :key="index">
-                <div class="excellent_nums">{{item.percent}}</div>
+                <div class="excellent_nums">{{item.percent}}%</div>
                 <div class="excellent_labels">
                   <span class="labels excellent-label" :class="`label-` + index"></span>
                   <span class="label-desc">{{item.type}}</span>
@@ -303,6 +303,7 @@
         dataMap: {},
         poperClass:'date-picker-poper',
         selectpoperClass:'select-poper',
+        elTooltipClass: 'el-tooltip-class',
         lang: this.$i18n.locale,
         timeMode: 1, //weekly mode
         daysRangeList: [],
@@ -320,6 +321,8 @@
         varWindowWidth:window.innerWidth,
         varyWindowHeight:window.innerHeight,
         isEnSpan: false,
+        showNextGroup: false,
+        showPreviousGroup: false
       }
 
     },
@@ -366,6 +369,13 @@
       previousGroup(){
         let self = this;
         self.curGroupIndex == 0 ? 0 : self.curGroupIndex--;
+        if(self.curGroupIndex == 0){
+          self.showPreviousGroup = false;
+          self.showNextGroup = true;
+        }
+        else{
+          self.showPreviousGroup = true;
+        }
         console.log(self.curGroupIndex)
         let option = {
           baseOption: {
@@ -421,7 +431,7 @@
               trigger: 'axis',
               padding: 5,
               axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
               },
               textStyle:{
                 align:'left'
@@ -579,7 +589,14 @@
       },
       nextGroup(){
         let self = this;
-        self.curGroupIndex < self.totalGroupNum-1 ? self.curGroupIndex++ : self.curGroupIndex
+        self.curGroupIndex < self.totalGroupNum-1 ? self.curGroupIndex++ : self.curGroupIndex;
+        if(self.curGroupIndex == self.totalGroupNum-1){
+          self.showNextGroup = false;
+          self.showPreviousGroup = true;
+        }
+        else{
+          self.showNextGroup = true;
+        }
         console.log(self.curGroupIndex)
         let option = {
           baseOption: {
@@ -635,7 +652,7 @@
               trigger: 'axis',
               padding: 5,
               axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
               },
               textStyle:{
                 align:'left'
@@ -648,7 +665,7 @@
               data: self.resultList,
               itemWidth: 10,
               itemHeight: 10,
-              itemGap: 10,
+              itemGap: 20,
               padding: [15, 0, 0, 0],
               textStyle:{
                 color: self.echartColor,
@@ -1251,10 +1268,10 @@
         let self = this;
         let inspectItems = await self.getInspectStatsItemInfo(self.params);
         console.log(inspectItems);
-        let excellentPer = '0%';
-        let qualifiedPer = '0%';
-        let unqualifiedPer = '0%';
-        let ignorePer = '0%';
+        let excellentPer = 0;
+        let qualifiedPer = 0;
+        let unqualifiedPer = 0;
+        let ignorePer = 0;
         let errCode = inspectItems.errCode;
         let jsonArray = self.itemsLegend;
         let seriesData = [];
@@ -1301,17 +1318,19 @@
             self.itemsTopFive = [];
             seriesData = [];
           }
-          let totalItems = totalIgnored + totalUnqualified + totalQualified + totalExcellent;
-          if(totalItems != 0){
-            ignorePer = self.toPercent(totalIgnored/totalItems);
-            unqualifiedPer = self.toPercent(totalUnqualified/totalItems);
-            qualifiedPer = self.toPercent(totalQualified/totalItems);
-            excellentPer = self.toPercent(totalExcellent/totalItems);
-          }
-          jsonArray[0].percent = excellentPer;
-          jsonArray[1].percent = qualifiedPer;
-          jsonArray[2].percent = unqualifiedPer;
-          jsonArray[3].percent = ignorePer;
+          let totalArray = [totalExcellent, totalQualified, totalUnqualified, totalIgnored];
+          console.log(totalArray);
+          // let totalItems = totalIgnored + totalUnqualified + totalQualified + totalExcellent;
+          // if(totalItems != 0){
+          //   ignorePer = self.toPercent(totalIgnored/totalItems);
+          //   unqualifiedPer = self.toPercent(totalUnqualified/totalItems);
+          //   qualifiedPer = self.toPercent(totalQualified/totalItems);
+          //   excellentPer = self.toPercent(totalExcellent/totalItems);
+          // }
+          jsonArray[0].percent = util.getPercentValue(totalArray,0,2);
+          jsonArray[1].percent = util.getPercentValue(totalArray,1,2);
+          jsonArray[2].percent = util.getPercentValue(totalArray,2,2);
+          jsonArray[3].percent = util.getPercentValue(totalArray,3,2);
           self.itemsOptions = {
             tooltip: {
               trigger: 'item',
@@ -1486,9 +1505,6 @@
           },
           tooltip: {
             padding: 10,
-            backgroundColor: '#222',
-            borderColor: '#777',
-            borderWidth: 1,
             textStyle:{
               align:'left',
               fontSize: 12
@@ -1603,21 +1619,6 @@
                     }
                   }
                 },
-                  // {
-                  //   yAxis: 20,
-                  //   valueIndex: 0,
-                  //   lineStyle: {
-                  //     normal: {
-                  //       color: '##7D8CAB',
-                  //       type: 'dashed'
-                  //     }
-                  //   },
-                  //   label: {
-                  //     normal: {
-                  //       show: false
-                  //     }
-                  //   }
-                  // }
                 ]
               },
               data: [],
@@ -1767,7 +1768,7 @@
               trigger: 'axis',
               padding: 5,
               axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
               },
               textStyle:{
                 align:'left'
@@ -1780,7 +1781,7 @@
               data: self.resultList,
               itemWidth: 10,
               itemHeight: 10,
-              itemGap: 10,
+              itemGap: 20,
               padding: [15, 0, 0, 0],
               textStyle:{
                 color: self.echartColor,
@@ -1865,6 +1866,7 @@
             let length = regions.length;
             let groupSize = Math.ceil(length/self.showRegionNum);
             self.totalGroupNum = groupSize;
+            self.totalGroupNum > 1 ? self.showNextGroup= true : self.showNextGroup = false;
             let tempRegions =  util.groupArrayOnSize(regions, self.showRegionNum);
             self.regionGroups = tempRegions;
             console.log(tempRegions);
@@ -2129,11 +2131,11 @@
             border-top: 1px solid $border;
             border-right: 1px solid $border;
             height:calc(330/1920*100vw);
-            padding: calc(45/1920*100vw) calc(45/1920*100vw) 0 calc(30/1920*100vw);
+            padding: calc(25/1920*100vw) calc(45/1920*100vw) 0 calc(30/1920*100vw);
             .region-content{
               height:calc(270/1920*100vw);
               .region-result-panel{
-                height:calc(270/1920*100vw);
+                height:calc(290/1920*100vw);
                 position: relative;
                 .result-content{
                   height: 100%;
@@ -2171,7 +2173,7 @@
           .focus-content {
             height: calc(330 / 1920 * 100vw);
             border-top: 1px solid $border;
-            padding:calc(40 / 1920 * 100vw) calc(30 / 1920 * 100vw);
+            padding:calc(25 / 1920 * 100vw) calc(30 / 1920 * 100vw);
             position: relative;
 
             .chart-content{
@@ -2534,7 +2536,7 @@
                 height: 100%;
                 .radar-title{
                   text-align: left;
-                  font-size: calc(16/1920*100vw);
+                  font-size: calc(14/1920*100vw);
                   color: $tab;
                   white-space: nowrap;
                   overflow: hidden;
@@ -2717,6 +2719,10 @@
   .process-panel .el-progress-circle{
     width: 150px !important;
     height: 150px  !important;
+  }
+
+  .el-tooltip-class{
+    background: red !important;
   }
   @media screen and (max-width:1680px){
     .process-panel .el-progress-circle{

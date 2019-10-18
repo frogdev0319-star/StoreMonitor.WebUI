@@ -31,7 +31,7 @@ export default new Router({
     {
       path: '/home',
       name: 'overview',
-      redirect: '/reinspection',
+      redirect: '/patrolOverview',
       component: Home,
       hidden: false,
       iconCls:'iconfont icon-zonglan',

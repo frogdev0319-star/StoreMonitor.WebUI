@@ -79,7 +79,7 @@
             </div>
             <div class="pct-nums">
               <div class="content-labels" :class="lang='en'? 'en-label': ''" v-for="(item, index) in sourcePerArray" :key="index">
-                <div class="excellent_nums">{{item.percent}}</div>
+                <div class="excellent_nums">{{item.percent}}%</div>
                 <div class="excellent_labels">
                   <span class="labels excellent-label" :class="`label-` + index"></span>
                   <span class="label-desc">{{item.type}}</span>
@@ -100,7 +100,7 @@
             </div>
             <div class="pct-nums">
               <div class="content-labels" v-for="(item, index) in statusPerArray" :key="index">
-                <div class="excellent_nums">{{item.percent}}</div>
+                <div class="excellent_nums">{{item.percent}}%</div>
                 <div class="excellent_labels">
                   <span class="labels excellent-label" :class="`label-` + index"></span>
                   <span class="label-desc">{{item.type}}</span>
@@ -390,10 +390,10 @@
 
         if(item == -1){
           self.checkAllStore = true;
-          self.storeName = '全部门店';
+          self.storeName = self.$t('overview.all');
           self.storeIds = [];
           self.storeDataList.forEach(item=>{
-            item.checked = false;
+            item.checked = true;
           })
         }
         else{
@@ -417,30 +417,6 @@
         self.showMonthDrap = false;
         self.getStoreEventStatics();
       },
-      allStoreChecked(val){
-        /**
-         * 选择所有门店
-         * @type {default.methods}
-         */
-        let self = this;
-        console.log(val);
-        let selectedStores = [];
-        if(val){
-          self.storeDataList.forEach(item=>{
-            item.checked = true;
-            selectedStores.push(item.value)
-          })
-        }
-        else{
-          self.storeDataList.forEach(item=>{
-            item.checked = false
-          })
-        }
-        self.storeName = val ? '全部门店' : '';
-        self.selectStoresName = val ? selectedStores: [] ;
-        console.log(self.storeName);
-        console.log(self.selectStoresName)
-      },
       async getAllStoreList(){
         let self=this;
         let params={
@@ -459,7 +435,7 @@
             value:item.name,
             userId:item.userId,
             userName:item.userName,
-            checked: false
+            checked: true
           }
           tempStore.push(obj);
         })
@@ -544,9 +520,9 @@
         let jsonArray = self.sourceLegend;
         let sourcePieList = self.eventBySource;
         console.log(sourcePieList);
-        let remotePatrolPer = '0%';
-        let onsitePatrolPer = '0%';
-        let storeMonitorPer = '0%';
+        let remotePatrolPer = 0;
+        let onsitePatrolPer = 0;
+        let storeMonitorPer = 0;
         let remoteEventNum = 0;
         let onsiteEventNum =  0;
         let storeEventNum = 0;
@@ -565,11 +541,12 @@
             storeEventNum = item.numOfEvent;
           }
         })
-
+        let totalArray = [remoteEventNum, onsiteEventNum, storeEventNum];
+        console.log(totalArray);
+        jsonArray[0].percent = util.getPercentValue(totalArray,0,2);
+        jsonArray[1].percent = util.getPercentValue(totalArray,1,2);
+        jsonArray[2].percent = util.getPercentValue(totalArray,2,2);
         if(sumEvent != 0){
-          remotePatrolPer = self.toPercent(remoteEventNum/sumEvent);
-          onsitePatrolPer = self.toPercent(onsiteEventNum/sumEvent);
-          storeMonitorPer = self.toPercent(storeEventNum/sumEvent);
           seriesData = [
             { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
             { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
@@ -579,9 +556,6 @@
         else{
           seriesData = [];
         }
-        jsonArray[0].percent = remotePatrolPer;
-        jsonArray[1].percent = onsitePatrolPer;
-        jsonArray[2].percent = storeMonitorPer;
         self.eventSourceOptions = {
           tooltip: {
             trigger: 'item',
@@ -655,11 +629,12 @@
             closedEventNum = item.numOfEvent;
           }
         })
-
+        let totalArray = [pendingEventNum, doneEventNum, closedEventNum];
+        console.log(totalArray);
+        jsonArray[0].percent = util.getPercentValue(totalArray,0,2);
+        jsonArray[1].percent = util.getPercentValue(totalArray,1,2);
+        jsonArray[2].percent = util.getPercentValue(totalArray,2,2);
         if(sumEvent != 0){
-          pendingPer = self.toPercent(pendingEventNum/sumEvent);
-          donePer = self.toPercent(doneEventNum/sumEvent);
-          closedPer = self.toPercent(closedEventNum/sumEvent);
           seriesData = [
             { value: pendingEventNum, name: self.$t('overview.pendingEvent') },
             { value: doneEventNum, name: self.$t('overview.processedEvent') },
@@ -669,9 +644,6 @@
         else{
           seriesData = [];
         }
-        jsonArray[0].percent = pendingPer;
-        jsonArray[1].percent = donePer;
-        jsonArray[2].percent = closedPer;
         self.eventStatusOptions = {
           tooltip: {
             trigger: 'item',
@@ -726,10 +698,30 @@
         params = JSON.parse(JSON.stringify(self.params));
         params.numOfStores = 5;
         params.rankType = self.rankType;
+        let axisArray = [];
+        let colorArray = [];
+        let seriesData = [];
+        if(self.rankType == 0){
+          axisArray = ['门店名称',self.$t('overview.pendingEvent')];
+          colorArray = [self.pendingColor];
+          seriesData = [{type: 'bar', stack: 'test', barWidth: 35}]
+        }
+        else if(self.rankType == 2){
+          axisArray =  ['门店名称', self.$t('overview.closedEvents')];
+          colorArray = [self.closedColor];
+          seriesData = [{type: 'bar', stack: 'test', barWidth: 35}]
+        }
+        else{
+          axisArray = ['门店名称',self.$t('overview.pendingEvent'),self.$t('overview.processedEvent'), self.$t('overview.closedEvents')];
+          colorArray =  [self.pendingColor, self.doneColor, self.closedColor];
+          seriesData = [{type: 'bar', stack: 'test', barWidth: 35},
+            {type: 'bar', stack: 'test', barWidth: 35},
+            {type: 'bar', stack: 'test', barWidth: 35}]
+        }
         let rankingResult = await self.getEventStatsRanking(params);
         console.log(rankingResult);
         let option = {
-          color: [self.pendingColor, self.doneColor, self.closedColor],
+          color: colorArray,
           legend: {
             x: 'center',
             y: 'bottom',
@@ -752,10 +744,11 @@
             bottom:'32',//距离下边距
           },
           tooltip: {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+              type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
+            },
             padding: 10,
-            backgroundColor: '#222',
-            borderColor: '#777',
-            borderWidth: 1,
             textStyle:{
               align:'left',
               fontSize: 12
@@ -816,24 +809,31 @@
               margin: 10
             }
           },
-          series: [
-            {type: 'bar', stack: 'test', barWidth: 35},
-            {type: 'bar', stack: 'test', barWidth: 35},
-            {type: 'bar', stack: 'test', barWidth: 35}
-          ]
+          series: seriesData
         };
         if(rankingResult.errCode == 0){
           let result = rankingResult.data;
           console.log(result);
           self.statusStoreList = result;
           let soureceList = [];
-          soureceList.push(self.storeStatusLegend)
+          soureceList.push(axisArray)
           result.forEach(item=>{
             let itemArray = []
             itemArray.push(item.storeName);
-            itemArray.push(item.numOfUnprocessed);
-            itemArray.push(item.numOfInprocess);
-            itemArray.push(item.numOfProcessed);
+            if(self.rankType == 3){
+              itemArray.push(item.numOfUnprocessed);
+              itemArray.push(item.numOfInprocess);
+              itemArray.push(item.numOfProcessed);
+            }
+            else if(self.rankType == 0){
+              itemArray.push(item.numOfUnprocessed);
+            }
+            else if(self.rankType == 2){
+              itemArray.push(item.numOfProcessed);
+            }
+            else{
+
+            }
             soureceList.push(itemArray);
           })
           console.log(soureceList);
@@ -886,10 +886,11 @@
             bottom:'32',//距离下边距
           },
           tooltip: {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+              type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
+            },
             padding: 10,
-            backgroundColor: '#222',
-            borderColor: '#777',
-            borderWidth: 1,
             textStyle:{
               align:'left',
               fontSize: 12
@@ -955,9 +956,9 @@
             }
           },
           series: [
-            {type: 'line', stack: 'test', areaStyle:{color:'rgba(243,29,101, 0.1)'}},
-            {type: 'line', stack: 'test', areaStyle:{color:'rgba(67,76,94, 0.1)'}},
-            {type: 'line', stack: 'test', areaStyle:{color:'rgba(114,161,243, 0.1)'}}
+            {type: 'line', areaStyle:{color:'rgba(243,29,101, 0.1)'}, symbol: 'none'},
+            {type: 'line', areaStyle:{color:'rgba(67,76,94, 0.1)'}, symbol: 'none'},
+            {type: 'line', areaStyle:{color:'rgba(114,161,243, 0.1)'}, symbol: 'none'}
           ]
         };
         if(storeEventResult.errCode == 0){
@@ -966,11 +967,11 @@
           self.storeEventList = result;
           let soureceList = [];
           soureceList.push(self.storeEventLegend)
+          let sumOfNewEvents = 0;
+          let sumOfProcessedEvents = 0;
+          let sumOfClosedEvents = 0;
           result.forEach((item, index)=>{
             let storeList = item.stores;
-            let sumOfNewEvents = 0;
-            let sumOfProcessedEvents = 0;
-            let sumOfClosedEvents = 0
             storeList.forEach(_item=>{
               sumOfNewEvents += _item.numOfNewEvents;
               sumOfProcessedEvents += _item.numOfProcessedEvents;
