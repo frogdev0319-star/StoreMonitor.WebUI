@@ -88,24 +88,40 @@
                     <div class="iconrside">
                       <div class="speed-content" v-if="playBackState">
                         <span>{{generateStoreMonitorLang('speed')}}</span>
-                        <el-select class="el-test" size="mini" :value="curSpeed" :popper-class="popperClass">
+                        <el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" v-show="!fullScreen" @change="adjustSpeed">
                           <el-option
                             v-for="(item) in speedList"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
-                            @click="adjustSpeed(item.value, item.label)"
+                          >
+                          </el-option>
+                        </el-select>
+                        <el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" :popper-append-to-body='false' v-show="fullScreen" @change="adjustSpeed">
+                          <el-option
+                            v-for="(item) in speedList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
                           >
                           </el-option>
                         </el-select>
                         <span>{{generateStoreMonitorLang('back')}}</span>
-                        <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder=' ' :popper-append-to-body="false">
+                        <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" placeholder=' ' v-show="!fullScreen" @change="adjustProcess">
                           <el-option
                             v-for="(item) in backList"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
-                            @click.native="adjustProcess(item.value, item.label)"
+                          >
+                          </el-option>
+                        </el-select>
+                        <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" placeholder=' ' :popper-append-to-body='false' v-show="fullScreen" @change="adjustProcess">
+                          <el-option
+                            v-for="(item) in backList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
                           >
                           </el-option>
                         </el-select>
@@ -2069,10 +2085,9 @@ export default {
                 self.timeid=0;
             }
         },
-        adjustSpeed(val, label){
+        adjustSpeed(val){
             console.log(val);
             let self=this;
-            self.curSpeed = label;
             let video=document.getElementById('previewVideo');
             switch(val){
                 case 0:video.player.playbackRate(0.25);break;
@@ -2083,10 +2098,9 @@ export default {
             }
             video.playbackRate=val;
         },
-        adjustProcess(val, label){
+        adjustProcess(val){
             console.log(val);
             let self = this;
-            self.curBack = label;
             let video=document.getElementById('previewVideo');
             let curTime=video.player.currentTime();
             switch(val){
