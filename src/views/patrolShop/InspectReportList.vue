@@ -458,6 +458,8 @@ export default {
         changeCountry(val){
             let self=this;
             console.log(val);
+            self.curProvince='';
+            self.curCity='';
             self.clearStoreInfo();
 
             let storeList=self.storeList;
