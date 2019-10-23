@@ -599,6 +599,7 @@ export default {
     emptyMonth: 'Month cannot be empty',
     emptyTime: 'Execution time cannot be empty',
     newSchedule: 'New Schedule',
+    select: 'Please Select'
   }
 
 }

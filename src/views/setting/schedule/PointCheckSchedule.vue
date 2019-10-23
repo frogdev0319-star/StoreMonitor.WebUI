@@ -57,7 +57,7 @@
                   <span>{{generateScheduleLang('execDays')}}</span>
                   <div class="month-content" @click="choiceMonth">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div class="month-panel" v-if="showMonthContent" @mouseleave="showMonthContent=false">
@@ -77,7 +77,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
                   <div class="day-content" @click="choiceWeek(_index)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.dateStr" size="mini" id="elWeek" :placeholder="generateScheduleLang('everyDay')" :readonly=true></el-input>
+                    <el-input v-model="_item.dateStr" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                       <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div class="week-panel" v-if="_item.showWeekContent" @mouseleave="_item.showWeekContent = false">
@@ -116,7 +116,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
                   <div class="day-content" @click="choiceWeek(-1)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('everyDay')" :readonly=true></el-input>
+                    <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div class="week-panel" v-if="showWeekContent" @mouseleave="showWeekContent = false">
@@ -133,7 +133,7 @@
                     <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
                     <div class="day-content" @click="choiceTime(-1)">
                       <div class="input-arrow-panel"></div>
-                      <el-input v-model="timeArray.toString()" size="mini" id="elWeek" :placeholder="generateScheduleLang('everyDay')" :readonly=true></el-input>
+                      <el-input v-model="timeArray.toString()" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                       <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                     </div>
                     <div class="week-panel" v-if="showTimeContent" @mouseleave="hideTimePanel">

@@ -70,7 +70,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
                   <div class="day-content" @click="choiceWeek">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('everyDay')" :readonly=true></el-input>
+                    <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-week-panel': 'week-panel'" v-if="showWeekContent" @mouseleave="showWeekContent = false">
@@ -87,7 +87,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
                   <div class="month-content" @click="choiceMonthly">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-month-panel':'month-panel'" v-if="showMonthContent" @mouseleave="showMonthContent = false">
@@ -106,7 +106,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
                   <div class="month-content" @click="choiceSelfDefineMonth(_index)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="_item.showSelfDefineMonth" @mouseleave="_item.showSelfDefineMonth = false">
@@ -120,7 +120,7 @@
                   <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceSelfMonth(_index)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="_item.showMonthContent" @mouseleave="_item.showMonthContent = false">
@@ -140,7 +140,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
                   <div class="month-content" @click="choiceSelfDefineMonth(-1)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="showSelfDefineMonth" @mouseleave="showSelfDefineMonth = false">
@@ -154,7 +154,7 @@
                   <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceMonth">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="showMonthContent" @mouseleave="hiddenSelfMonthPanel">
@@ -925,7 +925,13 @@
         let tabIndex = Number(self.activeName);
         let mode = self.paneList[tabIndex].mode;
         let notifyTime = self.paneList[tabIndex].notifyTime;
-        let dayArray = self.dayArray;
+        let dayArray = [];
+        if(mode==1){
+          dayArray = self.selectWeek;
+        }
+        else if(mode==2){
+          dayArray = self.selectMonth;
+        }
         let name = self.paneList[tabIndex].name;
         let schedule = self.paneList[tabIndex].schedule;
         console.log(schedule)
@@ -1382,63 +1388,27 @@
           params.aheadNotification = 0; //不提前通知
         }
         let tempSchedule = [];
-        //日模式
-        if(params.mode == 0){
-          //日模式
-          let tempPeriod = [];
-          let timeSelect = self.timeArray;
-          timeSelect.forEach(item=>{
-            console.log(item);
-            let seconds = self.hourToSecond(item);
-            let obj = {};
-            obj.from = seconds;
-            tempPeriod.push(obj);
-          })
-          tempSchedule.push({
-            "day": 1,
-            "period": tempPeriod
-          });
-        }
-        else if(params.mode == 1){
+        if(params.mode == 1){
           //周模式
-          let timeSelected = self.timeArray;
           let selectedWeek = self.selectWeek;
           self.paneList[tabIndex].dayArray = selectedWeek;
           selectedWeek.forEach(item=>{
             console.log(item);
             let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
-              console.log(_item);
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
             tempSche.day = Number(item);
-            tempSche.period = timePeriod;
             tempSchedule.push(tempSche)
           })
           console.log(tempSchedule);
         }
         else if(params.mode == 2){
           //月模式
-          let timeSelected = self.timeArray;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = selectedMonth;
           selectedMonth.forEach(item=>{
             console.log(item);
-            let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
-              console.log(_item);
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
             tempSche.day = Number(item);
-            tempSche.period = timePeriod;
             tempSchedule.push(tempSche)
           })
           console.log(tempSchedule);
@@ -2230,66 +2200,32 @@
         else{
           params.aheadNotification = 0; //不提前通知
         }
-        params.from = self.paneList[tabIndex].from;
-        let year = self.$moment(params.from).format('YYYY'); //年self.paneList[tabIndex].from; //年
+        let year = self.paneList[tabIndex].from; //年self.paneList[tabIndex].from; //年
+        params.from = self.$moment(year).startOf('year').valueOf();
         params.to =  -1;
         params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
         let tempSchedule = [];
-        //日模式
-        if(params.mode == 0){
-          //日模式
-          let tempPeriod = [];
-          let timeSelect = self.timeArray;
-          timeSelect.forEach(item=>{
-            let seconds = self.hourToSecond(item);
-            let obj = {};
-            obj.from = seconds;
-            tempPeriod.push(obj);
-          })
-          tempSchedule.push({
-            "day": 1,
-            "period": tempPeriod
-          });
-        }
-        else if(params.mode == 1){
+        if(params.mode == 1){
           //周模式
-          let timeSelected = self.timeArray;
           let selectedWeek = self.selectWeek;
           self.paneList[tabIndex].dayArray = self.selectWeek;
           selectedWeek.forEach(item=>{
-            let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
             tempSche.day = Number(item);
-            tempSche.period = timePeriod;
             tempSchedule.push(tempSche)
           })
           console.log(tempSchedule);
         }
         else if(params.mode == 2){
           //月模式
-          let timeSelected = self.timeArray;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
           selectedMonth.forEach(item=>{
             console.log(item);
             let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
-              console.log(_item);
-              let seconds = self.hourToSecond(_item);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
-            })
             tempSche.day = Number(item);
-            tempSche.period = timePeriod;
             tempSchedule.push(tempSche)
           })
           console.log(tempSchedule);

@@ -606,5 +606,6 @@ export default {
     emptyMonth: '月份不能为空',
     emptyTime: '执行时间不能为空',
     newSchedule: '新增排程',
+    select: '请选择'
   }
 }

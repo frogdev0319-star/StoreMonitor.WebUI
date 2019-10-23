@@ -106,6 +106,7 @@ export default new Router({
           meta:{
             requireAuth: true,
             keepAlive:true,
+            isBack: false
           },
           isReadOnly:false,
         },

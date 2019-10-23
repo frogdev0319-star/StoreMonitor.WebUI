@@ -70,7 +70,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
                   <div class="month-content" @click="choiceMonthly">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-month-panel':'month-panel'" v-if="showMonthContent" @mouseleave="showMonthContent = false">
@@ -89,7 +89,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
                   <div class="month-content" @click="choiceSelfDefineMonth(_index)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="_item.showSelfDefineMonth" @mouseleave="_item.showSelfDefineMonth = false">
@@ -103,7 +103,7 @@
                   <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceSelfMonth(_index)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="_item.showMonthContent" @mouseleave="_item.showMonthContent = false">
@@ -123,7 +123,7 @@
                   <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
                   <div class="month-content" @click="choiceSelfDefineMonth(-1)">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="showSelfDefineMonth" @mouseleave="showSelfDefineMonth = false">
@@ -137,7 +137,7 @@
                   <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
                   <div class="month-content" @click="choiceMonth">
                     <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('everyMonth')" :readonly=true></el-input>
+                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
                     <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                   </div>
                   <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="showMonthContent" @mouseleave="hiddenSelfMonthPanel">
@@ -476,7 +476,7 @@
         showDrap: false,
         showMonthDrap: false,
         showMonthContent: false,
-        monthValue: this.$t('scheduleView.everyMonth'),
+        monthValue: '',
         weekDays: [],
         showWeekContent: false,
         showAddDialog: false,
@@ -865,7 +865,13 @@
         let tabIndex = Number(self.activeName);
         let mode = self.paneList[tabIndex].mode;
         let notifyTime = self.paneList[tabIndex].notifyTime;
-        let dayArray = self.dayArray;
+        let dayArray = [];
+        if(mode==1){
+          dayArray = self.selectWeek;
+        }
+        else if(mode==2){
+          dayArray = self.selectMonth;
+        }
         let name = self.paneList[tabIndex].name;
         let schedule = self.paneList[tabIndex].schedule;
         console.log(schedule)
@@ -2026,8 +2032,8 @@
         else {
           params.aheadNotification = 0; //不提前通知
         }
-        params.from = self.paneList[tabIndex].from;
-        let year = self.$moment(params.from).format('YYYY'); //年self.paneList[tabIndex].from; //年
+        let year = self.paneList[tabIndex].from; //年self.paneList[tabIndex].from; //年
+        params.from = self.$moment(year).startOf('year').valueOf();
         params.to = -1;
         params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
@@ -2062,7 +2068,6 @@
               let dayOfYear = self.$moment([year, month - 1, _item]).dayOfYear();
               let obj = {};
               obj.day = dayOfYear;
-              obj.period = [];
               tempSchedule.push(obj);
             })
           })
