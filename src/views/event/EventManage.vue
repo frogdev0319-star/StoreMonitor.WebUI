@@ -216,7 +216,9 @@ export default {
             defaultTime:[],
             lang: this.$i18n.locale,
             isFirstLoad: false, //是否首次加载
-            order: ''
+            order: '',
+          numberOfElements: 0,
+          totalElements: 0
         }
 
     },
@@ -241,6 +243,15 @@ export default {
             if(val!=0){
                 self.searchEventList(false);
             }
+        },
+        numberOfElements(val,oldVal){
+          console.log(val);
+          console.log(oldVal);
+          let self = this;
+          if(val == 0 && self.totalElements > 0){
+            self.params.filter.page -= 1;
+            self.getEventList(self.params);
+          }
         }
     },
     methods:{
@@ -673,6 +684,8 @@ export default {
                 self.tableDataList[tabIndex].total=res.data.totalElements;
                 //if(tabIndex==0){
                 self.tableDataList[tabIndex].eventCount=res.data.totalElements;
+                self.totalElements = res.data.totalElements;
+                self.numberOfElements = res.data.numberOfElements;
                 //}
             }).catch(err=>{
                 console.log("Error:"+err);

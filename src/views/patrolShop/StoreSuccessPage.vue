@@ -18,7 +18,8 @@
         </el-dialog>
         <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
             <div class="details">
-                <span :class="lang==='en'? 'en-event-label':'event-label'">{{generateStoreMonitorLang('storeName')}}</span>
+                <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 25px;">{{generateStoreMonitorLang('storeName')}}:</span>
+                <span class="event-label" v-else >{{generateStoreMonitorLang('storeName')}}：</span>
                 <span>{{storeName}}</span>
             </div>
             <div class="details">
