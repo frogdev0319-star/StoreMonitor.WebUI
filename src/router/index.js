@@ -106,7 +106,6 @@ export default new Router({
           meta:{
             requireAuth: true,
             keepAlive:true,
-            isBack: false
           },
           isReadOnly:false,
         },
@@ -130,7 +129,6 @@ export default new Router({
           meta:{
             requireAuth: true,
             keepAlive:true,
-            isBack: false
           },
           isReadOnly:false,
         },
@@ -166,7 +164,6 @@ export default new Router({
           meta:{
             keepAlive:true,  //the component is't to be cache.
             requireAuth: true,
-            isBack: false,
           }
         },
         {

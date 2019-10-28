@@ -11,7 +11,7 @@
                           @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
-                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input"
+                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input"  @input="adviceChanged"
                           :placeholder="generatePatrolLang('adviceInfo')"></el-input>
             </div>
         </el-col>
@@ -85,6 +85,7 @@ import util from '@/common/util'
 import {getCookie} from '@/common/auth'
 import {getUserInfo} from '@/api/login'
 import {generatePatrolLang} from '@/api/i18n'
+import filterString from '@/common/filterString.js'
 
 export default {
     name:'ConfirmAddSum',
@@ -452,6 +453,12 @@ export default {
                 duration:time
             });
         },
+      adviceChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.suggest = content;
+      }
     },
     mounted(){
         let self=this;

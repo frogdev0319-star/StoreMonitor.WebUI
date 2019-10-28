@@ -38,6 +38,7 @@ input:disabled{
     text-decoration: none;
     text-indent: 0;
     line-height: 20px;
+    text-align: center;
 }
 .a-upload input{
     width: 100%;

@@ -224,7 +224,7 @@
               <div  :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
                 <div class="nvr-data group-title"
                      v-for="(item,index) in nvrData"
-                     :key="index"  :class="!item.isClick?'noraml-color':'active-color'" @click="clickNVR(index,item)">
+                     :key="index"  :class="`${!item.isClick?'noraml-color':'active-color'}  ${item.comment.length > 0 ? 'tooltip-color' : ''}`" @click="clickNVR(index,item)" >
                   <div class="proper-flag" v-if="item.isClick"></div>
                   <div class="comment-data titles" :style="{visibility: (item.comment!= '') ? 'visible': 'hidden' }">
                     <el-tooltip effect="dark" :content="item.comment"
@@ -233,11 +233,13 @@
                     </el-tooltip>
                   </div>
                   <div class="name-data titles">
-                    <span v-if="!item.isEditing">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
+                    <span v-if="!item.isEditing">{{item.tempNvrName.length>15?item.tempNvrName.substr(0,15)+'...':item.tempNvrName}}</span>
                     <el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>
                   </div>
                   <div class="model-data titles">
-                    <span>{{item.deviceModel}}</span>
+                    <el-tooltip class="item" effect="dark" :content="item.deviceModel" placement="right">
+                      <span>{{item.deviceModel}}</span>
+                    </el-tooltip>
                   </div>
                   <div class="store-data titles">
                     <span>{{item.store}}</span>
@@ -257,28 +259,28 @@
                   </div>
                   <div class="operation-data titles">
                     <div class="iconcontent" v-if="item.isEditing">
-                      <div class="iconlised"  @click="confirmEditNvr(index,item)">
+                      <div class="iconlised"  @click.stop="confirmEditNvr(index,item)">
                         <i class="el-icon-check"></i>
                       </div>
-                      <div class="iconrised" @click="cancelEditNvr(index,item)">
+                      <div class="iconrised" @click.stop="cancelEditNvr(index,item)">
                         <i class="el-icon-close"></i>
                       </div>
                     </div>
                     <div class="iconcontent" v-if="!item.isEditing && !item.ifCanAdd">
-                      <div class="iconlised"  @click="editSingleNvr(index,item)" style=" border: none; background-color: #fff; color:#2c3e50;font-weight: normal;" :style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }">
+                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; background-color: #fff; color:#2c3e50;font-weight: normal;" :style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }">
                         <i class="iconfont icon-bianji"></i>
                       </div>
-                      <div class="iconrised" @click="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
+                      <div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
                         <i class="iconfont icon-shanchu"></i>
                       </div>
                     </div>
                     <div class="add-again" v-if="!item.isEditing && item.ifCanAdd">
                       <div class="" style="float:left;">
-                        <el-button @click="addAgain(index, item)" class="add-btn" size="mini" style=" border: none; background-color: #f31d65; color:#fff; width: 65px; ">
+                        <el-button @click.stop="addAgain(index, item)" class="add-btn" size="mini" style=" border: none; background-color: #f31d65; color:#fff; width: 65px; ">
                           <span style="position: relative;left: -10px;">{{generateDeviceLang('addAgain')}}</span>
                         </el-button>
                       </div>
-                      <div class="iconrised" @click="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
+                      <div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
                         <i class="iconfont icon-shanchu"></i>
                       </div>
                     </div>
@@ -877,6 +879,7 @@
       },
       clickNVR(index,item){
         let self=this;
+        console.log('点击NVR')
         item.isClick=true;
         self.curNVRItem=item;
         self.channelCountTemp = item.channelCount;
@@ -1740,6 +1743,7 @@
       confirmEditNvr(index,item){
         let self=this;
         console.log(item);
+        console.log('确认编辑')
         let obj={};
         obj.serialNumber = item.serialNumber;
         obj.name  = item.tempNvrName;
@@ -1757,6 +1761,8 @@
           if(errMsg!=undefined&&errMsg=='Success'){
             self.notify(self.$t('deviceView.editSuss'),'success',3000);
             item.isEditing = false;
+            item.name = item.tempNvrName;
+            item.channelCount = item.tempChannelCount;
           }
           else{
             self.notify(self.$t('deviceView.editFail'),'warning',3000);
@@ -1764,12 +1770,13 @@
           }
         })
           .then(async()=>{
-            self.channelData=await self.getChannelData();  //修改后更新数据源
+            // self.channelData=await self.getChannelData();  //修改后更新数据源
             self.getChannelListByDevice(self.curNVRItem.serialNumber);
           })
       },
       cancelEditNvr(index,item){
         let self = this;
+        console.log('取消编辑')
         item.isEditing = false;
         item.tempNvrName = item.name;
         item.tempChannelCount = item.channelCount;
@@ -1951,6 +1958,9 @@
   .active-color{
     color: $mainColor !important;
     background-color: #fff;
+  }
+  .tooltip-color{
+    color: rgba(75,82,98, 0.5) !important;
   }
   .el-search-input{
     @include point(width,180);

@@ -10,13 +10,14 @@
         size="mini"
         :clearable=false
         :editable=false
-        format="yyyy/MM/dd"
+        format="yyyy/MM/dd HH:mm:ss"
         class="date-range"
         :popper-class="poperClass"
         :picker-options='dateOpt'
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         @change="dateChange"
+        :default-time="['00:00:00', '23:59:59']"
         unlink-panels
       >
       </el-date-picker>
@@ -240,10 +241,10 @@
     },
     data(){
       return{
-        dateValue:[this.$moment().startOf('month').toDate(), new Date()],
+        dateValue:[this.$moment().startOf('month').toDate(), this.$moment(new Date).endOf('d').toDate()],
         dateOpt: {
           disabledDate:(time)=>{
-            return time.getTime() > Date.now();
+            return time.getTime() > this.$moment(new Date).endOf('d').toDate();
           }
         },
         toolTipClass: 'page-login-toolTipClass',
@@ -336,7 +337,7 @@
         if(val!=0){
           self.timeMode = 1;
           self.isEnSpan= false;
-          self.dateValue = [this.$moment().startOf('month').toDate(), new Date()];
+          self.dateValue = [self.$moment().startOf('month').toDate(),self.$moment(new Date).endOf('d').toDate()];
           let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
           let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
           self.params.beginTs = start;
@@ -565,9 +566,9 @@
             seriesArray[1] = seriesImproveJson;
 
             let seriesPassJson = {};
-            seriesImproveJson.stack = 'test';
-            seriesImproveJson.data = passList;
-            seriesArray[2] = seriesImproveJson;
+            seriesPassJson.stack = 'test';
+            seriesPassJson.data = passList;
+            seriesArray[2] = seriesPassJson;
 
             let seriesExcJson = {};
             seriesExcJson.stack = 'test';
@@ -786,9 +787,9 @@
             seriesArray[1] = seriesImproveJson;
 
             let seriesPassJson = {};
-            seriesImproveJson.stack = 'test';
-            seriesImproveJson.data = passList;
-            seriesArray[2] = seriesImproveJson;
+            seriesPassJson.stack = 'test';
+            seriesPassJson.data = passList;
+            seriesArray[2] = seriesPassJson;
 
             let seriesExcJson = {};
             seriesExcJson.stack = 'test';
@@ -918,8 +919,8 @@
       dateChange(val){
         let self=this;
         console.log(val);
-        let start= typeof(val[0])==='object'?val[0].getTime():val[0];
-        let end= typeof(val[1])==='object'?val[1].getTime():val[1];
+        let start = typeof(val[0])==='object'?val[0].getTime():val[0];
+        let end = typeof(val[1])==='object'?val[1].getTime():val[1];
         let daysDiff = self.$moment(end).diff(start, 'days');
         if(daysDiff < 7){  //当前选择的时间范围不到7天
           Message({
@@ -928,7 +929,8 @@
             duration:3*1000
           })
           start=end-3600*24*7*1000;
-          self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+          start = self.$moment(start).startOf('d').toDate().valueOf();
+          self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         if(daysDiff > 365){  //当前选择的时间范围超过365天
           Message({
@@ -937,10 +939,11 @@
             duration:3*1000
           })
           start=end-3600*24*365*1000;
-          self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+          start = self.$moment(start).startOf('d').toDate().valueOf();
+          self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         else{
-          self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
+          self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         daysDiff = self.$moment(end).diff(start, 'days');
         daysDiff <=30 ? self.timeMode = 1 : self.timeMode = 2;
@@ -984,6 +987,52 @@
         self.getRegionInspectResult();
 
       },
+      compareDanger(a,b){
+        if (b.numOfDangerous > a.numOfDangerous){
+          return 1
+        }
+        else if (b.numOfDangerous === a.numOfDangerous){
+          return b.numOfImproved - a.numOfImproved
+        }
+        else {
+          return -1;
+        }
+      },
+      findMaxDanger(items){
+        let max = 1 ;
+        items.map(function(item,index) {
+          if (item.numOfDangerous > max){
+            max = item.numOfDangerous
+          }
+          if (item.numOfImproved > max){
+            max = item.numOfImproved
+          }
+        })
+        return max ;
+      },
+      compareExcellent(a,b){
+        if (b.numOfExcellent > a.numOfExcellent){
+          return 1
+        }
+        else if (b.numOfExcellent === a.numOfExcellent){
+          return b.numOfQualified - a.numOfQualified
+        }
+        else {
+          return -1;
+        }
+      },
+      findMaxExcellent(items){
+        let max = 1 ;
+        items.map(function(item,index) {
+          if (item.numOfExcellent > max){
+            max = item.numOfExcellent
+          }
+          if (item.numOfQualified > max){
+            max = item.numOfQualified
+          }
+        })
+        return max ;
+      },
       getTopFiveRegionList(){
         let self = this;
         let result = self.regionResultList.concat([]);
@@ -991,21 +1040,16 @@
         let secondColor = '';
         let firstName = '';
         let secondName = '';
-        let maxFirstValue = 0;
-        let maxSecondValue = 0;
         let maxValue = 0;
+        let items = [];
         if(self.isWorstArea){
           firstColor = '#f31d65';
           secondColor = '#ffd035';
           firstName = self.$t("overview.danger");
           secondName = self.$t("overview.improve");
           try{
-            result.sort((item1, item2)=>{
-              return item1.numOfDangerous < item2.numOfDangerous ? 1 : -1;
-            })
-            maxFirstValue = result[0].numOfDangerous;
-            maxSecondValue = result[0].numOfImproved;
-            maxValue = maxFirstValue > maxSecondValue ? maxFirstValue: maxSecondValue;
+            result.sort(self.compareDanger)
+            maxValue = self.findMaxDanger(result);
           }
           catch (e) {
             result = [];
@@ -1017,12 +1061,8 @@
           firstName = self.$t("overview.excellent");
           secondName = self.$t("overview.pass");
           try {
-            result.sort((item1, item2)=>{
-              return item1.numberOfExcellent < item2.numberOfExcellent ? 1: -1;
-            })
-            maxFirstValue = result[0].numberOfExcellent;
-            maxSecondValue = result[0].numOfQualified;
-            maxValue = maxFirstValue > maxSecondValue ? maxFirstValue: maxSecondValue;
+            result.sort(self.compareExcellent);
+            maxValue = self.findMaxExcellent(result);
           }
           catch (e) {
             result = [];
@@ -1052,7 +1092,7 @@
             fiveArray.push(json)
           }
           else{
-            let tempFirstDouble = (item.numberOfExcellent/maxValue)*100;
+            let tempFirstDouble = (item.numOfExcellent/maxValue)*100;
             let tempSecondDouble = (item.numOfQualified/maxValue) * 100;
             let firstPectStr = tempFirstDouble.toFixed(0);
             let firstSecondStr = tempSecondDouble.toFixed(0);
@@ -1062,7 +1102,7 @@
             json.secondColor = secondColor;
             json.firstName = firstName;
             json.secondName = secondName;
-            json.firstNum = item.numberOfExcellent
+            json.firstNum = item.numOfExcellent
             json.secondNum = item.numOfQualified;
             fiveArray.push(json)
           }
@@ -1919,9 +1959,9 @@
               seriesArray[1] = seriesImproveJson;
 
               let seriesPassJson = {};
-              seriesImproveJson.stack = 'test';
-              seriesImproveJson.data = passList;
-              seriesArray[2] = seriesImproveJson;
+              seriesPassJson.stack = 'test';
+              seriesPassJson.data = passList;
+              seriesArray[2] = seriesPassJson;
 
               let seriesExcJson = {};
               seriesExcJson.stack = 'test';

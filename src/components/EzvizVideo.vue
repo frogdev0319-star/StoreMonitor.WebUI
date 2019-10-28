@@ -218,8 +218,8 @@
         </div>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button class="file-cancel-btn" @click="cancelEnterPassword" size="mini" style="">取消</el-button>
-        <el-button class="file-confirm-btn" @click="verifyEnterPassword" size="mini" type="primary">确定</el-button>
+        <el-button class="file-cancel-btn" @click="cancelEnterPassword" size="mini" style="">{{$t('storeMonitor.cancel')}}</el-button>
+        <el-button class="file-confirm-btn" @click="verifyEnterPassword" size="mini" type="primary">{{$t('storeMonitor.confirm')}}</el-button>
       </div>
     </el-dialog>
     <el-dialog :title="generatePatrolLang('feedbacks')"

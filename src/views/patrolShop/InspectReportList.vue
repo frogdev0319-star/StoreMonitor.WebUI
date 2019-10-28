@@ -229,27 +229,6 @@ export default {
             return (this.varyWindowWidth/1920)*50;
         },
         ...mapGetters({accountChanged:'accountChanged'})
-      // defaultTime(){
-        //     let date=new Date();
-        //     let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
-        //     let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
-        //     let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
-        //     let dateStr=hour+':'+minutes+':'+second;
-        //     let timeTemp=[];
-        //     timeTemp[0]=dateStr;
-        //     timeTemp[1]=dateStr;
-        //     return timeTemp;
-        // }
-        // sizeNum(){
-        //     let size=0;
-        //     if((this.varyWindowHeight/this.varyWindowWidth)>=0.625){
-        //         size=18;
-        //     }
-        //     else{
-        //         size=12;
-        //     }
-        //     return size;
-        // }
     },
     watch:{
       accountChanged(val,oldVal){
@@ -259,6 +238,11 @@ export default {
           self.initData();
           self.getRegionInfo();
           self.getInitReportList();
+          window.setTimeout(function(){
+              self.$route.meta.keepAlive = true;
+              console.log(self.$route.meta.keepAlive);
+            },
+            300);
         }
       }
     },
@@ -771,15 +755,21 @@ export default {
         to.meta.isBack = false;
         next();
       }
-        // if(from.name!='reportDetails'&&from.path!='/'){
-        //     to.meta.keepAlive=false;
-        // }
-        // else{
-        //     to.meta.keepAlive=true;
-        // }
-        // next(vm => {
-        //    console.log(vm);
-        // });
+    },
+    beforeRouteLeave (to, from, next) {
+      console.log(this.params);
+      if(to.name != 'reportDetails'){
+        from.meta.keepAlive = false;
+        next(vm=>{
+          console.log(vm)
+        });
+      }
+      else{
+        from.meta.keepAlive = true;
+        next(vm=>{
+          console.log(vm)
+        });
+      }
     },
     mounted(){
         console.log(this.sortTypeList);
@@ -794,9 +784,9 @@ export default {
     activated(){
       let self=this;
       if(!self.$route.meta.isBack || self.isFirstLoad){
-        self.initData();
-        self.getRegionInfo();
-        self.getInitReportList();
+        // self.initData();
+        // self.getRegionInfo();
+        // self.getInitReportList();
       }
       else{
         //

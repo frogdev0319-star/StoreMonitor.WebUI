@@ -196,7 +196,7 @@
             </div>
             <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true" :play-back="playBackState"
                          :cur-time="playBackTime"
-                         @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo">
+                         @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo" ref="ezvizVideo">
 
             </ezviz-video>
             <div class="el-event">
@@ -634,6 +634,7 @@ export default {
             cutDialogcurTime:0,
             lang: this.$i18n.locale,
             playBackTime: 0,
+            realTimeStartTs: 0
         }
     },
     computed:{
@@ -664,6 +665,11 @@ export default {
             let self=this;
             if(val!=0){
                 self.changeBrand();
+                window.setTimeout(function(){
+                    self.$route.meta.keepAlive = true;
+                    console.log(self.$route.meta.keepAlive);
+                  },
+                  300)
             }
         },
         realTimeSpeed(val,oldVal){
@@ -677,13 +683,8 @@ export default {
         }
     },
     beforeRouteEnter (to, from, next) {
-        console.log(from);
-        if(from.name=='storeSubEvent'){
-            to.meta.keepAlive=true;
-        }
-        else{
-            to.meta.keepAlive=false;
-        }
+      to.meta.keepAlive = true;
+      console.log(to.meta.keepAlive)
         next(vm => {
             //if(to.params.flag){
                 //vm.clearEvent();
@@ -695,17 +696,27 @@ export default {
     beforeRouteLeave(to, from, next){
         //离开页面的同时应该停止播放视频
         let self=this;
+        from.meta.keepAlive = true;
         window.clearInterval(self.timeid);
         window.clearInterval(self.timerPlayReal);
         self.isPlayingFlag=-1;
         self.timerPlayReal=null;
         self.timeid=null;
-        if(self.playState){
+        if(!self.isEzviz){
+          if(self.playState || self.playBackState){
             self.stopRealTime();
+          }
+        }
+        else{
+          self.$refs.ezvizVideo.stopRealTime();
         }
         if(to.name!='storeSubEvent'){
             from.meta.keepAlive=false;
         }
+        else{
+          from.meta.keepAlive=true;
+        }
+        console.log(from.meta.keepAlive)
         next();
     },
     async mounted(){
@@ -742,6 +753,10 @@ export default {
                     self.stopRealTimeVisPage();
                     window.clearInterval(self.timerPlayReal);
                 }
+                // if(self.playBackState){
+                //   self.stopRealTime();
+                //   window.clearInterval(self.timeid)
+                // }
             }else{
                 console.log("我进入页面了");
                 console.log(self.playBackState);
@@ -1192,8 +1207,65 @@ export default {
                 self.errorText=errorText;
             }
         },
+      async stopAndAdjustProcessHistoryVideo(){
+        let self=this;
+        let state=self.playBackState;
+        self.stopVideo();
+        window.clearInterval(self.timeid);
+        const data = {
+          request: {
+            method: 'disconnection',
+            sessionID: self.sessionId,
+            IVSID:self.channel.ivsId,
+            channel:JSON.stringify(self.channel.channelId),
+            streamType:'SubStream'
+          }
+        };
+        let url='';
+        if(state){
+          let ret=await dashAPI.playBack(0,data);
+          await dashAPI.Offline(self.sessionId);
+        }
+        else{
+          let ret=await dashAPI.RealTime(0,data);
+          await dashAPI.Offline(self.sessionId);
+        }
+        let sessionId= await dashAPI.Online();
+        self.sessionId=sessionId;
+        let dataonLine={
+          request: {
+            method: 'connection',
+            sessionID: sessionId,
+            streamingProtocol:this.protocal,
+            IVSID:self.channel.ivsId,
+            channel:JSON.stringify(self.channel.channelId),
+            beginTime:self.realTimeStartTs.toString().substr(0,10),
+            endTime:(self.realTimeStartTs +(5*60+1)).toString().substr(0,10),
+            streamType:'SubStream'
+          }
+        };
+        url=await dashAPI.playBack(1,dataonLine);
+        self.mpdurl = url;
+        console.log(self.mpdurl);
+        if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
+          console.log(self.mpdurl);
+          self.playVideo(self.mpdurl);
+          self.timeid= window.setInterval(function(){  //播放视频的同时进度条进行
+            self.getProcess();
+          },1000);
+        }
+        else{   //当前视频如果返回失败，需处于暂停状态
+          self.playState=false;
+          self.showModelContent=false;
+          console.log(self.mpdurl.ErrorCode);
+          let errorCode=self.mpdurl.ErrorCode; //错误码
+          let errorText= util.getErrorText(errorCode);
+          self.errorText=errorText;
+        }
+      },
         async playHistoryVideo(){
             let self=this;
+            self.realTimeStartTs =Number(self.curTime.getTime().toString().substr(0,10));
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
@@ -1232,8 +1304,10 @@ export default {
             self.showModelContent=true;
             let d=self.getCurTime();
             self.curTime=d;
-            let dstr=Number((d.getTime()+(1*60+1)*1000).toString().substr(0,10));
+            //let dstr=Number((d.getTime()+(1*60+1)*1000).toString().substr(0,10));
+            let dstr=Number((d.getTime()).toString().substr(0,10));
             self.startTs=dstr;
+            console.log(self.startTs)
             self.playBackTime = Number((d.getTime()).toString());
             self.currentTimeValue=0;
             self.playBackState=true;
@@ -1951,8 +2025,8 @@ export default {
                         streamingProtocol:this.protocal,
                         IVSID:self.channel.ivsId,
                         channel:JSON.stringify(self.channel.channelId),
-                        beginTime:(self.startTs).toString(),
-                        endTime:(self.startTs+5*60+1).toString(),
+                        beginTime:(self.realTimeStartTs).toString(),
+                        endTime:(self.realTimeStartTs+5*60+1).toString(),
                         streamType:'SubStream'
                     }
                 };
@@ -2004,6 +2078,10 @@ export default {
             var video = document.getElementById("previewVideo");
             self.previewplayer = videojs(video);
             self.previewplayer.pause();
+            window.clearInterval(self.timeid);
+            self.timeid=null;
+            self.timeid=0;
+            window.clearInterval(self.timerPlayReal);
         },
         async stopRealTimeVisPage(){
             let self=this;
@@ -2065,7 +2143,10 @@ export default {
             let duration=300;
             self.durationTimeValue=duration;
             self.currentTimeValue=curTime;
-
+            console.log(curTime);
+            console.log(self.startTs);
+            self.realTimeStartTs ++;
+            console.log(self.realTimeStartTs)
             let getTimeStr=function(val){
                 let hour=0;
                 let minute=0;
@@ -2079,7 +2160,7 @@ export default {
             self.durationStr=getTimeStr(duration);
             if(curTime>=duration){
                 self.stopHDash();
-                self.startTs=self.startTs+5*60;
+                //self.startTs=self.startTs+5*60;
                 window.clearInterval(self.timeid);
                 self.timeid=null;
                 self.timeid=0;
@@ -2098,16 +2179,55 @@ export default {
             }
             video.playbackRate=val;
         },
-        adjustProcess(val){
+        async adjustProcess(val){
             console.log(val);
             let self = this;
             let video=document.getElementById('previewVideo');
             let curTime=video.player.currentTime();
-            switch(val){
-                case 0:video.player.currentTime(curTime-10);break;
-                case 1:video.player.currentTime(curTime-30);break;
-                case 2:video.player.currentTime(curTime-60);break;
+            console.log(curTime);
+            let time = parseInt(self.currentTimeValue);
+          console.log(self.realTimeStartTs);
+          console.log(time);
+          // self.startTs=self.startTs+ time;
+          switch(val){
+                case 0: {
+                    self.realTimeStartTs = self.realTimeStartTs - 10;
+                    if(curTime > 10){
+                      video.player.currentTime(curTime-10);
+                    }
+                    else{
+                      console.log(self.realTimeStartTs);
+                      self.stopVideo();
+                      self.realTime();
+                    }
+                    break;
+                }
+                case 1: {
+                  self.realTimeStartTs = self.realTimeStartTs - 30;
+                  if(curTime > 30){
+                    video.player.currentTime(curTime-30);
+                  }
+                  else{
+                    console.log(self.realTimeStartTs);
+                    self.stopVideo();
+                    self.realTime();
+                  }
+                  break;
+                }
+                case 2: {
+                  self.realTimeStartTs = self.realTimeStartTs - 60;
+                  if(curTime > 60){
+                    video.player.currentTime(curTime-60);
+                  }
+                  else{
+                    console.log(self.realTimeStartTs);
+                    self.stopVideo();
+                    self.realTime();
+                  }
+                }
+                break;
             }
+          //self.stopAndAdjustProcessHistoryVideo();
         },
         controlScreen(){
             let self=this;
@@ -2435,6 +2555,7 @@ export default {
             window.clearInterval(self.timerPlayReal);
             self.realTimeSpeed=0;
             if(self.playBackState){
+                self.realTimeStartTs = self.startTs;
                 let ret=await dashAPI.playBack(0,dataDis);
                 await dashAPI.Offline(self.sessionId);
                 let sessionId= await dashAPI.Online();

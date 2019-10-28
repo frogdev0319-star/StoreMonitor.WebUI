@@ -217,8 +217,10 @@ export default {
             lang: this.$i18n.locale,
             isFirstLoad: false, //是否首次加载
             order: '',
+          ifChangeAccount: false,
           numberOfElements: 0,
-          totalElements: 0
+          totalElements: 0,
+          sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }],
         }
 
     },
@@ -240,8 +242,15 @@ export default {
         accountChanged(val,oldVal){
             console.log(val);
             let self=this;
-            if(val!=0){
-                self.searchEventList(false);
+            if(val!=0) {
+              console.log(self.dateValue)
+              self.searchEventList(false)
+              window.setTimeout(function(){
+                  self.$route.meta.keepAlive = true;
+                  console.log(self.$route.meta.keepAlive);
+                },
+                300);
+              self.ifChangeAccount = true;
             }
         },
         numberOfElements(val,oldVal){
@@ -399,8 +408,18 @@ export default {
             self.params.beginTs=startStr;
             self.params.endTs=endStr;
             self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            this.getEventList(this.params);
-        },
+            console.log(self.params);
+            let curTabSortColumn = self.sortColumnOfTab[tabIndex];
+              let order = curTabSortColumn.sortType.order;
+              let prop = curTabSortColumn.sortType.prop;
+              if(order!= '' && prop != ''){
+                self.params.order={
+                  "direction": order,
+                  "property": prop
+                }
+              }
+              this.getEventList(self.params);
+          },
         //点击状态搜索时，总共需要时间范围，状态
         selectChange(val){
             console.log(val);
@@ -612,22 +631,31 @@ export default {
             let column=col.column;
             let order=col.order;
             self.order = order;
+            let prop  = '';
+            let tempOrder = '';
             if(order=="ascending"){
                 self.params.order={
                     "direction":"asc",
                     "property":col.column.property
                 }
+              prop = col.column.property;
+              tempOrder =  "asc";
             }
             else if(order=="descending"){
                 self.params.order={
                     "direction":"desc",
                     "property": col.column.property
                 }
+                prop = col.column.property;
+                tempOrder =  "desc";
             }
             else{
                 self.params.order={};
             }
-            self.params.filter={
+            self.sortColumnOfTab[tabIndex].sortType.prop = prop;
+            self.sortColumnOfTab[tabIndex].sortType.order = tempOrder;
+          console.log(self.sortColumnOfTab);
+          self.params.filter={
                 page:self.tableDataList[tabIndex].page-1,
                 size:self.tableDataList[tabIndex].sizeNum
             }
@@ -942,7 +970,6 @@ export default {
            }
          ],
         self.getDeafultTime();
-        //await self.isLoginIn();
         let windowHeight=window.innerHeight;
         if(windowHeight>800){
           self.tableHeight=770+'px';
@@ -950,38 +977,16 @@ export default {
         console.log(self.tableHeight);
         self.getUserId();
         self.getInitList();
-        let initDateStr=util.getDateStr1(new Date().getTime()-3600*1000*24)+' ~ '+util.getDateStr1(new Date().getTime());
-        self.dateInputStr=initDateStr;
-        var ins1=laydate.render({
-          elem: '#dateinput',
-          type: 'datetime',
-          range: '~',
-          value: initDateStr,
-          btns: ['confirm'],
-          max:util.getDateStr1(new Date().getTime()),
-          /*ready: function(date){
-              console.log(date);
-              console.log(self.dateInputStr);
-              let dateStr=self.getInitDateStr();
-              console.log(dateStr);
-              self.dateInputStr=dateStr;
-              ins1.config.value=dateStr;
-              //ins1.hint(dateStr); /*打开后的提示信息*/
-          //},
-          done: (value) => {
-            console.log(value);
-            self.dateInputStr = value;
-            self.dateChangeInput(value);
-            //ins1.hint(value);
-          }
-        });
+
       }
     },
     created(){
+      console.log('created')
       this.isFirstLoad = true
     },
     async mounted(){
         let self=this;
+        console.log('mounted')
         self.getDeafultTime();
         await self.isLoginIn();
         let windowHeight=window.innerHeight;
@@ -994,74 +999,90 @@ export default {
 
         let initDateStr=util.getDateStr1(new Date().getTime()-3600*1000*24)+' ~ '+util.getDateStr1(new Date().getTime());
         self.dateInputStr=initDateStr;
-        var ins1=laydate.render({
-            elem: '#dateinput',
-            type: 'datetime',
-            range: '~',
-            value: initDateStr,
-            btns: ['confirm'],
-            max:util.getDateStr1(new Date().getTime()),
-            /*ready: function(date){
-                console.log(date);
-                console.log(self.dateInputStr);
-                let dateStr=self.getInitDateStr();
-                console.log(dateStr);
-                self.dateInputStr=dateStr;
-                ins1.config.value=dateStr;
-                //ins1.hint(dateStr); /*打开后的提示信息*/
-        //},
-            done: (value) => {
-                console.log(value);
-                self.dateInputStr = value;
-                self.dateChangeInput(value);
-                //ins1.hint(value);
-            }
-        });
     },
-    // beforeRouteLeave (to, from, next) {
-    //   console.log(this.params);
-    //     if(to.name=='eventDetails'){
-    //         if(!from.meta.keepAlive){
-    //             from.meta.keepAlive=true;
-    //
-    //         }
-    //       next();
-    //     }
-    //     else{
-    //         from.meta.keepAlive=false;
-    //       next()
-    //     }
-    // },
-    beforeRouteEnter (to, from, next) {
-      if(from.name=='eventDetails'&& to.name == 'eventManage'){
-        to.meta.isBack = true;
-        next();
-      }
-      else{
-        to.meta.isBack = false;
-        next();
-      }
-        // if(from.name!='eventDetails'&&from.path!='/'){
-        //     to.meta.keepAlive=true;
-        // }
-        // else{
-        //     to.meta.keepAlive=true;
-        // }
-        // next(vm => {
-        //    console.log(vm);
-        // });
-    },
-    activated(){
-        let self=this;
-        if(!self.$route.meta.isBack || self.isFirstLoad){
-          self.initData();
+  beforeRouteEnter (to, from, next) {
+    if(from.name=='eventDetails'&& to.name == 'eventManage'){
+      to.meta.isBack = true;
+      next();
+    }
+    else{
+      to.meta.isBack = false;
+      next();
+    }
+  },
+  activated(){
+    let self=this;
+    console.log('调用')
+    if(!self.$route.meta.isBack || self.isFirstLoad){
+      console.log('调用initData')
+    }
+    else{
+      self.getEventList(self.params);
+    }
+    self.$route.meta.isBack = false;
+    self.isFirstLoad = false;
+  },
+    beforeRouteLeave (to, from, next) {
+      console.log(this.params);
+        if(to.name != 'eventDetails'){
+          from.meta.keepAlive = false;
+          next(vm=>{
+            console.log(vm)
+          });
         }
         else{
-          self.getEventList(self.params);
+          from.meta.keepAlive = true;
+          next(vm=>{
+            console.log(vm)
+          });
         }
-      self.$route.meta.isBack = false;
-      self.isFirstLoad = false;
-    }
+    },
+    // beforeRouteEnter (to, from, next) {
+    //   console.log(to);
+    //   to.meta.keepAlive=true;
+    //   next(vm => {
+    //     console.log(vm);
+    //     // let queryStr = sessionStorage.getItem('queryparams')
+    //     // vm.params = JSON.parse(queryStr);
+    //     // if(from.name=='eventDetails' && to.name == 'eventManage'){
+    //     //   console.log(vm.params)
+    //     //   vm.getEventList(vm.params);
+    //     // }
+    //   });
+    // },
+    // activated(){
+    //     let self=this;
+    //     self.getEventList(self.params);
+    // }
+    // beforeRouteLeave (to, from, next) {
+    //   if(to.name=='eventDetails'){
+    //     if(!from.meta.keepAlive){
+    //       from.meta.keepAlive=true;
+    //     }
+    //   }
+    //   else{
+    //     from.meta.keepAlive=false;
+    //     //this.$destroy();
+    //   }
+    //   next();
+    // },
+    // beforeRouteEnter (to, from, next) {
+    //   if(from.name!='eventDetails'&&from.path!='/'){
+    //     to.meta.keepAlive=false;
+    //   }
+    //   else{
+    //     to.meta.keepAlive=true;
+    //   }
+    //   next(vm => {
+    //     console.log(vm);
+    //   });
+    // },
+    // activated(){
+    //   console.log('activated 调用')
+    //   let self=this;
+    //   console.log(self.params);
+    //   self.getEventList(self.params);
+    // }
 }
 </script>
 

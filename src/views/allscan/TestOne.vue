@@ -16,6 +16,7 @@
         :picker-options='dateOpt'
         start-placeholder="开始日期"
         end-placeholder="结束日期"
+        :default-time="['00:00:00', '23:59:59']"
         @change="dateChange"
         unlink-panels
       >
@@ -170,10 +171,10 @@
     },
     data(){
       return{
-        dateValue:[this.$moment().startOf('month').toDate(), new Date()],
+        dateValue:[this.$moment().startOf('month').toDate(), this.$moment(new Date).endOf('d').toDate()],
         dateOpt: {
           disabledDate:(time)=>{
-            return time.getTime() > Date.now();
+            return time.getTime() > this.$moment(new Date).endOf('d').toDate();
           }
         },
         toolTipClass: 'page-login-toolTipClass',
@@ -315,7 +316,7 @@
           self.storeIds = [];
           self.storeName = this.$t('overview.all');
           self.getAllStoreList();
-          self.dateValue = [this.$moment().startOf('month').toDate(), new Date()];
+          self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date).endOf('d').toDate()];
           let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
           let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
           self.params.beginTs = start;
@@ -358,7 +359,8 @@
             duration:3*1000
           })
           start=end-3600*24*7*1000;
-          self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+          start = self.$moment(start).startOf('d').toDate().valueOf();
+          self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         if(daysDiff > 365){  //当前选择的时间范围超过365天
           Message({
@@ -367,10 +369,11 @@
             duration:3*1000
           })
           start=end-3600*24*365*1000;
-          self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+          start = self.$moment(start).startOf('d').toDate().valueOf();
+          self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         else{
-          self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
+          self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         daysDiff = self.$moment(end).diff(start, 'days');
         daysDiff <=30 ? self.timeMode = 1 : self.timeMode = 2;
@@ -532,13 +535,13 @@
         sourcePieList.forEach((item, index)=>{
           sumEvent+= item.numOfEvent;
           if(index == 0){
-            remoteEventNum = item.numOfEvent;
+            storeEventNum = item.numOfEvent;
           }
           else if(index == 1){
-            onsiteEventNum = item.numOfEvent;
+            remoteEventNum = item.numOfEvent;
           }
           else if(index == 2){
-            storeEventNum = item.numOfEvent;
+            onsiteEventNum = item.numOfEvent;
           }
         })
         let totalArray = [remoteEventNum, onsiteEventNum, storeEventNum];

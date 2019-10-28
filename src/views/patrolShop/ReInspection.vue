@@ -3977,4 +3977,7 @@ export default {
     .des-input .el-textarea__inner{
         font-family: 'Microsoft YaHei';
     }
+  /*.score-menu.el-dropdown-menu{*/
+    /*z-index: 0 !important;*/
+  /*}*/
 </style>
