@@ -1,7 +1,6 @@
 export default {
   lengthFilter(content,count){
     content = content.replace(/(^\s*)/g, "");
-
     if (content.replace(/[^\x00-\xff]/g, '**').length <= count) {
       return content;
     }
@@ -38,5 +37,9 @@ export default {
     let emojiContent = this.emojiFilter(content);
     return (count != null) ? this.lengthFilter(emojiContent,count) : emojiContent;
   },
+  getContentLength(content){
+    let length = content.replace(/[^\x00-\xff]/g, '**').length;
+    return length;
+  }
 }
 

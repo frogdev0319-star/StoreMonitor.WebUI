@@ -1266,7 +1266,7 @@
             bestJson.storeSort = self.$t("overview.starStore");
             bestJson.storeName = bestStore.storeName;
             bestJson.iconSrc = self.bestStoreIcon;
-            bestJson.qualifiedRate = self.$t("overview.passRate")+ self.toPercent(bestStore.qualifiedRate);
+            bestJson.qualifiedRate = self.$t("overview.passRate")+ bestStore.qualifiedRate + '%';
             storesArray.push(bestJson)
           }
           else{
@@ -1281,7 +1281,7 @@
             worstJson.storeSort=self.$t("overview.backwordStroe");
             worstJson.storeName = worstStore.storeName;
             worstJson.iconSrc = self.worstStoreIcon;
-            worstJson.qualifiedRate = self.$t("overview.passRate") +  self.toPercent(worstStore.qualifiedRate);
+            worstJson.qualifiedRate = self.$t("overview.passRate") +  worstStore.qualifiedRate + '%';
             storesArray.push(worstJson)
           }
           else{

@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-device" :style="{'min-height':varyWindowHeight-120+'px'}">
+  <el-row class="el-device" :style="{'height':varyWindowHeight-120+'px'}">
     <el-col :span="24" class="el-btns">
       <div style="display:inline-block;" v-if="activeName=='dash'">
         <el-button @click="connectServer"  :size="varWindowWidth>1680?'small':'mini'" class="btns" type="primary">
@@ -608,10 +608,10 @@
     computed:{
       varyDivHeight:function(){
         if(this.varyWindowHeight>800){
-          return this.varyWindowHeight*0.65;
+          return this.varyWindowHeight*0.62;
         }
         else if(this.varyWindowHeight>700){
-          return this.varyWindowHeight*0.60;
+          return this.varyWindowHeight*0.45;
         }
         else{
           return this.varyWindowHeight*0.526;

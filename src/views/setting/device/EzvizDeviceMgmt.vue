@@ -1,87 +1,7 @@
 <template>
-  <el-row class="el-device" :style="{'min-height':varyWindowHeight-120+'px'}">
+  <el-row class="el-device" :style="{'height':varyWindowHeight-220+'px'}">
     <el-col :span="24" class="el-btns">
-      <!--<div style="display:inline-block;" v-if="activeName=='ezvizAccount'">-->
-        <!--<el-button @click="showAddEzvizAccount"  :size="varWindowWidth>1680?'small':'mini'" class="btns" type="primary">-->
-          <!--新增萤石云账号-->
-        <!--</el-button>-->
-        <!--<el-dialog title="新增萤石云账号"-->
-                   <!--:visible.sync="showAddAccount" v-if="showAddAccount"-->
-                   <!--:append-to-body='true'-->
-                   <!--:close-on-click-modal="false"-->
-                   <!--width="28%"-->
-                   <!--top="35vh"-->
-                   <!--left="40vh" customClass="addNvr"-->
-        <!--&gt;-->
-          <!--<div class="dialog-content" style="overflow:hidden;width:100%;">-->
-            <!--<hr style="border: 0.5px solid #f31d65;"/>-->
-            <!--<el-form :model="ezvizAccountInfo" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">-->
-              <!--<el-form-item style="height: 57px;">-->
-                <!--<el-col :span="13">-->
-                  <!--<el-form-item prop="ezvizAccount" label="萤石账号类型">-->
-                    <!--<el-select v-model="ezvizAccountInfo.scope" :placeholder="generateDeviceLang('selectStore')" style="width: 100%;">-->
-                      <!--<option v-for="item in ezvizScopes"-->
-                              <!--:key="item.value"-->
-                              <!--:label="item.label">-->
-                      <!--</option>-->
-                    <!--</el-select>-->
-                  <!--</el-form-item>-->
-                <!--</el-col>-->
-                <!--<el-col :span="9" :offset="2">-->
-                  <!--<el-form-item label="门店名称" prop="storeId">-->
-                    <!--<el-select v-model="ezvizAccountInfo.scope" :placeholder="generateDeviceLang('selectStore')" style="width: 100%;">-->
-                      <!--<el-option-->
-                        <!--v-for="item in storeDataList"-->
-                        <!--:key="item.storeId"-->
-                        <!--:label="item.label"-->
-                        <!--:value="item.storeId">-->
-                      <!--</el-option>-->
-                    <!--</el-select>-->
-                  <!--</el-form-item>-->
-                <!--</el-col>-->
-              <!--</el-form-item>-->
-              <!--<el-form-item style="height: 57px;">-->
-                <!--<el-col :span="24">-->
-                  <!--<el-form-item prop="name" label="萤石账号名称">-->
-                    <!--<el-input placeholder="请输入萤石账号名称" v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;"></el-input>-->
-                  <!--</el-form-item>-->
-                <!--</el-col>-->
-              <!--</el-form-item>-->
-              <!--<el-form-item>-->
-                <!--<el-col :span="24">-->
-                  <!--<el-form-item prop="name" label="萤石开发者服务">-->
-                    <!--<el-form class="ezviz-form" >-->
-                      <!--<el-col :span="24">-->
-                        <!--<el-form-item prop="appKey" label="AppKey">-->
-                          <!--<el-input placeholder="请输入AppKey" v-model="ezvizAccountInfo.appKey" style="width: 100%;"></el-input>-->
-                        <!--</el-form-item>-->
-                      <!--</el-col>-->
-                      <!--<el-col :span="24">-->
-                        <!--<el-form-item prop="appSecret" label="AppSecret">-->
-                          <!--<el-input placeholder="请输入Secret" v-model="ezvizAccountInfo.appSecret" style="width: 100%;"></el-input>-->
-                        <!--</el-form-item>-->
-                      <!--</el-col>-->
-                      <!--<el-col :span="18">-->
-                        <!--<el-form-item prop="appSecret" label="AccessToken">-->
-                          <!--<el-input placeholder="请获取AccessToken" v-model="ezvizAccountInfo.appSecret" style="width: 100%;"></el-input>-->
-                        <!--</el-form-item>-->
-                      <!--</el-col>-->
-                      <!--<el-col :span="6">-->
-                        <!--<el-button>获取</el-button>-->
-                      <!--</el-col>-->
-                    <!--</el-form>-->
-                  <!--</el-form-item>-->
-                <!--</el-col>-->
-              <!--</el-form-item>-->
-            <!--</el-form>-->
-          <!--</div>-->
-          <!--<div slot="footer" class="dialog-footer">-->
-            <!--<el-button class="file-cancel-btn" @click="showAddNvrDialog = false" size="mini" style="">{{generateDeviceLang('cancle')}}</el-button>-->
-            <!--<el-button class="file-confirm-btn" @click="addSingleNvr" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>-->
-          <!--</div>-->
-        <!--</el-dialog>-->
-      <!--</div>-->
-      <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;">
+      <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-if="activeName=='device'">
         <el-input
           v-if="false"
           size="small"
@@ -139,50 +59,10 @@
       </el-col>
     </el-col>
     <el-col :span="24" class="el-tabPanels">
-      <el-tabs v-model="activeName" :id="lang=='en'? 'en-devicetabs-content': ''">
-        <!--<el-tab-pane label="萤石云账号管理" name="ezvizAccount">-->
-          <!--<div class="el-table-content">-->
-            <!--<el-table-->
-              <!--:data="tableData"-->
-              <!--:highlight-current-row="true"-->
-              <!--empty-text="无数据"-->
-              <!--align='left'-->
-              <!--border-->
-              <!--stripe-->
-              <!--style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">-->
-              <!--<el-table-column v-for="(item,index) in tableInfoData" :key="index"-->
-                               <!--:prop="item.prop" :label="item.label"  :min-width="item.width">-->
-              <!--</el-table-column>-->
-              <!--<el-table-column-->
-                <!--prop="option"-->
-                <!--label="操作"-->
-                <!--min-width="90"-->
-                <!--align="left">-->
-                <!--<template slot-scope="scope">-->
-                  <!--<i class="iconfont icon-bianji" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>-->
-                  <!--<i class="iconfont icon-shanchu" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>-->
-                <!--</template>-->
-              <!--</el-table-column>-->
-              <!--<div slot="empty">-->
-                <!--<div>-->
-                  <!--<i class="iconfont icon-zhengque empty-data-icon"></i>-->
-                  <!--<span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">无数据</span>-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</el-table>-->
-            <!--<div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">-->
-              <!--<el-pagination background small-->
-                             <!--:page-sizes="[10, 20, 50, 100]"-->
-                             <!--@size-change="sizeChange"-->
-                             <!--@current-change="currentChange"-->
-                             <!--layout="jumper,total, prev, pager, next,sizes"-->
-                             <!--:page-size="sizeNum" :total="total"-->
-                             <!--:current-page="page"-->
-                             <!--style="float:right;margin-top:15px;">-->
-              <!--</el-pagination>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</el-tab-pane>-->
+      <el-tabs v-model="activeName" :id="lang=='en'? 'en-devicetabs-content': ''" @tab-click="handleClick">
+        <el-tab-pane :label="generateDeviceLang('ezvizAccountSetting')" name="ezvizAccount">
+          <ezviz-account></ezviz-account>
+        </el-tab-pane>
         <el-tab-pane :label="generateDeviceLang('deviceManage')" name="device">
           <el-col :span="lang=='en' && varWindowWidth<1920? 11: 10" class="lisde">
             <div class="nvr-info">
@@ -364,6 +244,16 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
+                </el-form-item>
+                <el-form-item :label="generateDeviceLang('ezvizAccount')" prop="ezvizAccount">
+                  <el-select v-model="addDeviceData.ezvizAccount" :placeholder="generateDeviceLang('selectEzvizAccount')" style="width: 100%;" :disabled="isAddAgain">
+                    <el-option
+                      v-for="item in ezvizAccountList"
+                      :key="item.id"
+                      :label="item.accountName"
+                      :value="item.ezvizAccount">
+                    </el-option>
+                  </el-select>
                 </el-form-item>
                 <el-form-item :label="generateDeviceLang('store')" prop="storeId">
                   <el-select v-model="addDeviceData.storeId" :placeholder="generateDeviceLang('selectStore')" style="width: 100%;" :disabled="isAddAgain">
@@ -574,13 +464,15 @@
   import { mapMutations,mapGetters} from 'vuex'
   import {generateDeviceLang} from '@/api/i18n'
   import {getStoreList} from '@/api/store'
+  import EzvizAccount from "./EzvizAccount";
 
   export default {
     name:'NvrDeviceMgmt',
+    components: {EzvizAccount},
     data(){
       return{
         dash:{},
-        activeName:'device',
+        activeName:'ezvizAccount',
         total:0,
         page:1,
         sizeNum:10,
@@ -627,7 +519,7 @@
         curNVRItem:null,
         lang: this.$i18n.locale,
         showAddNvrDialog: false,
-        addDeviceData: {name: '', validationCode: '', storeId: '',serialNumber: '', channelCount: 1},
+        addDeviceData: {name: '', validationCode: '', storeId: '',serialNumber: '', channelCount: 1, ezvizAccount: ''},
         channelNumList: [
           {
             value: 1,
@@ -709,6 +601,9 @@
           channelCount: [
             {required: true, message: this.$t('deviceView.selectChannelNum'), trigger: 'change' }
           ],
+          ezvizAccount: [
+            {required: true, message: this.$t('deviceView.selectEzvizAccount'), trigger: 'change' }
+          ],
           storeId: [
             {required: true, message: this.$t('deviceView.selectStore'), trigger: 'change' }
           ]
@@ -732,46 +627,9 @@
         file:'',
         deleteChannelId: 0,
         isUpdate: false,
-        tableData:[],
-        tableInfoData:[
-        {
-          "prop":"ezvizAccount",
-          "label": '账号名称',
-          "width":130,
-        },
-        {
-          "prop":"accountType",
-          "label": '账号类型',
-          "width":120
-        },
-        {
-          "prop":"storeName",
-          "label": '所属门店',
-          "width":100
-        },
-      ],
-        ezvizAccountInfo: {
-          ezvizAccount : '',
-          appKey: '',
-          appSecret: '',
-          accessToken: '',
-          scope: '',
-          target: '',
-          comment: ''
-        },
-        showAddAccount: false,
-        ezvizScopes: [
-          {
-            'label': '企业账号',
-            'value': 0,
-          },
-          {
-            'label': '个人账号',
-            'value': 1
-          }
-        ],
         deviceNameTemp: '',
         channelCountTemp: 0,
+        ezvizAccountList: [],
       }
     },
     watch:{
@@ -781,13 +639,14 @@
         if(val!=0){
           self.InitData();
           self.getAllStoreList();
+          self.getAccountList();
         }
       }
     },
     computed:{
       varyDivHeight:function(){
         if(this.varyWindowHeight>800){
-          return this.varyWindowHeight*0.65;
+          return this.varyWindowHeight*0.50;
         }
         else if(this.varyWindowHeight>700){
           return this.varyWindowHeight*0.60;
@@ -802,6 +661,19 @@
     },
     methods:{
       generateDeviceLang,
+      handleClick(tabs){
+        console.log(tabs);
+        let self=this;
+        let index=Number(tabs.index);
+        switch(index){
+          case 0:
+            self.getAccountList();
+            break;
+          case 1:
+            self.InitData();
+            break;
+        }
+      },
       handleChange (file, fileList) {
         this.addChannelData.pictureUrl = file.url;
         this.addChannelData.file = file;
@@ -1578,6 +1450,7 @@
           params.syncToEzviz = false;
           params.channelCount = obj.channelCount;
           params.validationCode = obj.validationCode;
+          params.ezvizAccount = obj.ezvizAccount;
           console.log(params);
           ezvizRESTful.updateEzvizDevice(params).then(res => {
             let errMsg = res.errMsg;
@@ -1613,7 +1486,7 @@
                 self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
                 self.showAddNvrDialog = false;
               }
-              self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1};
+              self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1, ezvizAccount: ''};
               self.page = 1;
               let params = {
                 "filter": {
@@ -1738,7 +1611,7 @@
       showAddDialog(){
         let self = this;
         self.showAddNvrDialog = true;
-        self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1};
+        self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1, ezvizAccount: ''};
       },
       confirmEditNvr(index,item){
         let self=this;
@@ -1856,6 +1729,21 @@
         var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
         return sortFun;
       },
+      async getAccountList(){
+        let self = this;
+        self.tableData = [];
+        let retData = await self.getEzvizAccountList();
+        let accountList = retData.data;
+        console.log(accountList)
+        self.ezvizAccountList = accountList;
+      },
+      getEzvizAccountList(){
+        return new Promise((resolve,reject)=>{
+          ezvizRESTful.getEzvizAccountList().then(result=>{
+            resolve(result);
+          })
+        })
+      },
       notify(msg,type,time) {
         this.$message({
           message: msg,
@@ -1863,46 +1751,14 @@
           duration:time
         });
       },
-      showAddEzvizAccount(){
-        let self = this;
-        self.showAddAccount = true;
-      },
-      async getAccountList(){
-        let self = this;
-        let retData = await self.getEzvizAccountList();
-        let accountList = retData.data.content;
-        accountList.forEach(item=>{
-          item.accountType = item.scope == 0 ? '企业账号': '个人账号';
-          let storeId = item.target;
-          if(item.scope == 0){
-            item.storeName = '全部门店';
-          }
-          else{
-            self.storeDataList.forEach(_item=>{
-              if(storeId == _item.storeId){
-                item.storeName = _item.storeId;
-              }
-            })
-          }
 
-        })
-        console.log(accountList)
-        self.tableData = accountList;
-      },
-       getEzvizAccountList(){
-        return new Promise((resolve,reject)=>{
-          deviceRESTful.getEzvizAccountList().then(result=>{
-            resolve(result);
-          })
-        })
-      }
     },
 
     mounted(){
       let self=this;
       self.InitData();
       self.getAllStoreList();
-      //self.getAccountList();
+      self.getAccountList();
     },
   }
 </script>

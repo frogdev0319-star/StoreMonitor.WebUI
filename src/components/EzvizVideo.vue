@@ -4,7 +4,7 @@
       <span>{{errorMsg}}</span>
     </div>
     <div v-else>
-      <div class="video-content"  id="videoContent" ref="videoContent"
+      <div class="video-content"  id="videoContent" ref="videoContent" :style="isEvent?{}: {'margin-bottom': 0}"
            @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-if="!fullWindow"
            v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0.8)">
         <!-- 录像时的动画 -->
@@ -283,6 +283,10 @@
       },
       curTime:{
         type: Number
+      },
+      storeId:{
+        type: String,
+        default: ''
       }
     },
     data(){
@@ -379,20 +383,17 @@
         recorder: null,
         isRecordingStarted: false,
         isStoppedRecording: true,
-        blob: null
+        blob: null,
+        ezvizExpireTime: 0,
+        currentStoreId: null
       }
     },
     async mounted(){
       let self=this;
-      let result = await self.getEzvizAccessToken();
-      if(result.errCode=='0' && result.data != {}){
-        self.accessToken = result.data.accessToken;
-        console.log(self.accessToken)
-      }
-      else{
-        self.accessToken = '';
-      }
+      console.log(self.storeId)
+      console.log(self.accessToken)
       if(!self.isStoreMonitor){
+        let result = await self.getEzvizAccessToken(self.storeId);
         self.checkIfEncry();
       }
       else{
@@ -462,7 +463,9 @@
         //stop video
         self.stopRealTime();
         //首先查看视频是否加密
-        self.checkIfEncry();
+        if(self.accessToken.length > 0){
+          await self.checkIfEncry();
+        }
       },
       realTimeSpeed(val,oldVal){
         let self=this;
@@ -513,6 +516,14 @@
           self.initVideo();
         })
       },
+      storeId(newValue, oldValue){
+        console.log(newValue);
+        console.log(oldValue);
+        let self = this;
+        if(newValue.length > 0){
+          self.getEzvizAccessToken(newValue)
+        }
+      }
     },
     computed:{
       graphBtnWidth:function(){
@@ -596,21 +607,32 @@
           self.exitFullscreen()
         }
       },
-      getEzvizAccessToken(){
+      getEzvizAccessToken(storeId){
         let self=this;
+        let params = {};
+        params.storeId = storeId;
         return new Promise((resolve,reject)=>{
-          getEzvizAccessToken().then(res=>{
-            console.log(res);
-            resolve(res);
-          })
+          if(self.currentStoreId == storeId && (Date.parse(new Date()) < self.ezvizExpireTime)){
+            resolve(self.accessToken);
+          }else{
+            getEzvizAccessToken(params)
+              .then(result => {
+                resolve(result.data.accessToken);
+
+                self.currentStoreId = storeId;
+                self.accessToken = result.data.accessToken;
+                self.ezvizExpireTime = result.data.expireTime;
+              })
+              .catch(error => {
+                reject();
+              })
+          }
         })
       },
       async checkIfEncry(){
         let self = this;
         let obj={};
-        if(self.accessToken == ''){
-          return;
-        }
+        console.log(self.accessToken)
         obj.accessToken= self.accessToken;// token
         obj.deviceSerial= self.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
@@ -795,6 +817,10 @@
           }
           case 5402:{
             msg = self.$t('storeMonitor.noHistoryVideo');
+            break;
+          }
+          case 5544:{
+            msg = self.$t('storeMonitor.noVideoSource');
             break;
           }
           default:{
@@ -1902,7 +1928,6 @@
     @include point(min-width,500);
     @include point(min-height,408);
     background-color: #000;
-    margin-bottom: 0;
     .getvideo-content{
       position: absolute;
       z-index: 930;
