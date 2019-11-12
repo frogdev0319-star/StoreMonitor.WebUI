@@ -38,7 +38,16 @@ export default {
     leftBracket: '(',
     rightBracket: ')',
     patrolOverview: 'Patrol statistics',
-    eventOverview: 'Event statistics'
+    eventOverview: 'Event statistics',
+    titleManage: 'Title Management',
+    titleSetting: 'Title Management Setting',
+    patrolShop: 'Patrol Management/Daily Patrol Shop',
+    patrolPlan: 'Patrol Plan (To be Patrolled)',
+    statisticalAna: 'Statistical Analysis',
+    patrolAppraisalStat: 'Patrol Appraisal Statistics',
+    patrolItemsStat: 'Patrol Item Statistics',
+    eventStat: 'Event Processing Statistics',
+    supervisorStat: 'Supervisory Efficiency Statistics'
   },
   overview:{
     'date': 'Date',
@@ -94,7 +103,7 @@ export default {
     'pending': 'Pending',
     'done': 'Done',
     'closed': 'Closed',
-    'eventHading': 'Event hanling in store',
+    'eventHading': 'Event handling in store',
     'pendingEvent': 'Pending events',
     selectStores: 'Select Store',
     rankType: 'Rank Type',
@@ -175,7 +184,8 @@ export default {
     qualified: 'Qualified',
     unit: '',
     summaryInfo: 'Please select overall summary!',
-    allIgnored: 'All inspection items are ignored, please re-evaluate'
+    allIgnored: 'All inspection items are ignored, please re-evaluate',
+    videoLicense: "Please contact your supervisor for video access license",
   },
   // Store Monitor page language
   storeMonitor:{
@@ -249,7 +259,8 @@ export default {
     initialCode : 'Look for initial code on the device label',
     videoEncrypted: 'Video is encrypted',
     deviceOffline: 'Device offline',
-    lackParams: 'Lack of necessary parameters'
+    lackParams: 'Lack of necessary parameters',
+    noVideoSource: 'No video source device',
   },
 
   //report management page language
@@ -484,7 +495,43 @@ export default {
     channelOrder: 'Channel Number ',
     nvrNameEmpty: 'NVR name may not be empty',
     channelNameEmpty: 'Channel name may not be empty',
-    deviceNameEmpty: 'Device name may not be empty'
+    deviceNameEmpty: 'Device name may not be empty',
+    ezvizAccountSetting: 'Ezviz Account Settings',
+    addEzvizAccount: 'Add Account',
+    ezvizAccount: 'Account',
+    accountName: 'Account Name',
+    appliedStores: 'Number of applied stores',
+    description: 'Description',
+    noData: 'No Data',
+    addNewAccount: 'Add Ezviz account',
+    updateAccount: 'Edit Ezviz account',
+    deleteAccount: 'Delete Ezviz Account',
+    storeViuAccount: 'StoreViu Account',
+    userAccount: 'User Provided Account',
+    selectAccountType: 'Please Select Account Type',
+    enterAccount: 'Please Enter Account',
+    comment: 'Comment',
+    mobilePhone: 'Account (Mobile Number)',
+    developerService: 'Developer service',
+    confirmAdd: 'Confirm',
+    obtain: 'Obtain',
+    enterAppKey: 'Please Enter AppKey',
+    enterSecret: 'Please Enter Secret',
+    obtainToken: 'Please Obatin Access Token',
+    confirmDelete: 'Confirm Delete Ezviz Account',
+    selectEzvizAccount: 'Please Select Account',
+    canotDeleteInfo: 'The account already has an associated device, not allowed to delete',
+    total: 'Total ',
+    ezvizAccountNum: ' ezviz account: ',
+    storeViuNum: ' storeViu acccount,',
+    userAccountNum: ' business account',
+    appKeyNotExist: 'AppKey does not exist',
+    appKeyFrozen: 'AppKey is frozen',
+    mismatchInfo: 'AppKey does not match Secret',
+    enterCorrentAccount: 'Please enter correct ezviz account',
+    accountExist: 'This account already exists',
+    enterDeveloperKey: 'Please enter full developer key',
+    enterAccountName: 'User name consists of 1~20 Chinese characters, letters or numbers'
   },
   //Store Management page language
   storeView: {
@@ -600,6 +647,30 @@ export default {
     emptyTime: 'Execution time cannot be empty',
     newSchedule: 'New Schedule',
     select: 'Please Select'
+  },
+  titleView:{
+    addTitle: 'Add Title',
+    deleteTitle: 'Delete',
+    titleName: 'Title Name',
+    titleCate: 'Title Category',
+    description: 'Description',
+    operation: 'Operation',
+    save: 'Save',
+    titleSetting: 'Title management settings',
+    roleId1Title: 'Enterprise senior/IT operation and maintenance',
+    roleId2Title: 'Enterprise middle manager',
+    roleId3Title: 'Enterprise grass-roots',
+    roleId4Title: 'Store operator',
+    comment: 'Comment',
+    roleSetting: 'Menu permission configuration',
+    emptyDeleteInfo: 'Please check the title to delete',
+    confirmInfo: 'Confirm Delete',
+    confirmDeleteTitle: 'Confirm delete the title?',
+    deleteSuss: 'Delete Successfully',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    enterTitleName: 'Please enter title name',
+    titleValidateInfo: 'The name of title is 1~20 letters or Chinese characters',
+    saveSuss: 'Save successfully'
   }
-
 }

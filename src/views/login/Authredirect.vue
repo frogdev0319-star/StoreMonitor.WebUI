@@ -22,7 +22,7 @@ export default{
                     // obj.appKey =paramsArray[2].substr(paramsArray[2].indexOf('=')+1);
                     // //obj.lang=paramsArray[3].substr(paramsArray[3].indexOf('=')+1);
                     this.$store.commit('SET_TOKEN',obj.token);
-                    if(obj.ezvizAppKey != ''){
+                    if(obj.ezvizProtocol){
                       this.$store.commit('SET_ISEZVIZ',true);
                       setCookie('isEzviz',true);
                     }

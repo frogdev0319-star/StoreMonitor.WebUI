@@ -39,7 +39,16 @@ export default {
     leftBracket: '（',
     rightBracket: '）',
     patrolOverview: '巡檢统计',
-    eventOverview: '事件统计'
+    eventOverview: '事件统计',
+    titleManage: '職務管理',
+    titleSetting: '職務管理設置',
+    patrolShop: '巡店管理/日常巡店',
+    patrolPlan: '巡檢計劃（待巡檢）',
+    statisticalAna: '統計分析',
+    patrolAppraisalStat: '巡店考評統計',
+    patrolItemsStat: '巡檢項統計',
+    eventStat: '事件處理統計',
+    supervisorStat:'督導效率統計'
   },
   overview:{
     'date': '時間自定',
@@ -176,7 +185,8 @@ export default {
     qualified: '合格',
     unit: '個',
     summaryInfo: '請選擇巡檢總評！',
-    allIgnored: '您已忽略所有巡檢項，請重新評估'
+    allIgnored: '您已忽略所有巡檢項，請重新評估',
+    videoLicense: "無視頻訪問權限，請聯繫上級管理員",
   },
 
   // Store Monitor page language
@@ -251,7 +261,8 @@ export default {
     initialCode : '初始密碼為機身標簽上的驗證碼（密碼區分大小寫）',
     videoEncrypted: '視頻已加密',
     deviceOffline: '設備離線，播放失敗',
-    lackParams: '缺少必要參數'
+    lackParams: '缺少必要參數',
+    noVideoSource: '設備無視頻源'
   },
 
   //report management page language
@@ -490,7 +501,41 @@ export default {
     channelOrder: '通道號',
     nvrNameEmpty: 'NVR 名稱不能為空',
     channelNameEmpty: '通道名稱不能為空',
-    deviceNameEmpty: '設備名稱不能為空'
+    deviceNameEmpty: '設備名稱不能為空',
+    ezvizAccountSetting: '螢石賬號設置',
+    addEzvizAccount: '增加螢石賬號',
+    ezvizAccount: '賬號',
+    accountName: '用戶名',
+    appliedStores: '關聯門店數',
+    description: '描述',
+    noData: '無數據',
+    addNewAccount: '新增螢石賬號',
+    updateAccount: '編輯螢石賬號',
+    deleteAccount: '刪除螢石賬號',
+    selectAccountType: '請選擇賬號類型',
+    enterAccount: '請輸入賬號',
+    comment: '備註',
+    mobilePhone: '賬號（手機號）',
+    developerService: '螢石開發者服務',
+    confirmAdd: '確認添加',
+    obtain: '獲取',
+    enterAppKey: '請輸入AppKey',
+    enterSecret: '請輸入Secret',
+    obtainToken: '請獲取Access Token',
+    confirmDelete: '確認刪除螢石賬號',
+    selectEzvizAccount: '請選擇賬號',
+    canotDeleteInfo: '該賬號已存在關聯設備，不允許刪除',
+    total: '共',
+    ezvizAccountNum: '個螢石賬號',
+    storeViuNum: '個店看看賬號，',
+    userAccountNum: '個企業賬號',
+    appKeyNotExist: 'AppKey不存在',
+    appKeyFrozen: 'AppKey已凍結',
+    mismatchInfo: 'AppKey與Secret不匹配',
+    enterCorrentAccount: '請輸入正確的螢石賬號',
+    accountExist: '該賬號已存在',
+    enterDeveloperKey: '請輸入完整的開發者密鑰',
+    enterAccountName: '用戶名由1~20個漢字、字母或數字組成'
   },
   //Store Management page language
   storeView: {
@@ -605,5 +650,30 @@ export default {
     emptyTime: '執行時間不能為空',
     newSchedule: '新增排程',
     select: '請選擇'
+  },
+  titleView:{
+    addTitle: '新增職務',
+    deleteTitle: '刪除',
+    titleName: '職務名稱',
+    titleCate: '職務類別',
+    description: '描述',
+    operation: '操作',
+    save: '保存',
+    titleSetting: '職務管理設置',
+    roleId1Title: '企業高層/IT運維',
+    roleId2Title: '企業中層',
+    roleId3Title: '企業基層',
+    roleId4Title: '門店運營',
+    comment: '備註說明',
+    roleSetting: '菜單權限配置',
+    emptyDeleteInfo: '請勾選要刪除的職務',
+    confirmInfo: '確認刪除',
+    confirmDeleteTitle: '確認刪除職務',
+    deleteSuss: '刪除成功',
+    confirm: '確認',
+    cancel: '取消',
+    enterTitleName: '請輸入職務名稱',
+    titleValidateInfo: '職務名稱為1~20個字母或漢字',
+    saveSuss: '保存成功'
   }
 }

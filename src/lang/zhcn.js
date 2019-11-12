@@ -20,7 +20,7 @@ export default {
     scheduleManage: '排程设置',
     otherSetting: '其他设置',
     transactionMonitor: '交易巡视',
-    storeChecking: '门店检点',
+    storeChecking: '门店点检',
     my: '我的',
     logOut: '退出登录',
     select: '请选择',
@@ -39,7 +39,16 @@ export default {
     leftBracket: '（',
     rightBracket: '）',
     patrolOverview: '巡检统计',
-    eventOverview: '事件统计'
+    eventOverview: '事件统计',
+    titleManage: '职务管理',
+    titleSetting: '职务管理设置',
+    patrolShop: '巡店管理/日常巡店',
+    patrolPlan: '巡检计划（待巡检）',
+    statisticalAna: '统计分析',
+    patrolAppraisalStat: '巡店考评统计',
+    patrolItemsStat: '巡检项统计',
+    eventStat: '事件处理统计',
+    supervisorStat:'督导效率统计'
   },
   overview:{
     date: '时间自定',
@@ -176,7 +185,8 @@ export default {
     qualified: '合格',
     unit: '个',
     summaryInfo: '请选择巡检总评！',
-    allIgnored: '您已忽略所有巡检项，请重新评估'
+    allIgnored: '您已忽略所有巡检项，请重新评估',
+    videoLicense: "无视频访问权限，请联系上级管理员",
   },
 
   // Store Monitor page language
@@ -251,7 +261,8 @@ export default {
     initialCode : '初始密码为机身标签上的验证码（密码区分大小写）',
     videoEncrypted: '视频已加密',
     deviceOffline: '设备离线，播放失败',
-    lackParams: '缺少必要参数'
+    lackParams: '缺少必要参数',
+    noVideoSource: '设备无视频源'
 },
   //report management page language
   reportView:{
@@ -491,7 +502,43 @@ export default {
     channelOrder: '通道号',
     nvrNameEmpty: 'NVR 名称不能为空',
     channelNameEmpty: '通道名称不能为空',
-    deviceNameEmpty: '设备名称不能为空'
+    deviceNameEmpty: '设备名称不能为空',
+    ezvizAccountSetting: '萤石账号设置',
+    addEzvizAccount: '增加萤石账号',
+    ezvizAccount: '账号',
+    accountName: '用户名',
+    appliedStores: '关联门店数',
+    description: '描述',
+    noData: '无数据',
+    addNewAccount: '新增萤石账号',
+    updateAccount: '编辑萤石账号',
+    deleteAccount: '删除萤石账号',
+    storeViuAccount: '店看看账号',
+    userAccount: '客户萤石账号',
+    selectAccountType: '请选择账号类型',
+    enterAccount: '请输入账号',
+    comment: '备注',
+    mobilePhone: '账号（手机号）',
+    developerService: '萤石开发者服务',
+    confirmAdd: '确认添加',
+    obtain: '获取',
+    enterAppKey: '请输入AppKey',
+    enterSecret: '请输入Secret',
+    obtainToken: '请获取Access Token',
+    confirmDelete: '确认删除萤石账号',
+    selectEzvizAccount: '请选择萤石账号',
+    canotDeleteInfo: '该账号已存在关联设备，不允许删除',
+    total: '共',
+    ezvizAccountNum: '个萤石账号',
+    storeViuNum: '个店看看账号，',
+    userAccountNum: '个企业账号',
+    appKeyNotExist: 'AppKey不存在',
+    appKeyFrozen: 'AppKey已冻结',
+    mismatchInfo: 'AppKey与Secret不匹配',
+    enterCorrentAccount: '请输入正确的萤石账号',
+    accountExist: '该账号已存在',
+    enterDeveloperKey: '请输入完整的开发者密钥',
+    enterAccountName: '用户名由1~20个汉字、字母或数字组成'
   },
 
   //Store Management page language
@@ -607,5 +654,30 @@ export default {
     emptyTime: '执行时间不能为空',
     newSchedule: '新增排程',
     select: '请选择'
+  },
+  titleView:{
+    addTitle: '新增职务',
+    deleteTitle: '删除',
+    titleName: '职务名称',
+    titleCate: '职务类别',
+    description: '描述',
+    operation: '操作',
+    save: '保存',
+    titleSetting: '职务管理设置',
+    roleId1Title: '企业高层/IT运维',
+    roleId2Title: '企业中层',
+    roleId3Title: '企业基层',
+    roleId4Title: '门店运营',
+    comment: '备注说明',
+    roleSetting: '菜单权限配置',
+    emptyDeleteInfo: '请勾选要删除的职务',
+    confirmInfo: '确认删除',
+    confirmDeleteTitle: '确认删除职务',
+    deleteSuss: '删除成功',
+    confirm: '确认',
+    cancel: '取消',
+    enterTitleName: '请输入职务名称',
+    titleValidateInfo: '职务名称为1~20个字母或汉字',
+    saveSuss: '保存成功'
   }
 }

@@ -18,6 +18,7 @@ Vue.use(BootstrapVue)
 
 import store from './store/index.js';
 import i18n from './lang'
+import './permission' // permission control
 import $ from 'jquery';
 import jquery from 'jquery';
 import moment from 'moment';

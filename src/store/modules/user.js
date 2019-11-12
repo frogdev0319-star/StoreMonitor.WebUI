@@ -1,7 +1,9 @@
-import {loginByUsername,logout,getUserInfo,changeAccount} from '@/api/login'
+import {loginByUsername,logout,getUserInfo,changeAccount, getUserAuthorities} from '@/api/login'
 import {getDashServerInfo} from '@/api/device'
 import {getToken,setToken,removeToken,getCookie,setCookie} from '@/common/auth'
-import api from '@/api/index'
+import PermissionHelper from "../../api/PermissionHelper";
+import Home from '@/views/home/Home'
+import router, { resetRouter,constantRoutes } from '@/router'
 
 const user={
     state:{
@@ -22,7 +24,11 @@ const user={
         accountId:'',
         cachePath:[""],
         isEzviz: getCookie('isEzviz') ? JSON.parse(getCookie('isEzviz')): false ,
+        authorities: [],
+        routes: [],
+        addRoutes: []
     },
+
     mutations:{
         SET_CODE: (state, code) => {
             state.code = code
@@ -62,6 +68,13 @@ const user={
         },
         SET_ISEZVIZ: (state, isEzviz)=>{
           state.isEzviz  = isEzviz
+        },
+        SET_AUTHORITY: (state, authorities)=>{
+          state.authorities = authorities
+        },
+        SET_ROUTES: (state, routes) => {
+          state.addRoutes = routes
+          state.routes = constantRoutes.concat(routes)
         }
     },
     actions:{
@@ -96,7 +109,7 @@ const user={
                         let accountId=params.accountId.toLowerCase();
                         localStorage.setItem('oss_bucket',accountId);
                         commit('SET_ACCOUNTID',accountId);
-                        if(res.data.ezvizAppKey != ''){
+                        if(res.data.ezvizProtocol){
                           commit('SET_ISEZVIZ', true)
                           setCookie('isEzviz', true)
                         }
@@ -151,7 +164,402 @@ const user={
                 removeToken();
                 resolve();
             })
-        }
+        },
+        GetUserAuthorities({commit}){
+          return new Promise(resolve => {
+            getUserAuthorities().then((res)=>{
+              commit('SET_AUTHORITY', res.data.authorities);
+              commit('SET_ROLES', [res.data.roleId]);
+              resolve(res);
+            }).catch(error=>{
+              reject(error);
+            })
+          })
+        },
+        // remove token
+        resetToken({ commit }) {
+          return new Promise(resolve => {
+            commit('SET_TOKEN', '')
+            commit('SET_ROLES', [])
+            removeToken()
+            resolve()
+          })
+        },
+      generateRoutes({ commit }) {
+        return new Promise(resolve => {
+          let accessedRoutes = [];
+          console.log(user.state.authorities)
+          PermissionHelper.setData(user.state.authorities)
+
+          let route1 = {
+            path: '/home',
+            name: 'overview',
+            component: Home,
+            hidden: false,
+            iconCls:'iconfont icon-zonglan',
+            styles:'font-size:22px',
+            leaf:false, //没有子节点
+            isReadOnly:false,
+            children: [],
+          };
+          PermissionHelper.enableRemoteOverview() && route1.children.push({
+            path:'/patrolOverview',
+            name:'patrolOverview',
+            component:resolve=>require(['@/views/allscan/AllScan'],resolve),
+          })
+          PermissionHelper.enableEventOverview() && route1.children.push({
+            path:'/eventOverview',
+            name:'eventOverview',
+            component:resolve=>require(['@/views/allScan/TestOne'],resolve),
+          })
+          if(route1.children.length > 0){
+            route1.redirect = route1.children[0].path;
+            accessedRoutes.push(route1);
+          }
+
+          let route2 = {
+              path: '/home',
+              name:'patrolManage',
+              component: Home,
+              iconCls:'iconfont icon-menu-xundian',
+              styles:'font-size:22px',
+              leaf:false,  //多个子节点
+              hidden: false,
+              children:[]
+            };
+            PermissionHelper.enableRemoteInspect() && route2.children.push(
+              {
+                path:'/reinspection',
+                  name:'remotePatrol',
+                component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
+                meta:{
+                requireAuth: true,
+                  keepAlive:true,
+              },
+                isReadOnly:false,
+              },
+              {
+                path:'/reinspection',
+                  name:'remotePatrol',
+                component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
+                hidden:true,
+                meta:{
+                keepAlive:true
+              },
+                children:[
+                  {
+                    path:'/reinspect/confirmrein',
+                    name:'confirmSum',
+                    component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
+                  }
+                ]
+              },
+              {
+                path:'/reinspection',
+                  name:'remotePatrol',
+                component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
+                hidden:true,
+                children:[
+                {
+                  path:'/reinspect/submit',
+                  name:'submitEvent',
+                  component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
+                }
+              ]
+              },
+            );
+          PermissionHelper.enableStoreMonitor() && route2.children.push(
+            {
+              path:'/storemonitor',
+              name:'storeMonitor',
+              component:resolve=>require(['@/views/patrolShop/StoreMonitor'],resolve),
+              meta:{
+                requireAuth: true,
+                keepAlive:true,
+              },
+              isReadOnly:false,
+            },
+            {
+              path:'/storemonitor',
+              name:'storeMonitor',
+              component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
+              hidden:true,
+              children:[
+                {
+                  path:'/storemonitor/submit',
+                  name:'storeSubEvent',
+                  component:resolve=>require(['@/views/patrolShop/StoreSuccessPage'],resolve),
+                }
+              ]
+            }
+            );
+          PermissionHelper.enableInspectReport() && route2.children.push(
+            {
+              path:'/report',
+                name:'reports',
+              component:resolve=>require(['@/views/patrolShop/InspectReportList'],resolve),
+              meta:{
+              requireAuth: true,
+                keepAlive:true,
+            },
+              isReadOnly:false,
+            },
+            {
+              path:'/report',
+                name:'reports',
+              component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
+              hidden:true,
+              children:[
+              {
+                path:'/reportdetails',
+                name:'reportDetails',
+                component:resolve=>require(['@/views/patrolShop/InspectReport'],resolve),
+              }
+            ]
+            },
+          )
+          accessedRoutes.length == 0 ? route2.redirect = route2.children[0].path : '';
+          accessedRoutes.push(route2);
+
+          let route3 = {
+            path: '/home',
+            name:'eventManage',
+            component:Home,
+            iconCls:'iconfont icon-shijian',
+            styles:'font-size:22px',
+            leaf:true,
+            isReadOnly:false,
+            hidden: false,
+            children:[]
+          };
+          (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() )&& route3.children.push(
+            {
+              path:'/event',
+              name:'eventManage',
+              component:resolve=>require(['@/views/event/EventManage'],resolve),
+              meta:{
+                keepAlive:true,  //the component is't to be cache.
+                requireAuth: true,
+              }
+            },
+            {
+              path:'/event',
+              name:'eventManage',
+              component:resolve=>require(['@/views/event/details/RateManage'],resolve),
+              meta:{
+                requireAuth: false,
+              },
+              children:[
+                {
+                  path:'/rate',
+                  name:'eventDetails',
+                  component:resolve=>require(['@/views/event/details/RateManage'],resolve),
+
+                }
+              ]
+            },
+          );
+          accessedRoutes.push(route3);
+
+          // let route4 = {
+          //     path: '/home',
+          //     name:'statistics',
+          //     component:Home,
+          //     iconCls:'iconfont icon-tongjifenxi',
+          //     styles:'font-size:22px',
+          //     leaf:true,
+          //     isReadOnly:true,
+          //     hidden: false,
+          //     children:[
+          //       {
+          //         path:'/statistical',
+          //         name:'statistics',
+          //         component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve),
+          //         meta:{
+          //           requireAuth: true,
+          //         }
+          //       }
+          //     ]
+          //   };
+          // PermissionHelper.enablePatrolEvaStatistics() || PermissionHelper.enableInspectStatistics()
+          // || PermissionHelper.enableEventStatistics()  || PermissionHelper.enableSupervisionEffStatistics()
+          // && route4.children.push()
+
+          let route5 = {
+            path: '/home',
+            name:'systemSetting',
+            iconCls:'iconfont icon-button',
+            styles:'font-size:22px',
+            component:Home,
+            leaf:false,
+            hidden: false,
+            children:[]
+          }
+          PermissionHelper.enablePatrolSetting() && route5.children.push(
+            {
+              path:'/routeinspection',
+              name:'inspectSetting',
+              component:resolve=>require(['@/views/setting/routeInspection/RouteInspection'],resolve),
+              hidden:false,
+              meta:{
+                requireAuth: true,
+                keepAlive:false,
+              }
+            },
+            {
+              path:'/routeinspection',
+              name:'inspectSetting',
+              component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve),
+              hidden:true,
+              meta:{
+                requireAuth: true,
+              },
+              children:[
+                {
+                  path:'/addroute',
+                  name:'itemSetting',
+                  component:resolve=>require(['@/views/setting/routeInspection/AddRuteInspect'],resolve)
+                }
+              ]
+            },
+            {
+              path:'/routeinspection',
+              name:'inspectSetting',
+              component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve),
+              hidden:true,
+              meta:{
+                requireAuth: true,
+              },
+              children:[
+                {
+                  path:'/bindroute',
+                  name:'bindStore',
+                  component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve)
+                }
+              ]
+            }
+          )
+          PermissionHelper.enableDeviceSetting() && route5.children.push(
+            {
+              path:'/device',
+              name:'deviceManage',
+              component:resolve=>require(['@/views/setting/device/DeviceSetMge'],resolve),
+              meta:{
+                requireAuth: true,
+              },
+            },
+          )
+          PermissionHelper.enableStoreSetting() && route5.children.push(
+            {
+              path:'/storemanage',
+              name:'storeManage',
+              component:resolve=>require(['@/views/setting/store/StoreManage'],resolve),
+              hidden:false,
+              meta:{
+                keepAlive:false,  //the component is't to be cache.
+                requireAuth:true
+              }
+            },
+            {
+              path:'/storemanage',
+              name:'storeManage',
+              component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve),
+              hidden:true,
+              meta:{
+                requireAuth:true
+              },
+              children:[
+                {
+                  path:'/storedetail',
+                  name:'storeDetail',
+                  component:resolve=>require(['@/views/setting/store/EditStoreVue'],resolve)
+                }
+              ]
+            }
+          )
+          PermissionHelper.enableScheduleSetting() && route5.children.push(
+            {
+              path:'/schedule',
+              name:'scheduleManage',
+              isReadOnly:false,
+              component: resolve=>require(['@/views/setting/schedule/ScheduleManage'],resolve),
+              hidden:false,
+              threeChild : true,
+              meta:{
+                keepAlive:true,  //the component is't to be cache.
+                requireAuth:true
+              },
+              children:[
+                {
+                  path:'/pointCheck',
+                  name:'pointCheck',
+                  component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve)
+                },
+                // {
+                //   path:'/lpsSechedule',
+                //   name:'lpsSechedule',
+                //   component:resolve=>require(['@/components/EzvizVideo'],resolve)
+                // },
+                {
+                  path:'/patrolSechedule',
+                  name:'patrolSechedule',
+                  component:resolve=>require(['@/views/setting/schedule/PatrolSechedule'],resolve)
+                },
+              ]
+            },
+          )
+          // PermissionHelper.enableTitleSetting() &&
+           route5.children.push(
+            {
+              path:'/title',
+              name:'titleManage',
+              isReadOnly:false,
+              component: resolve=>require(['@/views/setting/title/TitleManage'],resolve),
+              hidden:false,
+              meta:{
+                keepAlive:false,  //the component is't to be cache.
+                requireAuth:true
+              }
+            },
+            {
+              path:'/title',
+              name:'titleManage',
+              component:resolve=>require(['@/views/setting/title/TitleSetting'],resolve),
+              hidden:true,
+              meta:{
+                requireAuth:true
+              },
+              children:[
+                {
+                  path:'/titleSetting',
+                  name:'titleSetting',
+                  component:resolve=>require(['@/views/setting/title/TitleSetting'],resolve)
+                }
+              ]
+            },
+          )
+          route5.children.length > 0 ? accessedRoutes.push(route5): '';
+
+          commit('SET_ROUTES', accessedRoutes)
+          resolve(accessedRoutes)
+        })
+      },
+      changeRoutes({ commit, dispatch }) {
+        return new Promise(async resolve => {
+
+          const result = await dispatch('GetUserAuthorities')
+
+          resetRouter()
+
+          // generate accessible routes map based on roles
+          const accessRoutes = await dispatch('generateRoutes')
+
+          // dynamically add accessible routes
+          router.addRoutes(accessRoutes)
+
+          resolve()
+        })
+      }
     }
 }
 

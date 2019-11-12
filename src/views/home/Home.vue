@@ -156,6 +156,7 @@ import {getUserInfo,getAccountList} from '@/api/login'
 import PubSub from 'pubsub-js';
 import {getCookie} from '@/common/auth';
 import { generateRoute } from '@/api/i18n'
+import PermissionHelper from "../../api/PermissionHelper";
 export default {
 
     name:"Home",
@@ -169,7 +170,7 @@ export default {
             collapsed:false,
             varyWindowWidth:window.innerWidth,
             varyWindowHeight:window.innerHeight,
-            routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length),
+            // routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length),
             //wrapperAll:true,
             route:this.$route,
             path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute'],
@@ -183,6 +184,10 @@ export default {
         }
     },
     computed:{
+      routerList(){
+        console.log(this.$store.state.user.routes)
+        return this.$store.state.user.routes.slice(1,this.$store.state.user.routes.length);
+      },
         groupHeight(){
             return (this.varyWindowWidth*70)/1920;
         },
@@ -374,11 +379,20 @@ export default {
             self.$store.dispatch('changeAccount',params).then((res)=>{
                 console.log(res);
                 if(res.errCode==0){
+                    self.changeRoutes();
                     self.$route.meta.keepAlive=false;
                     self.getUserName();
                 }
             });
         },
+      changeRoutes(){
+          let self = this;
+          self.$store.dispatch('GetUserAuthorities').then((result)=>{
+            if(result.errCode==0){
+              self.$store.dispatch('generateRoutes')
+            }
+          })
+      },
         getUserName(){
             let self=this;
             let userId=getCookie('UserId');

@@ -218,10 +218,10 @@
                 </div>
               </div>
               <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
-                           :show-feed-dialog2="showFeedDialog2"
+                           :show-feed-dialog2="showFeedDialog2" :store-id="store.storeId"
                            @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback"  @confirmEzvizVideoFeedback="ezvizVideoFeedback"
                            ref="ezvizVideo"
-                           @emitEzvizVideo="confirmEzvizVideo">
+                           @emitEzvizVideo="confirmEzvizVideo" >
 
               </ezviz-video>
             </div>
@@ -406,7 +406,7 @@
 <script>
 import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
 import util from '@/common/util'
-import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore} from '@/api/store'
+import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore, getVideoAuthority} from '@/api/store'
 import {getUserInfo} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {getStorageInfo} from '@/api/event'
@@ -659,6 +659,7 @@ export default {
             initEzviz: false,
             sourceListLength: 0,
             realTimeSpeed: 0,
+            videoAuthority: false
         }
     },
     computed:{
@@ -733,7 +734,8 @@ export default {
         //self.getInitStoreData();
         self.getFaStoreData();
         self.getDeviceList();
-        if(!self.isEzviz){
+        //self.getVideoAuthority();
+      if(!self.isEzviz){
           self.looper();
         }
         else{
@@ -787,6 +789,7 @@ export default {
             self.getFaStoreData();
             //self.videoEl=document.getElementById('previewVideo').children[0];
             self.getDeviceList();
+            //self.getVideoAuthority();
         },
         anchorLinkTo () {
             let self=this;
@@ -1865,6 +1868,12 @@ export default {
                       }
                         self.curDeviceId=item.deviceId;
                     }
+                    // else{
+                    //   if(!self.videoAuthority){
+                    //     self.showError = true;
+                    //     self.errorText = self.$t('remotePatrol.videoLicense');
+                    //   }
+                    // }
                 }
             }
             else if(item.deviceId==-1){
@@ -2141,6 +2150,11 @@ export default {
         },
         async realTime(){
             let self=this;
+            // if(!self.videoAuthority){
+            //   self.showError = true;
+            //   self.errorText = self.$t('remotePatrol.videoLicense');
+            //   return false;
+            // }
             if(self.channel==null){
                 return false;
             }
@@ -2194,6 +2208,11 @@ export default {
         },
         async stopRealTimeVisPage(){
             let self=this;
+            // if(!self.videoAuthority){
+            //   self.showError = true;
+            //   self.errorText = self.$t('remotePatrol.videoLicense');
+            //   return false;
+            // }
             self.stopVideo();
             const data = {
                 request: {
@@ -2228,6 +2247,11 @@ export default {
         },
        async stopAndRealTime(){
             let self=this;
+           // if(!self.videoAuthority){
+           //   self.showError = true;
+           //   self.errorText = self.$t('remotePatrol.videoLicense');
+           //   return false;
+           // }
             self.stopVideo();
             const dataDis = {
                 request: {
@@ -2610,7 +2634,7 @@ export default {
             });
         },
       /**
-       * 处理子组件发送过来的抓拍图片
+       * handle ezviz video snapshot
        */
       editEzvizCanvas(src){
           console.log(src)
@@ -2637,7 +2661,7 @@ export default {
           console.log(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList)
         },
       /**
-       * 处理萤石云组件的截图反馈
+       * handle ezviz video picture feedback
        * @param obj
        */
       ezvizPictureFeedback(obj){
@@ -2663,7 +2687,7 @@ export default {
         self.showFeedBackInfo=false;
       },
       /**
-       * 处理萤石云组件的视频反馈
+       * handle ezviz video feedback
        * @param obj
        */
       ezvizVideoFeedback(ezvizObj){
@@ -2684,7 +2708,7 @@ export default {
         self.showFeedBackInfo=false;
       },
       /**
-       * 处理萤石云视频录像
+       * handle ezviz record video
        */
       confirmEzvizVideo(blob){
         let self = this;
@@ -2706,6 +2730,20 @@ export default {
         else{
           self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
         }
+      },
+      getVideoAuthority(){
+        let self = this;
+        return new Promise((resolve, reject)=>{
+          getVideoAuthority().then(res=>{
+            console.log(res);
+            resolve(res)
+          }).then(result=>{
+            self.videoAuthority = result.data.authorized;
+          })
+            .catch(error=>{
+            console.log(error);
+          })
+        })
       }
     }
 }

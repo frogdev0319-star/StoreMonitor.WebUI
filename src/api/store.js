@@ -41,3 +41,10 @@ export const deleteFavoriteStore=data=>{
         data
     })
 }
+
+export const getVideoAuthority=()=>{
+  return request({
+    url: `${version}/auth/video`,
+    method: 'get'
+  })
+}

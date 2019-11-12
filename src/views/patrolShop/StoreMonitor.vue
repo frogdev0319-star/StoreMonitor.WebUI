@@ -195,7 +195,7 @@
               </div>
             </div>
             <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true" :play-back="playBackState"
-                         :cur-time="playBackTime"
+                         :cur-time="playBackTime" :store-id="store.storeId"
                          @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo" ref="ezvizVideo">
 
             </ezviz-video>
@@ -634,9 +634,13 @@ export default {
             cutDialogcurTime:0,
             lang: this.$i18n.locale,
             playBackTime: 0,
-            realTimeStartTs: 0
+            realTimeStartTs: 0,
+          isFirstLoad: false
         }
     },
+  created(){
+    this.isFirstLoad = true
+  },
     computed:{
         graphBtnWidth:function(){
             return this.varyWindowHeight*0.185;
@@ -683,7 +687,12 @@ export default {
         }
     },
     beforeRouteEnter (to, from, next) {
-      to.meta.keepAlive = true;
+      if(from.name=='storeSubEvent'){
+        to.meta.isBack = true;
+      }
+      else{
+        to.meta.isBack = false;
+      }
       console.log(to.meta.keepAlive)
         next(vm => {
             //if(to.params.flag){
@@ -696,7 +705,6 @@ export default {
     beforeRouteLeave(to, from, next){
         //离开页面的同时应该停止播放视频
         let self=this;
-        from.meta.keepAlive = true;
         window.clearInterval(self.timeid);
         window.clearInterval(self.timerPlayReal);
         self.isPlayingFlag=-1;

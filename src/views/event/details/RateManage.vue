@@ -30,7 +30,7 @@
                             class="video-js vjs-fill">
                         </video>
                     </div>
-                  <ezviz-video v-else :channel-info="channelInfo" :is-event='isEvent' ref="ezvizVideo">
+                  <ezviz-video v-else :channel-info="channelInfo" :is-event='isEvent' :store-id="event.storeId" ref="ezvizVideo">
                   </ezviz-video>
                 </div>
             </el-dialog>
@@ -197,6 +197,7 @@ import $ from 'jquery';
 import {getDeviceList} from '@/api/device'
 import {generateEventLang} from  '@/api/i18n'
 import EzvizVideo from '@/components/EzvizVideo.vue'
+import PermissionHelper from "../../../api/PermissionHelper";
 
 export default {
     name:"RateManage",
@@ -240,7 +241,6 @@ export default {
             showPhotoContent:false,
             deafultImg:'this.src="' + require('../../../../static/img/pic2.png') + '"',
             sessionId:'',
-            subBtnList:[{name:this.$t('eventView.handling'),isActive:true},{name:this.$t('eventView.closing'),isActive:false},{name:this.$t('eventView.adding'),isActive:false}],
             eventDes:'',
             videoSrc:require('../../../../static/img/监控icon.png'),
             inspectSrc:require('../../../../static/img/远程icon.png'),
@@ -253,7 +253,8 @@ export default {
             playState:false,
             lang: this.$i18n.locale,
             isEvent: true,
-            channelInfo: {}
+            channelInfo: {},
+            subBtnList:[]
         }
     },
     computed: {
@@ -515,7 +516,8 @@ export default {
                 status:event.status,
                 score:event.score,
                 sourceType:event.sourceType,
-                description:event.initialComment.description
+                description:event.initialComment.description,
+                storeId: event.storeId
             };
             self.event=obj;
             let deviceId=self.event.deviceId;
@@ -797,6 +799,26 @@ export default {
 　　　　　　　　　　}, 50)
             }, 50);
         },
+        getBtnList(){
+            let self = this;
+            let authorities = self.$store.state.user.authorities;
+            console.log(authorities)
+            PermissionHelper.setData(authorities);
+            let tempBtnList = [];
+            PermissionHelper.enableEventHandle()  && tempBtnList.push({
+              name:this.$t('eventView.handling'),
+            });
+            PermissionHelper.enableEventClose()  && tempBtnList.push({
+              name:this.$t('eventView.closing'),
+            })
+            PermissionHelper.enableEventAdd() && tempBtnList.push({
+              name:this.$t('eventView.adding'),
+            })
+            tempBtnList.forEach((item, index)=>{
+              item.isActive = index == 0 ? true: false;
+            })
+          self.subBtnList = tempBtnList;
+        }
     },
     // beforeRouteLeave (to, from, next) {
     //     if(to.name=='事件管理'){
@@ -806,6 +828,7 @@ export default {
     // },
     mounted(){
         let self=this;
+        self.getBtnList();
         self.getSessionData();  //获取session中存储的event信息
         self.getCommentList();  //获取comment信息
         self.$nextTick(function(){

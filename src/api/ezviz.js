@@ -379,3 +379,40 @@ export async function updateDevicePassword(data){
   return ret;
 }
 
+export async function getAccessToken(data){
+  let ret=null;
+  console.log(data)
+  await instance({
+    method: 'post',
+    url: '/lapp/token/get',
+    data: data,
+  }).then(res=>{
+    console.log(res)
+    let data = res.data;
+    ret =  res;
+  }).catch((err) => {
+  })
+  return ret;
+}
+
+export const addEzvizAccount =data=>{
+  return request({
+    url:`${version}/ezviz/account/add`,
+    method:'post',
+    data
+  })
+}
+export const updateEzvizAccount=data=>{
+  return request({
+    url:`${version}/ezviz/account/update`,
+    method:'post',
+    data
+  })
+}
+export const deleteEzvizAccount=params=>{
+  return request({
+    url:`${version}/ezviz/account/delete`,
+    method:'post',
+    params
+  })
+}

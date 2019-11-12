@@ -93,6 +93,7 @@
 import { isvalidUsername } from '@/common/validate'
 import {Message} from  'element-ui'
 import {getCookie,setCookie,removeCookie} from '@/common/auth'
+import PermissionHelper from "../../api/PermissionHelper";
 export default {
     name:'Login',
      data(){
@@ -227,7 +228,16 @@ export default {
                         let resData=res.data;
                         if(resData){
                             console.log(resData);
+                            self.$store.dispatch('GetUserAuthorities').then((result)=>{
+                              let resultData = result.data;
+                              console.log(resultData);
+                              if(resultData){
+                                console.log(resultData.authorities)
+                                PermissionHelper.setData(resultData.authorities);
+                              }
+                            })
                             self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId, ezvizAppKey: resData.ezvizAppKey}});
+
                             //self.$router.push({path:self.redirect||'/'});
                             //setCookie('UserId',resData.userId);
                             //sessionStorage.setItem('UserId',resData.userId);

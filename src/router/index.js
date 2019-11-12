@@ -7,17 +7,60 @@ import LoginForm from '@/views/login/LoginForm'
 import AuthRedirect from '@/views/login/AuthRedirect'
 
 Vue.use(Router)
-export default new Router({
+/**
+ * constantRoutes
+ * a base page that does not have permission requirements
+ * all roles can be accessed
+ */
+export const constantRoutes = [
+  // {
+  //   path:'/login',
+  //   name:'Login',
+  //   hidden: true,
+  //   component:LoginForm,
+  //   meta:{
+  //     requireAuth: false,
+  //   }
+  // },
+  {
+    path:'*',
+    redirect: '/'
+  },
+  {
+    path:'/',
+    name:'AuthRedirect',
+    hidden:true,
+    component:AuthRedirect
+  },
+]
+
+const createRouter = () => new Router({
+  // mode: 'history', // require service support
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRoutes
+})
+
+const router = createRouter()
+
+// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
+export function resetRouter() {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
+}
+
+export default router
+
+ new Router({
   routes: [
-    {
-      path:'/login',
-      name:'Login',
-      hidden: true,
-      component:LoginForm,
-      meta:{
-        requireAuth: false,
-      }
-    },
+    // {
+    //   path:'/login',
+    //   name:'Login',
+    //   hidden: true,
+    //   component:LoginForm,
+    //   meta:{
+    //     requireAuth: false,
+    //   }
+    // },
     {
       path:'*',
       redirect: '/'
@@ -336,6 +379,33 @@ export default new Router({
               name:'patrolSechedule',
               component:resolve=>require(['@/views/setting/schedule/PatrolSechedule'],resolve)
             },
+          ]
+        },
+        {
+          path:'/title',
+          name:'titleManage',
+          isReadOnly:false,
+          component: resolve=>require(['@/views/setting/title/TitleManage'],resolve),
+          hidden:false,
+          meta:{
+            keepAlive:false,  //the component is't to be cache.
+            requireAuth:true
+          }
+        },
+        {
+          path:'/title',
+          name:'titleManage',
+          component:resolve=>require(['@/views/setting/title/TitleSetting'],resolve),
+          hidden:true,
+          meta:{
+            requireAuth:true
+          },
+          children:[
+            {
+              path:'/titleSetting',
+              name:'titleSetting',
+              component:resolve=>require(['@/views/setting/title/TitleSetting'],resolve)
+            }
           ]
         },
         {

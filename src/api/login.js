@@ -48,3 +48,9 @@ export const changeAccount=params=>{
         params
     })
 }
+export const getUserAuthorities=()=>{
+  return request({
+    url:`${version}/user/info`,
+    method:'get',
+  })
+}
