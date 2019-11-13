@@ -1714,7 +1714,7 @@
                 tempArray.push(qualifiedRate)
                 tempArray.push(inspectCycle)
                 tempArray.push(excellentRate)
-                tempArray.push(floatRage)
+                tempArray.push(parseFloat(dangerRate))
                 tempArray.push(region)
                 console.log(tempArray);
                 if(qualifiedRate> 50){
