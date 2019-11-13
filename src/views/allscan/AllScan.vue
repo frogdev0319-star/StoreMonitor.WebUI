@@ -922,23 +922,23 @@
         let start = typeof(val[0])==='object'?val[0].getTime():val[0];
         let end = typeof(val[1])==='object'?val[1].getTime():val[1];
         let daysDiff = self.$moment(end).diff(start, 'days');
-        if(daysDiff < 7){  //当前选择的时间范围不到7天
+        if(daysDiff < 6){  //当前选择的时间范围不到7天
           Message({
             message: self.$t('overview.changeTimeRange'),
             type:'warning',
             duration:3*1000
           })
-          start=end-3600*24*7*1000;
+          start=end-3600*24*6*1000;
           start = self.$moment(start).startOf('d').toDate().valueOf();
           self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
-        if(daysDiff > 365){  //当前选择的时间范围超过365天
+        if(daysDiff > 364){  //当前选择的时间范围超过365天
           Message({
             message: self.$t('overview.changeTimeRange'),
             type:'warning',
             duration:3*1000
           })
-          start=end-3600*24*365*1000;
+          start=end-3600*24*364*1000;
           start = self.$moment(start).startOf('d').toDate().valueOf();
           self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
@@ -946,7 +946,7 @@
           self.dateValue=[self.$moment(start).startOf('d').toDate(),new Date().setTime(end)];
         }
         daysDiff = self.$moment(end).diff(start, 'days');
-        daysDiff <=30 ? self.timeMode = 1 : self.timeMode = 2;
+        daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
         console.log(self.timeMode);
         self.params.beginTs = start;
         self.params.endTs = end;
@@ -1345,10 +1345,10 @@
               item.percent = parseInt((percent*100).toFixed(0));
             })
             seriesData = [
-              { value: totalExcellent, name: '优秀' },
-              { value: totalQualified, name: '合格' },
-              { value: totalUnqualified, name: '不合格' },
-              { value: totalIgnored, name: '忽略' }
+              { value: totalExcellent, name: self.$t('overview.excellent') },
+              { value: totalQualified, name: self.$t('overview.pass') },
+              { value: totalUnqualified, name: self.$t('overview.failed') },
+              { value: totalIgnored, name: self.$t('overview.ignored') }
             ];
             console.log(topFiveArray);
             self.itemsTopFive = topFiveArray;
@@ -1381,7 +1381,7 @@
             },
             series: [
               {
-                name:'巡检项评估占比',
+                name: self.$t('overview.itemsAssessment'),
                 type: 'pie',
                 radius: ['70%', '85%'],
                 center: ['50%', '50%'],
