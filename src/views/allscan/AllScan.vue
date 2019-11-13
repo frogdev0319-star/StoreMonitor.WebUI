@@ -1764,6 +1764,8 @@
               data: self.daysRangeList,
               padding: [10,0,5,0],
               symbolSize: 5,
+              left: 30,
+              right: 20,
               label:{
                 position: 5,
                 color: self.echartColor,
