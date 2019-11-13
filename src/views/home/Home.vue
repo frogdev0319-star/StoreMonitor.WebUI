@@ -351,6 +351,9 @@ export default {
             let self=this;
             //self.$router.push('/login');
             //window.location.href='https://portals.storeviu.com';
+            self.$store.dispatch('logout').then(()=>{
+
+            })
             let url=sessionStorage.getItem('LoginURL');
             window.location.href=url;
         },
@@ -1083,6 +1086,7 @@ export default {
       font-size: calc(24/1920*100vw) !important;
       font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
     }
+
 </style>
 <style>
 .brand-list .el-input__inner{
@@ -1121,6 +1125,16 @@ export default {
     margin-right: 35px !important;
     color: #fff !important;
 }
-
+/*更改左侧菜单箭头方向*/
+.el-submenu>.el-submenu__title .el-submenu__icon-arrow{
+  -webkit-transform: rotateZ(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotateZ(-90deg);
+}
+.el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
+  -webkit-transform: rotateZ(0deg);
+  -ms-transform: rotate(0deg);
+  transform: rotateZ(0deg);
+}
 </style>
 

@@ -3,7 +3,7 @@
         <el-col :span="24" class="storeEdit-header">
             <div class="store-title ">
                 <span>{{storeTitle}}</span>
-                <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary'>{{generateStoreLang('mySubmit')}}</el-button>
+                <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary' :disabled="scheduleData.length == 0? true : false">{{generateStoreLang('mySubmit')}}</el-button>
             </div>
             <div class="store-info">
               <strong style="margin-right:20px;">{{generateStoreLang('solver')}}</strong><span style="min-width:100px;display:inline-block;"><el-input v-model="userName" disabled size="mini" class='input'></el-input></span>
@@ -12,15 +12,17 @@
                 <span style="font-size:14px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
                 <span style="font-size:14px; display:inline-block;"><el-input v-model="curTag" disabled size="mini" style="" class='input'></el-input></span>
               <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
-              <el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"
-                         class="el-schedule">
-                <el-option
-                  v-for="item in personList"
-                  :key="item.userId"
-                  :label="item.userName"
-                  :value="item.userId">
-                </el-option>
-              </el-select>
+              <span style="min-width:100px;display:inline-block;">
+                <el-input v-model="supervisorName" disabled size="mini" class='input'></el-input></span>
+              <!--<el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"-->
+                         <!--class="el-schedule">-->
+                <!--<el-option-->
+                  <!--v-for="item in personList"-->
+                  <!--:key="item.userId"-->
+                  <!--:label="item.userName"-->
+                  <!--:value="item.userId">-->
+                <!--</el-option>-->
+              <!--</el-select>-->
             </div>
             <div class="store-handle">
               <el-col :span="24" class="header-details1">
@@ -142,7 +144,7 @@ export default {
         self.getChannelByStore(storeId);
         self.getNapeByStore(storeId);
 
-        self.getUserList();
+        //self.getUserList();
     },
     methods:{
         generateStoreLang,
@@ -267,23 +269,23 @@ export default {
                     {
                         "storeId": self.store.storeId,
                         //"userId": self.curPerson
-                        "supervisorId": self.curPerson
+                        "supervisorId": self.supervisorId
                     }
                 ]
             };
             if(self.scheduleData.length==0){
-                let resUpdateStore=null;
-                if(self.curPerson==null||self.curPerson.length==0){
-                    self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
-                    return false;
-                }
-                if(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson)){  //如果没有修改负责人不执行
-                    resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
-                }
-                if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
-                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
-                     self.supervisorId = self.curPerson;
-                }
+                // let resUpdateStore=null;
+                // if(self.curPerson==null||self.curPerson.length==0){
+                //     self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
+                //     return false;
+                // }
+                // if(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson)){  //如果没有修改负责人不执行
+                //     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
+                // }
+                // if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
+                //      self.notify(this.$t('storeView.successSubmit'),'success',3000);
+                //      self.supervisorId = self.curPerson;
+                // }
             }
             else{
                 if((count!=0&&(count!=countChannel))||countChannel==0){
@@ -295,22 +297,21 @@ export default {
                 };
 
                 let resUpdateStore=null,resBindInspect=null;
-                if(self.curPerson ==null ||self.curPerson.length==0 ){
-                  self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
-                  return false;
-                }
-                else if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson))){  //如果没有修改负责人不执行
-                    resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
-                }
+                // if(self.curPerson ==null ||self.curPerson.length==0 ){
+                //   self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
+                //   return false;
+                // }
+                // else if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson))){  //如果没有修改负责人不执行
+                //     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
+                // }
                 //else{
                     // self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
                     // return false;
                // }
                 resBindInspect=await self.bindInspectItem(paramsInspec);
-                if(((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))
-                || (resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
+              //((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success')) ||
+              if((resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
-                    self.supervisorId = self.curPerson;
                 }
                 else{
                     self.notify(this.$t('storeView.failSubmit'),'warning',3000);
