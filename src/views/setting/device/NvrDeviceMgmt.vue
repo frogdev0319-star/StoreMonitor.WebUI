@@ -210,12 +210,12 @@
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="name" :label="generateDeviceLang('nvr')">
-                      <el-input :placeholder="generateDeviceLang('inputNvrName')" v-model="addNvrData.name" style="width: 100%;"></el-input>
+                      <el-input v-model="addNvrData.name" style="width: 100%;"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="channelCount" :label="generateDeviceLang('channelNum')">
-                      <el-select v-model="addNvrData.channelCount" :placeholder="generateDeviceLang('inputNvrNumber')" size="mini">
+                      <el-select v-model="addNvrData.channelCount" size="mini">
                         <el-option
                           v-for="numList in channelNumList"
                           :key="numList.value"
@@ -227,7 +227,7 @@
                   </el-col>
                 </el-form-item>
                 <el-form-item :label="generateDeviceLang('store')" prop="storeId">
-                  <el-select v-model="addNvrData.storeId" :placeholder="generateDeviceLang('selectStore')" style="width: 100%;">
+                  <el-select v-model="addNvrData.storeId" style="width: 100%;">
                     <el-option
                       v-for="item in storeDataList"
                       :key="item.storeId"
@@ -281,11 +281,11 @@
                      :key="index">
                   <div class="nape-name-data">
                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" :placeholder="generateDeviceLang('inputInspectName')" v-if="item.isClick"></el-input>
+                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" v-if="item.isClick"></el-input>
                   </div>
                   <div class="nape-dep-data">
                     <span class="nape-dep" v-if="item.id != 0 ">{{item.channelId}}</span>
-                    <el-select v-model="item.channelId" :placeholder="generateDeviceLang('selectDeviceChannel')" size="mini" class="nvr-select" v-if="item.id == 0" style="margin-left: 10%">
+                    <el-select v-model="item.channelId"  size="mini" class="nvr-select" v-if="item.id == 0" style="margin-left: 10%">
                       <el-option
                         v-for="numList in newChannelNumList"
                         :key="numList.value"
@@ -562,10 +562,10 @@
         showConfirmDelete: false, //删除NVR时的提示信息
         rules: {
           ivsId: [
-            { required: true, message: '请输入IVS ID', trigger: 'blur' },
+            { required: true, message: this.$t('deviceView.inputIvsId'), trigger: 'blur' },
           ],
           name: [
-            { required: true, message: '请输入NVR名称', trigger: 'blur' }
+            { required: true, message: this.$t('deviceView.inputNvrName'), trigger: 'blur' }
           ],
           channelCount: [
             {required: true, message: '请选择通道数目', trigger: 'change' }
@@ -1448,7 +1448,7 @@
               self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
               self.showAddNvrDialog=false;
             }
-            self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
+            self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: self.storeDataList[0].storeId};
             self.page=1;
             let params={
               "filter": {
@@ -1471,7 +1471,6 @@
       cancelAddNvr(){
         let self = this;
         self.showAddNvrDialog=false;
-        self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
       },
       //增加单个通道
       addSingleChannel(){
@@ -1584,7 +1583,7 @@
       showAddDialog(){
         let self = this;
         self.showAddNvrDialog = true;
-        self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: ''};
+        self.addNvrData = {ivsId:'',  name:'', channelCount: 1, storeId: self.storeDataList[0].storeId};
       },
       confirmEditNvr(index,item){
         let self=this;

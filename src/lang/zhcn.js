@@ -465,6 +465,7 @@ export default {
     deleteFail: '删除失败',
     codeInfo: '请输入验证码',
     unit: '个',
+    inputIvsId : '请输入IVS ID',
     inputNvrName: '请输入NVR名称',
     inputNvrNumber: '请选择NVR通道数',
     nvrChannelNumber: 'NVR通道数',
@@ -538,7 +539,8 @@ export default {
     enterCorrentAccount: '请输入正确的萤石账号',
     accountExist: '该账号已存在',
     enterDeveloperKey: '请输入完整的开发者密钥',
-    enterAccountName: '用户名由1~20个汉字、字母或数字组成'
+    enterAccountName: '用户名由1~20个汉字、字母或数字组成',
+    EzvizAccount: '萤石账号'
   },
 
   //Store Management page language

@@ -150,7 +150,9 @@ const user={
             return new Promise((resolve,reject)=>{
                 logout().then(()=>{
                     commit('SET_TOKEN','');
+                    commit('SET_ROLES', [])
                     removeToken();
+                    resetRouter();
                     resolve();
                 }).catch(error=>{
                     reject(error);

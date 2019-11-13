@@ -2,16 +2,16 @@
   <div class="detail-container"  :style="{'height':varyWindowWidth-220+'px'}" >
     <el-row>
       <el-col :span="24" class="detail-title">
-        <span class="title-title ">{{totalMsg}}</span>
-        <div class="route-btns">
-          <el-button
-            :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
-            @click="showAddEzvizAccount"
-            size="mini">
-            <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
-            <span>{{$t('deviceView.addEzvizAccount')}}</span>
-          </el-button>
-        </div>
+        <!--<span class="title-title ">{{totalMsg}}</span>-->
+        <!--<div class="route-btns">-->
+          <!--<el-button-->
+            <!--:class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"-->
+            <!--@click="showAddEzvizAccount"-->
+            <!--size="mini">-->
+            <!--<i style="margin-right:8px;" class="iconfont el-icon-plus"></i>-->
+            <!--<span>{{$t('deviceView.addEzvizAccount')}}</span>-->
+          <!--</el-button>-->
+        <!--</div>-->
         <el-dialog :title="accountTitle"
                    :visible.sync="showAddAccount" v-if="showAddAccount"
                    :append-to-body='true'
@@ -31,7 +31,7 @@
                 </el-form-item>
               <div v-if="ezvizAccountInfo.scope == '0'">
                 <el-col :span="24">
-                  <el-form-item :label="$t('deviceView.enterAccount')" prop="ezvizAccount">
+                  <el-form-item :label="$t('deviceView.mobilePhone')" prop="ezvizAccount">
                     <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" ></el-input>
                   </el-form-item>
                 </el-col>
@@ -51,15 +51,15 @@
                 </el-row>
                 <el-form-item  :label="$t('deviceView.developerService')" required>
                   <div class="account-list">
-                    <el-form  label-position="left" label-width="120px" :model="ezvizAccountInfo" :rules="rules.appRules" class="ezviz-account" ref="appForm" size="mini">
+                    <el-form  label-position="left" :label-width="varyWindowHeight< 1600? '90px' : '120px'" :model="ezvizAccountInfo" :rules="rules.appRules" class="ezviz-account" ref="appForm" size="mini">
                       <el-form-item label="AppKey" prop="appKey">
-                        <el-input v-model="ezvizAccountInfo.appKey" :placeholder="$t('deviceView.enterAppKey')"  :type="isAdd? '': 'password'" ></el-input>
+                        <el-input v-model="ezvizAccountInfo.appKey"  :type="isAdd? '': 'password'" ></el-input>
                       </el-form-item>
                       <el-form-item label="AppSecret" prop="appSecret">
-                        <el-input v-model="ezvizAccountInfo.appSecret" :placeholder="$t('deviceView.enterSecret')" :type="isAdd? '': 'password'"></el-input>
+                        <el-input v-model="ezvizAccountInfo.appSecret"  :type="isAdd? '': 'password'"></el-input>
                       </el-form-item>
                       <el-form-item prop="accessToken" label="AccessToken" class="access-token" :error="errorMsg" >
-                        <el-input :placeholder="$t('deviceView.obtainToken')" ref='tokenInput' v-model="ezvizAccountInfo.accessToken" :type="isAdd? '': 'password'" readonly></el-input>
+                        <el-input  ref='tokenInput' v-model="ezvizAccountInfo.accessToken" :type="isAdd? '': 'password'" readonly></el-input>
                         <el-button @click.prevent="getAccessToken()" class="get-button">{{$t('deviceView.obtain')}}</el-button>
                       </el-form-item>
                     </el-form>
@@ -178,7 +178,8 @@
             }
           }
           return{
-            varyWindowWidth: window.innerHeight,
+            varyWindowWidth: window.innerWidth,
+            varyWindowHeight: window.innerHeight,
             tableData:[],
             tableInfoData:[
               {
@@ -194,7 +195,7 @@
               {
                 "prop":"appliedStores",
                 "label": this.$t('deviceView.appliedStores'),
-                "width":130
+                "width":150
               },
               {
                 "prop":"comment",
@@ -440,7 +441,7 @@
                     self.showAddAccount = false;
                   }
                   else {
-                    self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+                    self.notify(`${self.$t('deviceView.editFail')} : ${res.errMsg}`, 'warning', 3000);
                     self.showAddAccount = false;
                   }
                 }
@@ -546,6 +547,9 @@
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
   }
+  *{
+    font-family: Arial, "Microsoft YaHei";
+  }
   .detail-title{
     overflow: hidden;
     .title-title{
@@ -609,8 +613,11 @@
     position: absolute;
     @include point(right, 5);
     height: 24px;
-    @include point(top, 3);
+    @include point(top, 2);
     font-size: 12px;
+    @media screen and (min-width: 1920px){
+      top: 2px
+    }
   }
   .account-list{
     padding: calc(20/1920*100vw);

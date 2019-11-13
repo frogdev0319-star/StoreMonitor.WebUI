@@ -15,6 +15,15 @@
           <span>{{item.btnTitle}}</span>
         </el-button>
       </div>
+      <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-else>
+        <el-button
+          :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
+          @click="callChildAdd"
+          size="mini">
+          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
+          <span>{{$t('deviceView.addEzvizAccount')}}</span>
+        </el-button>
+      </div>
       <el-col :span="varWindowWidth<1540?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
         <el-dialog :title="generateDeviceLang('import')"
                    id="importId"
@@ -61,7 +70,7 @@
     <el-col :span="24" class="el-tabPanels">
       <el-tabs v-model="activeName" :id="lang=='en'? 'en-devicetabs-content': ''" @tab-click="handleClick">
         <el-tab-pane :label="generateDeviceLang('ezvizAccountSetting')" name="ezvizAccount">
-          <ezviz-account></ezviz-account>
+          <ezviz-account ref="ezvizAccount"></ezviz-account>
         </el-tab-pane>
         <el-tab-pane :label="generateDeviceLang('deviceManage')" name="device">
           <el-col :span="lang=='en' && varWindowWidth<1920? 11: 10" class="lisde">
@@ -217,24 +226,24 @@
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="serialNumber" :label="generateDeviceLang('serialNum')">
-                      <el-input :placeholder="generateDeviceLang('inputSerialNum')" v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain"></el-input>
+                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="validationCode" :label="generateDeviceLang('validationCode')">
-                      <el-input :placeholder="generateDeviceLang('codeInfo')" v-model="addDeviceData.validationCode" style="width: 100%;"></el-input>
+                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="name" :label="generateDeviceLang('deviceName')">
-                      <el-input :placeholder="generateDeviceLang('inputDeviceName')" v-model="addDeviceData.name" style="width: 100%;"></el-input>
+                      <el-input  v-model="addDeviceData.name" style="width: 100%;"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="channelCount" :label="generateDeviceLang('deviceChannelNum')">
-                      <el-select v-model="addDeviceData.channelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" :disabled="isAddAgain">
+                      <el-select v-model="addDeviceData.channelCount"  size="mini" :disabled="isAddAgain">
                         <el-option
                           v-for="numList in channelNumList"
                           :key="numList.value"
@@ -245,8 +254,8 @@
                     </el-form-item>
                   </el-col>
                 </el-form-item>
-                <el-form-item :label="generateDeviceLang('ezvizAccount')" prop="ezvizAccount">
-                  <el-select v-model="addDeviceData.ezvizAccount" :placeholder="generateDeviceLang('selectEzvizAccount')" style="width: 100%;" :disabled="isAddAgain">
+                <el-form-item :label="generateDeviceLang('EzvizAccount')" prop="ezvizAccount">
+                  <el-select v-model="addDeviceData.ezvizAccount" style="width: 100%;" :disabled="isAddAgain">
                     <el-option
                       v-for="item in ezvizAccountList"
                       :key="item.id"
@@ -256,7 +265,7 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item :label="generateDeviceLang('store')" prop="storeId">
-                  <el-select v-model="addDeviceData.storeId" :placeholder="generateDeviceLang('selectStore')" style="width: 100%;" :disabled="isAddAgain">
+                  <el-select v-model="addDeviceData.storeId" style="width: 100%;" :disabled="isAddAgain">
                     <el-option
                       v-for="item in storeDataList"
                       :key="item.storeId"
@@ -398,12 +407,12 @@
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
                       <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;"></el-input>
+                        <el-input  v-model="addChannelData.name" style="width: 100%;"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
                       <el-form-item  prop="channelId" :label="generateDeviceLang('devChannelNum')">
-                        <el-select v-model="addChannelData.channelId" :placeholder="generateDeviceLang('selectDeviceChannel')" size="mini">
+                        <el-select v-model="addChannelData.channelId"  size="mini">
                           <el-option
                             v-for="numList in newChannelNumList"
                             :key="numList.value"
@@ -661,6 +670,10 @@
     },
     methods:{
       generateDeviceLang,
+      callChildAdd(){
+        let self = this;
+        self.$refs.ezvizAccount.showAddEzvizAccount();
+      },
       handleClick(tabs){
         console.log(tabs);
         let self=this;
@@ -671,6 +684,8 @@
             break;
           case 1:
             self.InitData();
+            self.getAccountList();
+            self.getAllStoreList()
             break;
         }
       },
@@ -1140,6 +1155,7 @@
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]))
       },
+
       handleNVR(index,item){
         let self=this;
         console.log(item);
@@ -1486,7 +1502,7 @@
                 self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
                 self.showAddNvrDialog = false;
               }
-              self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1, ezvizAccount: ''};
+              self.addDeviceData = {name: '', validationCode: '', storeId: self.storeDataList[0].storeId, serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount};
               self.page = 1;
               let params = {
                 "filter": {
@@ -1611,7 +1627,7 @@
       showAddDialog(){
         let self = this;
         self.showAddNvrDialog = true;
-        self.addDeviceData = {name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1, ezvizAccount: ''};
+        self.addDeviceData = {name: '', validationCode: '', storeId: self.storeDataList[0].storeId, serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount};
       },
       confirmEditNvr(index,item){
         let self=this;
@@ -1756,8 +1772,8 @@
 
     mounted(){
       let self=this;
-      self.InitData();
-      self.getAllStoreList();
+      // self.InitData();
+      // self.getAllStoreList();
       self.getAccountList();
     },
   }
@@ -1810,6 +1826,37 @@
     color: #4b5262 !important;
     background-color: #FAFAFA;
     cursor: pointer;
+  }
+  .el-delete-btn{
+    background-color: $mainColor;
+    border-color:  $mainColor;
+    color: #fff;
+    @include point(margin-right,8);
+    font-size: 12px;
+    &:disabled{
+      opacity: 0.6;
+    }
+  }
+  .en-el-delete-btn{
+    background-color: $mainColor;
+    border-color:  $mainColor;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    /**
+    @media screen and (min-width: 1366px){
+      @include point(width, 105);
+    }
+    @media screen and (max-width: 1366px){
+      @include point(width, 150);
+    }
+    */
+    &:disabled{
+      opacity: 0.6;
+    }
+    span{
+      position: relative;
+    }
   }
   .active-color{
     color: $mainColor !important;

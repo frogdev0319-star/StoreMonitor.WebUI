@@ -463,6 +463,7 @@ export default {
     deleteSuccess: '刪除成功',
     deleteFail: '刪除失敗',
     unit: '個',
+    inputIvsId : '請輸入IVS ID',
     codeInfo: '請輸入驗證碼',
     inputNvrName: '請輸入NVR名稱',
     inputNvrNumber: '請選擇NVR通道數',
@@ -535,7 +536,8 @@ export default {
     enterCorrentAccount: '請輸入正確的螢石賬號',
     accountExist: '該賬號已存在',
     enterDeveloperKey: '請輸入完整的開發者密鑰',
-    enterAccountName: '用戶名由1~20個漢字、字母或數字組成'
+    enterAccountName: '用戶名由1~20個漢字、字母或數字組成',
+    EzvizAccount: '螢石賬號'
   },
   //Store Management page language
   storeView: {
