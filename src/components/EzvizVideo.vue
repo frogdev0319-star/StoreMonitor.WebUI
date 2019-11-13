@@ -850,9 +850,16 @@
           self.isLoading = false;
           self.showModelContent=true;
           self.showInfoContent=false;
-          if(!self.ifOpenSound){
-            self.decoder.closeSound();
-            self.ifOpenSound = false
+          // self.ifOpenSound = false;
+          if(self.fullWindow){
+            if(self.ifOpenSound){
+              self.fullDecoder.openSound()
+            }
+          }
+          else{
+            if(self.ifOpenSound){
+              self.decoder.openSound()
+            }
           }
           if(self.playBack){
             self.playBackState = true;
@@ -883,8 +890,8 @@
           self.showModelContent=true;
           self.showInfoContent=false;
           self.isLoading = false;
-          if(!self.ifOpenSound){
-            self.decoder.closeSound();
+          if(self.ifOpenSound){
+            self.fullDecoder.openSound()
           }
           //self.ifOpenSound = false
         }, 2000);
@@ -913,8 +920,8 @@
           self.isLoading = false;
           self.showModelContent=true;
           self.showInfoContent=false;
-          if(!self.ifOpenSound){
-            self.decoder.closeSound();
+          if(self.ifOpenSound){
+            self.decoder.openSound()
           }
         }, 2000);
       },
