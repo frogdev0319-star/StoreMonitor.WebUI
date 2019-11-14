@@ -21,6 +21,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item :label="$t('titleView.comment')" prop="comment" class="comment-class">
+            <label slot="label" class="comment-label">{{$t('titleView.comment')}}</label>
             <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  @input="commentChange" ></el-input>
             <span class="text" style="float: right;color: #909399;">{{curLength}}/200</span>
           </el-form-item>
@@ -60,8 +61,9 @@
         name: "titleSetting",
       data(){
           const validateTitle=(rule,value,callback)=>{
+            let self = this;
             if(value == undefined){
-              return callback(new Error($t('titleView.enterTitleName')))
+              return callback(new Error(self.$t('titleView.enterTitleName')))
             }
             else{
               const reg = /^[A-Za-z\u4e00-\u9fa5]{1,20}$/
@@ -70,7 +72,7 @@
               if (reg.test(value) && commentLength <=20) {
                 callback()
               } else {
-                return callback(new Error($t('titleView.titleValidateInfo')))
+                return callback(new Error(self.$t('titleView.titleValidateInfo')))
               }
             }
           }
@@ -292,7 +294,7 @@
                 self.addBasicInformation().then(res=>{
                   console.log(res);
                   if(res.errCode == 0){
-                    self.notify('保存成功','success',3000);
+                    self.notify(self.$t('titleView.emptyDeleteInfo'),'success',3000);
                   }
                   else{
                     self.notify(res.errorMsg,'warning',3000);
@@ -730,5 +732,10 @@
   .role-group .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
     background-color:#f31d65 ;
     border-color: #f31d65;
+  }
+  .comment-label::before{
+    content: '*';
+    margin-right: 4px;
+    visibility: hidden;
   }
 </style>

@@ -578,7 +578,6 @@
         isAdd: false,
       }
     },
-
     methods: {
       generateScheduleLang,
       noTimeDialog(val){

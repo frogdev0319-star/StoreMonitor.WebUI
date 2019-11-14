@@ -36,7 +36,7 @@ let _Environments = {
 }
 
 function getEnvironment() {
-  return _Environments.Debug_XA;
+  return _Environments.QA;
 }
 
 var Environment = getEnvironment()

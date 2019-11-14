@@ -76,7 +76,7 @@
               </div>
             </div>
           </el-table>
-          <el-dialog  title="确认删除"
+          <el-dialog  :title="$t('titleView.confirmInfo')"
                       :visible.sync="showDeleteDialog" v-if="showDeleteDialog"
                       :append-to-body='true'
                       :close-on-click-modal="false"
@@ -87,7 +87,7 @@
               <hr style="border: 0.5px solid #FB4C5D;"/>
               <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                 <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                <span>确认删除职务</span>
+                <span>{{deleteInfo}}</span>
               </p>
             </div>
             <div slot="footer" class="dialog-footer">
@@ -112,6 +112,8 @@
 
 <script>
   import {titleRESTful} from '@/api/index'
+  import {mapGetters} from 'vuex'
+
   export default {
         name: "titleManage",
       data(){
@@ -123,6 +125,7 @@
             page:1,
             showDeleteDialog: false,
             deleteIds : [],
+            deleteInfo: this.$t('titleView.confirmDeleteTitle')
           }
       },
       computed:{
@@ -137,7 +140,16 @@
             return this.varyWindowWidth*0.63;
           }
         },
-        // ...mapGetters({accountChanged:'accountChanged'})
+        ...mapGetters({accountChanged:'accountChanged'})
+      },
+      watch:{
+        accountChanged(val,oldVal){
+          console.log(val);
+          let self=this;
+          if(val!=0){
+            self.getTitleList();
+          }
+        },
       },
       methods:{
         addNewTitle(){
@@ -168,10 +180,16 @@
             self.deleteIds = arr;
           }
           if(self.deleteIds.length == 0){
-            self.notify('请勾选要删除的职务','warning',3000)
+            self.notify(self.$t('titleView.emptyDeleteInfo'),'warning',3000)
             return false;
           }
           else{
+            if(self.deleteIds.length == 1){
+              self.deleteInfo = self.$t('titleView.confirmDeleteTitle')
+            }
+            else{
+              self.deleteInfo = self.$t('titleView.confirmDeleteTitles')
+            }
             self.showDeleteDialog = true;
           }
         },
@@ -180,7 +198,7 @@
           self.deleteUserTitle().then(res=>{
             console.log(res);
             if(res.errCode == 0){
-              self.notify('删除成功','success',3000);
+              self.notify(self.$t('titleView.deleteSuss'),'success',3000);
             }
             else{
               self.notify(res.errorMsg,'warning',3000);
@@ -226,22 +244,23 @@
           })
         },
         formatRoleId(row, column, cellValue) {
+          let self = this;
           let roleId = row.roleId;
           switch (roleId) {
             case 1: {
-              return '企业高层/IT运维';
+              return  self.$t('titleView.roleId1Title');
               break
             }
             case 2: {
-              return  '企业中层';
+              return  self.$t('titleView.roleId2Title');
               break
             }
             case 3: {
-              return '企业基层';
+              return self.$t('titleView.roleId3Title');
               break
             }
             case 4: {
-              return '门店运营';
+              return self.$t('titleView.roleId4Title');
               break
             }
             default: {
