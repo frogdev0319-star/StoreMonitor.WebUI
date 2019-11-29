@@ -19,7 +19,7 @@
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
+          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini">{{generateScheduleLang('cancel')}}</el-button>
           <el-button class="file-confirm-btn" @click="addSchedule" size="mini" type="primary">{{generateScheduleLang('confirm')}}</el-button>
         </div>
       </el-dialog>
@@ -131,7 +131,7 @@
                   </div>
                   <span class="delete-time-btn" size="mini" v-if="item.schedule.length > 1" style="margin: 0 20px 0 30px"
                         @click="deleteMonthAndDays(_index)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addMonth"
+                  <el-button class="time-btn" size="mini" @click="addMonth" type="primary"
                              v-if="!showAddMonth && (_index == item.schedule.length-1)"><i class="el-icon-plus"></i></el-button>
                 </div>
               </el-col>
@@ -165,7 +165,7 @@
                   </div>
                   <span class="delete-time-btn" size="mini" v-if="" style="margin: 0 20px 0 30px"
                         @click="deleteMonthAndDays(-1)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addMonth"><i class="el-icon-plus"></i></el-button>
+                  <el-button class="time-btn" size="mini" @click="addMonth" type="primary"><i class="el-icon-plus"></i></el-button>
                 </div>
               </el-col>
               <el-col :span="24" class="header-details"
@@ -249,8 +249,9 @@
               </div>
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
                 <div class="el-btn-content">
-                  <el-button :disabled="storeList.length==0" class="btn" size="mini" @click="bindScheduleBtn"><i
-                    class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>{{generateScheduleLang('saveAndApply')}}
+                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn"><i
+                    class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>
+                    <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>
               </div>
@@ -314,7 +315,7 @@
         timeArray: ['08:00'], //选中的执行时间
         lang: this.$i18n.locale ,
         hasSelectMonth: false,
-        monthList:[
+        bigMonthList:[
           {
             'checked': false,
             value: 1,
@@ -471,6 +472,7 @@
             name: '31'
           },
         ],
+        monthList: [],
         value: '',
         input4:'',
         checked:false,
@@ -908,7 +910,7 @@
         let year = self.$moment().format('YYYY');
         let days = self.$moment([year, month-1]).daysInMonth();
         console.log(days)
-        self.monthList = monthList.splice(0, days);
+        self.monthList = self.bigMonthList.slice(0, days);
         console.log(self.monthList )
       },
       addScheduleButton() {
@@ -1089,6 +1091,7 @@
           }
         }
         else if(type == 2){
+          self.monthList = self.bigMonthList.slice(0, 28); // 月模式1-28号
           let selectedMonth = self.dayArray;
           self.selectMonth = selectedMonth;
           console.log(selectedMonth + 'selectedMonth');
@@ -1116,6 +1119,7 @@
           }
         }
         else if(type == 3){
+          self.monthList = self.bigMonthList;
           let selectedMonth = self.dayArray;
           self.selectMonth = selectedMonth;
           console.log(selectedMonth + 'selectedMonth');
@@ -1456,6 +1460,8 @@
         let self = this;
         self.scheduleName = self.$t('scheduleView.newSchedule');
         self.showAddDialog = false;
+        self.checkAllWeek = false;
+        self.checkAllMonth = false;
         let addInfo = {
           name: self.scheduleName,
           mode: 1,
@@ -1886,7 +1892,10 @@
         let mode = self.paneList[Number(self.activeName)].mode;
         if(mode == 2){
           //月模式
-          self.monthList = self.monthList.slice(0, 28); // 月模式1-28号
+          self.monthList = self.bigMonthList.slice(0, 28); // 月模式1-28号
+        }
+        else{
+          self.monthList = self.bigMonthList;
         }
         self.showCityContent = false;
         self.serachVale = '';
@@ -2456,7 +2465,7 @@
           .el-type{
             width: 200px;
             /deep/ .el-input__inner{
-                height: 28px !important;
+                height: 30px !important;
             }
           }
           .time-select{
@@ -2911,9 +2920,23 @@
           @include point(margin-top,15);
           @include point(margin-bottom,15);
           .btn{
-            @include point(width,90);
-            min-width: 160px;
-            background-color: #f31d65;
+            //background-color: #f31d65;
+            font-size: calc(14/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            padding: 0 0;
+            width: calc(130/1920*100vw);
+            .icon-quxiaolianjie{
+              font-size: calc(24/1920*100vw);
+              padding: calc(5/1920*100vw) 0;
+            }
+            span{
+              position: relative;
+              bottom: calc(4/1920*100vw);
+              @media screen and (max-width: 1280px) {
+                bottom: calc(3/1920*100vw);
+              };
+            }
             color: #fff;
           }
         }
@@ -2944,6 +2967,9 @@
         position: absolute;
         @include point(right, 220);
         @include point(margin-top, 10);
+        .icon-tishi1{
+          font-size: calc(16/1920*100vw);
+        }
       }
       .el-schedule-btns{
         position: absolute;
@@ -3092,7 +3118,7 @@
       }
     }
     .time-btn{
-      background-color: $red;
+      //background-color: $red;
       color: #fff;
       font-size: 12px;
       width: 14px;
@@ -3143,11 +3169,9 @@
   #patrltabs-content /deep/ .el-tabs__active-bar{
     height: 0 !important;
   }
-
-</style>
-<style>
-  #el-menuscrollbar .el-scrollbar__wrap {
-    overflow-x: hidden;
+  /deep/ .el-input--mini .el-input__inner{
+    height: 30px;
+    line-height: 30px;
   }
   /* 浏览器滚动条样式 */
 
@@ -3173,5 +3197,11 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
   }
+</style>
+<style>
+  #el-menuscrollbar .el-scrollbar__wrap {
+    overflow-x: hidden;
+  }
+
 </style>
 

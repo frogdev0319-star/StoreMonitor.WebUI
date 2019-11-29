@@ -1,16 +1,16 @@
 <template>
-  <el-row class="el-schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
+  <el-row class="schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
     <div class="el-schedule-header">
       <el-col :span="7" class="el-schedule-btns">
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'"
+        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
                    @click="addScheduleButton">
-          <i style="margin-right:18px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
+          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
         </el-button>
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
+        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
                    @click="deleteScheduleButton"
                    :disabled="Number(activeName) == 0? true: false"
         >
-          <i style="margin-right:18px;font-size:16px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
+          <i style="margin-right:8px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
         </el-button>
       </el-col>
       <el-col :span="18" class="el-schedule-tabs">
@@ -32,6 +32,7 @@
   import {getStoreList} from '@/api/store'
   import RemoteDetail from '@/views/setting/schedule/RemoteDetail'
   import OnsiteDetail from '@/views/setting/schedule/OnsiteDetail'
+  import {mapGetters} from 'vuex'
 
   export default {
     name: "PatrolSchedule",
@@ -381,7 +382,23 @@
         self.activePatrol = val.index;
         self.activeName = '0';
       }
-    }
+    },
+    watch:{
+      accountChanged(val,oldVal){
+        console.log(val);
+        let self=this;
+        if(val!=0){
+          self.activePatrol = '0';
+          self.$refs.remoteHandle.isFirstLoad = true;
+          self.$refs.remoteHandle.getScheduleList();
+        }
+      }
+    },
+    computed:{
+      ...mapGetters({
+        accountChanged:'accountChanged'
+      }),
+    },
   }
 </script>
 
@@ -411,48 +428,142 @@
     #{$poi}:checkRem($val);
   }
 
-  .en-el-add-btn{
-    background-color: $mainColor;
+  .el-add-btn{
+    //background-color: $mainColor;
     color: #fff;
-    border-color: $mainColor;
+    //border-color: $mainColor;
     position: relative;
     @include point(margin-right,15);
-    //@include point(width, 120);
-    font-size: 12px;
-    &:disabled{
-      opacity: 0.6;
+    // @include point(width, 98);
+    .icon-shanchu{
+      font-size: calc(24/1920*100vw);
+      padding:  calc(5/1920*100vw) 0;
     }
-    @media screen and (min-width: 1680px){
-      @include point(width, 120);
+    span{
+      position: relative;
+      bottom: calc(4/1920*100vw);
+      @media screen and (max-width: 1280px) {
+        bottom: calc(2/1920*100vw);
+      };
+    }
+    &:disabled{
+      opacity: 0.5;
     }
     @media screen and (max-width: 1680px){
-      width: 160px;
+      width: 120px;
     }
   }
-
-  .en-el-delete-btn{
-    background-color: $mainColor;
+  .en-el-add-btn{
+    //background-color: $mainColor;
     color: #fff;
-    border-color: $mainColor;
+    //border-color: $mainColor;
+    position: relative;
+    @include point(margin-right,15);
+    font-size: calc(14/1920*100vw);
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    width: calc(160/1920*100vw);
+    .el-icon-plus{
+      font-size: calc(24/1920*100vw);
+      padding:  calc(5/1920*100vw) 0;
+    }
+    span{
+      position: relative;
+      bottom: calc(4/1920*100vw);
+      @media screen and (max-width: 1280px) {
+        bottom: calc(2/1920*100vw);
+      };
+    }
+    &:disabled{
+      opacity: 0.5;
+    }
+    @media screen and (max-width: 1680px){
+      width: 130px;
+    }
+
+  }
+  .el-delete-btn {
+    color: #fff;
+    position: relative;
+    @include point(margin-right, 15);
+    font-size: calc(14/1920*100vw);
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    width: calc(130/1920*100vw);
+    @media screen and (max-width: 1680px){
+      width: 120px;
+    }
+    .icon-shanchu{
+      font-size: calc(24/1920*100vw);
+      padding:  calc(5/1920*100vw) 0;
+    }
+    span{
+      position: relative;
+      bottom: calc(4/1920*100vw);
+      @media screen and (max-width: 1280px) {
+        bottom: calc(2/1920*100vw);
+      };
+    }
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+  .en-el-delete-btn{
+    //background-color: $mainColor;
+    color: #fff;
+    //border-color: $mainColor;
     position: relative;
     @include point(margin-right, 15);
     // @include point(width, 120);
-    font-size: 12px;
-    &:disabled {
-      opacity: 0.6;
+    font-size: calc(14/1920*100vw);
+    height: calc(36/1920*100vw);
+    padding: 0 0;
+    width: calc(160/1920*100vw);
+    .icon-shanchu{
+      font-size: calc(24/1920*100vw);
+      padding:  calc(5/1920*100vw) 0;
     }
-    @media screen and (min-width: 1680px){
-      @include point(width, 120);
+    span{
+      position: relative;
+      bottom: calc(4/1920*100vw);
+      @media screen and (max-width: 1280px) {
+        bottom: calc(2/1920*100vw);
+      };
     }
     @media screen and (max-width: 1680px){
-      width: 160px;
+      width: 130px;
+    }
+    &:disabled {
+      opacity: 0.5;
     }
   }
-
-  .el-schedule-container{
-    margin: 20px 15px 15px 15px;
-    height: calc(180 / 1920 * 100vw);
-
+  .btn-class{
+    height: calc(36/1920*100vw);
+    padding: 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
+    .el-icon-plus, .icon-shanchu{
+      padding: calc(5/1920*100vw) 0;
+      font-size: calc(24/1920*100vw);
+    }
+    span{
+      position: relative;
+      bottom: calc(4/1920*100vw);
+      @media screen and (max-width: 1280px) {
+        bottom: calc(3/1920*100vw);
+      };
+    }
+    @media screen and (max-width: 1440px) {
+      width: 125px;
+    }
+  }
+  .schedule-container{
+    padding: 20px 15px 15px 15px;
+    /*height: calc(180 / 1920 * 100vw);*/
+    border: 1px solid $border;
+    background-color: #fff;
     .el-schedule-header {
       @include point(margin-top, 10);
 
@@ -490,41 +601,7 @@
         @include point(right, 30);
         z-index: 10;
         width: auto;
-        @include point(top, 5);
-        .el-add-btn {
-          background-color: $mainColor;
-          color: #fff;
-          border-color: $mainColor;
-          position: relative;
-          @include point(margin-right, 15);
-          font-size: 12px;
-          &:disabled {
-            opacity: 0.6;
-          }
-          @media screen and (min-width: 1680px){
-            @include point(width, 98);
-          }
-          @media screen and (max-width: 1680px){
-            width: 120px;
-          }
-        }
-        .el-delete-btn {
-          background-color: $mainColor;
-          color: #fff;
-          border-color: $mainColor;
-          position: relative;
-          @include point(margin-right, 15);
-          font-size: 12px;
-          &:disabled {
-            opacity: 0.6;
-          }
-          @media screen and (min-width: 1680px){
-            @include point(width, 98);
-          }
-          @media screen and (max-width: 1680px){
-            width: 120px;
-          }
-        }
+        @include point(top, 20);
       }
     }
     #patrol-content /deep/ .el-tabs__nav-scroll{
@@ -545,12 +622,6 @@
     #patrol-content /deep/ .el-tabs__active-bar{
       height: 0 !important;
     }
-  }
-
-</style>
-<style>
-  #el-menuscrollbar .el-scrollbar__wrap {
-    overflow-x: hidden;
   }
   /* 浏览器滚动条样式 */
   /* width */
@@ -575,4 +646,11 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
   }
+
+</style>
+<style>
+  #el-menuscrollbar .el-scrollbar__wrap {
+    overflow-x: hidden;
+  }
+
 </style>

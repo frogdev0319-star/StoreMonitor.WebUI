@@ -2,13 +2,13 @@
   <el-row class="el-schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
     <div class="el-schedule-header">
       <el-col :span="7" class="el-schedule-btns">
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'"
+        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
                    @click="addSchedule">
-          <i style="margin-right:18px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
+          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
         </el-button>
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
+        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
                    @click="deleteScheduleButton" :disabled="Number(activeName) == 0? true: false">
-          <i style="margin-right:18px;font-size:16px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
+          <i style="margin-right:8px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
         </el-button>
       </el-col>
       <el-dialog :title="generateScheduleLang('delete')"
@@ -107,7 +107,7 @@
                 <span class="delete-time-btn" size="mini" v-if="paneItem.weeklySchedule.length > 1" style="margin: 0 20px 0 30px"
                       @click="deleteWeekDays(_index)"><i class="el-icon-error"></i>
                 </span>
-                <el-button class="time-btn" size="mini" @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                <el-button class="time-btn" size="mini" type="primary"  @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
                            v-if="_index == paneItem.weeklySchedule.length-1 && !showAddWeek"><i class="el-icon-plus"></i></el-button>
               </el-col>
 
@@ -145,7 +145,7 @@
                   </div>
                   <span class="delete-time-btn" size="mini" v-if="" style="margin: 0 20px 0 30px"
                         @click="deleteWeekDays(-1)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addWeekDays(-1)"><i class="el-icon-plus"></i></el-button>
+                  <el-button class="time-btn" size="mini" type="primary"  @click="addWeekDays(-1)"><i class="el-icon-plus"></i></el-button>
               </el-col>
               <!-- 日模式和月模式 -->
               <el-col :span="24" class="header-details" v-if="paneItem.timeList.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeList"
@@ -164,9 +164,9 @@
                     </div>
                   </div>
                 </div>
-                <span class="delete-time-btn" size="mini" v-if="paneItem.timeList.length > 1" style="margin: 0 20px 0 30px"
+                <span class="delete-time-btn" size="mini" type="primary"  v-if="paneItem.timeList.length > 1" style="margin: 0 20px 0 30px"
                       @click="deleteCurTime(timeIndex)"><i class="el-icon-error"></i></span>
-                <el-button class="time-btn" size="mini" @click="addTime" :style="paneItem.timeList.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                <el-button class="time-btn" size="mini" type="primary" @click="addTime" :style="paneItem.timeList.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
                            v-if="timeIndex == paneItem.timeList.length-1 && !showAddTime"><i class="el-icon-plus"></i></el-button>
               </el-col>
               <el-col v-if="showAddTime && paneItem.mode != 1" :span="24" class="header-details">
@@ -185,7 +185,7 @@
                   </div>
                 </div>
                   <span class="delete-time-btn" size="mini" @click="deleteCurTime(-1)" style="margin: 0 20px 0 30px"><i class="el-icon-error" ></i></span>
-                  <el-button class="time-btn" size="mini" @click="addTime"><i class="el-icon-plus"></i></el-button>
+                  <el-button class="time-btn" size="mini" type="primary" @click="addTime"><i class="el-icon-plus"></i></el-button>
               </el-col>
             </div>
             <hr class="el-header-hr"/>
@@ -234,8 +234,9 @@
               </div>
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
                 <div class="el-btn-content">
-                  <el-button :disabled="storeList.length==0" class="btn" size="mini" @click="bindScheduleBtn"><i
-                    class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>{{generateScheduleLang('saveAndApply')}}
+                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn"><i
+                    class="iconfont icon-quxiaolianjie" style="margin-right:8px;"></i>
+                    <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>
               </div>
@@ -279,6 +280,7 @@
   import {getStoreList} from '@/api/store'
   import DialogVue from '@/components/DialogVue.vue'
   import util from '@/common/util'
+  import {mapGetters} from 'vuex'
 
   export default {
     name: "PointCheckSch",
@@ -578,6 +580,22 @@
         isAdd: false,
       }
     },
+    watch:{
+      accountChanged(val,oldVal){
+        console.log(val);
+        let self=this;
+        if(val!=0){
+          self.isFirstLoad = true;
+          self.activeName = '0';
+          self.getScheduleList();
+        }
+      }
+    },
+    computed:{
+      ...mapGetters({
+        accountChanged:'accountChanged'
+      }),
+    },
     methods: {
       generateScheduleLang,
       noTimeDialog(val){
@@ -760,7 +778,35 @@
         let type = self.paneList[Number(self.activeName)].mode;
         let dateStr = '';
         let count = 0;
-          if(type == 2){
+        if(type == 1){
+          let selectedWeek = self.dayArray;
+          self.selectWeek = selectedWeek;
+          console.log(selectedWeek + 'selectedWeek');
+          self.weekList.forEach(item => {
+            selectedWeek.forEach(_item=>{
+              if(item.value == _item){
+                dateStr = dateStr + item.name + ',';
+                item.checked = true;
+                count++;
+              }
+            })
+          })
+          if (dateStr.length != 0) {
+            if (count == self.weekList.length) {
+              self.weekValue = self.$t('scheduleView.everyDay');
+              self.checkAllWeek = true;
+            }
+            else {
+              self.weekValue = dateStr;
+              self.checkAllWeek = false;
+            }
+          }
+          else{
+            self.checkAllWeek = false;
+          }
+          console.log(self.weekValue)
+        }
+        else if(type == 2){
           let selectedMonth = self.dayArray;
           console.log(selectedMonth + 'selectedMonth');
           self.selectMonth = selectedMonth;
@@ -1227,6 +1273,8 @@
         let self = this;
         self.scheduleName = self.$t('scheduleView.newSchedule');
         self.isAdd = true;
+        self.checkAllWeek = false;
+        self.checkAllMonth = false;
         let scheduleInfo = {
           name: self.scheduleName,
           mode: 0,
@@ -1873,7 +1921,6 @@
           //self.timeArray = self.paneList[0].timeArray
           console.log(self.paneList);
           self.getHasBoundStroeIds();
-
         }
         else if(data.length == 0){
           console.log(self.paneList)
@@ -2232,9 +2279,10 @@
     }
   }
   .el-schedule-container{
-    margin: 20px 15px 15px 15px;
-    height: calc(180 / 1920 * 100vw);
-
+    padding: 20px 15px 15px 15px;
+    /*height: calc(180 / 1920 * 100vw);*/
+    border: 1px solid $border;
+    background-color: #fff;
     .el-schedule-header {
       @include point(margin-top, 10);
 
@@ -2264,7 +2312,7 @@
           .el-type{
             width: 200px;
             /deep/ .el-input__inner{
-              height: 28px !important;
+              height: 30px !important;
             }
           }
           .time-select{
@@ -2486,6 +2534,7 @@
         }
       }
       .el-bind-footer{
+        text-align: left;
         @include point(height,50);
         @include point(line-height,50);
         @include point(margin-bottom,25);
@@ -2496,9 +2545,23 @@
           @include point(margin-top,15);
           @include point(margin-bottom,15);
           .btn{
-            @include point(width,90);
-            min-width: 160px;
-            background-color: #f31d65;
+            //background-color: #f31d65;
+            font-size: calc(14/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            padding: 0 0;
+            width: calc(130/1920*100vw);
+            .icon-quxiaolianjie{
+              font-size: calc(24/1920*100vw);
+              padding: calc(5/1920*100vw) 0;
+            }
+            span{
+              position: relative;
+              bottom: calc(4/1920*100vw);
+              @media screen and (max-width: 1280px) {
+                bottom: calc(3/1920*100vw);
+              };
+            }
             color: #fff;
           }
         }
@@ -2529,95 +2592,137 @@
         position: absolute;
         @include point(right, 220);
         @include point(margin-top, 10);
+        .icon-tishi1{
+          font-size: calc(16/1920*100vw);
+        }
       }
       .el-schedule-btns{
         position: absolute;
         @include point(right,30);
         z-index: 10;
         width: auto;
-        @include point(top,5);
+        @include point(top,20);
         .el-add-btn{
-          background-color: $mainColor;
+          //background-color: $mainColor;
           color: #fff;
-          border-color: $mainColor;
+          //border-color: $mainColor;
           position: relative;
           @include point(margin-right,15);
           // @include point(width, 98);
-          font-size: 12px;
-          &:disabled{
-            opacity: 0.6;
+          .icon-shanchu{
+            font-size: calc(24/1920*100vw);
+            padding:  calc(5/1920*100vw) 0;
           }
-          @media screen and (min-width: 1680px){
-            @include point(width, 98);
+          span{
+            position: relative;
+            bottom: calc(4/1920*100vw);
+            @media screen and (max-width: 1280px) {
+              bottom: calc(2/1920*100vw);
+            };
+          }
+          &:disabled{
+            opacity: 0.5;
           }
           @media screen and (max-width: 1680px){
             width: 120px;
           }
         }
         .en-el-add-btn{
-          background-color: $mainColor;
+          //background-color: $mainColor;
           color: #fff;
-          border-color: $mainColor;
+          //border-color: $mainColor;
           position: relative;
           @include point(margin-right,15);
-          //@include point(width, 120);
-          font-size: 12px;
-          &:disabled{
-            opacity: 0.6;
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          padding: 0 0;
+          width: calc(160/1920*100vw);
+          .el-icon-plus{
+            font-size: calc(24/1920*100vw);
+            padding:  calc(5/1920*100vw) 0;
           }
-          @media screen and (min-width: 1680px){
-            @include point(width, 120);
+          span{
+            position: relative;
+            bottom: calc(4/1920*100vw);
+            @media screen and (max-width: 1280px) {
+              bottom: calc(2/1920*100vw);
+            };
+          }
+          &:disabled{
+            opacity: 0.5;
           }
           @media screen and (max-width: 1680px){
-            width: 160px;
+            width: 130px;
           }
+
         }
         .el-delete-btn {
-          background-color: $mainColor;
           color: #fff;
-          border-color: $mainColor;
           position: relative;
           @include point(margin-right, 15);
-          // @include point(width, 98);
-          font-size: 12px;
-          &:disabled {
-            opacity: 0.6;
-          }
-          @media screen and (min-width: 1680px){
-            @include point(width, 98);
-          }
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          padding: 0 0;
+          width: calc(130/1920*100vw);
           @media screen and (max-width: 1680px){
             width: 120px;
           }
+          .icon-shanchu{
+            font-size: calc(24/1920*100vw);
+            padding:  calc(5/1920*100vw) 0;
+          }
+          span{
+            position: relative;
+            bottom: calc(4/1920*100vw);
+            @media screen and (max-width: 1280px) {
+              bottom: calc(2/1920*100vw);
+            };
+          }
+          &:disabled {
+            opacity: 0.5;
+          }
         }
         .en-el-delete-btn{
-          background-color: $mainColor;
+          //background-color: $mainColor;
           color: #fff;
-          border-color: $mainColor;
+          //border-color: $mainColor;
           position: relative;
           @include point(margin-right, 15);
           // @include point(width, 120);
-          font-size: 12px;
-          &:disabled {
-            opacity: 0.6;
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
+          padding: 0 0;
+          width: calc(160/1920*100vw);
+          .icon-shanchu{
+            font-size: calc(24/1920*100vw);
+            padding:  calc(5/1920*100vw) 0;
           }
-          @media screen and (min-width: 1680px){
-            @include point(width, 120);
+          span{
+            position: relative;
+            bottom: calc(4/1920*100vw);
+            @media screen and (max-width: 1280px) {
+              bottom: calc(2/1920*100vw);
+            };
           }
           @media screen and (max-width: 1680px){
-            width: 160px;
+            width: 130px;
+          }
+          &:disabled {
+            opacity: 0.5;
           }
         }
         .en-el-bind-btn{
-          background-color: $mainColor;
+          //background-color: $mainColor;
           color: #fff;
-          border-color: $mainColor;
+          //border-color: $mainColor;
           position: relative;
           @include point(margin-right,15);
           font-size: 12px;
           width:120px;
           &:disabled{
-            opacity: 0.6;
+            opacity: 0.5;
           }
           @media screen and (min-width: 1366px){
             @include point(width, 90);
@@ -2634,7 +2739,26 @@
           }
 
         }
-
+        .btn-class{
+          height: calc(36/1920*100vw);
+          padding: 0;
+          font-size: calc(14/1920*100vw);
+          width: calc(130/1920*100vw);
+          .el-icon-plus, .icon-shanchu{
+            padding: calc(5/1920*100vw) 0;
+            font-size: calc(24/1920*100vw);
+          }
+          span{
+            position: relative;
+            bottom: calc(4/1920*100vw);
+            @media screen and (max-width: 1280px) {
+              bottom: calc(3/1920*100vw);
+            };
+          }
+          @media screen and (max-width: 1440px) {
+            width: 125px;
+          }
+        }
         .downLoad-btn{
           margin-left: 0px !important;
           border-color: $mainColor !important;
@@ -2724,7 +2848,7 @@
       }
     }
     .time-btn{
-      background-color: $red;
+      //background-color: $red;
       color: #fff;
       font-size: 12px;
       width: 14px;
@@ -2767,11 +2891,9 @@
       height: 0 !important;
     }
   }
-
-</style>
-<style>
-  #el-menuscrollbar .el-scrollbar__wrap {
-    overflow-x: hidden;
+  /deep/ .el-input--mini .el-input__inner{
+    height: 30px;
+    line-height: 30px;
   }
   /* 浏览器滚动条样式 */
 
@@ -2797,4 +2919,10 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
   }
+</style>
+<style>
+  #el-menuscrollbar .el-scrollbar__wrap {
+    overflow-x: hidden;
+  }
+
 </style>
