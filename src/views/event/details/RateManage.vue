@@ -70,12 +70,16 @@
                 </div>
                 <div class="storeInfo-details">
                     <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'">
-                        <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('submitter')}}：</span></dd>
+                      <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('submitter')}}：</span></dd>
+                      <el-tooltip :popper-class="tooltipClass" effect="dark" :content="event.createor" placement="bottom-start">
                         <span class="details-info">{{event.createor}}</span>
+                      </el-tooltip>
                     </div>
                     <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'">
                         <dd><span :class="lang=='en'? 'en-w3': 'w3'">{{generateEventLang('solver')}}：</span></dd>
+                      <el-tooltip :popper-class="tooltipClass" effect="dark" :content="event.assigneeName" placement="bottom-start">
                         <span class="details-info">{{event.assigneeName}}</span>
+                      </el-tooltip>
                     </div>
                 </div>
                 <div class="storeInfo-details">
@@ -254,7 +258,8 @@ export default {
             lang: this.$i18n.locale,
             isEvent: true,
             channelInfo: {},
-            subBtnList:[]
+            subBtnList:[],
+            tooltipClass:'event-tooltip-class'
         }
     },
     computed: {
@@ -1121,19 +1126,18 @@ $h1:#292e36;
                 overflow: hidden;
                 display: inline-block;
                 //width: 200px;
-                width: calc(300/1920*100vw);
+                width: calc(400/1920*100vw);
+                white-space: nowrap;
+                text-overflow: ellipsis;
             }
             .en-w3-content{
               margin-right: 45px;
               overflow: hidden;
               display: inline-block;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              width: calc(400/1920*100vw);
               //width: 200px;
-              @media screen and (max-width: 1366px){
-                width: calc(230/1366*100vw);
-              }
-              @media screen and (min-width: 1366px){
-                width: calc(300/1920*100vw);
-              }
 
             }
             .w3{
@@ -1149,7 +1153,6 @@ $h1:#292e36;
             }
             .details-info{
                 margin-left: 15px;
-                float: left;
                 color: $tab;
             }
         }
@@ -1467,4 +1470,7 @@ $h1:#292e36;
 .el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
 }
+  .event-tooltip-class{
+    max-width: calc(200/1920*100vw);
+  }
 </style>
