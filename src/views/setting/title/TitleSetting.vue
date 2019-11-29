@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-container" :style="{'height':varyWindowHeight-170+'px'}">
+  <div class="setting-container" :style="{'height':varyWindowHeight-150+'px'}">
     <div class="basic-info">
       <div class="title">
         <div class="title-info">
@@ -306,7 +306,7 @@
                 self.updateBasicInformation().then(res=>{
                   console.log(res);
                   if(res.errCode == 0){
-                    self.notify('保存成功','success',3000);
+                    self.notify(self.$t('titleView.saveSuss'),'success',3000);
                   }
                   else{
                     self.notify(res.errorMsg,'warning',3000);
@@ -608,7 +608,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-
+    border: 1px solid $border;
+    background-color: #fff;
     .basic-info{
       .title{
         @include point(height, 50);
@@ -626,8 +627,12 @@
         }
         .title-save{
           .save-button{
-            width: calc(120/1920*100vw);
+            width: calc(130/1920*100vw);
             vertical-align: middle;
+            font-size: calc(14/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            padding: 0 0;
           }
         }
       }
@@ -675,6 +680,7 @@
         @media screen and (min-width: 1920px){
           height: 380px;
         }
+
         .role-group{
           width: 60%;
           @include point(margin-top,20);
@@ -737,5 +743,8 @@
     content: '*';
     margin-right: 4px;
     visibility: hidden;
+  }
+  .role-list #el-menuscrollbar .el-scrollbar__wrap{
+    overflow-x: hidden;
   }
 </style>

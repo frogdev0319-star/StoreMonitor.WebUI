@@ -1,5 +1,5 @@
 <template>
-  <div class="title-container" :style="{'height':varyWindowWidth-155+'px'}">
+  <div class="title-container" :style="{'height':varyWindowWidth-150+'px'}">
       <div class="btn-col">
         <div class="title-btns">
           <el-button
@@ -14,6 +14,7 @@
           <el-button
             class="el-delete-btn"
             size="mini"
+            type="primary"
             @click="showDeleteDialogMethod(0)"
           >
             <i style="margin-right:8px;" class="iconfont el-icon-delete"></i>
@@ -28,13 +29,15 @@
             align='left'
             stripe
             border
-            style="width:100%; text-algin:center;height:300px;border: 1px solid #ebebeb;"
-            :height="tableHieght"
+            style="width:100%;"
+            :maxHeight="tableHieght"
             ref="titleTable"
+            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
           >
             <el-table-column
               type="selection"
               align="center"
+              min-width="80"
             >
             </el-table-column>
             <el-table-column
@@ -62,11 +65,10 @@
             <el-table-column
               prop="option"
               :label="$t('titleView.operation')"
-              width="100"
               align="left">
               <template slot-scope="scope">
-                <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer; margin-right: 20px" @click="updateTitle(scope.row)"></i>
-                <i class="iconfont icon-shanchu" style="font-size:20px;cursor: pointer;" @click="showDeleteDialogMethod(scope.row)"></i>
+                <i class="iconfont icon-gengduo" style="cursor: pointer; margin-right: 20px" @click="updateTitle(scope.row)"></i>
+                <i class="iconfont icon-shanchu" style="cursor: pointer;" @click="showDeleteDialogMethod(scope.row)"></i>
               </template>
             </el-table-column>
             <div slot="empty">
@@ -91,8 +93,8 @@
               </p>
             </div>
             <div slot="footer" class="dialog-footer">
-              <el-button class="file-cancel-btn" @click="showDeleteDialog = false" size="mini" style="">取消</el-button>
-              <el-button class="file-confirm-btn" @click="deleteTitle()" size="mini" type="primary">确认</el-button>
+              <el-button class="file-cancel-btn" @click="showDeleteDialog = false" size="mini" style="">{{$t('titleView.cancel')}}</el-button>
+              <el-button class="file-confirm-btn" @click="deleteTitle()" size="mini" type="primary">{{$t('titleView.confirm')}}</el-button>
             </div>
           </el-dialog>
           <!--<div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">-->
@@ -304,7 +306,10 @@
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
   }
-
+  .title-container{
+    border: 1px solid $border;
+    background-color: #fff;
+  }
   .btn-col{
     border-bottom:  1px solid $border;
     overflow: hidden;
@@ -316,44 +321,63 @@
     @include point(margin-right,10);
     width: auto;
     .el-add-btn{
-      background-color: $mainColor;
       color: #fff;
-      border-color: $mainColor;
       position: relative;
       @include point(margin-right,10);
-      font-size: 12px;
-      vertical-align: middle;
+      font-size: calc(14/1920*100vw);
+      height: calc(36/1920*100vw);
+      line-height: calc(36/1920*100vw);
+      width: calc(130/1920*100vw);
+      padding: 0;
+      .iconfont{
+        font-size: calc(24/1920*100vw);
+        padding: calc(5/1920*100vw) 0;
+      }
+      span{
+        position: relative;
+        bottom: calc(4/1920*100vw);
+        @media screen and (max-width: 1280px) {
+          bottom: calc(2/1920*100vw);
+        };
+      }
       &:disabled{
-        opacity: 0.6;
+        opacity: 0.5;
       }
-      @media screen and (min-width: 1680px){
-        @include point(width, 98);
-      }
-      @media screen and (max-width: 1680px){
-        width: 120px;
-      }
+
     }
     .el-delete-btn {
-      background-color: $mainColor;
       color: #fff;
-      border-color: $mainColor;
       position: relative;
       @include point(margin-right, 15);
-      font-size: 12px;
-      vertical-align: middle;
+      font-size: calc(14/1920*100vw);
+      height: calc(36/1920*100vw);
+      line-height: calc(36/1920*100vw);
+      width: calc(130/1920*100vw);
+      padding: 0;
+      .iconfont{
+        font-size: calc(24/1920*100vw);
+        padding: calc(5/1920*100vw) 0;
+      }
+      span{
+        position: relative;
+        bottom: calc(4/1920*100vw);
+        @media screen and (max-width: 1280px) {
+          bottom: calc(2/1920*100vw);
+        };
+      }
       &:disabled {
-        opacity: 0.6;
-      }
-      @media screen and (min-width: 1680px){
-        @include point(width, 98);
-      }
-      @media screen and (max-width: 1680px){
-        width: 120px;
+        opacity: 0.5;
       }
     }
   }
   .title-table{
     @include point(margin, 15);
+    height: auto;
+    border-right: 1px solid $border;
+    .iconfont{
+      font-size: calc(24/1920*100vw);
+      color: $tab;
+    }
   }
 </style>
 <style>
@@ -370,9 +394,12 @@
   .el-table--border th{
     border-right: 0 !important;
   }
-  .el-table--border, .el-table--group{
-    border: none !important;
+  .title-table .el-table--border th:first-child{
+    border-left: 1px solid #e3e9f4;
   }
+  /*.el-table--border, .el-table--group{*/
+    /*border: none !important;*/
+  /*}*/
   /*.el-table__header-wrapper th:nth-last-of-type(2){*/
     /*border-right: none !important;*/
   /*}*/
@@ -391,5 +418,23 @@
   }
   .el-dialog__body {
     padding: 0
+  }
+  .title-table .el-table--border{
+    border-left: none;
+  }
+  .el-table__row{
+    height: calc(60/1920*100vw);
+    font-size: calc(14/1920*100vw);
+    color: #182752;
+  }
+  .el-table .cell{
+    padding-left: calc(20/1920*100vw);
+    padding-right: calc(20/1920*100vw);
+  }
+  .el-table--striped .el-table__body tr.el-table__row--striped td{
+    background-color: #f7f8fb;
+  }
+  .el-table__header{
+    font-size: calc(12/1920*100vw);
   }
 </style>
