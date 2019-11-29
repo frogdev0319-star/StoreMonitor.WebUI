@@ -389,6 +389,8 @@ $suggestBack:#F1F6FE;
     height: 100%;
     color: $black;
     position: relative;
+    border: 1px solid $border;
+    background-color: #fff;
     .report-img{
         position: absolute;
         right: 2px;

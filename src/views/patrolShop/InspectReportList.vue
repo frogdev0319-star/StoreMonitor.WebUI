@@ -30,15 +30,31 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"
-                class="el-province select-store" @change="changeStore" @clear="clearStore">
-                    <el-option
-                    v-for="item in storeDataList"
-                    :key="item.storeId"
-                    :label="item.label"
-                    :value="item.storeId">
-                    </el-option>
-                </el-select>
+                <div  class="stores-panel" >
+                  <div class="month-content" @click="choiceStore">
+                    <div class="input-arrow-panel"></div>
+                    <el-input v-model="storeName" size="mini" id="elMonth" :placeholder="generateReportLang('stores')" :readonly=true></el-input>
+                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                  </div>
+                  <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">
+                    <div class="month-details">
+                      <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>
+                    </div>
+                    <div class="month-details" v-for="(item,index) in storeDataList" :key="index">
+                      <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>
+                      <span>{{item.label}}</span>
+                    </div>
+                  </div>
+                </div>
+              <!--<el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"-->
+                <!--class="el-province select-store" @change="changeStore" @clear="clearStore">-->
+                    <!--<el-option-->
+                    <!--v-for="item in storeDataList"-->
+                    <!--:key="item.storeId"-->
+                    <!--:label="item.label"-->
+                    <!--:value="item.storeId">-->
+                    <!--</el-option>-->
+                <!--</el-select>-->
                 <div class="search-content" v-if="searchContent">
                     <span>{{generateReportLang('keywords')}}</span>
                     <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
@@ -67,7 +83,7 @@
                 <el-tooltip class="item" effect="dark"
                     placement="bottom-end">
                     <div slot="content">*{{generateReportLang('timePlaceholder')}}</div>
-                    <i class="iconfont icon-bangzhu iconbangzhu"></i>
+                    <i class="iconfont icon-bangzhu iconbangzhu" style="font-size: 20px;color: #7d8cad;"></i>
                 </el-tooltip>
                 <span>{{generateReportLang('reportType')}}</span>
                 <el-select v-model="curReportType" clearable  :placeholder="generateReportLang('all')" size="mini"
@@ -100,7 +116,7 @@
             </el-col>
         </el-col>
         <el-col :span="24" class="report-content">
-            <el-row class="card-content">
+            <el-row class="card-content" v-if="reportList.length!=0">
                 <el-col :span="24" class="card-header" v-if="reportList.length!=0">
                     <el-radio v-model="curSortType" v-for="(item,index) in sortTypeList" :key="index" :label="item.id" @change="checkSortType">
                         <span class="sort-name">{{item.name}}</span>
@@ -134,6 +150,9 @@
                     class="el-pag">
                     </el-pagination>
                 </el-col>
+            </el-row>
+            <el-row class="card-content" v-else>
+              <div class="empty-content">{{$t('deviceView.noData')}}</div>
             </el-row>
         </el-col>
     </el-row>
@@ -218,7 +237,10 @@ export default {
             storeIdList:[],  //存放当前选中的门店id
             poperClass:'date-picker-poper',
             lang: this.$i18n.locale,
-            isFirstLoad: false
+            isFirstLoad: false,
+            storeName: '',
+            showMonthDrap: false,
+            showStoreContent: false,
         }
     },
     created(){
@@ -427,7 +449,8 @@ export default {
                     label:item.name,
                     value:item.name,
                     userId:item.userId,
-                    userName:item.userName
+                    userName:item.userName,
+                    checked: false
                 }
                 tempStore.push(obj);
             })
@@ -594,6 +617,53 @@ export default {
                 }
             })
             self.storeDataList=tempStore;
+        },
+        choiceStore(){
+          let self = this;
+          self.showStoreContent = !self.showStoreContent;
+          self.showMonthDrap = true;
+        },
+        changeStoreItem(item){
+          let self = this;
+          self.checkAllStore = false;
+
+          if(item == -1){
+            self.checkAllStore = true;
+            self.storeName = self.$t('overview.all');
+            self.curStore = [];
+            self.storeDataList.forEach(item=>{
+              item.checked = true;
+            })
+          }
+          else{
+            console.log(item);
+            let daysStr = "";
+            let count = 0;
+            let selectedStores = [];
+            daysStr = item.label;
+            selectedStores.push(item.storeId);
+
+            self.storeName = daysStr;
+            self.curStore = selectedStores;
+            console.log(self.curStore);
+            console.log(self.storeName)
+            self.storeDataList.forEach(item=>{
+              item.checked = false;
+            })
+            item.checked = true;
+          }
+          self.showStoreContent = false;
+          self.showMonthDrap = false;
+          let selectIds = [];
+          let storeStr = '';
+          self.storeDataList.forEach(item=>{
+            if(item.checked){
+              selectIds.push(item.storeId);
+              storeStr += item.label +'，';
+            }
+          })
+          storeStr = storeStr.substr(0,storeStr.length-1)
+          self.storeStr = storeStr;
         },
         changeStore(val){
             let self=this;
@@ -810,19 +880,19 @@ $suggestBack:#F1F6FE;
     // padding-top: calc(60/1920*100vw);
     // padding-right: calc(30/1920*100vw);
     .report-header{
-        height: calc(180/1920*100vw);
+        /*height: calc(180/1920*100vw);*/
         margin-bottom: calc(20/1920*100vw);
         border-bottom: 1px solid $border;
         background-color: #fff;
-        padding-top: calc(15/1920*100vw);
-        padding-bottom: calc(15/1920*100vw);
+        padding-top: calc(30/1920*100vw);
+        padding-bottom: calc(30/1920*100vw);
         color: $black;
         .header-details1{
             text-align: left;
             padding-left: calc(30/1920*100vw);
             padding-right: calc(30/1920*100vw);
-            height: auto;
-            line-height: calc(26/1920*100vw);
+            height: calc(20/1920*100vw);
+            line-height: calc(20/1920*100vw);
             span{
                 font-size: calc(14/1920*100vw);
                 margin-right: calc(20/1920*100vw);
@@ -838,8 +908,6 @@ $suggestBack:#F1F6FE;
         .header-details{
             text-align: left;
             padding-left: calc(30/1920*100vw);
-            height: calc(50/1920*100vw);
-            line-height: calc(50/1920*100vw);
             position: relative;
             .search-content{
                 display: inline-block;
@@ -863,22 +931,89 @@ $suggestBack:#F1F6FE;
               }
             }
             .el-province{
-                width: calc(180/1920*100vw);
+                width: calc(160/1920*100vw);
                 margin-right: calc(15/1920*100vw);
             }
-            .select-store{
-                min-width: 160px;
+          .stores-panel{
+            position: relative;
+            display: inline-block;
+            .month-content{
+              width: calc(200/1920*100vw);
+              display: inline-block;
+              position: relative;
+              cursor: pointer;
+              #elMonth{
+                width: 200px;
+                border-radius: 0px;
+                background-color: #f0f5f8;
+              }
+              .el-input{
+                width: calc(160/1920*100vw);
+                /deep/ .el-input__inner{
+                  padding-right: 20px;
+                  height: calc(36/1920*100vw);
+                  line-height: calc(36/1920*100vw);
+                  background-color: #f4f5f9;
+                }
+              }
+              .input-arrow-panel{
+                width: calc(160/1920*100vw);
+                height: calc(36/1920*100vw);
+                position: absolute;
+                background-color: transparent;
+                cursor: pointer;
+                z-index: 100;
+                top: calc(48/1920*100vw);
+              }
+              .icon-input{
+                position: relative;
+                right: 25px;
+                top: 1px;
+                font-size: 12px;
+                color: #C0C4CC;
+              }
             }
+            .month-panel{
+              position: absolute;
+              margin-top: 3px;
+              width: calc(160/1920*100vw);
+              height: 150px;
+              z-index: 980;
+              background-color: #fff;
+              border: 1px solid #ddd;
+              padding: 5px;
+              overflow: auto;
+              .month-details{
+                padding: 2px 0px;
+                span{
+                  margin-left: 10px;
+                  font-size: 14px;
+                  color: #606266;
+                }
+                .el-checkbox{
+                  margin-right: 0;
+                }
+              }
+            }
+          }
             .search-input{
                 width: calc(150/1920*100vw);
             }
             .search-btn{
-                width: calc(120/1920*100vw);
-                margin-left: calc(20/1920*100vw);
+              width: calc(130/1920*100vw);
+              height: calc(36/1920*100vw);
+              line-height: calc(36/1920*100vw);
+              padding: 0 0;
+              font-size: calc(14/1920*100vw);
             }
             .en-search-btn{
-              width: calc(120/1920*100vw);
+              width: calc(130/1920*100vw);
               margin-left: calc(20/1920*100vw);
+              border-color: $red;
+              height: calc(36/1920*100vw);
+              line-height: calc(36/1920*100vw);
+              padding: 0 0;
+              font-size: calc(14/1920*100vw);
             }
             // .storename-str{
             //     width: 100%;
@@ -887,6 +1022,10 @@ $suggestBack:#F1F6FE;
             //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
             // }
         }
+      .header-details:nth-child(2){
+        padding-top:calc(20/1920*100vw);
+        padding-bottom: calc(30/1920*100vw);
+      }
     }
     .report-content{
         padding-right: calc(50/1920*100vw);
@@ -898,6 +1037,14 @@ $suggestBack:#F1F6FE;
             padding-right: calc(20/1920*100vw);
             height: calc(630/1920*100vw);
             //height: calc(730/1080*100vh);
+        }
+        .empty-content{
+          font-size: 16px;
+          color: #4b5262;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
         }
         .card-header{
             text-align: left;
@@ -989,10 +1136,10 @@ $suggestBack:#F1F6FE;
 <style scoped>
     .el-select >>> .el-input__inner{
         background: #f4f5f9 !important;
-        border-radius: 0px !important;
-        border: 0 !important;
-        height: 28px !important;
-        line-height: 28px !important;
+        /*border-radius: 0px !important;*/
+        /*border: 0 !important;*/
+        /*height: 28px !important;*/
+        /*line-height: 28px !important;*/
     }
 </style>
 <style>
