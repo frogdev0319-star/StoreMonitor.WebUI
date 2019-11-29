@@ -163,7 +163,7 @@
                             </div>
                             <pre v-if="item.description!=null" class="description">{{item.description}}</pre>
                             <div class="source-content" v-if="item.sourceList!=null&&item.sourceList.length!=0">
-                                <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                                <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" :height="imgHeight+'px'">
                                     <div v-if="_item.mediaType==2" class="img-content">
                                         <img class="imgLittle imgInner" :title="imgTitle"
                                         :src="_item.url" :height="imgHeight+'px'" :onerror='deafultImg'
@@ -985,6 +985,14 @@ $h1:#292e36;
                 @include point(right,20);
                 @include point(width,90);
                 color: #fff;
+                height: calc(36/1920*100vw);
+                width: calc(130/1920*100vw);
+                margin: 0;
+                padding: 0;
+                font-size: calc(14/1920*100vw);
+                line-height: calc(36/1920*100vw);
+                border-width: 0;
+                border-radius: 3px;
             }
         }
         .dialog-content{
@@ -1256,6 +1264,9 @@ $h1:#292e36;
                             left: 35%;
                             top: 30%;
                         }
+                      .imgLittle{
+                        width: calc(130/1920*100vw);
+                      }
                     }
                     .video-content{
                         width: 100%;
@@ -1420,7 +1431,7 @@ $h1:#292e36;
                             float: left;
                             @include point(max-width,220);
                             @include point(width,100);
-                            @include point(height,65);
+                            //@include point(height,65);
                             .img-content{
                                 position: relative;
                                 cursor: pointer;
@@ -1429,8 +1440,11 @@ $h1:#292e36;
                                     left: 35%;
                                     top: 30%;
                                 }
+                              .imgLittle{
+                                width: calc(130/1920*100vw);
+                              }
                             }
-                            &:first-child{
+                            &:nth-child(2n+1){
                                 @include point(margin-left,15);
                             }
                         }

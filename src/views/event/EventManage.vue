@@ -1,5 +1,5 @@
 <template>
-    <div class="el-event-content" :style="{'height':windowHeight-118+'px'}">
+    <div class="el-event-content" :style="{'minHeight':windowHeight-118+'px'}">
        <div class="el-date">
             <span class="date-title">{{generateEventLang('time')}}</span>
             <el-date-picker
@@ -46,7 +46,10 @@
        </div>
         <div class="el-table-content">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-              <i style="margin-right:18px;font-size:16px;" class="iconfont icon-excel"></i><span>{{generateEventLang('exportReport')}}</span>
+              <div class="btn-area">
+                <i style="" class="iconfont icon-excel"></i>
+                <span class="spanClass">{{generateEventLang('exportReport')}}</span>
+              </div>
             </el-button>
             <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
                 <el-tab-pane v-for="(item,index) in tableDataList"
@@ -59,11 +62,12 @@
                             align='left'
                             border
                             stripe
-                            :height="windowHeight-320"
+                            :height="windowHeight-260"
                             @sort-change='sortChange'
                             @row-click='rowClickItem'
-                            style="border-left:1px solid #eee;"
+                            style=""
                             class="table-content"
+                            :header-cell-style="{background:'#f4f5f9',color:'#7d8cad'}"
                         >
                                 <el-table-column
                                     min-width="80"
@@ -82,9 +86,9 @@
                                     sortable='custom'
                                     align="left">
                                     <template slot-scope="scope">
-                                        <img class='sourceType-icon' v-if="scope.row.sourceType==0" :src='videoSrc' height="24px"/>
-                                        <img class='sourceType-icon' v-else-if="scope.row.sourceType==1" :src='inspectSrc' height="24px"/>
-                                        <img class='sourceType-icon' v-else :src='insiteInspectSrc' height="24px"/>
+                                        <img class='sourceType-icon' v-if="scope.row.sourceType==0" :src='videoSrc'/>
+                                        <img class='sourceType-icon' v-else-if="scope.row.sourceType==1" :src='inspectSrc'/>
+                                        <img class='sourceType-icon' v-else :src='insiteInspectSrc'/>
                                         <span class="event-subject">{{scope.row.subject}}</span>
                                     </template>
                                 </el-table-column>
@@ -97,7 +101,7 @@
                                 min-width="80"
                                 align="left">
                                 <template slot-scope="scope">
-                                    <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
+                                    <i class="iconfont icon-gengduo" style="font-size:24px;cursor: pointer;color: #7d8cad" @click="toEventDetail(scope.row)"></i>
                                 </template>
                             </el-table-column>
                             <div slot="empty">
@@ -227,13 +231,13 @@ export default {
     computed:{
         tableHieght(){
             if(this.windowHeight>800){
-                return this.windowHeight*0.63;
+                return this.windowHeight*0.85;
             }
             else if(this.windowHeight>700){
                 return this.windowHeight*0.58;
             }
             else{
-                return this.windowHeight*0.52;
+                return this.windowHeight*0.7;
             }
         },
         ...mapGetters({accountChanged:'accountChanged'})
@@ -1013,6 +1017,7 @@ export default {
   activated(){
     let self=this;
     console.log('调用')
+    self.windowHeight = window.innerHeight;
     if(!self.$route.meta.isBack || self.isFirstLoad){
       console.log('调用initData')
     }
@@ -1109,12 +1114,15 @@ $h1:#292e36;
 .el-event-content{
     width: 100%;
     position: relative;
-    overflow: hidden;
+    border: 1px solid #e3e9f4;
+    /*overflow: hidden;*/
     .sourceType-icon{
-        margin-right: 15px;
+        margin-right: calc(20/1920*100vw);
         position: relative;
         float: left;
-        @include point(bottom,3);
+        @include point(bottom,2);
+        height: calc(28/1920*100vw);
+        width: calc(24/1920*100vw);
     }
     .icon-span{
         display:inline-block;
@@ -1123,12 +1131,16 @@ $h1:#292e36;
         color:white;
         font-size: 12px;
     }
+    .icon-gengduo{
+      font-size: calc(24/1920*100vw);
+    }
     .el-date{
         height: 70px;
         line-height: 70px;
         text-align: left;
         border-bottom: 1px solid #e3e9f4;
         position: relative;
+        background-color: #fff;
         .date-title{
             @include point(margin-left,30);
             @include point(margin-right,20);
@@ -1140,7 +1152,7 @@ $h1:#292e36;
            font-size:20px;
            position:relative;
            top:2px;
-           color:$black;
+           color:$tab;
         }
         .date-range{
             width:320px;
@@ -1161,50 +1173,83 @@ $h1:#292e36;
     }
     .el-table-content{
         width: 100%;
-        float: left;
         background-color: #fff;
         position: relative;
         @include point(padding-top,20);
         .export-btn{
             position: absolute;
             @include point(right,20);
-            background-color: $red;
+            //background-color: $red;
             border-color: $red;
             z-index: 990;
+            height: calc(36/1920*100vw);
+            width: calc(130/1920*100vw);
+            margin: 0;
+            padding: 0;
+            font-size: calc(14/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            color: #ffffff;
+            border-width: 0;
+            border-radius: 3px;
+            .btn-area{
+              position: relative;
+              padding: 0 calc(6/1920*100vw);
+              height: calc(36/1920*100vw);
+              display: inline-flex;
+              align-items: center;
+              .icon-excel{
+                margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                font-size: calc(24/1920*100vw);
+              }
+              .spanClass{
+                font-size: calc(14/1920*100vw);
+                display: inline-block;
+              }
+            }
         }
       .en-export-btn{
         position: absolute;
         @include point(right,20);
-        background-color: $red;
+        //background-color: $red;
         border-color: $red;
         z-index: 990;
+        height: calc(36/1920*100vw);
+        width: calc(130/1920*100vw);
+        margin: 0;
+        padding: 0;
+        font-size: calc(14/1920*100vw);
+        line-height: calc(36/1920*100vw);
+        color: #ffffff;
+        border-width: 0;
+        border-radius: 3px;
+        .btn-area{
+          position: relative;
+          padding: 0 calc(6/1920*100vw);
+          height: calc(36/1920*100vw);
+          display: inline-flex;
+          align-items: center;
+          .icon-excel{
+            margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+            font-size: calc(24/1920*100vw);
+          }
+          .spanClass{
+            font-size: calc(14/1920*100vw);
+            display: inline-block;
+          }
+        }
+
         @media screen and (min-width: 1366px){
           width: 160px;
-          span{
-            position: relative;
-            @include point(bottom, 1)
-          }
         }
         @media screen and (max-width: 1366px){
           width: 140px;
-          span{
-            position: relative;
-            @include point(bottom, 1)
-          }
-
         }
       }
-
       .table-content{
-            width:96%;
-            @include point(margin-left,15);
-            @include point(margin-right,15);
+            width:100%;
             text-align: center;
-            height:300px;
-            float:left;
-            border-top: 0;
-            border-left: 0;
-            border-right: 0;
+            /*height:300px;*/
+            /*float:left;*/
         }
     }
     #tabs-content /deep/  .el-tabs__nav-scroll{
@@ -1218,6 +1263,13 @@ $h1:#292e36;
       height: 4px !important;
       background-color: #f31d65 !important;
     }
+  .el-table-panel{
+    border: none;
+    border-right: 1px solid $border;
+    border-bottom: 1px solid $border;
+    @include point(margin-left,15);
+    @include point(margin-right,15);
+  }
 }
 .el-select-content{
     @include point(width,120);
@@ -1238,8 +1290,8 @@ $h1:#292e36;
 <style scoped>
     .el-select >>> .el-input__inner{
         background: #F4F5F9 !important;
-        border-radius: 0px !important;
-        border: 0 !important;
+        /*border-radius: 0px !important;*/
+        /*border: 0 !important;*/
     }
 </style>
 <style>
@@ -1286,18 +1338,32 @@ $h1:#292e36;
     .el-table--border th{
         border-right: 0 !important;
     }
-    .el-table--border, .el-table--group{
-        border: none !important;
-    }
-    .el-table__header-wrapper th:nth-last-of-type(2){
-        border-right: none !important;
-    }
+    /*.el-table--border, .el-table--group{*/
+        /*border: none !important;*/
+    /*}*/
+    /*.el-table__header-wrapper th:nth-last-of-type(2){*/
+        /*border-right: none !important;*/
+    /*}*/
     .el-table--border td:nth-last-of-type(1){
         border-right: none !important;
     }
     .el-table--border::after, .el-table--group::after{
         width: 0 !important;
     }
-
+    .el-table__row{
+      height: calc(60/1920*100vw);
+      font-size: calc(14/1920*100vw);
+      color: #182752;
+    }
+ .el-table .cell{
+   padding-left: calc(20/1920*100vw);
+   padding-right: calc(20/1920*100vw);
+ }
+ .el-table--striped .el-table__body tr.el-table__row--striped td{
+   background-color: #f7f8fb;
+ }
+  .el-table__header{
+    font-size: calc(12/1920*100vw);
+  }
 </style>
 
