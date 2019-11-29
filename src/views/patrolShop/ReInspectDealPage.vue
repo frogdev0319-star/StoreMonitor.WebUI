@@ -176,7 +176,9 @@
 }
 </script>
 <style lang="scss" scoped>
-.el-sucPage-content{
+  @import '../../assets/css/pagination.css';
+
+  .el-sucPage-content{
     width: 100%;
     height: 100%;
     padding-top: 50px;

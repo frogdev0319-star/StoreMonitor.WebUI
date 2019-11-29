@@ -1003,11 +1003,12 @@ export default {
                 let tempId=self.getIndexById(self.curItemId);
                 console.log(tempId);
                 if(tempId!=null){
-                    self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList = self.sourceList;
+                    self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj) ;
                 }
                 else{
                     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
                 }
+                self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
             })
         },
         playCutVideo(item,index){
@@ -1171,7 +1172,7 @@ export default {
         getVideo(){
             let self=this;
             console.log(self.curGroupIndex);
-            if(self.sourceList.length>=5){
+            if(self.sourceListLength >=5){
                 self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
                 return false;
             }
@@ -1218,7 +1219,7 @@ export default {
             }
             else{
                 self.showCancelContent=false;
-                if(self.sourceList.length>=5){
+                if(self.sourceListLength >= 5){
                     self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
                     return false;
                 }
@@ -1289,6 +1290,7 @@ export default {
         },
         confirmEdit(){
             let self=this;
+            self.sourceList = [];
             let obj={};
             obj.mediaType=2;
             obj.src=self.canvasEl.toDataURL("image/jpeg");
@@ -1302,11 +1304,14 @@ export default {
             let tempId=self.getIndexById(self.curItemId);
             console.log(tempId);
             if(tempId!=null){
-                self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
+                //self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
+              self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
             }
             else{
                 self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
             }
+            self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+
         },
         mouseDownAction(e){
            let self=this;
@@ -1754,6 +1759,7 @@ export default {
         deleteImg(item,index){
             let self=this;
             item.sourceList.splice(index,1);
+            self.sourceListLength--;
         },
         ignoreInspectDialog(val){
             let self=this;
@@ -2796,7 +2802,7 @@ export default {
         pointer-events: none;
     }
     .el-container{
-        background-color: #f7f8fa;
+        background-color: $background;
         .spreadLsideClass{
             width: 98%;
         }
@@ -3086,16 +3092,19 @@ export default {
                 .el-submit{
                     position: absolute;
                     @include point(right,20);
-                    @include point(width,90);
+                    //@include point(width,90);
                     color: #fff;
-                    padding: 9px 6px;
+                    /*padding: 9px 6px;*/
                 }
                 .en-el-submit{
                     position: absolute;
                     @include point(right,20);
-                    @include point(width,120);
+                    width:calc(130/1920*100vw);
                     color: #fff;
-                    padding: 9px 6px;
+                    height: calc(36/1920*100vw);
+                    line-height: calc(36/1920*100vw);
+                    padding: 0 0;
+                    font-size: calc(14/1920*100vw);
                 }
                 @media screen and(min-width: 1366px){
                     .el-submit{
@@ -3111,7 +3120,7 @@ export default {
                     }
                     .en-el-submit{
                       top: 20%;
-                      width: 145px;
+                      width:calc(160/1920*100vw);
                     }
                 }
             }
@@ -3788,7 +3797,7 @@ export default {
         .rside{
             border: 1px solid $border;
             background-color: #fff;
-            @include point(margin-right,20);
+            //@include point(margin-right,20);
             .el-header-title{
                 text-align: left;
                 position: relative;
@@ -3994,7 +4003,7 @@ export default {
 
 </style>
 <style scoped>
-.el-search-input.el-input--small >>>.el-input__inner{
+  .el-search-input.el-input--small >>>.el-input__inner{
     background: #F4F5F9 !important;
     border-radius: 15px !important;
     height: 32px !important;
@@ -4009,6 +4018,8 @@ export default {
 @import '../../assets/css/importfile.css';
 @import '../../assets/css/videoBar.css';
 @import '../../assets/css/tabsItem.css';
+@import '../../assets/css/pagination.css';
+
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }

@@ -523,9 +523,11 @@ $h1:#292e36;
             .sum-btn{
                 float: right;
                 margin-top: calc(18/1920*100vw);
-                width: calc(100/1920*100vw);
-                line-height: 1 !important;
-                font-size: 12px !important;
+                height: calc(36/1920*100vw);
+                width: calc(130/1920*100vw);
+                line-height: calc(36/1920*100vw);
+                font-size: calc(14/1920*100vw);
+                padding: 0 0;
             }
         }
         .submit-content{
@@ -713,7 +715,7 @@ $h1:#292e36;
 
 </style>
 <style>
-    .el-menuscrollbar .el-scrollbar__wrap {
+  .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }
     .el-textarea__inner{
