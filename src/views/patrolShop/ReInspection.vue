@@ -3094,7 +3094,11 @@ export default {
                     @include point(right,20);
                     //@include point(width,90);
                     color: #fff;
-                    /*padding: 9px 6px;*/
+                    width:calc(130/1920*100vw);
+                    height: calc(36/1920*100vw);
+                    line-height: calc(36/1920*100vw);
+                    padding: 0 0;
+                    font-size: calc(14/1920*100vw);
                 }
                 .en-el-submit{
                     position: absolute;

@@ -22,7 +22,7 @@
       >
       </el-date-picker>
       <el-tooltip class="item"
-                  placement="bottom-end">
+                  placement="right" :popper-class="tooltipClass">
         <div slot="content">{{$t('overview.dataRangeTips')}}</div>
         <i class="iconfont icon-bangzhu iconbangzhu"></i>
       </el-tooltip>
@@ -248,6 +248,7 @@
           }
         },
         toolTipClass: 'page-login-toolTipClass',
+        tooltipClass: 'tooltip-class',
         taskList: [],
         isWorstArea: true,
         isWorstWork: true,
@@ -2056,15 +2057,15 @@
     #{$poi}:checkRem($val);
   }
   *{
-    font-size: calc(14/1920*100vw);
     font-family: Arial,  "Microsoft YaHei";
     box-sizing: border-box;
   }
   .el-overview-content {
     width: 100%;
     position: relative;
+    font-size: calc(14/1920*100vw);
     height: auto;
-    background-color: #f6f9fe;
+    /*background-color: #f6f9fe;*/
     padding-bottom: calc(20/1920*100vw);
     .sourceType-icon {
       margin-right: calc(15/1920*100vw);
@@ -2102,16 +2103,22 @@
         color: $tab;
       }
       .date-range {
+        border: 1px solid #ccc;
         width: 200px;
+        height: calc(35 / 1920 * 100vw);
+        /*.el-range-separator{*/
+          /*height: calc(35 / 1920 * 100vw);*/
+          /*line-height: calc(35 / 1920 * 100vw);*/
+        /*}*/
       }
       .item {
-        font-size: calc(16 / 1920 * 100vw);
         color: $tab;
         margin-left: calc(20 / 1920 * 100vw);
         margin-right: calc(8 / 1920 * 100vw);
       }
       .content {
         display: inline-block;
+        font-size: calc(12 / 1920 * 100vw);
       }
       .el-store {
         position: absolute;
@@ -2755,8 +2762,12 @@
 </style>
 <style>
   @import '../../assets/css/pagination.css';
+
   .date-picker-poper .el-button--text{
     visibility: hidden !important;
+  }
+  .el-input__inner .el-input__inner{
+    border: 1px solid #dddddd;
   }
   .process-panel .el-progress-circle{
     width: 150px !important;
@@ -2793,5 +2804,15 @@
   }
   .region-process .el-progress-bar .el-progress-bar__outer{
     background-color: #f4f5f9;
+  }
+  .el-tooltip__popper.is-dark{
+    background-color: rgb(78, 81, 95);
+  }
+  .el-range-editor--mini .el-range-separator{
+    height: calc(35/1920*100vw);
+    line-height: calc(35/1920*100vw);
+  }
+  .tooltip-class{
+    font-size: calc(12/1920*100vw);
   }
 </style>

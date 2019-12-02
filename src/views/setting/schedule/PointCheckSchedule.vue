@@ -2755,9 +2755,6 @@
               bottom: calc(3/1920*100vw);
             };
           }
-          @media screen and (max-width: 1440px) {
-            width: 125px;
-          }
         }
         .downLoad-btn{
           margin-left: 0px !important;

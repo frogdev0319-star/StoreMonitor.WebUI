@@ -6,15 +6,16 @@
                   {{itemNum}} {{generateInsSettingLang('item')}}</span>
                 <div class="route-btns">
                      <el-button
-                    :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
+                    :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
                     @click="deleteNapes"
                     size="mini" :disabled="routeData.length==0">
-                        <i style="margin-right:8px;" class="iconfont icon-shanchu"></i>
-                        <span>{{generateInsSettingLang('deleteItem')}}</span>
+                       <i style="margin-right:8px;" class="iconfont icon-shanchu"></i>
+                       <span>{{generateInsSettingLang('deleteItem')}}</span>
                     </el-button>
                      <el-button
-                    :class="lang=='en'? 'en-el-set-btn':'el-set-btn'"
+                    :class="lang=='en'? 'en-el-set-btn':'el-set-btn'" class="btn-class"
                     @click="setItem"
+                    type="primary"
                     size="mini" :disabled="routeData.length==0">
                         <i style="margin-right:8px;" class="iconfont icon-button"></i>
                         <span>{{generateInsSettingLang('setItem')}}</span>
@@ -75,7 +76,7 @@
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
                         <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
-                     <div v-if="item.itemData.length!=0">
+                     <div v-if="item.itemData.length!=0" class="table-class">
                         <el-table
                         :data="item.itemData"
                         size="medium"
@@ -92,7 +93,7 @@
                             <el-table-column prop="score" :label="generateInsSettingLang('score')" min-width="8%"></el-table-column>
                             <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="10%">
                                 <template slot-scope="scope">
-                                        <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
+                                        <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
                                     </template>
                             </el-table-column>
                         </el-table>
@@ -695,6 +696,9 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
+    .iconfont{
+      font-size: calc(24/1920*100vw);
+    }
     .detail-title{
         overflow: hidden;
         .title-title{
@@ -715,67 +719,93 @@ export default {
                 opacity: 0.6;
             }
             .el-delete-btn{
-                background-color: #fff;
+                //background-color: #fff;
                 border-color:  $mainColor;
                 color: $mainColor;
                 border-radius: 0px;
                 @include point(margin-right,8);
                 font-size: 12px;
                 &:disabled{
-                    opacity: 0.6;
+                    opacity: 0.5;
                 }
             }
             .en-el-delete-btn{
-              background-color: #fff;
+              //background-color: #fff;
               border-color:  $mainColor;
               color: $mainColor;
               border-radius: 0px;
               @include point(margin-right,8);
-              font-size: 12px;
-              @media screen and (min-width: 1366px){
-                @include point(width, 105);
+              font-size: calc(14/1920*100vw);
+              height: calc(36/1920*100vw);
+              line-height: calc(36/1920*100vw);
+              padding: 0 0;
+              width: calc(130/1920*100vw);
+              .icon-shanchu{
+                font-size: calc(24/1920*100vw);
               }
-              @media screen and (max-width: 1366px){
-                @include point(width, 140);
+              span{
               }
               &:disabled{
-                opacity: 0.6;
+                opacity: 0.5;
               }
-               span{
-                 position: relative;
-                 @include point(bottom, 2)
-               }
             }
             .el-set-btn{
-                background-color: $mainColor;
+                //background-color: $mainColor;
                 border-color:  $mainColor;
                 color: #fff;
                 border-radius: 0px;
                 font-size: 12px;
                 &:disabled{
-                    opacity: .6;
+                    opacity: .5;
                 }
             }
             .en-el-set-btn{
-              background-color: $mainColor;
+              //background-color: $mainColor;
               border-color:  $mainColor;
               color: #fff;
               border-radius: 0px;
-              font-size: 12px;
-              @media screen and (min-width: 1366px){
-                @include point(width, 105);
-              }
-              @media screen and (max-width: 1366px){
-                @include point(width, 140);
-              }
+              font-size: calc(14/1920*100vw);
+              height: calc(36/1920*100vw);
+              padding: 0;
+              width: calc(130/1920*100vw);
               &:disabled{
-                opacity: .6;
+                opacity: .5;
+              }
+              span{
+              }
+              .iconfont{
+              }
+              @media screen and (min-width: 1440px) {
+                  width: calc(130/1920*100vw);
+              }
+              @media screen and (max-width: 1440px) {
+                  width: 125px;
+                  span{
+                    position: relative;
+                    bottom: 1px
+                  }
+              }
+            }
+            .btn-class{
+              height: calc(36/1920*100vw);
+              line-height: calc(36/1920*100vw);
+              padding: 0;
+              font-size: calc(14/1920*100vw);
+              width: calc(130/1920*100vw);
+              .iconfont{
+                padding: calc(5/1920*100vw) 0;
               }
               span{
                 position: relative;
-                @include point(bottom, 2)
+                bottom: calc(4/1920*100vw);
+                @media screen and (max-width: 1280px) {
+                  bottom: calc(3/1920*100vw);
+                };
               }
-            }
+              @media screen and (max-width: 1440px) {
+                width: 125px;
+              }
+          }
         }
     }
     .data-content{
@@ -847,6 +877,12 @@ export default {
                 margin-right: 0;
             }
         }
+      .table-class{
+        .iconfont{
+          font-size: calc(24/1920*100vw);
+          color: #7d8cad;
+        }
+      }
         .table-title{
             @include point(margin-left,38);
             margin-left: 38px;

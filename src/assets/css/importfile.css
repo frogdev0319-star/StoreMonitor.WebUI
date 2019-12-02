@@ -11,15 +11,22 @@
 .tabName-input ::-webkit-input-placeholder{
     color: #EAEDF2 !important;
 } */
-.file-cancel-btn{
-    width: 76px !important;
+.file-cancel-btn.el-button--default.el-button--mini{
+    width: calc(100/1920*100vw) !important;
     background-color: #EAEDF2 !important;
-    color: 	#708090 !important;
-    font-size:12px;
+    color: 	#adb1c0 !important;
+    font-size: calc(14/1920*100vw);
+    height:calc(32/1920*100vw) ;
+    border-radius: 4px;
+    margin-right: calc(20/1920*100vw);
+    padding: 0;
 }
-.file-confirm-btn{
-    width: 76px;
-    font-size:12px;
+.file-confirm-btn.el-button--primary.el-button--mini{
+    width: calc(100/1920*100vw) !important;
+    font-size: calc(14/1920*100vw);
+    height:calc(32/1920*100vw) !important;
+    border-radius: 4px;
+    padding: 0;
 }
 input:disabled{
     background-color: 	#F5F5F5 !important;

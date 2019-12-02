@@ -451,22 +451,6 @@
 
       },
       //监听父组件的数值变化
-      async id(newValue, old) {
-        let self = this;
-        console.log("id")
-        console.log(newValue)
-        console.log(old)
-        self.videoPassword = '';
-        if(newValue == undefined){
-          return false;
-        }
-        //stop video
-        self.stopRealTime();
-        //首先查看视频是否加密
-        if(self.accessToken.length > 0){
-          await self.checkIfEncry();
-        }
-      },
       realTimeSpeed(val,oldVal){
         let self=this;
         console.log(val);
@@ -523,7 +507,23 @@
         if(newValue.length > 0){
           self.getEzvizAccessToken(newValue)
         }
-      }
+      },
+      async id(newValue, old) {
+        let self = this;
+        console.log("id")
+        console.log(newValue)
+        console.log(old)
+        self.videoPassword = '';
+        if(newValue == undefined){
+          return false;
+        }
+        //stop video
+        self.stopRealTime();
+        //首先查看视频是否加密
+        if(self.accessToken.length > 0){
+          await self.checkIfEncry();
+        }
+      },
     },
     computed:{
       graphBtnWidth:function(){
@@ -668,7 +668,12 @@
           self.$nextTick(()=> {
             self.decoder = null;
             console.log(self.$refs.myPlayer)
-            self.initVideo();
+            if(self.fullWindow){
+              self.initFullWindowVideo()
+            }
+            else{
+              self.initVideo();
+            }
           })
         }
       },
@@ -1099,14 +1104,19 @@
         self.showInfoContent=false;
       },
       //关闭实时视频
-      realTime(){
+      async realTime(){
         let self = this;
         self.times = 0;
-        if(self.fullWindow){
-          self.initFullWindowVideo();
+        if(self.isStoreMonitor){
+          self.checkIfEncry();
         }
         else{
-          self.initVideo();
+          if(self.fullWindow){
+            self.initFullWindowVideo();
+          }
+          else{
+            self.initVideo();
+          }
         }
       },
       initFullWindowVideo(){

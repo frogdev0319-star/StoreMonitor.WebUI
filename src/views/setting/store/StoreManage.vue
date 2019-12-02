@@ -1,5 +1,5 @@
 <template>
-    <div class="el-event-content" :style="{'height':windowHeight-138+'px'}">
+    <div class="el-event-content" :style="{'height':windowHeight-142+'px'}">
        <div class="seacrh-content">
             <span class="select-title">{{generateStoreLang('provinceTitle')}}</span>
             <el-select v-model="curProvince" clearable  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
@@ -49,7 +49,9 @@
             :height="tableHieght"
             @sort-change='sortChange'
             @row-click='rowClickItem'
-            style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
+            style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;"
+            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+            >
                 <el-table-column
                     min-width="120"
                     header-align="center"
@@ -89,17 +91,18 @@
             </el-table-column>
             <el-table-column prop="schedue"
                 :label="generateStoreLang('bindSchedule')"
-                min-width="140"
+                min-width="100"
                 align="left">
 
             </el-table-column>
             <el-table-column
                 prop="option"
                 :label="generateStoreLang('operation')"
-                min-width="90"
-                align="left">
+                align="left"
+                min-width="100"
+            >
                 <template slot-scope="scope">
-                    <i class="iconfont icon-gengduo" style="font-size:20px;cursor: pointer;" @click="toEventDetail(scope.row)"></i>
+                    <i class="iconfont icon-gengduo" style="cursor: pointer;" @click="toEventDetail(scope.row)"></i>
                 </template>
             </el-table-column>
             <div slot="empty">
@@ -202,14 +205,15 @@ import {generateStoreLang} from '@/api/i18n'
         },
         computed:{
             tableHieght(){
-                if(this.windowHeight>800){
-                    return this.windowHeight*0.72;
+              console.log(this.windowHeight);
+              if(this.windowHeight>800){
+                    return this.windowHeight*0.70;
                 }
                 else if(this.windowHeight>700){
                     return this.windowHeight*0.67;
                 }
                 else{
-                    return this.windowHeight*0.63;
+                    return this.windowHeight*0.55;
                 }
             },
             ...mapGetters({accountChanged:'accountChanged'})
@@ -584,6 +588,7 @@ import {generateStoreLang} from '@/api/i18n'
     #{$poi}:checkRem($val);
 }
  $red:#f31d65;
+  $border:#e3e9f4;
 .city-panel{
     @include point(height,auto);
     padding: 0px 15px 30px 15px;
@@ -607,6 +612,8 @@ import {generateStoreLang} from '@/api/i18n'
 .el-event-content{
     width: 100%;
     position: relative;
+    border: 1px solid $border;
+    background-color: #fff;
     .elcheckBox {
         margin-right: 10px !important;
     }
@@ -622,22 +629,29 @@ import {generateStoreLang} from '@/api/i18n'
             font-size: 14px;
         }
         .el-province{
-            @include point(width,160);
+            width: calc(160/1920*100vw);
             @include point(margin-right,20);
             @include point(margin-left,15);
             position: relative;
             @include point(bottom,1);
         }
         .el-search-btn{
-            width: 90px;
-            text-align: center;
+            font-size: calc(14/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            width: calc(130/1920*100vw);
+            padding: 0 0;
             @include point(margin-left,15);
             color: #fff;
             position: relative;
             @include point(bottom,1);
         }
         .en-el-search-btn{
-          @include point(width,90);
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          width: calc(130/1920*100vw);
+          padding: 0 0;
           text-align: center;
           @include point(margin-left,15);
           color: #fff;
@@ -645,14 +659,24 @@ import {generateStoreLang} from '@/api/i18n'
           @include point(bottom,1);
         }
         .city-input{
-            @include point(width,160);
-            height: 28px;
-            line-height: 28px;
+            width: calc(160/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
             background: #F4F5F9 !important;
             cursor: pointer;
             display:inline-block;
             position: relative;
-            // border: 1px solid #DCDFE6;
+            border: 1px solid #DCDFE6;
+            box-sizing: border-box;
+            @media screen and (max-width: 1920px){
+              top: 12px;
+            }
+            @media screen and (max-width: 1600px){
+              top: 10px;
+            }
+            @media screen and (max-width: 1280px){
+              top: 8px;
+            }
             top: 8px;
             span{
                 display: inline-block;
@@ -709,6 +733,10 @@ import {generateStoreLang} from '@/api/i18n'
             }
 
         }
+        .icon-gengduo{
+          font-size: calc(24/1920*100vw);
+          color: #7d8cad;
+        }
     }
 }
 .empty-data-icon{
@@ -720,7 +748,7 @@ import {generateStoreLang} from '@/api/i18n'
     .el-select >>> .el-input__inner{
         background: #F4F5F9 !important;
         border-radius: 0px !important;
-        border: 0 !important;
+        border: 1px solid #E4E7ED !important;
     }
     .el-input--small >>>.el-input__inner{
         background: #F4F5F9 !important;
@@ -738,12 +766,12 @@ import {generateStoreLang} from '@/api/i18n'
     .el-table tbody tr:hover>td {
         background-color: #FDE8EF !important;
     }
-    .el-table--border th{
-        border-right: 0 !important;
-    }
-    .el-table--border, .el-table--group{
-        border: none !important;
-    }
+    /*.el-table--border th{*/
+        /*border-right: 0 !important;*/
+    /*}*/
+    /*.el-table--border, .el-table--group{*/
+        /*border: none !important;*/
+    /*}*/
     .el-table__header-wrapper th:nth-last-of-type(2){
         border-right: none !important;
     }
@@ -752,6 +780,24 @@ import {generateStoreLang} from '@/api/i18n'
     }
     .el-table--border::after, .el-table--group::after{
         width: 0 !important;
+    }
+    .title-table .el-table--border{
+      border-left: none;
+    }
+    .el-table__row{
+      height: calc(60/1920*100vw);
+      font-size: calc(14/1920*100vw);
+      color: #182752;
+    }
+    .el-table .cell{
+      padding-left: calc(20/1920*100vw);
+      padding-right: calc(20/1920*100vw);
+    }
+    .el-table--striped .el-table__body tr.el-table__row--striped td{
+      background-color: #f7f8fb;
+    }
+    .el-table__header{
+      font-size: calc(12/1920*100vw);
     }
 </style>
 

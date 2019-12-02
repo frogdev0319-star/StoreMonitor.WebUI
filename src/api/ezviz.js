@@ -118,6 +118,7 @@ export async function getIsEncrypt(data){
 function getUpdatePasswordMsg(code){
   let lang = i18n.locale;
   let msg = '';
+  code = parseInt(code)
   switch (code) {
     case 10001:{
       switch (lang) {
@@ -340,6 +341,7 @@ function getUpdatePasswordMsg(code){
       break;
     }
   }
+  return msg;
 }
 /**
  * 设备加密，前台输入验证码，调用ezviz接口，查看验证码是否正确
@@ -355,7 +357,7 @@ export async function updateDevicePassword(data){
   }).then(res=>{
     console.log(res)
     let data = res.data;
-    let code = res.code;
+    let code = data.code;
     let msgCode = getUpdatePasswordMsg(code)
     if(data.code !== '200'){
       Message({

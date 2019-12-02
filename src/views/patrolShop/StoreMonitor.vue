@@ -194,8 +194,8 @@
                 </div>
               </div>
             </div>
-            <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true" :play-back="playBackState"
-                         :cur-time="playBackTime" :store-id="store.storeId"
+            <ezviz-video v-else :store-id="store.storeId" :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true" :play-back="playBackState"
+                         :cur-time="playBackTime"
                          @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo" ref="ezvizVideo">
 
             </ezviz-video>
@@ -2205,8 +2205,7 @@ export default {
                     }
                     else{
                       console.log(self.realTimeStartTs);
-                      self.stopVideo();
-                      self.realTime();
+                      self.stopAndAdjustProcessHistoryVideo();
                     }
                     break;
                 }
@@ -2217,8 +2216,7 @@ export default {
                   }
                   else{
                     console.log(self.realTimeStartTs);
-                    self.stopVideo();
-                    self.realTime();
+                    self.stopAndAdjustProcessHistoryVideo();
                   }
                   break;
                 }
@@ -2229,8 +2227,7 @@ export default {
                   }
                   else{
                     console.log(self.realTimeStartTs);
-                    self.stopVideo();
-                    self.realTime();
+                    self.stopAndAdjustProcessHistoryVideo();
                   }
                 }
                 break;
@@ -2973,7 +2970,7 @@ export default {
         pointer-events: none;
     }
     .el-container{
-        background-color: #f7f8fa;
+        background-color: $background;
         .spreadLsideClass{
             width: 98%;
         }
@@ -3073,11 +3070,13 @@ export default {
                 .el-submit{
                     position: absolute;
                     @include point(right,20);
-                    @include point(width,90);
-                    font-size: 12px;
+                    width:calc(130/1920*100vw);
                     color: #fff;
-                    border-radius: 3px !important;
-                    line-height: 1;
+                    height: calc(36/1920*100vw);
+                    line-height: calc(36/1920*100vw);
+                    padding: 0 0;
+                    border-radius: 3px;
+                    font-size: calc(14/1920*100vw);
                 }
                 @media screen and(min-width: 1366px){
                     .el-submit{
@@ -3321,10 +3320,10 @@ export default {
                         }
                         @media screen and(min-width:1366px){
                             .iconrside{
-                                width: 40%;
+                                width: 50%;
                             }
                         }
-                        @media screen and(min-width:1366px){
+                        @media screen and(max-width:1366px){
                             .iconrside{
                                 width: 60%;
                             }
@@ -3708,7 +3707,7 @@ export default {
         .rside{
             border: 1px solid $border;
             background-color: #fff;
-            @include point(margin-right,20);
+            //@include point(margin-right,20);
             @media screen and(max-width: 1366px){
                 .el-header-title{
                     font-size: 14px;
@@ -4067,6 +4066,8 @@ export default {
 @import '../../assets/css/importfile.css';
 @import '../../assets/css/videoBar.css';
 @import '../../assets/css/tabsItem.css';
+@import '../../assets/css/pagination.css';
+
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }

@@ -163,7 +163,9 @@ const user={
         FedLogOut({commit}){
             return new Promise(resolve=>{
                 commit('SET_TOKEN','');
+                commit('SET_ROLES', [])
                 removeToken();
+                resetRouter();
                 resolve();
             })
         },
@@ -500,7 +502,7 @@ const user={
                 // {
                 //   path:'/lpsSechedule',
                 //   name:'lpsSechedule',
-                //   component:resolve=>require(['@/components/EzvizVideo'],resolve)
+                //   component:resolve=>require(['@/views/setting/schedule/LpsSechedule'],resolve)
                 // },
                 {
                   path:'/patrolSechedule',
@@ -510,8 +512,7 @@ const user={
               ]
             },
           )
-          // PermissionHelper.enableTitleSetting() &&
-           route5.children.push(
+          PermissionHelper.enableTitleSetting() && route5.children.push(
             {
               path:'/title',
               name:'titleManage',

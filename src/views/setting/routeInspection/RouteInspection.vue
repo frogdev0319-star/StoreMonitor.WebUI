@@ -3,8 +3,8 @@
         <el-col :span="24" class="el-route-header">
           <el-col :span="7" class="el-route-btns">
               <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
-                <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' "
-                :disabled="elTableData[Number(activeName)].routeData.length==0">
+                <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class"
+                :disabled="elTableData[Number(activeName)].routeData.length==0" type="primary">
                     <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
                     <span>{{generateInsSettingLang('bindList')}}</span>
                 </el-button>
@@ -69,7 +69,7 @@
                 </el-dialog>
             </el-col>
             <el-col :span="18" class="el-route-tabs">
-                <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-patrltabs-content': ''">
+                <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :closable="index!=0&&index!=1?true:false" >
                         <div v-if="item.routeData">
                             <route-detail :ref="curIndex" :route-data="item.routeData" :down-src="downLoadSrc"
@@ -783,6 +783,7 @@ export default {
 </style>
 <style lang="scss" scoped>
     $mainColor:#f31d65;
+    $border: #e3e9f4;
     *{
         font-family: Arial, Microsoft YaHei;
     }
@@ -811,7 +812,9 @@ export default {
     }
 
     .el-route-container{
-        margin: 20px 15px 15px 15px;
+        padding: 20px 15px 15px 15px;
+        border: 1px solid $border;
+        background-color: #fff;
         .el-route-header{
             @include point(margin-top,10);
             .el-route-tabs{
@@ -823,7 +826,7 @@ export default {
                 @include point(right,30);
                 z-index: 10;
                 width: auto;
-                @include point(top,5);
+                @include point(top,12);
                 .bind-title{
                     @include point(margin-right,15);
                     color:#A2AEBC;
@@ -835,7 +838,7 @@ export default {
                   font-size: 12px;
                 }
                 .el-bind-btn{
-                    background-color: $mainColor;
+                    //background-color: $mainColor;
                     color: #fff;
                     border-color: $mainColor;
                     position: relative;
@@ -843,35 +846,44 @@ export default {
                     @include point(margin-right,15);
                     font-size: 12px;
                     &:disabled{
-                        opacity: 0.6;
+                        opacity: 0.5;
                     }
+                  @media screen and (max-width: 1440px) {
+                    width: 125px !important;
+                  }
                 }
                 .en-el-bind-btn{
-                  background-color: $mainColor;
                   color: #fff;
                   border-color: $mainColor;
                   position: relative;
                   border-radius: 0px;
                   @include point(margin-right,15);
-                  font-size: 12px;
-                  width:120px;
+                  .icon-quxiaolianjie{
+                    font-size: calc(24/1920*100vw);
+                  }
+                  span{
+                  }
                   &:disabled{
-                    opacity: 0.6;
-                  }
-                  @media screen and (min-width: 1366px){
-                    @include point(width, 90);
-                    span{
-                      position: relative;
-                      @include point(bottom,1);
-                    }
-                  }
-                  @media screen and (max-width: 1366px){
-                    span{
-                      position: relative;
-                      @include point(bottom, 2)
-                    }
+                    opacity: 0.5;
                   }
 
+                }
+                .btn-class{
+                  height: calc(36/1920*100vw);
+                  line-height: calc(36/1920*100vw);
+                  padding: 0;
+                  font-size: calc(14/1920*100vw);
+                  width: calc(130/1920*100vw);
+                  .iconfont{
+                    padding: calc(5/1920*100vw) 0;
+                  }
+                  span{
+                    position: relative;
+                    bottom: calc(4/1920*100vw);
+                    @media screen and (max-width: 1280px) {
+                      bottom: calc(3/1920*100vw);
+                    };
+                  }
                 }
                 .downLoad-btn{
                     margin-left: 0px !important;
@@ -905,13 +917,27 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    padding: 3px 5px !important;
                     position: relative;
                     top: 3px;
                     border-right: 0;
-                    span{
+                    height: calc(36/1920*100vw);
+                    line-height: calc(36/1920*100vw);
+                    padding: 0 0;
+                    font-size: calc(14/1920*100vw);
+                    width: calc(130/1920*100vw);
+                    @media screen and (min-width: 1366px){
+                      //@include point(width, 90);
+                      span{
                         position: relative;
                         @include point(bottom,3);
+                      }
+                    }
+                    @media screen and (max-width: 1366px){
+                      //@include point(width, 120);
+                      span{
+                        position: relative;
+                        @include point(bottom,5);
+                      }
                     }
                     &:last-child{
                         border-right: 1px solid;
@@ -929,19 +955,24 @@ export default {
                 border-color: $mainColor !important;
                 color: $mainColor !important;
                 border-radius: 0px;
-                padding: 3px 5px !important;
+                /*padding: 3px 5px !important;*/
                 position: relative;
                 top: 3px;
                 border-right: 0;
+                height: calc(36/1920*100vw);
+                line-height: calc(36/1920*100vw);
+                padding: 0 0;
+                font-size: calc(14/1920*100vw);
+                width: calc(130/1920*100vw);
                 @media screen and (min-width: 1366px){
-                  @include point(width, 90);
+                  //@include point(width, 90);
                   span{
                     position: relative;
                     @include point(bottom,3);
                   }
                 }
                 @media screen and (max-width: 1366px){
-                  @include point(width, 120);
+                  //@include point(width, 120);
                   span{
                     position: relative;
                     @include point(bottom,5);
@@ -969,7 +1000,7 @@ export default {
     #en-patrltabs-content /deep/ .el-tabs__item {
       padding: 0 0;
       font-size: 14px;
-      width: 160px;
+      width: calc(160/1920*100vw);
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;

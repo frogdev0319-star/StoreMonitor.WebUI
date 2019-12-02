@@ -22,7 +22,7 @@
       >
       </el-date-picker>
       <el-tooltip class="item" effect="dark"
-                  placement="bottom-end">
+                  placement="right">
         <div slot="content">{{$t('overview.dataRangeTips')}}</div>
         <i class="iconfont icon-bangzhu iconbangzhu"></i>
       </el-tooltip>
@@ -1084,7 +1084,6 @@
     #{$poi}:checkRem($val);
   }
   *{
-    font-size: calc(14/1920*100vw);
     font-family: Arial,  "Microsoft YaHei";
     box-sizing: border-box;
   }
@@ -1092,7 +1091,8 @@
     width: 100%;
     position: relative;
     height: auto;
-    background-color: #f6f9fe;
+    /*background-color: #f6f9fe;*/
+    font-size: calc(14/1920*100vw);
     padding-bottom: calc(20/1920*100vw);
     .sourceType-icon {
       margin-right: calc(15/1920*100vw);
@@ -1130,10 +1130,11 @@
         color: $tab;
       }
       .date-range {
+        border: 1px solid #ccc;
         width: 200px;
+        height: calc(35 / 1920 * 100vw);
       }
       .item {
-        font-size: calc(16 / 1920 * 100vw);
         color: $tab;
         margin-left: calc(20 / 1920 * 100vw);;
         margin-right: calc(8 / 1920 * 100vw);

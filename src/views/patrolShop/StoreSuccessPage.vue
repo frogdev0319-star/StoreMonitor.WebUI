@@ -19,7 +19,7 @@
         <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
             <div class="details">
                 <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 25px;">{{generateStoreMonitorLang('storeName')}}:</span>
-                <span class="event-label" v-else >{{generateStoreMonitorLang('storeName')}}：</span>
+                <span class="event-label" v-else >{{generateStoreMonitorLang('storeName')}}</span>
                 <span>{{storeName}}</span>
             </div>
             <div class="details">

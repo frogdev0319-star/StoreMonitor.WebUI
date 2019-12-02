@@ -17,7 +17,25 @@
   -ms-transform: none;
   transform: none;
 }
+#storetab-content /deep/ .el-tabs__item {
+  padding: 0 0;
+  font-size: 14px;
+}
+#storetab-content /deep/ .is-active {
+  border-bottom: 4px solid #f31d65;
+}
 
+#storetab-content /deep/ .el-tabs__active-bar{
+  height: 0;
+  transform: translateX(0px);
+}
+#storetab-content /deep/ .el-tabs__nav{
+  -moz-transform: none;
+  -webkit-transform: none;
+  -o-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
 #en-devicetabs-content /deep/ .el-tabs__item {
   padding: 0 0;
   font-size: 14px;

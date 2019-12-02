@@ -351,6 +351,7 @@ export default {
     $red:#FB4C5D;
     $fff:#fff;
     $tab:#7d8cad;
+  $border:#e3e9f4;
     @function rem($val){
         @return $val/16+rem;
     }
@@ -371,6 +372,8 @@ export default {
         cursor: pointer;
     }
     .el-storeEdit-content{
+      border: 1px solid $border;
+      background-color: #fff;
         @include point(padding-left,30);
         @include point(padding-top,20);
         @include point(padding-right,10);
@@ -384,7 +387,11 @@ export default {
                 .sub-btn{
                     float: right;
                     @include point(margin-right,20);
-                    @include point(width,90);
+                    font-size: calc(14/1920*100vw);
+                    height: calc(36/1920*100vw);
+                    line-height: calc(36/1920*100vw);
+                    padding: 0 0;
+                    width: calc(130/1920*100vw);
                 }
             }
             .store-info{
@@ -430,6 +437,9 @@ export default {
                   color: $tab;
                   i{
                     margin-right: calc(15/1920*100vw);
+                  }
+                  .icon-tishi1{
+                    font-size: calc(16/1920*100vw);
                   }
                 }
               }

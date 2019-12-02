@@ -294,7 +294,7 @@
                 self.addBasicInformation().then(res=>{
                   console.log(res);
                   if(res.errCode == 0){
-                    self.notify(self.$t('titleView.emptyDeleteInfo'),'success',3000);
+                    self.notify(self.$t('titleView.saveSuss'),'success',3000);
                   }
                   else{
                     self.notify(res.errorMsg,'warning',3000);

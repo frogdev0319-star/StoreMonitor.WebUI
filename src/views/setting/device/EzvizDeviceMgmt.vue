@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-device" :style="{'height':varyWindowHeight-220+'px'}">
+  <el-row class="el-device" :style="{'height':varyWindowHeight-170+'px'}">
     <el-col :span="24" class="el-btns">
       <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-if="activeName=='device'">
         <el-input
@@ -19,7 +19,10 @@
         <el-button
           :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
           @click="callChildAdd"
-          size="mini">
+          size="mini"
+          type="primary"
+          class="btn-class"
+        >
           <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
           <span>{{$t('deviceView.addEzvizAccount')}}</span>
         </el-button>
@@ -68,7 +71,7 @@
       </el-col>
     </el-col>
     <el-col :span="24" class="el-tabPanels">
-      <el-tabs v-model="activeName" :id="lang=='en'? 'en-devicetabs-content': ''" @tab-click="handleClick">
+      <el-tabs v-model="activeName" id="en-devicetabs-content" @tab-click="handleClick">
         <el-tab-pane :label="generateDeviceLang('ezvizAccountSetting')" name="ezvizAccount">
           <ezviz-account ref="ezvizAccount"></ezviz-account>
         </el-tab-pane>
@@ -76,9 +79,9 @@
           <el-col :span="lang=='en' && varWindowWidth<1920? 11: 10" class="lisde">
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
-              <el-button type="primary" size="mini" class="add-btn"
+              <el-button type="primary" size="mini" class="add-btn btn-class"
                          @click="showAddDialog">
-                <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
+                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -287,9 +290,9 @@
           <el-col :span="lang=='en' && varWindowWidth<1920? 13: 14" class="risde">
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('channelSetting')}}</span>
-              <el-button type="primary" size="mini" class="add-btn"
+              <el-button type="primary" size="mini" class="add-btn btn-class"
                          @click="addNewChannel" :disabled="channelBtnDisabled">
-                <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
+                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
               </el-button>
             </div>
             <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
@@ -364,9 +367,9 @@
                       </div>
                     </div>
                     <div v-if="!item.isClick">
-                      <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;color:#2c3e50"
+                      <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"
                          @click="handleEdit(index,item)"></i>
-                      <i class="iconfont icon-shanchu" style="cursor:pointer;margin-right:10px;color:#2c3e50"
+                      <i class="iconfont icon-shanchu" style="cursor:pointer;margin-right:10px;"
                          @click="handleDelete(index, item)"></i>
                     </div>
                   </div>
@@ -1828,8 +1831,8 @@
     cursor: pointer;
   }
   .el-delete-btn{
-    background-color: $mainColor;
-    border-color:  $mainColor;
+    //background-color: $mainColor;
+    //border-color:  $mainColor;
     color: #fff;
     @include point(margin-right,8);
     font-size: 12px;
@@ -1838,8 +1841,8 @@
     }
   }
   .en-el-delete-btn{
-    background-color: $mainColor;
-    border-color:  $mainColor;
+    //background-color: $mainColor;
+    //border-color:  $mainColor;
     color: #fff;
     font-size: 12px;
     text-align: center;
@@ -1874,12 +1877,26 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    padding: 3px 10px !important;
     position: relative;
     top: 3px;
-    span{
-      position: relative;
-      bottom: 3px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
+    @media screen and (min-width: 1366px){
+      //@include point(width, 90);
+      span{
+        position: relative;
+        @include point(bottom,3);
+      }
+    }
+    @media screen and (max-width: 1366px){
+      //@include point(width, 120);
+      span{
+        position: relative;
+        @include point(bottom,5);
+      }
     }
     &:first-child{
       border-right-width: 0px;
@@ -1899,29 +1916,25 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    padding: 3px 10px !important;
     position: relative;
     top: 3px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
     @media screen and (min-width: 1366px){
-      @include point(width, 90);
+      //@include point(width, 90);
       span{
         position: relative;
-        bottom: 5px;
+        @include point(bottom,3);
       }
     }
-    @media screen and (max-width: 1440px){
-      @include point(width, 100);
-      span{
-        position: relative;
-        bottom: 5px;
-      }
-    }
-
     @media screen and (max-width: 1366px){
-      @include point(width, 120);
+      //@include point(width, 120);
       span{
         position: relative;
-        bottom: 5px;
+        @include point(bottom,5);
       }
     }
 
@@ -1939,6 +1952,8 @@
     }
   }
   .el-device{
+    border: 1px solid $border;
+    background-color: #fff;
     .el-btns{
       @include point(padding-top,10);
       @include point(padding-right,20);
@@ -2000,10 +2015,19 @@
         .add-btn{
           position: absolute;
           @include point(right, 20);
-          height: 32px;
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          padding: 0 0;
+          width: calc(130/1920*100vw);
           top: 0;
           bottom: 0;
           margin: auto;
+          .el-icon-plus{
+            font-size: calc(24/1920*100vw);
+          }
+          span{
+          }
           @media screen and (max-width: 1680px){
             span{
               position: relative;
@@ -2323,6 +2347,10 @@
               @include point(margin-top,14);
               cursor: pointer;
               display: inline-block;
+              .iconfont{
+                font-size: calc(24/1920*100vw);
+                color: #7d8cad;
+              }
               .iconlised{
                 float: left;
                 position: relative;
@@ -2507,10 +2535,35 @@
           .nape-items-handle{
             width: 12%;
             display: inline-block;
+            .iconfont{
+              font-size: calc(24/1920*100vw);
+              color: #7d8cad !important;
+            }
           }
         }
 
       }
+    }
+  }
+  .btn-class{
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
+    .el-icon-plus{
+      padding: calc(5/1920*100vw) 0;
+      font-size: calc(24/1920*100vw);
+    }
+    span{
+      position: relative;
+      bottom: calc(4/1920*100vw);
+      @media screen and (max-width: 1280px) {
+        bottom: calc(3/1920*100vw);
+      };
+    }
+    @media screen and (max-width: 1280px) {
+      width: 125px;
     }
   }
 </style>

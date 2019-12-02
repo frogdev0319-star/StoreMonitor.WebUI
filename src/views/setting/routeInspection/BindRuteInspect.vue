@@ -74,7 +74,7 @@
         </div>
         <div class="el-bind-footer">
             <div class="el-btn-content">
-                <el-button :disabled="storeList.length==0" :class="lang=='en'? 'en-btn': 'btn'" size="mini"  @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>
+                <el-button :disabled="storeList.length==0" :class="lang=='en'? 'en-btn': 'btn'" size="mini" type="primary" @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>
                   {{generateInsSettingLang('confirmBound')}}</el-button>
             </div>
         </div>
@@ -696,6 +696,8 @@ $h1:#292e36;
     }
 }
 .el-bind-device{
+  border: 1px solid $border;
+  background-color: #fff;
     .seacrh-content{
         @include point(margin-top,30);
         @include point(margin-left,30);
@@ -704,14 +706,14 @@ $h1:#292e36;
             font-size: 14px;
         }
         .el-province{
-            @include point(width,160);
+            width: calc(160/1920*100vw);
             @include point(margin-left,15);
             @include point(margin-right,20);
         }
         .city-input{
-            @include point(width,160);
-            height: 28px;
-            line-height: 28px;
+            width: calc(160/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
             background: #F4F5F9 !important;
             cursor: pointer;
             display:inline-block;
@@ -732,16 +734,20 @@ $h1:#292e36;
                 position: absolute;
                 @include point(right,10);
                 top: 6px;
-                font-size: 14px;
+                font-size: calc(14/1920*100vw);
                 color: #C0C4CC;
             }
         }
         .el-search-btn{
-            @include point(width,90);
+            font-size: calc(14/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            padding: 0;
+            width: calc(130/1920*100vw);
             text-align: center;
             @include point(margin-left,15);
             color: #fff;
-            padding: 9px 15px;
+            /*padding: 9px 15px;*/
         }
         .icon-input{
             position: absolute;
@@ -775,6 +781,9 @@ $h1:#292e36;
         position: absolute;
         @include point(right,10);
         @include point(margin-top,10);
+      .icon-tishi1{
+        font-size: calc(16/1920*100vw);
+      }
     }
     .el-bind-content{
         @include point(margin-left,30);
@@ -833,15 +842,26 @@ $h1:#292e36;
             .btn{
               @include point(width,90);
               min-width: 100px;
-              background-color: #f31d65;
+             // background-color: #f31d65;
+              border-color:  #f31d65;
               color: #fff;
             }
             .en-btn{
-              @include point(width,90);
-              min-width: 160px;
-              background-color: #f31d65;
+              width: calc(130/1920*100vw);
+              height: calc(36/1920*100vw);
+              /*min-width: 160px;*/
+              border-color:  #f31d65;
               color: #fff;
               text-align: center;
+              .iconfont {
+                font-size: calc(24 / 1920 * 100vw);
+              }
+              span{
+                font-size: calc(14 / 1920 * 100vw);
+              }
+              @media screen and (max-width: 1680px){
+                width: 130px;
+              }
             }
         }
     }
@@ -849,7 +869,7 @@ $h1:#292e36;
 </style>
 <style>
 .el-button--mini, .el-button--mini.is-round{
-    padding:7px 15px !important;
+    /*padding:7px 15px !important;*/
 }
 .el-province .el-input__inner{
     border-radius: 0px !important;

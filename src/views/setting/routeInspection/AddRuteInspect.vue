@@ -18,7 +18,7 @@
                <div class="title-content">
                    <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
                    <div class="btn-content">
-                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup"><i class="el-icon-plus"></i><span style='margin-left:5px;'>{{generateInsSettingLang('addCategory')}}</span></el-button>
+                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup" type="primary" class="btn-class"><i class="el-icon-plus"></i><span style='margin-left:5px;'>{{generateInsSettingLang('addCategory')}}</span></el-button>
                    </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -32,9 +32,9 @@
                         <div v-if="item.showEdit" class="show-edit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
                                 <i class="iconfont icon-bianji"
-                                style="font-size: 20px;cursor:pointer;margin-right:10px;"
+                                style="cursor:pointer;margin-right:10px;"
                                  @click="editGroup(index,item)"></i>
-                                <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"
+                                <i class="iconfont icon-shanchu" style="cursor:pointer;"
                                   @click="deleteGroup(index, item)"></i>
                             </div>
                         </div>
@@ -68,8 +68,8 @@
                <div class="title-content">
                     <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
                     <div class="btn-content" v-if="groupList.length!=0">
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape"><i class="el-icon-plus"></i><span>{{generateInsSettingLang('addInsItem')}}</span></el-button>
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape"><i class="iconfont icon-shanchu"></i><span>{{generateInsSettingLang('deleteInsItem')}}</span></el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape" type="primary" class="btn-class"><i class="el-icon-plus"></i><span>{{generateInsSettingLang('addInsItem')}}</span></el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape" type="primary" class="btn-class"><i class="iconfont icon-shanchu"></i><span>{{generateInsSettingLang('deleteInsItem')}}</span></el-button>
                     </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -106,8 +106,8 @@
                             </div>
                        </div>
                        <div class="nape-items-handle">
-                           <i class="iconfont icon-bianji" style="font-size: 20px;cursor:pointer;margin-right:10px;"  @click="handleEdit(index,item)"></i>
-                           <i class="iconfont icon-shanchu" style="font-size: 20px;cursor:pointer;"  @click="handleDelete(index, item)"></i>
+                           <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"  @click="handleEdit(index,item)"></i>
+                           <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(index, item)"></i>
                        </div>
                    </div>
                     <el-dialog :title="generateInsSettingLang('confirmDelete')"
@@ -797,6 +797,8 @@ export default {
         width: 100%;
         height: 100%;
         color: $black;
+        border: 1px solid $border;
+        background-color: #fff;
         @media screen and (min-width:1366px){
             .tab-name{
                 font-size: 18px;
@@ -861,37 +863,27 @@ export default {
             }
         }
         .rute-btn{
-            background-color: $red;
+            //background-color: $red;
+            border-color: $red;
             color: #fff;
             font-size: 12px;
-            .el-icon-plus{
-                font-size:16px;
-            }
         }
         .en-rute-btn{
-          background-color: $red;
+          //background-color: $red;
+          border-color: $red;
           color: #fff;
-          font-size: 12px;
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          padding: 0 0;
+          width: calc(130/1920*100vw);
           .el-icon-plus{
-            font-size:16px;
+            font-size:calc(24/1920*100vw);
+            padding: calc(5/1920*100vw) 0;
           }
-        }
-        @media screen and (min-width: 1366px) {
-          .en-rute-btn{
-            @include point(width,105);
-            span{
-              position: relative;
-              bottom: 1px
-            }
-          }
-        }
-        @media screen and (max-width: 1366px) {
-          .en-rute-btn{
-            width: 125px;
-            span{
-              position: relative;
-              bottom: 1px
-            }
+          .icon-shanchu{
+            padding: calc(5/1920*100vw) 0;
+            font-size:calc(24/1920*100vw);
           }
         }
         .iconcontent{
@@ -1014,6 +1006,13 @@ export default {
                     &:last-child{
                         @include point(margin-bottom,20);
                     }
+                  .nape-items-handle{
+                    .iconfont{
+                      font-size: calc(24/1920*100vw);
+                      color: #7d8cad;
+                      font-weight: 400;
+                    }
+                  }
                 }
             }
             .group-add{
@@ -1151,6 +1150,10 @@ export default {
                     @include point(line-height,20);
                     @include point(margin-top,15);
                     text-align: left;
+                    .iconfont{
+                      font-size: calc(24/1920*100vw);
+                      color: #7d8cad;
+                    }
                 }
                 .iconcontent{
                     @include point(margin-left,25);
@@ -1182,7 +1185,28 @@ export default {
         .noraml-groupColor{
             background-color: #FAFAFA;
         }
+      .btn-class{
+        height: calc(36/1920*100vw);
+        padding: 0;
+        font-size: calc(14/1920*100vw);
+        width: calc(130/1920*100vw);
+        .el-icon-plus, .icon-shanchu{
+          padding: calc(5/1920*100vw) 0;
+          font-size: calc(24/1920*100vw);
+        }
+        span{
+          position: relative;
+          bottom: calc(4/1920*100vw);
+          @media screen and (max-width: 1280px) {
+            bottom: calc(3/1920*100vw);
+          };
+        }
+        @media screen and (max-width: 1440px) {
+          width: 125px;
+        }
+      }
     }
+
 </style>
 <style>
 .el-dialog__body{

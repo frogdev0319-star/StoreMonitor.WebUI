@@ -1,5 +1,5 @@
 <template>
-  <div class="detail-container"  :style="{'height':varyWindowWidth-220+'px'}" >
+  <div class="detail-container"  :style="{'height':varyWindowHeight-350+'px'}" >
     <el-row>
       <el-col :span="24" class="detail-title">
         <!--<span class="title-title ">{{totalMsg}}</span>-->
@@ -88,7 +88,10 @@
             align='left'
             stripe
             border
-            style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;">
+            :max-height="tableHieght"
+            style="width:100%;text-algin:center;border: 0px solid #ebebeb;"
+            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+          >
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
                              :prop="item.prop" :label="item.label"  :min-width="item.width">
             </el-table-column>
@@ -98,8 +101,8 @@
               min-width="90"
               align="left">
               <template slot-scope="scope">
-                <i class="iconfont icon-bianji" style="font-size:20px;cursor: pointer; margin-right: 20px" @click="updateAccount(scope.row)"></i>
-                <i class="iconfont icon-shanchu" style="font-size:20px;cursor: pointer;" @click="showDeleteAccountDialog(scope.row)"></i>
+                <i class="iconfont icon-bianji" style="cursor: pointer; margin-right: 20px" @click="updateAccount(scope.row)"></i>
+                <i class="iconfont icon-shanchu" style="cursor: pointer;" @click="showDeleteAccountDialog(scope.row)"></i>
               </template>
             </el-table-column>
             <div slot="empty">
@@ -520,6 +523,19 @@
             });
           },
         },
+        computed:{
+          tableHieght(){
+            if(this.windowHeight>800){
+              return this.windowHeight*0.72;
+            }
+            else if(this.windowHeight>700){
+              return this.windowHeight*0.67;
+            }
+            else{
+              return this.windowHeight*0.55;
+            }
+          },
+        },
         mounted(){
           let self=this;
           self.getAccountList();
@@ -600,6 +616,14 @@
           position: relative;
         }
       }
+    }
+  }
+  .el-table-content{
+    border: 1px solid $border;
+    border-bottom: none;
+    .iconfont{
+      font-size: calc(24/1920*100vw);
+      color: #7d8cad;
     }
   }
   .access-button{
@@ -808,5 +832,8 @@
   }
   .nvrForm .el-form-item__error{
     left: 0;
+  }
+  .el-table--border th:first-child .cell, .el-table--border td:first-child .cell {
+    padding-left: 20px;
   }
 </style>

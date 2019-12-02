@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="device-content">
     <ezviz-device-mgmt v-if="isEzviz"></ezviz-device-mgmt>
     <nvr-device-mgmt v-else></nvr-device-mgmt>
   </div>
@@ -49,6 +49,6 @@
     },
   }
 </script>
-<style>
-
+<style lang="scss" scoped>
+  $border:#e3e9f4;
 </style>

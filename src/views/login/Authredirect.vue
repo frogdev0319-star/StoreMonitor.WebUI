@@ -1,6 +1,8 @@
 <script>
 import { mapMutations } from 'vuex'
 import {setCookie} from '@/common/auth'
+import router from '../../router'
+
 export default{
     name:'AuthRedirect',
     created(){
@@ -17,10 +19,6 @@ export default{
                 if(paramsArray.toString().length!=0){
                   let obj = self.queryURL(hash);
                   console.log(obj);
-                    // obj.token=paramsArray[0].substr(paramsArray[0].indexOf('=')+1);
-                    // obj.userId=paramsArray[1].substr(paramsArray[1].indexOf('=')+1);
-                    // obj.appKey =paramsArray[2].substr(paramsArray[2].indexOf('=')+1);
-                    // //obj.lang=paramsArray[3].substr(paramsArray[3].indexOf('=')+1);
                     this.$store.commit('SET_TOKEN',obj.token);
                     if(obj.ezvizProtocol){
                       this.$store.commit('SET_ISEZVIZ',true);
@@ -48,6 +46,13 @@ export default{
                     setCookie('lang', lang)
                 }
             }
+            const { roles } = await self.$store.dispatch('GetUserAuthorities')
+            console.log(roles)
+            // generate accessible routes map based on roles
+            const accessRoutes = await self.$store.dispatch('generateRoutes')
+
+            // dynamically add accessible routes
+            router.addRoutes(accessRoutes)
             window.location.href=window.location.origin+window.location.pathname+'#/home';
             //}
             // else{

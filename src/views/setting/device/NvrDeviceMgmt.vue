@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-device" :style="{'height':varyWindowHeight-120+'px'}">
+  <el-row class="el-device" :style="{'height':varyWindowHeight-139+'px'}">
     <el-col :span="24" class="el-btns">
       <div style="display:inline-block;" v-if="activeName=='dash'">
         <el-button @click="connectServer"  :size="varWindowWidth>1680?'small':'mini'" class="btns" type="primary">
@@ -16,13 +16,13 @@
         </el-input>
         <el-button v-for="(item,index) in btnList"
                    :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
-          <i :class="item.iconClass" style="font-size:24px;"></i>
+          <i :class="item.iconClass"></i>
           <span>{{item.btnTitle}}</span>
         </el-button>
       </div>
     </el-col>
     <el-col :span="24" class="el-tabPanels">
-      <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-devicetabs-content': ''">
+      <el-tabs v-model="activeName" @tab-click="handleClick" id="en-devicetabs-content">
         <el-tab-pane :label="generateDeviceLang('mediaService')" name="dash">
           <el-col :span="varWindowWidth<1540?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
             <div class="details">
@@ -89,7 +89,7 @@
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
                          @click="showAddDialog">
-                  <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
+                  <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -251,7 +251,7 @@
               <span class="info-title">{{generateDeviceLang('nvrChannelSetting')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
                          @click="addNewChannel" :disabled="channelBtnDisabled">
-                <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
+                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
               </el-button>
             </div>
             <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
@@ -608,7 +608,7 @@
     computed:{
       varyDivHeight:function(){
         if(this.varyWindowHeight>800){
-          return this.varyWindowHeight*0.62;
+          return this.varyWindowHeight*0.58;
         }
         else if(this.varyWindowHeight>700){
           return this.varyWindowHeight*0.45;
@@ -1734,6 +1734,8 @@
   @import '../../../assets/css/importfile.css';
   @import '../../../assets/css/textstyle.css';
   $mainColor:#f31d65;
+  $border:#e3e9f4;
+  $tab: #7d8cad;
   @function rem($val){
     @return $val/16+rem;
   }
@@ -1783,7 +1785,6 @@
     top: 3px;
     span{
       position: relative;
-      bottom: 3px;
     }
     &:first-child{
       border-right-width: 0px;
@@ -1806,19 +1807,15 @@
     padding: 3px 10px !important;
     position: relative;
     top: 3px;
-    @media screen and (min-width: 1366px){
-      @include point(width, 90);
-      span{
-        position: relative;
-        bottom: 5px;
-      }
+    height: calc(36/1920*100vw);
+    width: calc(130/1920*100vw);
+    .iconfont{
+      font-size: calc(24/1920*100vw);
+      vertical-align: middle;
     }
-    @media screen and (max-width: 1366px){
-      @include point(width, 120);
-      span{
-        position: relative;
-        bottom: 5px;
-      }
+    span{
+      font-size: calc(14/1920*100vw);
+      vertical-align: middle;
     }
 
     &:first-child{
@@ -1833,8 +1830,13 @@
     &:focus{
       background-color: #FEE4E7;
     }
+    &:disabled{
+      opacity: 0.5;
+    }
   }
   .el-device{
+    border: 1px solid $border;
+    background-color: #FFF;
     .el-btns{
       @include point(padding-top,10);
       @include point(padding-right,20);
@@ -1844,7 +1846,10 @@
         position: absolute;
         @include point(right,25);
         z-index: 979;
-        @include point(width,90);
+        width: calc(130/1920*100vw);
+        height: calc(36/1920*100vw);
+        font-size: calc(14/1920*100vw);
+        padding: 0;
       }
     }
     .el-tabPanels{
@@ -1892,21 +1897,26 @@
         .add-btn{
           position: absolute;
           @include point(right, 20);
-          height: 32px;
+          height: calc(36/1920*100vw);
+          width: calc(130/1920*100vw);
+          padding: 0;
           top: 0;
           bottom: 0;
           margin: auto;
-          @media screen and (max-width: 1680px){
-            .add-span{
-              position: relative;
-              bottom: 3px;
-            }
+          .el-icon-plus{
+            font-size: calc(24/1920*100vw);
+            padding: calc(5/1920*100vw) 0;
           }
-          @media screen and (max-width: 1280px){
-            .add-span{
-              position: relative;
-              bottom: 3px;
-            }
+          span{
+            font-size: calc(14/1920*100vw);
+            position: relative;
+            bottom: calc(4/1920*100vw);
+            @media screen and (max-width: 1280px) {
+              bottom: calc(2/1920*100vw);
+            };
+          }
+          @media screen and (max-width: 1680px){
+            width: 110px;
           }
         }
       }
@@ -2048,6 +2058,10 @@
               @include point(margin-top,14);
               cursor: pointer;
               display: inline-block;
+              .iconfont{
+                font-size: calc(24/1920*100vw);
+                color: $tab;
+              }
               .iconlised{
                 float: left;
                 position: relative;
@@ -2227,6 +2241,10 @@
           .nape-items-handle{
             width: 12%;
             display: inline-block;
+            .iconfont{
+              font-size: calc(24/1920*100vw);
+              color: $tab !important;
+            }
           }
         }
 
