@@ -674,6 +674,7 @@ export default {
     cancel: 'Cancel',
     enterTitleName: 'Please enter job title',
     titleValidateInfo: 'Job title consists of 1~20 Chinese characters or letters',
-    saveSuss: 'Successfully Save'
+    saveSuss: 'Successfully Save',
+    titleExist: 'The job title already exists'
   }
 }

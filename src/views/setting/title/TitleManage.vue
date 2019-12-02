@@ -127,7 +127,8 @@
             page:1,
             showDeleteDialog: false,
             deleteIds : [],
-            deleteInfo: this.$t('titleView.confirmDeleteTitle')
+            deleteInfo: this.$t('titleView.confirmDeleteTitle'),
+            titleList: []
           }
       },
       computed:{
@@ -157,12 +158,14 @@
         addNewTitle(){
           let self = this;
           self.$router.push({name:'titleSetting', params: { isAdd: true }});
+          sessionStorage.setItem('titleList', JSON.stringify(self.titleList))
         },
         updateTitle(row){
           let self = this;
           console.log(row);
-          self.$router.push({name:'titleSetting', params: { isAdd: false }});
+          self.$router.push({name:'titleSetting', params: { isAdd: false}});
           sessionStorage.setItem('titleInfo', JSON.stringify(row))
+          sessionStorage.setItem('titleList', JSON.stringify(self.titleList))
         },
         showDeleteDialogMethod(val){
           let self = this;
@@ -203,7 +206,7 @@
               self.notify(self.$t('titleView.deleteSuss'),'success',3000);
             }
             else{
-              self.notify(res.errorMsg,'warning',3000);
+              self.notify(res.errMsg,'warning',3000);
             }
             self.getTitleList();
             self.showDeleteDialog = false;
@@ -232,7 +235,13 @@
               let roleId = item.roleId;
 
             })
-            self.tableData = res.data
+            self.tableData = res.data;
+            let listArray = [];
+            self.tableData.forEach(item=>{
+              listArray.push(item.title)
+            })
+            self.titleList = listArray;
+            console.log(self.titleList);
           })
             .catch(err=>{
               console.log(err)

@@ -677,6 +677,7 @@ export default {
     cancel: '取消',
     enterTitleName: '請輸入職務名稱',
     titleValidateInfo: '職務名稱為1~20個字母或漢字',
-    saveSuss: '保存成功'
+    saveSuss: '保存成功',
+    titleExist: '職務名稱已存在'
   }
 }

@@ -70,7 +70,31 @@
               console.log(reg.test(value))
               let commentLength = filterString.getContentLength(value)
               if (reg.test(value) && commentLength <=20) {
-                callback()
+                let titleList = JSON.parse(sessionStorage.getItem('titleList'));
+                if(self.isAdd){
+                  // add title
+                  if(titleList.includes(value)){
+                    return callback(new Error(self.$t('titleView.titleExist')))
+                  }
+                  else{
+                    callback()
+                  }
+                }
+                else{
+                  //update title
+                  let oldTitleName = JSON.parse(sessionStorage.getItem('titleInfo')).title;
+                  if(value == oldTitleName){
+                    callback()
+                  }
+                  else{
+                    if(titleList.includes(value)){
+                      return callback(new Error(self.$t('titleView.titleExist')))
+                    }
+                    else{
+                      callback()
+                    }
+                  }
+                }
               } else {
                 return callback(new Error(self.$t('titleView.titleValidateInfo')))
               }
@@ -297,7 +321,7 @@
                     self.notify(self.$t('titleView.saveSuss'),'success',3000);
                   }
                   else{
-                    self.notify(res.errorMsg,'warning',3000);
+                    self.notify(res.errMsg,'warning',3000);
                   }
                 }).catch(error=>{
                 });
@@ -309,7 +333,7 @@
                     self.notify(self.$t('titleView.saveSuss'),'success',3000);
                   }
                   else{
-                    self.notify(res.errorMsg,'warning',3000);
+                    self.notify(res.errMsg,'warning',3000);
                   }
                 }).catch(error=>{
                 });
