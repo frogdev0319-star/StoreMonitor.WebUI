@@ -647,7 +647,7 @@ $red:#fb4c5d;
  .el-select-dropdown__item.selected{
     color: #FB4C5D !important;
 }
-.el-form-item__error{
+.login-form /deep/ .el-form-item__error{
     color: #fff !important;
     font-size: 12px !important;
     line-height: 1 !important;

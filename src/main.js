@@ -1,7 +1,6 @@
 
 import Vue from 'vue'
 import App from './App'
-import router from './router'
 import './assets/font/iconfont.css'
 import ElementUI from 'element-ui';
 // import locale from 'element-ui/lib/locale/lang/en' // lang i18n
@@ -10,6 +9,8 @@ import Cookies from 'js-cookie'
 import 'video.js/dist/video-js.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'videojs-flash'
+import router from './router'
+
 import rem from '@/common/rem'
 //const ElementUI=require('element-ui');
 import axios from 'axios'

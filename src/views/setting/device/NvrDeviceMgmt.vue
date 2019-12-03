@@ -16,7 +16,7 @@
         </el-input>
         <el-button v-for="(item,index) in btnList"
                    :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
-          <i :class="item.iconClass"></i>
+          <i :class="item.iconClass" style="font-size: 24px;"></i>
           <span>{{item.btnTitle}}</span>
         </el-button>
       </div>
@@ -1780,9 +1780,27 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    padding: 3px 10px !important;
     position: relative;
     top: 3px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
+    @media screen and (min-width: 1366px){
+      //@include point(width, 90);
+      span{
+        position: relative;
+        @include point(bottom,3);
+      }
+    }
+    @media screen and (max-width: 1366px){
+      //@include point(width, 120);
+      span{
+        position: relative;
+        @include point(bottom,5);
+      }
+    }
     span{
       position: relative;
     }

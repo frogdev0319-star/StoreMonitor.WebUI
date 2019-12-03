@@ -250,7 +250,7 @@
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn"><i
-                    class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>
+                    class="iconfont icon-quxiaolianjie" style="margin-right:8px;"></i>
                     <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>

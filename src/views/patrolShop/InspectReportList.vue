@@ -38,7 +38,7 @@
                   </div>
                   <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">
                     <div class="month-details">
-                      <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>
+                      <el-checkbox v-model="checkAllStore" @change="allStoreChecked"></el-checkbox> <span>{{$t('overview.all')}}</span>
                     </div>
                     <div class="month-details" v-for="(item,index) in storeDataList" :key="index">
                       <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>
@@ -241,6 +241,7 @@ export default {
             storeName: '',
             showMonthDrap: false,
             showStoreContent: false,
+            checkAllStore: false
         }
     },
     created(){
@@ -295,6 +296,11 @@ export default {
           self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
           self.reportList=[];
           self.curSortType=0;
+          self.storeName =  '';
+          self.showMonthDrap = false;
+          self.showStoreContent =  false;
+          self.checkAllStore =  false;
+          self.curStore=[];
         },
         getReportList(params){
             let self=this;
@@ -623,47 +629,68 @@ export default {
           self.showStoreContent = !self.showStoreContent;
           self.showMonthDrap = true;
         },
-        changeStoreItem(item){
+        allStoreChecked(val){
+          /**
+           * 选择所有门店
+           * @type {default.methods}
+           */
           let self = this;
-          self.checkAllStore = false;
-
-          if(item == -1){
-            self.checkAllStore = true;
-            self.storeName = self.$t('overview.all');
-            self.curStore = [];
+          console.log(val);
+          let selectedStores = [];
+          let daysStr = "";
+          if(val){
             self.storeDataList.forEach(item=>{
               item.checked = true;
+              selectedStores.push(item.storeId);
+              daysStr = daysStr  + item.label + ',';
             })
+            daysStr = daysStr.substr(0,daysStr.length-1)
+            self.storeStr = daysStr;
           }
           else{
-            console.log(item);
-            let daysStr = "";
-            let count = 0;
-            let selectedStores = [];
-            daysStr = item.label;
-            selectedStores.push(item.storeId);
-
-            self.storeName = daysStr;
-            self.curStore = selectedStores;
-            console.log(self.curStore);
-            console.log(self.storeName)
             self.storeDataList.forEach(item=>{
-              item.checked = false;
+              item.checked = false
             })
-            item.checked = true;
+            self.storeStr = '';
           }
-          self.showStoreContent = false;
-          self.showMonthDrap = false;
-          let selectIds = [];
-          let storeStr = '';
-          self.storeDataList.forEach(item=>{
-            if(item.checked){
-              selectIds.push(item.storeId);
-              storeStr += item.label +'，';
+          self.storeName = val ? self.$t('overview.all') : '';
+          self.curStore = val ? selectedStores: [] ;
+          console.log(self.storeName);
+          console.log(self.curStore)
+        },
+        changeStoreItem(item){
+          let self = this;
+          console.log(item);
+          let daysStr = "";
+          let count = 0;
+          let selectedMonths = [];
+          self.storeDataList.forEach(item => {
+            if (item.checked) {
+              daysStr = daysStr  + item.label + ',';
+              selectedMonths.push(item.storeId);
+              count++;
             }
           })
-          storeStr = storeStr.substr(0,storeStr.length-1)
-          self.storeStr = storeStr;
+          self.curStore = selectedMonths;
+          console.log(daysStr);
+          console.log(self.curStore)
+          if (daysStr.length != 0) {
+            daysStr = daysStr.substr(0,daysStr.length-1)
+            self.storeStr = daysStr;
+            self.storeName = self.storeStr;
+            if (count == self.storeDataList.length) {
+              self.storeName = self.$t('overview.all');
+              self.checkAllStore = true;
+            }
+            else{
+              self.checkAllStore = false;
+            }
+          }
+          else {
+            self.storeStr = '';
+            self.storeName = '';
+            self.checkAllStore = false;
+          }
         },
         changeStore(val){
             let self=this;
@@ -976,7 +1003,7 @@ $suggestBack:#F1F6FE;
             .month-panel{
               position: absolute;
               margin-top: 3px;
-              width: calc(160/1920*100vw);
+              min-width: calc(160/1920*100vw);
               height: 150px;
               z-index: 980;
               background-color: #fff;
@@ -1136,10 +1163,35 @@ $suggestBack:#F1F6FE;
 <style scoped>
     .el-select >>> .el-input__inner{
         background: #f4f5f9 !important;
+        border: 1px solid #E4E7ED  !important;
         /*border-radius: 0px !important;*/
         /*border: 0 !important;*/
         /*height: 28px !important;*/
         /*line-height: 28px !important;*/
+    }
+    /* 浏览器滚动条样式 */
+
+    /* width */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: rgb(255, 255, 255);
+      border-radius: 8px;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: rgb(201, 201, 202);
+      border-radius: 8px;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgb(162, 162, 163);
     }
 </style>
 <style>

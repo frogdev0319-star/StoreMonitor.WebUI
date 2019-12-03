@@ -119,7 +119,7 @@ export default {
     clickToStar: 'Click to star',
     submit: 'Submit',
     confirmSum: 'Confirm Summary',
-    startPatrol: 'Click on each title to start remote!',
+    startPatrol: 'Click on each title to start remote patrol!',
     takeSnapshot: 'Click to take snapshots!',
     snapshot: 'Snapshot',
     record: 'Record',

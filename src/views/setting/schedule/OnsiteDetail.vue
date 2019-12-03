@@ -234,7 +234,7 @@
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" type="primary" size="mini" @click="bindScheduleBtn"><i
                     class="iconfont icon-quxiaolianjie" style="margin-right:8px;"></i>
-                    <sapn>{{generateScheduleLang('saveAndApply')}}</sapn>
+                    <sapn class="span-class">{{generateScheduleLang('saveAndApply')}}</sapn>
                   </el-button>
                 </div>
               </div>
@@ -2718,14 +2718,14 @@
               font-size: calc(24/1920*100vw);
               padding: calc(5/1920*100vw) 0;
             }
-            span{
+            color: #fff;
+            .span-class{
               position: relative;
               bottom: calc(4/1920*100vw);
               @media screen and (max-width: 1280px) {
                 bottom: calc(3/1920*100vw);
               };
             }
-            color: #fff;
           }
         }
       }

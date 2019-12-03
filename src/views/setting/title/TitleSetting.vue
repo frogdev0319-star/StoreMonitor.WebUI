@@ -303,7 +303,7 @@
       methods:{
         commentChange(val){
           let self = this;
-          let comment = filterString.all(val,100);
+          let comment = filterString.all(val,200);
           console.log(comment);
           let commentLength = filterString.getContentLength(comment)
           self.curLength = commentLength;
@@ -398,6 +398,10 @@
             console.log(JSON.parse(data));
             self.infoForm = JSON.parse(data);
             console.log(self.infoForm);
+            let comment = filterString.all(self.infoForm.comment,200);
+            console.log(comment);
+            let commentLength = filterString.getContentLength(comment)
+            self.curLength = commentLength;
           }
           let roleId = self.infoForm.roleId;
           console.log(roleId)
@@ -759,7 +763,7 @@
   .role-group .el-checkbox{
     margin-right: 0;
   }
-  .role-group .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
+  .role-group /deep/ .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
     background-color:#f31d65 ;
     border-color: #f31d65;
   }

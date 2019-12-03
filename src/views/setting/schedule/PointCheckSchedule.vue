@@ -2921,5 +2921,9 @@
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
   }
+  .el-switch.is-checked .el-switch__core{
+    border-color: #00FF00;
+    background-color: #00FF00;
+  }
 
 </style>

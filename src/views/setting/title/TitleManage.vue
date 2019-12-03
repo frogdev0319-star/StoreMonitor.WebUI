@@ -406,6 +406,9 @@
   .title-table .el-table--border th:first-child{
     border-left: 1px solid #e3e9f4;
   }
+  .title-table .el-table--border td:first-child .cell, .el-table--border th:first-child .cell{
+    padding-left: calc(10/1920*100vw);
+  }
   /*.el-table--border, .el-table--group{*/
     /*border: none !important;*/
   /*}*/
