@@ -188,11 +188,11 @@
                     checked: false,
                     disabled: false,
                   },
-                  {
-                    roleName: this.$t('route.storeChecking'),
-                    checked: false,
-                    disabled: true,
-                  }
+                  // {
+                  //   roleName: this.$t('route.storeChecking'),
+                  //   checked: false,
+                  //   disabled: true,
+                  // }
                 ]
               },
               {
@@ -277,6 +277,7 @@
                 ]
               }
             ],
+            tempRoleNameList: [],
             authorityInfoLists:[],
             isAdd: this.$route.params.isAdd,
             lang: this.$i18n.locale
@@ -287,10 +288,12 @@
         'infoForm.roleId'(newValue, old){
           let self = this;
           console.log(newValue);
+          console.log(self.tempRoleNameList);
           if(self.isAdd){
+            self.roleNameList = self.tempRoleNameList;
+            console.log(self.roleNameList)
             self.roleNameList.forEach(item=>{
               item.checked = false;
-              item.display = false;
               item.children.forEach(_item=>{
                 _item.checked = false;
                 _item.disabled = false;
@@ -416,7 +419,7 @@
           self.roleNameList[1].children[3].disabled = PermissionHelper.enablePatrolTask() ? false :  true;
           self.roleNameList[1].children[4].disabled = PermissionHelper.enableStoreMonitor() ? false :  true;
           self.roleNameList[1].children[5].disabled = PermissionHelper.enableTransactionPatrol() ? false :  true;
-          self.roleNameList[1].children[6].disabled = PermissionHelper.enableStorePointCheck() ? false :  true;
+          // self.roleNameList[1].children[6].disabled = PermissionHelper.enableStorePointCheck() ? false :  true;
 
           self.roleNameList[2].children[0].disabled = PermissionHelper.enableEventHandle() ? false : true;
           self.roleNameList[2].children[1].disabled = PermissionHelper.enableEventClose() ? false : true;
@@ -463,7 +466,7 @@
             self.roleNameList[2].children[0].checked = true;
             self.roleNameList[2].children[0].disabled = true;
           }
-
+          console.log(self.roleNameList)
           self.roleNameList.forEach(item=>{
             let disabledNum = 0;
             item.children.forEach(_item=>{
@@ -473,6 +476,9 @@
             })
             if(disabledNum == item.children.length){
               item.disabled = true;
+            }
+            else{
+              item.disabled = false;
             }
           })
           //show the maxmium roleList
@@ -498,7 +504,7 @@
             self.roleNameList[1].children[3].checked = PermissionHelper.enablePatrolTask() ? true : false;
             self.roleNameList[1].children[4].checked = PermissionHelper.enableStoreMonitor() ? true : false;
             self.roleNameList[1].children[5].checked = PermissionHelper.enableTransactionPatrol() ? true : false;
-            self.roleNameList[1].children[6].checked = PermissionHelper.enableStorePointCheck() ? true : false;
+            // self.roleNameList[1].children[6].checked = PermissionHelper.enableStorePointCheck() ? true : false;
 
             self.roleNameList[2].children[0].checked = PermissionHelper.enableEventHandle() ? true : false;
             self.roleNameList[2].children[1].checked = PermissionHelper.enableEventClose() ? true : false;
@@ -515,36 +521,56 @@
             self.roleNameList[4].children[3].checked = PermissionHelper.enableScheduleSetting() ? true : false;
             self.roleNameList[4].children[4].checked = PermissionHelper.enableTitleSetting() ? true : false;
           }
-          self.roleNameList.forEach((item,index)=>{
-            let parentDisable = self.roleNameList[index].disabled;
+          self.roleNameList.forEach(item=>{
+            let childrenMustNum = 0;
             let childrenCheckedNum = 0;
-            let childrenDisableNum = 0;
-            item.children.forEach(_item=>{
-              if(_item.checked){
-                childrenCheckedNum++;
+            let childrenUncheckedNum = 0;
+            let childrenNoAuthorityNum = 0;
+            item.children.forEach(_item=> {
+              if(_item.disabled){
+                _item.checked ? childrenMustNum++ : childrenNoAuthorityNum ++;
               }
-              else if(_item.disabled){
-                childrenDisableNum++;
+              else{
+                _item.checked ? childrenCheckedNum++ : childrenUncheckedNum ++;
               }
             })
-            let sumCheckAndDis = childrenCheckedNum + childrenDisableNum;
-            if(childrenDisableNum== item.children.length){
-              item.disabled = true;
-            }
-            if(sumCheckAndDis == item.children.length){
+            if( childrenMustNum + childrenNoAuthorityNum + childrenCheckedNum == item.children.length )  {
               item.checked = true;
             }
-            // if(sumCheckAndDis == item.children.length && !parentDisable){
-            //   if(childrenDisableNum > 0){
-            //     item.disabled = true;
-            //     item.checked = false;
-            //   }
-            //   else{
-            //     item.disabled = false;
-            //     item.checked = true;
-            //   }
-            // }
+            else{
+              item.checked = false;
+            }
           })
+          // self.roleNameList.forEach((item,index)=>{
+          //   let parentDisable = self.roleNameList[index].disabled;
+          //   let childrenCheckedNum = 0;
+          //   let childrenDisableNum = 0;
+          //   item.children.forEach(_item=>{
+          //     if(_item.checked){
+          //       childrenCheckedNum++;
+          //     }
+          //     else if(_item.disabled){
+          //       childrenDisableNum++;
+          //     }
+          //   })
+          //   let sumCheckAndDis = childrenCheckedNum + childrenDisableNum;
+          //   if(childrenDisableNum== item.children.length){
+          //     item.disabled = true;
+          //   }
+          //   if(sumCheckAndDis == item.children.length){
+          //     item.checked = true;
+          //   }
+          //   // if(sumCheckAndDis == item.children.length && !parentDisable){
+          //   //   if(childrenDisableNum > 0){
+          //   //     item.disabled = true;
+          //   //     item.checked = false;
+          //   //   }
+          //   //   else{
+          //   //     item.disabled = false;
+          //   //     item.checked = true;
+          //   //   }
+          //   // }
+          // })
         },
         checkAllChildrenRole(index, val){
           let self=this;
@@ -574,8 +600,8 @@
           let sumCheckAndDis = childrenCheckedNum + childrenDisableNum;
           if(sumCheckAndDis == self.roleNameList[index].children.length && !parentDisable){
             if(childrenDisableNum > 0){
-              self.roleNameList[index].disabled = true;
-              self.roleNameList[index].checked = false;
+              self.roleNameList[index].disabled = false;
+              self.roleNameList[index].checked = true;
             }
             else{
               self.roleNameList[index].disabled = false;
@@ -608,6 +634,7 @@
       },
       mounted(){
           let self = this;
+          self.tempRoleNameList = JSON.parse(JSON.stringify(self.roleNameList));
           self.getAuthorityInfoList();
       }
     }
