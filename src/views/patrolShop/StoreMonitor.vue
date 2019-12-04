@@ -103,25 +103,28 @@
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
+                            @click.native="adjustProcess(item.value, item.label)"
                           >
                           </el-option>
                         </el-select>
                         <span>{{generateStoreMonitorLang('back')}}</span>
-                        <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" placeholder=' ' v-show="!fullScreen" @change="adjustProcess">
+                        <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder=' ' v-show="!fullScreen">
                           <el-option
                             v-for="(item) in backList"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
+                            @click.native="adjustProcess(item.value, item.label)"
                           >
                           </el-option>
                         </el-select>
-                        <el-select class="el-test" size="mini" v-model="curBack" :popper-class="popperClass" placeholder=' ' :popper-append-to-body='false' v-show="fullScreen" @change="adjustProcess">
+                        <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder=' ' :popper-append-to-body='false' v-show="fullScreen">
                           <el-option
                             v-for="(item) in backList"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
+                            @click.native="adjustProcess(item.value, item.label)"
                           >
                           </el-option>
                         </el-select>
@@ -1163,6 +1166,8 @@ export default {
         async stopAndPlayHistoryVideo(){
             let self=this;
             let state=self.playBackState;
+            self.realTimeStartTs =Number(self.curTime.getTime().toString().substr(0,10));
+            console.log(self.realTimeStartTs);
             self.stopVideo();
             const data = {
                 request: {
@@ -1274,7 +1279,9 @@ export default {
         async playHistoryVideo(){
             let self=this;
             self.realTimeStartTs =Number(self.curTime.getTime().toString().substr(0,10));
-            let sessionId= await dashAPI.Online();
+            console.log(self.realTimeStartTs);
+
+          let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
             let data= {
@@ -2187,9 +2194,10 @@ export default {
             }
             video.playbackRate=val;
         },
-        async adjustProcess(val){
+        async adjustProcess(val, label){
             console.log(val);
             let self = this;
+            self.curBack = label;
             let video=document.getElementById('previewVideo');
             let curTime=video.player.currentTime();
             console.log(curTime);
