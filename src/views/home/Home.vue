@@ -8,8 +8,8 @@
           <!--<span class="sys-name" v-if="!collapsed" @click="routerHome">{{$t('navbar.title')}}</span>-->
         </el-col>
         <el-col :span="1" class="el-traggle-content">
-          <i class="iconfont icon-zhankai icon-collapse" @click="clickCollapse" v-if="collapsed"></i>
-          <i class="iconfont icon-shouqi icon-collapse" @click="clickCollapse" v-else></i>
+          <i class="iconfont icon-indent" @click="clickCollapse" v-if="collapsed"></i>
+          <i class="iconfont icon-outdent" @click="clickCollapse" v-else></i>
         </el-col>
         <el-col :span="10">
           <el-breadcrumb separator="|" class="breadcrumb-inner" >
@@ -97,9 +97,6 @@
                                :index="child.path"  :disabled="child.isReadOnly"
                                :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
                     <template slot="title">
-                      <!--<div :class="lang=='en' ? 'en-icon-content': 'icon-content'">-->
-                      <!--<div class="tag-icon"></div>-->
-                      <!--</div>-->
                       <i class="iconfont icon-yuandian icon-content"></i>
                       <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" class="third-title">{{generateRoute(child.name)}}</span>
                     </template>
@@ -551,8 +548,8 @@
         height: 100%;
         border-right: 1px solid #e3e9f4;
         position: relative;
-        .icon-collapse{
-          @include point(font-size,32);
+        .icon-outdent, .icon-indent{
+          font-size: calc(24/1920*100vw);
           cursor: pointer;
           color: #7d8cad;
         }
@@ -679,10 +676,10 @@
         float:left;
         margin-right: calc(48/1920*100vw);
         width: 10px;
-        width: 10px;
         position: relative;
         height: 100%;
-        font-size: 10px;
+        font-size: calc(20/1920*100vw);
+        transform: scale(0.5);
         color: #a0a4ad;
       }
       .en-icon-content{
@@ -691,7 +688,8 @@
         width: 10px;
         position: relative;
         height: 100%;
-        font-size: 10px;
+        font-size: calc(20/1920*100vw);
+        transform: scale(0.5);
         color: #a0a4ad;
       }
       .tag-icon{
@@ -977,9 +975,14 @@
     font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
     height: 60px;
     line-height: 60px;
+    color: #fff;
   }
   .el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
     background-color: rgba(243,29,101,0.1) !important;
+  }
+  .el-select-dropdown__item.selected{
+    background-color: rgba(243,29,101,0.1) !important;
+    color: #f31d65 !important;
   }
 </style>
 <style>
@@ -1046,6 +1049,9 @@
   .el-submenu__title:hover{
     background-color:  #f31d65 !important;
   }
+  .el-submenu-content.el-submenu.is-active.is-opened > .el-submenu__title{
+    background-color:  #f31d65 !important;
+  }
   .el-submenu .el-menu-item{
     height: 60px;
     line-height: 60px;
@@ -1089,7 +1095,11 @@
   }
   .el-menu.el-menu--popup.el-menu--popup-right-start .icon-content{
     margin-right: calc(48/1920* 100vw);
-    font-size: 10px;
+    float: left;
+    position: relative;
+    height: 100%;
+    font-size: calc(20/1920*100vw);
+    transform: scale(0.5);
   }
   .el-menu--popup-right-start{
     padding: 0;
@@ -1209,6 +1219,12 @@
     background-color: rgba(243,29,101,0.1) !important;
     color:#f31d65 !important ;
   }
+  .el-submenu.is-active.zh-three-child > .el-submenu__title .icon-content,.el-submenu.is-active.zh-three-child > .el-submenu__title span{
+    color:#f31d65 !important ;
+  }
+  .el-submenu.is-active.three-child > .el-submenu__title .icon-content,.el-submenu.is-active.three-child > .el-submenu__title span{
+    color:#f31d65 !important ;
+  }
   .el-menu--popup .zh-three-child .el-submenu__title{
     height: 60px;
     line-height: 60px;
@@ -1294,5 +1310,18 @@
   }
   .el-button [class*="el-icon-"] + span{
     margin-left: 0px !important;
+  }
+  .brand-list.el-select .el-input .el-select__caret{
+    -webkit-transform: rotateZ(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotateZ(90deg);
+  }
+  .brand-list.el-select .el-input .el-select__caret.is-reverse{
+    -webkit-transform: rotateZ(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotateZ(180deg);
+  }
+  .el-submenu-content.el-submenu.is-active > .el-submenu__title{
+    background-color: #f31d65 !important;
   }
 </style>
