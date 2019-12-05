@@ -385,7 +385,8 @@
         isStoppedRecording: true,
         blob: null,
         ezvizExpireTime: 0,
-        currentStoreId: null
+        currentStoreId: null,
+        isLoaded: false
       }
     },
     async mounted(){
@@ -731,6 +732,7 @@
               self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
             }
           }
+          console.log(self.videoUrl);
           if(self.accessToken == ''){
             self.notify(self.$t('storeMonitor.getAccessTokenError'), 'warning',3000)
             return;
@@ -1107,8 +1109,9 @@
       async realTime(){
         let self = this;
         self.times = 0;
-        if(self.isStoreMonitor){
+        if(self.isStoreMonitor && !self.isLoaded){
           self.checkIfEncry();
+          self.isLoaded = true;
         }
         else{
           if(self.fullWindow){

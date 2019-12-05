@@ -84,9 +84,38 @@ function getMsg() {
   }
   return msg;
 }
+async function getDeviceCapacity(data){
+  let ret = false;
+  await instance({
+    method: 'post',
+    url: '/lapp/device/capacity',
+    data: data,
+  }).then(capRes=>{
+    let data = capRes.data;
+    if(data.code !== '200'){
+      ret = false;
+    }
+    else if(!data.data.hasOwnProperty("support_modify_pwd") || data.data.support_modify_pwd == 0){
+      ret = false;
+    }
+    else if(data.data.support_modify_pwd == 1) {
+      ret = true;
+    }
+  })
+    .catch(err=>{
+
+    })
+  console.log(ret);
+  return ret;
+}
 export async function getIsEncrypt(data){
   let ret=null;
   console.log(data)
+  let result = await getDeviceCapacity(data);
+  console.log(result);
+  if(!result){
+    return ret = 0;
+  }
   await instance({
     method: 'post',
     url: '/lapp/device/info',
