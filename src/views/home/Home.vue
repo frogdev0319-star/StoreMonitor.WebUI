@@ -53,7 +53,7 @@
             </el-select>
           </div>
           <div v-else class="collapsed-brand-panel"></div>
-          <el-menu :default-active="$route.path"
+          <el-menu :default-active="activePath"
                    class="el-menu-vertical-demo"
                    text-color="#eee"
                    background-color="#222538"
@@ -213,6 +213,47 @@
       },
       curPath(){
         return this.route.path
+      },
+      activePath(){
+        console.log(this.$route.path)
+        let path = this.$route.path;
+        switch (path) {
+          case '/reinspect/confirmrein':
+          case '/reinspect/submit':{
+            path = '/reinspection';
+            break;
+          }
+          case '/storemonitor/submit':{
+            path = '/storemonitor';
+            break;
+          }
+          case '/reportdetails':{
+            path = '/report';
+            break;
+          }
+          case '/rate':{
+            path = '/event';
+            break;
+          }
+          case '/bindroute' :
+          case '/addroute':
+          {
+            path = '/routeinspection';
+            break;
+          }
+          case '/storedetail':{
+            path = '/storemanage';
+            break;
+          }
+          case '/titleSetting': {
+            path = '/title';
+            break;
+          }
+          default:{
+            break;
+          }
+        }
+        return path;
       },
       cachePath(el){
         return this.$store.state.cachePath;
@@ -870,18 +911,17 @@
       }
       .content-wrapper-all{
         height: auto;
-        min-height: 90%;
-        @include point(padding,20);
+        padding: calc(30/1920*100vw);
         /*border: solid #e3e9f4;*/
         /*border-width: 0;*/
         width:100%;
         //@include point(margin-right,50);
         background-color: #f4f5f9;
+        min-height: calc(100vh - 80 / 1920 * 100vw - 45px);
       }
       .content-wrapper{
         height: auto;
-        @include point(padding,20);
-        /*border: solid #e3e9f4;*/
+        padding: calc(30/1920*100vw);
         /*border-width: 0;*/
         width: 100%;
         background: #f4f5f9;
@@ -900,7 +940,7 @@
         background-color: #f4f5f9;
       }
       .footercontent{
-        padding:0px 0 10px 60px;
+        padding:0px 0 30px 60px;
         color:#777;
         font-size:12px;
         background-color: #f4f5f9;
@@ -951,7 +991,6 @@
       margin-left:calc(330/1920*100vw);
       height: auto;
       width:calc(100% - 330/1920*100vw);
-      min-height: 100%;
     }
     .menu li{
       margin-left: 80px;
@@ -979,6 +1018,7 @@
   }
   .el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
     background-color: rgba(243,29,101,0.1) !important;
+    color: #f31d65 !important;
   }
   .el-select-dropdown__item.selected{
     background-color: rgba(243,29,101,0.1) !important;
