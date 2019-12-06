@@ -553,7 +553,9 @@ import {generateStoreLang} from '@/api/i18n'
                 this.tableHeight=770+'px';
                 this.sizeNum=20;
             }
-            await this.isLoginIn();
+            self.getProvinceList();
+            self.getInitData();
+            //await this.isLoginIn();
             // if(!this.timeid){
             //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
             // }
