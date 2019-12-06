@@ -186,6 +186,7 @@ export default {
     summaryInfo: 'Please select overall summary!',
     allIgnored: 'All inspection items are ignored, please re-evaluate',
     videoLicense: "Please contact your supervisor for video access license",
+    suggestEmpty: 'Please enter suggestions for this inspection !'
   },
   // Store Monitor page language
   storeMonitor:{

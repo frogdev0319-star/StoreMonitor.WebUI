@@ -187,6 +187,7 @@ export default {
     summaryInfo: '请选择巡检总评！',
     allIgnored: '您已忽略所有巡检项，请重新评估',
     videoLicense: "无视频访问权限，请联系上级管理员",
+    suggestEmpty: '请输入本次巡检建议！'
   },
 
   // Store Monitor page language

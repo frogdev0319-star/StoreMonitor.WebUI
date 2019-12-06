@@ -214,6 +214,10 @@ export default {
                 self.notify(self.$t('remotePatrol.summaryInfo'),'warning',3000);
                 return false;
             }
+            if(self.suggest.length == 0){
+              self.notify(self.$t('remotePatrol.suggestEmpty'),'warning',3000);
+              return false;
+            }
             let storageParams = {};
             storageParams.storeId = self.store.storeId;
             //上传文件时获取门店对应的BucketName
