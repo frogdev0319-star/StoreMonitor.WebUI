@@ -177,11 +177,13 @@
 </script>
 <style lang="scss" scoped>
   @import '../../assets/css/pagination.css';
-
+  $border:#e3e9f4;
   .el-sucPage-content{
     width: 100%;
     height: 100%;
     padding-top: 50px;
+    border: 1px solid $border;
+    background-color: #fff;
     .page-icon{
         margin-bottom: 40px;
         position: relative;
@@ -305,11 +307,12 @@
                 }
             }
         }
-        .page-err-btn{
-            .retry-btn{
-                margin-top: 30px;
-            }
-        }
+    }
+    .page-err-btn{
+      margin-bottom: 50px;
+      .retry-btn{
+        margin-top: 30px;
+      }
     }
 }
 </style>

@@ -152,6 +152,7 @@
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
             <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
+            <dialog-vue :dialog-title='leaveObj.title' :show-info='leaveObj.showInfo' :is-warning='leaveObj.isWarning' :dialog-closed='leaveObj.dialogCosed' @confirmed='leaveDialog' @canceled='cancelLeave'></dialog-vue>
             <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
                     <div class="num-content">
@@ -166,7 +167,7 @@
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
                             <span>{{generatePatrolLang('snapshot')}}</span>
                         </div>
-                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
                             <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
                             <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                           <span>{{generatePatrolLang('record')}}</span>
@@ -206,7 +207,7 @@
                     </div>
                   </transition>
                   <transition name="fade">
-                    <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
+                    <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo" style="display: none">
                       <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;margin-left: -15px;"></i>
                       <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                       <span>{{generatePatrolLang('record')}}</span>
@@ -625,6 +626,12 @@ export default {
               isWarning:false,
               dialogCosed:false
             },
+            leaveObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: '当前巡检尚未完成，确认是否离开页面？',
+              isWarning:true,
+              dialogCosed:false
+            },
             recorder:null,
             videoCanvasSrc:'',
             isRecordingStarted : false,
@@ -699,8 +706,44 @@ export default {
     },
     beforeRouteLeave(to, from, next){
         let self=this;
+        if(self.editCount != 0 && to.name !='confirmSum'){
+          self.$confirm('当前巡检尚未完成，确认是否离开页面？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+            customClass: 'confirmClass',
+            cancelButtonClass: 'cancelBtn',
+            confirmButtonClass: 'confirmBtn'
+          }).then(() => {
+            console.log('confirm')
+            if(to.name !='confirmSum' ){
+              from.meta.keepAlive=false;
+            }
+            if(self.playState){
+              self.stopRealTime();
+              window.clearInterval(self.timerPlayReal);
+              self.timerPlayReal=null;
+            }
+            next()
+          }).catch(() => {
+            // 如果取消跳转地址栏会变化，这时保持地址栏不变
+            console.log('cancel')
+            next(false)
+          })
+        }
+        else{
+          if(to.name !='confirmSum'){
+            from.meta.keepAlive=false;
+          }
+          if(self.playState){
+            self.stopRealTime();
+            window.clearInterval(self.timerPlayReal);
+            self.timerPlayReal=null;
+          }
+          next();
+        }
         // if(self.editCount!=0){
-        //     let confirm=window.confirm('当前巡检项尚未提交，确认是否离开页面？');
+        //     let confirm=window.confirm('当前巡检尚未完成，确认是否离开页面？');
         //     if(confirm==true){
         //         if(to.name!='巡检提交事件'){
         //             from.meta.keepAlive=false;
@@ -714,16 +757,16 @@ export default {
         //         next(false);
         //     }
         // }
-        self.isPlayingFlag=-1;
-        if(to.name!='confirmSum'){
-            from.meta.keepAlive=false;
-        }
-        if(self.playState){
-            self.stopRealTime();
-            window.clearInterval(self.timerPlayReal);
-            self.timerPlayReal=null;
-        }
-        next();
+        // self.isPlayingFlag=-1;
+        // if(to.name!='confirmSum'){
+        //     from.meta.keepAlive=false;
+        // }
+        // if(self.playState){
+        //     self.stopRealTime();
+        //     window.clearInterval(self.timerPlayReal);
+        //     self.timerPlayReal=null;
+        // }
+        // next();
     },
     async mounted(){
         let self=this;
@@ -1957,6 +2000,15 @@ export default {
                     }
                 }
             })
+        },
+        leaveDialog(){
+          let self=this;
+          self.leaveObj.dialogCosed=false;
+          self.editCount = 0;
+        },
+        cancelLeave(){
+          let self=this;
+          self.leaveObj.dialogCosed = false;
         },
         noAllInspectDialog(){
             let self=this;
@@ -4033,4 +4085,33 @@ export default {
   /*.score-menu.el-dropdown-menu{*/
     /*z-index: 0 !important;*/
   /*}*/
+  .confirmClass{
+    width: 28%;
+  }
+  .confirmClass .el-message-box__header{
+    border-bottom: 1px solid #f31d65;
+    padding: 20px 20px 10px 20px;
+  }
+  .confirmClass .el-message-box__content{
+    padding: 20px;
+  }
+  .confirmClass .cancelBtn{
+    width: calc(76/1920*100vw);
+    margin-right: calc(20/1920*100vw);
+    background-color: #EAEDF2 !important;
+    color: #708090 !important;
+    font-size: 12px;
+    line-height: 12px;
+  }
+ .confirmClass .confirmBtn{
+    width: calc(76/1920*100vw);
+    background-color: #f31d65;;
+    color: #fff !important;
+    font-size: 12px;
+    line-height: 12px;
+    }
+  .confirmClass .el-message-box__btns{
+    padding: 20px;
+    padding-top: 10px;
+  }
 </style>

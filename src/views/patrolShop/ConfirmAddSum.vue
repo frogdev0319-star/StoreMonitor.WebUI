@@ -505,7 +505,6 @@ $h1:#292e36;
 }
 .sum-content{
     color: $black;
-    background-color: #f6f9fe;
     .sum-submit{
         margin-bottom: calc(30/1920*100vw);
         text-align: left;
@@ -532,6 +531,8 @@ $h1:#292e36;
                 line-height: calc(36/1920*100vw);
                 font-size: calc(14/1920*100vw);
                 padding: 0 0;
+                outline: none;
+                border-radius: 4px;
             }
         }
         .submit-content{
