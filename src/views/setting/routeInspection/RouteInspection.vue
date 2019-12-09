@@ -24,7 +24,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -56,10 +56,10 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>{{generateInsSettingLang('clearInfo')}}</span>
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('clearInfo')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -285,7 +285,7 @@ export default {
                                 objChild.id=itemChild.id;
                                 objChild.checked=false;
                                 objChild.name=itemChild.subject;
-                                objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
+                                objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
                                 //objChild.score=itemChild.itemScore+'分';
                                 if(self.lang == 'en'){
                                   objChild.score=itemChild.itemScore ;
@@ -784,6 +784,7 @@ export default {
 <style lang="scss" scoped>
     $mainColor:#f31d65;
     $border: #e3e9f4;
+    $tab: #7d8cad;
     *{
         font-family: Arial, Microsoft YaHei;
     }
@@ -829,12 +830,12 @@ export default {
                 @include point(top,12);
                 .bind-title{
                     @include point(margin-right,15);
-                    color:#A2AEBC;
+                    color:$tab;
                     font-size: 12px;
                 }
                 .en-bind-title{
                   @include point(margin-right,0);
-                  color:#A2AEBC;
+                  color:$tab;
                   font-size: 12px;
                 }
                 .el-bind-btn{
@@ -842,24 +843,24 @@ export default {
                     color: #fff;
                     border-color: $mainColor;
                     position: relative;
-                    border-radius: 0px;
+                    border-radius: 3px;
                     @include point(margin-right,15);
                     font-size: 12px;
                     &:disabled{
                         opacity: 0.5;
                     }
                   @media screen and (max-width: 1440px) {
-                    width: 125px !important;
+                    width: 110px !important;
                   }
                 }
                 .en-el-bind-btn{
                   color: #fff;
                   border-color: $mainColor;
                   position: relative;
-                  border-radius: 0px;
+                  border-radius: 3px;
                   @include point(margin-right,15);
                   .icon-quxiaolianjie{
-                    font-size: calc(24/1920*100vw);
+                    font-size: calc(16/1920*100vw);
                   }
                   span{
                   }
@@ -870,18 +871,19 @@ export default {
                 }
                 .btn-class{
                   height: calc(36/1920*100vw);
-                  line-height: calc(36/1920*100vw);
                   padding: 0;
                   font-size: calc(14/1920*100vw);
                   width: calc(130/1920*100vw);
                   .iconfont{
+                    font-size: calc(16/1920*100vw);
                     padding: calc(5/1920*100vw) 0;
                   }
                   span{
                     position: relative;
-                    bottom: calc(4/1920*100vw);
-                    @media screen and (max-width: 1280px) {
-                      bottom: calc(3/1920*100vw);
+                    padding: calc(5/1920*100vw) 0;
+                    bottom: calc(1/1920*100vw);
+                    @media screen and (max-width: 1440px) {
+                      bottom: 0;
                     };
                   }
                 }
@@ -921,10 +923,9 @@ export default {
                     top: 3px;
                     border-right: 0;
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
-                    width: calc(130/1920*100vw);
+                    min-width: calc(110/1920*100vw);
                     @media screen and (min-width: 1366px){
                       //@include point(width, 90);
                       span{
@@ -932,8 +933,17 @@ export default {
                         @include point(bottom,3);
                       }
                     }
+                    @media screen and (max-width: 1440px){
+                      //@include point(width, 120);
+                      top: 5px;
+                      span{
+                        position: relative;
+                        @include point(bottom,5);
+                      }
+                    }
                     @media screen and (max-width: 1366px){
                       //@include point(width, 120);
+                      top: 6px;
                       span{
                         position: relative;
                         @include point(bottom,5);
@@ -973,6 +983,7 @@ export default {
                 }
                 @media screen and (max-width: 1366px){
                   //@include point(width, 120);
+                  top: 6px;
                   span{
                     position: relative;
                     @include point(bottom,5);

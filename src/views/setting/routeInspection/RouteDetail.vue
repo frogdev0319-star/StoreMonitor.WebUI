@@ -49,10 +49,10 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>{{generateInsSettingLang('confirmCurDel')}}</span>
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;" >{{generateInsSettingLang('confirmCurDel')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -117,7 +117,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -329,7 +329,7 @@ export default {
                             objChild.id=itemChild.id;
                             objChild.checked=false;
                             objChild.name=itemChild.subject;
-                            objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
+                            objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
                             objChild.score=itemChild.itemScore+'分';
                             tempChild.push(objChild);
                         })
@@ -696,6 +696,9 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
+    *{
+      font-family:Arial,  'Microsoft YaHei';
+    }
     .iconfont{
       font-size: calc(24/1920*100vw);
     }
@@ -788,22 +791,23 @@ export default {
             }
             .btn-class{
               height: calc(36/1920*100vw);
-              line-height: calc(36/1920*100vw);
               padding: 0;
               font-size: calc(14/1920*100vw);
               width: calc(130/1920*100vw);
+              border-radius: 3px;
               .iconfont{
                 padding: calc(5/1920*100vw) 0;
+                font-size: calc(16/1920*100vw);
               }
               span{
                 position: relative;
-                bottom: calc(4/1920*100vw);
-                @media screen and (max-width: 1280px) {
-                  bottom: calc(3/1920*100vw);
+                bottom: calc(1/1920*100vw);
+                @media screen and (max-width: 1440px) {
+                  bottom: 0;
                 };
               }
               @media screen and (max-width: 1440px) {
-                width: 125px;
+                width: 110px;
               }
           }
         }
@@ -838,17 +842,27 @@ export default {
 
             .description-title{
                 float: left;
-                width: 51%;
+                width: 50%;
                 //margin-left: 12%;
             }
-            @media screen and(min-width:1280px) and(max-width:1440px){
+            @media screen and(min-width:1440px) and(max-width:1680px){
+              .description-title{
+                width: 48%;
+              }
+            }
+            @media screen and(min-width:1290px) and(max-width:1440px){
                 .description-title{
-                    width: 41%;
+                    width: 44%;
                 }
+            }
+            @media screen and (max-width: 1280px){
+              .description-title{
+                width: 40%;
+              }
             }
             .score-title{
                 float: left;
-                width: 8%;
+                width: 9%;
                 // margin-left: 7%;
             }
             .handle-title{

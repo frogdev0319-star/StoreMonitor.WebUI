@@ -3,34 +3,33 @@
         <div class="el-bind-header">
             <div class="seacrh-content">
                 <span>{{generateStoreLang('provinceTitle')}}</span>
-                  <el-select v-model="curProvince" :placeholder="generateStoreLang('provincePlaceholder')" clearable size="mini" class="el-province"
-                  @change="changePro" @clear="clearCitys">
-                    <el-option
+                <el-select v-model="curProvince" :placeholder="generateStoreLang('provincePlaceholder')" size="mini" class="el-province"
+                           @change="changePro" @clear="clearCitys">
+                  <el-option
                     v-for="item in provinceList"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
-                    </el-option>
+                  </el-option>
                 </el-select>
 
-                <el-popover
-                    placement="bottom-start"
-                    width="600"
-                    visible-arrow='false'
-                    :disabled='showPopoVer'
-                    v-model="showCityContent"
-                    trigger="click">
+                 <el-popover
+                   placement="bottom-start"
+                   width="600"
+                   visible-arrow='false'
+                   :disabled='showPopoVer'
+                   v-model="showCityContent"
+                   trigger="click">
                         <div class="city-panel" @mouseleave="showCityContent=false">
                             <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                                style="margin-right:10px;"></el-checkbox>{{generateStoreLang('all')}}</p>
+                                                                                      style="margin-right:10px;"></el-checkbox>{{generateStoreLang('all')}}</p>
                             <div class="city-details" v-for="(item,index) in cityList" :key="index">
                                 <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
                                 <span>{{item.cityName}}</span>
                             </div>
                         </div>
-                    <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
+                    <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#7d8cad':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
                 </el-popover>
-
                 <el-button :size="varyWindowWidth>1680?'small':'mini'" class="el-search-btn" @click="searchStore" type="primary">{{generateStoreLang('searchButton')}}</el-button>
 
                 <el-input
@@ -74,8 +73,9 @@
         </div>
         <div class="el-bind-footer">
             <div class="el-btn-content">
-                <el-button :disabled="storeList.length==0" :class="lang=='en'? 'en-btn': 'btn'" size="mini" type="primary" @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:10px;"></i>
-                  {{generateInsSettingLang('confirmBound')}}</el-button>
+                <el-button :disabled="storeList.length==0" :class="lang=='en'? 'en-btn': 'btn'" size="mini" type="primary" @click="applyNape"><i class="iconfont icon-quxiaolianjie" style="margin-right:8px;"></i>
+                  <span>{{generateInsSettingLang('confirmBound')}}</span>
+                </el-button>
             </div>
         </div>
     </div>
@@ -123,10 +123,18 @@ export default {
       //切换省份
         changePro(val){
             let self=this;
-            self.getCityByProvince(val);
-            self.curCitys= self.$t('storeView.cityPlaceholder');
-            self.multeCityList.length=0;
-            self.allCityChecked=false;
+            if(val == ''){
+              self.cityList=[];
+              self.showCityContent=false;
+              self.curCitys = self.$t('storeView.cityPlaceholder');
+              self.multeCityList.length=0;
+            }
+            else{
+              self.getCityByProvince(val);
+              self.curCitys= self.$t('storeView.cityPlaceholder');
+              self.multeCityList.length=0;
+              self.allCityChecked=false;
+            }
         },
         clearCitys(){
             let self=this;
@@ -408,6 +416,7 @@ export default {
                     }
                 })
             }
+            temp.length > 0 ? temp.unshift({value:'', label:self.$t('storeView.provincePlaceholder'),}) : temp;
             self.provinceList=temp;
         },
         async getCityByProvince(province){
@@ -718,12 +727,15 @@ $h1:#292e36;
             cursor: pointer;
             display:inline-block;
             position: relative;
-            // border: 1px solid #DCDFE6;
-            top: 8px;
+            vertical-align: middle;
+            border: 1px solid #E4E7ED;
+            box-sizing: border-box;
+            border-radius: 3px;
+            overflow: hidden;
             span{
                 display: inline-block;
                 font-size: 12px;
-                color: #C0C4CC;
+                color: #7d8cad;
                 margin-left: 15px;
                 @include point(width,130);
                 white-space: nowrap;
@@ -733,15 +745,20 @@ $h1:#292e36;
             .icon-input{
                 position: absolute;
                 @include point(right,10);
-                top: 6px;
+                top: 10px;
                 font-size: calc(14/1920*100vw);
                 color: #C0C4CC;
+              @media screen and(max-width: 1440px){
+                top: 6px;
+              }
+              @media screen and(max-width: 1280px){
+                top: 4px;
+              }
             }
         }
         .el-search-btn{
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             padding: 0;
             width: calc(130/1920*100vw);
             text-align: center;
@@ -754,6 +771,9 @@ $h1:#292e36;
             right: 10px;
             @include point(right,10);
             @include point(top,6);
+          @media screen and (max-width: 1280px){
+            top: 6px !important;
+          }
         }
     }
     .el-header-title{
@@ -842,19 +862,31 @@ $h1:#292e36;
             .btn{
               @include point(width,90);
               min-width: 100px;
+              width: calc(130/1920*100vw);
+              height: calc(36/1920*100vw);
              // background-color: #f31d65;
-              border-color:  #f31d65;
               color: #fff;
+              text-align: center;
+              .iconfont {
+                font-size: calc(16 / 1920 * 100vw);
+              }
+              span{
+                font-size: calc(14 / 1920 * 100vw);
+                position: relative;
+                bottom: calc(1 / 1920 * 100vw);
+                @media screen and (max-width: 1440px) {
+                  bottom: 0;
+                };
+              }
             }
             .en-btn{
               width: calc(130/1920*100vw);
               height: calc(36/1920*100vw);
               /*min-width: 160px;*/
-              border-color:  #f31d65;
               color: #fff;
               text-align: center;
               .iconfont {
-                font-size: calc(24 / 1920 * 100vw);
+                font-size: calc(16 / 1920 * 100vw);
               }
               span{
                 font-size: calc(14 / 1920 * 100vw);
@@ -868,11 +900,12 @@ $h1:#292e36;
 }
 </style>
 <style>
-.el-button--mini, .el-button--mini.is-round{
+  @import '../../../assets/css/pagination.css';
+  .el-button--mini, .el-button--mini.is-round{
     /*padding:7px 15px !important;*/
 }
 .el-province .el-input__inner{
-    border-radius: 0px !important;
+    border-radius: 3px !important;
     background-color: #F4F5F9 !important;
     border :0 !important;
 }
@@ -882,9 +915,7 @@ $h1:#292e36;
 .el-select-dropdown__item.hover{
     background-color:#FEE4E7 !important;
 }
-.el-select .el-input.is-focus .el-input__inner{
-    border-color: #FEE4E7 !important;
-}
+
 .el-select-dropdown__item.selected{
     color:#f31d65 !important;
 }

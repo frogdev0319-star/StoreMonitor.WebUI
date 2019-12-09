@@ -118,11 +118,11 @@
                     top="35vh"
                     left="40vh">
                         <div  style="overflow:hidden;">
-                            <hr style="border: 0.5px solid #f31d65;"/>
+                            <hr style="border: 0.5px solid #dfe2e9;;"/>
 
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                <span>{{generateInsSettingLang('confirmCurDel')}}</span>
+                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                                <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('confirmCurDel')}}</span>
                             </p>
                         </div>
                         <div slot="footer" class="dialog-footer">
@@ -139,11 +139,11 @@
                     top="35vh"
                     left="40vh">
                         <div  style="overflow:hidden;">
-                            <hr style="border: 0.5px solid #f31d65;"/>
+                            <hr style="border: 0.5px solid #dfe2e9;"/>
 
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                <span>{{generateInsSettingLang('deleteGroup')}}</span>
+                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803; display: inline-block; vertical-align: middle;"></i>
+                                <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('deleteGroup')}}</span>
                             </p>
                         </div>
                         <div slot="footer" class="dialog-footer">
@@ -1066,6 +1066,9 @@ export default {
                     position: relative;
                     left: 10%;
                 }
+              @media screen and (max-width: 1280px){
+                  width: 49%;
+              }
             }
             .nape-handle-title{
                 width: 10%;
@@ -1192,17 +1195,19 @@ export default {
         width: calc(130/1920*100vw);
         .el-icon-plus, .icon-shanchu{
           padding: calc(5/1920*100vw) 0;
-          font-size: calc(24/1920*100vw);
+          font-size: calc(16/1920*100vw);
+          margin-right: 8px;
         }
         span{
           position: relative;
-          bottom: calc(4/1920*100vw);
-          @media screen and (max-width: 1280px) {
-            bottom: calc(3/1920*100vw);
+          bottom: calc(1/1920*100vw);
+          margin-left:0;
+          @media screen and (max-width: 1440px) {
+            bottom: 0;
           };
         }
         @media screen and (max-width: 1440px) {
-          width: 125px;
+          width: 100px;
         }
       }
     }
