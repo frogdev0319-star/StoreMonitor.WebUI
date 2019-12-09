@@ -755,15 +755,41 @@ export default {
                 self.notify(this.$t('eventView.emptyInfo'),'warning',3000);
                 return false;
             }
-            if(self.subBtnList[0].isActive==true){
-                status=1;
-            }
-            else if(self.subBtnList[1].isActive==true){
-                status=2;
-            }
-            else{  //追加状态，需判断当前状态
+            if(self.subBtnList[0].isActive){
+              if(status = self.subBtnList[0].order==0){
+                status = 1;
+              }
+              else if(self.subBtnList[0].order==1){
+                status = 2;
+              }
+              else{
+                //追加状态，需判断当前状态
                 status=self.curStatus;
+              }
             }
+            else if(self.subBtnList[1].isActive){
+              if(self.subBtnList[1].order == 1){
+                status = 2;
+              }
+              else{
+                //追加状态，需判断当前状态
+                status=self.curStatus;
+              }
+            }
+            else{
+              //追加状态，需判断当前状态
+              status=self.curStatus;
+            }
+            console.log(status)
+            // if(self.subBtnList[0].isActive==true){
+            //     status=1;
+            // }
+            // else if(self.subBtnList[1].isActive==true){
+            //     status=2;
+            // }
+            // else{  //追加状态，需判断当前状态
+            //     status=self.curStatus;
+            // }
             self.addComment(status,description);
         },
         checkFull(){
@@ -812,12 +838,15 @@ export default {
             let tempBtnList = [];
             PermissionHelper.enableEventHandle()  && tempBtnList.push({
               name:this.$t('eventView.handling'),
+              order: 0,
             });
             PermissionHelper.enableEventClose()  && tempBtnList.push({
               name:this.$t('eventView.closing'),
+              order: 1,
             })
             PermissionHelper.enableEventAdd() && tempBtnList.push({
               name:this.$t('eventView.adding'),
+              order: 2
             })
             tempBtnList.forEach((item, index)=>{
               item.isActive = index == 0 ? true: false;
@@ -1294,13 +1323,17 @@ $h1:#292e36;
                     .icon-video{
                         font-size: 18px;
                         color: $red;
-                        position: relative;
-                        top: 2px;
+                        /*position: relative;*/
+                        /*top: 2px;*/
                         margin-right: 5px;
+                        display: inline-block;
+                        vertical-align: middle;
                     }
                     .ahref{
-                        text-decoration: underline;
-                        color: $red;
+                      text-decoration: underline;
+                      color: $red;
+                      vertical-align: bottom;
+                      display: inline-block;
                     }
                 }
             }

@@ -47,7 +47,7 @@
         <div class="el-table-content">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
               <div class="btn-area">
-                <i style="" class="iconfont icon-excel"></i>
+                <img :src="exportPng" class="icon-excel">
                 <span class="spanClass">{{generateEventLang('exportReport')}}</span>
               </div>
             </el-button>
@@ -60,14 +60,14 @@
                             :highlight-current-row="true"
                             empty-text='没有事件数据'
                             align='left'
-                            border
                             stripe
                             :height="windowHeight-260"
                             @sort-change='sortChange'
                             @row-click='rowClickItem'
                             style=""
                             class="table-content"
-                            :header-cell-style="{background:'#f4f5f9',color:'#7d8cad'}"
+                            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+                            :cell-style="cellStyle"
                         >
                                 <el-table-column
                                     min-width="80"
@@ -101,25 +101,25 @@
                                 min-width="80"
                                 align="left">
                                 <template slot-scope="scope">
-                                    <i class="iconfont icon-gengduo" style="font-size:24px;cursor: pointer;color: #7d8cad" @click="toEventDetail(scope.row)"></i>
+                                    <i class="iconfont icon-gengduo" @click="toEventDetail(scope.row)"></i>
                                 </template>
                             </el-table-column>
                             <div slot="empty">
                                 <div>
                                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{generateEventLang('noEvents')}}</span>
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad','font-family':'Microsoft YaHei'}">{{generateEventLang('noEvents')}}</span>
                                 </div>
                             </div>
                         </el-table>
                     </div>
-                    <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:13%;margin-bottom:0px;">
+                    <div class="toolbar pagination clearfix" style="width:100%; margin:10px 15px 0px 0px;height:13%;">
                         <el-pagination background small
                             :page-sizes="[10, 20, 50, 100]"
                             @size-change="sizeChange"
                             @current-change="currentChange"
                             :current-page="item.page"
                         layout="jumper,total, prev, pager, next,sizes"
-                        :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;">
+                        :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;margin-right: 10px;">
                         </el-pagination>
                     </div>
                 </el-tab-pane>
@@ -138,6 +138,9 @@ import {getCookie} from '@/common/auth';
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {generateEventLang} from '@/api/i18n'
+// require(['bootstrap-multiselect'], function(purchase){
+//   $('#example-multiple-selected').multiselect();
+// });
 export default {
     name: "ExceptEvent",
     data(){
@@ -225,6 +228,7 @@ export default {
           numberOfElements: 0,
           totalElements: 0,
           sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }],
+          exportPng: require('../../../static/img/icon_excel.png')
         }
 
     },
@@ -268,6 +272,18 @@ export default {
         }
     },
     methods:{
+      cellStyle({ row, column, rowIndex, columnIndex}){
+        console.log(row);
+        console.log(columnIndex);
+        let obj = {};
+        if(columnIndex == 0){
+          obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+        }
+        else{
+          obj = {'border-right':'1px solid #e3e9f4'}
+        }
+        return obj;
+      },
         generateEventLang,
         /*focusDate(val){
             let self=this;
@@ -1133,6 +1149,9 @@ $h1:#292e36;
     }
     .icon-gengduo{
       font-size: calc(24/1920*100vw);
+      vertical-align: middle;
+      cursor: pointer;
+      color: #7d8cad;
     }
     .el-date{
         height: 70px;
@@ -1175,7 +1194,7 @@ $h1:#292e36;
         width: 100%;
         background-color: #fff;
         position: relative;
-        @include point(padding-top,20);
+        padding-top: calc(30/1920*100vw);
         .export-btn{
             position: absolute;
             @include point(right,20);
@@ -1190,7 +1209,8 @@ $h1:#292e36;
             line-height: calc(36/1920*100vw);
             color: #ffffff;
             border-width: 0;
-            border-radius: 3px;
+            border-radius: 4px;
+            top: calc(24/1920*100vw);
             .btn-area{
               position: relative;
               padding: 0 calc(6/1920*100vw);
@@ -1200,6 +1220,8 @@ $h1:#292e36;
               .icon-excel{
                 margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
                 font-size: calc(24/1920*100vw);
+                height: calc(24/1920*100vw);
+                width: calc(24/1920*100vw);
               }
               .spanClass{
                 font-size: calc(14/1920*100vw);
@@ -1221,7 +1243,7 @@ $h1:#292e36;
         line-height: calc(36/1920*100vw);
         color: #ffffff;
         border-width: 0;
-        border-radius: 3px;
+        border-radius: 4px;
         .btn-area{
           position: relative;
           padding: 0 calc(6/1920*100vw);
@@ -1264,11 +1286,15 @@ $h1:#292e36;
       background-color: #f31d65 !important;
     }
   .el-table-panel{
-    border: none;
-    border-right: 1px solid $border;
-    border-bottom: 1px solid $border;
     @include point(margin-left,15);
     @include point(margin-right,15);
+  }
+  .clearfix{
+    content: "";
+    display: block;
+    height: 0;
+    clear:both;
+    overflow: auto;
   }
 }
 .el-select-content{
@@ -1312,58 +1338,12 @@ $h1:#292e36;
         color: #f31d65 !important;
         border: 1px solid #f31d65 !important;
     }
-    /*#tabs-content .el-tabs__nav-scroll{*/
-        /*margin-left:40px;*/
-    /*}*/
-    /*#tabs-content .el-tabs__header{*/
-        /*margin-bottom:0px !important;*/
-    /*}*/
-
-    /*.el-tabs__active-bar{*/
-        /*height: 4px !important;*/
-        /*background-color: #f31d65 !important;*/
-    /*}*/
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }
      .select-poper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-    .current-row > td {
-        background: #FEE7E4 !important;
-    }
-    .el-table tbody tr:hover>td {
-        background-color: #FDE8EF !important;
-    }
-    .el-table--border th{
-        border-right: 0 !important;
-    }
-    /*.el-table--border, .el-table--group{*/
-        /*border: none !important;*/
-    /*}*/
-    /*.el-table__header-wrapper th:nth-last-of-type(2){*/
-        /*border-right: none !important;*/
-    /*}*/
-    .el-table--border td:nth-last-of-type(1){
-        border-right: none !important;
-    }
-    .el-table--border::after, .el-table--group::after{
-        width: 0 !important;
-    }
-    .el-table__row{
-      height: calc(60/1920*100vw);
-      font-size: calc(14/1920*100vw);
-      color: #182752;
-    }
- .el-table .cell{
-   padding-left: calc(20/1920*100vw);
-   padding-right: calc(20/1920*100vw);
- }
- .el-table--striped .el-table__body tr.el-table__row--striped td{
-   background-color: #f7f8fb;
- }
-  .el-table__header{
-    font-size: calc(12/1920*100vw);
-  }
+
 </style>
 
