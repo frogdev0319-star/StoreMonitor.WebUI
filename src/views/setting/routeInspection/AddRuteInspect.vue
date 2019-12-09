@@ -288,11 +288,11 @@ export default {
                 console.log(res);
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify(self.$t('insSettingView.editSuss'),'success',3000);
+                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
                     item.isEdit=false;
                 }
                 else{
-                    self.notify(self.$t('insSettingView.editFail'),'warning',3000);
+                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
                     return false;
                 }
             })
