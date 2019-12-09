@@ -3,7 +3,7 @@
         <el-col :span="24" class="report-header">
             <el-col :span="24" class="header-details">
                 <span>{{generateReportLang('selectStores')}}</span>
-                <el-select v-model="curCountry" clearable  :placeholder="generateReportLang('country')" size="mini"
+                <el-select v-model="curCountry"  :placeholder="generateReportLang('country')" size="mini"
                 class="el-province" @change="changeCountry" @clear="clearCountry">
                     <el-option
                     v-for="item in countryList"
@@ -12,7 +12,7 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <el-select v-model="curProvince" clearable  :placeholder="generateReportLang('regionI')" size="mini" :disabled='curCountry.length==0'
+                <el-select v-model="curProvince"  :placeholder="generateReportLang('regionI')" size="mini" :disabled="curCountry.length==0"
                 class="el-province" @change="changePro" @clear="cleaPro">
                     <el-option
                     v-for="item in provinceList"
@@ -21,7 +21,7 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <el-select v-model="curCity" clearable  :placeholder="generateReportLang('regionII')" size="mini" :disabled='curProvince.length==0'
+                <el-select v-model="curCity"  :placeholder="generateReportLang('regionII')" size="mini" :disabled="curProvince.length==0"
                 class="el-province" @change="changeCity" @clear="clearCity">
                     <el-option
                     v-for="item in cityList"
@@ -57,7 +57,7 @@
                 <!--</el-select>-->
                 <div class="search-content" v-if="searchContent">
                     <span>{{generateReportLang('keywords')}}</span>
-                    <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
+                    <el-input size="mini" v-model="searchInput" class="search-input"></el-input>
                 </div>
             </el-col>
             <el-col :span="24" class="header-details">
@@ -86,7 +86,7 @@
                     <i class="iconfont icon-bangzhu iconbangzhu" style="font-size: 20px;color: #7d8cad;"></i>
                 </el-tooltip>
                 <span>{{generateReportLang('reportType')}}</span>
-                <el-select v-model="curReportType" clearable  :placeholder="generateReportLang('all')" size="mini"
+                <el-select v-model="curReportType"  :placeholder="generateReportLang('all')" size="mini"
                     class="el-province" @change="changeReportType" @clear="clearReportType">
                     <el-option
                     v-for="item in reportTypeList"
@@ -96,7 +96,7 @@
                     </el-option>
                 </el-select>
                 <span>{{generateReportLang('resultType')}}</span>
-                <el-select v-model="curAppraise" clearable  :placeholder="generateReportLang('all')" size="mini"
+                <el-select v-model="curAppraise"  :placeholder="generateReportLang('all')" size="mini"
                     class="el-province " @change="changeAppraise" @clear="clearAppraise">
                     <el-option
                     v-for="item in appraiseList"
@@ -218,12 +218,13 @@ export default {
                     return time.getTime() > Date.now();
                 }
             },
-            curReportType:'',
+            curReportType: -1,
             reportTypeList:[
-                {'mode':0,'label':this.$t('reportView.remotePatrol')},{'mode':1,'label':this.$t('reportView.onsitePatrol')}
+              {'mode':-1,'label':this.$t('reportView.all')},{'mode':0,'label':this.$t('reportView.remotePatrol')},{'mode':1,'label':this.$t('reportView.onsitePatrol')}
             ],
-            curAppraise:'',
+            curAppraise: -1,
             appraiseList:[
+                {'status':-1,'label':this.$t('reportView.all')},
                 {'status':0,'label':this.$t('reportView.dangerous')},
                 {'status':1,'label':this.$t('reportView.improve')},
                 {'status':2,'label':this.$t('reportView.qualified')},
@@ -436,6 +437,7 @@ export default {
 
             let getCountry=storeList=>{
                 let temp=[];
+                temp.push({label:self.$t('reportView.country'), value:''})
                 storeList.forEach(item=>{
                     if(temp.map(x=>x.value).indexOf(item.country)==-1){
                         let obj={
@@ -469,36 +471,54 @@ export default {
             self.storeStr='';
         },
         changeCountry(val){
-            let self=this;
-            console.log(val);
-            self.curProvince='';
-            self.curCity='';
-            self.clearStoreInfo();
+          let self=this;
+          console.log(val);
+          self.curProvince='';
+          self.curCity='';
+          let storeList=self.storeList;
+          let tempStore=[];
+          let temp=[];
 
-            let storeList=self.storeList;
-            let temp=[];
-            let tempStore=[];
+          self.clearStoreInfo();
+          if(val== ''){
             storeList.forEach(item=>{
-                if(item.country==val){
-                    if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                        let obj={
-                            label:item.province,
-                            value:item.province
-                        }
-                        temp.push(obj);
-                    }
-                    let obj={
-                        storeId:item.storeId,
-                        label:item.name,
-                        value:item.name,
-                        userId:item.userId,
-                        userName:item.userName
-                    };
-                    tempStore.push(obj);
-                }
+              let obj={
+                storeId:item.storeId,
+                label:item.name,
+                value:item.name,
+                userId:item.userId,
+                userName:item.userName
+              }
+              tempStore.push(obj);
             })
-            self.provinceList=temp;
-            self.storeDataList=tempStore;
+            //self.storeDataList=tempStore;
+            self.checkAllStore = false;
+          }
+          else{
+            storeList.forEach(item=>{
+              if(item.country==val){
+                if(temp.map(x=>x.value).indexOf(item.province)==-1){
+                  let obj={
+                    label:item.province,
+                    value:item.province
+                  }
+                  temp.push(obj);
+                }
+                let obj={
+                  storeId:item.storeId,
+                  label:item.name,
+                  value:item.name,
+                  userId:item.userId,
+                  userName:item.userName
+                };
+                tempStore.push(obj);
+              }
+            })
+          }
+
+          temp.length > 0 ? temp.unshift({label:self.$t('reportView.regionI'), value:''}): temp;
+          self.provinceList=temp;
+          self.storeDataList=tempStore;
 
         },
         clearCountry(){
@@ -530,26 +550,53 @@ export default {
             let storeList=self.storeList;
             let temp=[];
             let tempStore=[];
-            storeList.forEach(item=>{
-                if(item.province==val){
-                    if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                        let obj={
-                            label:item.city,
-                            value:item.city
-                        }
-                        temp.push(obj);
-                    }
+            if(val == ''){
+              storeList.forEach(item=>{
+                if(item.country==self.curCountry){
+                  if(temp.map(x=>x.value).indexOf(item.province)==-1){
                     let obj={
-                        storeId:item.storeId,
-                        label:item.name,
-                        value:item.name,
-                        userId:item.userId,
-                        userName:item.userName
-                    };
-                    tempStore.push(obj);
+                      label:item.province,
+                      value:item.province
+                    }
+                    temp.push(obj);
+                  }
+                  let obj={
+                    storeId:item.storeId,
+                    label:item.name,
+                    value:item.name,
+                    userId:item.userId,
+                    userName:item.userName
+                  };
+                  tempStore.push(obj);
                 }
-            })
-            self.cityList=temp;
+              })
+              temp.length >0 ? temp.unshift({label:self.$t('reportView.regionI'), value:''}): temp;
+              self.provinceList=temp;
+              self.checkAllStore = false;
+            }
+            else{
+              storeList.forEach(item=>{
+                if(item.province==val){
+                  if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                    let obj={
+                      label:item.city,
+                      value:item.city
+                    }
+                    temp.push(obj);
+                  }
+                  let obj={
+                    storeId:item.storeId,
+                    label:item.name,
+                    value:item.name,
+                    userId:item.userId,
+                    userName:item.userName
+                  };
+                  tempStore.push(obj);
+                }
+              })
+              temp.length > 0 ? temp.unshift({label:self.$t('reportView.regionII'), value:''}) : temp;
+              self.cityList=temp;
+            }
             self.storeDataList=tempStore;
         },
         cleaPro(){
@@ -588,20 +635,37 @@ export default {
 
             let storeList=self.storeList;
             let temp=[];
-            storeList.forEach(item=>{
-                if(item.city==val){
-                    if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                        let obj={
-                            storeId:item.storeId,
-                            label:item.name,
-                            value:item.name,
-                            userId:item.userId,
-                            userName:item.userName
-                        }
-                        temp.push(obj);
-                    }
+            if(val == ''){
+              storeList.forEach(item=>{
+                if(item.province==self.curProvince){
+                  let obj={
+                    storeId:item.storeId,
+                    label:item.name,
+                    value:item.name,
+                    userId:item.userId,
+                    userName:item.userName
+                  };
+                  temp.push(obj);
                 }
-            })
+              })
+              self.checkAllStore = false;
+            }
+            else{
+              storeList.forEach(item=>{
+                if(item.city==val){
+                  if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                    let obj={
+                      storeId:item.storeId,
+                      label:item.name,
+                      value:item.name,
+                      userId:item.userId,
+                      userName:item.userName
+                    }
+                    temp.push(obj);
+                  }
+                }
+              })
+            }
             self.storeDataList=temp;
         },
         clearCity(){
@@ -796,10 +860,10 @@ export default {
                 }
             }
             console.log(self.curReportType);
-            if(self.curReportType!== null && self.curReportType!==''){
+            if(self.curReportType!== null && self.curReportType!== -1){
                 clause.mode=self.curReportType;
             }
-            if(self.curAppraise!== null && self.curAppraise!==''){
+            if(self.curAppraise!== null && self.curAppraise!== -1){
                 clause.status=self.curAppraise;
             }
             self.params.clause=clause;
@@ -981,6 +1045,7 @@ $suggestBack:#F1F6FE;
                   height: calc(36/1920*100vw);
                   line-height: calc(36/1920*100vw);
                   background-color: #f4f5f9;
+                  color: $tab;
                 }
               }
               .input-arrow-panel{
@@ -990,7 +1055,6 @@ $suggestBack:#F1F6FE;
                 background-color: transparent;
                 cursor: pointer;
                 z-index: 100;
-                top: calc(48/1920*100vw);
               }
               .icon-input{
                 position: relative;
@@ -1003,7 +1067,7 @@ $suggestBack:#F1F6FE;
             .month-panel{
               position: absolute;
               margin-top: 3px;
-              min-width: calc(160/1920*100vw);
+              width: auto;
               height: 150px;
               z-index: 980;
               background-color: #fff;
@@ -1029,18 +1093,18 @@ $suggestBack:#F1F6FE;
             .search-btn{
               width: calc(130/1920*100vw);
               height: calc(36/1920*100vw);
-              line-height: calc(36/1920*100vw);
               padding: 0 0;
               font-size: calc(14/1920*100vw);
+              margin-left: calc(20/1920*100vw);
             }
             .en-search-btn{
               width: calc(130/1920*100vw);
               margin-left: calc(20/1920*100vw);
               border-color: $red;
               height: calc(36/1920*100vw);
-              line-height: calc(36/1920*100vw);
               padding: 0 0;
               font-size: calc(14/1920*100vw);
+              margin-left: calc(20/1920*100vw);
             }
             // .storename-str{
             //     width: 100%;
@@ -1063,11 +1127,12 @@ $suggestBack:#F1F6FE;
             padding-top: calc(20/1920*100vw);
             padding-right: calc(20/1920*100vw);
             height: calc(630/1920*100vw);
+            margin-bottom: calc(30/1920*100vw);
             //height: calc(730/1080*100vh);
         }
         .empty-content{
           font-size: 16px;
-          color: #4b5262;
+          color: $tab;
           position: absolute;
           top: 50%;
           left: 50%;
