@@ -195,7 +195,7 @@ export default {
         self.getCommentList();
         if(self.isSuccess){
             self.timeid=setInterval(function(){
-                self.getBackSecond();
+                //self.getBackSecond();
             },1000)
         }
     },
@@ -235,6 +235,8 @@ export default {
     .el-sucPage-content{
         width: 100%;
         height: 100%;
+        overflow: hidden;
+        background-color: #fff;
         .canvas-content{
             position: relative;
             #previewCutVideo{
@@ -243,7 +245,7 @@ export default {
             }
             .dialog-hr{
                 border: 0.5px solid ;
-                border-color: rgba(251,76,93,0.3);
+                border-color: #dfe2e9;
                 margin-bottom:10px;
                 position: relative;
                 bottom: 5px;
@@ -255,7 +257,7 @@ export default {
             position: relative;
             .icon-content{
                 margin:0 auto;
-                margin-top: 50px;
+                padding-top: 50px;
                 .suc-icon{
                     height: 80px;
                 }
@@ -384,6 +386,7 @@ export default {
         .page-err-btn{
             .retry-btn{
                 margin-top: 30px;
+                margin-bottom: 50px;
             }
         }
     }

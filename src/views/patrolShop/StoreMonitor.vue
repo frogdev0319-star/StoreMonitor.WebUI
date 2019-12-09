@@ -3085,6 +3085,7 @@ export default {
                     padding: 0 0;
                     border-radius: 3px;
                     font-size: calc(14/1920*100vw);
+                    border: none;
                 }
                 @media screen and(min-width: 1366px){
                     .el-submit{
@@ -3127,7 +3128,7 @@ export default {
                 }
                 .dialog-hr{
                     border: 0.5px solid ;
-                    border-color: rgba(251,76,93,0.3);
+                    border-color: #dfe2e9;
                     margin-bottom:0px;
                     position: relative;
                     bottom: 5px;
