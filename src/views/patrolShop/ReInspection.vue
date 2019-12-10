@@ -628,7 +628,7 @@ export default {
             },
             leaveObj:{
               title: this.$t('remotePatrol.prompt'),
-              showInfo: '当前巡检尚未完成，确认是否离开页面？',
+              showInfo: this.$t('remotePatrol.changPageInfo'),
               isWarning:true,
               dialogCosed:false
             },
@@ -706,7 +706,8 @@ export default {
     },
     beforeRouteLeave(to, from, next){
         let self=this;
-        if(self.editCount != 0 && to.name !='confirmSum'){
+        let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
+        if(canLeave && to.name !='confirmSum'){
           self.$confirm('当前巡检尚未完成，确认是否离开页面？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -1823,7 +1824,8 @@ export default {
         },
         ignoreItem(item,index){
             let self=this;
-            self.editCount=self.editCount+1;
+            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            //self.editCount=self.editCount+1;
             self.curItemIndex=index;
             self.curItem=item;
             if(item.isIgnore){
@@ -2004,7 +2006,7 @@ export default {
         leaveDialog(){
           let self=this;
           self.leaveObj.dialogCosed=false;
-          self.editCount = 0;
+          self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
         },
         cancelLeave(){
           let self=this;
@@ -2490,7 +2492,15 @@ export default {
             let self=this;
             _item.isActive=true;
             self.showStoreUp=true;
-            self.editCount=0;
+            if(!self.isEzviz){
+              self.editCount=0;
+            }
+            else{
+              if(!self.showGuide){
+                self.$refs.ezvizVideo.editCount = 0
+              }
+            }
+            //self.editCount=0;
             self.showError=false;
             self.curDeviceId=-1;
             self.showFeedBack=false;
@@ -2663,7 +2673,7 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
-            if(self.editCount!=0){
+            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -2899,7 +2909,7 @@ export default {
 
             .dialog-hr{
                 border: 0.5px solid ;
-                border-color: rgba(251,76,93,0.3);
+                border-color: #dfe2e9;
                 margin-bottom:0px;
                 position: relative;
                 bottom: 5px;
@@ -3148,7 +3158,6 @@ export default {
                     color: #fff;
                     width:calc(130/1920*100vw);
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
                 }
@@ -3158,7 +3167,6 @@ export default {
                     width:calc(130/1920*100vw);
                     color: #fff;
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
                 }
@@ -3189,6 +3197,7 @@ export default {
                 @include point(min-height,414);
                 background-color: #232730;
                 color: $red;
+                z-index: 100;
                 span{
                     position: absolute;
                     top: 50%;
@@ -3223,7 +3232,8 @@ export default {
                         width: auto;
                         height: auto;
                         position: absolute;
-                        top: 30%;
+                        //top: 30%;
+                        top: 60%;
                         right: 0;
                         .iconright{
                             width: 80px;
@@ -3276,6 +3286,7 @@ export default {
                 @include point(min-height,408);
                 background-color: #000;
                 margin-bottom: 0;
+                z-index: 100;
                 .getvideo-content{
                     position: absolute;
                     z-index: 930;
@@ -3413,7 +3424,8 @@ export default {
                     border-radius: 4px;
                     text-align: center;
                     background-color: rgba($color: #24293d, $alpha: 0.6);
-                    top: 40%;
+                    //top: 40%;
+                    top: 45%;
                     span{
                         // font-size: 12px;
                         margin-left: 12px;
@@ -3439,7 +3451,8 @@ export default {
                 margin-bottom: 40px;
                 border-radius: 4px;
                 background-color: rgba($color: #24293d, $alpha: 0.6);
-                top: 40%;
+                //top: 40%;
+                top: 45%;
                 span{
                   // font-size: 12px;
                   margin-left: 12px;
@@ -3534,6 +3547,8 @@ export default {
                     color: $tab;
                     background-color: $background;
                     border-bottom:1px solid $border;
+                    position: relative;
+                    z-index: 100;
                 }
                 @media screen and (min-width: 1366px){
                     .inspect-header{
@@ -4082,15 +4097,16 @@ export default {
     .des-input .el-textarea__inner{
         font-family: 'Microsoft YaHei';
     }
-  /*.score-menu.el-dropdown-menu{*/
-    /*z-index: 0 !important;*/
-  /*}*/
+  .score-menu.el-dropdown-menu{
+    z-index: 0 !important;
+  }
   .confirmClass{
     width: 28%;
   }
   .confirmClass .el-message-box__header{
-    border-bottom: 1px solid #f31d65;
-    padding: 20px 20px 10px 20px;
+    border-bottom: 0.5px solid #dfe2e9;
+    padding: 20px;
+    font-size: 14px;
   }
   .confirmClass .el-message-box__content{
     padding: 20px;

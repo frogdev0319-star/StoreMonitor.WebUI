@@ -386,7 +386,8 @@
         blob: null,
         ezvizExpireTime: 0,
         currentStoreId: null,
-        isLoaded: false
+        isLoaded: false,
+        editCount: 0,
       }
     },
     async mounted(){
@@ -838,6 +839,7 @@
       handleSuccess(){
         console.log("播放成功回调函数，此处可执行播放成功后续动作");
         let self = this;
+        self.editCount ++;
         self.showError = false;
         self.errorMsg = '';
         self.realTimeSpeed=0;
@@ -879,6 +881,7 @@
       handleFullWindowSuccess(){
         console.log("全屏播放成功回调函数，此处可执行播放成功后续动作");
         let self = this;
+        self.editCount ++;
         // self.playState = true;
         self.showError = false;
         self.errorMsg = '';
@@ -1901,13 +1904,14 @@
   }
   .errorVideo-model{
     @include point(margin,20);
-    /*margin-bottom: 0;*/
+    margin-bottom: 0;
     height: auto;
     position: relative;
     @include point(min-width,500);
     @include point(min-height,414);
     background-color: #232730;
     color: $red;
+    z-index: 100;
     span{
       position: absolute;
       top: 50%;
@@ -1946,6 +1950,7 @@
     @include point(min-width,500);
     @include point(min-height,408);
     background-color: #000;
+    z-index: 100;
     .getvideo-content{
       position: absolute;
       z-index: 930;
