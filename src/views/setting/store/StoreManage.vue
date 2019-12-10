@@ -2,7 +2,7 @@
     <div class="el-event-content" :style="{'height':windowHeight-142+'px'}">
        <div class="seacrh-content">
             <span class="select-title">{{generateStoreLang('provinceTitle')}}</span>
-            <el-select v-model="curProvince" clearable  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
+            <el-select v-model="curProvince"  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
              class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
@@ -44,16 +44,16 @@
             :highlight-current-row="true"
             :empty-text="generateStoreLang('noStoreData')"
             align='left'
-            border
             stripe
             :height="tableHieght"
             @sort-change='sortChange'
             @row-click='rowClickItem'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;"
-            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+            :cell-style="cellStyle"
             >
                 <el-table-column
-                    min-width="120"
+                    min-width="140"
                     header-align="center"
                     align="center">
                         <template slot-scope="scope" v-if="scope.row.showTag">
@@ -102,7 +102,7 @@
                 min-width="100"
             >
                 <template slot-scope="scope">
-                    <i class="iconfont icon-gengduo" style="cursor: pointer;" @click="toEventDetail(scope.row)"></i>
+                    <i class="iconfont icon-gengduo" style="cursor: pointer; vertical-align: middle" @click="toEventDetail(scope.row)"></i>
                 </template>
             </el-table-column>
             <div slot="empty">
@@ -219,13 +219,33 @@ import {generateStoreLang} from '@/api/i18n'
             ...mapGetters({accountChanged:'accountChanged'})
         },
         methods:{
+          cellStyle({ row, column, rowIndex, columnIndex}){
+            console.log(row);
+            console.log(columnIndex);
+            let obj = {};
+            if(columnIndex == 0){
+              obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+            }
+            else{
+              obj = {'border-right':'1px solid #e3e9f4'}
+            }
+            return obj;
+          },
             generateStoreLang,
             changePro(val){
                 let self=this;
-                self.getCityByProvince(val);
-                self.curCitys=this.$t('storeView.cityPlaceholder');
-                self.multeCityList.length=0;
-                self.allCityChecked=false;
+                if(val == ''){
+                  self.cityList=[];
+                  self.showCityContent=false;
+                  self.curCitys=this.$t('storeView.cityPlaceholder');
+                  self.multeCityList.length=0;
+                }
+                else{
+                  self.getCityByProvince(val);
+                  self.curCitys=this.$t('storeView.cityPlaceholder');
+                  self.multeCityList.length=0;
+                  self.allCityChecked=false;
+                }
             },
             clearCitys(){
                 let self=this;
@@ -396,6 +416,7 @@ import {generateStoreLang} from '@/api/i18n'
                         }
                     })
                 }
+                temp.length>0 ? temp.unshift({value:'', label:self.$t('storeView.provincePlaceholder'),}) : temp;
                 self.provinceList=temp;
             },
             clearPage(){
@@ -441,7 +462,7 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
                     obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
-                    obj.schedue='---',
+                    obj.schedue='--',
                     obj.device=item.device;
                     temp.push(obj);
                 })
@@ -640,7 +661,6 @@ import {generateStoreLang} from '@/api/i18n'
         .el-search-btn{
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             width: calc(130/1920*100vw);
             padding: 0 0;
             @include point(margin-left,15);
@@ -651,7 +671,6 @@ import {generateStoreLang} from '@/api/i18n'
         .en-el-search-btn{
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
           width: calc(130/1920*100vw);
           padding: 0 0;
           text-align: center;
@@ -670,20 +689,23 @@ import {generateStoreLang} from '@/api/i18n'
             position: relative;
             border: 1px solid #DCDFE6;
             box-sizing: border-box;
-            @media screen and (max-width: 1920px){
-              top: 12px;
-            }
-            @media screen and (max-width: 1600px){
-              top: 10px;
-            }
-            @media screen and (max-width: 1280px){
-              top: 8px;
-            }
-            top: 8px;
+            vertical-align: middle;
+            border-radius: 3px;
+            overflow: hidden;
+            /*@media screen and (max-width: 1920px){*/
+            /*  top: 12px;*/
+            /*}*/
+            /*@media screen and (max-width: 1600px){*/
+            /*  top: 10px;*/
+            /*}*/
+            /*@media screen and (max-width: 1280px){*/
+            /*  top: 8px;*/
+            /*}*/
+            /*top: 8px;*/
             span{
                 display: inline-block;
                 font-size: 12px;
-                color: #C0C4CC;
+                color: #7d8cad;
                 margin-left: 15px;
                 @include point(width,130);
                 white-space: nowrap;
@@ -693,9 +715,15 @@ import {generateStoreLang} from '@/api/i18n'
             .icon-input{
                 position: absolute;
                 @include point(right,10);
-                top: 6px;
+                top: 10px;
                 font-size: 14px;
                 color: #C0C4CC;
+              @media screen and(max-width: 1440px){
+                top: 6px;
+              }
+              @media screen and(max-width: 1280px){
+                top: 4px;
+              }
             }
         }
         .el-search-input{
@@ -791,7 +819,7 @@ import {generateStoreLang} from '@/api/i18n'
       font-size: calc(14/1920*100vw);
       color: #182752;
     }
-    .el-table .cell{
+    .el-table-content .el-table .cell{
       padding-left: calc(20/1920*100vw);
       padding-right: calc(20/1920*100vw);
     }

@@ -28,11 +28,11 @@
             :highlight-current-row="true"
             align='left'
             stripe
-            border
             style="width:100%;"
-            :maxHeight="tableHieght"
+            :height="tableHieght"
             ref="titleTable"
-            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+            :cell-style="cellStyle"
           >
             <el-table-column
               type="selection"
@@ -67,14 +67,14 @@
               :label="$t('titleView.operation')"
               align="left">
               <template slot-scope="scope">
-                <i class="iconfont icon-gengduo" style="cursor: pointer; margin-right: 20px" @click="updateTitle(scope.row)"></i>
-                <i class="iconfont icon-shanchu" style="cursor: pointer;" @click="showDeleteDialogMethod(scope.row)"></i>
+                <i class="iconfont icon-gengduo" style="cursor: pointer; margin-right: 20px;vertical-align: middle" @click="updateTitle(scope.row)"></i>
+                <i class="iconfont icon-shanchu" style="cursor: pointer;vertical-align: middle" @click="showDeleteDialogMethod(scope.row)"></i>
               </template>
             </el-table-column>
             <div slot="empty">
               <div>
                 <i class="iconfont icon-zhengque empty-data-icon"></i>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{$t('deviceView.noData')}}</span>
+                <span :style="{'margin-left':'20px','font-size':'16px','color':'#=7d8cad','font-family':'Microsoft YaHei'}">{{$t('deviceView.noData')}}</span>
               </div>
             </div>
           </el-table>
@@ -86,10 +86,10 @@
                       top="35vh"
                       left="40vh">
             <div class="dialog-content" style="overflow:hidden;width:100%;">
-              <hr style="border: 0.5px solid #FB4C5D;"/>
+              <hr style="border: 0.5px solid #dfe2e9;"/>
               <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                <span>{{deleteInfo}}</span>
+                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"></i>
+                <span style="display: inline-block;  vertical-align: middle">{{deleteInfo}}</span>
               </p>
             </div>
             <div slot="footer" class="dialog-footer">
@@ -155,6 +155,18 @@
         },
       },
       methods:{
+        cellStyle({ row, column, rowIndex, columnIndex}){
+          console.log(row);
+          console.log(columnIndex);
+          let obj = {};
+          if(columnIndex == 0){
+            obj = {'border-left': '1px solid #e3e9f4'};
+          }
+          else{
+            obj = {'border-right':'1px solid #e3e9f4'}
+          }
+          return obj;
+        },
         addNewTitle(){
           let self = this;
           self.$router.push({name:'titleSetting', params: { isAdd: true }});
@@ -333,20 +345,19 @@
       color: #fff;
       position: relative;
       @include point(margin-right,10);
-      font-size: calc(14/1920*100vw);
       height: calc(36/1920*100vw);
-      line-height: calc(36/1920*100vw);
       width: calc(130/1920*100vw);
       padding: 0;
       .iconfont{
-        font-size: calc(24/1920*100vw);
+        font-size: calc(16/1920*100vw);
         padding: calc(5/1920*100vw) 0;
       }
       span{
         position: relative;
-        bottom: calc(4/1920*100vw);
-        @media screen and (max-width: 1280px) {
-          bottom: calc(2/1920*100vw);
+        bottom: calc(1/1920*100vw);
+        font-size: calc(14/1920*100vw);
+        @media screen and (max-width: 1680px) {
+          bottom:calc(-1/1920*100vw);
         };
       }
       &:disabled{
@@ -360,18 +371,17 @@
       @include point(margin-right, 15);
       font-size: calc(14/1920*100vw);
       height: calc(36/1920*100vw);
-      line-height: calc(36/1920*100vw);
       width: calc(130/1920*100vw);
       padding: 0;
       .iconfont{
-        font-size: calc(24/1920*100vw);
+        font-size: calc(16/1920*100vw);
         padding: calc(5/1920*100vw) 0;
       }
       span{
         position: relative;
-        bottom: calc(4/1920*100vw);
-        @media screen and (max-width: 1280px) {
-          bottom: calc(2/1920*100vw);
+        bottom: calc(1/1920*100vw);
+        @media screen and (max-width: 1680px) {
+          bottom:calc(-1/1920*100vw);
         };
       }
       &:disabled {
@@ -382,7 +392,6 @@
   .title-table{
     @include point(margin, 15);
     height: auto;
-    border-right: 1px solid $border;
     .iconfont{
       font-size: calc(24/1920*100vw);
       color: $tab;
@@ -391,62 +400,34 @@
 </style>
 <style>
   @import '../../../assets/css/pagination.css';
-  .el-table::before{
+/*  .el-table::before{
     height: 0px !important;
-  }
+  }*/
   .current-row > td {
     background: #FEE7E4 !important;
   }
-  .el-table tbody tr:hover>td {
-    background-color: #FDE8EF !important;
+  .title-table .el-table .cell{
+    padding-left: calc(20/1920*100vw);
+    padding-right: calc(20/1920*100vw);
   }
-  .el-table--border th{
-    border-right: 0 !important;
+  .title-table .el-table .cell:first-child{
+    padding-right: calc(10/1920*100vw);
   }
-  .title-table .el-table--border th:first-child{
-    border-left: 1px solid #e3e9f4;
-  }
+/*
   .title-table .el-table--border td:first-child .cell, .el-table--border th:first-child .cell{
     padding-left: calc(10/1920*100vw);
   }
-  /*.el-table--border, .el-table--group{*/
-    /*border: none !important;*/
-  /*}*/
+  .el-table--border, .el-table--group{
+    border: none !important;
+  }*/
   /*.el-table__header-wrapper th:nth-last-of-type(2){*/
     /*border-right: none !important;*/
   /*}*/
   .el-table--border::after, .el-table--group::after{
     width: 0 !important;
   }
-  .el-table th .el-checkbox__input{
+ .el-table th .el-checkbox__input{
     display: none;
   }
-  .title-table .el-table__body{
-    border-left: 1px solid #EBEEF5;
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .el-table__row .el-table-column--selection{
-    border-right: none !important;
-  }
-  .el-dialog__body {
-    padding: 0
-  }
-  .title-table .el-table--border{
-    border-left: none;
-  }
-  .el-table__row{
-    height: calc(60/1920*100vw);
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-  .el-table .cell{
-    padding-left: calc(20/1920*100vw);
-    padding-right: calc(20/1920*100vw);
-  }
-  .el-table--striped .el-table__body tr.el-table__row--striped td{
-    background-color: #f7f8fb;
-  }
-  .el-table__header{
-    font-size: calc(12/1920*100vw);
-  }
+
 </style>

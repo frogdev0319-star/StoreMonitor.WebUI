@@ -101,7 +101,7 @@
                       <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" class="third-title">{{generateRoute(child.name)}}</span>
                     </template>
                     <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                                  v-for="grandChild in child.children" :index="grandChild.path"  :disabled="child.isReadOnly"
+                                  v-for="grandChild in child.children" :index="grandChild.path"  :disabled="grandChild.isReadOnly"
                                   :key="grandChild.path" >
                       <template>
                         <span :class="lang=='en' ? 'third-child-span' : 'zh-third-child-span'">{{generateRoute(grandChild.name)}}</span>
@@ -925,6 +925,7 @@
         /*border-width: 0;*/
         width: 100%;
         background: #f4f5f9;
+        min-height: calc(100vh - 80 / 1920 * 100vw - 45px);
         //@include point(margin-right,50);
       }
       // .wrapper-all-header{
@@ -938,6 +939,7 @@
         // width: 96.5%;
         padding-bottom: calc(10/1920*100vw);
         background-color: #f4f5f9;
+        min-height: calc(100vh - 80 / 1920 * 100vw - 45px);
       }
       .footercontent{
         padding:0px 0 30px 60px;
@@ -1363,5 +1365,18 @@
   }
   .el-submenu-content.el-submenu.is-active > .el-submenu__title{
     background-color: #f31d65 !important;
+  }
+  .el-dialog__headerbtn .el-dialog__close{
+    font-size: calc(20/1920*100vw);
+  }
+  .el-dialog__title{
+    font-size: calc(14/1920*100vw);
+  }
+
+  .el-tabs__item{
+    color: #7d8cad;
+  }
+  .el-table__row{
+    height: calc(60/1920*100vw);
   }
 </style>

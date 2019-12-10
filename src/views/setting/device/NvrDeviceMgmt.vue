@@ -50,7 +50,7 @@
                        top="35vh"
                        left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <p style="margin-left:26px;margin-bottom:0px;">{{generateDeviceLang('selectFilePos')}}</p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -69,11 +69,10 @@
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
-
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                  <span>{{generateDeviceLang('clearInfo')}}</span>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                  <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('clearInfo')}}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -165,11 +164,11 @@
                             top="35vh"
                             left="40vh">
                   <div class="dialog-content" style="overflow:hidden;width:100%;">
-                    <hr style="border: 0.5px solid #FB4C5D;"/>
+                    <hr style="border: 0.5px solid #dfe2e9;"/>
 
                     <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                      <span>{{generateDeviceLang('deleteNvrInfo')}}</span>
+                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;;display: inline-block; vertical-align: middle"></i>
+                      <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteNvrInfo')}}</span>
                     </p>
                   </div>
                   <div slot="footer" class="dialog-footer">
@@ -202,7 +201,7 @@
                      left="40vh" customClass="addNvr"
           >
             <div class="dialog-content" style="overflow:hidden;width:100%;">
-              <hr style="border: 0.5px solid #f31d65;"/>
+              <hr style="border: 0.5px solid #dfe2e9;"/>
               <el-form :model="addNvrData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item label="IVS ID" prop="ivsId">
                   <el-input v-model="addNvrData.ivsId"></el-input>
@@ -343,11 +342,11 @@
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
+                <hr style="border: 0.5px solid #dfe2e9;;"/>
 
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                  <span style="margin: 20px;">{{generateDeviceLang('deleteChannel')}}</span>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                  <span style="margin: 20px;display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteChannel')}}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -364,7 +363,7 @@
                        left="40vh" customClass="addNvr"
             >
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #f31d65;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <el-form :model="addChannelData" :rules="channelRules" ref="channelForm" class="nvrForm" label-position="top" size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
@@ -1786,7 +1785,7 @@
     line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
-    width: calc(130/1920*100vw);
+    min-width: calc(110/1920*100vw);
     @media screen and (min-width: 1366px){
       //@include point(width, 90);
       span{
@@ -1822,34 +1821,40 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    padding: 3px 10px !important;
+    /*padding: 3px 5px !important;*/
     position: relative;
     top: 3px;
+    border-right: 0;
     height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
-    .iconfont{
-      font-size: calc(24/1920*100vw);
-      vertical-align: middle;
+    @media screen and (min-width: 1366px){
+      //@include point(width, 90);
+      span{
+        position: relative;
+        @include point(bottom,3);
+      }
     }
-    span{
-      font-size: calc(14/1920*100vw);
-      vertical-align: middle;
+    @media screen and (max-width: 1366px){
+      //@include point(width, 120);
+      top: 6px;
+      span{
+        position: relative;
+        @include point(bottom,5);
+      }
     }
 
-    &:first-child{
-      border-right-width: 0px;
-    }
     &:last-child{
-      border-left-width: 0px;
+      border-right: 1px solid;
     }
+
     &:hover{
       background-color: #FEE4E7;
     }
     &:focus{
       background-color: #FEE4E7;
-    }
-    &:disabled{
-      opacity: 0.5;
     }
   }
   .el-device{
@@ -1878,6 +1883,9 @@
       @include point(padding-bottom,0);
       .dialog-content{
         width: 100%;
+      }
+      .nvr-title .titles{
+        color: $tab;
       }
       .titles{
         display: inline-block;
@@ -1922,15 +1930,15 @@
           bottom: 0;
           margin: auto;
           .el-icon-plus{
-            font-size: calc(24/1920*100vw);
+            font-size: calc(16/1920*100vw);
             padding: calc(5/1920*100vw) 0;
           }
           span{
             font-size: calc(14/1920*100vw);
             position: relative;
-            bottom: calc(4/1920*100vw);
+            bottom: calc(1/1920*100vw);
             @media screen and (max-width: 1280px) {
-              bottom: calc(2/1920*100vw);
+              bottom: 0;
             };
           }
           @media screen and (max-width: 1680px){
@@ -2036,10 +2044,10 @@
             }
           }
           .store-data{
-            width: 40%;
+            width: 35%;
             height: 100%;
             position: absolute;
-            left: 27%;
+            /*left: 27%;*/
             span{
               display: inline-block;
               width: 70%;
@@ -2049,10 +2057,10 @@
             }
           }
           .count-data{
-            width: 15%;
+            width: 20%;
             height: 100%;
             position: absolute;
-            left: 65%;
+            left: 60%;
             span{
               display: inline-block;
               width: 70%;
@@ -2158,6 +2166,9 @@
             width: 15%;
           }
         }
+        .nape-items-title .titles, en-nape-items-title .titles{
+          color: $tab;
+        }
         .en-nape-items-title{
           @include titleStyle;
           @media screen and (min-width: 1366px) {
@@ -2212,7 +2223,7 @@
             }
           }
           .nape-dep-data{
-            width: 30%;
+            width: 26%;
             display: inline-block;
             position: relative;
             span{
@@ -2220,10 +2231,11 @@
             }
           }
           .nape-picture-data{
-            width:25%;
+            width:26%;
             height: 100%;
             display: inline-block;
             position: relative;
+            left: 1%;
             .img-class{
               height: 90%;
               @include point(width, 80);

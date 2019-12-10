@@ -461,7 +461,6 @@
     @include point(margin-right,15);
     font-size: calc(14/1920*100vw);
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
     width: calc(160/1920*100vw);
     .el-icon-plus{
@@ -479,7 +478,7 @@
       opacity: 0.5;
     }
     @media screen and (max-width: 1680px){
-      width: 130px;
+      width: 130px !important;
     }
 
   }
@@ -489,7 +488,6 @@
     @include point(margin-right, 15);
     font-size: calc(14/1920*100vw);
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
     width: calc(130/1920*100vw);
     @media screen and (max-width: 1680px){
@@ -546,18 +544,18 @@
     width: calc(130/1920*100vw);
     .el-icon-plus, .icon-shanchu{
       padding: calc(5/1920*100vw) 0;
-      font-size: calc(24/1920*100vw);
+      font-size: calc(16/1920*100vw);
     }
     span{
       position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(3/1920*100vw);
+      bottom: calc(1/1920*100vw);
+      @media screen and (max-width: 1440px) {
+        bottom: 0;
       };
     }
-    @media screen and (max-width: 1440px) {
-      width: 125px;
-    }
+  }
+  .en-el-delete-btn.btn-class, en-el-add-btn.btn-class{
+    width: 130px;
   }
   .schedule-container{
     padding: 20px 15px 15px 15px;

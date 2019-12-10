@@ -46,22 +46,31 @@
           <div class="region-result">
             <div class="store-list">
               <span class="store-name">{{$t('overview.selectStores')}}</span>
-              <div  class="stores-panel" >
-                <div class="month-content" @click="choiceStore">
-                  <div class="input-arrow-panel"></div>
-                  <el-input v-model="storeName" size="mini" id="elMonth" placeholder="请选择门店" :readonly=true></el-input>
-                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                </div>
-                <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">
-                  <div class="month-details">
-                    <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>
-                  </div>
-                  <div class="month-details" v-for="(item,index) in storeDataList" :key="index">
-                    <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>
-                    <span>{{item.label}}</span>
-                  </div>
-                </div>
-              </div>
+              <el-select v-model="curStore" placeholder="请选择门店" style="width: 200px" size="mini" @change="changeStore">
+                <el-option
+                  v-for="item in storeDataList"
+                  :key="item.storeId"
+                  :label="item.label"
+                  :value="item.storeId"
+                >
+                </el-option>
+              </el-select>
+<!--              <div  class="stores-panel" >-->
+<!--                <div class="month-content" @click="choiceStore">-->
+<!--                  <div class="input-arrow-panel"></div>-->
+<!--                  <el-input v-model="storeName" size="mini" id="elMonth" placeholder="请选择门店" :readonly=true></el-input>-->
+<!--                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
+<!--                </div>-->
+<!--                <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">-->
+<!--                  <div class="month-details">-->
+<!--                    <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>-->
+<!--                  </div>-->
+<!--                  <div class="month-details" v-for="(item,index) in storeDataList" :key="index">-->
+<!--                    <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>-->
+<!--                    <span>{{item.label}}</span>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
 
             </div>
             <div class="charts-content">
@@ -198,6 +207,7 @@
         storeDataList: [],
         checkAllStore: true,
         storeIds: [],
+        curStore: this.$t('overview.all'),
         storeName: this.$t('overview.all'),
         showMonthDrap: false,
         showStoreContent: false,
@@ -299,6 +309,8 @@
         storeStatusLegend: ['门店名称',this.$t('overview.pendingEvent'),this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
         storeEventList: [],
         storeEventLegend: ['日期',this.$t('overview.createdEvent'),this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
+        echartAxiasColor: '#e3e9f4',
+        echartBackground: 'rgba(30,34,52,0.75)',
       }
 
     },
@@ -315,6 +327,7 @@
           self.checkAllStore = true;
           self.storeIds = [];
           self.storeName = this.$t('overview.all');
+          self.curStore = this.$t('overview.all');
           self.getAllStoreList();
           self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date).endOf('d').toDate()];
           let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
@@ -382,6 +395,18 @@
         self.params.endTs = end;
         self.initData();
       },
+      changeStore(val){
+        let self=this;
+        console.log(val);
+        self.storeIds = [];
+        if(val == -1){
+          self.storeIds = [];
+        }
+        else{
+          self.storeIds.push(self.curStore);
+        }
+        self.getStoreEventStatics();
+      },
       choiceStore(){
         let self = this;
         self.showStoreContent = !self.showStoreContent;
@@ -431,6 +456,11 @@
         let retData=await self.getStoreData(params);
         let storeList=retData.data.content;
         let tempStore=[];
+        tempStore.push(
+          {storeId:'-1',
+          label: self.$t('overview.all'),
+          value:self.$t('overview.all')}
+          )
         storeList.forEach(item=>{
           let obj={
             storeId:item.storeId,
@@ -565,7 +595,8 @@
             formatter: '{b} : {c} ({d}%)',
             textStyle:{
               align:'left'
-            }
+            },
+            backgroundColor: self.echartBackground,
           },
           series: [
             {
@@ -653,7 +684,8 @@
             formatter: '{b} : {c} ({d}%)',
             textStyle:{
               align:'left'
-            }
+            },
+            backgroundColor: self.echartBackground,
           },
           series: [
             {
@@ -751,11 +783,11 @@
             axisPointer : {            // 坐标轴指示器，坐标轴触发有效
               type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
             },
-            padding: 10,
+            padding: 5,
             textStyle:{
               align:'left',
-              fontSize: 12
-            }
+            },
+            backgroundColor: self.echartBackground,
           },
           dataset: {
             source: [],
@@ -800,6 +832,10 @@
             },
             splitLine: {
               show: true,
+              lineStyle:{
+                color: self.echartAxiasColor,
+                width: 1,
+              }
             },
             axisLine: {
               show: false,
@@ -893,11 +929,11 @@
             axisPointer : {            // 坐标轴指示器，坐标轴触发有效
               type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
             },
-            padding: 10,
+            padding: 5,
             textStyle:{
               align:'left',
-              fontSize: 12
             },
+            backgroundColor: self.echartBackground,
           },
           dataset: {
             source: [],
@@ -936,6 +972,10 @@
             minInterval: 20,
             splitLine:{
               show:true,
+              lineStyle:{
+                color: self.echartAxiasColor,
+                width: 1,
+              }
             },
             axisTick: {
               show: false,
@@ -1213,6 +1253,7 @@
           margin-left: calc(30/1920*100vw);
           font-size: calc(20/1920*100vw);
           text-align: left;
+          color: $black;
         }
         .kpi-list{
           height: 100%;
@@ -1282,6 +1323,7 @@
                     width: 200px;
                     /deep/ .el-input__inner{
                       padding-right: 20px;
+                      color: #7d8cad;
                     }
                   }
                   .input-arrow-panel{
@@ -1432,6 +1474,7 @@
             padding-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             text-align: left;
+            color: $black;
           }
           .label-0 {
             background-color: $pending;
@@ -1455,6 +1498,7 @@
             font-size: calc(20/1920*100vw);
             text-align: left;
             border-bottom: 1px solid $border;
+            color: $black;
           }
           .store-panel {
             height: calc(295 / 1920 * 100vw);
@@ -1505,7 +1549,12 @@
   .item-process .el-progress-bar .el-progress-bar__outer{
     background-color: #fff;
   }
-
+  .store-list .el-select.el-input__inner, .store-list .el-select .el-input__inner:focus{
+    border: 1px solid #E4E7ED !important;
+  }
+  .store-list .el-select .el-input.is-focus .el-input__inner{
+    border: 1px solid #E4E7ED !important;
+  }
 </style>
 
 

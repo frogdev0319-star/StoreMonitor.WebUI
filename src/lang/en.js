@@ -111,7 +111,8 @@ export default {
     pendingFive: 'Pending event TOP5',
     closedFive: 'Closed event TOP5',
     all: 'All',
-    times: ''
+    times: '',
+    orders: 'Ascending/descending order'
   },
   //remote Patrol page language
   remotePatrol:{
@@ -186,7 +187,8 @@ export default {
     summaryInfo: 'Please select overall summary!',
     allIgnored: 'All inspection items are ignored, please re-evaluate',
     videoLicense: "Please contact your supervisor for video access license",
-    suggestEmpty: 'Please enter suggestions for this inspection !'
+    suggestEmpty: 'Please enter suggestions for this inspection !',
+    changPageInfo: 'Not finish yet, confirm leaving the page? '
   },
   // Store Monitor page language
   storeMonitor:{

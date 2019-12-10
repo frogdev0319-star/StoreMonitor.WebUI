@@ -11,10 +11,10 @@
                  top="35vh"
                  left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #f31d65;"/>
-          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <span>{{generateScheduleLang('scheduleName')}}</span>
-            <el-input v-model="scheduleName" clearable :placeholder="generateScheduleLang('inputPlaceholder')" size="mini" ref="scheduleName"
+          <hr style="border: 0.5px solid #dfe2e9;"/>
+          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;display: inline-block;  vertical-align: middle">
+            <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('scheduleName')}}</span>
+            <el-input v-model="scheduleName" :placeholder="generateScheduleLang('inputPlaceholder')" size="mini" ref="scheduleName"
                       class="el-schedule-name"></el-input>
           </p>
         </div>
@@ -31,10 +31,10 @@
                  top="35vh"
                  left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #f31d65;"/>
+          <hr style="border: 0.5px solid #dfe2e9;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-            <span>{{generateScheduleLang('saveInfo')}}</span>
+            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"></i>
+            <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('saveInfo')}}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -51,12 +51,12 @@
             <div :style="{height:varyWindowHeight}">
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-                <el-input v-model="item.name" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
                           class="el-type"></el-input>
               </el-col>
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-                <el-select v-model="item.mode" clearable  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
+                <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
                            class="el-type" >
                   <el-option
                     v-for="itemType in typeList"
@@ -192,7 +192,7 @@
               </el-col>
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('dueDays')}}</span>
-                <el-select v-model="item.dueDays" clearable  placeholder="选择执行时效" size="mini"
+                <el-select v-model="item.dueDays"  placeholder="选择执行时效" size="mini"
                            class="el-type" >
                   <el-option
                     v-for="item in dueDaysList"
@@ -249,8 +249,7 @@
               </div>
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
                 <div class="el-btn-content">
-                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn"><i
-                    class="iconfont icon-quxiaolianjie" style="margin-right:8px;"></i>
+                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
                     <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>
@@ -267,10 +266,10 @@
                    top="35vh"
                    left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #f31d65;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-              <span>{{generateScheduleLang('confirmBind')}}</span>
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"></i>
+              <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('confirmBind')}}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -2919,23 +2918,18 @@
           position: absolute;
           @include point(margin-top,15);
           @include point(margin-bottom,15);
+          clear: both;
           .btn{
             //background-color: #f31d65;
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             padding: 0 0;
             width: calc(130/1920*100vw);
+            float: left;
+            margin: 0 calc(30/1920*100vw);
             .icon-quxiaolianjie{
               font-size: calc(24/1920*100vw);
               padding: calc(5/1920*100vw) 0;
-            }
-            span{
-              position: relative;
-              bottom: calc(4/1920*100vw);
-              @media screen and (max-width: 1280px) {
-                bottom: calc(3/1920*100vw);
-              };
             }
             color: #fff;
           }
@@ -3123,7 +3117,7 @@
       font-size: 12px;
       width: 14px;
       /deep/ span{
-        margin-left: -5px;
+        margin-left: -6px;
       }
       .el-icon-plus{
         font-size:12px;

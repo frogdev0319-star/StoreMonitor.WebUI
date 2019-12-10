@@ -2486,8 +2486,8 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
-            if(self.playState|| self.$refs.ezvizVideo.playState || self.eventName.length!=0){
-                self.changeStoreObj.dialogCosed=true;
+            if( (!self.isEzviz && (self.playState || self.eventName.length!=0 )) || self.isEzviz && (self.$refs.ezvizVideo.playState || self.eventName.length!=0)){
+              self.changeStoreObj.dialogCosed=true;
             }
             else{
                 //self.changeStore(item,index,_item,_index);

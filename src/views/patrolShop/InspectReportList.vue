@@ -1067,7 +1067,8 @@ $suggestBack:#F1F6FE;
             .month-panel{
               position: absolute;
               margin-top: 3px;
-              width: auto;
+              white-space:nowrap;
+              box-sizing: border-box;
               height: 150px;
               z-index: 980;
               background-color: #fff;

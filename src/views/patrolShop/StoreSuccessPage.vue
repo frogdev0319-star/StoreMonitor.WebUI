@@ -195,7 +195,7 @@ export default {
         self.getCommentList();
         if(self.isSuccess){
             self.timeid=setInterval(function(){
-                //self.getBackSecond();
+                self.getBackSecond();
             },1000)
         }
     },

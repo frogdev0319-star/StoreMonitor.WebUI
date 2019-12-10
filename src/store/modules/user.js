@@ -244,7 +244,7 @@ const user={
               },
               {
                 path:'/reinspection',
-                  name:'remotePatrol',
+                name:'remotePatrol',
                 component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
                 hidden:true,
                 meta:{
@@ -260,7 +260,7 @@ const user={
               },
               {
                 path:'/reinspection',
-                  name:'remotePatrol',
+                name:'remotePatrol',
                 component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
                 hidden:true,
                 children:[
@@ -497,7 +497,8 @@ const user={
                 {
                   path:'/pointCheck',
                   name:'pointCheck',
-                  component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve)
+                  component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve),
+                  isReadOnly:true,
                 },
                 // {
                 //   path:'/lpsSechedule',

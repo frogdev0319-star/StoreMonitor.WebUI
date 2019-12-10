@@ -112,7 +112,8 @@ export default {
     pendingFive: '待处理事件TOP5',
     closedFive: '结案数量TOP5',
     all: '全部门店',
-    times: '次'
+    times: '次',
+    orders: '升序/降序'
   },
   //remote Patrol page language
   remotePatrol:{
@@ -158,7 +159,7 @@ export default {
     sentSucc: '提交成功！',
     sentFail: '提交失败！',
     copyFail: '已将不合格项发送至',
-    return: '后自动返回远程巡检页面！',
+    return: '秒后自动返回远程巡检页面！',
     storeName: '门店名称',
     item: '项目',
     ifpass: '是否合格',
@@ -187,7 +188,8 @@ export default {
     summaryInfo: '请选择巡检总评！',
     allIgnored: '您已忽略所有巡检项，请重新评估',
     videoLicense: "无视频访问权限，请联系上级管理员",
-    suggestEmpty: '请输入本次巡检建议！'
+    suggestEmpty: '请输入本次巡检建议！',
+    changPageInfo: '当前巡检尚未完成，确认是否离开页面？'
   },
 
   // Store Monitor page language
@@ -242,7 +244,7 @@ export default {
     emptyTitle: '问题名称不能为空！',
     recording: '正在录制',
     recordSucc: '录制成功',
-    return: '后自动返回远程巡检页面！',
+    return: '秒后自动返回门店监控页面！',
     storeName: '门店名称：',
     eventTitle: '问题名称',
     eventStatus: '问题状态',

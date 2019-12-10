@@ -63,9 +63,14 @@
           <div class="title">
             <span class="area-title" v-if="isWorstArea">{{$t('overview.worstRegion')}}</span>
             <span class="area-title" v-else>{{$t('overview.bestRegion')}}</span>
-            <span class="arrows">
-              <i @click="showBestArea" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstArea }"></i>
-              <i @click="showWorstArea" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstArea }"></i>
+            <!--<span class="arrows">-->
+              <!--<i @click="showBestArea" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstArea }"></i>-->
+              <!--<i @click="showWorstArea" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstArea }"></i>-->
+            <!--</span>-->
+            <span class="arrows" @click="changBestAndWorst">
+              <span class="order-span">{{$t('overview.orders')}}</span>
+              <img :src="descending" v-if="isWorstArea" class="img-class">
+              <img :src="ascending" v-else  class="img-class">
             </span>
           </div>
           <div class="focus-content" v-if="regionTopFive.length > 0">
@@ -92,10 +97,15 @@
       <el-row class="task-row">
         <div class="titles">
           <span class="title">{{$t('overview.patrolRanking')}}</span>
-          <span class="arrows">
-            <i @click="showBestWorks" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstWork }"></i>
-            <i @click="showWorstWorks" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstWork }"></i>
+          <span class="arrows" @click="changWorkerRanking">
+            <span class="order-span">{{$t('overview.orders')}}</span>
+            <img :src="descending" v-if="isWorstWork" class="img-class">
+              <img :src="ascending" v-else  class="img-class">
           </span>
+          <!--<span class="arrows">-->
+            <!--<i @click="showBestWorks" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstWork }"></i>-->
+            <!--<i @click="showWorstWorks" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstWork }"></i>-->
+          <!--</span>-->
           <!--<span class="five-title" v-if="isWorstWork">{{$t('overview.worstPatrol')}}</span>-->
           <!--<span class="five-title" v-else>{{$t('overview.bestPatrol')}}</span>-->
         </div>
@@ -314,6 +324,8 @@
         regionResultList: [],
         regionTopFive: [],
         echartColor: '#7d8cab',
+        echartBackground: 'rgba(30,34,52,0.75)',
+        echartAxiasColor: '#e3e9f4',
         regionChartEmpty: true,
         showRegionNum: 10,
         totalGroupNum: 0,
@@ -324,7 +336,9 @@
         varyWindowHeight:window.innerHeight,
         isEnSpan: false,
         showNextGroup: false,
-        showPreviousGroup: false
+        showPreviousGroup: false,
+        descending: require('../../../static/img/descending.png'),
+        ascending: require('../../../static/img/ascending.png')
       }
 
     },
@@ -348,6 +362,16 @@
       }
     },
     methods:{
+      changBestAndWorst(){
+        let self = this;
+        self.isWorstArea = !self.isWorstArea;
+        self.isWorstArea ? self.showWorstArea() : self.showBestArea();
+      },
+      changWorkerRanking(){
+        let self = this;
+        self.isWorstWork = !self.isWorstWork;
+        self.isWorstWork ? self.showWorstWorks() : self.showBestWorks();
+      },
       showWorstArea(){
         let self = this;
         self.isWorstArea = true;
@@ -395,7 +419,7 @@
                 fontSize: 12,
               },
               lineStyle:{
-                color: self.echartColor,
+                color: self.echartBackground,
               },
               controlStyle:{
                 color: self.echartColor,
@@ -433,11 +457,12 @@
               trigger: 'axis',
               padding: 5,
               axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
+                type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
               },
               textStyle:{
                 align:'left'
-              }
+              },
+              backgroundColor: self.echartBackground,//通过设置rgba调节背景颜色与透明度
             },
             legend: {
               x: 'center',
@@ -464,7 +489,7 @@
                 axisLine: {
                   show: false,
                   lineStyle:{
-                    color: '#e3e9f4',
+                    color: self.echartAxiasColor,
                   }
                 },
                 axisTick: {
@@ -473,7 +498,7 @@
                 axisLabel: {
                   interval: 0,
                   textStyle: {
-                    color: '#7D8CAB',
+                    color: self.echartColor,
                   }
                 }
               }
@@ -491,11 +516,15 @@
                 },
                 axisLabel: {
                   textStyle: {
-                    color: '#7D8CAB',
+                    color: [self.echartColor],
                   }
                 },
                 splitLine:{
                   show:true,
+                  lineStyle:{
+                    color: self.echartAxiasColor,
+                    width: 1,
+                  }
                 },
               }
             ],
@@ -654,11 +683,12 @@
               trigger: 'axis',
               padding: 5,
               axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
+                type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
               },
               textStyle:{
                 align:'left'
-              }
+              },
+              backgroundColor: self.echartBackground,
             },
             legend: {
               x: 'center',
@@ -685,7 +715,7 @@
                 axisLine: {
                   show: false,
                   lineStyle:{
-                    color: '#e3e9f4',
+                    color: self.echartAxiasColor,
                   }
                 },
                 axisTick: {
@@ -694,7 +724,7 @@
                 axisLabel: {
                   interval: 0,
                   textStyle: {
-                    color: '#7D8CAB',
+                    color: self.echartColor,
                   }
                 }
               }
@@ -712,11 +742,15 @@
                 },
                 axisLabel: {
                   textStyle: {
-                    color: '#7D8CAB',
+                    color: self.echartColor,
                   }
                 },
                 splitLine:{
                   show:true,
+                  lineStyle:{
+                    color: self.echartAxiasColor,
+                    width: 1,
+                  }
                 },
               }
             ],
@@ -833,7 +867,8 @@
           tooltip: {
             textStyle:{
               align:'left'
-            }
+            },
+            backgroundColor: self.echartBackground,
           },
           legend: {
             data: ['inspect radar']
@@ -857,7 +892,18 @@
                 color: 'rgba(255,0,0,0)', // 图表背景的颜色
               },
             },
-
+            axisLine:{
+              lineStyle: {
+                color: self.echartAxiasColor ,
+              },
+            },
+            splitLine : {
+              show : true,
+              lineStyle : {
+                width : 1,
+                color : self.echartAxiasColor // 图表背景网格线的颜色
+              }
+            }
           },
           series: {
             name: '巡检项',
@@ -1037,6 +1083,11 @@
       getTopFiveRegionList(){
         let self = this;
         let result = self.regionResultList.concat([]);
+        // if there is one region, no show best area
+        if(result.length == 1 && !self.isWorstArea){
+          self.regionTopFive = [];
+          return;
+        }
         let firstColor = '';
         let secondColor = '';
         let firstName = '';
@@ -1378,7 +1429,8 @@
               formatter: '{a} <br/>{b} : {c} ({d}%)',
               textStyle:{
                 align:'left'
-              }
+              },
+              backgroundColor: self.echartBackground,
             },
             series: [
               {
@@ -1545,10 +1597,12 @@
             bottom:'30',//距离下边距
           },
           tooltip: {
-            padding: 10,
+            padding: 5,
             textStyle:{
               align:'left',
-              fontSize: 12
+            },
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+              type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
             },
             formatter: function (obj) {
               var value = obj.value;
@@ -1561,7 +1615,8 @@
                 + schema[1].text + '：' + value[0] + '%<br>'
                 + schema[2].text + '：' + value[2] + '%<br>'
                 + schema[3].text + '：' + value[3] + '%<br>';
-            }
+            },
+            backgroundColor: self.echartBackground,
           },
           xAxis: {
             type: 'value',
@@ -1589,11 +1644,12 @@
             },
             axisLine: {
               lineStyle: {
-                color: '#7D8CAB'
+                color: self.echartAxiasColor
               }
             },
             axisLabel:{
               fontStyle: 12,
+              color: self.echartColor,
               formatter: function(value, index){
                 if(value==0){
                   return ''
@@ -1616,7 +1672,7 @@
             },
             axisLine: {
               lineStyle: {
-                color: '#7D8CAB'
+                color: self.echartAxiasColor
               }
             },
             splitLine: {
@@ -1630,7 +1686,8 @@
             },
             axisLabel:{
               fontSize: 12,
-              width: 10
+              width: 10,
+              color: self.echartColor
             }
           },
 
@@ -1811,11 +1868,12 @@
               trigger: 'axis',
               padding: 5,
               axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'none'        // 默认为直线，可选为：'line' | 'shadow'
+                type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
               },
               textStyle:{
                 align:'left'
-              }
+              },
+              backgroundColor: self.echartBackground,
             },
             legend: {
               x: 'center',
@@ -1842,7 +1900,7 @@
                 axisLine: {
                   show: false,
                   lineStyle:{
-                    color: '#e3e9f4',
+                    color: self.echartAxiasColor,
                   }
                 },
                 axisTick: {
@@ -1851,7 +1909,7 @@
                 axisLabel: {
                   interval: 0,
                   textStyle: {
-                    color: '#7D8CAB',
+                    color: self.echartColor,
                   }
                 }
               }
@@ -1869,11 +1927,16 @@
                 },
                 axisLabel: {
                   textStyle: {
-                    color: '#7D8CAB',
+                    color: self.echartColor,
                   }
                 },
                 splitLine:{
                   show:true,
+                  lineStyle:{
+                    color: self.echartAxiasColor,
+                    width: 1,
+                  }
+
                 },
               }
             ],
@@ -2134,6 +2197,7 @@
         border: 1px solid $border;
         background-color: #fff;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        color: $black;
         .title{
           height: calc(70/1920*100vw);
           padding-top: calc(30/1920*100vw);
@@ -2219,12 +2283,16 @@
 
         }
         .focus-list{
+          @media screen and (max-width: 1280px){
+            .title{
+              margin-left: calc(5/1920*100vw);
+            }
+          }
           .focus-content {
             height: calc(330 / 1920 * 100vw);
             border-top: 1px solid $border;
             padding:calc(25 / 1920 * 100vw) calc(30 / 1920 * 100vw);
             position: relative;
-
             .chart-content{
               height: 100%;
               width: 100%;
@@ -2300,6 +2368,20 @@
         // width: calc(20/1920*100vw);
         display: inline-block;
         color: $tab;
+        cursor: pointer;
+        margin-left: calc(10/1920*100vw);
+        @media screen and (max-width: 1280px){
+          margin-left: 0;
+        }
+        .order-span{
+          font-size: calc(12/1920*100vw);
+          vertical-align: middle;
+        }
+        .img-class{
+          width: calc(20/1920*100vw);
+          height: calc(20/1920*100vw);
+          vertical-align: middle;
+        }
         .iconfont{
           font-size: calc(20/1920*100vw) !important;
           cursor: pointer;
@@ -2325,6 +2407,7 @@
             margin-left: calc(30/1920*100vw);
             font-size: calc(20/1920*100vw);
             display: inline-block;
+            color: $black;
           }
           .arrows{
             font-size: calc(20/1920*100vw);
@@ -2357,9 +2440,14 @@
                   width: calc(150/1920*100vw) !important;
                   height: calc(150/1920*100vw) !important;
                   margin: 0 auto;
-                  @media screen and (max-width:1280px){
+                  @media screen and (max-width:1440px){
                     width: 126px ;
                     height: 126px;
+                    margin: 0 auto;
+                  }
+                  @media screen and (max-width:1280px){
+                    width: 112px ;
+                    height: 112px;
                     margin: 0 auto;
                   }
                 }
@@ -2393,6 +2481,7 @@
         .task-empty{
           height: calc(270/1920* 100vw);
           line-height: calc(270/1920* 100vw);
+          color: $tab;
         }
       }
       .items-row{
@@ -2405,7 +2494,7 @@
           padding-left: calc(30/1920*100vw);
           font-size: calc(20/1920*100vw);
           text-align: left;
-
+          color: $black;
         }
         .evalution-pct{
           border: 1px solid $border;
@@ -2681,6 +2770,7 @@
             font-size: calc(20/1920*100vw);
             text-align: left;
             border-bottom: 1px solid $border;
+            color: $black;
           }
           .cycle-panel{
             height: calc(325/1920*100vw);
@@ -2761,7 +2851,6 @@
   }
 </style>
 <style>
-  @import '../../assets/css/pagination.css';
 
   .date-picker-poper .el-button--text{
     visibility: hidden !important;
@@ -2775,19 +2864,29 @@
   }
 
   .el-tooltip-class.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
-    border-bottom-color: rgba(50,50,50,0.7);
+    border-bottom-color: rgba(30,34,52,0.75);
+    display: none;
   }
   .el-tooltip-class.el-tooltip__popper[x-placement^='bottom'] .popper__arrow:after {
-    border-bottom-color: rgba(50,50,50,0.7);
+    border-bottom-color: rgba(30,34,52,0.75);
   }
 
-  .el-tooltip-class{
-    background: rgba(50,50,50,0.7) !important;
+  .el-tooltip-class.el-tooltip__popper.is-dark{
+    background: rgba(30,34,52,0.75) !important;
+    font-size: 14px !important;
+    line-height: 21px;
+    padding: 5px;
   }
-  @media screen and (max-width:1680px){
+  @media screen and ( max-width: 1680px ) and (min-width: 1440px) {
     .process-panel .el-progress-circle{
       width: 130px !important;
       height: 130px !important;
+    }
+  }
+  @media screen and ( max-width: 1440px ) and (min-width: 1280px){
+    .process-panel .el-progress-circle{
+      width: 112px !important;
+      height: 112px !important;
     }
   }
   @media screen and (max-width:1280px){
@@ -2805,14 +2904,8 @@
   .region-process .el-progress-bar .el-progress-bar__outer{
     background-color: #f4f5f9;
   }
-  .el-tooltip__popper.is-dark{
-    background-color: rgb(78, 81, 95);
-  }
   .el-range-editor--mini .el-range-separator{
     height: calc(35/1920*100vw);
     line-height: calc(35/1920*100vw);
-  }
-  .tooltip-class{
-    font-size: calc(12/1920*100vw);
   }
 </style>

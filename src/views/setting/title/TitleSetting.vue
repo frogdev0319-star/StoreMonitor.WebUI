@@ -686,7 +686,6 @@
             vertical-align: middle;
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             padding: 0 0;
           }
         }

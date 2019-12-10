@@ -9,7 +9,7 @@
                 <span class="svg-container">
                     <i class="iconfont icon-admin icons"></i>
                 </span>
-                <el-input 
+                <el-input
                     class="el-login-input"
                     v-model="loginForm.username"
                     :placeholder="login.username"
@@ -33,7 +33,7 @@
                         <i class="iconfont icons" :class="passwordType=='password'?'icon-eye1':'icon-eye'"></i>
                     </span>
             </el-form-item>
-            <el-button :loading="loading" type="primary"  class="login-btn" 
+            <el-button :loading="loading" type="primary"  class="login-btn"
              @click.native.prevent="handleLogin">{{login.loginBtnTitle}}</el-button>
         </el-form>
     </div>
@@ -61,7 +61,7 @@ export default {
             }
         }
         return{
-            
+
             login:{
                 title:'Login Form',
                 username:'username',
@@ -182,9 +182,4 @@ export default {
             }
         }
     }
-</style>
-<style>
-.el-form-item__error{
-    left: 15% !important;
-}
 </style>

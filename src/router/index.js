@@ -52,15 +52,15 @@ export default router
 
  new Router({
   routes: [
-    // {
-    //   path:'/login',
-    //   name:'Login',
-    //   hidden: true,
-    //   component:LoginForm,
-    //   meta:{
-    //     requireAuth: false,
-    //   }
-    // },
+    {
+      path:'/login',
+      name:'Login',
+      hidden: true,
+      component:LoginForm,
+      meta:{
+        requireAuth: false,
+      }
+    },
     {
       path:'*',
       redirect: '/'

@@ -389,7 +389,6 @@ export default {
                     @include point(margin-right,20);
                     font-size: calc(14/1920*100vw);
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     width: calc(130/1920*100vw);
                 }

@@ -37,7 +37,7 @@
                    top="35vh"
                    left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #FB4C5D;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
             <p style="margin-left:26px;margin-bottom:0px;">{{generateDeviceLang('selectFilePos')}}</p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -56,11 +56,11 @@
                     top="35vh"
                     left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #FB4C5D;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
 
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-              <span>{{generateDeviceLang('clearInfo')}}</span>
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+              <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('clearInfo')}}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -104,7 +104,7 @@
                    :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterStore"></i>
               </div>
               <div :class="lang=='en' ? 'en-count-title titles': 'count-title titles'" >
-                <span>{{generateDeviceLang('deviceChannelNum')}}</span>
+                <span>{{generateDeviceLang('channelNum')}}</span>
                 <!--<i class="icon-filter"-->
                 <!--:class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterChannelNum"></i>-->
               </div>
@@ -186,11 +186,11 @@
                             top="35vh"
                             left="40vh">
                   <div class="dialog-content" style="overflow:hidden;width:100%;">
-                    <hr style="border: 0.5px solid #FB4C5D;"/>
+                    <hr style="border: 0.5px solid #dfe2e9;"/>
 
                     <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                      <span>{{generateDeviceLang('deleteInfo')}}</span>
+                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                      <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteInfo')}}</span>
                       <!--<el-checkbox v-model="deleteFromEzviz">是否从萤石云平台删除？</el-checkbox>-->
                     </p>
                   </div>
@@ -201,7 +201,7 @@
                 </el-dialog>
               </div>
             </el-scrollbar>
-            <div class="toolbar pagination" style="width:100%; margin-top:10px;">
+            <div class="toolbar pagination" style="width:100%; margin-top:10px; margin-bottom:10px;">
               <el-pagination
                 style="text-align:right;margin-right:15px;"
                 @size-change="sizeChange"
@@ -224,7 +224,7 @@
                      left="40vh" customClass="addNvr"
           >
             <div class="dialog-content" style="overflow:hidden;width:100%;">
-              <hr style="border: 0.5px solid #f31d65;"/>
+              <hr style="border: 0.5px solid #dfe2e9;"/>
               <el-form :model="addDeviceData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
@@ -384,11 +384,11 @@
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
 
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                  <span style="margin: 20px;">{{generateDeviceLang('deleteChannel')}}</span>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                  <span style="margin: 20px;display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteChannel')}}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -405,7 +405,7 @@
                        left="40vh" customClass="addNvr"
             >
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #f31d65;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <el-form :model="addChannelData" :rules="channelRules" ref="channelForm" class="nvrForm" label-position="top" size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
@@ -1880,10 +1880,9 @@
     position: relative;
     top: 3px;
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
-    width: calc(130/1920*100vw);
+    min-width: calc(110/1920*100vw);
     @media screen and (min-width: 1366px){
       //@include point(width, 90);
       span{
@@ -1919,7 +1918,6 @@
     position: relative;
     top: 3px;
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
@@ -2017,29 +2015,15 @@
           @include point(right, 20);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
           padding: 0 0;
           width: calc(130/1920*100vw);
           top: 0;
           bottom: 0;
           margin: auto;
           .el-icon-plus{
-            font-size: calc(24/1920*100vw);
+            font-size: calc(16/1920*100vw);
           }
-          span{
-          }
-          @media screen and (max-width: 1680px){
-            span{
-              position: relative;
-              @include point(bottom, 1)
-            }
-          }
-          @media screen and (max-width: 1280px){
-            span{
-              position: relative;
-              @include point(bottom, 1)
-            }
-          }
+
         }
       }
       .lisde{
@@ -2246,6 +2230,9 @@
             }
           }
         }
+        .nvr-title .titles{
+          color: $tab;
+        }
         .nvr-data{
           @include titleStyle;
           position: relative;
@@ -2282,7 +2269,7 @@
             }
           }
           .name-data{
-            width: 25%;
+            width: 20%;
             height: 100%;
             position: absolute;
             span{
@@ -2311,7 +2298,7 @@
             width: 20%;
             height: 100%;
             position: absolute;
-            left: 44%;
+            left: 43%;
             span{
               display: inline-block;
               width: 70%;
@@ -2420,7 +2407,7 @@
           @include titleStyle;
           font-size: 14px;
           .nape-name-title{
-            width: 34%;
+            width: 30%;
           }
           .nape-dep-title{
             width: 30%;
@@ -2452,6 +2439,9 @@
           .nape-handle-title{
             width: 15%;
           }
+        }
+        .nape-items-title .titles, .en-nape-items-title .titles{
+          color: $tab;
         }
         .nape-items-data{
           overflow: hidden;
@@ -2495,7 +2485,7 @@
             }
           }
           .nape-picture-data{
-            width: 25%;
+            width: 20%;
             height: 100%;
             display: inline-block;
             position: relative;
@@ -2547,23 +2537,22 @@
   }
   .btn-class{
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0;
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
     .el-icon-plus{
       padding: calc(5/1920*100vw) 0;
-      font-size: calc(24/1920*100vw);
+      font-size: calc(16/1920*100vw);
     }
     span{
       position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(3/1920*100vw);
+      bottom: calc(1/1920*100vw);
+      @media screen and (max-width: 1440px) {
+        bottom: 0;
       };
     }
-    @media screen and (max-width: 1280px) {
-      width: 125px;
+    @media screen and (max-width: 1440px) {
+      width: 125px !important;
     }
   }
 </style>

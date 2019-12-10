@@ -236,7 +236,7 @@ export default {
                                 PermissionHelper.setData(resultData.authorities);
                               }
                             })
-                            self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId, ezvizAppKey: resData.ezvizAppKey}});
+                            self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId, ezvizProtrol: resData.ezvizProtrol, lang: resData.lang}});
 
                             //self.$router.push({path:self.redirect||'/'});
                             //setCookie('UserId',resData.userId);

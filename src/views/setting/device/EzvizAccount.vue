@@ -21,7 +21,7 @@
                    left="40vh"
         >
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #f31d65;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
             <el-form class="nvrForm" label-position="top"  :model="ezvizAccountInfo" :rules="rules" ref="accountForm" size="mini">
                 <el-form-item :label="$t('deviceView.selectAccountType')" v-if="isAdd" required class="radio-item">
                   <el-radio-group v-model="ezvizAccountInfo.scope">
@@ -87,10 +87,10 @@
             :highlight-current-row="true"
             align='left'
             stripe
-            border
             :max-height="tableHieght"
             style="width:100%;text-algin:center;border: 0px solid #ebebeb;"
-            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+            :cell-style="cellStyle"
           >
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
                              :prop="item.prop" :label="item.label"  :min-width="item.width">
@@ -133,10 +133,10 @@
                   top="35vh"
                   left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #FB4C5D;"/>
+          <hr style="border: 0.5px solid #dfe2e9;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-            <span>{{$t('deviceView.confirmDelete')}}</span>
+            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+            <span style="display: inline-block; vertical-align: middle">{{$t('deviceView.confirmDelete')}}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -266,6 +266,18 @@
           }
         },
         methods:{
+          cellStyle({ row, column, rowIndex, columnIndex}){
+            console.log(row);
+            console.log(columnIndex);
+            let obj = {};
+            if(columnIndex == 0){
+              obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+            }
+            else{
+              obj = {'border-right':'1px solid #e3e9f4'}
+            }
+            return obj;
+          },
           generateDeviceLang,
           showAddEzvizAccount(){
             let self = this;
@@ -420,7 +432,7 @@
                     self.showAddAccount = false;
                   }
                   else {
-                    self.notify(res.errMsg, 'warning', 3000);
+                    self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
                     self.showAddAccount = false;
                   }
                 }
@@ -444,7 +456,7 @@
                     self.showAddAccount = false;
                   }
                   else {
-                    self.notify(`${self.$t('deviceView.editFail')} : ${res.errMsg}`, 'warning', 3000);
+                    self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
                     self.showAddAccount = false;
                   }
                 }
@@ -619,7 +631,6 @@
     }
   }
   .el-table-content{
-    border: 1px solid $border;
     border-bottom: none;
     .iconfont{
       font-size: calc(24/1920*100vw);
@@ -833,7 +844,11 @@
   .nvrForm .el-form-item__error{
     left: 0;
   }
-  .el-table--border th:first-child .cell, .el-table--border td:first-child .cell {
-    padding-left: 20px;
+  .el-table-content .el-table::before{
+    height: 0px !important;
+  }
+  .el-table-content .el-table .cell {
+    padding-left: calc(20/1920*100vw);
+    padding-right: calc(20/1920*100vw);
   }
 </style>
