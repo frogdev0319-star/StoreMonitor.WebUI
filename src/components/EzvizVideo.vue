@@ -210,7 +210,7 @@
                 top="35vh"
                 left="40vh">
       <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #FB4C5D;"/>
+        <hr style="border: 0.5px solid #dfe2e9;"/>
         <div style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
           <p>{{$t("storeMonitor.contactInfo") }}</p>
           <el-input :placeholder="$t('storeMonitor.enterPassword')" v-model="videoPassword" show-password size="mini"></el-input>
@@ -501,12 +501,12 @@
           self.initVideo();
         })
       },
-      storeId(newValue, oldValue){
+      async storeId(newValue, oldValue){
         console.log(newValue);
         console.log(oldValue);
         let self = this;
         if(newValue.length > 0){
-          self.getEzvizAccessToken(newValue)
+          await self.getEzvizAccessToken(newValue)
         }
       },
       async id(newValue, old) {
@@ -521,9 +521,8 @@
         //stop video
         self.stopRealTime();
         //首先查看视频是否加密
-        if(self.accessToken.length > 0){
-          await self.checkIfEncry();
-        }
+        await self.getEzvizAccessToken(self.storeId);
+        await self.checkIfEncry();
       },
     },
     computed:{
@@ -618,11 +617,10 @@
           }else{
             getEzvizAccessToken(params)
               .then(result => {
-                resolve(result.data.accessToken);
-
                 self.currentStoreId = storeId;
                 self.accessToken = result.data.accessToken;
                 self.ezvizExpireTime = result.data.expireTime;
+                resolve(result.data.accessToken);
               })
               .catch(error => {
                 reject();
@@ -2120,7 +2118,8 @@
       margin-bottom: 40px;
       border-radius: 4px;
       background-color: rgba($color: #24293d, $alpha: 0.6);
-      top: 40%;
+      //top: 40%;
+      top: 45%;
       text-align: center;
       span{
         // font-size: 12px;
@@ -2147,7 +2146,8 @@
       margin-bottom: 40px;
       border-radius: 4px;
       background-color: rgba($color: #24293d, $alpha: 0.6);
-      top: 40%;
+      //top: 40%;
+      top: 45%;
       text-align: center;
       span{
         // font-size: 12px;
@@ -2248,7 +2248,7 @@
 
     .dialog-hr{
       border: 0.5px solid ;
-      border-color: rgba(251,76,93,0.3);
+      border-color: #dfe2e9;
       margin-bottom:0px;
       position: relative;
       bottom: 5px;

@@ -2505,8 +2505,15 @@ export default {
             self.hideLast=false;
             self.hideNext=false;
             //切换门店时暂停播放之前播放的视频，并自动播放当前门店下第一个通道的视频
-            if(self.playState){
+            if(!self.isEzviz){
+              if(self.playState){
                 self.stopRealTime();
+              }
+            }
+            else{
+              if(self.$refs.ezvizVideo.playState){
+                self.$refs.ezvizVideo.stopRealTime();
+              }
             }
             storeItem.device.forEach((item,index)=>{
                 let obj={};
@@ -2665,6 +2672,13 @@ export default {
             }
             else{
               //萤石云处理
+              if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                self.stopRealTime();
+                self.realTime();
+              }
+              else{
+                self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+              }
             }
         },
         getIndexById(id){
