@@ -148,7 +148,7 @@
                       <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
                       <span>{{generateStoreMonitorLang('snapshot')}}</span>
                     </div>
-                    <div class="paizhao-content" @click="getVideo">
+                    <div class="paizhao-content" @click="getVideo" style="display: none">
                       <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:22px;margin-left: -14px;"></i>
                       <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:22px"></i>
                       <span style="margin-left:12px;">{{generateStoreMonitorLang('record')}}</span>
@@ -2486,7 +2486,7 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
-            if(self.playState||self.eventName.length!=0){
+            if(self.playState|| self.$refs.ezvizVideo.playState || self.eventName.length!=0){
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -3373,7 +3373,8 @@ export default {
                         position: absolute;
                         right:20px;
                         height: 30%;
-                        top: 30%;
+                        //top: 30%;
+                        top: 40%;
                         .paizhao-content{
                             cursor: pointer;
                             margin-top: 30px;
@@ -3409,7 +3410,8 @@ export default {
                     position: absolute;
                     right:20px;
                     height: 30%;
-                    top: 30%;
+                    /*top: 30%;*/
+                    top: 40%;
                     .paizhao-content{
                       cursor: pointer;
                       margin-top: 30px;
