@@ -4014,10 +4014,14 @@ export default {
                     .btn-content{
                         width: 86%;
                         float: left;
+                        display: flex;
                         .btn-details{
                             display: inline-block;
                             margin-bottom: 5px;
                             @include point(margin-left,15);
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
                             &:last-child{
                                 @include point(margin-right,15);
                             }

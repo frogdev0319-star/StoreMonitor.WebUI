@@ -1659,6 +1659,7 @@ export default {
             }
         },
         mouseUpAction(e){
+            console.log(e)
             let self=this;
             self.isMouseDown=false;
             //self.showCutModel=true;
@@ -2672,13 +2673,13 @@ export default {
             }
             else{
               //萤石云处理
-              if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-                self.stopRealTime();
-                self.realTime();
-              }
-              else{
-                self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-              }
+              // if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+              //   self.$refs.ezvizVideo.stopRealTime();
+              //   self.$refs.ezvizVideo.realTime();
+              // }
+              // else{
+              //   self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+              // }
             }
         },
         getIndexById(id){
@@ -3860,11 +3861,15 @@ export default {
                 .btn-content{
                     width: 86%;
                     float: left;
+                    display: flex;
                     .btn-details{
                         // width: 100px;
                         display: inline-block;
                         margin-bottom: 5px;
                         @include point(margin-left,15);
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
                         &:last-child{
                             @include point(margin-right,15);
                         }
