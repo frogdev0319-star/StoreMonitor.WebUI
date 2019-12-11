@@ -560,11 +560,14 @@ export default {
             if(self.showAudio){
                 let audio=self.$refs.audioRef;
                 let du=audio.duration;
+                console.log(du)
+                console.log(typeof(du)=='string')
                 if(isNaN(du)){
                     self.showAudio=false;
                 }
                 else{
-                    self.audioOftenText=parseInt(du)+'"';
+                    //self.audioOftenText=parseInt(du)+'"';
+                    self.audioOftenText=Math.ceil(du)+'"';
                 }
             }
         },
@@ -573,11 +576,13 @@ export default {
             if(item.showAudio){
                 let audio=self.$refs[item.audio.audioRef][0];
                 let du=audio.duration;
+                console.log(du)
                 if(isNaN(du)){
                     item.showAudio=false;
                 }
                 else{
-                    item.audio.audioOftenText=parseInt(du)+'"';
+                    //item.audio.audioOftenText=parseInt(du)+'"';
+                    item.audio.audioOftenText=Math.ceil(du)+'"';
                     console.log(item.audio.audioOftenText);
                 }
             }
@@ -1047,7 +1052,7 @@ $h1:#292e36;
             margin: auto;
             .dialog-hr{
                 border: 0.5px solid ;
-                border-color: rgba(251,76,93,0.3);
+                border-color: #dfe2e9;
                 margin-bottom:10px;
                 bottom: 5px;
                 margin-top: 0;
