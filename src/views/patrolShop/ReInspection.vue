@@ -265,7 +265,8 @@
                                     <div class="dropdown-model" v-if="item.disabled"></div>
                                     <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
-                                            {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}<i class="el-icon-arrow-down el-icon--right"></i>
+                                            {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
+                                            <i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
                                         <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
@@ -3828,24 +3829,40 @@ export default {
                             cursor: not-allowed;
                         }
                         .item-score{
+                            box-sizing: border-box;
                             position: absolute;
                             @include point(right,46);
                             @include point(top,12);
                             font-size: 12px;
                             margin-right: 20px;
-                            width: 96px;
+                            //width: 96px;
+                            width: 110px;
                             height: 22px;
                             // @include point(width,86);
-
-                            @include point(padding-left,10);
+                            //@include point(padding-left,10);
                             background-color: orange;
                             line-height: 22px;
                             color: #fff;
                             border-radius: 13px;
                             cursor: pointer;
                             .iconscore{
-                                margin-left: 10px;
+                                //margin-left: 10px;
                             }
+                          .el-dropdown-link{
+                            display: inline-block;
+                            font-size: 12px;
+                            margin-right: 20px;
+                            width: 110px;
+                            height: 22px;
+                            background-color: orange;
+                            line-height: 22px;
+                            color: #fff;
+                            border-radius: 13px;
+                            cursor: pointer;
+                            padding-right: 10px;
+                            box-sizing: border-box;
+                            padding-left: 10px
+                          }
                         }
                         .score-menu{
                             max-height: 160px;
