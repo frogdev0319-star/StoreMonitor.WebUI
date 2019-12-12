@@ -566,13 +566,17 @@ export default {
                     self.showAudio=false;
                 }
                 else{
-                    //self.audioOftenText=parseInt(du)+'"';
-                    self.audioOftenText=Math.ceil(du)+'"';
+                    let duration = Math.floor(du);
+                    if(duration === 0){
+                      du = 1;
+                    }
+                    self.audioOftenText=parseInt(du)+'"';
                 }
             }
         },
         getCommentDuration(item){
             let self=this;
+            console.log(item)
             if(item.showAudio){
                 let audio=self.$refs[item.audio.audioRef][0];
                 let du=audio.duration;
@@ -581,8 +585,11 @@ export default {
                     item.showAudio=false;
                 }
                 else{
-                    //item.audio.audioOftenText=parseInt(du)+'"';
-                    item.audio.audioOftenText=Math.ceil(du)+'"';
+                    let duration = Math.floor(du);
+                    if(duration === 0){
+                      du = 1;
+                    }
+                    item.audio.audioOftenText=parseInt(du)+'"';
                     console.log(item.audio.audioOftenText);
                 }
             }
@@ -647,6 +654,7 @@ export default {
         getCommentList(){
             let self=this;
             let eventIds=[];
+            self.commentList = [];
             eventIds.push(self.event.id);
             let params={
                 "eventIds":eventIds
