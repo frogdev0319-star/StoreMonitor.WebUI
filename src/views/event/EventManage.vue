@@ -1008,7 +1008,7 @@ export default {
         let self=this;
         console.log('mounted')
         self.getDeafultTime();
-        await self.isLoginIn();
+        //await self.isLoginIn();
         let windowHeight=window.innerHeight;
         if(windowHeight>800){
             self.tableHeight=770+'px';
@@ -1039,6 +1039,16 @@ export default {
     }
     else{
       self.getEventList(self.params);
+      let status=[];
+      let selectValue=self.value;
+      switch(selectValue){
+        case 0:status=[0,1,2];break;
+        default:status=selectValue-1;break;
+      }
+      let like=self.params.like;
+      let start = self.params.beginTs;
+      let end = self.params.endTs;
+      self.getEventCount(start,end,status);
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
