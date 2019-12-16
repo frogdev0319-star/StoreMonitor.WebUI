@@ -298,9 +298,9 @@ export default {
             let self=this;
             let options={
                 backgroundColor: '#fff',
-                title: {
-                    text: '巡检项雷达图'
-                },
+                // title: {
+                //     text: '巡检项雷达图'
+                // },
                 tooltip: {},
                 legend: {
                     data: ['inspect radar']

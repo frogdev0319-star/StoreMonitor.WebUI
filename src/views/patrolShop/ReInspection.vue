@@ -153,7 +153,8 @@
             <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <dialog-vue :dialog-title='leaveObj.title' :show-info='leaveObj.showInfo' :is-warning='leaveObj.isWarning' :dialog-closed='leaveObj.dialogCosed' @confirmed='leaveDialog' @canceled='cancelLeave'></dialog-vue>
-            <div class="guide-content" v-if="showGuide">
+            <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
+          <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
                     <div class="num-content">
                         <span class="guide-num">2</span>
@@ -633,6 +634,12 @@ export default {
               isWarning:true,
               dialogCosed:false
             },
+            videoLoadingObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.videoLoading'),
+              isWarning:true,
+              dialogCosed:false
+            },
             recorder:null,
             videoCanvasSrc:'',
             isRecordingStarted : false,
@@ -667,7 +674,8 @@ export default {
             initEzviz: false,
             sourceListLength: 0,
             realTimeSpeed: 0,
-            videoAuthority: false
+            videoAuthority: false,
+            isLoading: false,
         }
     },
     computed:{
@@ -1850,6 +1858,10 @@ export default {
         clickBtn(item,index){
             let self=this;
             console.log(item);
+            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
             let obj={
                 id:item.id,
                 channelId:item.channelId,
@@ -1885,6 +1897,10 @@ export default {
             let self=this;
             if(item.isIgnore){
                 return false;
+            }
+            if(self.isLoading || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed = true;
+              return false;
             }
             self.sourceList=[];
             self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
@@ -2028,6 +2044,14 @@ export default {
         cancelAllIgnore(){
           let self=this;
           self.allIgnoreObj.dialogCosed=false;
+        },
+        videoLoadingDialog(){
+          let self=this;
+          self.videoLoadingObj.dialogCosed=false;
+        },
+        cancelVideoLoading(){
+          let self=this;
+          self.videoLoadingObj.dialogCosed=false;
         },
         async submit1(){
             let self=this;
@@ -2221,6 +2245,7 @@ export default {
             }
             window.clearInterval(self.timerPlayReal);
             self.realTimeSpeed=0;
+            self.isLoading = true;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             // if(!self.showVideo){
@@ -2244,7 +2269,8 @@ export default {
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
                 self.isPlayingFlag=1;
-                window.clearInterval(self.timerPlayReal);
+                self.isLoading = false;
+              window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal=window.setInterval(()=>{
                   console.log(self.realTimeSpeed)
                     self.realTimeSpeed=self.realTimeSpeed+1;
@@ -2253,6 +2279,7 @@ export default {
             else{
                 self.showGuide=false;
                 self.showError=true;
+                self.isLoading = false;
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
@@ -2313,6 +2340,7 @@ export default {
            //   self.errorText = self.$t('remotePatrol.videoLicense');
            //   return false;
            // }
+            self.isLoading = true;
             self.stopVideo();
             const dataDis = {
                 request: {
@@ -2349,7 +2377,7 @@ export default {
                 self.isPlayingFlag=1;
                 self.playVideo(self.mpdurl);
                 self.realTimeSpeed=0;
-
+                self.isLoading = false;
                 self.timerPlayReal=window.setInterval(()=>{
                     console.log(self.realTimeSpeed)
                     self.realTimeSpeed=self.realTimeSpeed+1;
@@ -2358,6 +2386,7 @@ export default {
             else{   //当前视频如果返回失败，需处于暂停状态
                 self.showGuide=false;
                 self.showError=true;
+                self.isLoading = false;
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
@@ -2674,6 +2703,10 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
+            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
             if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
                 self.changeStoreObj.dialogCosed=true;
             }

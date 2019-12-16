@@ -189,7 +189,8 @@ export default {
     allIgnored: '您已忽略所有巡檢項，請重新評估',
     videoLicense: "無視頻訪問權限，請聯繫上級管理員",
     suggestEmpty: '請輸入本次巡檢建議！',
-    changPageInfo: '當前巡檢尚未完成，確認是否離開頁面？'
+    changPageInfo: '當前巡檢尚未完成，確認是否離開頁面？',
+    videoLoading: '視頻加載中...'
   },
 
   // Store Monitor page language

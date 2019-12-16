@@ -138,7 +138,7 @@
           </transition>
         </div>
         <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
-                @mousemove="mouseMoveAction($event)"></canvas>
+                @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)"></canvas>
         <img :src="imgSrc" id="imgTest" style="display: none"/>
         <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
                     'margin-left':47*percentHeight+'px'}">
@@ -174,7 +174,7 @@
             </transition>
           </div>
           <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)" @mouseup="mouseUpHandler"
-                  @mousemove="mouseMoveAction($event)"></canvas>
+                  @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)"></canvas>
           <img :src="imgSrc" id="imgTest" style="display: none"/>
           <div class="cancel-content" v-if="showCancelContent" :style="{'width':520*percentHeight+'px',
                         'margin-left':47*percentHeight+'px'}">
@@ -1626,6 +1626,11 @@
           self.imageCanvasList.push(imgObj);
         }
         self.flag=0;
+      },
+      mouseLeaveAction(e){
+        console.log(e)
+        let self=this;
+        self.isMouseDown=false;
       },
       drawLine(x,y,x1,y1){
         let self=this;

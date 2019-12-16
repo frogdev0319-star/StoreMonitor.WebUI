@@ -188,7 +188,8 @@ export default {
     allIgnored: 'All inspection items are ignored, please re-evaluate',
     videoLicense: "Please contact your supervisor for video access license",
     suggestEmpty: 'Please enter suggestions for this inspection !',
-    changPageInfo: 'Not finish yet, confirm leaving the page? '
+    changPageInfo: 'Not finish yet, confirm leaving the page? ',
+    videoLoading: 'Video loading...'
   },
   // Store Monitor page language
   storeMonitor:{

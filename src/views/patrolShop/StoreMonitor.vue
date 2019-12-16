@@ -30,7 +30,7 @@
                         </div>
                     </transition>
                     <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
-                    @mousemove="mouseMoveAction($event)"></canvas>
+                    @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)" @mouseup="mouseUpAction($event)"></canvas>
                     <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
                     'margin-left':47*percentHeight+'px'}">
                         <div class="content" @click="cancleEditCanvas">
@@ -70,6 +70,8 @@
             <dialog-vue :dialog-title='changeChannelObj.title' :show-info='changeChannelObj.showInfo' :is-warning='changeChannelObj.isWarning' :dialog-closed='changeChannelObj.dialogCosed' @confirmed='changeChannelDialog' @canceled='cancelchangeChannel'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
+            <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
+
             <div v-if="!isEzviz">
               <div class="video-content" v-if="!showgongge" id="videoContent" >
                 <div class="getvideo-content" v-if="showGetVideo">
@@ -638,7 +640,14 @@ export default {
             lang: this.$i18n.locale,
             playBackTime: 0,
             realTimeStartTs: 0,
-          isFirstLoad: false
+            isFirstLoad: false,
+            videoLoadingObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.videoLoading'),
+              isWarning:true,
+              dialogCosed:false
+            },
+            isLoading: false,
         }
     },
   created(){
@@ -1168,6 +1177,7 @@ export default {
             let state=self.playBackState;
             self.realTimeStartTs =Number(self.curTime.getTime().toString().substr(0,10));
             console.log(self.realTimeStartTs);
+            self.isLoading = true;
             self.stopVideo();
             const data = {
                 request: {
@@ -1207,6 +1217,9 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
+                setTimeout(()=>{
+                  self.isLoading = false;;
+                },1000);
                 self.timeid= window.setInterval(function(){  //播放视频的同时进度条进行
                     self.getProcess();
                 },1000);
@@ -1214,6 +1227,7 @@ export default {
             else{   //当前视频如果返回失败，需处于暂停状态
                 self.playState=false;
                 self.showModelContent=false;
+                self.isLoading = false;
                 console.log(self.mpdurl.ErrorCode);
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
@@ -1225,6 +1239,7 @@ export default {
         let state=self.playBackState;
         self.stopVideo();
         window.clearInterval(self.timeid);
+        self.isLoading = true;
         const data = {
           request: {
             method: 'disconnection',
@@ -1263,6 +1278,9 @@ export default {
         if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
           console.log(self.mpdurl);
           self.playVideo(self.mpdurl);
+          setTimeout(()=>{
+            self.isLoading = false;;
+          },1000);
           self.timeid= window.setInterval(function(){  //播放视频的同时进度条进行
             self.getProcess();
           },1000);
@@ -1270,6 +1288,7 @@ export default {
         else{   //当前视频如果返回失败，需处于暂停状态
           self.playState=false;
           self.showModelContent=false;
+          self.isLoading = false;
           console.log(self.mpdurl.ErrorCode);
           let errorCode=self.mpdurl.ErrorCode; //错误码
           let errorText= util.getErrorText(errorCode);
@@ -1280,8 +1299,8 @@ export default {
             let self=this;
             self.realTimeStartTs =Number(self.curTime.getTime().toString().substr(0,10));
             console.log(self.realTimeStartTs);
-
-          let sessionId= await dashAPI.Online();
+            self.isLoading = true;
+            let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
             let data= {
@@ -1300,6 +1319,9 @@ export default {
             self.mpdurl=url;
             if(url.ErrorCode==undefined&&url.length!=0){
                 self.playVideo(self.mpdurl);
+                setTimeout(()=>{
+                  self.isLoading = false;;
+                },1000);
                 self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                     self.getProcess();
                 },1000);
@@ -1307,6 +1329,7 @@ export default {
             else{
                 self.playState=false;
                 self.showModelContent=false;
+                self.isLoading = false;
                 console.log(self.mpdurl.ErrorCode);
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
@@ -1673,6 +1696,11 @@ export default {
             }
             self.flag=0;
         },
+        mouseLeaveAction(e){
+          console.log(e)
+          let self=this;
+          self.isMouseDown=false;
+        },
         showCancel(){
             let self=this;
             self.showCancelContent=true;
@@ -2019,6 +2047,7 @@ export default {
                self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
+            self.isLoading = true;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
@@ -2048,6 +2077,9 @@ export default {
                 };
                 url=await dashAPI.playBack(1,data);
                 if(url.ErrorCode==undefined&&url.length!=0){
+                    setTimeout(()=>{
+                      self.isLoading = false;;
+                    },1000);
                     self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                         self.getProcess();
                     },1000);
@@ -2071,7 +2103,10 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
-                if(!self.playBackState){
+                setTimeout(()=>{
+                  self.isLoading = false;;
+                },1000);
+              if(!self.playBackState){
                     self.isPlayingFlag=1;
                     self.timerPlayReal=window.setInterval(()=>{
                         self.realTimeSpeed=self.realTimeSpeed+1;
@@ -2081,6 +2116,7 @@ export default {
             else{   //当前视频如果返回失败，需处于暂停状态
                 self.playState=false;
                 self.showModelContent=false;
+                self.isLoading = false;
                 console.log(self.mpdurl.ErrorCode);
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
@@ -2203,10 +2239,10 @@ export default {
             let curTime=video.player.currentTime();
             console.log(curTime);
             let time = parseInt(self.currentTimeValue);
-          console.log(self.realTimeStartTs);
-          console.log(time);
-          // self.startTs=self.startTs+ time;
-          switch(val){
+            console.log(self.realTimeStartTs);
+            console.log(time);
+            // self.startTs=self.startTs+ time;
+            switch(val){
                 case 0: {
                     self.realTimeStartTs = self.realTimeStartTs - 10;
                     if(curTime > 10){
@@ -2481,6 +2517,10 @@ export default {
         },
         clickStore(item,index,_item,_index){
             let self=this;
+            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed = true;
+              return false;
+            }
             self.showStoreUp=true;
 
             self.curTabIndex=index;
@@ -2557,6 +2597,7 @@ export default {
         },
         async stopAndRealTime(){
             let self=this;
+            self.isLoading = true;
             self.stopVideo();
             const dataDis = {
                 request: {
@@ -2618,6 +2659,9 @@ export default {
             console.log(self.mpdurl);
             if (url.ErrorCode==undefined&&url.length!=0) {
                 self.playVideo(self.mpdurl);
+                setTimeout(()=>{
+                  self.isLoading = false;;
+                },1000);
                 if(self.playBackState){ //播放历史视频时，启动计时器
                     self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                         self.getProcess();
@@ -2759,6 +2803,10 @@ export default {
         },
         clickBtn(item,index){
             let self=this;
+            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
             self.curChannelItem=item;
             self.curChannelIndex=index;
             if(self.eventName.trim().length!=0){
@@ -2942,7 +2990,15 @@ export default {
         obj.src= url;
         obj.height='100px';
         self.sourceList.push(obj);
-      }
+      },
+      videoLoadingDialog(){
+        let self=this;
+        self.videoLoadingObj.dialogCosed=false;
+      },
+      cancelVideoLoading(){
+        let self=this;
+        self.videoLoadingObj.dialogCosed=false;
+      },
     }
 }
 </script>
