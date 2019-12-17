@@ -84,8 +84,10 @@
                                     :label="generateEventLang('name')"
                                     min-width="220"
                                     sortable='custom'
-                                    align="left">
-                                    <template slot-scope="scope">
+                                    align="left"
+                                    :class-name = "selfClassName"
+                                >
+                                  <template slot-scope="scope">
                                         <img class='sourceType-icon' v-if="scope.row.sourceType==0" :src='videoSrc'/>
                                         <img class='sourceType-icon' v-else-if="scope.row.sourceType==1" :src='inspectSrc'/>
                                         <img class='sourceType-icon' v-else :src='insiteInspectSrc'/>
@@ -228,7 +230,8 @@ export default {
           numberOfElements: 0,
           totalElements: 0,
           sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }],
-          exportPng: require('../../../static/img/icon_excel.png')
+          exportPng: require('../../../static/img/icon_excel.png'),
+          selfClassName: 'self-class-name'
         }
 
     },
@@ -1146,7 +1149,7 @@ $h1:#292e36;
         margin-right: calc(20/1920*100vw);
         position: relative;
         float: left;
-        @include point(bottom,2);
+        //@include point(bottom,2);
         height: calc(28/1920*100vw);
         width: calc(24/1920*100vw);
     }
@@ -1354,6 +1357,9 @@ $h1:#292e36;
      .select-poper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-
+   .self-class-name  /deep/ .cell{
+     display: flex ;
+     align-items: center;
+   }
 </style>
 

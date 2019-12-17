@@ -942,6 +942,8 @@ $h1:#292e36;
     border-bottom: 1px solid $border;
     @include point(padding-left,20);
     @include point(padding-right,20);
+    display: flex;
+    align-items: center;
 }
 #outerdiv{
     position:fixed;
@@ -1010,7 +1012,7 @@ $h1:#292e36;
             @include title-content;
             .title-img{
                 position: relative;
-                @include point(top,8);
+                //@include point(top,8);
                 @include point(margin-left,20);
             }
             .event-title{
@@ -1018,6 +1020,10 @@ $h1:#292e36;
                 font-weight: bold;
                 color: $black;
                 margin-left: 20px;
+                width: 70%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .event-score{
                 background-color: #FCBA3F;
