@@ -266,7 +266,8 @@ export default {
     videoEncrypted: '視頻已加密',
     deviceOffline: '設備離線，播放失敗',
     lackParams: '缺少必要參數',
-    noVideoSource: '設備無視頻源'
+    noVideoSource: '設備無視頻源',
+    enterDesc: '請輸入信息'
   },
 
   //report management page language

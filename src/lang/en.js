@@ -265,6 +265,7 @@ export default {
     deviceOffline: 'Device offline',
     lackParams: 'Lack of necessary parameters',
     noVideoSource: 'No video source device',
+    enterDesc: 'Enter description'
   },
 
   //report management page language

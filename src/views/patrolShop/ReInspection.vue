@@ -69,11 +69,12 @@
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
                     <div class="dialog-event-content">
-                        <span class="event-title">{{generatePatrolLang('name')}}</span>
-                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName"></el-input>
+                        <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
-                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows: 7}"
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
@@ -112,11 +113,12 @@
                         </div>
                     </div>
                     <div class="event-content">
-                        <span class="event-title">{{generatePatrolLang('name')}}</span>
-                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName"></el-input>
+                        <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
-                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows: 7}"
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
@@ -136,7 +138,7 @@
                         <span class="event-title">{{generatePatrolLang('name')}}</span>
                         <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
-                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
                         maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
@@ -294,8 +296,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                        maxlength="300" v-model="item.inspectInput" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled"></el-input>
+                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
+                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled"></el-input>
                                 </div>
                             </div>
                             <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else-if="showFeedBackInfo">
@@ -423,6 +425,7 @@ import RecordRTC from '../../../static/RecordRTC.js'
 import {validateInput} from '@/common/validate'
 import {generatePatrolLang} from '@/api/i18n'
 import EzvizVideo from '@/components/EzvizVideo.vue'
+import filterString from '@/common/filterString.js'
 
 export default {
     name:'ReInspection',
@@ -676,6 +679,7 @@ export default {
             realTimeSpeed: 0,
             videoAuthority: false,
             isLoading: false,
+            showEventNameInfo: false
         }
     },
     computed:{
@@ -910,6 +914,7 @@ export default {
             self.showFeedDialog1=true;
             self.eventName='';
             self.eventDes='';
+            self.showEventNameInfo = false;
         },
         confirmAddFeedBack3(){
             let self=this;
@@ -947,7 +952,8 @@ export default {
                 sourceObj:srcObj
             }
             if(self.eventName.trim().length==0){
-                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                self.showEventNameInfo = true;
                 return false;
             }
             self.eventList.push(obj);
@@ -962,7 +968,8 @@ export default {
                 sourceObj:null
             }
             if(self.eventName.trim().length==0){
-                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                self.showEventNameInfo = true;
+                //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
             self.eventList.push(obj);
@@ -1259,6 +1266,7 @@ export default {
                 self.showFeedDialog2=true;
                 self.eventName='';
                 self.eventDes='';
+                self.showEventNameInfo = false;
                 this.$nextTick(()=>{
                     self.canvasEl=document.getElementById('icanvas');
                     var ctx = self.canvasEl.getContext('2d');
@@ -2235,6 +2243,7 @@ export default {
         },
         async realTime(){
             let self=this;
+            self.showError = false;
             // if(!self.videoAuthority){
             //   self.showError = true;
             //   self.errorText = self.$t('remotePatrol.videoLicense');
@@ -2846,6 +2855,24 @@ export default {
             console.log(error);
           })
         })
+      },
+      itemDescriptionChanged(val, item){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        item.inspectInput = content;
+      },
+      eventNameChanged(val){
+        let self = this;
+        let content = filterString.standard(val,50);
+        console.log(content);
+        self.eventName = content;
+      },
+      eventDesChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.eventDes = content;
       }
     }
 }
@@ -2954,6 +2981,16 @@ export default {
             .dialog-img-content{
                 @include point(padding,15);
             }
+            .is-required{
+              color: $red;
+            }
+            .error-class{
+              @include point(margin-left,20);
+              font-size: 10px;
+              margin-top: 5px;
+              color: #ff2400;
+              display: block;
+            }
             .dialog-event-content{
                 text-align: left;
                 @include point(margin-bottom,20);
@@ -2962,10 +2999,11 @@ export default {
                     display: block;
                     margin: 15px;
                     @include point(margin-left,20);
+                    @include point(margin-right,20);
                     font-size: 14px;
                 }
                 .name-input{
-                    @include point(width,150);
+                    @include point(width,200);
                     @include point(margin-left,20);
                 }
                 .des-input{
@@ -2993,6 +3031,8 @@ export default {
                 float: left;
                 text-align: left;
                 margin-left: 1%;
+                padding-right: 20px;
+                box-sizing: border-box;
                 .event-title{
                     color: $black;
                     display: block;
@@ -3000,12 +3040,16 @@ export default {
                     margin-left: 0;
                     font-size: 14px;
                 }
+                .error-class {
+                  margin-left: 0;
+                }
                 .name-input{
-                    @include point(width,150);
-                    @include point(margin-bottom,15);
+                  width: 100%;
+                    //@include point(width,150);
+                    //@include point(margin-bottom,15);
                 }
                 .des-input{
-                    width: 80%;
+                    width: 100%;
                 }
             }
             #previewCutVideo{

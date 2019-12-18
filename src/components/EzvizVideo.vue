@@ -189,11 +189,12 @@
           </div>
         </div>
         <div class="event-content">
-          <span class="event-title">{{generatePatrolLang('name')}}</span>
-          <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+          <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
+          <el-input size="mini" class="name-input" v-model="eventName" @input="eventNameChanged"></el-input>
+          <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
           <span class="event-title">{{generatePatrolLang('description')}}</span>
-          <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                    maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+          <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
+                    @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
         </div>
       </div>
       <div slot="footer">
@@ -253,6 +254,7 @@
   import qs from 'qs'
   import {getCookie} from "../common/auth";
   import RecordRTC from '../../static/RecordRTC.js'
+  import filterString from "../common/filterString";
 
   export default {
     name: "EzvizVideo",
@@ -388,6 +390,7 @@
         currentStoreId: null,
         isLoaded: false,
         editCount: 0,
+        showEventNameInfo: false,
       }
     },
     async mounted(){
@@ -1245,6 +1248,7 @@
           self.showFeedDialog2=true;
           self.eventName='';
           self.eventDes='';
+          self.showEventNameInfo = false;
           this.$nextTick(()=>{
             self.canvasEl = document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
@@ -1669,7 +1673,8 @@
           src: src
         }
         if(self.eventName.trim().length==0){
-          self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+          //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+          self.showEventNameInfo = true;
           return false;
         }
         self.$emit('ezvizCutPictureFeedback', obj);
@@ -1878,7 +1883,18 @@
         console.log(validateCode)
         return validateCode;
       },
-
+      eventNameChanged(val){
+        let self = this;
+        let content = filterString.standard(val,50);
+        console.log(content);
+        self.eventName = content;
+      },
+      eventDesChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.eventDes = content;
+      }
     }
   }
 </script>
@@ -2315,9 +2331,19 @@
         margin-left: 0;
         font-size: 14px;
       }
+      .is-required{
+        color: $red;
+      }
+      .error-class{
+        font-size: 10px;
+        margin-top: 5px;
+        color: #ff2400;
+        display: block;
+      }
       .name-input{
-        @include point(width,150);
-        @include point(margin-bottom,15);
+        width: 80%;
+        //@include point(width,150);
+        //@include point(margin-bottom,15);
       }
       .des-input{
         width: 80%;

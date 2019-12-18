@@ -214,13 +214,16 @@
                     </div>
                     <div class="lside-scrollbar">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <span class="event-title">{{generateStoreMonitorLang('title')}}</span>
-                            <el-input size="mini" class="name-input" maxlength="10" :disabled="corEvent" v-model="eventName"></el-input>
+                            <span class="event-title"><span class="is-required">*</span>{{generateStoreMonitorLang('title')}}</span>
+                            <el-input size="mini" class="name-input" @input="eventNameChanged" :disabled="corEvent" v-model="eventName"></el-input>
+                            <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                             <span v-if="!corEvent" class="event-title">{{generateStoreMonitorLang('description')}}</span>
-                            <span v-else class="event-title">{{generateStoreMonitorLang('description')}}</span>
-                            <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                            maxlength="300" v-model="eventDes" :placeholder="generateStoreMonitorLang('descPlaceholder')"></el-input>
-                            <div class="source-content">
+                            <span v-else class="event-title"><span class="is-required">*</span>{{generateStoreMonitorLang('description')}}</span>
+                            <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
+                             v-model="eventDes" :placeholder="generateStoreMonitorLang('descPlaceholder')" @input="eventDesChanged"></el-input>
+                            <span class="error-class" v-if="showEventDescInfo">{{$t('storeMonitor.enterDesc')}}</span>
+
+                          <div class="source-content">
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
                                     <div class="img-content" v-if="item.mediaType==2">
                                         <i class="el-icon-close icondelete" @click="deleteImg(item,index)" ></i>
@@ -243,7 +246,7 @@
                         <span class="event-title cor-des">{{generateStoreMonitorLang('relevantEvent')}}</span>
                         <div class="event-content">
                             <div class="event-details" v-for="(item,index) in eventList" :key="index">
-                                <el-radio v-model="curEvent" :label="item.id" @change="checkEvent">
+                                <el-radio v-model="curEvent" :label="item.id" @change="checkEvent" class="radio-class">
                                     <span class="event-name" :title="item.name">{{item.name}}</span></el-radio>
                                 <div class="event-date">
                                     <span class='date-year'>{{item.dateYear}}</span>
@@ -380,6 +383,8 @@ import {validateInput} from '@/common/validate'
 import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
 import DialogVue from '@/components/DialogVue.vue'
 import {generateStoreMonitorLang} from '@/api/i18n'
+import filterString from '@/common/filterString.js'
+
 // import GetVideoBtn from '@/components/GetVideoBtn.vue'
 import {getCookie} from '@/common/auth';
 import {indexedDB} from '@/common/util'
@@ -648,6 +653,8 @@ export default {
               dialogCosed:false
             },
             isLoading: false,
+          showEventNameInfo: false,
+          showEventDescInfo: false,
         }
     },
   created(){
@@ -667,6 +674,8 @@ export default {
             accountChanged:'accountChanged'
         }),
         corEvent:function(){
+            this.showEventNameInfo = false;
+            this.showEventDescInfo = false;
             return this.evBtns[1].isActive;
         },
         isEzviz() {
@@ -1475,16 +1484,13 @@ export default {
         async submit(){
             let self=this;
             if(self.eventName.trim().length==0){
-                self.notify(self.$t('storeMonitor.emptyTitle'),'warning',3000);
+              self.showEventNameInfo = true;
+                // self.notify(self.$t('storeMonitor.emptyTitle'),'warning',3000);
                 return false;
             }
-            if(validateInput(self.eventName)){
-                self.notify(self.$t('storeMonitor.illegalStr'),'warning',3000);
-                return false;
-            }
-            if(validateInput(self.eventDes)){
-                self.notify(self.$t('storeMonitor.illegalDesc'),'warning',3000);
-                return false;
+            if(self.corEvent && self.eventDes.trim().length == 0){
+              self.showEventDescInfo = true;
+              return false;
             }
             let params = {};
             params.storeId = self.store.storeId;
@@ -2679,6 +2685,7 @@ export default {
             else{
                 self.playState=false;
                 self.showModelContent=false;
+                self.isLoading = false;
                 console.log(self.mpdurl.ErrorCode);
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
@@ -2999,6 +3006,18 @@ export default {
         let self=this;
         self.videoLoadingObj.dialogCosed=false;
       },
+      eventNameChanged(val){
+        let self = this;
+        let content = filterString.standard(val,50);
+        console.log(content);
+        self.eventName = content;
+      },
+      eventDesChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.eventDes = content;
+      }
     }
 }
 </script>
@@ -3651,6 +3670,9 @@ export default {
                     margin-left: 20px;
                     font-size: 14px;
                 }
+                .is-required{
+                  color: $red;
+                }
                 .cor-des{
                     font-weight: bold;
                 }
@@ -3706,6 +3728,9 @@ export default {
                         padding-bottom: 20px;
                         .event-details{
                             position: relative;
+                           .radio-class{
+                             width: calc(100% - 70px);
+                           }
                             .event-name{
                                 display: inline;
                             }
@@ -3737,8 +3762,15 @@ export default {
                     }
                 }
                 .name-input{
-                    @include point(width,200);
+                    @include point(width,260);
                     margin-left: 20px;
+                }
+                .error-class{
+                  margin-left: 20px;
+                  font-size: 10px;
+                  margin-top: 5px;
+                  color: #ff2400;
+                  display: block;
                 }
                 .des-input{
                     width: 90%;
@@ -4160,5 +4192,15 @@ export default {
     .des-input .el-textarea__inner{
         font-family: 'Microsoft YaHei';
     }
-
+  /*::-webkit-scrollbar {*/
+    /*width: 6px;*/
+  /*}*/
+  /*::-webkit-scrollbar-thumb {*/
+    /*background-color:rgba(144, 147, 153, 0.3);*/
+    /*border-radius: 4px;*/
+    /*position: absolute;*/
+    /*right: 2px;*/
+    /*bottom: 2px;*/
+    /*cursor:pointer;*/
+  /*}*/
 </style>
