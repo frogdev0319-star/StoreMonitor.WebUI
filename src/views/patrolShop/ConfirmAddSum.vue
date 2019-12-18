@@ -11,7 +11,7 @@
                           @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
-                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input"  @input="adviceChanged"
+                <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
                           :placeholder="generatePatrolLang('adviceInfo')"></el-input>
             </div>
         </el-col>
@@ -68,7 +68,8 @@
                                 <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
                                     <div class="item-blag"></div>
                                     <span class="item-name">{{index!=2?_item.name:_item.subject}}</span>
-                                    <span class="item-des">{{_item.description}}</span>
+                                    <!--<span class="item-des">{{_item.description}}</span>-->
+                                    <span class="item-des"></span>
                                 </div>
                             </el-scrollbar>
                         </div>
