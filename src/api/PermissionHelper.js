@@ -55,6 +55,10 @@ export default class PermissionHelper {
   static enableStorePointCheck(){
     return this.enableAuthorities(1,0x0,0x40);
   }
+  static enableCustomers(){
+    return this.enableAuthorities(1,0x0,0x80);
+  }
+
   //index(2) => ID(4): Event
   static enableEventHandle(){
     return this.enableAuthorities(2,0x0,0x1);

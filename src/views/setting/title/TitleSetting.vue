@@ -192,7 +192,12 @@
                   //   roleName: this.$t('route.storeChecking'),
                   //   checked: false,
                   //   disabled: true,
-                  // }
+                  // },
+                  {
+                    roleName: this.$t('route.customers'),
+                    checked: false,
+                    disabled: false,
+                  }
                 ]
               },
               {
@@ -420,6 +425,7 @@
           self.roleNameList[1].children[4].disabled = PermissionHelper.enableStoreMonitor() ? false :  true;
           self.roleNameList[1].children[5].disabled = PermissionHelper.enableTransactionPatrol() ? false :  true;
           // self.roleNameList[1].children[6].disabled = PermissionHelper.enableStorePointCheck() ? false :  true;
+          self.roleNameList[1].children[6].disabled = PermissionHelper.enableCustomers() ? false : true;
 
           self.roleNameList[2].children[0].disabled = PermissionHelper.enableEventHandle() ? false : true;
           self.roleNameList[2].children[1].disabled = PermissionHelper.enableEventClose() ? false : true;
@@ -505,6 +511,7 @@
             self.roleNameList[1].children[4].checked = PermissionHelper.enableStoreMonitor() ? true : false;
             self.roleNameList[1].children[5].checked = PermissionHelper.enableTransactionPatrol() ? true : false;
             // self.roleNameList[1].children[6].checked = PermissionHelper.enableStorePointCheck() ? true : false;
+            self.roleNameList[1].children[6].checked = PermissionHelper.enableCustomers() ? true : false;
 
             self.roleNameList[2].children[0].checked = PermissionHelper.enableEventHandle() ? true : false;
             self.roleNameList[2].children[1].checked = PermissionHelper.enableEventClose() ? true : false;
