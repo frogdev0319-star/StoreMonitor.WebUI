@@ -863,7 +863,8 @@ export default {
             self.eventName='';
             self.eventDes='';
             self.sourceList=[];
-            self.curEvent=''
+            self.curEvent='';
+            self.showEventNameInfo = false;
         },
         getFaStoreList(){
             let self=this;
@@ -1168,6 +1169,7 @@ export default {
                     self.eventName=item.name;
                 }
             })
+            self.showEventNameInfo = false;
         },
         getCurTime(){
             let self=this;
@@ -3011,12 +3013,14 @@ export default {
         let content = filterString.standard(val,50);
         console.log(content);
         self.eventName = content;
+        self.showEventNameInfo = false;
       },
       eventDesChanged(val){
         let self = this;
         let content = filterString.all(val,200);
         console.log(content);
         self.eventDes = content;
+        self.showEventDescInfo = false;
       }
     }
 }

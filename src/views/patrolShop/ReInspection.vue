@@ -2867,6 +2867,7 @@ export default {
         let content = filterString.standard(val,50);
         console.log(content);
         self.eventName = content;
+        self.showEventNameInfo = false;
       },
       eventDesChanged(val){
         let self = this;
