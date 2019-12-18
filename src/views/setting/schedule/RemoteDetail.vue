@@ -3137,10 +3137,12 @@
     }
 
   }
-
+  #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
+    line-height: 30px;
+  }
   #patrltabs-content /deep/ .el-tabs__item {
     padding: 0 0;
-    margin: 0 10px;
+    margin: 0 12px;
     font-size: 12px;
     font-family: "Microsoft YaHei";
     width: 100px;
@@ -3149,7 +3151,9 @@
     height: 30px;
     line-height: 30px;
   }
-
+  #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
+    height: 30px;
+  }
   #patrltabs-content /deep/ .el-tabs__nav-wrap::after{
     position: static;
   }

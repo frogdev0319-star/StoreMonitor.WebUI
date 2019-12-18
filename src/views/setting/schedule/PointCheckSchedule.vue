@@ -2863,12 +2863,25 @@
         font-size:12px;
       }
     }
-
+    #patrltabs-content /deep/ .el-tabs__header.is-top{
+      width: 70%;
+    }
+    #patrltabs-content /deep/ .el-tabs__header.is-top::after{
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 143%;;
+      z-index: 1;
+      height: 2px;
+      background-color: #E4E7ED;
+    }
     #patrltabs-content /deep/ .el-tabs__nav-scroll{
       height: 40px;
     }
     #patrltabs-content /deep/ .el-tabs__item {
       padding: 0 0;
+      margin: 0 12px;
       font-size: 14px;
       width: 100px;
       overflow: hidden;

@@ -478,6 +478,7 @@
         showMonthDrap: false,
         showMonthContent: false,
         monthValue: '',
+        monthValue: this.$t('scheduleView.everyMonth'),
         weekDays: [],
         showWeekContent: false,
         showAddDialog: false,
@@ -849,8 +850,8 @@
         let year = self.$moment().format('YYYY');
         let days = self.$moment([year, month - 1]).daysInMonth();
         console.log(days)
-        self.monthList = self.bigMonthList.splice(0, days);
-        console.log(self.monthList)
+        self.monthList = self.bigMonthList.slice(0, days);
+        console.log(self.monthList )
       },
       addScheduleButton() {
         let self = this;
@@ -969,7 +970,8 @@
       addMonth() {
         let self = this;
         self.showAddMonth = true;
-        self.monthList.forEach(item => {
+        self.monthValue = '';
+        self.monthList.forEach(item=>{
           item.checked = false;
         })
       },
@@ -1332,7 +1334,7 @@
         })
         self.monthValue = '';
         self.dayArray = [];
-        self.isAdd = true,
+        self.isAdd = true;
           console.log(self.paneList)
         self.$emit('sendActiveName', self.activeName)
       },
@@ -2947,7 +2949,7 @@
 
   #patrltabs-content /deep/ .el-tabs__item {
     padding: 0 0;
-    margin: 0 10px;
+    margin: 0 12px;
     font-size: 12px;
     font-family: "Microsoft YaHei";
     width: 100px;
@@ -2966,7 +2968,12 @@
     color: #fff;
     border-radius: 3px;
   }
-
+  #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
+    height: 30px;
+  }
+  #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
+    line-height: 30px;
+  }
   #patrltabs-content /deep/ .el-tabs__active-bar{
     height: 0 !important;
   }
