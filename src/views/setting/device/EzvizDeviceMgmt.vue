@@ -76,7 +76,7 @@
           <ezviz-account ref="ezvizAccount"></ezviz-account>
         </el-tab-pane>
         <el-tab-pane :label="generateDeviceLang('deviceManage')" name="device">
-          <el-col :span="lang=='en' && varWindowWidth<1920? 11: 10" class="lisde">
+          <el-col :span="lang=='en' && varWindowWidth<1920? 11: 11" class="lisde">
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn btn-class"
@@ -94,9 +94,12 @@
                    :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}" @click="filterNVR"></i>
               </div>
               <div :class="lang=='en' ? 'en-model-title titles': 'model-title titles'">
-                <span>{{generateDeviceLang('deviceModel')}}</span>
+                <!--<span>{{generateDeviceLang('deviceModel')}}</span>-->
+                <!--<i class="icon-filter"-->
+                   <!--:class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}" @click="filterModel"></i>-->
+                <span>{{generateDeviceLang('EzvizAccount')}}</span>
                 <i class="icon-filter"
-                   :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}" @click="filterModel"></i>
+                   :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}" @click="filterAccount"></i>
               </div>
               <div :class="lang=='en' ? 'en-store-title titles': 'store-title titles'" >
                 <span>{{generateDeviceLang('store')}}</span>
@@ -120,59 +123,70 @@
                   <div class="proper-flag" v-if="item.isClick"></div>
                   <div class="comment-data titles" :style="{visibility: (item.comment!= '') ? 'visible': 'hidden' }">
                     <el-tooltip effect="dark" :content="item.comment"
-                                placement="bottom">
+                                placement="bottom" :popper-class="elTooltipClass">
+                      <div slot="content">{{generateDeviceLang('failedReason')}}<br/>{{item.comment}}</div>
                       <span style="margin-left: 10%; color: #fea316;"><i class="iconfont icon-jinggao2"></i></span>
                     </el-tooltip>
                   </div>
                   <div class="name-data titles">
-                    <span v-if="!item.isEditing">{{item.tempNvrName.length>15?item.tempNvrName.substr(0,15)+'...':item.tempNvrName}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>
+                    <el-tooltip class="item" effect="dark" :content="item.tempNvrName"
+                                placement="bottom" :popper-class="elTooltipClass">
+                      <span>{{item.tempNvrName.length>15?item.tempNvrName.substr(0,15)+'...':item.tempNvrName}}</span>
+                    </el-tooltip>
+                    <!--<el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>-->
                   </div>
                   <div class="model-data titles">
-                    <el-tooltip class="item" effect="dark" :content="item.deviceModel" placement="right">
-                      <span>{{item.deviceModel}}</span>
-                    </el-tooltip>
+                      <span>{{item.ezvizAccount}}</span>
                   </div>
                   <div class="store-data titles">
-                    <span>{{item.store}}</span>
+                    <el-tooltip class="item" effect="dark" :content="item.store" :popper-class="elTooltipClass"
+                                placement="bottom">
+                    <span>{{item.store.length>7?item.store.substr(0,7)+'...':item.store}}</span>
+                    </el-tooltip>
+                    <!--<span>{{item.store}}</span>-->
                   </div>
                   <div class="count-data titles">
-                    <span v-if="!item.isEditing">{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>
-                    <el-select v-model="item.tempChannelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" class="nvr-select" v-if="item.isEditing">
-                      <el-option
-                        v-for="numList in editNvrChannelNumList"
-                        :key="numList.value"
-                        :label="numList.label"
-                        :value="numList.value"
-                        :disabled="numList.disabled"
-                      >
-                      </el-option>
-                    </el-select>
+                    <span>{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>
+                    <!--<span v-if="!item.isEditing">{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>-->
+                    <!--<el-select v-model="item.tempChannelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" class="nvr-select" v-if="item.isEditing">-->
+                      <!--<el-option-->
+                        <!--v-for="numList in editNvrChannelNumList"-->
+                        <!--:key="numList.value"-->
+                        <!--:label="numList.label"-->
+                        <!--:value="numList.value"-->
+                        <!--:disabled="numList.disabled"-->
+                      <!--&gt;-->
+                      <!--</el-option>-->
+                    <!--</el-select>-->
                   </div>
                   <div class="operation-data titles">
-                    <div class="iconcontent" v-if="item.isEditing">
-                      <div class="iconlised"  @click.stop="confirmEditNvr(index,item)">
-                        <i class="el-icon-check"></i>
-                      </div>
-                      <div class="iconrised" @click.stop="cancelEditNvr(index,item)">
-                        <i class="el-icon-close"></i>
-                      </div>
-                    </div>
-                    <div class="iconcontent" v-if="!item.isEditing && !item.ifCanAdd">
-                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; background-color: #fff; color:#2c3e50;font-weight: normal;" :style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }">
+                    <!--<div class="iconcontent" v-if="item.isEditing">-->
+                      <!--<div class="iconlised"  @click.stop="confirmEditNvr(index,item)">-->
+                        <!--<i class="el-icon-check"></i>-->
+                      <!--</div>-->
+                      <!--<div class="iconrised" @click.stop="cancelEditNvr(index,item)">-->
+                        <!--<i class="el-icon-close"></i>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="iconcontent" v-if="!item.isEditing && !item.ifCanAdd">-->
+                      <!--<div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; background-color: #fff; color:#2c3e50;font-weight: normal;" :style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }">-->
+                        <!--<i class="iconfont icon-bianji"></i>-->
+                      <!--</div>-->
+                      <!--<div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">-->
+                        <!--<i class="iconfont icon-shanchu"></i>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                    <div class="iconcontent" v-if="!item.ifCanAdd">
+                      <!--<div class="" style="float:left;">-->
+                        <!--<el-button @click.stop="addAgain(index, item)" class="add-btn" size="mini" style=" border: none; background-color: #f31d65; color:#fff; width: 65px; ">-->
+                          <!--<span style="position: relative;left: -10px;">{{generateDeviceLang('addAgain')}}</span>-->
+                        <!--</el-button>-->
+                      <!--</div>-->
+                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; color:#2c3e50;font-weight: normal;background-color: #fff">
+                           <!--:style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }"-->
                         <i class="iconfont icon-bianji"></i>
                       </div>
-                      <div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
-                        <i class="iconfont icon-shanchu"></i>
-                      </div>
-                    </div>
-                    <div class="add-again" v-if="!item.isEditing && item.ifCanAdd">
-                      <div class="" style="float:left;">
-                        <el-button @click.stop="addAgain(index, item)" class="add-btn" size="mini" style=" border: none; background-color: #f31d65; color:#fff; width: 65px; ">
-                          <span style="position: relative;left: -10px;">{{generateDeviceLang('addAgain')}}</span>
-                        </el-button>
-                      </div>
-                      <div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
+                      <div class="iconrised" @click="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
                         <i class="iconfont icon-shanchu"></i>
                       </div>
                     </div>
@@ -215,7 +229,7 @@
               </el-pagination>
             </div>
           </el-col>
-          <el-dialog :title="generateDeviceLang('addDevice')"
+          <el-dialog :title="isAddAgain? generateDeviceLang('updateDevice') : generateDeviceLang('addDevice')"
                      :visible.sync="showAddNvrDialog" v-if="showAddNvrDialog"
                      :append-to-body='true'
                      :close-on-click-modal="false"
@@ -246,7 +260,17 @@
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="channelCount" :label="generateDeviceLang('deviceChannelNum')">
-                      <el-select v-model="addDeviceData.channelCount"  size="mini" :disabled="isAddAgain">
+                      <el-select v-model="addDeviceData.channelCount"  size="mini" v-if="isAddAgain">
+                        <el-option
+                          v-for="numList in editNvrChannelNumList"
+                          :key="numList.value"
+                          :label="numList.label"
+                          :value="numList.value"
+                          :disabled="numList.disabled"
+                        >
+                        </el-option>channelNumList
+                      </el-select>
+                      <el-select v-model="addDeviceData.channelCount"  size="mini"  v-else>
                         <el-option
                           v-for="numList in channelNumList"
                           :key="numList.value"
@@ -258,7 +282,7 @@
                   </el-col>
                 </el-form-item>
                 <el-form-item :label="generateDeviceLang('EzvizAccount')" prop="ezvizAccount">
-                  <el-select v-model="addDeviceData.ezvizAccount" style="width: 100%;" :disabled="isAddAgain">
+                  <el-select v-model="addDeviceData.ezvizAccount" style="width: 100%;">
                     <el-option
                       v-for="item in ezvizAccountList"
                       :key="item.id"
@@ -287,7 +311,7 @@
               <el-button class="file-confirm-btn" @click="addSingleNvr" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
             </div>
           </el-dialog>
-          <el-col :span="lang=='en' && varWindowWidth<1920? 13: 14" class="risde">
+          <el-col :span="lang=='en' && varWindowWidth<1920? 13: 13" class="risde">
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('channelSetting')}}</span>
               <el-button type="primary" size="mini" class="add-btn btn-class"
@@ -642,6 +666,7 @@
         deviceNameTemp: '',
         channelCountTemp: 0,
         ezvizAccountList: [],
+        elTooltipClass: 'el-tooltipClass'
       }
     },
     watch:{
@@ -861,6 +886,24 @@
         };
         self.getDeviceList(params);
       },
+      filterAccount(){
+        let self=this;
+        self.modelFilter=!self.modelFilter;
+        console.log(self.modelFilter);
+        self.page=1;
+        self.nvrFilterName='ezvizAccount';
+        let params={
+          "filter": {
+            "page": self.page-1,
+            "size": self.sizeNum
+          },
+          "order": {
+            "direction": self.modelFilter?"asc":"desc",
+            "property": "ezvizAccount"
+          }
+        };
+        self.getDeviceList(params);
+      },
       filterStore(){
         let self=this;
         self.storeFilter=!self.storeFilter;
@@ -932,6 +975,8 @@
         return new Promise((resolve,reject)=>{
           ezvizRESTful.addEzivzDevice(params).then(resDevice=>{
             resolve(resDevice);
+          }).catch((err)=>{
+
           })
         })
       },
@@ -1011,8 +1056,9 @@
           })
         }
         let res1= await self.addEzivzDevice(paramsNVR);
+        console.log(res1);
         let res2= await self.addDevice(paramsDevice);
-        if(res1.errMsg=='Success'&&res2.errMsg=='Success'){
+        if(res1.errCode === 0 &&res2.errCode === 0){
           self.notify(self.$t('deviceView.importSuss'),'success',3000);
           self.showImportContent=false;
         }
@@ -1086,6 +1132,7 @@
                   channelCount:item["通道数"],
                   storeId:item["StoreID"],
                   validationCode: item['设备验证码'],
+                  ezvizAccount: item['萤石账号']
                 }
                 nvrDataTemp.push(obj);
               }
@@ -1122,8 +1169,8 @@
         var that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const tHeader = ['StoreID','所属门店', '序列号','设备名称','设备验证码','通道数','通道名称','通道序号']; // 导出的表头名
-          const filterVal = ['storeId','storeName','serialNumber','name', 'validationCode' ,'channelCount','channelName','channelNum']; // 导出的表头字段名
+          const tHeader = ['StoreID','所属门店', '序列号','设备名称','设备验证码','通道数','通道名称','通道序号', '萤石账号']; // 导出的表头名
+          const filterVal = ['storeId','storeName','serialNumber','name', 'validationCode' ,'channelCount','channelName','channelNum', 'ezvizAccount']; // 导出的表头字段名
           console.log(that.activeName);
           let deviceData=await that.getAllDeviceData();
           let channelData=that.channelData;
@@ -1141,6 +1188,7 @@
                   obj.channelCount=item.channelCount;
                   obj.channelName=_item.name;
                   obj.channelNum=_item.channelId;
+                  obj.ezvizAccount = item.ezvizAccount;
                   excelData.push(obj);
                 }
 
@@ -1280,24 +1328,25 @@
               obj.store=item.storeName;
               obj.storeId=item.storeId;
               obj.deviceModel=item.deviceModel;
+              obj.ezvizAccount = item.ezvizAccount;
               obj.channelCount = item.channelCount;
               obj.tempChannelCount = item.channelCount;
               obj.channelNum=item.channelCount+'个';
               obj.comment = item.comment; //错误提示信息
               console.log(obj.comment);
-              obj.ifCanEdit = false;
+              obj.ifCanEdit = true;
               obj.ifCanAdd = false;
-              if(obj.comment.length > 0){
-                if(obj.comment.indexOf('20010')!= -1){
-                  obj.ifCanAdd = true;
-                }
-                else{
-                  obj.ifCanAdd = false;
-                }
-              }
-              else{
-                obj.ifCanEdit = true;
-              }
+              // if(obj.comment.length > 0){
+              //   if(obj.comment.indexOf('20010')!= -1){
+              //     obj.ifCanAdd = true;
+              //   }
+              //   else{
+              //     obj.ifCanAdd = false;
+              //   }
+              // }
+              // else{
+              //   obj.ifCanEdit = true;
+              // }
               obj.isEditing = false;
               if(index==0){
                 obj.isClick=true;
@@ -1476,10 +1525,12 @@
             if (errMsg != undefined && errMsg == 'Success') {
               self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
               self.showAddNvrDialog = false;
+              self.isAddAgain = false;
             }
             else {
               self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
               self.showAddNvrDialog = false;
+              self.isAddAgain = false;
             }
           })
             .then(async () => {
@@ -1621,15 +1672,27 @@
       editSingleNvr(index, item){
         let self=this;
         item.isEditing = true;
+        item.isClick = true;
         self.nvrData.forEach((_item,_index)=>{
           if(index!=_index){
             _item.isEditing=false;
+            _item.isClick = false;
           }
         })
+        self.curNVRItem=item;
+        self.channelCountTemp = item.channelCount;
+        console.log(item.serialNumber)
+        self.getChannelListByDevice(item.serialNumber);
+        // show update dialog
+        self.addDeviceData = item;
+        self.isAddAgain = true;
+        console.log(self.addDeviceData)
+        self.showAddNvrDialog = true;
       },
       showAddDialog(){
         let self = this;
         self.showAddNvrDialog = true;
+        self.isAddAgain = false;
         self.addDeviceData = {name: '', validationCode: '', storeId: self.storeDataList[0].storeId, serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount};
       },
       confirmEditNvr(index,item){
@@ -2262,7 +2325,7 @@
             width: 4%;
             height: 100%;
             span{
-              display: inline-block;
+              //display: inline-block;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
@@ -2273,7 +2336,7 @@
             height: 100%;
             position: absolute;
             span{
-              display: inline-block;
+              //display: inline-block;
               width: 70%;
               overflow: hidden;
               white-space: nowrap;
@@ -2300,7 +2363,7 @@
             position: absolute;
             left: 43%;
             span{
-              display: inline-block;
+              //display: inline-block;
               width: 70%;
               overflow: hidden;
               white-space: nowrap;
@@ -2614,6 +2677,20 @@
     width: 100px;
     height: 100px;
     display: block;
+  }
+  .el-tooltipClass.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
+    border-bottom-color: rgba(30, 34, 52, 0.75) !important;
+  }
+
+  .el-tooltipClass.el-tooltip__popper[x-placement^='bottom'] .popper__arrow:after {
+    border-bottom-color: rgba(30, 34, 52, 0.75) !important;
+  }
+
+  .el-tooltipClass.el-tooltip__popper.is-dark {
+    background: rgba(30, 34, 52, 0.75) !important;
+    font-size: 14px !important;
+    /*line-height: 21px;*/
+    padding: 5px;
   }
 </style>
 <style scoped>
