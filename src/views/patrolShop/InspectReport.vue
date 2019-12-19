@@ -12,7 +12,12 @@
             </div>
         </div>
         <div class="el-acticle">
-            <p class="suggest" v-if="suggest!=null&&suggest.length!=0">{{generateReportLang('advice')}}{{suggest}}</p>
+            <div class="suggest" v-if="suggest!=null&&suggest.length!=0">
+                <div class="suggest-content">
+                  <span>{{generateReportLang('advice')}}</span>
+                  <span v-html="turnSuggest(suggest)"></span>
+                </div>
+            </div>
             <el-row class="report-content" :gutter="40">
                 <el-col :span="8" class="radior-content">
                     <v-chart :options="options" class="chart-content" :auto-resize='true'/>
@@ -53,7 +58,7 @@
                                 <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
                                     <div class="item-blag"></div>
                                     <span class="item-name">{{index!=2?_item.name:_item.subject}}</span>
-                                    <span class="item-des">{{_item.description}}</span>
+                                    <span class="item-des"></span>
                                 </div>
                             </el-scrollbar>
                         </div>
@@ -80,6 +85,7 @@ import 'echarts/lib/chart/radar'
 import {getInspectReportList,getInspectReportInfo} from '../../api/inspect'
 import util from '@/common/util'
 import {generateReportLang} from '@/api/i18n'
+import filterString from "../../common/filterString";
 
 export default {
     name:'InspectReport',
@@ -247,7 +253,7 @@ export default {
             getInspectReportInfo(params).then(res=>{
                 console.log(res);
                 let data=res.data[0].info;
-                self.suggest=data.comment;
+                self.suggest= data.comment;
                 let summary=data.summary;
                 let summaryTemp=[];
                 summary.forEach(item=>{
@@ -298,48 +304,71 @@ export default {
             let self=this;
             let options={
                 backgroundColor: '#fff',
-                // title: {
-                //     text: '巡检项雷达图'
-                // },
-                tooltip: {},
+                tooltip: {
+                  backgroundColor: 'rgba(30,34,52,0.75)'
+                },
                 legend: {
                     data: ['inspect radar']
                 },
-                radar: {
+                radar: [
+                  {
+                  indicator: [],
+                    nameGap: 5,
                     name: {
-                        textStyle: {
-                            color: '#7d8cad',
-                            backgroundColor: '#fff',
-                            borderRadius: 3,
-                            padding: [3, 5]
-                        }
+                    textStyle: {
+                      color: '#7d8cad',
+                      borderRadius: 3,
+                      padding: [3, 5]
                     },
-                    indicator: [],
-                    splitArea : {
-                        show : false,
-                        areaStyle : {
-                            color: 'rgba(255,0,0,0)', // 图表背景的颜色
-                        },
+                    formatter: (params)=>{
+                      console.log(params);
+                      let str = '';
+                      if(params.length > 6){
+                        str = params.substr(0, 6) + '...';
+                      }
+                      else{
+                        str = params;
+                      }
+                      return str;
                     },
-
+                  },
                 },
-                series: {
-                    name: '巡检项',
+                  {
+                    indicator: [],
+                    name: {
+                      textStyle: {
+                        color: 'rgba(255,255,255,0)',
+                        borderRadius: 3,
+                        padding: [3, 5]
+                      },
+                    },
+                  }
+                ],
+                series: [{
                     type: 'radar',
                     data : [],
+                },
+                  {
+                  type: 'radar',
+                  data : [],
+                    name: self.$t('remotePatrol.category'),
+                    radarIndex: 1,
                     itemStyle: {
-                        normal: {
-                            lineStyle: {
-                                color: '#FDBA40',
-                                width:4
-                            },
-                            areaStyle:{
-                                color:'#D7E5FD'
-                            }
-                        },
+                    normal: {
+                      lineStyle: {
+                        color: '#FDBA40',
+                        width:4
+                      },
+                      areaStyle:{
+                        color:'#D7E5FD'
+                      }
                     },
-
+                  },
+                  tooltip: {
+                    trigger: 'item'
+                  },
                 }
+                ]
             };
             let tempIndicator=[];
             let seriesValue=[];
@@ -353,8 +382,10 @@ export default {
             let temp=[];
             let obj={value:seriesValue};
             temp.push(obj);
-            options.radar.indicator=tempIndicator;
-            options.series.data=temp;
+            options.radar[0].indicator=tempIndicator;
+            options.radar[1].indicator=tempIndicator;
+            options.series[0].data=temp;
+            options.series[1].data=temp;
             if(tempIndicator.length<6){
                 options.radar.splitNumber=tempIndicator.length;
             }
@@ -362,6 +393,9 @@ export default {
                 options.radar.splitNumber=5;
             }
             self.options=options;
+        },
+        turnSuggest(data) {
+          return data.replace(/(\r\n|\n|\r)/gm, "<br/>");
         }
     },
     mounted(){
@@ -431,13 +465,21 @@ $suggestBack:#F1F6FE;
             margin-top: calc(20/1920*100vw);
             font-size: calc(14/1920*100vw);
             font-weight: bold;
-            height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
+            height: calc(20/1920*100vw);
+            line-height: calc(20/1920*100vw);
             background-color: $suggestBack;
             color: $qualified;
             padding-left: calc(30/1920*100vw);
             border: 1px solid #a0c1f8;
-
+            max-height: calc(100/1920*100vw);
+            height: auto;
+            overflow-y: auto;
+            .suggest-content{
+              display: flex;
+            }
+            span:first-child{
+              padding-right: calc(20/1920*100vw);
+            }
         }
         .report-content{
             margin-top: calc(30/1920*100vw);
@@ -460,10 +502,10 @@ $suggestBack:#F1F6FE;
                     border-bottom-width: 1px;
                     padding:0.5rem;
                     &:first-child{
-                        width: 40%;
+                        width: 55%;
                     }
                     &:not(:first-child){
-                        width: 20%;
+                        width: 15%;
                         text-align: left;
                         padding-left: 1rem;
                     }

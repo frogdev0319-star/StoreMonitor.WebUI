@@ -47,7 +47,8 @@ export default {
     patrolAppraisalStat: 'Patrol Evaluation Statistics',
     patrolItemsStat: 'Inspection Items Statistics',
     eventStat: 'Event Processing Statistics',
-    supervisorStat: 'Supervisory Work Statistics'
+    supervisorStat: 'Supervisory Work Statistics',
+    customers: 'Customers'
   },
   overview:{
     'date': 'Date',

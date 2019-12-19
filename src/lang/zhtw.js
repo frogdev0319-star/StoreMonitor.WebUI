@@ -48,7 +48,8 @@ export default {
     patrolAppraisalStat: '巡店考評統計',
     patrolItemsStat: '巡檢項統計',
     eventStat: '事件處理統計',
-    supervisorStat:'督導效率統計'
+    supervisorStat:'督導效率統計',
+    customers: '店客'
   },
   overview:{
     'date': '時間自定',
