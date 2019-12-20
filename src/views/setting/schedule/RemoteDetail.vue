@@ -941,10 +941,10 @@
           self.$refs.scheduleName[tabIndex].focus();
           return false;
         }
-        if(notifyTime == ''){
-          self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning',3000);
-          return false;
-        }
+        // if(notifyTime == ''){
+        //   self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning',3000);
+        //   return false;
+        // }
         console.log(dayArray)
         console.log(self.selectWeek);
 
@@ -1381,7 +1381,9 @@
         self.paneList[tabIndex].from = params.from;
         self.paneList[tabIndex].to =  params.to;
         self.paneList[tabIndex].modeDisabled = true;
-        params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
+        if(self.paneList[tabIndex].notifyTime.length > 0){
+          params.notifyTime =  self.hourToSecond(self.paneList[tabIndex].notifyTime);
+        }
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
         let ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
         if(ifNotifyOneDay){
@@ -2044,7 +2046,7 @@
             tempScheduleData.modeDisabled = true;
             tempScheduleData.schId = _item.id; //排程id
             tempScheduleData.enable = _item.enable;
-            tempScheduleData.notifyTime = self.secondsToHour(_item.notifyTime);
+            tempScheduleData.notifyTime = (_item.notifyTime == -1)? '' : self.secondsToHour(_item.notifyTime);
             tempScheduleData.from = self.$moment(_item.from).format('YYYY'); //从from获取年
             let aheadNotification = _item.aheadNotification; //是否提前一天通知
 
@@ -2211,7 +2213,12 @@
         let year = self.paneList[tabIndex].from; //年self.paneList[tabIndex].from; //年
         params.from = self.$moment(year).startOf('year').valueOf();
         params.to =  -1;
-        params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
+        if(self.paneList[tabIndex].notifyTime !== null){
+          params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
+        }
+        else{
+          params.notifyTime = -1;
+        }
         params.dueDays = self.paneList[tabIndex].dueDays; //执行时效
         let tempSchedule = [];
         if(params.mode == 1){
