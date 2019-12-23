@@ -96,7 +96,8 @@ export default {
     },
     data(){
         return{
-            elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
+            //elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
+            elTableData:[],
             radioList:[
                 {
                     'value':'1',
@@ -178,13 +179,21 @@ export default {
             }
         });
     },
+    created(){
+      let self=this;
+      self.getTagList();
+      let tabIndex=sessionStorage.getItem('TabIndex');
+      self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+      self.initData();
+      self.getDownLoadURL();
+    },
     mounted(){
-        let self=this;
-        self.getTagList();
-        let tabIndex=sessionStorage.getItem('TabIndex');
-        self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-        self.initData();
-        self.getDownLoadURL();
+        // let self=this;
+        // self.getTagList();
+        // let tabIndex=sessionStorage.getItem('TabIndex');
+        // self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+        // self.initData();
+        // self.getDownLoadURL();
     },
     methods:{
         generateInsSettingLang,
@@ -970,7 +979,7 @@ export default {
                 top: 3px;
                 border-right: 0;
                 height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
+                /*line-height: calc(36/1920*100vw);*/
                 padding: 0 0;
                 font-size: calc(14/1920*100vw);
                 width: calc(130/1920*100vw);
