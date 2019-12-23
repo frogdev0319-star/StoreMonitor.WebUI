@@ -22,7 +22,7 @@
           </el-form-item>
           <el-form-item :label="$t('titleView.comment')" prop="comment" class="comment-class">
             <label slot="label" class="comment-label">{{$t('titleView.comment')}}</label>
-            <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  @input="commentChange" ></el-input>
+              <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  @input="commentChange" :autosize="{minRows: 2, maxRows: 4}" ></el-input>
             <span class="text" style="float: right;color: #909399;">{{curLength}}/200</span>
           </el-form-item>
         </el-form>
@@ -188,11 +188,11 @@
                     checked: false,
                     disabled: false,
                   },
-                  // {
-                  //   roleName: this.$t('route.storeChecking'),
-                  //   checked: false,
-                  //   disabled: true,
-                  // },
+                  {
+                    roleName: this.$t('route.storeChecking'),
+                    checked: false,
+                    disabled: true,
+                  },
                   {
                     roleName: this.$t('route.customers'),
                     checked: false,
@@ -424,8 +424,8 @@
           self.roleNameList[1].children[3].disabled = PermissionHelper.enablePatrolTask() ? false :  true;
           self.roleNameList[1].children[4].disabled = PermissionHelper.enableStoreMonitor() ? false :  true;
           self.roleNameList[1].children[5].disabled = PermissionHelper.enableTransactionPatrol() ? false :  true;
-          // self.roleNameList[1].children[6].disabled = PermissionHelper.enableStorePointCheck() ? false :  true;
-          self.roleNameList[1].children[6].disabled = PermissionHelper.enableCustomers() ? false : true;
+          self.roleNameList[1].children[6].disabled = PermissionHelper.enableStorePointCheck() ? false :  true;
+          self.roleNameList[1].children[7].disabled = PermissionHelper.enableCustomers() ? false : true;
 
           self.roleNameList[2].children[0].disabled = PermissionHelper.enableEventHandle() ? false : true;
           self.roleNameList[2].children[1].disabled = PermissionHelper.enableEventClose() ? false : true;
@@ -501,6 +501,7 @@
           else{
             // check has selected roles
             PermissionHelper.setData(self.infoForm.authorities)
+            console.log(self.infoForm.authorities)
             self.roleNameList[0].children[0].checked = PermissionHelper.enableRemoteOverview() ? true : false;
             self.roleNameList[0].children[1].checked = PermissionHelper.enableEventOverview() ? true : false;
 
@@ -510,8 +511,8 @@
             self.roleNameList[1].children[3].checked = PermissionHelper.enablePatrolTask() ? true : false;
             self.roleNameList[1].children[4].checked = PermissionHelper.enableStoreMonitor() ? true : false;
             self.roleNameList[1].children[5].checked = PermissionHelper.enableTransactionPatrol() ? true : false;
-            // self.roleNameList[1].children[6].checked = PermissionHelper.enableStorePointCheck() ? true : false;
-            self.roleNameList[1].children[6].checked = PermissionHelper.enableCustomers() ? true : false;
+            self.roleNameList[1].children[6].checked = PermissionHelper.enableStorePointCheck() ? true : false;
+            self.roleNameList[1].children[7].checked = PermissionHelper.enableCustomers() ? true : false;
 
             self.roleNameList[2].children[0].checked = PermissionHelper.enableEventHandle() ? true : false;
             self.roleNameList[2].children[1].checked = PermissionHelper.enableEventClose() ? true : false;

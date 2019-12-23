@@ -74,7 +74,7 @@
             <div slot="empty">
               <div>
                 <i class="iconfont icon-zhengque empty-data-icon"></i>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#=7d8cad','font-family':'Microsoft YaHei'}">{{$t('deviceView.noData')}}</span>
+                <span :style="{'margin-left':'20px','font-size':'16px','color':'#=7d8cad','font-family':'Microsoft YaHei'}">{{noData}}</span>
               </div>
             </div>
           </el-table>
@@ -128,7 +128,8 @@
             showDeleteDialog: false,
             deleteIds : [],
             deleteInfo: this.$t('titleView.confirmDeleteTitle'),
-            titleList: []
+            titleList: [],
+            noData: ''
           }
       },
       computed:{
@@ -248,6 +249,9 @@
 
             })
             self.tableData = res.data;
+            if(self.tableData.length == 0){
+              self.noData = self.$t('deviceView.noData')
+            }
             let listArray = [];
             self.tableData.forEach(item=>{
               listArray.push(item.title)
