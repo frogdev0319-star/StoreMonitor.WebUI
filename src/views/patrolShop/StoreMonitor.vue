@@ -4000,6 +4000,31 @@ export default {
                         }
                     }
                 }
+              @media screen and (max-width: 1440px){
+                .date-picker-content{
+                  text-align: left;
+                  @include point(padding-left,10);
+                  position: relative;
+                  span{
+                    font-size: 12px;
+                    color: $black;
+                    margin-right: 10px;
+                    @include point(margin-left,10);
+                  }
+                  .time-picker{
+                    width: 110px;
+                    font-size: 12px;
+                  }
+                  .backdate-btn{
+                    position: absolute;
+                    @include point(right,10);
+                    font-size: 12px;
+                    line-height: 12px;
+                    width: 120px;
+                    padding: 6px 0;
+                  }
+                }
+              }
                 @media screen and (max-width: 1366px){
                     .date-picker-content{
                         text-align: left;
@@ -4009,7 +4034,7 @@ export default {
                             font-size: 12px;
                             color: $black;
                             margin-right: 10px;
-                            @include point(margin-left,30);
+                            @include point(margin-left,10);
                         }
                         .time-picker{
                             width: 110px;
@@ -4020,7 +4045,8 @@ export default {
                             @include point(right,10);
                             font-size: 12px;
                             line-height: 12px;
-                            width: 96px;
+                            width: 120px;
+                            padding: 6px 0;
                         }
                     }
                 }

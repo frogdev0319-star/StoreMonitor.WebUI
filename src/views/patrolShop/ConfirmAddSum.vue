@@ -563,6 +563,9 @@ $h1:#292e36;
                     color: $red;
                 }
             }
+            .sug-input{
+              width: 99.5%;
+            }
         }
 
     }
@@ -633,7 +636,7 @@ $h1:#292e36;
                 }
                 .icon-blag{
                     display: inline-block;
-                    width: calc(80/1920*100vw);
+                    width: calc(100/1920*100vw);
                     padding:3px 6px;
                     text-align: center;
                     color: #fff;

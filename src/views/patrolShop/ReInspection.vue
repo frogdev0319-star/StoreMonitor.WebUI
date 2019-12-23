@@ -3263,7 +3263,7 @@ export default {
                     }
                     .en-el-submit{
                       top: 20%;
-                      width:calc(160/1920*100vw);
+                      //width:calc(160/1920*100vw);
                     }
                 }
             }
@@ -3930,7 +3930,7 @@ export default {
                             display: inline-block;
                             font-size: 12px;
                             margin-right: 20px;
-                            width: 110px;
+                            width: 120px;
                             height: 22px;
                             background-color: orange;
                             line-height: 22px;
@@ -4164,7 +4164,7 @@ export default {
 }
 .item-score .el-icon--right{
     position: absolute !important;
-    right: 8px !important;
+    right: 1px !important;
     top: 6px !important;
 }
 #storetab-content .el-tabs__active-bar .is-top{
