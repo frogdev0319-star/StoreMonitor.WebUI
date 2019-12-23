@@ -147,7 +147,7 @@
                       </div>
                     </div>
                     <div class="iconcontent" v-if="!item.isEditing">
-                      <div class="iconlised"  @click="editSingleNvr(index,item)"  style=" border: none; background-color: #fff; color:#2c3e50; font-weight: normal">
+                      <div class="iconlised"  @click="editSingleNvr(index,item)"  style=" border: none; background-color: rgba(255, 255, 255, 0); color:#2c3e50; font-weight: normal">
                         <i class="iconfont icon-bianji"></i>
                       </div>
                       <div class="iconrised" @click="showConfirmDelete=true" style="border: none; color:#2c3e50;font-weight: normal">
@@ -1765,6 +1765,7 @@
     color: #4b5262 !important;
     background-color: #FAFAFA;
     cursor: pointer;
+    background-color: #f4f5f9;
   }
   .active-color{
     color: $mainColor !important;
@@ -1947,7 +1948,6 @@
         }
       }
       .lisde{
-        background-color: #FAFAFA;
         height: auto;
         position: relative;
         .icon-filter{
@@ -2107,7 +2107,7 @@
                 border-width: 1px 1px 1px 0px;
                 border-style: solid;
                 border-color: #ddd;
-                background-color: #fff;
+                background-color: rgba(255, 255, 255, 0);
                 @include point(line-height,21);
                 @include point(height,21);
               }

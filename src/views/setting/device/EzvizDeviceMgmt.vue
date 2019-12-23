@@ -182,7 +182,7 @@
                           <!--<span style="position: relative;left: -10px;">{{generateDeviceLang('addAgain')}}</span>-->
                         <!--</el-button>-->
                       <!--</div>-->
-                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; color:#2c3e50;font-weight: normal;background-color: #fff">
+                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; color:#2c3e50;font-weight: normal;background-color: rgba(255,255,255,0)">
                            <!--:style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }"-->
                         <i class="iconfont icon-bianji"></i>
                       </div>
@@ -1890,7 +1890,7 @@
   }
   .noraml-color{
     color: #4b5262 !important;
-    background-color: #FAFAFA;
+    background-color: #f4f5f9;
     cursor: pointer;
   }
   .el-delete-btn{
@@ -2423,7 +2423,7 @@
                 border-width: 1px 1px 1px 0px;
                 border-style: solid;
                 border-color: #ddd;
-                background-color: #fff;
+                background-color: rgba(255, 255, 255, 0);
                 @include point(line-height,21);
                 @include point(height,21);
               }
