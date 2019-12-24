@@ -108,7 +108,7 @@
             <div slot="empty">
                 <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{generateStoreLang('noStoreData')}}</span>
+                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{noData}}</span>
                 </div>
             </div>
         </el-table>
@@ -190,7 +190,8 @@ import {generateStoreLang} from '@/api/i18n'
                 isChecked:false,
                 curCitys:'城市',
                 showPopoVer:true,
-                lang: this.$i18n.locale
+                lang: this.$i18n.locale,
+                noData: ''
             }
         },
         watch:{
@@ -472,6 +473,9 @@ import {generateStoreLang} from '@/api/i18n'
                 let tempStoreId=temp.map(x=>x.storeId);
                 self.tableData=temp;
                 console.log(self.tableData)
+                if(self.tableData.length == 0){
+                  self.noData = self.$t('storeView.noStoreData')
+                }
                 self.total=self.storeData.totalElements;
                 if(paramsGetBind.storeIds.length!=0){
                     getInspectBindCount(paramsGetBind).then(res=>{

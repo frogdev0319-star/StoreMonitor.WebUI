@@ -152,7 +152,7 @@
                 </el-col>
             </el-row>
             <el-row class="card-content" v-else>
-              <div class="empty-content">{{$t('deviceView.noData')}}</div>
+              <div class="empty-content">{{noData}}</div>
             </el-row>
         </el-col>
     </el-row>
@@ -242,7 +242,8 @@ export default {
             storeName: '',
             showMonthDrap: false,
             showStoreContent: false,
-            checkAllStore: false
+            checkAllStore: false,
+            noData: ''
         }
     },
     created(){
@@ -398,6 +399,9 @@ export default {
                 });
                 self.reportList=temp;
                 self.total=res.data.totalElements;
+                if(self.reportList.length == 0){
+                  self.noData = self.$t('deviceView.noData')
+                }
             })
         },
         getStoreData(params){

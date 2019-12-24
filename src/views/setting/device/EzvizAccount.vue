@@ -108,7 +108,7 @@
             <div slot="empty">
               <div>
                 <i class="iconfont icon-zhengque empty-data-icon"></i>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{$t('deviceView.noData')}}</span>
+                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{noData}}</span>
               </div>
             </div>
           </el-table>
@@ -262,7 +262,8 @@
             userAccountNum : 0,
             storeviuNum: 0,
             curLength: 0,
-            totalMsg: ''
+            totalMsg: '',
+            noData: ''
           }
         },
         methods:{
@@ -322,6 +323,9 @@
             self.totalMsg = totalMsg;
             console.log(accountList)
             self.tableData = accountList;
+            if(self.tableData.length == 0){
+              self.noData = self.$t('deviceView.noData');
+            }
           },
           getEzvizAccountList(){
             return new Promise((resolve,reject)=>{
