@@ -29,10 +29,10 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>{{generateInsSettingLang('confirmSelecDel')}}</span>
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('confirmSelecDel')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">

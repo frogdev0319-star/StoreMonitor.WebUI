@@ -185,7 +185,7 @@ export default {
       let tabIndex=sessionStorage.getItem('TabIndex');
       self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
       self.initData();
-      self.getDownLoadURL();
+      //self.getDownLoadURL();
     },
     mounted(){
         // let self=this;
@@ -313,12 +313,18 @@ export default {
                         let obj={};
                         obj.label=item;
                         obj.routeData=temp;
+                        if(temp.length == 0){
+                          self.getDownLoadURL();
+                        }
                         self.elTableData[0]=obj;
                     }
                     else if(item=='现场巡检'){
                         let obj={};
                         obj.label=item;
                         obj.routeData=temp;
+                        if(temp.length == 0){
+                          self.getDownLoadURL();
+                        }
                         self.elTableData[1]=obj;
                     }
                     else{
@@ -330,7 +336,8 @@ export default {
                 self.elTableData=self.elTableData.concat(tempAllData);
             }
             else{
-                self.elTableData=[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}];
+              self.getDownLoadURL();
+              self.elTableData=[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}];
             }
             self.getBindStoreList();
         },
