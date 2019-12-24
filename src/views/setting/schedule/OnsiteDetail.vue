@@ -2279,7 +2279,7 @@
             margin-right: calc(40 / 1920 * 100vw);
             margin-left: calc(20 / 1920 * 100vw);
             display: inline-block;
-            width: 100px;
+            width: 110px;
           }
           .search-content {
             display: inline-block;
