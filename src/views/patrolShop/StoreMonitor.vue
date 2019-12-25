@@ -1641,6 +1641,7 @@ export default {
             this.$nextTick(()=>{
                 self.imageCanvasList=[];
                 if(self.playBackState){
+                    self.stopRealTime();
                     let video=document.getElementById('previewVideo');
                     self.cutDialogcurTime=video.player.currentTime();
                 }
@@ -1760,20 +1761,20 @@ export default {
         },
         closeEdit(){
             let self=this;
-            if(self.playBackState){
-                let video=document.getElementById('previewVideo');
-                console.log(self.cutDialogcurTime);
-                video.player.currentTime(self.cutDialogcurTime);
-            }
+            // if(self.playBackState){
+            //     let video=document.getElementById('previewVideo');
+            //     console.log(self.cutDialogcurTime);
+            //     video.player.currentTime(self.cutDialogcurTime);
+            // }
         },
         cancelEdit(){
             let self=this;
             self.showCutDialog = false;
-            if(self.playBackState){
-                let video=document.getElementById('previewVideo');
-                console.log(self.cutDialogcurTime);
-                video.player.currentTime(self.cutDialogcurTime);
-            }
+            // if(self.playBackState){
+            //     let video=document.getElementById('previewVideo');
+            //     console.log(self.cutDialogcurTime);
+            //     video.player.currentTime(self.cutDialogcurTime);
+            // }
         },
         confirmEdit(){
             let self=this;
@@ -1788,11 +1789,11 @@ export default {
             self.sourceList.push(obj);
             self.showCutDialog=false;
             self.myDivHeight();
-            if(self.playBackState){
-                let video=document.getElementById('previewVideo');
-                console.log(self.cutDialogcurTime);
-                video.player.currentTime(self.cutDialogcurTime);
-            }
+            // if(self.playBackState){
+            //     let video=document.getElementById('previewVideo');
+            //     console.log(self.cutDialogcurTime);
+            //     video.player.currentTime(self.cutDialogcurTime);
+            // }
         },
         processInWebWorker(workerPath){
             var blob = URL.createObjectURL(new Blob(['importScripts("' + workerPath + '");var now = Date.now;function print(text) {postMessage({"type" : "stdout","data" : text});};onmessage = function(event) {var message = event.data;if (message.type === "command") {var Module = {print: print,printErr: print,files: message.files || [],arguments: message.arguments || [],TOTAL_MEMORY: message.TOTAL_MEMORY || false};postMessage({"type" : "start","data" : Module.arguments.join(" ")});postMessage({"type" : "stdout","data" : "Received command: " +Module.arguments.join(" ") +((Module.TOTAL_MEMORY) ? ".  Processing with " + Module.TOTAL_MEMORY + " bits." : "")});var time = now();var result = ffmpeg_run(Module);var totalTime = now() - time;postMessage({"type" : "stdout","data" : "Finished processing (took " + totalTime + "ms)"});postMessage({"type" : "done","data" : result,"time" : totalTime});}};postMessage({"type" : "ready"});'], {
