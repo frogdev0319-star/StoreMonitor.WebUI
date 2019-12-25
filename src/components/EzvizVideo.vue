@@ -859,7 +859,7 @@
           self.playState = true;
           self.isLoading = false;
           self.showModelContent=true;
-          self.showInfoContent=false;
+          //self.showInfoContent=false;
           // self.ifOpenSound = false;
           if(self.fullWindow){
             if(self.ifOpenSound){
@@ -899,7 +899,7 @@
 
         setTimeout(() => {
           self.showModelContent=true;
-          self.showInfoContent=false;
+          //self.showInfoContent=false;
           self.isLoading = false;
           if(self.ifOpenSound){
             self.fullDecoder.openSound()
@@ -914,7 +914,7 @@
         self.showError = false;
         self.errorMsg = '';
         if(self.clickSnapshot){
-          self.stopRealTime()
+          //self.stopRealTime()
           self.isLoading = false;
           self.showModelContent=false;
         }
@@ -930,7 +930,7 @@
         setTimeout(() => {
           self.isLoading = false;
           self.showModelContent=true;
-          self.showInfoContent=false;
+          //self.showInfoContent=false;
           if(self.ifOpenSound){
             self.decoder.openSound()
           }
@@ -942,7 +942,7 @@
           self.fullWindowScreen();
           setTimeout(() => {
             self.showModelContent=false;
-            self.showInfoContent=false;
+            //self.showInfoContent=false;
           }, 3000);
         }
         else{
@@ -1060,6 +1060,7 @@
           playerEle.style.height = screen.height + 'px';
           console.log(width);
           console.log(height)
+          console.log(playerEle);
           console.log(self.playState)
           if(self.playBack){
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
@@ -1099,7 +1100,7 @@
       },
       showModel(){
         let self=this;
-        self.showInfoContent=true;
+        //self.showInfoContent=true;
         if(self.playState){
           self.showModelContent=true;
         }
@@ -1107,7 +1108,7 @@
       hiddenModel(){
         let self=this;
         self.showModelContent=false;
-        self.showInfoContent=false;
+        //self.showInfoContent=false;
       },
       //关闭实时视频
       async realTime(){
@@ -1190,7 +1191,7 @@
         }
         self.ifOpenSound = false;
         self.showModelContent=false;
-        self.showInfoContent=false;
+        //self.showInfoContent=false;
         self.playState = false;
         self.curBack = '';
         self.currentTimeValue = 0;
@@ -1286,7 +1287,7 @@
             let img = new Image();
             setTimeout(() => {
               self.imgSrc = sessionStorage.getItem('fileUrl');
-              self.stopRealTime();
+              //self.stopRealTime();
               let img = document.getElementById('imgTest');
               if(self.fullWindow){
                 self.exitFullscreen();
