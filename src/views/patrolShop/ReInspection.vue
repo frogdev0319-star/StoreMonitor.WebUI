@@ -460,7 +460,7 @@ export default {
             checkImgSrc:'',
             showOuter:false,
             showModelContent:false,
-            showInfoContent:false,
+            showInfoContent:true,
             activeIndex:'0',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
@@ -2212,7 +2212,7 @@ export default {
             let self=this;
             console.log('playvideo enter!');
             self.showModelContent=true;
-            self.showInfoContent=true;
+            //self.showInfoContent=true;
             self.playState=true;
             var video = document.getElementById("previewVideo");
             this.previewplayer = videojs(video);
@@ -2220,7 +2220,7 @@ export default {
             this.previewplayer.play();
             setTimeout(() => {
                 self.showModelContent=true;
-                self.showInfoContent=false;
+                //self.showInfoContent=false;
             }, 3000);
         },
         destroyVideo(){
@@ -2232,11 +2232,11 @@ export default {
         hiddenModel(){
             let self=this;
             self.showModelContent=false;
-            self.showInfoContent=false;
+            //self.showInfoContent=false;
         },
         showModel(){
             let self=this;
-            self.showInfoContent=true;
+            //self.showInfoContent=true;
             if(self.playState){
                 self.showModelContent=true;
             }
@@ -2338,6 +2338,8 @@ export default {
             self.isPlayingFlag=-1;
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
             //self.showVideo=false;
             //self.destroyVideo();
             //self.showGuide=true;
@@ -2409,7 +2411,7 @@ export default {
                 self.fullScreen=true;
                 setTimeout(() => {
                     self.showModelContent=false;
-                    self.showInfoContent=false;
+                    //self.showInfoContent=false;
                 }, 3000);
             }
             else{
