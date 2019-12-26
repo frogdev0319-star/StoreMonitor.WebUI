@@ -114,7 +114,9 @@ export default {
     closedFive: '結案數量TOP5',
     all: '全部門店',
     times: '次',
-    orders: '升序/降序'
+    orders: '升序/降序',
+    descendingOrder: '倒序',
+    ascendingOrder: '正序'
   },
   //remote Patrol page language
   remotePatrol:{

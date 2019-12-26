@@ -113,7 +113,9 @@ export default {
     closedFive: 'Closed event TOP5',
     all: 'All',
     times: '',
-    orders: 'Ascending/descending order'
+    orders: 'Ascending/descending order',
+    descendingOrder: 'DescendingOrder',
+    ascendingOrder: 'Ascending Order'
   },
   //remote Patrol page language
   remotePatrol:{

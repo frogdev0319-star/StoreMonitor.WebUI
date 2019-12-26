@@ -51,7 +51,7 @@
           <div class="region-result">
             <div class="region-content">
               <div class="region-result-panel">
-                <v-chart :options="storeOptions" class="result-content" :auto-resize='true' ref="storeChart"/>
+                <v-chart :options="storeOptions" class="result-content" :auto-resize='true' ref="storeChart" @timelinechanged="timelineHandler"/>
                 <i @click="previousGroup" class="el-icon-arrow-left icon-arrow" v-if="showPreviousGroup"></i>
                 <div v-if="regionChartEmpty" class="empty-text">{{$t('overview.noData')}}</div>
                 <i @click="nextGroup" class="el-icon-arrow-right icon-arrow" v-if="showNextGroup"></i>
@@ -69,7 +69,8 @@
             <!--<i @click="showWorstArea" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstArea }"></i>-->
             <!--</span>-->
             <span class="arrows" @click="changBestAndWorst">
-              <span class="order-span">{{$t('overview.orders')}}</span>
+              <span class="order-span" v-if="isWorstArea">{{$t('overview.descendingOrder')}}</span>
+              <span class="order-span" v-else>{{$t('overview.ascendingOrder')}}</span>
               <img :src="descending" v-if="isWorstArea" class="img-class">
               <img :src="ascending" v-else class="img-class">
             </span>
@@ -105,7 +106,8 @@
         <div class="titles">
           <span class="title">{{$t('overview.patrolRanking')}}</span>
           <span class="arrows" @click="changWorkerRanking">
-            <span class="order-span">{{$t('overview.orders')}}</span>
+            <span class="order-span" v-if="isWorstWork">{{$t('overview.descendingOrder')}}</span>
+            <span class="order-span" v-else>{{$t('overview.ascendingOrder')}}</span>
             <img :src="descending" v-if="isWorstWork" class="img-class">
               <img :src="ascending" v-else class="img-class">
           </span>
@@ -357,7 +359,8 @@
         showNextGroup: false,
         showPreviousGroup: false,
         descending: require('../../../static/img/descending.png'),
-        ascending: require('../../../static/img/ascending.png')
+        ascending: require('../../../static/img/ascending.png'),
+        currentIndex: 0
       }
 
     },
@@ -411,6 +414,12 @@
         self.isWorstWork = false
         self.getInspectTaskRanking();
       },
+      timelineHandler(event, instance, echarts){
+        console.log(event);
+        let self = this;
+        self.currentIndex = event.currentIndex;
+        console.log(self.currentIndex)
+      },
       previousGroup() {
         let self = this;
         self.curGroupIndex == 0 ? 0 : self.curGroupIndex--;
@@ -427,6 +436,7 @@
             color: ["#f31d65", "#ffd035", "#72a1f3", "#57e78f"],
             timeline: {
               axisType: 'category',
+              currentIndex: self.currentIndex,
               autoPlay: true,
               playInterval: 10 * 1000,
               data: self.daysRangeList,
@@ -653,6 +663,7 @@
             color: ["#f31d65", "#ffd035", "#72a1f3", "#57e78f"],
             timeline: {
               axisType: 'category',
+              currentIndex: self.currentIndex,
               autoPlay: true,
               playInterval: 10 * 1000,
               data: self.daysRangeList,
@@ -1885,6 +1896,7 @@
             color: ["#f31d65", "#ffd035", "#72a1f3", "#57e78f"],
             timeline: {
               axisType: 'category',
+              currentIndex: self.currentIndex,
               autoPlay: true,
               playInterval: 10 * 1000,
               data: self.daysRangeList,
@@ -2360,11 +2372,6 @@
 
         }
         .focus-list {
-          @media screen and (max-width: 1280px) {
-            .title {
-              margin-left: calc(5 / 1920 * 100vw);
-            }
-          }
           .focus-content {
             height: calc(330 / 1920 * 100vw);
             border-top: 1px solid $border;
