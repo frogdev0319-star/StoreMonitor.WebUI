@@ -379,6 +379,7 @@
           let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
           self.params.beginTs = start;
           self.params.endTs = end;
+          self.currentIndex = 0;
           self.initData();
         }
       }
@@ -644,6 +645,7 @@
           self.dataMap.dataQualified = {0: []}
           self.dataMap.dataExcellent = {0: []};
           self.regionChartEmpty = true;
+          option.baseOption.timeline.autoPlay = false;
         }
         self.storeOptions = option;
       },
@@ -1045,6 +1047,7 @@
       dateChange(val) {
         let self = this;
         console.log(val);
+        self.currentIndex = 0;
         let start = typeof(val[0]) === 'object' ? val[0].getTime() : val[0];
         let end = typeof(val[1]) === 'object' ? val[1].getTime() : val[1];
         let daysDiff = self.$moment(end).diff(start, 'days');

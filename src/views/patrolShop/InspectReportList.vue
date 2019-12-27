@@ -30,22 +30,25 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
-                <div  class="stores-panel" >
-                  <div class="month-content" @click="choiceStore">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="storeName" size="mini" id="elMonth" :placeholder="generateReportLang('stores')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">
-                    <div class="month-details">
-                      <el-checkbox v-model="checkAllStore" @change="allStoreChecked"></el-checkbox> <span>{{$t('overview.all')}}</span>
-                    </div>
-                    <div class="month-details" v-for="(item,index) in storeDataList" :key="index">
-                      <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>
-                      <span>{{item.label}}</span>
-                    </div>
-                  </div>
-                </div>
+                <!--<div  class="stores-panel" >-->
+                  <!--<div class="month-content" @click="choiceStore">-->
+                    <!--<div class="input-arrow-panel"></div>-->
+                    <!--<el-input v-model="storeName" size="mini" id="elMonth" :placeholder="generateReportLang('stores')" :readonly=true></el-input>-->
+                    <!--<i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
+                  <!--</div>-->
+                  <!--<div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">-->
+                    <!--<div class="month-details">-->
+                      <!--<el-checkbox v-model="checkAllStore" @change="allStoreChecked"></el-checkbox> <span>{{$t('overview.all')}}</span>-->
+                    <!--</div>-->
+                    <!--<div class="month-details" v-for="(item,index) in storeDataList" :key="index">-->
+                      <!--<el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>-->
+                      <!--<span>{{item.label}}</span>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                <!--</div>-->
+                <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleChange" style="display: inline" ref="multiSelect">
+
+                </multi-select>
               <!--<el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"-->
                 <!--class="el-province select-store" @change="changeStore" @clear="clearStore">-->
                     <!--<el-option-->
@@ -164,8 +167,11 @@ import util from '@/common/util'
 import {Message} from 'element-ui'
 import {generateReportLang} from '@/api/i18n'
 import {mapGetters} from 'vuex'
+import MultiSelect from '@/components/MultiSelect'
+
 export default {
     name:'InspectReportList',
+    components: {MultiSelect},
     data(){
         return{
             varyWindowWidth:window.innerWidth,
@@ -260,6 +266,9 @@ export default {
         console.log(val);
         let self=this;
         if(val!=0){
+          self.storeDataList = [];
+          self.$refs.multiSelect.selectedArray = [];
+          self.$refs.multiSelect.input=''
           self.initData();
           self.getRegionInfo();
           self.getInitReportList();
@@ -910,6 +919,11 @@ export default {
                 duration:time
             });
         },
+        handleChange (arr) {
+          console.log(arr)
+          this.curStore = arr
+          this.changeStore(arr)
+        }
     },
     beforeRouteEnter (to, from, next) {
       if(from.name=='reportDetails'&& to.name == 'reports'){

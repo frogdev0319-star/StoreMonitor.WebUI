@@ -53,6 +53,7 @@
             </el-select>
           </div>
           <div v-else class="collapsed-brand-panel"></div>
+          <el-scrollbar style="height:100%;" id="el-menuscrollbar">
           <el-menu :default-active="activePath"
                    class="el-menu-vertical-demo"
                    text-color="#eee"
@@ -113,6 +114,7 @@
             </template>
 
           </el-menu>
+          </el-scrollbar>
         </aside>
 
         <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
@@ -1378,5 +1380,30 @@
   }
   .el-table__row{
     height: calc(60/1920*100vw);
+  }
+  ::-webkit-scrollbar {
+    width: 4px;
+    /*height: 4px;*/
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(144, 147, 153, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #fff;
+    border-radius: 2px;
+  }
+  .el-scrollbar .el-scrollbar__wrap{
+    margin-bottom: -17px  !important;
+    margin-right: -4px !important;
+  }
+  .el-input__inner{
+    font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+  }
+  .el-select-dropdown__item{
+    font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
 </style>

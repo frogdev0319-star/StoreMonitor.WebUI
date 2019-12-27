@@ -3424,12 +3424,12 @@ export default {
                         }
                         @media screen and(min-width:1366px){
                             .iconrside{
-                                width: 50%;
+                                width: 70%;
                             }
                         }
                         @media screen and(max-width:1366px){
                             .iconrside{
-                                width: 60%;
+                                width: 70%;
                             }
                         }
                         .iconrside{
@@ -3694,6 +3694,12 @@ export default {
                         @include point(width,90);
                         @include point(padding,6);
                         text-align: center;
+                      @media screen and(max-width: 1680px) {
+                        @include point(width, 100);
+                      }
+                      @media screen and(max-width: 1440px) {
+                        @include point(width, 110);
+                      }
                       @media screen and(max-width: 1366px) {
                         @include point(width, 130);
                       }
