@@ -86,7 +86,7 @@
                 <el-tooltip class="item" effect="dark"
                     placement="bottom-end">
                     <div slot="content">*{{generateReportLang('timePlaceholder')}}</div>
-                    <i class="iconfont icon-bangzhu iconbangzhu" style="font-size: 20px;color: #7d8cad;"></i>
+                    <i class="iconfont icon-bangzhu iconbangzhu" style="font-size: 20px;color: #7d8cad;vertical-align: middle;"></i>
                 </el-tooltip>
                 <span>{{generateReportLang('reportType')}}</span>
                 <el-select v-model="curReportType"  :placeholder="generateReportLang('all')" size="mini"
@@ -115,7 +115,19 @@
                 <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{generateReportLang('search')}}</el-button>
             </el-col>
             <el-col :span="24" class="header-details1">
-                <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{generateReportLang('selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
+                <span class="choice-store">
+                  <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
+                  {{generateReportLang('selected')}}
+                  <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
+                </span>
+                <div class="store-selected" v-if="showStoreInfo">
+                  <h1>已选门店</h1>
+                  <ul class="store-list" v-show="storeStr.length > 0">
+                    <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
+                      - {{item}}
+                    </li>
+                  </ul>
+                </div>
             </el-col>
         </el-col>
         <el-col :span="24" class="report-content">
@@ -249,7 +261,8 @@ export default {
             showMonthDrap: false,
             showStoreContent: false,
             checkAllStore: false,
-            noData: ''
+            noData: '',
+            showStoreInfo: false
         }
     },
     created(){
@@ -1009,9 +1022,47 @@ $suggestBack:#F1F6FE;
             }
             .choice-store{
                 color: $tab;
+                white-space: nowrap;
+                overflow: hidden;
+                /* text-overflow: ellipsis; */
+                width: 90%;
+                display: inline-block;
                 i{
                     margin-right: calc(15/1920*100vw);
                 }
+            }
+            .store-selected{
+              top: unset;
+              background-color: rgba(30, 34, 52, 0.75);
+              position: absolute;
+              /* display: none; */
+              z-index: 1;
+              padding: 20px;
+              min-width: 200px;
+              border-radius: 10px;
+              left: calc(80 / 1920 * 100vw);
+              h1{
+                white-space: nowrap;
+                font-size: 18px;
+                margin: 0;
+                font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
+                color: #fff;
+                font-weight: 500;
+                line-height: 1.1;
+              }
+              .store-list{
+                margin-top: 10px;
+                margin-left: 10px;
+                padding: 0;
+                .store-item{
+                  white-space: nowrap;
+                  font-size: 14px;
+                  margin: 0;
+                  list-style-type: none;
+                  font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
+                  color: #fff;
+                }
+              }
             }
         }
         .header-details{
