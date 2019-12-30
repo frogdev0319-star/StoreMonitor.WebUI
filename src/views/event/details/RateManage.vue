@@ -1020,7 +1020,7 @@ $h1:#292e36;
                 font-weight: bold;
                 color: $black;
                 margin-left: 20px;
-                width: 70%;
+                max-width: 50%;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1032,6 +1032,8 @@ $h1:#292e36;
                 font-size: 12px;
                 font-weight: bold;
                 border-radius: 12px;
+                height: calc(16/1920*100vw);
+                line-height: calc(16/1920*100vw);
             }
             .el-submit{
                 position: absolute;
