@@ -86,7 +86,7 @@
                 <el-tooltip class="item" effect="dark"
                     placement="bottom-end">
                     <div slot="content">*{{generateReportLang('timePlaceholder')}}</div>
-                    <i class="iconfont icon-bangzhu iconbangzhu" style="font-size: 20px;color: #7d8cad;vertical-align: middle;"></i>
+                    <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
                 </el-tooltip>
                 <span>{{generateReportLang('reportType')}}</span>
                 <el-select v-model="curReportType"  :placeholder="generateReportLang('all')" size="mini"
@@ -121,7 +121,7 @@
                   <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
                 </span>
                 <div class="store-selected" v-if="showStoreInfo">
-                  <h1>已选门店</h1>
+                  <h1>{{generateReportLang('selected')}}</h1>
                   <ul class="store-list" v-show="storeStr.length > 0">
                     <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
                       - {{item}}
@@ -495,6 +495,8 @@ export default {
             let self=this;
             self.curStore=[];
             self.storeStr='';
+            self.$refs.multiSelect.selectedArray = [];
+            self.$refs.multiSelect.input=''
         },
         changeCountry(val){
           let self=this;
@@ -1029,6 +1031,7 @@ $suggestBack:#F1F6FE;
                 display: inline-block;
                 i{
                     margin-right: calc(15/1920*100vw);
+                    font-size: calc(16/1920*100vw);
                 }
             }
             .store-selected{
@@ -1074,6 +1077,9 @@ $suggestBack:#F1F6FE;
             }
             .date-range{
                 width:320px;
+            }
+            .iconbangzhu{
+              font-size: calc(16/1920*100vw);
             }
             span{
                 font-size: calc(14/1920*100vw);
