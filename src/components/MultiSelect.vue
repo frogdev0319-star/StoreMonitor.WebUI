@@ -24,7 +24,7 @@
         },
         data () {
           return {
-            selectedArray: this.selected,
+            selectedArray: JSON.parse(JSON.stringify(this.selected)),
             input: '',
             disabledLength: 0
           }
