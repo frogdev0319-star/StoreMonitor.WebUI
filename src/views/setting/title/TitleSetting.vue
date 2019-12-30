@@ -22,7 +22,7 @@
           </el-form-item>
           <el-form-item :label="$t('titleView.comment')" prop="comment" class="comment-class">
             <label slot="label" class="comment-label">{{$t('titleView.comment')}}</label>
-              <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  @input="commentChange" :autosize="{minRows: 2, maxRows: 4}" ></el-input>
+              <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  class="role-comment" @input="commentChange" :autosize="{minRows: 2, maxRows: 4}" ></el-input>
             <span class="text" style="float: right;color: #909399;">{{curLength}}/200</span>
           </el-form-item>
         </el-form>
@@ -70,10 +70,10 @@
               console.log(reg.test(value))
               let commentLength = filterString.getContentLength(value)
               if (reg.test(value) && commentLength <=20) {
-                let titleList = JSON.parse(sessionStorage.getItem('titleList'));
+                //let titleList = JSON.parse(sessionStorage.getItem('titleList'));
                 if(self.isAdd){
                   // add title
-                  if(titleList.includes(value)){
+                  if(self.titleList.includes(value)){
                     return callback(new Error(self.$t('titleView.titleExist')))
                   }
                   else{
@@ -87,7 +87,7 @@
                     callback()
                   }
                   else{
-                    if(titleList.includes(value)){
+                    if(self.titleList.includes(value)){
                       return callback(new Error(self.$t('titleView.titleExist')))
                     }
                     else{
@@ -285,7 +285,8 @@
             tempRoleNameList: [],
             authorityInfoLists:[],
             isAdd: this.$route.params.isAdd,
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            titleList: JSON.parse(sessionStorage.getItem('titleList'))
           }
 
       },
@@ -327,9 +328,10 @@
                   console.log(res);
                   if(res.errCode == 0){
                     self.notify(self.$t('titleView.saveSuss'),'success',3000);
+                    self.titleList.push(self.infoForm.title);
                   }
                   else{
-                    self.notify(res.errMsg,'warning',3000);
+                    self.notify(self.$t('titleView.saveFail'),'warning',3000);
                   }
                 }).catch(error=>{
                 });
@@ -341,7 +343,7 @@
                     self.notify(self.$t('titleView.saveSuss'),'success',3000);
                   }
                   else{
-                    self.notify(res.errMsg,'warning',3000);
+                    self.notify(self.$t('titleView.saveFail'),'warning',3000);
                   }
                 }).catch(error=>{
                 });
@@ -808,5 +810,8 @@
   }
   .role-list #el-menuscrollbar .el-scrollbar__wrap{
     overflow-x: hidden;
+  }
+  .role-comment .el-textarea__inner{
+    font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei
   }
 </style>

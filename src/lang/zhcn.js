@@ -692,6 +692,7 @@ export default {
     enterTitleName: '请输入职务名称',
     titleValidateInfo: '职务名称为1~20个字母或汉字',
     saveSuss: '保存成功',
-    titleExist: '职务名称已存在'
+    titleExist: '职务名称已存在',
+    saveFail: '保存失败',
   }
 }

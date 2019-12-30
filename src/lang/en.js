@@ -685,6 +685,7 @@ export default {
     enterTitleName: 'Please enter job title',
     titleValidateInfo: 'Job title consists of 1~20 Chinese characters or letters',
     saveSuss: 'Successfully saved',
-    titleExist: 'The job title already exists'
+    titleExist: 'The job title already exists',
+    saveFail: 'Failed to save',
   }
 }
