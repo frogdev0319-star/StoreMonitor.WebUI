@@ -165,7 +165,7 @@
                   <span>{{errorText}}</span>
                 </div>
                 <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls"
-                        class="video-js vjs-fill">
+                        class="video-js vjs-fill"  @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)">
                 </video>
               </div>
               <div class="video-gongge-content" v-else>
@@ -3022,6 +3022,14 @@ export default {
         console.log(content);
         self.eventDes = content;
         self.showEventDescInfo = false;
+      },
+      onPlayerWaiting(e){
+        console.log('video is loading')
+        this.showCutContent = false
+      },
+      onPlayerPlaying(e){
+        console.log('video is playing')
+        this.showCutContent = true
       }
     }
 }

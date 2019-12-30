@@ -217,7 +217,7 @@
                     </div>
                   </transition>
                   <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
-                          class="video-js vjs-fill" >
+                          class="video-js vjs-fill" @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)">
                   </video >
                 </div>
               </div>
@@ -2218,10 +2218,10 @@ export default {
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
-            setTimeout(() => {
-                self.showModelContent=true;
-                //self.showInfoContent=false;
-            }, 3000);
+            // setTimeout(() => {
+            //     self.showModelContent=true;
+            //     //self.showInfoContent=false;
+            // }, 3000);
         },
         destroyVideo(){
             let self=this;
@@ -2231,15 +2231,15 @@ export default {
         },
         hiddenModel(){
             let self=this;
-            self.showModelContent=false;
+            //self.showModelContent=false;
             //self.showInfoContent=false;
         },
         showModel(){
             let self=this;
             //self.showInfoContent=true;
-            if(self.playState){
-                self.showModelContent=true;
-            }
+            // if(self.playState){
+            //     self.showModelContent=true;
+            // }
         },
         async realTime(){
             let self=this;
@@ -2409,10 +2409,10 @@ export default {
             if(!self.fullScreen){
                 self.fullWindowScreen();
                 self.fullScreen=true;
-                setTimeout(() => {
-                    self.showModelContent=false;
-                    //self.showInfoContent=false;
-                }, 3000);
+                // setTimeout(() => {
+                //     self.showModelContent=false;
+                //     //self.showInfoContent=false;
+                // }, 3000);
             }
             else{
                 self.exitFullscreen();
@@ -2876,6 +2876,14 @@ export default {
         let content = filterString.all(val,200);
         console.log(content);
         self.eventDes = content;
+      },
+      onPlayerWaiting(e){
+        console.log('video is loading')
+        this.showModelContent = false
+      },
+      onPlayerPlaying(e){
+        console.log('video is playing')
+        this.showModelContent = true
       }
     }
 }
