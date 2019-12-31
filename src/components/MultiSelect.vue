@@ -1,6 +1,7 @@
 <template>
   <div class="content">
-    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' :placeholder="$t('reportView.stores')" @visible-change="visibileHandler" class="el-province">
+    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect'
+               :placeholder="$t('reportView.stores')" @visible-change="visibileHandler" class="el-province">
       <el-option :label="$t('overview.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.storeId' :disabled="item.disabled"></el-option>
     </el-select>
@@ -137,7 +138,7 @@
   }
   .el-select-dropdown__item{
     padding: 0 20px 0 50px !important;
-    color: #7d8cad;
+    /*color: #7d8cad;*/
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
     font-family: "iconfont" !important;

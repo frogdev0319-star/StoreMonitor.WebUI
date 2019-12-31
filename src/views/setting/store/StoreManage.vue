@@ -26,7 +26,7 @@
                             <span>{{item.cityName}}</span>
                         </div>
                     </div>
-                <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
+                <div slot="reference" @click="choiceCity" class="city-input"><span>{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
             </el-popover>
 
             <el-button :size="varyWindowWidth>1680?'small':'mini'"  :class="lang=='en'? 'en-el-search-btn': 'el-search-btn'" @click="searchStore" type="primary">{{generateStoreLang('searchButton')}}</el-button>

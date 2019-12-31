@@ -1334,6 +1334,15 @@ $suggestBack:#F1F6FE;
     ::-webkit-scrollbar-thumb:hover {
       background: rgb(162, 162, 163);
     }
+    /deep/ .el-input.is-disabled .el-input__inner::-webkit-input-placeholder {
+      color: #7d8cad;
+    }
+    /deep/ .el-input.is-disabled .el-input__inner::-ms-input-placeholder {
+      color: #7d8cad;
+    }
+    /deep/ .el-input.is-disabled .el-input__inner::placeholder {
+      color: #7d8cad;
+    }
 </style>
 <style>
 @import '../../assets/css/pagination.css';

@@ -86,6 +86,7 @@
 .search-input.el-input.el-input--mini .el-input__inner{
   height: calc(36/1920*100vw);
   line-height: calc(36/1920*100vw);
+  color: #7d8cad;
 }
 .el-date-editor .el-range-input{
   color: #7d8cad;
