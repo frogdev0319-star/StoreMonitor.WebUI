@@ -43,7 +43,7 @@
         <aside :class="collapsed?'aside-collapse-width':'aside-width'">
           <div class="brand-panel" v-if="!collapsed">
             <span class="brand-label">{{generateRoute('brand')}}</span>
-            <el-select v-model="accountId" :placeholder="generateRoute('select')"   popper-class='brandSelect' class="brand-list" @change='changeAccount' :disabled="brandDisabled">
+            <el-select v-model="accountId" :placeholder="generateRoute('select')"   popper-class='brandSelect' class="brand-list" @change='changeAccount' :disabled="brandDisabled" ref="fieldSelect">
               <el-option
                 class="options"
                 v-for="(item,index) in brandList" :key="index"
@@ -475,6 +475,11 @@
       this.getAccountList();
       this.updateTitle();
       console.log(this.$router.options.routes)
+      this.$nextTick(function() {
+        this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
+          "scroll-opacity"
+        );
+      });
     },
   }
 </script>
@@ -1405,5 +1410,10 @@
   }
   .el-select-dropdown__item{
     font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+  }
+</style>
+<style  lang="scss">
+  .el-select-dropdown .scroll-opacity.el-scrollbar .el-scrollbar__bar.is-vertical {
+    opacity: 1;//改为0不显示滚动条
   }
 </style>
