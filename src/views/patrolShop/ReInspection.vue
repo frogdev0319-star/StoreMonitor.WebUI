@@ -721,9 +721,9 @@ export default {
         let self=this;
         let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
         if(canLeave && to.name !='confirmSum'){
-          self.$confirm('当前巡检尚未完成，确认是否离开页面？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
+          self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
+            confirmButtonText: self.$t('remotePatrol.confirm'),
+            cancelButtonText: self.$t('remotePatrol.cancel'),
             type: 'warning',
             customClass: 'confirmClass',
             cancelButtonClass: 'cancelBtn',
@@ -3018,8 +3018,10 @@ export default {
                     @include point(margin-left,20);
                 }
                 .des-input{
-                    width: 90%;
+                    display: block;
+                    width: auto;
                     @include point(margin-left,20);
+                    @include point(margin-right,20);
                 }
             }
             .feed-canvas-content{
@@ -4211,17 +4213,23 @@ export default {
   }
   .confirmClass{
     width: 28%;
+    font-family: Arial, 'Microsoft YaHei';
   }
   .confirmClass .el-message-box__header{
     border-bottom: 0.5px solid #dfe2e9;
     padding: 20px;
+    padding-bottom: 17px;
     font-size: 14px;
   }
   .confirmClass .el-message-box__content{
     padding: 20px;
   }
+  .confirmClass .el-message-box__header .el-message-box__title{
+    font-size: 14px;
+    line-height: 24px;
+  }
   .confirmClass .cancelBtn{
-    width: calc(76/1920*100vw);
+    width: 4.75rem;
     margin-right: calc(20/1920*100vw);
     background-color: #EAEDF2 !important;
     color: #708090 !important;
@@ -4229,7 +4237,7 @@ export default {
     line-height: 12px;
   }
  .confirmClass .confirmBtn{
-    width: calc(76/1920*100vw);
+    width: 4.75rem;
     background-color: #f31d65;;
     color: #fff !important;
     font-size: 12px;
@@ -4238,5 +4246,9 @@ export default {
   .confirmClass .el-message-box__btns{
     padding: 20px;
     padding-top: 10px;
+  }
+  .confirmClass .el-message-box__headerbtn{
+    font-size: calc(20/1920*100vw);
+    top: 20px;
   }
 </style>

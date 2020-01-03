@@ -3209,6 +3209,7 @@ export default {
                 color: #708090 !important;
                 font-size: 12px;
                 line-height: 12px;
+                border-radius: 3px;
             }
             #confirmBtn{
                 @include point(width,76);
@@ -3216,6 +3217,7 @@ export default {
                 @include point(margin-right,20);
                 font-size: 12px;
                 line-height: 12px;
+                border-radius: 3px;
             }
             .canvas-content{
                 position: relative;
@@ -3235,6 +3237,7 @@ export default {
                     margin-bottom:0px;
                     position: relative;
                     bottom: 5px;
+                    margin-top: 0;
                 }
                 .cancel-content{
                     position: absolute;
