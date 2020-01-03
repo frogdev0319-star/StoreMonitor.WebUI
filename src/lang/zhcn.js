@@ -270,7 +270,8 @@ export default {
     deviceOffline: '设备离线，播放失败',
     lackParams: '缺少必要参数',
     noVideoSource: '设备无视频源',
-    enterDesc: '请输入信息'
+    enterDesc: '请输入信息',
+    videoCannotPlay: '加密设备不支持播放'
 },
   //report management page language
   reportView:{
@@ -550,7 +551,8 @@ export default {
     enterDeveloperKey: '请输入完整的开发者密钥',
     enterAccountName: '用户名由1~20个汉字、字母或数字组成',
     EzvizAccount: '萤石账号',
-    failedReason: '失败原因：'
+    failedReason: '失败原因：',
+    preview: '预览区域'
   },
 
   //Store Management page language

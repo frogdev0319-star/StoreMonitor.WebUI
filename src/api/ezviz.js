@@ -84,7 +84,7 @@ function getMsg() {
   }
   return msg;
 }
-async function getDeviceCapacity(data){
+export async function getDeviceCapacity(data){
   let ret = false;
   await instance({
     method: 'post',
@@ -111,11 +111,11 @@ async function getDeviceCapacity(data){
 export async function getIsEncrypt(data){
   let ret=null;
   console.log(data)
-  let result = await getDeviceCapacity(data);
-  console.log(result);
-  if(!result){
-    return ret = 0;
-  }
+  // let result = await getDeviceCapacity(data);
+  // console.log(result);
+  // if(!result){
+  //   return ret = 0;
+  // }
   await instance({
     method: 'post',
     url: '/lapp/device/info',

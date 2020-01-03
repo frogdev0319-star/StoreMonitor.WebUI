@@ -268,7 +268,8 @@ export default {
     deviceOffline: 'Device offline',
     lackParams: 'Lack of necessary parameters',
     noVideoSource: 'No video source device',
-    enterDesc: 'Enter description'
+    enterDesc: 'Enter description',
+    videoCannotPlay: 'Video playback is not supported on encrypted devices'
   },
 
   //report management page language
@@ -543,7 +544,8 @@ export default {
     enterDeveloperKey: 'Please enter developer key',
     enterAccountName: 'Username must be between 1~20 long, can contain Chinese characters, letters and numbers',
     EzvizAccount: 'Ezviz Account',
-    failedReason: 'Failure Reason:'
+    failedReason: 'Failure Reason:',
+    preview: 'Preview Area'
   },
   //Store Management page language
   storeView: {

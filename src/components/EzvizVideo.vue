@@ -248,7 +248,7 @@
 
 <script>
   import  EZUIKit from '../../static/ezuikit/ezuikit.js'
-  import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword} from '@/api/ezviz'
+  import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword,getDeviceCapacity} from '@/api/ezviz'
   import {generatePatrolLang} from '@/api/i18n'
   import {mapGetters} from 'vuex'
   import qs from 'qs'
@@ -640,23 +640,36 @@
         obj.deviceSerial= self.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
         console.log(result);
+        let suportUpdatePass = false;
         if(result == 1){
-          //已加密设备先从缓存中查看是否已经有验证码，有验证码直接取出，没有验证码要弹出对话框
-          let deviceObj = {};
-          deviceObj.deviceSerial = self.ivsId;
-          deviceObj.channelId = self.channelId;
-          let result = self.getDeviceValidateCode(deviceObj);
-          console.log('从缓存中取得的验证码' + result)
-          if(result.length > 0){
-            self.videoPassword = result;
-            self.verifyEnterPassword(); //验证密码是否正确
+          suportUpdatePass = await getDeviceCapacity(qs.stringify(obj));
+        }
+        console.log(suportUpdatePass)
+        if(result == 1){
+          if( suportUpdatePass ){
+            //已加密设备先从缓存中查看是否已经有验证码，有验证码直接取出，没有验证码要弹出对话框
+            let deviceObj = {};
+            deviceObj.deviceSerial = self.ivsId;
+            deviceObj.channelId = self.channelId;
+            let result = self.getDeviceValidateCode(deviceObj);
+            console.log('从缓存中取得的验证码' + result)
+            if(result.length > 0){
+              self.videoPassword = result;
+              self.verifyEnterPassword(); //验证密码是否正确
+            }
+            else{
+              //不存在密码
+              self.isLoading = false;
+              self.showError = true;
+              self.errorMsg = self.$t('storeMonitor.videoEncrypted');
+              self.showInputPassword = true;
+            }
           }
           else{
             //不存在密码
             self.isLoading = false;
             self.showError = true;
-            self.errorMsg = self.$t('storeMonitor.videoEncrypted');
-            self.showInputPassword = true;
+            self.errorMsg = self.$t('storeMonitor.videoCannotPlay');
           }
         }
         else{
