@@ -196,7 +196,7 @@
                             :visible.sync="showConfirmDelete" v-if="showConfirmDelete"
                             :append-to-body='true'
                             :close-on-click-modal="false"
-                            width="28%"
+                            width="510px"
                             top="35vh"
                             left="40vh">
                   <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -233,7 +233,7 @@
                      :visible.sync="showAddNvrDialog" v-if="showAddNvrDialog"
                      :append-to-body='true'
                      :close-on-click-modal="false"
-                     width="28%"
+                     width="510px"
                      top="35vh"
                      left="40vh" customClass="addNvr"
           >
@@ -362,10 +362,18 @@
                   </div>
                   <div class="nape-picture-data">
                     <span v-if="item.tempUrl">
-                       <img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">
-                        <img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">
+                      <el-image :src="item.tempUrl" class="img-class" v-if="isUpdate">
+                        <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
+                      <el-image :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class" v-else>
+                         <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
                     </span>
-                    <span v-else="!item.tempUrl" class="img-class" style="display: inline-block;background: #cccc;">
+                    <span v-else class="img-class" style="display: inline-block;background: #cccc;">
                       <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
                     <el-upload v-if="item.isClick"
@@ -404,7 +412,7 @@
                         :visible.sync="showDeleteChannel" v-if="showDeleteChannel"
                         :append-to-body='true'
                         :close-on-click-modal="false"
-                        width="28%"
+                        width="510px"
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -424,7 +432,7 @@
                        :visible.sync="showAddChannelDialog" v-if="showAddChannelDialog"
                        :append-to-body='true'
                        :close-on-click-modal="false"
-                       width="28%"
+                       width="510px"
                        top="35vh"
                        left="40vh" customClass="addNvr"
             >
@@ -471,7 +479,12 @@
                           <el-button  size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
                             <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('selectPicture')}}</span>
                           </el-button>
-                          <img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">
+                          <!--<img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">-->
+                          <el-image :src="addChannelData.pictureUrl" class="image-class">
+                            <div slot="error" class="image-slot">
+                              <span class="image-span">{{$t('deviceView.preview')}}</span>
+                            </div>
+                          </el-image>
                         </el-upload>
                       </el-form-item>
                     </el-col>
@@ -2512,8 +2525,8 @@
           padding-left: 1%;
           cursor: pointer;
           font-size: 14px;
-          @include point(height,49);
-          @include point(line-height,49);
+          height: calc(90/1920*100vw);
+          line-height: calc(90/1920*100vw);
 
           text-align: left;
           .nape-input{
@@ -2557,6 +2570,10 @@
               @include point(width, 80);
               vertical-align: middle;
               text-align: center;
+              line-height: calc(70/1920*100vw);
+              height: calc(70/1920*100vw);
+              width: calc(100/1920*100vw);
+              display: inline-block;
             }
             .upload-demo{
               position: absolute;
@@ -2678,6 +2695,27 @@
     height: 100px;
     display: block;
   }
+  .image-class{
+    height: calc(70/1920*100vw);
+    width: calc(100/1920*100vw);
+    border: 1px dashed #7d8cad;
+  }
+  .el-image__inner{
+    height: calc(70/1920*100vw);
+    width: calc(100/1920*100vw);
+  }
+  .image-slot{
+    height: calc(70/1920*100vw);
+    width: calc(100/1920*100vw);
+    color: #7d8cad;
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .image-span{
+    height: calc(70/1920*100vw);
+    line-height: calc(70/1920*100vw);
+  }
   .el-tooltipClass.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
     border-bottom-color: rgba(30, 34, 52, 0.75) !important;
   }
@@ -2691,6 +2729,9 @@
     font-size: 14px !important;
     /*line-height: 21px;*/
     padding: 5px;
+  }
+  .el-icon-picture-outline{
+    font-size: 16px;
   }
 </style>
 <style scoped>

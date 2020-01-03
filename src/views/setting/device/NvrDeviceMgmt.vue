@@ -46,7 +46,7 @@
                        :visible.sync="showImportContent" v-if="showImportContent"
                        :close-on-click-modal="false"
                        :append-to-body='true'
-                       width="28%"
+                       width="510px"
                        top="35vh"
                        left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -65,7 +65,7 @@
                         :visible.sync="showConfirmImport" v-if="showConfirmImport"
                         :append-to-body='true'
                         :close-on-click-modal="false"
-                        width="28%"
+                        width="510px"
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -160,7 +160,7 @@
                             :visible.sync="showConfirmDelete" v-if="showConfirmDelete"
                             :append-to-body='true'
                             :close-on-click-modal="false"
-                            width="28%"
+                            width="510px"
                             top="35vh"
                             left="40vh">
                   <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -196,7 +196,7 @@
                      :visible.sync="showAddNvrDialog" v-if="showAddNvrDialog"
                      :append-to-body='true'
                      :close-on-click-modal="false"
-                     width="28%"
+                     width="510px"
                      top="35vh"
                      left="40vh" customClass="addNvr"
           >
@@ -296,10 +296,22 @@
                   </div>
                   <div class="nape-picture-data">
                     <span v-if="item.tempUrl">
-                       <img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">
-                        <img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">
+                      <el-image :src="item.tempUrl" class="img-class" v-if="isUpdate">
+                        <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
+                      <el-image :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class" v-else>
+                        <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
                     </span>
-                    <span v-else="!item.tempUrl" class="img-class" style="display: inline-block;background: #cccc;">
+                    <!--<span v-if="item.tempUrl">-->
+                       <!--<img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">-->
+                        <!--<img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">-->
+                    <!--</span>-->
+                    <span v-else class="img-class" style="display: inline-block;background: #cccc;">
                       <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
                     <el-upload v-if="item.isClick"
@@ -338,7 +350,7 @@
                         :visible.sync="showDeleteChannel" v-if="showDeleteChannel"
                         :append-to-body='true'
                         :close-on-click-modal="false"
-                        width="28%"
+                        width="510px"
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -358,7 +370,7 @@
                        :visible.sync="showAddChannelDialog" v-if="showAddChannelDialog"
                        :append-to-body='true'
                        :close-on-click-modal="false"
-                       width="28%"
+                       width="510px"
                        top="35vh"
                        left="40vh" customClass="addNvr"
             >
@@ -387,7 +399,7 @@
                     </el-col>
                   </el-form-item>
                   <el-from-item>
-                    <el-col :span="6">
+                    <el-col :span="8">
                       <el-form-item :label="generateDeviceLang('thumbnail')" ref="uploadElement" prop="pictureUrl">
                         <el-input v-model="addChannelData.pictureUrl" v-if="false"></el-input>
                         <el-upload
@@ -402,15 +414,22 @@
                           accept="image/png,image/jpg,image/jpeg"
                           list-type="picture"
                           :data="addChannelData">
-                          <el-button  size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
+                          <el-button  size="mini" type="primary" style=" margin-bottom: 0px;position: relative;margin-right: 0px;">
                             <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('selectPicture')}}</span>
                           </el-button>
-                          <img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">
+                          <!--<img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">-->
                         </el-upload>
+                        <el-image :src="addChannelData.pictureUrl" class="image-class">
+                          <div slot="error" class="image-slot">
+                            <span class="image-span">{{$t('deviceView.preview')}}</span>
+                          </div>
+                        </el-image>
                       </el-form-item>
                     </el-col>
-                    <el-col :span="varWindowWidth<1440? 14: 16" :offset="varWindowWidth<1440? 3: 1">
-                      <span class="picture-tips">*{{generateDeviceLang('thumbnailInfo')}}</span>
+                    <el-col :span="16" :offset="varWindowWidth<1440? 3: 0">
+                      <el-form-item label="">
+                        <span class="picture-tips">*{{generateDeviceLang('thumbnailInfo')}}</span>
+                      </el-form-item>
                     </el-col>
                   </el-from-item>
 
@@ -580,7 +599,7 @@
             { required: true, message: this.$t('deviceView.inputChannelName'), trigger: 'blur' }
           ],
           channelId: [
-            {required: true, message: '请选择NVR通道号', trigger: 'change' }
+            {required: true, message: this.$t('deviceView.selectNvrChannel'), trigger: 'change' }
           ],
           pictureUrl: [
             {required: true, message: this.$t('deviceView.uploadImage'), trigger: 'blur' }
@@ -2196,9 +2215,9 @@
           padding-left: 1%;
           cursor: pointer;
           font-size: 14px;
-          @include point(height,49);
-          @include point(line-height,49);
-
+          height: calc(90/1920*100vw);
+          line-height: calc(90/1920*100vw);
+          //border-bottom: 1px solid red;
           text-align: left;
           .nape-input{
             @include point(width,180);
@@ -2237,10 +2256,14 @@
             position: relative;
             left: 1%;
             .img-class{
-              height: 90%;
+              //height: 90%;
               @include point(width, 80);
               vertical-align: middle;
               text-align: center;
+              line-height: calc(70/1920*100vw);
+              height: calc(70/1920*100vw);
+              width: calc(100/1920*100vw);
+              display: inline-block;
             }
             .upload-demo{
               position: absolute;
@@ -2250,22 +2273,22 @@
                 width: 100%;
               }
               /deep/ .el-button{
-                width: 100%;
+                width: calc(100/1920*100vw);
                 @include point(height,20);
                 opacity: 0.5;
                 position: absolute;
-                bottom: 0;
+                bottom: calc(9/1920*100vw);
                 left: 0;
               }
               /deep/ .el-button--mini{
-                padding: 7px;
+                padding: 2px;
               }
-              @media screen and (max-width: 1280px){
-                .edit-picture{
-                  position: relative;
-                  bottom: 4px;
-                }
-              }
+              /*@media screen and (max-width: 1280px){*/
+                /*.edit-picture{*/
+                  /*position: relative;*/
+                  /*bottom: 4px;*/
+                /*}*/
+              /*}*/
             }
           }
           .nape-items-handle{
@@ -2280,7 +2303,6 @@
 
       }
     }
-
   }
 </style>
 <style>
@@ -2340,6 +2362,30 @@
     width: 100px;
     height: 100px;
     display: block;
+  }
+  .image-class{
+    height: calc(70/1920*100vw);
+    width: calc(100/1920*100vw);
+    border: 1px dashed #7d8cad;
+  }
+  .el-image__inner{
+    height: calc(70/1920*100vw);
+    width: calc(100/1920*100vw);
+  }
+   .image-slot{
+     height: calc(70/1920*100vw);
+     width: calc(100/1920*100vw);
+     color: #7d8cad;
+     font-size: 12px;
+     text-align: center;
+     overflow: hidden;
+  }
+  .image-span{
+    height: calc(70/1920*100vw);
+    line-height: calc(70/1920*100vw);
+  }
+  .el-icon-picture-outline{
+    font-size: 16px;
   }
 </style>
 <style scoped>
