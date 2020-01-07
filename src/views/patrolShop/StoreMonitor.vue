@@ -336,7 +336,7 @@
                         size="mini"
                         :clearable="false"
                         placeholder="任意时间点"
-                        @change='changeDate'>
+                    >
                     </el-time-picker>
                     <el-button size="mini" class='backdate-btn' @click="backCurDate" type="primary">{{generateStoreMonitorLang('backToNow')}}</el-button>
                 </div>
@@ -752,7 +752,8 @@ export default {
         let self=this;
         self.isREC=false;
         //self.videoEl=document.getElementById('previewVideo');
-        document.onmouseup=self.mouseUpAction;
+        //document.onmouseup=self.mouseUpAction;
+        document.addEventListener("mouseup",self.mouseUpAction, false);
         //self.getPlayer();
         //初始化页面数据
         self.myDivHeight();
@@ -1376,7 +1377,8 @@ export default {
               }
             }
             else{
-
+              console.log('ezviz')
+              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
             }
         },
         afterCurDate(sindex,item){
@@ -1692,6 +1694,7 @@ export default {
         },
         mouseUpAction(e){
             console.log(e)
+            console.log(e.target.className)
             let self=this;
             self.isMouseDown=false;
             //self.showCutModel=true;
@@ -1704,6 +1707,9 @@ export default {
                 self.imageCanvasList.push(imgObj);
             }
             self.flag=0;
+            if(e.target.className == 'el-time-panel__btn confirm'){
+              self.changeDate();
+            }
         },
         mouseLeaveAction(e){
           console.log(e)
@@ -3031,8 +3037,13 @@ export default {
         console.log('video is playing')
         this.showCutContent = true
       }
-    }
-}
+    },
+    beforeDestroy() {
+      let self = this;
+      // 清除监听器
+      document.removeEventListener('mouseup', self.mouseUpAction);
+    },
+  }
 </script>
 <style lang="scss" scoped>
 @import 'node_modules/bootstrap/scss/bootstrap';

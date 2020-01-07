@@ -482,29 +482,30 @@
           self.playBackState = false;
         }
       },
-      curTime(newValue, oldValue){
-        console.log("curTime")
-        let self = this;
-        if(!self.id || !self.ivsId){
-          self.showError = true;
-          self.errorMsg = self.$t('storeMonitor.lackParams')
-          return;
-        }
-        self.showError = false;
-        self.times = 0;
-        console.log('new:', newValue);
-        console.log(self.curTime)
-        self.startTs = newValue;
-        if(self.playState){
-          self.decoder.stop();
-          self.playState = false
-        }
-        self.$nextTick(()=> {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer)
-          self.initVideo();
-        })
-      },
+      // curTime(newValue, oldValue){
+      //   console.log("curTime")
+      //   let self = this;
+      //   if(!self.id || !self.ivsId){
+      //     self.showError = true;
+      //     self.errorMsg = self.$t('storeMonitor.lackParams')
+      //     return;
+      //   }
+      //   self.showError = false;
+      //   self.times = 0;
+      //   console.log('new:', newValue);
+      //   console.log(self.curTime)
+      //   self.startTs = newValue;
+      //   if(self.playState){
+      //     self.decoder.stop();
+      //     self.playState = false
+      //   }
+      //   self.$nextTick(()=> {
+      //     self.decoder = null;
+      //     console.log(self.$refs.myPlayer)
+      //     //self.initVideo();
+      //     self.checkIfEncry();
+      //   })
+      // },
       async storeId(newValue, oldValue){
         console.log(newValue);
         console.log(oldValue);
@@ -583,6 +584,30 @@
     },
     methods: {
       generatePatrolLang,
+      changeHistoryTime(newValue){
+        console.log("curTime")
+        let self = this;
+        if(!self.id || !self.ivsId){
+          self.showError = true;
+          self.errorMsg = self.$t('storeMonitor.lackParams')
+          return;
+        }
+        self.showError = false;
+        self.times = 0;
+        console.log('new:', newValue);
+        console.log(self.curTime)
+        self.startTs = newValue;
+        if(self.playState){
+          self.decoder.stop();
+          self.playState = false
+        }
+        self.$nextTick(()=> {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer)
+          //self.initVideo();
+          self.checkIfEncry();
+        })
+      },
       visibleChange(){
         console.log('子组件退出')
         let self = this;
@@ -1032,11 +1057,24 @@
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
             console.log('历史视频')
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('加入验证码历史视频' + self.videoUrl)
+            }
+            else {
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('历史视频' + self.videoUrl)
+            }
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+              console.log('加入验证码实时视频' + self.videoUrl)
+            }
+            else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            }
+            //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
           }
           // 初始化视频方法
           self.decoder = new EZUIKit.EZUIPlayer({
@@ -1079,11 +1117,23 @@
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
             console.log('历史视频')
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('加入验证码历史视频' + self.videoUrl)
+            }
+            else {
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('历史视频' + self.videoUrl)
+            }
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+              console.log('加入验证码实时视频' + self.videoUrl)
+            }
+            else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            }
           }
           // 初始化视频方法
           self.fullDecoder = new EZUIKit.EZUIPlayer({
@@ -1161,11 +1211,24 @@
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
             console.log('历史视频')
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('加入验证码历史视频' + self.videoUrl)
+            }
+            else {
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('历史视频' + self.videoUrl)
+            }
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+              console.log('加入验证码实时视频' + self.videoUrl)
+            }
+            else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            }
+            //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
           }
           // 初始化视频方法
           self.fullDecoder = new EZUIKit.EZUIPlayer({
