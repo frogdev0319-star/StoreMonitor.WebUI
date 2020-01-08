@@ -158,12 +158,33 @@
         name: "EzvizAccount",
         data(){
           const validateEzvizAccount =(rule,value,callback)=>{
+            let self = this;
             const reg = /^1[3|4|5|7|8|9][0-9]\d{8}$/
             console.log(reg.test(value))
-            if (reg.test(value)) {
-              callback()
-            } else {
-              return callback(new Error(this.$t('deviceView.enterCorrentAccount')))
+            if(value == undefined){
+              return callback(new Error(this.$t('deviceView.enterAccount')))
+            }
+            else{
+              if(self.isAdd){
+                if(self.accountList.includes(value)) {
+                  return callback(new Error(this.$t('deviceView.accountExist')))
+                }
+              }
+              else{
+                if(self.ezvizAccountInfo.oldEzvizAccount == value){
+                  callback()
+                }
+                else{
+                  if(self.accountList.includes(value)) {
+                    return callback(new Error(this.$t('deviceView.accountExist')))
+                  }
+                }
+              }
+              if (reg.test(value)) {
+                callback()
+              } else{
+                return callback(new Error(this.$t('deviceView.enterCorrentAccount')))
+              }
             }
           }
           const validateAccountName =(rule,value,callback)=>{
@@ -263,7 +284,8 @@
             storeviuNum: 0,
             curLength: 0,
             totalMsg: '',
-            noData: ''
+            noData: '',
+            accountList: []
           }
         },
         methods:{
@@ -326,6 +348,12 @@
             if(self.tableData.length == 0){
               self.noData = self.$t('deviceView.noData');
             }
+            let listArray = [];
+            self.tableData.forEach(item=>{
+              listArray.push(item.ezvizAccount)
+            })
+            self.accountList = listArray;
+            console.log(self.accountList);
           },
           getEzvizAccountList(){
             return new Promise((resolve,reject)=>{
@@ -485,6 +513,7 @@
             self.ezvizAccountInfo.appSecret = row.appSecret;
             self.ezvizAccountInfo.scope = row.scope;
             self.ezvizAccountInfo.comment = row.comment;
+            self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
             let commentLength = filterString.getContentLength(row.comment)
             self.curLength = commentLength;
             self.deleteId = row.id;
