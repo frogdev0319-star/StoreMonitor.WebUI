@@ -1416,4 +1416,7 @@
   .el-select-dropdown .scroll-opacity.el-scrollbar .el-scrollbar__bar.is-vertical {
     opacity: 1;//改为0不显示滚动条
   }
+  .el-form-item.is-success .el-input__inner, .el-form-item.is-success .el-input__inner:focus, .el-form-item.is-success .el-textarea__inner, .el-form-item.is-success .el-textarea__inner:focus {
+    border-color: #e3e9f4;
+  }
 </style>
