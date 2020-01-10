@@ -1485,7 +1485,7 @@
               {value: totalIgnored, name: self.$t('overview.ignored')}
             ];
             console.log(topFiveArray);
-            self.itemsTopFive = topFiveArray;
+            self.itemsTopFive = topFiveArray.filter(x=> x.percent > 0);
             self.showItemRadar(firstItem, 0);
           }
           catch (e) {
@@ -2938,6 +2938,7 @@
   }
 </style>
 <style>
+  @import '../../assets/css/pagination.css';
 
   .date-picker-poper .el-button--text {
     visibility: hidden !important;
