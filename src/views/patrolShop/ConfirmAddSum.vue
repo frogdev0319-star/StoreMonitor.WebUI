@@ -43,7 +43,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
                             <td class="icon-td"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua? pass : fail }}</div></td>
                             <td><span>{{item.numOfExcellentItems}}</span></td>
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
@@ -728,6 +728,6 @@ $h1:#292e36;
         overflow-x: hidden;
     }
     .el-textarea__inner{
-        font-family: 'Microsoft YaHei';
+        font-family: Arial, 'Microsoft YaHei';
     }
 </style>

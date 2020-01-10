@@ -1221,6 +1221,6 @@ export default {
   overflow-x: hidden;
 }
 .nape-input .el-textarea__inner{
-    font-family: 'Microsoft YaHei';
+    font-family: Arial, 'Microsoft YaHei';
 }
 </style>

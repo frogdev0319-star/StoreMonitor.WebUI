@@ -863,7 +863,14 @@ export default {
             .score-title{
                 float: left;
                 width: 9%;
+                padding: 0 10px;
                 // margin-left: 7%;
+              @media screen and (max-width: 1680px){
+                width: 8%;
+              }
+              @media screen and (max-width: 1440px){
+                width: 7%;
+              }
             }
             .handle-title{
                 float: left;

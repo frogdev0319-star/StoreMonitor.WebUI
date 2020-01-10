@@ -4249,7 +4249,7 @@ export default {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
-        font-family: 'Microsoft YaHei';
+        font-family: Arial, 'Microsoft YaHei';
     }
   /*::-webkit-scrollbar {*/
     /*width: 6px;*/
