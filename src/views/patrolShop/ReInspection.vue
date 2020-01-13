@@ -679,7 +679,8 @@ export default {
             realTimeSpeed: 0,
             videoAuthority: false,
             isLoading: false,
-            showEventNameInfo: false
+            showEventNameInfo: false,
+            fromName: ''
         }
     },
     computed:{
@@ -705,6 +706,11 @@ export default {
             let self=this;
             if(val!=0){
                 self.changeBrand();
+                window.setTimeout(function(){
+                  self.$route.meta.keepAlive = true;
+                  console.log(self.$route.meta.keepAlive);
+                },
+                300)
             }
         },
         realTimeSpeed(val,oldVal){
@@ -717,8 +723,22 @@ export default {
             }
         },
     },
+    beforeRouteEnter(to, from, next){
+      console.log(to.meta.keepAlive)
+      if(from.name !== 'submitEvent'){
+        //to.meta.keepAlive = true
+      }
+      //to.meta.keepAlive = true
+      next(vm=>{
+    //     vm.fromName = from.name;
+    //     if(from.name == 'submitEvent' && !to.meta.keepAlive){
+    //       vm.$destroy()
+    //     }
+      })
+     },
     beforeRouteLeave(to, from, next){
         let self=this;
+        console.log(from.meta.keepAlive)
         let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
         if(canLeave && to.name !='confirmSum'){
           self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
@@ -732,6 +752,9 @@ export default {
             console.log('confirm')
             if(to.name !='confirmSum' ){
               from.meta.keepAlive=false;
+            }
+            else{
+              from.meta.keepAlive = true;
             }
             if(self.playState){
               self.stopRealTime();
@@ -749,10 +772,16 @@ export default {
           if(to.name !='confirmSum'){
             from.meta.keepAlive=false;
           }
+          else{
+            from.meta.keepAlive=true;
+          }
           if(self.playState){
             self.stopRealTime();
             window.clearInterval(self.timerPlayReal);
             self.timerPlayReal=null;
+          }
+          if(self.isEzviz && !self.showGuide){
+            self.$refs.ezvizVideo.stopRealTime();
           }
           next();
         }
@@ -4206,7 +4235,7 @@ export default {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
-        font-family: 'Microsoft YaHei';
+        font-family: Arial, 'Microsoft YaHei';
     }
   .score-menu.el-dropdown-menu{
     z-index: 0 !important;
