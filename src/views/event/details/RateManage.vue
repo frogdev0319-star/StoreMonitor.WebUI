@@ -1032,8 +1032,8 @@ $h1:#292e36;
                 font-size: 12px;
                 font-weight: bold;
                 border-radius: 12px;
-                height: calc(16/1920*100vw);
-                line-height: calc(16/1920*100vw);
+                height: 12px;
+                line-height: 12px;
             }
             .el-submit{
                 position: absolute;
@@ -1272,7 +1272,7 @@ $h1:#292e36;
             }
             .description{
                 text-align: left;
-                font-family:'Microsoft YaHei';
+                font-family: Arial, 'Microsoft YaHei';
                 font-size: 12px;
                 white-space:pre-wrap; /* css3.0 */
                 white-space:-moz-pre-wrap; /* Firefox */
@@ -1471,7 +1471,7 @@ $h1:#292e36;
                         text-align: left;
                         @include point(margin-top,15);
                         @include point(margin-left,20);
-                        font-family:'Microsoft YaHei';
+                        font-family:Arial, 'Microsoft YaHei';
                         font-size: 12px;
                         white-space:pre-wrap; /* css3.0 */
                         white-space:-moz-pre-wrap; /* Firefox */
