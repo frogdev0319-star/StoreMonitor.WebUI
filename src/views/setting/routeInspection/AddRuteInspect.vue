@@ -28,7 +28,7 @@
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
                             <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
-                        <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input" v-if="item.isEdit"></el-input>
+                        <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
                         <div v-if="item.showEdit" class="show-edit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
                                 <i class="iconfont icon-bianji"
@@ -48,7 +48,7 @@
                         </div>
                     </div>
                     <div class="group-add" v-if="showAddGroup">
-                        <el-input  size="mini" maxlength="10" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput"></el-input>
+                        <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" @click="confirmAddGroup">
                                     <i class="el-icon-check"></i>
@@ -91,11 +91,11 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" v-if="item.isClick"></el-input>
+                            <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick"></el-input>
+                           <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -154,10 +154,10 @@
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" ></el-input>
+                            <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" @input="(val)=>napeNameChange(val, {})"></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input maxlength="70" type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')"></el-input>
+                           <el-input type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -182,6 +182,7 @@ import {validateInput} from '@/common/validate'
 import {inpectRESTful} from '@/api/index'
 import PubSub from 'pubsub-js'
 import {generateInsSettingLang} from '@/api/i18n'
+import filterString from '@/common/filterString'
 
 export default {
     name:'AddRuteInspect',
@@ -753,6 +754,39 @@ export default {
                 duration:time
             });
         },
+        groupNameChange(val, item){
+          let self = this;
+          let comment = filterString.all(val,20);
+          console.log(comment);
+          if(0 == Object.keys(item).length){
+            self.groupNameInput = comment;
+          }
+          else{
+            item.groupName = comment;
+          }
+        },
+        napeNameChange(val, item){
+          let self = this;
+          let comment = filterString.all(val,50);
+          console.log(comment);
+          if(0 == Object.keys(item).length){
+            self.newNapeName = comment;
+          }
+          else{
+            item.napeName = comment;
+          }
+        },
+        napeDepChange(val, item){
+          let self = this;
+          let comment = filterString.all(val,140);
+          console.log(comment);
+          if(0 == Object.keys(item).length){
+            self.newNapeDep = comment;
+          }
+          else{
+            item.napeDep = comment;
+          }
+        }
     },
     mounted(){
         let self=this;

@@ -89,6 +89,8 @@ import {validateInput,validateInspectGroup} from '@/common/validate'
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {generateInsSettingLang} from '@/api/i18n'
+import filterString from '@/common/filterString'
+
 export default {
     name:'RouteInspection',
     components:{
@@ -643,7 +645,7 @@ export default {
                         if(item['检查分类']!=undefined&&item["检查分类"].length!=0){
                             indexArry.push(index);
                             typeName.push(item['检查分类']);
-                            if(item['检查分类'].toString().trim().length>10){
+                            if(filterString.getContentLength(item['检查分类'].toString().trim()) > 20){
                                 flaggroupLength=true;
                             }
                             if(validateInput(item['检查分类'])){
@@ -654,7 +656,7 @@ export default {
                             flagItemName=true;
                         }
                         else{
-                            if(item['检查项目名称'].toString().trim().length>25){
+                            if(filterString.getContentLength(item['检查项目名称'].toString().trim()) > 50){
                                 flagItemLength=true;
                             }
                             if(validateInput(item['检查项目名称'])){
