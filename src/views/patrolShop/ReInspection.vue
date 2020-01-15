@@ -3650,7 +3650,7 @@ export default {
                 .guide-lside{
                     position: absolute;
                     width: auto;
-                    z-index: 20;
+                    z-index: 1000;
                     img{
                         @include point(height,42);
                         position: relative;
