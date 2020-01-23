@@ -411,7 +411,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 *{
-    font-family:'Microsoft YaHei';
+    font-family:Arial, 'Microsoft YaHei';
 }
 $dark_gray:#889aa4;
 $light_gray:#eee;

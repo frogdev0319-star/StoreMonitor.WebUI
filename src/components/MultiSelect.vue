@@ -1,7 +1,7 @@
 <template>
   <div class="content">
-    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect'
-               :placeholder="$t('reportView.stores')" @visible-change="visibileHandler" class="el-province">
+    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler"
+               :placeholder="$t('reportView.stores')" class="el-province">
       <el-option :label="$t('overview.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.storeId' :disabled="item.disabled"></el-option>
     </el-select>
@@ -25,13 +25,21 @@
         },
         data () {
           return {
-            selectedArray: JSON.parse(JSON.stringify(this.selected)),
             input: '',
-            disabledLength: 0
+            disabledLength: 0,
+            selectedArray: this.selected,
+            changed: false,
           }
         },
         mounted () {
+          console.log(this.selected)
           this.initData();
+        },
+        watch:{
+          selected(val, oldVal){
+            this.selectedArray = val
+            this.initData()
+          }
         },
         methods: {
           initData(){
@@ -78,6 +86,7 @@
           },
           changeSelect (val) {
             console.log(val)
+            this.changed = true;
             if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
               this.input = this.$t('overview.all')
               this.selectedArray.unshift('-1')
@@ -107,17 +116,19 @@
             }
           },
           visibileHandler (val) {
-            if (!val) {
+            if (!val && this.changed) {
               let selectedList = []
-              if (this.selectedArray.includes('-1')) {
-                this.options.forEach(item =>{
-                  selectedList.push(item.storeId)
-                })
-              } else {
-                selectedList = this.selectedArray
-              }
+              // if (this.selectedArray.includes('-1')) {
+              //   this.options.forEach(item =>{
+              //     selectedList.push(item.storeId)
+              //   })
+              // } else {
+              //   selectedList = this.selectedArray
+              // }
+              selectedList = this.selectedArray
               this.$emit('changeInput', selectedList)
             }
+
           }
         }
     }
@@ -135,6 +146,7 @@
     position: relative;
     top: calc(2/1920*100vw);
     width: calc(160/1920*100vw);
+    margin-right: calc(30/1920*100vw);
   }
   .el-select-dropdown__item{
     padding: 0 20px 0 50px !important;

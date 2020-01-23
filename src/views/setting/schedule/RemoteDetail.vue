@@ -1299,11 +1299,16 @@
         actPanList.schedule[index].showMonthContent = !actPanList.schedule[index].showMonthContent;
         self.monthList.forEach(item => {
           item.checked = false;
+          if(actPanList.schedule[index].monthValue ==  self.$t('scheduleView.everyDay')){
+            item.checked = true;
+          }
+          else{
             actPanList.schedule[index].monthValue.split(',').forEach(_item=>{
               if (item.value == _item) {
                 item.checked = true;
               }
             })
+          }
         })
       },
       changeSelfMonthItem(index){
@@ -1326,7 +1331,7 @@
           actPanList.schedule[index].day = daysArray.slice(0,daysArray.length-1); //去除最后一个逗号
           console.log(actPanList.schedule[index].monthValue)
           if (count == self.monthList.length) {
-            actPanList.schedule[index].monthValue = self.$t('scheduleView.everyMonth');
+            actPanList.schedule[index].monthValue = self.$t('scheduleView.everyDay');
           }
         }
         else{
