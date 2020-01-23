@@ -208,7 +208,9 @@
       },
       showHeader(){
         let flag=false;
-        if((this.$route.path=='/report' || this.$route.path == '/patrolOverview' || this.$route.path == '/eventOverview')){
+        if((this.$route.path=='/report' || this.$route.path == '/patrolOverview' || this.$route.path == '/eventOverview')
+          || this.$route.path == '/patrolEvaluation' || this.$route.path == '/patrolItem' || this.$route.path == '/supervisorStat'
+          || this.$route.path == '/eventStat'){
           flag= true;
         }
         return flag;
@@ -1418,5 +1420,8 @@
   }
   .el-form-item.is-success .el-input__inner, .el-form-item.is-success .el-input__inner:focus, .el-form-item.is-success .el-textarea__inner, .el-form-item.is-success .el-textarea__inner:focus {
     border-color: #e3e9f4;
+  }
+  .el-table .cell{
+    word-break: break-word;
   }
 </style>
