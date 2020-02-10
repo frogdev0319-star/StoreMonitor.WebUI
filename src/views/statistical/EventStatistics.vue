@@ -68,7 +68,7 @@
     <el-col :span="24" class="el-overview">
       <el-row class="first-row">
         <el-col :span="24"  class="kpi-list">
-          <div class="title">事件解决趋势图</div>
+          <div class="title">{{$t('overview.eventGraph')}}</div>
         </el-col>
         <el-col :span="3"  class="kpi-list">
           <div class="kpi-content">
@@ -104,7 +104,7 @@
       </el-row>
       <el-row class="second-row">
         <el-col :span="24" class="items-title">
-          <span class="title">事件列表</span>
+          <span class="title">{{$t('overview.eventList')}}</span>
           <div class="exprotBtn">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
               <div class="btn-area">
@@ -133,12 +133,12 @@
                 :row-class-name="rowClass"
               >
                 <el-table-column v-for="(_item,_index) in eventInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
+                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
                 </el-table-column>
                 <el-table-column
-                  label="远程巡检"
+                  :label="$t('overview.remotePatrol')"
                   prop="remotePer"
-                  min-width="8%"
+                  :min-width="lang!=='en'? 120 : 150"
                   sortable="custom">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper remote">
@@ -147,9 +147,9 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="现场巡检"
+                  :label="$t('overview.onsitePatrol')"
                   prop="onsitePer"
-                  min-width="8%"
+                  :min-width="lang!=='en'? 120 : 150"
                   sortable="custom">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper onsite">
@@ -158,9 +158,9 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  label="门店监控"
+                  :label="$t('overview.storeMonitor')"
                   prop="videoPer"
-                  min-width="8%"
+                  :min-width="lang!=='en'? 120 : 150"
                   sortable="custom">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper video">
@@ -171,7 +171,7 @@
                 <div slot="empty">
                   <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">暂无数据</span>
+                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">{{$t('overview.noData')}}</span>
                   </div>
                 </div>
               </el-table>
@@ -248,19 +248,19 @@
         showStoreInfo: false,
         eventKPIs: [
           {
-            eventTitle: '事件总数',
+            eventTitle: this.$t('overview.sumEvents'),
             eventNum: 0,
           },
           {
-            eventTitle: '待处理事件总数',
+            eventTitle: this.$t('overview.sumUnprocessEvents'),
             eventNum: 0,
           },
           {
-            eventTitle: '已处理事件总数',
+            eventTitle: this.$t('overview.sumProcessEvents'),
             eventNum: 0,
           },
           {
-            eventTitle: '已结案事件总数',
+            eventTitle: this.$t('overview.sumClosedEvents'),
             eventNum: 0,
           }
         ],
@@ -318,39 +318,45 @@
         eventInfoData: [
           {
             "prop": "storeName",
-            "label": '门店名称',
+            "label": this.$t('overview.storeName'),
             "sortable": false,
-            "width": '19%'
+            "width": '290',
+            "maxWidth": '290'
           },
           {
             "prop":"regionName",
-            "label": '所属区域',
+            "label": this.$t('overview.area'),
             "sortable": false,
-            "width": '11%'
+            "width": '165',
+            "maxWidth": '165'
           },
           {
             "prop":"numOfTotal",
-            "label": '事件总数',
+            "label": this.$t('overview.sumEvents'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '165',
+            "maxWidth": '165'
           },
           {
             "prop": "numOfUnprocessed",
-            "label": '待处理事件数量',
+            "label": this.$t('overview.numUnprocessEvents'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '165',
+            "maxWidth": '165'
           },
           {
             "prop":"numOfInprocess",
-            "label": '已处理事件数量',
+            "label": this.$t('overview.numProcessEvents'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '165',
+            "maxWidth": '165'
           },
           {
             "prop":"numOfProcessed",
-            "label": '已结案事件数量',
+            "label": this.$t('overview.numClosedEvents'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '165',
+            "maxWidth": '165'
           },
           // {
           //   "prop":"numOfRemote",
@@ -1008,7 +1014,7 @@
         var that = this;
         if(that.allEventData.length==0){
           Message({
-            message: '事件列表为空，请重新筛选数据',
+            message: that.$t('overview.emptyEventList'),
             type:'warning',
             duration:3*1000
           })
@@ -1937,6 +1943,8 @@
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
                   font-size: calc(24/1920*100vw);
+                  height: calc(24/1920*100vw);
+                  width: calc(24/1920*100vw);
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
@@ -2016,6 +2024,7 @@
     font-weight: bold;
     color: #7d8cad;
     background-color: #f4f5f9 !important;
+    border-right: none !important;
   }
   .cell-class{
     padding-left: 20px;
@@ -2059,6 +2068,19 @@
   .video .el-tag{
     color: #fccc3f;
     border: 1px solid #fccc3f;
+  }
+
+  .header-class .cell{
+    padding-left: calc(20/1920*100vw) !important;
+  }
+  .header-class:first-child .cell{
+    padding-left: calc(70/1920*100vw) !important;
+  }
+  .cell-class .cell{
+    padding-left: calc(20/1920*100vw) !important;
+  }
+  .cell-class:first-child .cell{
+    padding-left: calc(70/1920*100vw) !important;
   }
 </style>
 

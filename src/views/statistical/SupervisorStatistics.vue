@@ -32,7 +32,7 @@
     <el-col :span="24" class="items-content">
       <el-col :span="24" class="contents-container">
         <el-col :span="24" class="items-title">
-          <span class="title">督导巡店列表</span>
+          <span class="title">{{$t('overview.patrolList')}}</span>
           <div class="exprotBtn">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
               <div class="btn-area">
@@ -64,9 +64,9 @@
                 :row-class-name="rowClass"
               >
                 <el-table-column v-for="(_item,_index) in supervisorInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
+                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
                 </el-table-column>
-                <el-table-column type="expand" label="巡店详情" width="100">
+                <el-table-column type="expand" :label="$t('overview.detail')" :width="lang!=='en'? 100: 120">
                   <template slot-scope="props">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
                       <!--<el-tab-pane label="巡店计划" name="patrolPlan" style="display: none">-->
@@ -87,7 +87,7 @@
                           <!--</el-table-column>-->
                         <!--</el-table>-->
                       <!--</el-tab-pane>-->
-                      <el-tab-pane label="巡店执行情况" name="planImplementation">
+                      <el-tab-pane :label="$t('overview.patrolExecution')" name="planImplementation">
                         <el-table
                           :data="implementTableData"
                           :highlight-current-row="true"
@@ -112,7 +112,7 @@
                 <div slot="empty">
                   <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">暂无数据</span>
+                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">{{$t('overview.noData')}}</span>
                   </div>
                 </div>
               </el-table>
@@ -163,33 +163,45 @@
         supervisorInfoData:[
           {
             "prop": "supervisorName",
-            "label": '督导名称',
+            "label": this.$t('overview.supervisorName'),
             "sortable":false,
+            "width": 232,
+            "maxWidth": 232,
           },
           {
             "prop":"numOfStores",
-            "label": '管辖门店数量',
+            "label": this.$t('overview.storeNum'),
             "sortable":'custom',
+            "width": 227,
+            "maxWidth": 227,
           },
           {
             "prop":"numOfTasked",
-            "label": '计划巡店次数',
+            "label": this.$t('overview.scheduleNum'),
             "sortable":'custom',
+            "width": 227,
+            "maxWidth": 210,
           },
           {
             "prop": "numOfCompleted",
-            "label": '按计划巡店次数',
+            "label": this.$t('overview.inscheduleNum'),
             "sortable":'custom',
+            "width": 227,
+            "maxWidth": 220,
           },
           {
             "prop":"numOfUnscheduled",
-            "label": '计划外巡店次数',
+            "label": this.$t('overview.unscheduleNum'),
             "sortable":'custom',
+            "width": 227,
+            "maxWidth": 220,
           },
           {
             "prop":"completionRateStr",
-            "label": '巡店计划完成率',
+            "label": this.$t('overview.completeRate'),
             "sortable":'custom',
+            "width": 227,
+            "maxWidth": 220,
           }
         ],
         total: 0,
@@ -232,28 +244,28 @@
         implementTableData: [],
         implementTableInfo: [
           {
-            "prop": "supervisorName",
-            "label": '巡店日期',
+            "prop": "fromDateStr",
+            "label": this.$t('overview.patrolDate'),
           },
           {
-            "prop":"numOfStores",
-            "label": '巡店方式',
+            "prop":"modeStr",
+            "label": this.$t('overview.patrolMethod'),
           },
           {
-            "prop":"计划描述",
-            "label": '任务有效期',
+            "prop":"toDateStr",
+            "label": this.$t('overview.missionValidity'),
           },
           {
-            "prop": "numOfCompleted",
-            "label": '已巡检门店',
+            "prop": "completedStoresStr",
+            "label": this.$t('overview.inspectedStores'),
           },
           {
-            "prop": "numOfCompleted",
-            "label": '未巡检门店',
+            "prop": "incompletedStoresStr",
+            "label": this.$t('overview.uninspectedStores'),
           },
           {
-            "prop": "numOfCompleted",
-            "label": '任务执行情况',
+            "prop": "percentSchedule",
+            "label": this.$t('overview.taskPerformance'),
           }
         ],
         expands: [],
@@ -533,7 +545,7 @@
         var that = this;
         if(that.supervisorTableData.length==0){
           Message({
-            message: '督导巡店列表为空，请重新筛选数据',
+            message: that.$t('overview.emptyPatrolList'),
             type:'warning',
             duration:3*1000
           })
@@ -600,7 +612,7 @@
             content.forEach(item => {
               item.fromDateStr = self.$moment(item.fromDate).format('YYYY-MM-DD HH:mm:ss');
               item.toDateStr = self.$moment(item.toDate).format('YYYY-MM-DD HH:mm:ss');
-              item.modeStr = item.mode== 0 ? '远程巡检': '现场巡检';
+              item.modeStr = item.mode== 0 ? self.$t('overview.remotePatrol'): self.$t('overview.onsitePatrol');
               let completedStoresStr = '';
               let completeStoresNum = 0;
               completeStoresNum = item.completedStores.length;
@@ -615,8 +627,8 @@
               })
               completedStoresStr = completedStoresStr.slice(0, completedStoresStr.length - 1)
               incompletedStoresStr = incompletedStoresStr.slice(0, incompletedStoresStr.length - 1)
-              item.completedStoresStr = completeStoresNum==0 ? '无': completedStoresStr;
-              item.incompletedStoresStr = incompleteStoresNum==0 ? '无': incompletedStoresStr;
+              item.completedStoresStr = completeStoresNum==0 ? self.$t('overview.none'): completedStoresStr;
+              item.incompletedStoresStr = incompleteStoresNum==0 ? self.$t('overview.none'): incompletedStoresStr;
               let sumStores = completeStoresNum + incompleteStoresNum;
               let percentSchedule = 0
               if(sumStores == 0){
@@ -890,7 +902,8 @@
                 align-items: center;
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-                  font-size: calc(24/1920*100vw);
+                  height: calc(24/1920*100vw);
+                  width: calc(24/1920*100vw);
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
@@ -937,6 +950,7 @@
     font-weight: bold;
     color: #7d8cad;
     background-color: #f4f5f9 !important;
+    border-right: none !important;
   }
   .el-table__row > .cell-class{
     padding-left: 20px;

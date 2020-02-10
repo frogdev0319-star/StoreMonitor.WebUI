@@ -19,7 +19,7 @@
 
         <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                       style="display: inline" ref="multiSelect"></multi-select>
-        <span>巡检表类型</span>
+        <span>{{$t('overview.patrolType')}}</span>
         <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini"
                    class="el-province" @change="changeType">
           <el-option
@@ -81,7 +81,7 @@
       <el-col :span="24" class="contents-container">
         <el-col :span="24" class="items-row">
           <el-col :span="24" class="items-title">
-            <span class="title">巡检项分布图&报表</span>
+            <span class="title">{{$t('overview.itemChartReport')}}</span>
             <div class="exprotBtn">
               <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                 <div class="btn-area">
@@ -92,9 +92,9 @@
             </div>
           </el-col>
           <el-col :span="12" class="evalution-pct">
-            <div class="title">巡检项评估占比图</div>
+            <div class="title">{{$t('overview.proportionOfInspectionItems')}}</div>
             <div class="pct-content">
-              <div v-if="!hasNoData">
+              <div>
                 <div class="pct-panel">
                   <v-chart :auto-resize='true' :options="itemsOptions" class="chart-content" ref="itemsPie"></v-chart>
                 </div>
@@ -109,14 +109,14 @@
                   </div>
                 </div>
               </div>
-              <div v-else class="data-empty">
-                {{$t('overview.noData')}}
-              </div>
+<!--              <div v-else class="data-empty">-->
+<!--                {{$t('overview.noData')}}-->
+<!--              </div>-->
             </div>
 
           </el-col>
           <el-col :span="12" class="evalution-pct">
-            <div class="radar-title">远程巡检类别占比图</div>
+            <div class="radar-title">{{curType== 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite')}}</div>
             <div class="inspect-catergy">
               <div class="rader-panel">
                 <div v-if="!hasNoData">
@@ -148,12 +148,12 @@
                 :row-class-name="rowClass"
               >
                 <el-table-column v-for="(_item,_index) in itemsInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
+                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
                 </el-table-column>
                 <div slot="empty">
                   <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">暂无数据</span>
+                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">{{$t('overview.noData')}}</span>
                   </div>
                 </div>
               </el-table>
@@ -234,11 +234,11 @@
             inspectTypeList: [
               {
                 value: 0,
-                label: '远程巡检表',
+                label: this.$t('overview.remotePatrolTable'),
               },
               {
                 value: 1,
-                label: '现场巡检表',
+                label: this.$t('overview.onsitePatrolTable'),
               }
             ],
             showStoreInfo: false,
@@ -272,51 +272,59 @@
             itemsInfoData:[
               {
                 "prop": "inspectGroupName",
-                "label": '巡检表类别',
+                "label": this.$t("overview.patrolType"),
                 "sortable": false,
-                "width": '19%'
+                "width": '280',
+                "maxWidth": '280'
               },
               {
                 "prop":"inspectItemName",
-                "label": '巡检项',
+                "label": this.$t("overview.items"),
                 "sortable":'custom',
-                "width": '26%'
+                "width": '380',
+                "maxWidth": '380'
               },
               {
                 "prop":"numOfTotal",
-                "label": '评估次数',
+                "label": this.$t("overview.numOfEvaluations"),
                 "sortable":'custom',
-                "width": '9.4%'
+                "width": '130',
+                "maxWidth": '200'
               },
               {
                 "prop": "numOfExcellent",
-                "label": '优良（次）',
+                "label": `${this.$t("overview.excellent")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "width": '9.4%'
+                "width": '130',
+                "maxWidth": '150'
               },
               {
                 "prop":"numOfQualified",
-                "label": '合格（次）',
+                "label": `${this.$t("overview.pass")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "width": '9.4%'
+                "width": '130',
+                "maxWidth": '150'
               },
               {
                 "prop":"numOfUnqualified",
-                "label": '不合格（次）',
+                "label": `${this.$t("overview.failed")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "width": '9.4%'
+                "width": '130',
+                "maxWidth": '150'
               },
               {
                 "prop":"numOfIgnored",
-                "label": '忽略（次）',
+                "label": `${this.$t("overview.ignored")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "width": '9.4%'
+                "width": '130',
+                "maxWidth": '150'
               },
               {
                 "prop":"qualifiedRateStr",
-                "label": '合格率',
+                "label": this.$t("overview.passRate"),
                 "sortable":'custom',
-                "width": '9.4%'
+                "width": '130',
+                "maxWidth": '150'
               }
             ],
             total: 0,
@@ -1038,6 +1046,7 @@
             self.getCatergyRadar(resultData.content);
           }
           else{
+            self.itemsPerArray = self.itemsLegend;
             self.hasNoData = true;
           }
 
@@ -1046,8 +1055,6 @@
           let self = this;
           let mergeData = self.getCatergyByMerge(arr);
           console.log(mergeData);
-
-
           let options = {
             backgroundColor: '#fff',
             tooltip: {
@@ -1229,7 +1236,7 @@
           var that = this;
           if(that.itemsTableData.length==0){
             Message({
-              message: '列表为空，请重新筛选数据',
+              message: that.$t('overview.emptyItemList'),
               type:'warning',
               duration:3*1000
             })
@@ -1588,7 +1595,8 @@
                 align-items: center;
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-                  font-size: calc(24/1920*100vw);
+                  height: calc(24/1920*100vw);
+                  width: calc(24/1920*100vw);
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
@@ -1686,7 +1694,9 @@
           }
           .data-empty{
             font-size: calc(14/1920*100vw);
-            color: $tab
+            color: $tab;
+            height: calc(222/1920*100vw);
+            line-height: calc(222/1920*100vw);
           }
           .radar-title {
             text-align: left;
@@ -1877,6 +1887,7 @@
     font-weight: bold;
     color: #7d8cad;
     background-color: #f4f5f9 !important;
+    border-right: none !important;
   }
   .cell-class{
     height: 35px;

@@ -375,8 +375,7 @@ const user={
               hidden: false,
               children:[]
             };
-          //PermissionHelper.enablePatrolEvaStatistics() &&
-          route4.children.push(
+          PermissionHelper.enablePatrolEvaStatistics() && route4.children.push(
             {
               path:'/patrolEvaluation',
               name:'patrolAppraisalStat',
@@ -388,8 +387,7 @@ const user={
               }
             }
           )
-          //PermissionHelper.enableInspectStatistics() &&
-          route4.children.push(
+          PermissionHelper.enableInspectStatistics() && route4.children.push(
             {
               path:'/patrolItem',
               name:'patrolItemsStat',
@@ -402,8 +400,7 @@ const user={
             }
           )
 
-          PermissionHelper.enableSupervisionEffStatistics() &&
-          route4.children.push(
+          PermissionHelper.enableSupervisionEffStatistics() && route4.children.push(
             {
               path:'/supervisorStat',
               name:'supervisorStat',
@@ -416,8 +413,7 @@ const user={
             }
           )
 
-          //PermissionHelper.enableEventStatistics() &&
-          route4.children.push(
+          PermissionHelper.enableEventStatistics() && route4.children.push(
             {
               path:'/eventStat',
               name:'eventStat',
@@ -429,9 +425,7 @@ const user={
               }
             }
           )
-          // PermissionHelper.enablePatrolEvaStatistics() || PermissionHelper.enableInspectStatistics()
-          // || PermissionHelper.enableEventStatistics()  || PermissionHelper.enableSupervisionEffStatistics()
-          // && route4.children.push()
+
           route4.children.length > 0 ? accessedRoutes.push(route4): '';
 
           let route5 = {

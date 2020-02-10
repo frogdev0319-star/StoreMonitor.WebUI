@@ -224,4 +224,10 @@
    .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
     color: #7d8cad;
   }
+  el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
+    background-color: #FEE4E7;
+  }
+  .el-select-dropdown.is-multiple .el-select-dropdown__item.selected.hover {
+    background-color: #FEE4E7;
+  }
 </style>

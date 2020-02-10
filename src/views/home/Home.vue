@@ -1390,7 +1390,7 @@
   }
   ::-webkit-scrollbar {
     width: 4px;
-    /*height: 4px;*/
+    height: 4px;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -1404,7 +1404,7 @@
     border-radius: 2px;
   }
   .el-scrollbar .el-scrollbar__wrap{
-    margin-bottom: -17px  !important;
+    margin-bottom: -4px  !important;
     margin-right: -4px !important;
   }
   .el-input__inner{

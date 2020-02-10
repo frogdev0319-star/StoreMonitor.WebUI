@@ -71,7 +71,7 @@
           <el-col :span="24" class="region-header">
             <div class="region-titles">
               <span class="title">
-              区域考评统计图
+              {{$t('overview.regionalAssessment')}}
             </span>
             </div>
           </el-col>
@@ -109,7 +109,7 @@
           <el-col :span="24" class="region-header">
             <div class="region-titles">
             <span class="title">
-              区域列表
+              {{$t('overview.regionalList')}}
             </span>
               <div class="exprotBtn">
                 <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
@@ -138,12 +138,12 @@
               :row-class-name="rowClass"
             >
               <el-table-column v-for="(_item,_index) in regionInfoData" :key="_index"
-                               :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
+                               :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
               </el-table-column>
               <div slot="empty">
                 <div>
                   <i class="iconfont icon-zhengque empty-data-icon"></i>
-                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">暂无数据</span>
+                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">{{$t('overview.noData')}}</span>
                 </div>
               </div>
             </el-table>
@@ -164,7 +164,7 @@
           <el-col :span="24" class="region-header">
             <div class="region-titles">
             <span class="title">
-              门店列表
+              {{$t('overview.storeList')}}
             </span>
               <div class="exprotBtn">
                 <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="exportStore2Excel" >
@@ -194,12 +194,12 @@
                 :row-class-name="rowClass"
               >
                 <el-table-column v-for="(_item,_index) in storeInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
+                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
                 </el-table-column>
                 <div slot="empty">
                   <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">暂无数据</span>
+                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Microsoft YaHei'}">{{$t('overview.noData')}}</span>
                   </div>
                 </div>
               </el-table>
@@ -312,51 +312,59 @@
         regionInfoData:[
           {
             "prop": "region",
-            "label": '区域名称',
+            "label": this.$t('overview.regionName'),
             "sortable": false,
-            "width":'19%'
+            "width": '284',
+            "maxWidth": '284'
           },
           {
             "prop":"cycleOfInspect",
-            "label": '平均巡店周期',
+            "label": this.$t('overview.advPatrolCycle'),
             "sortable":'custom',
-            "width":'11%'
+            "width": '160',
+            "maxWidth": '180'
           },
           {
             "prop":"numOfReport",
-            "label": '评估次数',
+            "label": this.$t('overview.numOfEvaluations'),
             "sortable":'custom',
-            "width":'11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop": "numOfExcellent",
-            "label": '优秀',
+            "label": this.$t('overview.excellent'),
             "sortable":'custom',
-            "width":'11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"numOfQualified",
-            "label": '合格',
+            "label": this.$t('overview.pass'),
             "sortable":'custom',
-            "width":'11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"numOfImproved",
-            "label": '待改善',
+            "label": this.$t('overview.improve'),
             "sortable":'custom',
-            "width":'11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"numOfDangerous",
-            "label": '立即督导',
+            "label": this.$t('overview.danger'),
             "sortable":'custom',
-            "width":'11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"qualifiedRatePer",
-            "label": '合格率',
+            "label": this.$t('overview.passRate'),
             "sortable":'custom',
-            "width": '15%'
+            "width": '219',
+            "maxWidth": '180'
           }
         ],
         regionTableData: [],
@@ -366,51 +374,59 @@
         storeInfoData:[
           {
             "prop": "region",
-            "label": '门店名称',
+            "label": this.$t('overview.storeName'),
             "sortable":false,
-            "width": '19%'
+            "width": '284',
+            "maxWidth": '284'
           },
           {
             "prop":"cycleOfInspect",
-            "label": '平均巡店周期',
+            "label": this.$t('overview.advPatrolCycle'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '160',
+            "maxWidth": '180'
           },
           {
             "prop":"numOfReport",
-            "label": '评估次数',
+            "label": this.$t('overview.numOfEvaluations'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop": "numOfExcellent",
-            "label": '优秀',
+            "label": this.$t('overview.excellent'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"numOfQualified",
-            "label": '合格',
+            "label": this.$t('overview.pass'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"numOfImproved",
-            "label": '待改善',
+            "label": this.$t('overview.improve'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"numOfDangerous",
-            "label": '立即督导',
+            "label": this.$t('overview.danger'),
             "sortable":'custom',
-            "width": '11%'
+            "width": '160',
+            "maxWidth": '160'
           },
           {
             "prop":"qualifiedRatePer",
-            "label": '合格率',
+            "label": this.$t('overview.passRate'),
             "sortable":'custom',
-            "width": '15%'
+            "width": '219',
+            "maxWidth": '180'
           }
         ],
         storeTableData: [],
@@ -998,7 +1014,7 @@
       searchData(){
         let self=this;
         if(self.curProvince.length == 0 ){
-          self.notify('请选择省份', 'warning', 3000)
+          self.notify(self.$t('storeView.selectProviceInfo'), 'warning', 3000)
           return false;
         }
         let storeIds = [];
@@ -1026,7 +1042,7 @@
         var that = this;
         if(that.regionTableData.length==0){
           Message({
-            message: '区域列表为空，请重新筛选数据',
+            message: that.$t('overview.emptyRegionList'),
             type:'warning',
             duration:3*1000
           })
@@ -1075,7 +1091,7 @@
         var that = this;
         if(that.storeTableData.length==0){
           Message({
-            message: '门店列表为空，请重新筛选数据',
+            message: that.$t('overview.emptyStoreList'),
             type:'warning',
             duration:3*1000
           })
@@ -1198,7 +1214,7 @@
           grid: {
             containLabel: true,
             top:'40',//距上边距
-            left:'8',//距离左边距
+            left:'25',//距离左边距
             right:'5',//距离右边距
             bottom:'32',//距离下边距
           },
@@ -1248,7 +1264,7 @@
           yAxis: [
             {
             type: 'value',
-            name: '合格率(%)',
+            name: self.$t('overview.passRate') + '(%)',
             // interval: 20,
             minInterval: 10,
             max: 100,
@@ -2156,7 +2172,8 @@
           align-items: center;
           .icon-excel{
             margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-            font-size: calc(24/1920*100vw);
+            height: calc(24/1920*100vw);
+            width: calc(24/1920*100vw);
           }
           .spanClass{
             font-size: calc(14/1920*100vw);
@@ -2197,10 +2214,10 @@
           }
           .pct-nums {
             margin-top: calc(30 / 1920 * 100vw);
-            margin-left: calc(75 / 1920 * 100vw);
+            /*margin-left: calc(75 / 1920 * 100vw);*/
             font-size: calc(12 / 1920 * 100vw);
             display: flex;
-            justify-content: flex-start;
+            justify-content: center;
             @media screen and (max-width: 1280px) {
               padding: 0 0;
             }
@@ -2316,6 +2333,7 @@
     font-weight: bold;
     color: #7d8cad;
     background-color: #f4f5f9 !important;
+    border-right: none !important;
   }
   .cell-class{
     height: 35px;
