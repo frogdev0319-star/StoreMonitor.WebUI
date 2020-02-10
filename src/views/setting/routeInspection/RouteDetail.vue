@@ -462,6 +462,7 @@ export default {
                     self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
+                self.allchecked = false;
             })
         },
         changeValue(value){

@@ -862,7 +862,7 @@ export default {
             console.log(self.params);
             let val = self.dateValue;
             console.log(val);
-          let start=typeof(val[0])==='object'?val[0].getTime():val[0];
+            let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
             self.params.beginTs=start;
             self.params.endTs=end;
@@ -884,7 +884,7 @@ export default {
             }
             else{
                 if(self.curStore.length!=0){
-                    clause.storeId=self.curStore;
+                    clause.storeId=self.curStore.includes("-1")? self.storeDataList.map(x=>x.storeId) : self.curStore;
                 }
             }
             console.log(self.curReportType);
