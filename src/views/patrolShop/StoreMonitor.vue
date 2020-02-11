@@ -105,7 +105,6 @@
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
-                            @click.native="adjustProcess(item.value, item.label)"
                           >
                           </el-option>
                         </el-select>
