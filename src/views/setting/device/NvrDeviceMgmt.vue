@@ -1606,6 +1606,7 @@
       confirmEditNvr(index,item){
         let self=this;
         console.log(item);
+        item.name = item.tempDeviceName;
         let obj={};
         obj.ivsId = item.ivsId;
         obj.name  = item.tempDeviceName;

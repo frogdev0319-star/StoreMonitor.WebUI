@@ -136,7 +136,7 @@
                     <!--<el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>-->
                   </div>
                   <div class="model-data titles">
-                      <span>{{item.ezvizAccount}}</span>
+                      <span>{{item.tempEzvizAccount}}</span>
                   </div>
                   <div class="store-data titles">
                     <el-tooltip class="item" effect="dark" :content="item.store" :popper-class="elTooltipClass"
@@ -679,7 +679,8 @@
         deviceNameTemp: '',
         channelCountTemp: 0,
         ezvizAccountList: [],
-        elTooltipClass: 'el-tooltipClass'
+        elTooltipClass: 'el-tooltipClass',
+        curIndex: 0
       }
     },
     watch:{
@@ -810,6 +811,7 @@
         console.log('点击NVR')
         item.isClick=true;
         self.curNVRItem=item;
+        self.curIndex = index;
         self.channelCountTemp = item.channelCount;
         console.log(item.serialNumber)
         self.getChannelListByDevice(item.serialNumber);
@@ -1342,6 +1344,7 @@
               obj.storeId=item.storeId;
               obj.deviceModel=item.deviceModel;
               obj.ezvizAccount = item.ezvizAccount;
+              obj.tempEzvizAccount = item.ezvizAccount;
               obj.channelCount = item.channelCount;
               obj.tempChannelCount = item.channelCount;
               obj.channelNum=item.channelCount+'个';
@@ -1539,11 +1542,18 @@
               self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
               self.showAddNvrDialog = false;
               self.isAddAgain = false;
+              console.log(self.nvrData[self.curIndex])
+              self.nvrData[self.curIndex].tempNvrName = obj.name;
+              self.nvrData[self.curIndex].tempEzvizAccount = obj.ezvizAccount;
+              self.nvrData[self.curIndex].tempChannelCount = obj.channelCount;
             }
             else {
               self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
               self.showAddNvrDialog = false;
               self.isAddAgain = false;
+              self.nvrData[self.curIndex].name = obj.tempNvrName;
+              self.nvrData[self.curIndex].ezvizAccount = obj.tempEzvizAccount;
+              self.nvrData[self.curIndex].channelCount = obj.tempChannelCount;
             }
           })
             .then(async () => {
@@ -1692,8 +1702,12 @@
             _item.isClick = false;
           }
         })
+        item.name = item.tempNvrName;
+        item.ezvizAccount = item.tempEzvizAccount;
+        item.channelCount = item.tempChannelCount;
         self.curNVRItem=item;
         self.channelCountTemp = item.channelCount;
+        self.curIndex = index;
         console.log(item.serialNumber)
         self.getChannelListByDevice(item.serialNumber);
         // show update dialog
