@@ -592,7 +592,7 @@
 
         }]
       },
-      getScheduleTaskImplementation(){
+      async getScheduleTaskImplementation(){
         let self = this;
         let params = {};
         params.beginTs = self.params.beginTs;
@@ -602,7 +602,7 @@
            "page": 0,
            "size": 3
         }
-        let result = self.getInspectScheduleImplemention(params)
+        let result = await self.getInspectScheduleImplemention(params)
         let errCode = result.errCode;
         if (errCode == 0) {
           let resultData = result.data;
@@ -621,8 +621,8 @@
               })
               let incompletedStoresStr = '';
               let incompleteStoresNum = 0;
-              incompleteStoresNum = item.inCompletedStores.length;
-              item.inCompletedStores.forEach(_item=>{
+              incompleteStoresNum = item.incompleteStores.length;
+              item.incompleteStores.forEach(_item=>{
                 incompletedStoresStr += _item + ','
               })
               completedStoresStr = completedStoresStr.slice(0, completedStoresStr.length - 1)
@@ -636,7 +636,7 @@
               }
               else{
                 let percent = completeStoresNum/sumStores * 100
-                percentSchedule = percent.toFixed(2);
+                percentSchedule = percent.toFixed(0) + '%';
               }
               item.percentSchedule = percentSchedule;
             })
@@ -993,6 +993,9 @@
   }
 
   .inside-header-class .cell{
+    padding-left: calc(25/1920*100vw) !important;
+  }
+  .inside-cell-class .cell{
     padding-left: calc(25/1920*100vw) !important;
   }
   .el-table--mini th, .el-table--mini td{

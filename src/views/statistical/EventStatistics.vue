@@ -528,7 +528,7 @@
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
         params.storeIds = self.params.storeIds;
-        params.timeMode = self.params.timeMode;
+        params.timeMode = self.timeMode;
         let storeEventResult = await self.getStoreEventData(params);
         let option = {
           color: [self.newColor, self.doneColor, self.closedColor],
@@ -681,10 +681,8 @@
         let self = this;
         console.log('尺寸改变');
         setTimeout(() => {
-          self.$refs.storeEventRef.resize()
-          self.$refs.storeStatusRef.resize()
           self.$refs.eventSourceRef.resize()
-          self.$refs.eventStatusRef.resize()
+          self.$refs.storeEventRef.resize()
         }, 20)
       },
       async getRegionInfo(){
@@ -1147,7 +1145,7 @@
         let params = {};
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        params.timeMode = self.params.timeMode;
+        params.timeMode = self.timeMode;
         console.log(self.curStore)
         let storeIds = [];
         if(self.curProvince.length == 0){

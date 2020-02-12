@@ -1853,7 +1853,15 @@
         self.getInspectStatsOverviewOfRegion();
         self.getInspectStatsOverviewOfStore();
         self.getInspectStatsLine();
-      }
+      },
+      adjustChart(){
+        let self = this;
+        console.log('尺寸改变');
+        setTimeout(() => {
+          self.$refs.itemsPie.resize()
+          self.$refs.storeChart.resize()
+        }, 20)
+      },
     },
     async created(){
       let self = this;
@@ -1867,7 +1875,12 @@
     },
     mounted(){
       let self = this;
+      window.addEventListener("resize", self.adjustChart, false);
     },
+    beforeDestroy(){
+      let self = this;
+      window.removeEventListener('resize', self.adjustChart);
+    }
   }
 </script>
 

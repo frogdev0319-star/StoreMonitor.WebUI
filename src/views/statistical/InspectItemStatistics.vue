@@ -1273,6 +1273,14 @@
         formatJson(filterVal, jsonData) {
           return jsonData.map(v => filterVal.map(j => v[j]))
         },
+        adjustChart(){
+          let self = this;
+          console.log('尺寸改变');
+          setTimeout(() => {
+            self.$refs.itemsPie.resize()
+            self.$refs.itemsRadar.resize()
+          }, 20)
+        },
       },
       async created(){
         let self = this;
@@ -1286,8 +1294,12 @@
       },
       mounted(){
         let self = this;
-        console.log(self.lang)
+        window.addEventListener("resize", self.adjustChart, false);
       },
+      beforeDestroy(){
+        let self = this;
+        window.removeEventListener('resize', self.adjustChart);
+      }
     }
 </script>
 
@@ -1616,7 +1628,7 @@
         .evalution-pct {
           background-color: #fff;
           .title{
-            float: left;
+            /*float: left;*/
             padding-left: calc(30/1920*100vw);
             text-align: left;
             padding-top: calc(20/1920*100vw);
@@ -1624,7 +1636,7 @@
             color: #7d8cad;
           }
           .pct-content {
-            padding-top: calc(30 / 1920 * 100vw);
+            /*padding-top: calc(30 / 1920 * 100vw);*/
             padding-bottom: calc(20 / 1920 * 100vw);
             width: 100%;
             text-align: center;
@@ -1717,7 +1729,7 @@
               .radar-content {
                 width: 100%;
                 height: calc(195/1920*100vw);
-                width: calc(195/1920*100vw);
+                width: calc(400/1920*100vw);
                 margin: 0 auto;
               }
             }
