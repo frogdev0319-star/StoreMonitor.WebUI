@@ -756,7 +756,7 @@ export default {
         },
         groupNameChange(val, item){
           let self = this;
-          let comment = filterString.all(val,20);
+          let comment = filterString.all(val,30);
           console.log(comment);
           if(0 == Object.keys(item).length){
             self.groupNameInput = comment;
@@ -767,7 +767,7 @@ export default {
         },
         napeNameChange(val, item){
           let self = this;
-          let comment = filterString.all(val,50);
+          let comment = filterString.all(val,100);
           console.log(comment);
           if(0 == Object.keys(item).length){
             self.newNapeName = comment;
@@ -778,7 +778,7 @@ export default {
         },
         napeDepChange(val, item){
           let self = this;
-          let comment = filterString.all(val,140);
+          let comment = filterString.all(val,300);
           console.log(comment);
           if(0 == Object.keys(item).length){
             self.newNapeDep = comment;

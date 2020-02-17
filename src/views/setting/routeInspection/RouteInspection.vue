@@ -641,11 +641,12 @@ export default {
                     let typeName=[];
                     let flaggroupLength=false,flaggroupRex=false;
                     let flagItemName=false,flagItemRex=false,flagItemLength=false;
+                    let flagDescName = false, flagDesLength=false;
                     arr.forEach((item,index)=>{
                         if(item['检查分类']!=undefined&&item["检查分类"].length!=0){
                             indexArry.push(index);
                             typeName.push(item['检查分类']);
-                            if(filterString.getContentLength(item['检查分类'].toString().trim()) > 20){
+                            if(filterString.getContentLength(item['检查分类'].toString().trim()) > 30){
                                 flaggroupLength=true;
                             }
                             if(validateInput(item['检查分类'])){
@@ -656,13 +657,21 @@ export default {
                             flagItemName=true;
                         }
                         else{
-                            if(filterString.getContentLength(item['检查项目名称'].toString().trim()) > 50){
+                            if(filterString.getContentLength(item['检查项目名称'].toString().trim()) > 100){
                                 flagItemLength=true;
                             }
                             if(validateInput(item['检查项目名称'])){
                                 flagItemRex=true;
                             }
                         }
+                      if(item['检查项目详细说明（选填，不填为空）']==undefined){
+                        flagDescName=true;
+                      }
+                      else{
+                        if(filterString.getContentLength(item['检查项目详细说明（选填，不填为空）'].toString().trim()) > 300){
+                          flagDesLength=true;
+                        }
+                      }
                     })
 
                     if(flaggroupLength){
@@ -689,6 +698,11 @@ export default {
                         _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
                         return false;
+                    }
+                    if(flagDesLength){
+                      _this.$refs.loadFile.value = '';
+                      _this.notify(_this.$t('insSettingView.excelIllegalDes'),'warning',3000);
+                      return false;
                     }
 
                     let dataArry=[];
