@@ -128,7 +128,7 @@ export default {
             }
         }
     },
-    mounted(){
+    async mounted(){
         let self=this;
         self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
         let storeId=self.store.storeId;
@@ -141,8 +141,8 @@ export default {
         console.log(self.store.napeTable)
         self.curTag=self.store.napeTable;
         self.phone=self.store.phone;
-        self.getChannelByStore(storeId);
-        self.getNapeByStore(storeId);
+        await self.getChannelByStore(storeId);
+        await self.getNapeByStore(storeId);
 
         //self.getUserList();
     },
