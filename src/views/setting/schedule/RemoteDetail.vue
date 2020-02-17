@@ -52,7 +52,7 @@
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
                 <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
-                          class="el-type"></el-input>
+                          class="el-type" @input="(val)=>scheduluNameChange(val,item)"></el-input>
               </el-col>
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
@@ -294,6 +294,7 @@
   import DialogVue from '@/components/DialogVue.vue'
   import Nape from "../../../api/ApiPath";
   import util from '@/common/util'
+  import filterString from '@/common/filterString'
 
   export default {
     name: "RemoteDetail",
@@ -2390,6 +2391,12 @@
           console.log(arr)
         }
         return arr;
+      },
+      scheduluNameChange(val, item){
+        let self = this;
+        let comment = filterString.all(val,30);
+        console.log(comment);
+        item.name = comment;
       }
     },
 
