@@ -243,19 +243,19 @@
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="serialNumber" :label="generateDeviceLang('serialNum')">
-                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain"></el-input>
+                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain" @input="(val)=>serialNumberChange(val)"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="validationCode" :label="generateDeviceLang('validationCode')">
-                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;"></el-input>
+                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;" @input="validateCodeChange"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="name" :label="generateDeviceLang('deviceName')">
-                      <el-input  v-model="addDeviceData.name" style="width: 100%;"></el-input>
+                      <el-input  v-model="addDeviceData.name" style="width: 100%;" @input="deviceNameChange"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
@@ -346,7 +346,7 @@
                      :key="index">
                   <div class="nape-name-data">
                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" :placeholder="generateDeviceLang('inputInspectName')" v-if="item.isClick"></el-input>
+                    <el-input size="mini" @input="(val)=>channelNameChange(val,item)" v-model="item.tempName" class="nape-input input-details" :placeholder="generateDeviceLang('inputInspectName')" v-if="item.isClick"></el-input>
                   </div>
                   <div class="nape-dep-data">
                     <span class="nape-dep" v-if="item.id != 0 ">{{item.channelId}}</span>
@@ -442,7 +442,7 @@
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
                       <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input  v-model="addChannelData.name" style="width: 100%;"></el-input>
+                        <el-input  v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
@@ -514,6 +514,7 @@
   import {generateDeviceLang} from '@/api/i18n'
   import {getStoreList} from '@/api/store'
   import EzvizAccount from "./EzvizAccount";
+  import filterString from '@/common/filterString'
 
   export default {
     name:'NvrDeviceMgmt',
@@ -1860,7 +1861,35 @@
           duration:time
         });
       },
-
+      channelNameChange(val,item){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        if(0 == Object.keys(item).length){
+          self.addChannelData.name = comment;
+        }
+        else{
+          item.tempName = comment;
+        }
+      },
+      serialNumberChange(val){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        self.addDeviceData.serialNumber = comment;
+      },
+      validateCodeChange(val){
+        let self = this;
+        let comment = filterString.all(val,10);
+        console.log(comment);
+        self.addDeviceData.validationCode = comment;
+      },
+      deviceNameChange(val){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        self.addDeviceData.name = comment;
+      }
     },
 
     mounted(){

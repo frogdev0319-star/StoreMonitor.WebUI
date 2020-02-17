@@ -119,7 +119,7 @@
                   <div class="proper-flag" v-if="item.isClick"></div>
                   <div class="name-data titles">
                     <span v-if="!item.isEditing">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempDeviceName" class="nvr-input" :placeholder="generateDeviceLang('inputNvrName')" v-if="item.isEditing"></el-input>
+                    <el-input size="mini"  v-model="item.tempDeviceName"  @input="(val)=>nvrNameChange(val,item)"class="nvr-input" :placeholder="generateDeviceLang('inputNvrName')" v-if="item.isEditing"></el-input>
                   </div>
                   <div class="store-data titles">
                     <span>{{item.store}}</span>
@@ -204,12 +204,12 @@
               <hr style="border: 0.5px solid #dfe2e9;"/>
               <el-form :model="addNvrData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item label="IVS ID" prop="ivsId">
-                  <el-input v-model="addNvrData.ivsId"></el-input>
+                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"></el-input>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="name" :label="generateDeviceLang('nvr')">
-                      <el-input v-model="addNvrData.name" style="width: 100%;"></el-input>
+                      <el-input v-model="addNvrData.name" style="width: 100%;" @input="(val)=>nvrNameChange(val, {})"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
@@ -280,7 +280,7 @@
                      :key="index">
                   <div class="nape-name-data">
                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" v-if="item.isClick"></el-input>
+                    <el-input size="mini" @input="(val)=>channelNameChange(val,item)" v-model="item.tempName" class="nape-input input-details" v-if="item.isClick"></el-input>
                   </div>
                   <div class="nape-dep-data">
                     <span class="nape-dep" v-if="item.id != 0 ">{{item.channelId}}</span>
@@ -380,7 +380,7 @@
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
                       <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;"></el-input>
+                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
@@ -453,6 +453,7 @@
   import { mapMutations,mapGetters} from 'vuex'
   import {generateDeviceLang} from '@/api/i18n'
   import {getStoreList} from '@/api/store'
+  import filterString from '@/common/filterString'
 
 
   export default {
@@ -1725,7 +1726,35 @@
           duration:time
         });
       },
-      ...mapMutations( [ 'SET_DASHURL'] )
+      ...mapMutations( [ 'SET_DASHURL'] ),
+      nvrNameChange(val, item){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        if(0 == Object.keys(item).length){
+          self.addNvrData.name = comment;
+        }
+        else{
+          item.tempDeviceName = comment;
+        }
+      },
+      channelNameChange(val,item){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        if(0 == Object.keys(item).length){
+          self.addChannelData.name = comment;
+        }
+        else{
+          item.tempName = comment;
+        }
+      },
+      ivsIdChange(val){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        self.addNvrData.ivsId = comment;
+      }
     },
     created(){
       // this.varWindowWidth=window.innerWidth;
