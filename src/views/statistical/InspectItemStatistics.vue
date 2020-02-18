@@ -29,7 +29,6 @@
             :value="item.value">
           </el-option>
         </el-select>
-        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{$t('reportView.search')}}</el-button>
 
       </el-col>
 
@@ -59,7 +58,7 @@
           <div slot="content">*{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
-
+        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{$t('reportView.search')}}</el-button>
       </el-col>
       <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -943,6 +942,7 @@
           params.beginTs = self.params.beginTs;
           params.endTs = self.params.endTs;
           params.storeIds = self.params.storeIds;
+          params.mode = self.params.mode;
           console.log(self.total)
           if(self.total > 0){
             self.hasNoData = false;
@@ -1143,7 +1143,7 @@
               {
                 type: 'radar',
                 data: [],
-                name: '巡检类别',
+                name: self.$t('insSettingView.category'),
                 radarIndex: 1,
                 itemStyle: {
                   normal: {
@@ -1728,7 +1728,7 @@
 
               .radar-content {
                 width: 100%;
-                height: calc(195/1920*100vw);
+                height: calc(220/1920*100vw);
                 width: calc(400/1920*100vw);
                 margin: 0 auto;
               }
