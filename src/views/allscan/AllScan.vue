@@ -10,7 +10,7 @@
         size="mini"
         :clearable=false
         :editable=false
-        format="yyyy/MM/dd HH:mm:ss"
+        format="yyyy/MM/dd"
         class="date-range"
         :popper-class="poperClass"
         :picker-options='dateOpt'
@@ -360,7 +360,8 @@
         showPreviousGroup: false,
         descending: require('../../../static/img/descending.png'),
         ascending: require('../../../static/img/ascending.png'),
-        currentIndex: 0
+        currentIndex: 0,
+        sidebarElm: null
       }
 
     },
@@ -1400,7 +1401,7 @@
             bestJson.storeSort = self.$t("overview.starStore");
             bestJson.storeName = bestStore.storeName;
             bestJson.iconSrc = self.bestStoreIcon;
-            bestJson.qualifiedRate = self.$t("overview.passRate") + bestStore.qualifiedRate + '%';
+            bestJson.qualifiedRate = self.$t("overview.passRate") + ' ' + bestStore.qualifiedRate + '%';
             storesArray.push(bestJson)
           }
           else {
@@ -1415,7 +1416,7 @@
             worstJson.storeSort = self.$t("overview.backwordStroe");
             worstJson.storeName = worstStore.storeName;
             worstJson.iconSrc = self.worstStoreIcon;
-            worstJson.qualifiedRate = self.$t("overview.passRate") + worstStore.qualifiedRate + '%';
+            worstJson.qualifiedRate = self.$t("overview.passRate") + ' ' + worstStore.qualifiedRate + '%';
             storesArray.push(worstJson)
           }
           else {
@@ -2145,15 +2146,26 @@
           })
         })
       },
-      adjustChart() {
+      adjustPatrolChart() {
         let self = this;
         console.log('尺寸改变');
-        setTimeout(() => {
-          self.$refs.storeChart.resize()
-          self.$refs.itemsPie.resize()
-          self.$refs.itemsRadar.resize()
+        if (self.$refs.storeChart) {
+          self.$refs.storeChart.resize();
+        }
+        if (self.$refs.itemsPie) {
+          self.$refs.itemsPie.resize();
+        }
+        if (self.$refs.itemsRadar) {
+          self.$refs.itemsRadar.resize();
+        }
+        if (self.$refs.cycleChart) {
           self.$refs.cycleChart.resize();
-        }, 20)
+        }
+      },
+      handleSideBar(e){
+        if(e.target === e.currentTarget || e.target === this){
+          this.adjustPatrolChart();
+        }
       }
     },
     created() {
@@ -2169,11 +2181,18 @@
     },
     mounted() {
       let self = this;
-      window.addEventListener("resize", self.adjustChart, false);
+      window.addEventListener("resize", self.adjustPatrolChart, false);
+      self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
+      self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
     },
     beforeDestroy() {
       let self = this;
-      window.removeEventListener('resize', self.adjustChart);
+      window.removeEventListener('resize', self.adjustPatrolChart);
+      self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar,false)
+      self.$refs.storeChart && self.$refs.storeChart.dispose()
+      self.$refs.itemsPie && self.$refs.itemsPie.dispose()
+      self.$refs.itemsRadar && self.$refs.itemsRadar.dispose()
+      self.$refs.cycleChart &&  self.$refs.cycleChart.dispose();
     }
   }
 </script>
@@ -2239,15 +2258,15 @@
       height: 80px;
       line-height: 80px;
       text-align: left;
-      margin-bottom: calc(30 / 1920 * 100vw);
+      margin-bottom: 30px;
       border-bottom: 1px solid $border;
       position: relative;
       background: #fff;
       .date-title {
         @include point(margin-left, 30);
         @include point(margin-right, 20);
-        margin-left: calc(60 / 1920 * 100vw);
-        margin-right: calc(40 / 1920 * 100vw);
+        margin-left: calc(60/1920*100vw);
+        margin-right: calc(40/1920*100vw);
         font-size: 14px;
         color: $black;
       }
@@ -2260,20 +2279,17 @@
       .date-range {
         border: 1px solid #ccc;
         width: 200px;
-        height: calc(35 / 1920 * 100vw);
-        /*.el-range-separator{*/
-        /*height: calc(35 / 1920 * 100vw);*/
-        /*line-height: calc(35 / 1920 * 100vw);*/
-        /*}*/
+        height: calc(36 / 1920 * 100vw);
+        line-height: calc(36 / 1920 * 100vw);
       }
       .item {
         color: $tab;
-        margin-left: calc(20 / 1920 * 100vw);
-        margin-right: calc(8 / 1920 * 100vw);
+        margin-left: calc(20/1920*100vw);
+        margin-right: calc(8/1920*100vw);
       }
       .content {
         display: inline-block;
-        font-size: calc(12 / 1920 * 100vw);
+        font-size: 12px;
       }
       .el-store {
         position: absolute;
@@ -2283,24 +2299,24 @@
     }
     .el-overview {
       position: relative;
-      padding: 0 calc(25 / 1920 * 100vw);
+      padding: 0 calc(25/1920*100vw);
       .zone-row {
-        height: calc(400 / 1920 * 100vw);
+        height: 400px;
         border: 1px solid $border;
         background-color: #fff;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         color: $black;
         .title {
-          height: calc(70 / 1920 * 100vw);
-          padding-top: calc(30 / 1920 * 100vw);
-          margin-left: calc(30 / 1920 * 100vw);
-          font-size: calc(20 / 1920 * 100vw);
+          height: 70px;
+          padding-top: 30px;
+          margin-left: calc(30/1920*100vw);
+          font-size: calc(20/1920*100vw);
           text-align: left;
         }
         .kpi-list {
           height: 100%;
           .kpi-content {
-            height: calc(330 / 1920 * 100vw);
+            height: 330px;
             border-top: 1px solid $border;
             border-right: 1px solid $border;
             display: flex;
@@ -2308,39 +2324,39 @@
             .total-store {
               height: 50%;
               border-bottom: 1px solid $border;
-              padding-top: calc(40 / 1920 * 100vw);
+              padding-top: 40px;
               :last-child {
                 border-bottom: none;
               }
-              padding-left: calc(34 / 1920 * 100vw);
+              padding-left: calc(34/1920*100vw);
               .total-title {
-                font-size: calc(16 / 1920 * 100vw);
+                font-size: calc(16/1920*100vw);
                 color: $tab;
                 text-align: left;
               }
               .total-num {
-                font-size: calc(30 / 1920 * 100vw);;
+                font-size: calc(30/1920*100vw);
                 color: $h1;
                 text-align: left;
-                margin-top: calc(20 / 1920 * 100vw);
+                margin-top: 20px;
                 .day {
-                  padding-left: calc(10 / 1920 * 100vw);
+                  padding-left: calc(10/1920*100vw);
                 }
               }
             }
           }
         }
         .store-list {
-          height: calc(400 / 1920 * 100vw);
+          height: 400px;
           .region-result {
             border-top: 1px solid $border;
             border-right: 1px solid $border;
-            height: calc(330 / 1920 * 100vw);
+            height: 330px;
             padding: calc(25 / 1920 * 100vw) calc(45 / 1920 * 100vw) 0 calc(30 / 1920 * 100vw);
             .region-content {
-              height: calc(270 / 1920 * 100vw);
+              height: 270px;
               .region-result-panel {
-                height: calc(290 / 1920 * 100vw);
+                height: 290px;
                 position: relative;
                 .result-content {
                   height: 100%;
@@ -2348,7 +2364,7 @@
                 }
                 .empty-text {
                   position: absolute;
-                  top: calc(90 / 1920 * 100vw);
+                  top: 90px;
                   left: 50%;
                   font-size: calc(14 / 1920 * 100vw);
                   color: $tab;
@@ -2360,12 +2376,12 @@
                 }
                 .el-icon-arrow-right {
                   position: absolute;
-                  top: calc(90 / 1920 * 100vw);
+                  top: 90px;
                   right: 0;
                 }
                 .el-icon-arrow-left {
                   position: absolute;
-                  top: calc(90 / 1920 * 100vw);
+                  top: 90px;
                   left: calc(20 / 1920 * 100vw);
                 }
               }
@@ -2376,9 +2392,9 @@
         }
         .focus-list {
           .focus-content {
-            height: calc(330 / 1920 * 100vw);
+            height: 330px;
             border-top: 1px solid $border;
-            padding: calc(25 / 1920 * 100vw) calc(30 / 1920 * 100vw);
+            padding: 25px calc(30/1920*100vw);
             position: relative;
             .chart-content {
               height: 100%;
@@ -2389,7 +2405,7 @@
               display: flex;
               align-items: center;
               .item-ranking {
-                font-size: calc(18 / 1920 * 100vw);
+                font-size: calc(18/1920*100vw);
                 text-align: left;
                 font-family: Arial MT;
               }
@@ -2409,10 +2425,10 @@
                 color: $tab;
               }
               .item-titles {
-                margin: 0 calc(20 / 1920 * 100vw);
+                margin: 0 calc(20/1920*100vw);
                 flex-grow: 1;
                 text-align: left;
-                font-size: calc(14 / 1920 * 100vw);
+                font-size: calc(14/1920*100vw);
                 margin-left: 0;
                 overflow: hidden;
                 .item-title {
@@ -2421,17 +2437,17 @@
                   text-overflow: ellipsis;
                 }
                 .item-process {
-                  margin-bottom: calc(1 / 1920 * 100vw);
+                  margin-bottom: 1px;
                 }
               }
               .region-name {
-                font-size: calc(14 / 1920 * 100vw);
-                margin: 0 calc(30 / 1920 * 100vw) 0 calc(20 / 1920 * 100vw);
-                width: calc(55 / 1920 * 100vw);
+                font-size: calc(14/1920*100vw);
+                margin: 0 calc(30/1920*100vw) 0 calc(20/1920*100vw);
+                width: 55px;
                 text-align: left;
               }
               .ranking-num {
-                font-size: calc(14 / 1920 * 100vw);
+                font-size: calc(14/1920*100vw);
                 text-align: left;
                 white-space: nowrap;
               }
@@ -2439,14 +2455,14 @@
 
           }
           .area-title {
-            font-size: calc(20 / 1920 * 100vw);
+            font-size: calc(20/1920*100vw);
             display: inline-block;
             /*margin-right: calc(10/1920*100vw);*/
           }
           .empty-content {
-            font-size: calc(14 / 1920 * 100vw);
+            font-size: calc(14/1920*100vw);
             color: $tab;
-            padding-top: calc(140 / 1920 * 100vw);
+            padding-top: 140px;
             border-top: 1px solid $border;
           }
         }
@@ -2456,41 +2472,41 @@
         display: inline-block;
         color: $tab;
         cursor: pointer;
-        margin-left: calc(10 / 1920 * 100vw);
+        margin-left: calc(10/1920*100vw);
         @media screen and (max-width: 1280px) {
           margin-left: 0;
         }
         .order-span {
-          font-size: calc(12 / 1920 * 100vw);
+          font-size: 12px;
           vertical-align: middle;
         }
         .img-class {
-          width: calc(20 / 1920 * 100vw);
-          height: calc(20 / 1920 * 100vw);
+          width: 20px;
+          height: 20px;
           vertical-align: middle;
         }
         .iconfont {
-          font-size: calc(20 / 1920 * 100vw) !important;
+          font-size: calc(20/1920*100vw) !important;
           cursor: pointer;
         }
         .active-arrow {
           color: $red;
-          font-size: calc(20 / 1920 * 100vw);
+          font-size: calc(20/1920*100vw);
         }
       }
       .task-row {
-        height: calc(340 / 1920 * 100vw);
-        margin-top: calc(30 / 1920 * 100vw);
+        height: 340px;
+        margin-top: 30px;
         border: 1px solid $border;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         background-color: #fff;
         .titles {
-          height: calc(70 / 1920 * 100vw);
+          height: 70px;
           text-align: left;
           border-bottom: 1px solid $border;
           .title {
             height: 100%;
-            padding-top: calc(30 / 1920 * 100vw);
+            padding-top: 30px;
             margin-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             display: inline-block;
@@ -2509,42 +2525,42 @@
           }
         }
         .task-board {
-          padding: calc(45 / 1920 * 100vw) calc(90 / 1920 * 100vw);
+          padding: 45px calc(90 / 1920 * 100vw);
           display: flex;
           flex-wrap: nowrap;
           justify-content: space-between;
           .task-item {
             height: 100%;
             .task-panel {
-              width: calc(150 / 1920 * 100vw);
-              height: calc(126 / 1920 * 100vw);
+              width: 150px;
+              height: 126px;
               position: relative;
               .process-panel {
                 width: 100%;
                 height: 100%;
                 margin: 0 auto;
                 .el-progress-circle {
-                  width: calc(150 / 1920 * 100vw) !important;
-                  height: calc(150 / 1920 * 100vw) !important;
+                  width: 150px !important;
+                  height: 150px !important;
                   margin: 0 auto;
-                  @media screen and (max-width: 1440px) {
-                    width: 126px;
-                    height: 126px;
-                    margin: 0 auto;
-                  }
-                  @media screen and (max-width: 1280px) {
-                    width: 112px;
-                    height: 112px;
-                    margin: 0 auto;
-                  }
+                  /*@media screen and (max-width: 1440px) {*/
+                  /*  width: 126px;*/
+                  /*  height: 126px;*/
+                  /*  margin: 0 auto;*/
+                  /*}*/
+                  /*@media screen and (max-width: 1280px) {*/
+                  /*  width: 112px;*/
+                  /*  height: 112px;*/
+                  /*  margin: 0 auto;*/
+                  /*}*/
                 }
               }
               .percent-num {
                 position: absolute;
                 left: 50%;
-                top: calc(75 / 1920 * 100vw);
+                top: 75px;
                 transform: translate(-50%, -50%);
-                width: calc(100 / 1920 * 100vw);
+                width: 100px;
                 .num {
                   font-size: calc(30 / 1920 * 100vw);
                   color: #292e36;
@@ -2555,10 +2571,10 @@
               }
             }
             .task-supervisor-name {
-              font-size: 16px;
+              font-size: calc(16 / 1920 * 100vw);
               color: $tab;
               text-align: center;
-              margin-top: calc(30 / 1920 * 100vw);
+              margin-top: 30px;
             }
           }
         }
@@ -2566,18 +2582,18 @@
           justify-content: space-around;
         }
         .task-empty {
-          height: calc(270 / 1920 * 100vw);
-          line-height: calc(270 / 1920 * 100vw);
+          height: 270px;
+          line-height: 270px;
           color: $tab;
         }
       }
       .items-row {
-        height: calc(400 / 1920 * 100vw);
-        margin-top: calc(30 / 1920 * 100vw);
+        height: 400px;
+        margin-top: 30px;
         .title {
-          height: calc(70 / 1920 * 100vw);
+          height: 70px;
           width: 100%;
-          padding-top: calc(30 / 1920 * 100vw);
+          padding-top: 30px;
           padding-left: calc(30 / 1920 * 100vw);
           font-size: calc(20 / 1920 * 100vw);
           text-align: left;
@@ -2587,16 +2603,16 @@
           border: 1px solid $border;
           background-color: #fff;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-          height: calc(400 / 1920 * 100vw);
+          height: 400px;
           .pct-content {
-            padding-top: calc(25 / 1920 * 100vw);
-            padding-bottom: calc(25 / 1920 * 100vw);
+            padding-top: 25px;
+            padding-bottom: 25px;
             border-top: 1px solid $border;
             width: 100%;
             text-align: center;
             .pct-panel {
-              height: calc(210 / 1920 * 100vw);
-              width: calc(210 / 1920 * 100vw);
+              height: 210px;
+              width: 210px;
               margin: 0 auto;
               border-radius: 50%;
               background: -webkit-radial-gradient(circle closest-side, #fff 60%, $background 40%);
@@ -2606,13 +2622,13 @@
               }
             }
             .pct-nums {
-              margin-top: calc(30 / 1920 * 100vw);
-              /*padding: 0 calc(20/1920*100vw);*/
+              margin-top: 30px;
               font-size: calc(12 / 1920 * 100vw);
               display: flex;
               justify-content: center;
-              @media screen and (max-width: 1280px) {
+              @media screen and (max-width: 1680px) {
                 padding: 0 0;
+                justify-content: space-around;
               }
               .content-labels {
                 padding: 0 calc(10 / 1920 * 100vw);
@@ -2620,7 +2636,7 @@
                 text-align: left;
                 .excellent_nums {
                   margin-left: calc(20 / 1920 * 100vw);
-                  margin-bottom: calc(10 / 1920 * 100vw);
+                  margin-bottom: 10px;
                   font-size: calc(14 / 1920 * 100vw);
                   line-height: calc(14 / 1920 * 100vw);
                 }
@@ -2632,6 +2648,9 @@
                     width: 10px;
                     display: inline-block;
                     margin-right: calc(10 / 1920 * 100vw);
+                    @media screen and (min-width: 1280px) and (max-width: 1366px){
+                      margin-right: calc(1 / 1920 * 100vw);
+                    }
                   }
                   .label-desc {
                     color: $tab;
@@ -2652,8 +2671,8 @@
                 }
               }
               .en-labels {
-                @media screen and (max-width: 1280px) {
-                  padding: 0 calc(5 / 1920 * 100vw);
+                @media screen and (max-width: 1680px) {
+                  padding: 0;
                 }
               }
             }
@@ -2663,18 +2682,21 @@
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           border: 1px solid $border;
           margin-left: calc(20 / 1920 * 100vw);
-          height: calc(400 / 1920 * 100vw);
+          height: 400px;
           background-color: #fff;
           .title {
             border-bottom: 1px solid $border;
           }
           .items-panel {
-            height: calc(298 / 1920 * 100vw);
-            margin: calc(15 / 1920 * 100vw);
+            height: 298px;
+            margin: 15px calc(15/1920*100vw);
             border: 1px solid $border;
             .top-five-items {
               height: 100%;
               position: relative;
+              @media screen and (max-width: 1280px){
+                width: 60%;
+              }
               .items-list {
                 height: 100%;
                 background: $background;
@@ -2712,6 +2734,7 @@
                     text-align: left;
                     font-size: calc(14 / 1920 * 100vw);
                     width: calc(300 / 1920 * 100vw);
+                    min-width: 160px;
                     .item-title {
                       overflow: hidden;
                       white-space: nowrap;
@@ -2753,9 +2776,12 @@
             .item-radar {
               height: 100%;
               padding-left: calc(15 / 1920 * 100vw);
-              padding-top: calc(15 / 1920 * 100vw);
+              padding-top: 15px;
               position: relative;
-
+              @media screen and (max-width: 1280px){
+                width: 40%;
+                padding-left: 0;
+              }
               .rader-panel {
                 width: 100%;
                 height: 100%;
@@ -2766,10 +2792,13 @@
                   white-space: nowrap;
                   overflow: hidden;
                   text-overflow: ellipsis;
+                  @media screen and (max-width: 1280px){
+                    padding-left: calc(15 / 1920 * 100vw);
+                  }
                 }
                 .radar-content {
                   width: 100%;
-                  height: calc(100% - 25 / 1920 * 100vw);
+                  height: calc(100% - 25px);
                 }
               }
               .radar-empty {
@@ -2786,10 +2815,10 @@
         }
       }
       .star-row {
-        height: calc(400 / 1920 * 100vw);;
-        margin-top: calc(30 / 1920 * 100vw);
+        height: 400px;
+        margin-top: 30px;
         @media screen and (min-width: 1280px) and(max-width: 1440px) {
-          height: calc(420 / 1920 * 100vw);
+          height: 420px;
         }
         .stores-list {
           display: flex;
@@ -2797,10 +2826,10 @@
           flex-direction: column;
           background-color: #fff;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-          height: calc(400 / 1920 * 100vw);
+          height: 400px;
           .title {
             font-size: calc(20 / 1920 * 100vw);
-            padding-top: calc(30 / 1920 * 100vw);
+            padding-top: 30px;
             color: $black;
           }
           .best-store {
@@ -2825,8 +2854,8 @@
             position: absolute;
             top: 0;
             right: 0;
-            height: calc(100 / 1920 * 100vw);
-            width: calc(100 / 1920 * 100vw);
+            height: 100px;
+            width: 100px;
             .store-icon {
               width: 100%;
               height: 100%;
@@ -2834,14 +2863,14 @@
           }
           .store-name {
             font-size: calc(30 / 1920 * 100vw);
-            margin-top: calc(20 / 1920 * 100vw);
+            margin-top: 20px;
             color: #292e36;
           }
           .pass-pct {
             font-size: calc(16 / 1920 * 100vw);
-            margin-top: calc(20 / 1920 * 100vw);
+            margin-top: 20px;
             color: $tab;
-            margin-bottom: calc(45 / 1920 * 100vw);
+            margin-bottom: 45px;
 
           }
         }
@@ -2851,8 +2880,8 @@
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           .cycle-title {
-            height: calc(70 / 1920 * 100vw);
-            padding-top: calc(30 / 1920 * 100vw);
+            height: 70px;
+            padding-top: 30px;
             padding-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             text-align: left;
@@ -2860,11 +2889,11 @@
             color: $black;
           }
           .cycle-panel {
-            height: calc(325 / 1920 * 100vw);
-            padding: calc(30 / 1920 * 100vw) calc(50 / 1920 * 100vw) 0 calc(20 / 1920 * 100vw);
+            height: 325px;
+            padding: 30px calc(50 / 1920 * 100vw) 0 20px;
             position: relative;
             .panel-bubble {
-              height: calc(270 / 1920 * 100vw);
+              height: 270px;
               position: relative;
               .radar-content {
                 height: 100%;
@@ -2873,14 +2902,14 @@
             }
             .cycle-label {
               font-size: calc(12 / 1920 * 100vw);
-              margin-bottom: calc(15 / 1920 * 100vw);
+              margin-bottom: 15px;
               display: flex;
               justify-content: center;
               position: relative;
               .cycle-labels {
                 margin-right: calc(30 / 1920 * 100vw);
                 line-height: calc(12 / 1920 * 100vw);
-                margin-top: calc(20 / 1920 * 100vw);
+                margin-top: 20px;
                 font-size: calc(12 / 1920 * 100vw);
                 color: $tab;
                 &:last-child {
@@ -2910,23 +2939,17 @@
             }
             .cycle-axis {
               position: absolute;
-              top: calc(30 / 1920 * 100vw);
-              left: calc(65 / 1920 * 100vw);
+              top: 30px;
+              left: 65px;
               font-size: calc(12 / 1920 * 100vw);
               color: $tab;
-              @media screen and (max-width: 1280px) {
-                left: calc(75 / 1920 * 100vw);
-              }
             }
             .pass-rate-axis {
               position: absolute;
-              bottom: calc(85 / 1920 * 100vw);
+              bottom: 85px;
               right: calc(50 / 1920 * 100vw);
               font-size: calc(12 / 1920 * 100vw);
               color: $tab;
-              @media screen and (max-width: 1280px) {
-                bottom: calc(105 / 1920 * 100vw);
-              }
             }
           }
         }
@@ -2969,26 +2992,26 @@
     padding: 5px;
   }
 
-  @media screen and ( max-width: 1680px ) and (min-width: 1440px) {
-    .process-panel .el-progress-circle {
-      width: 130px !important;
-      height: 130px !important;
-    }
-  }
+  /*@media screen and ( max-width: 1680px ) and (min-width: 1440px) {*/
+  /*  .process-panel .el-progress-circle {*/
+  /*    width: 130px !important;*/
+  /*    height: 130px !important;*/
+  /*  }*/
+  /*}*/
 
-  @media screen and ( max-width: 1440px ) and (min-width: 1280px) {
-    .process-panel .el-progress-circle {
-      width: 112px !important;
-      height: 112px !important;
-    }
-  }
+  /*@media screen and ( max-width: 1440px ) and (min-width: 1280px) {*/
+  /*  .process-panel .el-progress-circle {*/
+  /*    width: 112px !important;*/
+  /*    height: 112px !important;*/
+  /*  }*/
+  /*}*/
 
-  @media screen and (max-width: 1280px) {
-    .process-panel .el-progress-circle {
-      width: 100px !important;
-      height: 100px !important;
-    }
-  }
+  /*@media screen and (max-width: 1280px) {*/
+  /*  .process-panel .el-progress-circle {*/
+  /*    width: 100px !important;*/
+  /*    height: 100px !important;*/
+  /*  }*/
+  /*}*/
 
   .item-process .el-progress-bar .el-progress-bar__outer {
     background-color: #fff;

@@ -59,6 +59,7 @@
   height: calc(36/1920*100vw);
   line-height: calc(36/1920*100vw);
   border-color: #ddd;
+  min-height: 28px;
 }
 
 .el-select-content.el-select .el-input__inner{
@@ -79,6 +80,8 @@
   border-radius: 3px !important;
   background: #f4f5f9 !important;
   border: 1px solid #E4E7ED !important;
+  min-height: 28px;
+  min-width: 85px;
 }
 .el-province .el-input--mini .el-input__icon {
   line-height: calc(36/1920*100vw);
@@ -87,6 +90,8 @@
   height: calc(36/1920*100vw);
   line-height: calc(36/1920*100vw);
   color: #7d8cad;
+  min-height: 28px;
+  min-width: 85px;
 }
 .el-date-editor .el-range-input{
   color: #7d8cad;
@@ -99,6 +104,11 @@
   line-height: calc(35/1920*100vw);
   height: calc(35/1920*100vw);
 }
-
+.el-range-editor--mini .el-range__close-icon{
+  display: none
+}
+.el-date-editor .el-range-input{
+  width: 50%;
+}
 
 

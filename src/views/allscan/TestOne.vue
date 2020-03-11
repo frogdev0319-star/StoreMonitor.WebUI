@@ -55,22 +55,22 @@
                 >
                 </el-option>
               </el-select>
-<!--              <div  class="stores-panel" >-->
-<!--                <div class="month-content" @click="choiceStore">-->
-<!--                  <div class="input-arrow-panel"></div>-->
-<!--                  <el-input v-model="storeName" size="mini" id="elMonth" placeholder="请选择门店" :readonly=true></el-input>-->
-<!--                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
-<!--                </div>-->
-<!--                <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">-->
-<!--                  <div class="month-details">-->
-<!--                    <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>-->
-<!--                  </div>-->
-<!--                  <div class="month-details" v-for="(item,index) in storeDataList" :key="index">-->
-<!--                    <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>-->
-<!--                    <span>{{item.label}}</span>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
+              <!--              <div  class="stores-panel" >-->
+              <!--                <div class="month-content" @click="choiceStore">-->
+              <!--                  <div class="input-arrow-panel"></div>-->
+              <!--                  <el-input v-model="storeName" size="mini" id="elMonth" placeholder="请选择门店" :readonly=true></el-input>-->
+              <!--                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
+              <!--                </div>-->
+              <!--                <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">-->
+              <!--                  <div class="month-details">-->
+              <!--                    <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>-->
+              <!--                  </div>-->
+              <!--                  <div class="month-details" v-for="(item,index) in storeDataList" :key="index">-->
+              <!--                    <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>-->
+              <!--                    <span>{{item.label}}</span>-->
+              <!--                  </div>-->
+              <!--                </div>-->
+              <!--              </div>-->
 
             </div>
             <div class="charts-content">
@@ -311,6 +311,7 @@
         storeEventLegend: ['日期',this.$t('overview.createdEvent'),this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
         echartAxiasColor: '#e3e9f4',
         echartBackground: 'rgba(30,34,52,0.75)',
+        sidebarElm: null
       }
 
     },
@@ -458,9 +459,9 @@
         let tempStore=[];
         tempStore.push(
           {storeId:'-1',
-          label: self.$t('overview.all'),
-          value:self.$t('overview.all')}
-          )
+            label: self.$t('overview.all'),
+            value:self.$t('overview.all')}
+        )
         storeList.forEach(item=>{
           let obj={
             storeId:item.storeId,
@@ -1030,6 +1031,7 @@
           console.log(soureceList);
           option.dataset.source = soureceList;
         }
+        console.log(option)
         self.storeEventsOptions = option;
       },
       getStoreEventData(params){
@@ -1062,12 +1064,15 @@
       adjustChart(){
         let self = this;
         console.log('尺寸改变');
-        setTimeout(() => {
-          self.$refs.storeEventRef.resize()
-          self.$refs.storeStatusRef.resize()
-          self.$refs.eventSourceRef.resize()
-          self.$refs.eventStatusRef.resize()
-        }, 20)
+        self.$refs.storeEventRef.resize()
+        self.$refs.storeStatusRef.resize()
+        self.$refs.eventSourceRef.resize()
+        self.$refs.eventStatusRef.resize()
+      },
+      handleSideBar(e){
+        if(e.target === e.currentTarget || e.target === this){
+          this.adjustChart();
+        }
       }
     },
     created(){
@@ -1086,13 +1091,20 @@
       self.initData();
 
     },
-     mounted(){
+    mounted(){
       let self=this;
-       window.addEventListener("resize", self.adjustChart, false);
+      self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
+      self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
+      window.addEventListener("resize", self.adjustChart, false);
     },
     beforeDestroy(){
       let self = this;
       window.removeEventListener('resize', self.adjustChart);
+      self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar)
+      self.$refs.storeEventRef && self.$refs.storeEventRef.dispose()
+      self.$refs.storeStatusRef && self.$refs.storeStatusRef.dispose()
+      self.$refs.eventSourceRef && self.$refs.eventSourceRef.dispose()
+      self.$refs.eventStatusRef && self.$refs.eventStatusRef.dispose()
     }
   }
 </script>
@@ -1133,7 +1145,7 @@
     height: auto;
     /*background-color: #f6f9fe;*/
     font-size: calc(14/1920*100vw);
-    padding-bottom: calc(20/1920*100vw);
+    padding-bottom: 20px;
     .sourceType-icon {
       margin-right: calc(15/1920*100vw);
       position: relative;
@@ -1142,8 +1154,8 @@
     }
     .icon-span {
       display: inline-block;
-      width: calc(60/1920*100vw);
-      height: calc(22/1920*100vw);
+      width: 60px;
+      height: 22px;
       color: white;
       font-size: calc(12/1920*100vw);
     }
@@ -1151,7 +1163,7 @@
       height: 80px;
       line-height: 80px;
       text-align: left;
-      margin-bottom: calc(30/1920*100vw);
+      margin-bottom: 30px;
       border-bottom: 1px solid $border;
       position: relative;
       background: #fff;
@@ -1172,7 +1184,8 @@
       .date-range {
         border: 1px solid #ccc;
         width: 200px;
-        height: calc(35 / 1920 * 100vw);
+        height: calc(36 / 1920 * 100vw);
+        line-height: calc(36 / 1920 * 100vw);
       }
       .item {
         color: $tab;
@@ -1192,15 +1205,15 @@
       padding: 0 calc(25/1920*100vw);
       position: relative;
       .pct-content{
-        height: calc(330/1920*100vw);
-        padding-top: calc(40/1920*100vw);
-        padding-bottom: calc(20/1920*100vw);
+        height: 330px;
+        padding-top: 40px;
+        padding-bottom: 20px;
         border-top: 1px solid $border;
         width: 100%;
         text-align: center;
         .pct-panel{
-          height: calc(204/1920*100vw);
-          width: calc(204/1920*100vw);
+          height: 204px;
+          width: 204px;
           margin: 0 auto;
           border-radius: 50%;
           background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
@@ -1210,18 +1223,21 @@
           }
         }
         .pct-nums{
-          margin-top: calc(28/1920*100vw);
+          margin-top: 28px;
           padding: 0 calc(20/1920*100vw);
-          font-size: calc(12/1920*100vw);
+          font-size: 12px;
           display: flex;
-          justify-content: center;
+          justify-content: space-around;
+          @media screen and (max-width: 1680px){
+            padding: 0;
+          }
           .content-labels{
-            padding: 0 calc(10/1920*100vw);
-            font-size: calc(12/1920*100vw);
+            padding: 0 0 calc(10/1920*100vw);
+            font-size: 12px;
             text-align: left;
             .excellent_nums{
               margin-left: calc(20/1920*100vw);
-              margin-bottom:calc(10/1920*100vw);
+              margin-bottom: 10px;
               font-size: calc(14/1920*100vw);
               line-height: calc(14/1920*100vw);
             }
@@ -1233,6 +1249,9 @@
                 width: 10px;
                 display: inline-block;
                 margin-right: calc(10/1920*100vw);
+                @media screen and (max-width: 1440px){
+                  margin-right: calc(5/1920*100vw);
+                }
               }
               .label-desc{
                 color: $tab;
@@ -1248,8 +1267,8 @@
         background-color: #fff;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         .title{
-          height: calc(70/1920*100vw);
-          padding-top: calc(30/1920*100vw);
+          height: 70px;
+          padding-top: 30px;
           margin-left: calc(30/1920*100vw);
           font-size: calc(20/1920*100vw);
           text-align: left;
@@ -1264,29 +1283,29 @@
             display: flex;
             flex-direction: column;
             .event-list{
-              padding-top: calc(25/1920*100vw);
+              padding-top: 25px;
               padding-left: calc(34/1920*100vw);
-              padding-bottom: calc(20/1920*100vw);
+              padding-bottom: 20px;
               border-bottom: 1px solid $border;
               &:last-child{
                 border-bottom: none;
               }
               .event-title{
                 font-size: calc(16/1920*100vw);
-                height:calc(16/1920*100vw);
-                line-height:calc(16/1920*100vw);
+                height: 16px;
+                line-height:16px;
                 color: $tab;
                 text-align: left;
               }
               .event-num{
                 font-size: calc(30/1920*100vw);
                 line-height: calc(30/1920*100vw);
-                height: calc(28/1920*100vw);
+                height: 28px;
                 color: $h1;
                 text-align: left;
-                margin-top: calc(20/1920*100vw);
+                margin-top: 20px;
                 :last-child{
-                  padding-bottom: calc(20/1920*100vw);
+                  padding-bottom: 20px;
                 }
               }
             }
@@ -1294,14 +1313,17 @@
         }
         .store-events{
           height: auto;
+          @media screen and (max-width: 1536px){
+            width: 55%;
+          }
           .region-result{
             border-top: 1px solid $border;
             border-right: 1px solid $border;
-            height: calc(330/1920*100vw);
-            padding: calc(20/1920*100vw) calc(30/1920*100vw) calc(15/1920*100vw) calc(30/1920*100vw);
+            height: 330px;
+            padding: 20px calc(30/1920*100vw) 15px calc(20/1920*100vw);
             .store-list{
               text-align: left;
-              margin-bottom: calc(15/1920*100vw);
+              margin-bottom: 15px;
               position: relative;
               .store-name {
                 font-size: calc(14 / 1920 * 100vw);
@@ -1367,7 +1389,7 @@
 
             }
             .charts-content{
-              height:calc(245/1920*100vw);
+              height:245px;
               .result-content{
                 height: 100%;
                 width: 100%;
@@ -1377,16 +1399,19 @@
 
         }
         .source-list{
+          @media screen and (max-width: 1536px){
+            width: 28%;
+          }
           .pct-content{
-            height: calc(330/1920*100vw);
-            padding-top: calc(40/1920*100vw);
-            padding-bottom: calc(20/1920*100vw);
+            height: 330px;
+            padding-top: 40px;
+            padding-bottom: 20px;
             border-top: 1px solid $border;
             width: 100%;
             text-align: center;
             .pct-panel{
-              height: calc(204/1920*100vw);
-              width: calc(204/1920*100vw);
+              height: 204px;
+              width: 204px;
               margin: 0 auto;
               border-radius: 50%;
               background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
@@ -1396,21 +1421,27 @@
               }
             }
             .pct-nums{
-              margin-top: calc(28/1920*100vw);
+              margin-top: 28px;
               padding: 0 calc(20/1920*100vw);
-              font-size: calc(12/1920*100vw);
+              font-size: 12px;
               display: flex;
               justify-content: center;
-              @media screen and (max-width: 1280px){
+              @media screen and (max-width: 1920px){
                 padding: 0;
+              }
+              @media screen and (max-width: 1440px){
+                justify-content: space-around;
               }
               .content-labels{
                 padding: 0 calc(10/1920*100vw);
-                font-size: calc(12/1920*100vw);
+                @media screen and (max-width: 1280px){
+                  padding: 0;
+                }
+                font-size: 12px;
                 text-align: left;
                 .excellent_nums{
                   margin-left: calc(20/1920*100vw);
-                  margin-bottom:calc(10/1920*100vw);
+                  margin-bottom: 10px;
                   font-size: calc(14/1920*100vw);
                   line-height: calc(14/1920*100vw);
                 }
@@ -1422,6 +1453,9 @@
                     width: 10px;
                     display: inline-block;
                     margin-right: calc(10/1920*100vw);
+                    @media screen and (min-width: 1280px) and (max-width: 1366px) {
+                      margin-right: calc(2/1920*100vw);
+                    }
                   }
                   .label-desc{
                     color: $tab;
@@ -1439,8 +1473,11 @@
                 }
               }
               .en-label{
-                @media screen and (max-width: 1680px){
+                @media screen and (max-width: 1920px){
                   padding: 0 calc(5/1920*100vw);
+                }
+                @media screen and (max-width: 1660px){
+                  padding: 0 calc(1/1920*100vw);
                 }
               }
             }
@@ -1453,24 +1490,24 @@
           .empty-content{
             font-size: calc(14/1920*100vw);
             color: $tab;
-            padding-top: calc(140/1920*100vw);
+            padding-top: 140px;
             border-top: 1px solid $border;
           }
         }
       }
       .second-row {
         height: auto;
-        margin-top: calc(30 / 1920 * 100vw);
-        @media screen and (min-width: 1280px) and(max-width: 1440px) {
-          height: calc(420 / 1920 * 100vw);
-        }
+        margin-top: 30px;
+        /*@media screen and (min-width: 1280px) and(max-width: 1440px) {*/
+        /*  height: calc(420 / 1920 * 100vw);*/
+        /*}*/
         .status-list {
           background-color: #fff;
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           .status-title {
-            height: calc(70 / 1920 * 100vw);
-            padding-top: calc(30 / 1920 * 100vw);
+            height: 70px;
+            padding-top: 30px;
             padding-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             text-align: left;
@@ -1492,8 +1529,8 @@
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           .store-statul-title{
-            height: calc(70/1920*100vw);
-            padding-top: calc(30/1920*100vw);
+            height: 70px;
+            padding-top: 30px;
             padding-left: calc(30/1920*100vw);
             font-size: calc(20/1920*100vw);
             text-align: left;
@@ -1501,19 +1538,19 @@
             color: $black;
           }
           .store-panel {
-            height: calc(295 / 1920 * 100vw);
-            margin: calc(20 / 1920 * 100vw) calc(30 / 1920 * 100vw) calc(15 / 1920 * 100vw) calc(30 / 1920 * 100vw);
+            height: calc(330px - 35px);
+            margin: 20px calc(30/1920*100vw) 15px calc(30/1920*100vw);
             position: relative;
             .store-list {
               text-align: left;
-              margin-bottom: calc(15 / 1920 * 100vw);
+              margin-bottom: 15px;
               .store-name {
                 font-size: calc(14 / 1920 * 100vw);
                 margin-right: calc(20 / 1920 * 100vw);
               }
             }
             .status-content{
-              height: calc(245 / 1920 * 100vw);
+              height: 245px;
               .result-content{
                 height: 100%;
                 width: 100%;
@@ -1530,22 +1567,6 @@
   .date-picker-poper .el-button--text{
     visibility: hidden !important;
   }
-  .process-panel .el-progress-circle{
-    width: 150px !important;
-    height: 150px  !important;
-  }
-  @media screen and (max-width:1680px){
-    .process-panel .el-progress-circle{
-      width: 130px !important;
-      height: 130px !important;
-    }
-  }
-  @media screen and (max-width:1280px){
-    .process-panel .el-progress-circle{
-      width: 100px !important;
-      height: 100px !important;
-    }
-  }
   .item-process .el-progress-bar .el-progress-bar__outer{
     background-color: #fff;
   }
@@ -1556,5 +1577,3 @@
     border: 1px solid #E4E7ED !important;
   }
 </style>
-
-
