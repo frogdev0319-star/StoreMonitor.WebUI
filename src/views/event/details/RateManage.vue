@@ -45,6 +45,24 @@
                     </div>
                 </div>
             </el-dialog>
+          <el-dialog  :title="$t('eventView.associatedChannel')" :visible.sync="showRelatedChannelFlag" :close-on-click-modal="false" v-if="showRelatedChannelFlag"
+                      width="540px" top=18% @close='showRelatedChannelFlag = false' class='rate-video-dialog'>
+            <div class="video-dialog-content" style="overflow:hidden;">
+              <hr class="dialog-hr"/>
+              <div class="channel-content" >
+                <el-radio-group v-model="channelRadio" class="radio-group">
+                  <el-radio v-for="(item, index) in relatedChannels" :label="item.id" :key="index" class="radio-class">
+                    <img :src="cameraImg" class="radio-img">
+                    <span class="radio-span">{{item.name}}</span>
+                  </el-radio>
+                </el-radio-group>
+              </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+              <el-button id="cancelBtn" @click="cancelSelect" size="mini">{{$t('storeMonitor.cancel')}}</el-button>
+              <el-button id="confirmBtn" @click="confirmSelect" size="mini" type="primary">{{$t('storeMonitor.confirm')}}</el-button>
+            </span>
+          </el-dialog>
             <!-- <transition name="fade">
                 <div id="outerdiv" style="" v-show="showOuter">
                     <div id="innerdiv" style="position:absolute;">
@@ -83,8 +101,18 @@
                     </div>
                 </div>
                 <div class="storeInfo-details">
+                  <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'">
                     <dd><span :class="lang=='en'? 'en-w4': 'w4'">{{generateEventLang('submitTime')}}：</span></dd>
                     <span class="details-info">{{event.createDate}}</span>
+                  </div>
+                  <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'" v-if="event.sourceType == 1 && relatedChannels.length > 0">
+                    <dd :class="lang=='en'? 'en-w3': 'w3'" >
+                      <div :class="lang == 'en' ? 'en-related-channel': 'related-channel'" @click="showRelatedChannel">
+                        <img :src="cameraImg" class="img-class">
+                        <span class="related-span">{{$t('eventView.associatedChannel')}}</span>
+                      </div>
+                    </dd>
+                  </div>
                 </div>
             </div>
             <div class="eventInfo-content">
@@ -115,9 +143,15 @@
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
                                 <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
+                            <div class="viedo-info" v-if="event.sourceType == 1">
+                              <div @click="checkVideo(item, index)">
+                                <i class="iconfont icon-bofang icon-video"></i>
+                                <span class="ahref">{{item.name+'区域'}}</span>
+                              </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="viedo-info">
+                    <div class="viedo-info" v-if="event.sourceType != 1">
                         <div v-if="showCheckVideo" @click="checkVideo">
                             <i class="iconfont icon-bofang icon-video"></i>
                             <span class="ahref">{{curChannel.name+'区域'}}</span>
@@ -259,7 +293,13 @@ export default {
             isEvent: true,
             channelInfo: {},
             subBtnList:[],
-            tooltipClass:'event-tooltip-class'
+            tooltipClass:'event-tooltip-class',
+            cameraImg: require('../../../../static/img/camera.png'),
+            showRelatedChannelFlag: false,
+            relatedChannels: [],
+            channelRadio: '',
+            timerPlayReal: null,
+            realTimeSpeed: 0
         }
     },
     computed: {
@@ -315,6 +355,16 @@ export default {
         return self.$store.state.user.isEzviz
       }
     },
+    watch:{
+      realTimeSpeed(val,oldVal){
+        let self=this;
+        console.log(val);
+        if(val >= 300){
+          self.stopRealTime();
+          self.showControlInfo=false;
+        }
+      },
+    },
     methods:{
         generateEventLang,
         onPlayerPlay(player){
@@ -342,9 +392,9 @@ export default {
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
-            setTimeout(() => {
-                self.showControlInfo=false;
-            }, 3000);
+            // setTimeout(() => {
+            //     self.showControlInfo=false;
+            // }, 3000);
         },
 
         stopCommentVideo(){
@@ -383,6 +433,7 @@ export default {
         async realTime(){
             let self=this;
             console.log('实时播放');
+            self.realTimeSpeed   = 0;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
@@ -401,7 +452,24 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal = window.setInterval(()=>{
+                  console.log(self.realTimeSpeed)
+                  self.realTimeSpeed=self.realTimeSpeed+1;
+                },1000);
             }
+            else{
+                let errorCode=self.mpdurl.ErrorCode; //错误码
+                let errorText= util.getErrorText(errorCode);
+                self.errorText=errorText;
+                self.destroyVideo();
+            }
+        },
+        destroyVideo(){
+          let self=this;
+          var video = document.getElementById("previewVideo");
+          this.previewplayer = videojs(video);
+          self.previewplayer.dispose();
         },
         stopVideo(){
             let self=this;
@@ -416,6 +484,7 @@ export default {
               if(self.playState){
                 self.stopRealTime();
               }
+              self.previewplayer.dispose();
             }
             else{
               self.$refs.ezvizVideo.stopRealTime();
@@ -435,6 +504,9 @@ export default {
             };
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+            self.realTimeSpeed=0;
+            window.clearInterval(self.timerPlayReal);
+            self.timerPlayReal = null
         },
         gonggeScreen(){
 
@@ -549,10 +621,26 @@ export default {
                     // self.audio.audioRef='audioRef';
                 }
                 else{
+                  deviceList.forEach(_item=>{
+                    if(_item.id == item.deviceId){
+                      item.channelId = _item.channelId;
+                      item.name = _item.name;
+                      item.ivsId = _item.ivsId;
+                    }
+                  })
                     temp.push(item);
                 }
             })
             self.sourceList=temp;
+            let relatedDeviceIds = event.relatedDeviceIds.sort();
+            self.relatedChannels = [];
+            relatedDeviceIds.forEach(item=>{
+              deviceList.forEach(_item=>{
+                if(_item.id == item){
+                  self.relatedChannels.push(_item)
+                }
+              })
+            })
             console.log(self.event);
         },
         getDuration(){
@@ -641,9 +729,12 @@ export default {
                 }
             })
         },
-        checkVideo(){
+        checkVideo(item, index){
             let self=this;
             self.dialogFormVisible=true;
+            if(index != undefined){
+              self.curChannel = item
+            }
             if(!self.isEzviz){
               self.realTime();
             }
@@ -830,6 +921,7 @@ export default {
         destroyedBeforeunloadHandler() {
             //window.removeEventListener('beforeunload', e => this.beforeunloadHandler(e));//错误方法，无法移除
             window.removeEventListener('beforeunload', this.beforeunloadHandler, false);
+            this.beforeunloadHandler = null
             //this.rowEditEnable = 0;
         },
 
@@ -865,6 +957,32 @@ export default {
               item.isActive = index == 0 ? true: false;
             })
           self.subBtnList = tempBtnList;
+        },
+        showRelatedChannel(){
+          let self = this;
+          self.showRelatedChannelFlag = true;
+        },
+        cancelSelect(){
+          let self = this;
+          self.showRelatedChannelFlag = false;
+          self.channelRadio = ''
+        },
+        confirmSelect(){
+          let self = this;
+          self.showRelatedChannelFlag = false;
+          console.log('播放对应通道视频');
+          let channel = self.relatedChannels.filter(item=>item.id == self.channelRadio)
+          console.log(channel)
+          self.curChannel = channel[0];
+          self.dialogFormVisible=true;
+          self.channelRadio = ''
+          if(!self.isEzviz){
+            self.realTime();
+          }
+          else{
+            self.channelInfo = {};
+            self.channelInfo = self.curChannel;
+          }
         }
     },
     // beforeRouteLeave (to, from, next) {
@@ -911,6 +1029,7 @@ export default {
     },
     beforeDestroy(){
         window.clearInterval(this.timeid);
+        window.onresize = null;
     }
 }
 </script>
@@ -1144,7 +1263,58 @@ $h1:#292e36;
                     }
                 }
             }
+            .channel-content{
+              margin: 20px 30px;
+              padding-top: 0;
+              position: relative;
+              .radio-group{
+                display: grid;
+                grid-template-columns: 240px 240px;
+                grid-template-rows: 30px;
+              }
+              .radio-class{
+                display: flex;
+                align-items: center;
+                /deep/ .el-radio__label{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .radio-img{
+                  height: 26px;
+                  width: 26px;
+                  margin-right: 10px;
+                }
+                .radio-span{
+                  display: inline-block;
+                  max-width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-size: 14px;
+                  color: #94a4b4;
+                }
+              }
+            }
         }
+      /deep/ .el-dialog__footer{
+        line-height: 24px;
+        padding: 30px;
+        padding-top: 20px;
+        #cancelBtn{
+          @include point(width,76);
+          @include point(margin-right,20);
+          background-color: #EAEDF2 !important;
+          color: #708090 !important;
+          font-size: 12px;
+          line-height: 12px;
+        }
+        #confirmBtn{
+          @include point(width,76);
+          font-size: 12px;
+          line-height: 12px;
+        }
+      }
         #previewVideo{
             @include point(min-width,450);
             @include point(min-height,360);
@@ -1204,6 +1374,54 @@ $h1:#292e36;
             .details-info{
                 margin-left: 15px;
                 color: $tab;
+            }
+            .related-channel{
+              width: 110px;
+              height: 30px;
+              line-height: 30px;
+              margin: 10px;
+              margin-left: 0;
+              font-size: 12px;
+              color: #6097F4;
+              border-radius: 15px;
+              background-color: $background;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              letter-spacing:0;
+              cursor: pointer;
+              .img-class{
+                height: 26px;
+                width: 26px;
+                margin-right: 10px;
+              }
+              .related-span{
+                font-weight: bolder;
+              }
+            }
+            .en-related-channel{
+              width: 180px;
+              height: 30px;
+              line-height: 30px;
+              margin: 10px;
+              margin-left: 0;
+              font-size: 12px;
+              color: #6097F4;
+              border-radius: 15px;
+              background-color: $background;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              letter-spacing:0;
+              cursor: pointer;
+              .img-class{
+                height: 26px;
+                width: 26px;
+                margin-right: 10px;
+              }
+              .related-span{
+                font-weight: bolder;
+              }
             }
         }
         .submit-content{
@@ -1329,6 +1547,21 @@ $h1:#292e36;
                     //     left: 0;
                     //     clip: rect(0px 130px 100px 0px);
                     // }
+                  .icon-video{
+                    font-size: 18px;
+                    color: $red;
+                    /*position: relative;*/
+                    /*top: 2px;*/
+                    margin-right: 5px;
+                    display: inline-block;
+                    vertical-align: middle;
+                  }
+                  .ahref{
+                    text-decoration: underline;
+                    color: $red;
+                    vertical-align: bottom;
+                    display: inline-block;
+                  }
                 }
             }
             .viedo-info{
@@ -1521,6 +1754,7 @@ $h1:#292e36;
 </style>
 <style>
 @import '../../../assets/css/importfile.css';
+@import '../../../assets/css/videoBar.css';
 .el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
 }

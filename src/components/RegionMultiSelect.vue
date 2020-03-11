@@ -209,7 +209,21 @@
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
   }
+  /deep/ .el-select.el-select--mini .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 12px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    bottom: calc(2/1920*100vw);
+  }
   /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
+    position: relative;
+    z-index: 1;
+  }
+  /deep/ .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
@@ -226,7 +240,15 @@
     width: calc(160/1920*100vw);
     border-radius: 3px;
   }
-
+  .el-select.el-select--mini{
+    color: #7d8cad;
+    background: #f4f5f9 !important;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: 1px solid #E4E7ED !important;
+    width: calc(160/1920*100vw);
+    border-radius: 3px;
+  }
 </style>
 <style>
   @import '../assets/css/pagination.css';

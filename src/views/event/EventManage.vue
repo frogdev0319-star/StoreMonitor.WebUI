@@ -727,7 +727,8 @@ export default {
                         subject:item.subject,
                         score:item.score,
                         sourceType:item.sourceType,
-                        initialComment:item.initialComment
+                        initialComment:item.initialComment,
+                        relatedDeviceIds: item.relatedDeviceIds
                     }
                     temp.push(obj);
                 })

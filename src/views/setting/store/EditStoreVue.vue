@@ -14,29 +14,11 @@
               <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
               <span style="min-width:100px;display:inline-block;">
                 <el-input v-model="supervisorName" disabled size="mini" class='input'></el-input></span>
-              <!--<el-select v-model="curPerson" :placeholder="generateStoreLang('selectPlaceholder')" size="mini"-->
-                         <!--class="el-schedule">-->
-                <!--<el-option-->
-                  <!--v-for="item in personList"-->
-                  <!--:key="item.userId"-->
-                  <!--:label="item.userName"-->
-                  <!--:value="item.userId">-->
-                <!--</el-option>-->
-              <!--</el-select>-->
             </div>
             <div class="store-handle">
               <el-col :span="24" class="header-details1">
                 <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{generateStoreLang('bindSchedule')}}<span class="storename-str" style="margin-left:20px;">{{schedule}}</span></span>
               </el-col>
-              <!--<span style="margin-right:20px;font-size:14px;font-weight:bold;"><strong>{{generateStoreLang('routeSchedule')}}</strong></span>-->
-              <!--<el-select v-model="schedule" :placeholder="generateStoreLang('selectPlaceholder')" size="mini" class="el-schedule" :disabled=true>-->
-                <!--<el-option-->
-                  <!--v-for="item in scheduleList"-->
-                  <!--:key="item.value"-->
-                  <!--:label="item.label"-->
-                  <!--:value="item.value">-->
-                <!--</el-option>-->
-              <!--</el-select>-->
             </div>
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
@@ -55,14 +37,16 @@
                             <span class="nape-title">
                                 {{`${_index+1}. ${_item.subject}`}}
                             </span>
-                            <el-select v-model="_item.channelvalue" class="nape-value" size="mini"  @focus="clickItem(_item,_index)">
-                                <el-option
-                                v-for="item in alleList"
-                                :key="item.name"
-                                :label="item.name"
-                                :value="item.name">
-                                </el-option>
-                            </el-select>
+<!--                            <el-select v-model="_item.channelvalue" size="mini"  @focus="clickItem(_item,_index)" multiple  collapse-tags>-->
+<!--                                <el-option-->
+<!--                                v-for="item in alleList"-->
+<!--                                :key="item.name"-->
+<!--                                :label="item.name"-->
+<!--                                :value="item.name">-->
+<!--                                </el-option>-->
+<!--                            </el-select>-->
+                          <limit-select :selected="_item.channelvalue" :options="alleList" :inputSize="`mini`"
+                                        @changeInput="changeDeviceId($event, _item)"  @changeIfSelect="changeSelect($event, _item,_index)" class="nape-value"></limit-select>
                         </div>
                     </div>
                 </div>
@@ -77,12 +61,15 @@
 import api from '@/api/index'
 import {getUserInfo} from '@/api/login'
 import {getDeviceList} from '@/api/device'
-import {checkOutInspectItem,bindInspectItem} from '@/api/inspect'
+import {checkOutInspectItem,bindInspectItem, checkOutInspectItemV3, bindInspectItemV2, unbindInspectItemV2} from '@/api/inspect'
 import {updateStoreInfo} from '@/api/store'
 import {generateStoreLang} from '@/api/i18n'
-
+import LimitSelect from "../../../components/LimitSelect";
 export default {
     name:'EditStoreVue',
+    components:{
+      LimitSelect
+    },
     data(){
         return{
             curTag:'远程巡检',
@@ -143,8 +130,7 @@ export default {
         self.phone=self.store.phone;
         await self.getChannelByStore(storeId);
         await self.getNapeByStore(storeId);
-
-        //self.getUserList();
+       //self.getUserList();
     },
     methods:{
         generateStoreLang,
@@ -161,9 +147,13 @@ export default {
                         obj.id=item.id;
                         obj.name=item.name;
                         obj.ivsId=item.ivsId;
+                        obj.value = item.id;
+                        obj.label = item.name;
+                        obj.disabled = false;
                         temp.push(obj);
                     })
                     self.alleList=temp;
+                    //self.getNapeByStore(storeId)
                 }
             })
         },
@@ -178,15 +168,21 @@ export default {
                 })
             })
         },
+      changeDeviceId(val, item){
+        item.channelvalue = val;
+      },
+      changeSelect(val, item, index){
+          this.clickItem(item, index)
+      },
         getNapeByStore(storeId){
             let self=this;
             let params={
                 storeId:storeId,
                 mode:0
             }
-            checkOutInspectItem(params).then(res=>{
+          checkOutInspectItemV3(params).then(res=>{
                 console.log(res);
-                let data=res.data;
+                let data=res.data.groups;
                 let temp=[];
                 if(data.length!=0){
                     data.forEach(item=>{
@@ -199,8 +195,16 @@ export default {
                             let _obj={};
                             _obj.id=_item.id;
                             _obj.subject=_item.subject;
-                            _obj.channelvalue=_item.deviceId==-1?'':
-                            self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
+                            // _obj.channelvalue=_item.deviceId==-1?'': _item.deviceId;
+                            // self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
+                            _obj.channelvalue = []
+                            _obj.oldChannelvalue = []
+                            _item.deviceIds.forEach(id=>{
+                              if(id != -1){
+                                _obj.channelvalue.push(id)
+                              }
+                              _obj.oldChannelvalue.push(id)
+                            })
                             _obj.isClick=false,
                             _temp.push(_obj);
                         }
@@ -251,15 +255,27 @@ export default {
             let count=0;
             let countChannel=0;
             let temp=[];
+            let unbindTemp = [];
             self.scheduleData.forEach(item=>{
                 count+=item.itemData.length;
                 item.itemData.forEach(_item=>{
                     let obj={};
+                    let unbindObj = {};
                     if(_item.channelvalue.length!=0){
                         countChannel++;
                         obj.inspectItemId=_item.id;
                         obj.storeId=self.store.storeId;
-                        obj.deviceId=self.alleList[self.alleList.map(x=>x.name).indexOf(_item.channelvalue)].id;
+                        obj.deviceIds = _item.channelvalue;
+                        if(_item.oldChannelvalue.length > 0 && JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())){
+                          unbindObj.inspectItemId=_item.id;
+                          unbindObj.storeId=self.store.storeId;
+                          unbindObj.deviceIds = _item.oldChannelvalue;
+                          unbindTemp.push(unbindObj)
+                        }
+                        // _item.channelvalue.forEach(channelName=>{
+                        //   obj.deviceIds.push(self.alleList[self.alleList.map(x=>x.name).indexOf(channelName)].id)
+                        // })
+                        //obj.deviceId=self.alleList[self.alleList.map(x=>x.name).indexOf(_item.channelvalue)].id;
                         temp.push(obj);
                     }
                 })
@@ -296,7 +312,7 @@ export default {
                     items:temp
                 };
 
-                let resUpdateStore=null,resBindInspect=null;
+                let resUpdateStore=null,resBindInspect=null,resUnbindInspect=null;
                 // if(self.curPerson ==null ||self.curPerson.length==0 ){
                 //   self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
                 //   return false;
@@ -308,7 +324,16 @@ export default {
                     // self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
                     // return false;
                // }
-                resBindInspect=await self.bindInspectItem(paramsInspec);
+
+                if(unbindTemp.length > 0){
+                  let unbindParams = {
+                    items: unbindTemp
+                  }
+                  resUnbindInspect = await self.unbindInspectItem(unbindParams);
+                }
+                if(resUnbindInspect == null || resUnbindInspect.errMsg=='Success'){
+                  resBindInspect=await self.bindInspectItem(paramsInspec);
+                }
               //((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success')) ||
               if((resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
@@ -321,11 +346,19 @@ export default {
         },
         bindInspectItem(params){
             return new Promise((resolve,reject)=>{
-                bindInspectItem(params).then(res=>{
+                bindInspectItemV2(params).then(res=>{
                     console.log(res);
                     resolve(res);
                 })
             })
+        },
+        unbindInspectItem(params){
+          return new Promise((resolve,reject)=>{
+            unbindInspectItemV2(params).then(res=>{
+              console.log(res);
+              resolve(res);
+            })
+          })
         },
         updateStoreInfo(params){
             return new Promise((resolve,reject)=>{
@@ -492,11 +525,17 @@ export default {
                     }
                     .nape-value{
                         margin-left: 2%;
-                        width: 120px;
-                        .el-input__inner{
-                            background-color: #fff;
+                        width: 400px;
+                        /deep/  .el-province{
+                          width: 400px;
                         }
+                      /deep/ .input-class{
+                        width: 370px;
+                      }
                     }
+                  .nape-value.content{
+                    top: 0;
+                  }
                 }
             }
         }
@@ -507,10 +546,6 @@ export default {
     background: #f0f5f8 !important;
     border-radius: 0px !important;
     border: 0px !important;
-}
-.nape-value .el-input__inner{
-    border-radius: 0px;
-    background-color: #fff;
 }
 
 </style>

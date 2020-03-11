@@ -343,7 +343,7 @@
             <div class="el-header-title">
                 <span>{{generatePatrolLang('selectStrore')}}</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" :style="showFeedBack?{'height':'50%'}:{}">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
@@ -385,7 +385,7 @@
                     </el-scrollbar>
                 </el-tab-pane>
             </el-tabs>
-            <div class="channelbar-content" v-if="showFeedBack">
+            <div class="channelbar-content">
                 <hr class="rside-hr"/>
                 <div class="channel-content">
                     <span>{{generatePatrolLang('zoneList')}}</span>
@@ -409,7 +409,7 @@
     </el-row>
 </template>
 <script>
-import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
+import {checkOutInspectItem,submitInspectItem, checkOutInspectItemV3} from '@/api/inspect'
 import util from '@/common/util'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore, getVideoAuthority} from '@/api/store'
 import {getUserInfo} from '@/api/login'
@@ -665,6 +665,7 @@ export default {
             eventList:[],
             channelBtns:[],
             showChannelBtns:[],
+            allChannelBtns: [],
             hideLast:false,
             hideNext:false,
             eventName:'',
@@ -839,28 +840,48 @@ export default {
          /**
          * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
          */
-           window.addEventListener("visibilitychange",()=>{
-             console.log(self.isEzviz)
-             if(!self.isEzviz){
-               if(document.hidden){
-                 console.log("我暂时离开页面了");
-                 if(self.playState){  //当前播放的是实时视频
-                   self.stopRealTimeVisPage();
-                   window.clearInterval(self.timerPlayReal);
-                 }
-               }else{
-                 console.log("我进入页面了");
-                 console.log(self.isPlayingFlag);
-                 if(self.isPlayingFlag==1){
-                   self.realTime();
-                 }
-               }
-             }
-
-           })
+         window.addEventListener("visibilitychange", self.visibilityChange, false)
+           // window.addEventListener("visibilitychange",()=>{
+           //   console.log(self.isEzviz)
+           //   if(!self.isEzviz){
+           //     if(document.hidden){
+           //       console.log("我暂时离开页面了");
+           //       if(self.playState){  //当前播放的是实时视频
+           //         self.stopRealTimeVisPage();
+           //         window.clearInterval(self.timerPlayReal);
+           //       }
+           //     }else{
+           //       console.log("我进入页面了");
+           //       console.log(self.isPlayingFlag);
+           //       if(self.isPlayingFlag==1){
+           //         self.realTime();
+           //       }
+           //     }
+           //   }
+           //
+           // })
          },
     methods:{
         generatePatrolLang,
+        visibilityChange(){
+          let self = this;
+          console.log(self.isEzviz)
+          if(!self.isEzviz){
+            if(document.hidden){
+              console.log("我暂时离开页面了");
+              if(self.playState){  //当前播放的是实时视频
+                self.stopRealTimeVisPage();
+                window.clearInterval(self.timerPlayReal);
+              }
+            }else{
+              console.log("我进入页面了");
+              console.log(self.isPlayingFlag);
+              if(self.isPlayingFlag==1){
+                self.realTime();
+              }
+            }
+          }
+        },
         changeBrand(){
             let self=this;
             if(self.playState){
@@ -871,6 +892,7 @@ export default {
             self.activeIndex='0';
             self.showGuide=true;
             self.accountId=localStorage.getItem('oss_bucket');
+            self.showChannelBtns = [];
             //self.getInitStoreData();
             self.getFaStoreData();
             //self.videoEl=document.getElementById('previewVideo').children[0];
@@ -972,7 +994,8 @@ export default {
                 height:'100px',
                 width:'140px',
                 fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
-                file:util.base64ToBlob(src)
+                file:util.base64ToBlob(src),
+                deviceId: self.channel.id
             }
 
             let obj={
@@ -1388,6 +1411,7 @@ export default {
             obj.width='140px';
             obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
             obj.file=util.base64ToBlob(obj.src);
+            obj.deviceId = self.channel.id;
             self.sourceList.push(obj);
             self.showCutDialog=false;
             console.log(self.curItemId);
@@ -1796,9 +1820,10 @@ export default {
                 }
                 self.showGuide=false;
                 console.log(self.channel);
+                self.channelBtns = self.allChannelBtns.concat();
                 self.channelBtns.forEach((_item,_index)=>{
                     if(self.channel!=null){
-                        if(_item.channelId==self.channel.channelId){
+                        if(_item.id==self.channel.id){
                             _item.isClick=true;
                         }
                         else{
@@ -1816,7 +1841,10 @@ export default {
                 self.curItemIndex=0;
                 self.inspectItemList=item.items;
                 self.showFeedBack=false;
-
+                self.hideNext = false;
+                self.hideLast = false;
+                self.channelBtns = [];
+                self.showChannelBtns = [];
                 item.isClick=true;
                 this.$nextTick(()=>{
                     self.anchorLinkTo();
@@ -1830,11 +1858,16 @@ export default {
         },
         getDeviceById(deviceId){
             let self=this;
-            let device=null;
+            let device= [];
             self.deviceList.forEach(item=>{
-                if(deviceId==item.id){
-                    device=item;
+                // if(deviceId==item.id){
+                //     device=item;
+                // }
+              deviceId.forEach(_item=>{
+                if(_item==item.id){
+                  device.push(item);
                 }
+              })
             })
             return device;
         },
@@ -1907,10 +1940,12 @@ export default {
             };
             self.channel=obj;
             item.isClick=true;
-            self.inspectItemList.forEach(_item=>{
+            if(self.showFeedBack){
+              self.inspectItemList.forEach(_item=>{
                 _item.checked=false;
                 _item.disabled=true;
-            })
+              })
+            }
             self.showChannelBtns.forEach((_item,_index)=>{
                 if(_index!=index){
                     _item.isClick=false;
@@ -1931,6 +1966,7 @@ export default {
             }
         },
         clickItem(item,index){
+            console.log(item)
             let self=this;
             if(item.isIgnore){
                 return false;
@@ -1942,15 +1978,35 @@ export default {
             self.sourceList=[];
             self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
             let obj={};
-            if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
+            if(!item.deviceId.includes(-1)){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
-                if(device!=null){
-                    obj.id=device.id;
-                    obj.ivsId=device.ivsId;
-                    obj.channelName=device.name;
-                    obj.channelId=device.channelId;
+                if(device.length > 0){
+                    obj.id=device[0].id;
+                    obj.ivsId=device[0].ivsId;
+                    obj.channelName=device[0].name;
+                    obj.channelId=device[0].channelId;
                     self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
-
+                    self.channelBtns = []
+                    device.forEach(item=>{
+                      self.allChannelBtns.forEach(_item=>{
+                        if(item.id == _item.id){
+                          self.channelBtns.push(_item)
+                        }
+                      })
+                    })
+                    self.$nextTick(()=>{
+                      self.getshowBtns(self.channelBtns);
+                    })
+                    self.channelBtns.forEach((_item,_index)=>{
+                      if(self.channel!=null){
+                        if(_item.id == self.channel.id){
+                          _item.isClick=true;
+                        }
+                        else{
+                          _item.isClick=false;
+                        }
+                      }
+                    })
                     item.checked=true;
                     self.curItem=item;
                     self.curItemIndex=index;
@@ -2007,9 +2063,9 @@ export default {
                 storeId:self.store.storeId,
                 mode:0
             }
-            checkOutInspectItem(params).then(res=>{
+          checkOutInspectItemV3(params).then(res=>{
                 if(res.errCode==0){
-                    let data=res.data;
+                    let data=res.data.groups;
                     let temp=[];
                     data.forEach((item,index)=>{
                         let obj={};
@@ -2032,7 +2088,8 @@ export default {
                             itemObj.description=_item.description;
                             itemObj.itemScore='--';
                             itemObj.itemScoreTitle='--';
-                            itemObj.deviceId=_item.deviceId;
+                            //itemObj.deviceId=_item.deviceId;
+                            itemObj.deviceId=_item.deviceIds;
                             itemObj.inspectInput='';
                             itemObj.inputCount=0;
                             itemObj.disabled=true;
@@ -2158,11 +2215,13 @@ export default {
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=2;
                                 obj.url=url;
+                                obj.deviceId = self.channel.id;
                             }
                             else if(inspectList[i].items[j].sourceList[k].mediaType==1){
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=1;
                                 obj.url=url;
+                                obj.deviceId = self.channel.id;
                             }
                             tempFileUrl.push(obj);
                         }
@@ -2187,13 +2246,14 @@ export default {
                     let url=await self.upLoadFile(self.eventList[i].sourceObj);
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
-                        url:url
+                        url:url,
+                        deviceId: self.channel.id
                     }
                     commentTemp.push(commentObj);
                     obj.deviceId=self.channel.id;
                 }
                 else{                        //通过加号创建的问题反馈
-                    obj.diviceId=-1;
+                    obj.diviceId = -1;
                 }
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
@@ -2289,6 +2349,10 @@ export default {
             // if(!self.showVideo){
             //     self.showVideo=true;
             // }
+            if(sessionId == null){
+              self.isLoading = false;
+              return;
+            }
             self.sessionId=sessionId;
             const data = {
                 request: {
@@ -2302,13 +2366,17 @@ export default {
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
             console.log(self.mpdurl);
+            if(self.mpdurl == null){
+              self.isLoading = false;
+              return;
+            }
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
                 self.isPlayingFlag=1;
                 self.isLoading = false;
-              window.clearInterval(self.timerPlayReal);
+                window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal=window.setInterval(()=>{
                   console.log(self.realTimeSpeed)
                     self.realTimeSpeed=self.realTimeSpeed+1;
@@ -2724,6 +2792,7 @@ export default {
                 temp.push(obj);
             })
             self.channelBtns=temp;
+            self.allChannelBtns = temp;
         },
         cancelNoUser(){
             let self=this;
@@ -2789,6 +2858,7 @@ export default {
           obj.width='140px';
           obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
           obj.file=util.base64ToBlob(obj.src);
+          obj.deviceId = self.channel.id;
           self.sourceList.push(obj);
           console.log(self.curItemId);
           let tempId=self.getIndexById(self.curItemId);
@@ -2817,7 +2887,8 @@ export default {
           height:'100px',
           width:'140px',
           fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
-          file:util.base64ToBlob(src)
+          file:util.base64ToBlob(src),
+          deviceId: self.channel.id
         }
 
         let picObj={
@@ -2914,6 +2985,12 @@ export default {
         console.log('video is playing')
         this.showModelContent = true
       }
+    },
+    beforeDestroy() {
+      let self = this;
+      window.removeEventListener('visibilitychange', self.visibilityChange);
+      window.onresize = null;
+      self.visibilityChange = null;
     }
 }
 </script>

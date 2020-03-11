@@ -245,11 +245,13 @@ export default {
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=2;
                                 obj.url=url;
+                                obj.deviceId = inspectList[i].items[j].sourceList[k].deviceId;
                             }
                             else if(inspectList[i].items[j].sourceList[k].mediaType==1){
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=1;
                                 obj.url=url;
+                                obj.deviceId = inspectList[i].items[j].sourceList[k].deviceId;
                             }
                             tempFileUrl.push(obj);
                         }
@@ -274,13 +276,14 @@ export default {
                     let url=await self.upLoadFile(self.eventList[i].sourceObj);
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
-                        url:url
+                        url:url,
+                        deviceId: self.eventList[i].sourceObj.deviceId
                     }
                     commentTemp.push(commentObj);
-                    obj.deviceId=self.channel.id;
+                    obj.deviceId = self.eventList[i].sourceObj.deviceId;
                 }
                 else{                        //通过加号创建的问题反馈
-                    obj.diviceId=-1;
+                    //obj.diviceId=-1;
                 }
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);

@@ -1,9 +1,9 @@
 <template>
   <div class="content">
-    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' placeholder='请选择' @visible-change="visibileHandler" class="el-province">
+    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' placeholder='请选择' @visible-change="visibileHandler" class="el-province" :size="inputSize" @focus="clickSelect">
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.value' :disabled="item.disabled"></el-option>
     </el-select>
-    <el-input placeholder="" readonly
+    <el-input placeholder="" readonly  :size="inputSize"
               v-model="input" class="input-class">
     </el-input>
   </div>
@@ -23,11 +23,16 @@
       limit: {
         type: Number,
         default: 0
+      },
+      inputSize:{
+        type: String,
+        default: 'medium'
       }
     },
     watch: {
       selected(val, oldVal){
-        this.selectedArray = val
+        console.log(val)
+        this.selectedArray = val;
         this.initData()
       }
     },
@@ -56,12 +61,14 @@
         })
       })
       this.input = this.input.slice(0, this.input.length - 1)
-      if (this.selectedArray.length === 1) {
-        self.options.forEach(item => {
-          if (item.value === this.selectedArray[0]) {
-            item.disabled = true
-          }
-        })
+      if(this.limit > 0){
+        if (this.selectedArray.length === 1) {
+          self.options.forEach(item => {
+            if (item.value === this.selectedArray[0]) {
+              item.disabled = true
+            }
+          })
+        }
       }
     },
     methods: {
@@ -82,20 +89,25 @@
           })
         })
         this.input = this.input.slice(0, this.input.length - 1)
-        if (this.selectedArray.length === 1) {
-          self.options.forEach(item => {
-            if (item.value === this.selectedArray[0]) {
-              item.disabled = true
-            }
-          })
+        if(this.limit > 0){
+          if (this.selectedArray.length === 1) {
+            self.options.forEach(item => {
+              if (item.value === this.selectedArray[0]) {
+                item.disabled = true
+              }
+            })
+          }
         }
+
       },
       changeSelect (val) {
         console.log(val)
         let self = this
         self.changed = true;
-        while (val.length > this.limit) {
-          val.shift()
+        if(this.limit > 0){
+          while (val.length > this.limit) {
+            val.shift()
+          }
         }
         self.input = ''
         self.options.forEach(_item => {
@@ -106,12 +118,14 @@
           })
         })
         self.input = this.input.slice(0, this.input.length - 1)
-        if (self.selectedArray.length === 1) {
-          self.options.forEach(item => {
-            if (item.value === this.selectedArray[0]) {
-              item.disabled = true
-            }
-          })
+        if(this.limit > 0){
+          if (this.selectedArray.length === 1) {
+            self.options.forEach(item => {
+              if (item.value === this.selectedArray[0]) {
+                item.disabled = true
+              }
+            })
+          }
         }
         else{
           self.options.forEach(item => {
@@ -125,6 +139,9 @@
           selectedList = this.selectedArray
           this.$emit('changeInput', selectedList)
         }
+      },
+      clickSelect(){
+        this.$emit('changeIfSelect')
       }
     }
   }
@@ -176,6 +193,11 @@
   /deep/ .el-select__tags{
     opacity: 0;
   }
+  .el-province /deep/ .el-input--mini .el-input__inner{
+    height: 28px;
+    line-height: 27px;
+    border-radius: 0 !important;
+  }
   /deep/ .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
@@ -183,6 +205,15 @@
     border-right: none;
     color: #7d8cad;
     background: #f4f5f9 !important;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+  /deep/ .input-class.el-input--mini .el-input__inner{
+    height: 26px;
+    line-height: 26px;
+    border: none;
+    color: #7d8cad;
+    background: #fff !important;
     padding: 0 10px;
     font-size: 12px;
   }
@@ -196,13 +227,26 @@
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
   }
-  /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
+  /deep/ .el-select.el-select--mini .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 12px;
+    height: 28px;
+    line-height: 28px;
+  }
+  /deep/ .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
   /deep/ .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
+  }
+  .el-province /deep/ .el-input--mini .el-input__icon {
+    line-height: 28px;
+    height: 28px;
   }
   .el-select.el-select--medium{
     color: #7d8cad;
@@ -213,11 +257,21 @@
     width: calc(160/1920*100vw);
     border-radius: 3px;
   }
-
+  .el-select.el-select--mini{
+    color: #fff;
+    background: #fff !important;
+    height: 28px;
+    line-height: 28px;
+    width: calc(160/1920*100vw);
+    border-radius: 0;
+  }
 </style>
 <style>
   @import '../assets/css/pagination.css';
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
     color: #7d8cad;
+  }
+  .el-select-dropdown.is-multiple .el-select-dropdown__item.selected.hover {
+    background-color: #FEE4E7;
   }
 </style>

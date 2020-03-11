@@ -1,6 +1,6 @@
 <template>
   <div >
-    <div class="errorVideo-model" v-if="showError">
+    <div class="errorVideo-model" v-if="showError" :class="isEvent? 'event-error': ''">
       <span>{{errorMsg}}</span>
     </div>
     <div v-else>
@@ -423,6 +423,8 @@
       // 清除增加屏幕大小变化时的监听器
       window.removeEventListener('resize', self.resizeFun);
       window.removeEventListener("visibilitychange",self.visibleChange)
+      self.resizeFun = null;
+      self.visibleChange = null;
     },
     watch: {
       accountChanged(val,oldVal){
@@ -527,7 +529,9 @@
         self.stopRealTime();
         //首先查看视频是否加密
         await self.getEzvizAccessToken(self.storeId);
-        await self.checkIfEncry();
+        if(newValue!== null && old != undefined ){
+          await self.checkIfEncry();
+        }
       },
     },
     computed:{
@@ -597,6 +601,9 @@
         console.log('new:', newValue);
         console.log(self.curTime)
         self.startTs = newValue;
+        if(newValue == 0){
+          self.playBack =  false;
+        }
         if(self.playState){
           self.decoder.stop();
           self.playState = false
@@ -648,6 +655,7 @@
               .then(result => {
                 self.currentStoreId = storeId;
                 self.accessToken = result.data.accessToken;
+                //self.accessToken = 'at.1zxfxzy03nm6ld1t1s5s3es203455czn-45ft0jzwlk-06lc2eq-7rzulbgak';
                 self.ezvizExpireTime = result.data.expireTime;
                 resolve(result.data.accessToken);
               })
@@ -662,6 +670,9 @@
         let obj={};
         console.log(self.accessToken)
         obj.accessToken= self.accessToken;// token
+        if(self.ivsId == 0){
+          return;
+        }
         obj.deviceSerial= self.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
         console.log(result);
@@ -1333,7 +1344,7 @@
             setTimeout(() => {
               self.imgSrc = sessionStorage.getItem('fileUrl');
               let img = document.getElementById('imgTest');
-              self.stopRealTime();
+              //self.stopRealTime();
               if(self.fullWindow){
                 self.exitFullscreen();
                 self.fullWindow=false;
@@ -1870,6 +1881,7 @@
         let self = this;
         let obj = {};
         obj.accessToken = self.accessToken;
+        //obj.accessToken = 'at.1zxfxzy03nm6ld1t1s5s3es203455czn-45ft0jzwlk-06lc2eq-7rzulbgak';
         obj.deviceSerial = self.ivsId;
         obj.oldPassword = self.videoPassword;
         obj.newPassword = self.videoPassword;
@@ -2018,6 +2030,9 @@
       font-size: 12px;
       transform: translate(-50%, -50%);
     }
+  }
+  .event-error{
+    @include point(margin-bottom,20);
   }
   #cancelBtn{
     @include point(width,76);

@@ -308,7 +308,13 @@
             <hr class="rside-hr"/>
             <div class="channel-content">
                 <span>{{generateStoreMonitorLang('zoneList')}}</span>
-
+                <el-input
+                  size="small"
+                  class="el-search-input el-channel-search-input"
+                  placeholder="请输入关键字搜索通道"
+                  v-model="serachChannelValue" @keyup.enter.native="searchChannel">
+                  <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;" ></i>
+                </el-input>
                 <div class="channels-srollbar">
                     <div class="arrow-content">
                         <i @click="lastBar" class="el-icon-arrow-left icon-arrow" v-if="hideLast"></i>
@@ -326,45 +332,56 @@
             </div>
             <hr class="rside-hr" style="margin-top:0"/>
             <div class="time-content">
-                <span id="date-title">{{generateStoreMonitorLang('selectDate')}}</span>
+              <div class="time-title">
+                <span class="date-title">{{generateStoreMonitorLang('selectDate')}}</span>
+                <el-button size="mini" class='backTime-btn' @click="backCurDate" type="primary">{{generateStoreMonitorLang('backToNow')}}</el-button>
+              </div>
                 <div class="date-picker-content">
-                    <span>{{generateStoreMonitorLang('playTime')}}</span>
+                    <el-date-picker
+                      v-model="dateValue"
+                      class="date-picker"
+                      type="date"
+                      placeholder="日期"
+                      :picker-options="pickerOptions"
+                      size="mini"
+                      :clearable= 'false'
+                    >
+                    </el-date-picker>
                     <el-time-picker
                         class="time-picker"
                         v-model="curTime"
                         size="mini"
                         :clearable="false"
-                        placeholder="任意时间点"
+                        :placeholder="$t('storeMonitor.playTime')"
                     >
                     </el-time-picker>
-                    <el-button size="mini" class='backdate-btn' @click="backCurDate" type="primary">{{generateStoreMonitorLang('backToNow')}}</el-button>
                 </div>
-                <div class="date-content">
-                    <div class="date-header">
-                        <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>
-                        <span v-if="lang !== 'en'">{{curYear}}年{{curMonth}}月</span>
-                        <span v-else>{{curMonth}}/{{curYear}}</span>
-                        <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>
-                    </div>
-                    <div class="date-data">
-                        <span class="date-title" v-for="(item,index) in weekTitles" :key="index">
-                            {{item}}
-                        </span>
-                        <div class="date-details" v-for="(item,index) in weekDays">
-                            <div class="data" v-for="(_item,_index) in item"
-                            :key="_index" @click="checkDate(item,index,_item,_index)"
-                             :style="_item.disabed?{'cursor': 'not-allowed','background-color':'#F5F7FA'}:{'cursor': 'pointer','background-color':'#fff'}">
-                                <span v-if=" _item.disabed"
-                                 :style="_item.disabed?{'color':'#C3D3EA','background-color':'#F5F7FA'}:''">{{_item.data}}</span>
-                                <span v-else :class="_item.showBack?'opColor':'noramlColor'"
-                                :style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>
-                            </div>
-                        </div>
-                        <div class="schedule-tag" v-if="false">
-                        </div>
-                        <span style="margin-left:20px;color:#94a4b4;font-size:14px;" v-if="false">有事件</span>
-                    </div>
-                </div>
+<!--                <div class="date-content">-->
+<!--                    <div class="date-header">-->
+<!--                        <i @click="forWard" class="el-icon-arrow-left icon-arrow"></i>-->
+<!--                        <span v-if="lang !== 'en'">{{curYear}}年{{curMonth}}月</span>-->
+<!--                        <span v-else>{{curMonth}}/{{curYear}}</span>-->
+<!--                        <i @click="backWard" class="el-icon-arrow-right icon-arrow"></i>-->
+<!--                    </div>-->
+<!--                    <div class="date-data">-->
+<!--                        <span class="date-title" v-for="(item,index) in weekTitles" :key="index">-->
+<!--                            {{item}}-->
+<!--                        </span>-->
+<!--                        <div class="date-details" v-for="(item,index) in weekDays">-->
+<!--                            <div class="data" v-for="(_item,_index) in item"-->
+<!--                            :key="_index" @click="checkDate(item,index,_item,_index)"-->
+<!--                             :style="_item.disabed?{'cursor': 'not-allowed','background-color':'#F5F7FA'}:{'cursor': 'pointer','background-color':'#fff'}">-->
+<!--                                <span v-if=" _item.disabed"-->
+<!--                                 :style="_item.disabed?{'color':'#C3D3EA','background-color':'#F5F7FA'}:''">{{_item.data}}</span>-->
+<!--                                <span v-else :class="_item.showBack?'opColor':'noramlColor'"-->
+<!--                                :style="_item.showOp?{'color':'#E8E9ED'}:{'color':'black'}">{{_item.data}}</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="schedule-tag" v-if="false">-->
+<!--                        </div>-->
+<!--                        <span style="margin-left:20px;color:#94a4b4;font-size:14px;" v-if="false">有事件</span>-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
         </el-col>
     </el-row>
@@ -405,6 +422,7 @@ export default {
             fullscreenLoading:false,
             channelBtns:[],
             showChannelBtns:[],
+            allChannelBtns: [],
             store:{},
             showStoreUp:true,
             cityList:[],
@@ -654,6 +672,13 @@ export default {
             isLoading: false,
           showEventNameInfo: false,
           showEventDescInfo: false,
+          serachChannelValue: '',
+          pickerOptions: {
+            disabledDate(time) {
+              return time.getTime() > Date.now();
+            },
+          },
+          dateValue: new Date()
         }
     },
   created(){
@@ -775,28 +800,49 @@ export default {
         /**
          * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
          */
-        window.addEventListener("visibilitychange",()=>{
-            if(document.hidden){
-                console.log("我暂时离开页面了");
-                if(self.playState&&!self.playBackState){  //当前播放的是实时视频
-                    self.stopRealTimeVisPage();
-                    window.clearInterval(self.timerPlayReal);
-                }
-                // if(self.playBackState){
-                //   self.stopRealTime();
-                //   window.clearInterval(self.timeid)
-                // }
-            }else{
-                console.log("我进入页面了");
-                console.log(self.playBackState);
-                if(self.isPlayingFlag==1){
-                    self.realTime();
-                }
-            }
-        })
+        window.addEventListener("visibilitychange", self.visibilityChange, false)
+        // window.addEventListener("visibilitychange",()=>{
+        //     if(document.hidden){
+        //         console.log("我暂时离开页面了");
+        //         if(self.playState&&!self.playBackState){  //当前播放的是实时视频
+        //             self.stopRealTimeVisPage();
+        //             window.clearInterval(self.timerPlayReal);
+        //         }
+        //         // if(self.playBackState){
+        //         //   self.stopRealTime();
+        //         //   window.clearInterval(self.timeid)
+        //         // }
+        //     }else{
+        //         console.log("我进入页面了");
+        //         console.log(self.playBackState);
+        //         if(self.isPlayingFlag==1){
+        //             self.realTime();
+        //         }
+        //     }
+        // })
     },
     methods:{
         generateStoreMonitorLang,
+       visibilityChange(){
+          let self = this;
+          if(document.hidden){
+            console.log("我暂时离开页面了");
+            if(self.playState&&!self.playBackState){  //当前播放的是实时视频
+              self.stopRealTimeVisPage();
+              window.clearInterval(self.timerPlayReal);
+            }
+            // if(self.playBackState){
+            //   self.stopRealTime();
+            //   window.clearInterval(self.timeid)
+            // }
+          }else{
+            console.log("我进入页面了");
+            console.log(self.playBackState);
+            if(self.isPlayingFlag==1){
+              self.realTime();
+            }
+          }
+        },
         changeBrand(){
             let self=this;
             self.clearEvent();
@@ -970,6 +1016,7 @@ export default {
                     self.channel={};
                     self.channelBtns=[];
                     self.showChannelBtns=[];
+                    self.allChannelBtns = [];
                 }
                 else{
                     let obj={};
@@ -1173,9 +1220,12 @@ export default {
         },
         getCurTime(){
             let self=this;
-            let year=self.curYearNum==0?self.curYear:self.curYearNum;
-            let month=self.curMonthNum==0?self.curMonth:self.curMonthNum;
-            let day=self.curDayNum==0?self.curDay:self.curDayNum;
+            // let year=self.curYearNum==0?self.curYear:self.curYearNum;
+            // let month=self.curMonthNum==0?self.curMonth:self.curMonthNum;
+            // let day=self.curDayNum==0?self.curDay:self.curDayNum;
+            let year = self.dateValue.getFullYear();
+            let month = self.dateValue.getMonth() + 1;
+            let day= self.dateValue.getDate();
             let hours=self.curTime.getHours();
             let min=self.curTime.getMinutes();
             let second=self.curTime.getSeconds();
@@ -1351,8 +1401,9 @@ export default {
             let self=this;
             self.startTs=0;
             self.showModelContent=true;
-            let d=self.getCurTime();
-            self.curTime=d;
+            let d = self.getCurTime();
+            console.log(d)
+            self.curTime = d;
             //let dstr=Number((d.getTime()+(1*60+1)*1000).toString().substr(0,10));
             let dstr=Number((d.getTime()).toString().substr(0,10));
             self.startTs=dstr;
@@ -1511,11 +1562,13 @@ export default {
                     let url=await self.upLoadFile(self.sourceList[i]);
                     obj.mediaType=2;
                     obj.url=url;
+                    obj.deviceId=self.channel.id;
                 }
                 else if(self.sourceList[i].mediaType==1){
                     let url=await self.upLoadFile(self.sourceList[i]);
                     obj.mediaType=1;
                     obj.url=url;
+                    obj.deviceId=self.channel.id;
                 }
                 tempFileUrl.push(obj);
             }
@@ -2065,6 +2118,10 @@ export default {
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
+            if(sessionId == null){
+              self.isLoading = true;
+              return
+            }
             let data=null;
             let url='';
             if(self.timeid!=null){
@@ -2592,6 +2649,7 @@ export default {
                 temp.push(obj);
             })
             self.channelBtns=temp;
+            self.allChannelBtns = temp;
             self.getshowBtns(temp);
         },
         getshowBtns(list){
@@ -2607,6 +2665,9 @@ export default {
             }
             if(count<self.channelBtns.length){
                 self.hideNext=true;
+            }
+            else{
+              self.hideNext=false;
             }
         },
         async stopAndRealTime(){
@@ -2836,6 +2897,7 @@ export default {
          */
         backCurDate(){
             let self=this;
+            self.dateValue = new Date();
             self.curTime=new Date();  //点击回到当前时间，首先时间控件恢复，选择的日期回到当前日期，停止播放历史视频。
             self.playBackState=false;
             self.showModelContent=true;
@@ -2855,6 +2917,7 @@ export default {
             else{
               //萤石云
               self.playBackTime = 0;
+              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
             }
         },
         forWard(){
@@ -3035,12 +3098,37 @@ export default {
       onPlayerPlaying(e){
         console.log('video is playing')
         this.showCutContent = true
-      }
+      },
+      searchChannel(){
+          console.log('搜索通道')
+          let self = this;
+          let tempChannelList = self.allChannelBtns;
+          let temp=[];
+          let tempArray=[];
+          let tempChannel=[];
+          tempChannelList.forEach((_item,_index)=>{
+            console.log(_item.name)
+            temp.push(util.getPinyinList(_item.name));
+            tempChannel.push(_item);
+          })
+          for(var i=0;i<temp.length;i++){
+            if(temp[i][0].indexOf(self.serachChannelValue.trim())!=-1||
+              temp[i][1].indexOf(self.serachChannelValue.trim())!=-1){
+              tempArray.push(tempChannel[i]);
+            }
+          }
+          self.channelBtns = tempArray;
+          self.getshowBtns(tempArray);
+        }
     },
     beforeDestroy() {
       let self = this;
       // 清除监听器
       document.removeEventListener('mouseup', self.mouseUpAction);
+      window.removeEventListener('visibilitychange', self.visibilityChange);
+      window.onresize = null;
+      self.mouseUpAction = null;
+      self.visibilityChange = null;
     },
   }
 </script>
@@ -3958,7 +4046,10 @@ export default {
                     text-align: left;
                     @include point(margin-left,30);
                     color: $black;
-                    margin-bottom: 15px;
+                    margin-bottom: 20px;
+                }
+                .el-channel-search-input{
+                  width: 70%;
                 }
                 .channels-srollbar{
                     text-align: left;
@@ -3998,13 +4089,39 @@ export default {
 
             }
             .time-content{
-                #date-title{
+                .time-title{
+                  display: flex;
+                  justify-content: space-between;
+                  margin: 20px;
+                  @include point(margin-left,30);
+                  align-items: center;
+                  .date-title{
                     display: block;
                     text-align: left;
-                    margin:20px;
-                    @include point(margin-left,30);
                     color: $black;
+                    font-size: 16px;
+                  }
+                  .backTime-btn{
+                    @include point(right,20);
+                    font-size: 12px;
+                    line-height: 12px;
+                    border-radius: 3px !important;
+                    width: 120px;
+                    padding: 6px 0;
+                    height: 28px;
+                  }
                 }
+              .date-picker-content{
+                margin: 0 auto;
+                .date-picker.el-date-editor.el-input{
+                  width: 180px;
+                  margin-right: calc(20/1920*100vw);
+                }
+                .time-picker.el-date-editor.el-input{
+                  width: 120px;
+                }
+              }
+              /**
                 @media screen and (min-width: 1366px){
                     .date-picker-content{
                         text-align: left;
@@ -4156,6 +4273,7 @@ export default {
                         }
                     }
                 }
+              */
             }
         }
     }
@@ -4235,6 +4353,9 @@ export default {
     color:#425262;
     letter-spacing: 0px;
      width: 235px;
+}
+.el-channel-search-input.el-search-input.el-input--small >>>.el-input__inner{
+  width: 100%;
 }
 </style>
 

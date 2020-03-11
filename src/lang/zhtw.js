@@ -397,7 +397,8 @@ export default {
     submit : '提交',
     scores: '得分：',
     emptyInfo: '評論信息不能為空！',
-    view: '查看'
+    view: '查看',
+    associatedChannel: '關聯通道'
   },
 
   // Inspection Management page language
