@@ -23,7 +23,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+@font-face {
+  font-family: "Roboto";
+  src: url("Roboto.ttf");
+  font-style: normal;
+}
 .icon-jinggao2:before {
   content: "\e6aa";
 }
