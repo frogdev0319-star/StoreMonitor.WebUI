@@ -18,9 +18,9 @@
           <span v-html="turnSuggest(suggest)"></span>
         </div>
       </div>
-      <el-row class="report-content" :gutter="40">
+      <el-row class="report-content">
         <el-col :span="8" class="radior-content">
-          <v-chart :options="options" class="chart-content" :auto-resize='true'/>
+          <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
         <el-col :span="16" class="report-table">
           <table class="table table-bordered">
@@ -143,7 +143,8 @@
         pass: this.$t('reportView.pass'),
         failed: this.$t('reportView.failed'),
         lang: this.$i18n.locale,
-        isInsiteInspect: false
+        isInsiteInspect: false,
+        sidebarElm: null
       }
     },
     methods: {
@@ -326,6 +327,7 @@
             {
               indicator: [],
               nameGap: 5,
+              center: ['50%', '50%'],
               name: {
                 textStyle: {
                   color: '#7d8cad',
@@ -335,8 +337,8 @@
                 formatter: (params) => {
                   console.log(params);
                   let str = '';
-                  if (params.length > 6) {
-                    str = params.substr(0, 6) + '...';
+                  if (params.length > 5) {
+                    str = params.substr(0, 5) + '...';
                   }
                   else {
                     str = params;
@@ -350,6 +352,7 @@
             },
             {
               indicator: [],
+              center: ['50%', '50%'],
               name: {
                 textStyle: {
                   color: 'rgba(255,255,255,0)',
@@ -414,13 +417,37 @@
       },
       turnSuggest(data) {
         return data.replace(/(\r\n|\n|\r)/gm, "<br/>");
-      }
+      },
+      handleSideBar(e){
+        if(e.target === e.currentTarget || e.target === this){
+          this.adjustChart();
+        }
+      },
+      adjustChart(){
+        let self = this;
+        console.log('尺寸改变');
+        if (self.$refs.chartRadar) {
+          self.$refs.chartRadar.resize()
+        }
+      },
     },
     mounted() {
       let self = this;
+      window.addEventListener("resize", self.adjustChart, false);
+      self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
+      self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
       self.getRouterData();
       self.getReportInfo();
       //self.getRadarOption();
+    },
+    beforeDestroy(){
+      let self = this;
+      window.removeEventListener('resize', self.adjustChart);
+      self.adjustChart = null;
+      self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar,false)
+      if (self.$refs.chartRadar) {
+        self.$refs.chartRadar.dispose()
+      }
     }
   }
 </script>
@@ -451,10 +478,10 @@
     }
     .el-header {
       width: 100%;
-      height: calc(80 / 1920 * 100vw);
+      height: 80px;
       text-align: left;
       border-bottom: 1px solid $border;
-      line-height: calc(90 / 1920 * 100vw);
+      line-height: 80px;
       padding-left: calc(30 / 1920 * 100vw);
       position: relative;
       .report-title {
@@ -481,16 +508,16 @@
       padding-left: calc(40 / 1920 * 100vw);
       padding-right: calc(40 / 1920 * 100vw);
       .suggest {
-        margin-top: calc(20 / 1920 * 100vw);
+        margin-top: 20px;
         font-size: calc(14 / 1920 * 100vw);
         font-weight: bold;
         height: calc(20 / 1920 * 100vw);
-        line-height: calc(20 / 1920 * 100vw);
+        line-height: 20px;
         background-color: $suggestBack;
         color: $qualified;
         padding-left: calc(30 / 1920 * 100vw);
         border: 1px solid #a0c1f8;
-        max-height: calc(100 / 1920 * 100vw);
+        max-height: 100px;
         height: auto;
         overflow-y: auto;
         .suggest-content {
@@ -501,19 +528,20 @@
         }
       }
       .report-content {
-        margin-top: calc(30 / 1920 * 100vw);
+        margin-top: 30px;
         .radior-content {
-          height: calc(300 / 1920 * 100vw);
+          height: 300px;
           .chart-content {
             width: 100%;
             height: 100%;
           }
-          @media screen and (min-width: 1280px) and(max-width: 1440px) {
-            height: calc(360 / 1920 * 100vw);
-          }
+          /*@media screen and (min-width: 1280px) and(max-width: 1440px) {*/
+            /*height: calc(360 / 1920 * 100vw);*/
+          /*}*/
         }
         .report-table {
           font-size: calc(14 / 1920 * 100vw);
+          padding-left: calc(40/1920*100vw);
           th {
             color: $tab;
             background-color: $background;
@@ -540,11 +568,11 @@
           }
           .icon-content {
             text-align: left;
-            margin-left: 20%;
+            margin-left: 10%;
           }
           .icon-blag {
             display: inline-block;
-            width: calc(80 / 1920 * 100vw);
+            width: 80px;
             padding: 3px 6px;
             text-align: center;
             color: #fff;
@@ -566,15 +594,15 @@
         }
         .details {
           position: relative;
-          height: calc(320 / 1920 * 100vw);
+          height: 320px;
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           .item-header {
 
             position: relative;
             background-color: $background;
-            height: calc(40 / 1920 * 100vw);
-            line-height: calc(40 / 1920 * 100vw);
+            height: 40px;
+            line-height: 40px;
             border-bottom: 1px solid $border;
             padding-left: calc(20 / 1920 * 100vw);
             .icontemp {
@@ -600,13 +628,13 @@
           }
           .item-content {
             padding-top: calc(20 / 1920 * 100vw);
-            height: calc(280 / 1920 * 100vw);
+            height: 280px;
             .item-details {
               height: auto;
               font-size: calc(14 / 1920 * 100vw);
               padding-left: calc(30 / 1920 * 100vw);
               padding-right: calc(20 / 1920 * 100vw);
-              margin-bottom: calc(30 / 1920 * 100vw);
+              margin-bottom: 30px;
               color: #4b5262;
               .item-blag {
                 width: calc(12 / 1920 * 100vw);

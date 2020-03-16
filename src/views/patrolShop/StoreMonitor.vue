@@ -311,7 +311,7 @@
                 <el-input
                   size="small"
                   class="el-search-input el-channel-search-input"
-                  placeholder="请输入关键字搜索通道"
+                  :placeholder="$t('storeMonitor.channelPlaceholder')"
                   v-model="serachChannelValue" @keyup.enter.native="searchChannel">
                   <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;" ></i>
                 </el-input>
@@ -765,6 +765,9 @@ export default {
         }
         if(to.name!='storeSubEvent'){
             from.meta.keepAlive=false;
+            if(self.previewplayer){
+              self.previewplayer.dispose();
+            }
         }
         else{
           from.meta.keepAlive=true;
@@ -3136,7 +3139,7 @@ export default {
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';
     *{
-        font-family: Arial, Microsoft YaHei;
+        font-family: Roboto,Arial, Microsoft YaHei;
     }
     $red:#f31d65;
     $black:#182752;
@@ -3206,17 +3209,17 @@ export default {
         }
         /*左侧视频区域css*/
         .lside{
-            @include point(margin-right,20);
+            margin-right: calc(25/1920*100vw);
             border: 1px solid $border;
             background-color: #fff;
             .el-header-title{
                 text-align: left;
                 position: relative;
-                @include point(height,60);
-                @include point(line-height,60);
+                height: 80px;
+                line-height: 80px;
                 border-bottom: 1px solid $border;
-                @include point(padding-left,20);
-                @include point(padding-right,20);
+                padding-left: calc(25/1920*100vw);
+                padding-right: calc(25/1920*100vw);
                 .lside-title{
                     font-weight: bold;
                     color:$h1;
@@ -3278,8 +3281,8 @@ export default {
                 }
                 .el-submit{
                     position: absolute;
-                    @include point(right,20);
-                    width:calc(130/1920*100vw);
+                    right: calc(25/1920*100vw);
+                    width: calc(130/1920*100vw);
                     color: #fff;
                     height: calc(36/1920*100vw);
                     line-height: calc(36/1920*100vw);
@@ -3287,16 +3290,8 @@ export default {
                     border-radius: 3px;
                     font-size: calc(14/1920*100vw);
                     border: none;
-                }
-                @media screen and(min-width: 1366px){
-                    .el-submit{
-                        top: 30%;
-                    }
-                }
-                @media screen and(max-width: 1366px){
-                    .el-submit{
-                        top: 20%;
-                    }
+                    top: 50%;
+                    transform: translate(0, -50%);
                 }
             }
             /*截图区域css*/
@@ -3414,10 +3409,10 @@ export default {
             }
             /*video区域css*/
             .video-content{
-                height: auto;
                 position: relative;
-                @include point(margin,20);
+                margin: calc(25/1920*100vw);
                 margin-bottom: 0;
+                height: 420px;
                 .getvideo-content{
                     position: absolute;
                     z-index: 930;
@@ -3439,8 +3434,9 @@ export default {
                     }
                 }
                 #previewVideo{
-                    @include point(min-width,450);
-                    @include point(min-height,414);
+                    //@include point(min-width,450);
+                    //@include point(min-height,414);
+                  min-height: 420px;
                 }
                 .errorVideo-model{
                     height: 100%;
@@ -3738,8 +3734,8 @@ export default {
                 text-align: left;
                 border: 1px solid $border;
                 overflow: hidden;
-                @include point(margin,20);
-                padding-left: 20px;
+                margin: calc(25/1920*100vw);
+                padding-left: calc(20/1920*100vw);
                 margin-top: 0;
                 @media screen and(max-width:1366px){
                     .cor-des{
@@ -3782,7 +3778,7 @@ export default {
                     display: block;
                     margin: 15px;
                     margin-left: 20px;
-                    font-size: 14px;
+                    font-size: calc(14/1920*100vw);
                 }
                 .is-required{
                   color: $red;
@@ -3794,24 +3790,15 @@ export default {
                     margin-top: 10px;
                     .el-radio-details{
                         display: inline-block;
-                        @include point(margin-left,15);
+                        margin-left: calc(15/1920*100vw);
                         border: 1px solid #ddd;
                         padding:6px;
                         font-size: 12px;
                         border-radius: 4px;
                         cursor: pointer;
-                        @include point(width,90);
-                        @include point(padding,6);
+                        padding: 8px;
                         text-align: center;
-                      @media screen and(max-width: 1680px) {
-                        @include point(width, 100);
-                      }
-                      @media screen and(max-width: 1440px) {
-                        @include point(width, 110);
-                      }
-                      @media screen and(max-width: 1366px) {
-                        @include point(width, 130);
-                      }
+                        width: 120px;
                     }
                     .activeClass{
                         background-color: #FDE8EF !important;
@@ -3834,7 +3821,7 @@ export default {
                     margin-right: 15px;
                 }
                 .lside-scrollbar{
-                    height: 390px;
+                    height: 360px;
                 }
                 .event-rside{
                     position: relative;
@@ -3968,23 +3955,23 @@ export default {
                 text-align: left;
                 position: relative;
                 color:$black;
-                @include point(height,60);
-                @include point(line-height,60);
+                height: 80px;
+                line-height: 80px;
                 border-bottom: 1px solid $border;
-                @include point(padding-left,10);
+                padding-left: calc(15/1920*100vw);
                 span{
                     display: block;
-                    @include point(margin-left,25);
+                    margin-left: calc(30/1920*100vw);
                 }
             }
             #storetab-content, #en-storetab-content{
                 margin-top: 10px;
-                @include point(padding-left,15);
-                @include point(padding-right,15);
-                @include point(height,280);
+                padding-left: calc(20/1920*100vw);
+                padding-right: calc(20/1920*100vw);
+                height: 370px;
                 .storeList-content{
                     text-align: left;
-                    @include point(height,260);
+                    height: 345px;
                     .activeClass{
                         background-color: #FDE8EF !important;
                         color: $red;
@@ -3992,14 +3979,13 @@ export default {
                     }
                     .stores{
                         &:last-child{
-                            @include point(margin-bottom,20);
+                          margin-bottom: 25px;
                         }
                     }
                     .el-search-input{
-                        @include point(width,200);
-                        @include point(margin-left,15);
-                        @include point(margin,15);
-                        @include point(margin-top,10);
+                        width: calc(235/1920*100vw);
+                        margin: calc(20/1920*100vw);
+                        margin-top:calc(15/1920*100vw);
                     }
                     .store-name{
                         display: inline-block;
@@ -4044,7 +4030,7 @@ export default {
                 span{
                     display: block;
                     text-align: left;
-                    @include point(margin-left,30);
+                    margin-left: calc(40/1920*100vw);
                     color: $black;
                     margin-bottom: 20px;
                 }
@@ -4099,7 +4085,12 @@ export default {
                     display: block;
                     text-align: left;
                     color: $black;
-                    font-size: 16px;
+                    @media screen and(max-width: 1366px){
+                        font-size: 14px;
+                    }
+                    @media screen and(min-width: 1366px){
+                        font-size: 16px;
+                    }
                   }
                   .backTime-btn{
                     @include point(right,20);
@@ -4114,8 +4105,9 @@ export default {
               .date-picker-content{
                 margin: 0 auto;
                 .date-picker.el-date-editor.el-input{
-                  width: 180px;
+                  width: calc(180/1920*100vw);
                   margin-right: calc(20/1920*100vw);
+                  min-width: 128px;
                 }
                 .time-picker.el-date-editor.el-input{
                   width: 120px;
@@ -4352,7 +4344,8 @@ export default {
     padding-left:30px;
     color:#425262;
     letter-spacing: 0px;
-     width: 235px;
+    width: 235px;
+    font-size: calc(14/1920*100vw);
 }
 .el-channel-search-input.el-search-input.el-input--small >>>.el-input__inner{
   width: 100%;
@@ -4369,7 +4362,7 @@ export default {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
-        font-family: Arial, 'Microsoft YaHei';
+        font-family: Roboto, Arial, 'Microsoft YaHei';
     }
   /*::-webkit-scrollbar {*/
     /*width: 6px;*/

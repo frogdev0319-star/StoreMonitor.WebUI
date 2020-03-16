@@ -361,7 +361,8 @@
         descending: require('../../../static/img/descending.png'),
         ascending: require('../../../static/img/ascending.png'),
         currentIndex: 0,
-        sidebarElm: null
+        sidebarElm: null,
+        fontFamily: ''
       }
 
     },
@@ -483,6 +484,9 @@
               top: '10',
               bottom: '57',
               containLabel: true,
+            },
+            textStyle:{
+              fontFamily: self.fontFamily
             },
             tooltip: {
               trigger: 'axis',
@@ -2177,6 +2181,7 @@
       let enSpan = this.lang == 'en' && (this.varWindowWidth < 1440);
       console.log(enSpan)
       self.isEnSpan = enSpan;
+      self.fontFamily = self.lang == 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initData();
     },
     mounted() {
@@ -2230,7 +2235,6 @@
   }
 
   * {
-    font-family: Arial, "Microsoft YaHei";
     box-sizing: border-box;
   }
 
@@ -2407,7 +2411,7 @@
               .item-ranking {
                 font-size: calc(18/1920*100vw);
                 text-align: left;
-                font-family: Arial MT;
+                font-family: Roboto, Arial MT;
               }
               .item-ranking-0 {
                 color: $red;
@@ -2712,7 +2716,7 @@
                   .item-ranking {
                     font-size: calc(18 / 1920 * 100vw);
                     text-align: left;
-                    font-family: Arial Rounded MT Bold;
+                    font-family: Roboto, Arial Rounded MT Bold;
                     padding: 0 calc(20 / 1920 * 100vw);
                   }
                   .item-ranking-0 {
@@ -2879,6 +2883,7 @@
           margin-left: calc(20 / 1920 * 100vw);
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+          height: 400px;
           .cycle-title {
             height: 70px;
             padding-top: 30px;

@@ -58,10 +58,10 @@
                     <!--:value="item.storeId">-->
                     <!--</el-option>-->
                 <!--</el-select>-->
-                <div class="search-content" v-if="searchContent">
-                    <span>{{generateReportLang('keywords')}}</span>
-                    <el-input size="mini" v-model="searchInput" class="search-input"></el-input>
-                </div>
+                <!--<div class="search-content" v-if="searchContent">-->
+                    <!--<span>{{generateReportLang('keywords')}}</span>-->
+                    <!--<el-input size="mini" v-model="searchInput" class="search-input"></el-input>-->
+                <!--</div>-->
             </el-col>
             <el-col :span="24" class="header-details">
                 <span :class="lang== 'en'? 'en-span-class' : ''">{{generateReportLang('time')}}</span>
@@ -108,7 +108,7 @@
                     :value="item.status">
                     </el-option>
                 </el-select>
-                 <div class="search-content" v-if="!searchContent">
+                 <div class="search-content">
                     <span>{{generateReportLang('keywords')}}</span>
                     <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
                 </div>
@@ -124,7 +124,7 @@
                   <h1>{{generateReportLang('selected')}}</h1>
                   <ul class="store-list" v-show="storeStr.length > 0">
                     <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
-                      - {{item}}
+                        - {{item}}
                     </li>
                   </ul>
                 </div>
@@ -140,19 +140,21 @@
                 <el-col :span="4" class="report-card" v-for="(item,index) in reportList" :key="index">
                     <div class="cards" @click="clickReport(item,index)">
                         <img :src="item.iconSrc" alt="" :height="iconSrcHeight" class="item-img"/>
-                        <div class="item-header">
+                        <div class="item-flex">
+                          <div class="item-header">
                             <!-- <img :src="item.inspectSrc" alt="" :height="iconSrcHeight*3/5" class="inspect-img"/> -->
                             <div class="store-name">
-                                <span class="name">{{item.storeName}}</span>
-                                <span class="inspect">{{item.tagName}}</span>
+                              <span class="name">{{item.storeName}}</span>
+                              <span class="inspect">{{item.tagName}}</span>
                             </div>
-                        </div>
-                        <div class="item-icon">
+                          </div>
+                          <div class="item-icon">
                             <i class="iconfont inspectIcon" :class="item.mode==0?'icon-yuanchengxunjian':'icon-xianchangxunjian'"></i>
-                        </div>
-                        <div class="item-content">
+                          </div>
+                          <div class="item-content">
                             <span class="assigner">{{generateReportLang('submitter')}} {{item.submitterName}}</span>
                             <span class="datestr">{{item.datestr}}</span>
+                          </div>
                         </div>
                     </div>
                 </el-col>
@@ -1004,19 +1006,18 @@ $suggestBack:#F1F6FE;
     // padding-top: calc(60/1920*100vw);
     // padding-right: calc(30/1920*100vw);
     .report-header{
-        /*height: calc(180/1920*100vw);*/
-        margin-bottom: calc(20/1920*100vw);
+        margin-bottom: 20px;
         border-bottom: 1px solid $border;
         background-color: #fff;
-        padding-top: calc(30/1920*100vw);
-        padding-bottom: calc(30/1920*100vw);
+        padding-top: 30px;
+        padding-bottom: 30px;
         color: $black;
         .header-details1{
             text-align: left;
             padding-left: calc(30/1920*100vw);
             padding-right: calc(30/1920*100vw);
-            height: calc(20/1920*100vw);
-            line-height: calc(20/1920*100vw);
+            height: 20px;
+            line-height: 20px;
             span{
                 font-size: calc(14/1920*100vw);
                 margin-right: calc(20/1920*100vw);
@@ -1048,7 +1049,7 @@ $suggestBack:#F1F6FE;
                 white-space: nowrap;
                 font-size: 18px;
                 margin: 0;
-                font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
+                font-family: Roboto, "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
                 color: #fff;
                 font-weight: 500;
                 line-height: 1.1;
@@ -1062,7 +1063,7 @@ $suggestBack:#F1F6FE;
                   font-size: 14px;
                   margin: 0;
                   list-style-type: none;
-                  font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
+                  font-family: Roboto, "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
                   color: #fff;
                 }
               }
@@ -1070,35 +1071,45 @@ $suggestBack:#F1F6FE;
         }
         .header-details{
             text-align: left;
-            padding-left: calc(30/1920*100vw);
+            padding-left: calc(50/1920*100vw);
             position: relative;
             .search-content{
                 display: inline-block;
             }
             .date-range{
-                width:320px;
+                width:280px;
             }
             .iconbangzhu{
-              font-size: calc(16/1920*100vw);
+              font-size: 16px;
+              margin-right: calc(20/1920*100vw);
+              @media screen and (min-width: 1280px) and (max-width: 1560px){
+                margin-right: 10px;
+              };
+              @media screen and (min-width: 1024px) and (max-width: 1280px){
+                margin-right: 5px;
+              };
             }
             span{
                 font-size: calc(14/1920*100vw);
                 margin-right: calc(20/1920*100vw);
-                margin-left: calc(20/1920*100vw);
+              @media screen and (min-width: 1280px) and (max-width: 1560px){
+                margin-right: 10px;
+              };
             }
-            @media screen and(max-width: 1366px){
+            @media screen and(max-width: 1280px){
               .en-span-class{
-                margin-right: 60px;
-              }
-            }
-            @media screen and(min-width: 1366px){
-              .en-span-class{
-                //margin-right: 75px;
+                margin-right: 56px;
               }
             }
             .el-province{
                 width: calc(160/1920*100vw);
                 margin-right: calc(15/1920*100vw);
+                @media screen and (min-width: 1280px) and (max-width: 1560px){
+                  width: 85px;
+                };
+                @media screen and (max-width: 1022px){
+                  margin-right: 10px;
+                };
             }
           .stores-panel{
             position: relative;
@@ -1164,7 +1175,10 @@ $suggestBack:#F1F6FE;
             }
           }
             .search-input{
-                width: calc(150/1920*100vw);
+                width: calc(160/1920*100vw);
+                @media screen and (min-width: 1280px) and (max-width: 1560px){
+                  width: 85px;
+                };
             }
             .search-btn{
               width: calc(130/1920*100vw);
@@ -1175,12 +1189,17 @@ $suggestBack:#F1F6FE;
             }
             .en-search-btn{
               width: calc(130/1920*100vw);
-              margin-left: calc(20/1920*100vw);
               border-color: $red;
               height: calc(36/1920*100vw);
               padding: 0 0;
               font-size: calc(14/1920*100vw);
               margin-left: calc(20/1920*100vw);
+              @media screen and (min-width: 1280px) and (max-width: 1560px){
+                width: 85px;
+              };
+              @media screen and (max-width: 1024px){
+                margin-left: 10px;
+              };
             }
             // .storename-str{
             //     width: 100%;
@@ -1190,8 +1209,8 @@ $suggestBack:#F1F6FE;
             // }
         }
       .header-details:nth-child(2){
-        padding-top:calc(20/1920*100vw);
-        padding-bottom: calc(30/1920*100vw);
+        padding-top:20px;
+        padding-bottom: 30px;
       }
     }
     .report-content{
@@ -1200,10 +1219,11 @@ $suggestBack:#F1F6FE;
         .card-content{
             border: 1px solid $border;
             background-color: #fff;
-            padding-top: calc(20/1920*100vw);
+            padding-top: 20px;
             padding-right: calc(20/1920*100vw);
-            height: calc(630/1920*100vw);
-            margin-bottom: calc(30/1920*100vw);
+            min-height: calc(100vh - 125px - 230px);
+            margin-bottom: calc(20/1920*100vw);
+            padding-bottom: 20px;
             //height: calc(730/1080*100vh);
         }
         .empty-content{
@@ -1217,11 +1237,11 @@ $suggestBack:#F1F6FE;
         .card-header{
             text-align: left;
             padding-left: calc(20/1920*100vw);
-            margin-bottom: calc(15/1920*100vw);
+            margin-bottom: 15px;
         }
     }
     .report-card{
-        margin-bottom: calc(20/1920*100vw);
+        margin-bottom: 20px;
         .cards{
             cursor: pointer;
             margin-left: calc(20/1920*100vw);
@@ -1231,15 +1251,22 @@ $suggestBack:#F1F6FE;
             box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             position: relative;
             background-color: #fff;
-
+            min-height: 160px;
             .item-img{
                 position: absolute;
                 right: 1px;
                 top: 1px;
             }
+          .item-flex{
+            display: flex;
+            flex-direction: column;
+            padding-top: calc(40/1920*100vw);
+            justify-content: space-around;
+            height: calc(100% - 40/1920*100vw);
+          }
             .item-header{
                 width: 100%;
-                margin-top: calc(40/1920*100vw);
+                //margin-top: calc(40/1920*100vw);
                 overflow: hidden;
                 .inspect-img{
                     margin-left: calc(20/1920*100vw);
@@ -1279,8 +1306,8 @@ $suggestBack:#F1F6FE;
         .item-content{
             text-align: left;
             padding-left: calc(20/1920*100vw);
-            position: absolute;
-            bottom: 0;
+            /*position: absolute;*/
+            /*bottom: 0;*/
             span{
                 font-size: calc(14/1920*100vw);
                 color: $tab;
@@ -1291,12 +1318,13 @@ $suggestBack:#F1F6FE;
     }
 }
 .el-pat{
-    position: absolute;
-    height: calc(30/1920*100vw);
-    bottom: calc(10/1920*100vw);
+    //position: absolute;
+    height: 30px;
     .el-pag{
         position: absolute;
+        //float: right;
         right: calc(20/1920*100vw);
+        bottom: 20px;
     }
 }
 }

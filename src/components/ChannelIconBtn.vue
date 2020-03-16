@@ -1,7 +1,7 @@
 <template>
     <div class="channel-btn-content">
         <div class="btn-circle">
-            <img :src="iconSrc" height="60"/>
+            <img :src="iconSrc" />
         </div>
         <span class="btn-title" :class="isClick?'noramlColor':'abnoramlColor'">{{channelName}}</span>
     </div>
@@ -57,23 +57,36 @@ export default {
     .channel-btn-content{
         height: auto;
         text-align: center;
-        width: 60px;
+        width: calc(60/1920*100vw);
+        min-width: 40px;
+        min-height: 40px
     }
     .btn-circle{
-        width: 60px;
-        height: 60px;
+        width: calc(60/1920*100vw);
+        height: calc(60/1920*100vw);
         border-radius: 50%;
         margin: auto;
         position: relative;
         cursor: pointer;
+        min-width: 40px;
+        min-height: 40px
     }
     .btn-circle img{
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;
+        width: calc(60/1920*100vw);
+        height: calc(60/1920*100vw);
+        min-width: 40px;
+        min-height: 40px
     }
     .btn-title{
         font-size: 12px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
     }
 </style>
 

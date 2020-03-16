@@ -98,13 +98,13 @@ input:disabled{
     color: #f31d65 !important;
 }
 
-@media screen and (min-width: 1366px){
+@media screen and (min-width: 1450px){
     #storetab-content .el-tabs__nav.is-top{
         margin-left: 10%;
         width: 80%;
     }
 }
-@media screen and (max-width: 1366px){
+@media screen and (max-width: 1440px){
     #storetab-content .el-tabs__nav.is-top{
         width: 100%;
     }

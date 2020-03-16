@@ -67,7 +67,9 @@
   line-height: calc(36/1920*100vw);
   border-color: #ddd;
   color: #7d8cad;
-  min-width: calc(160/1920*100vw) !important;
+  width: calc(160/1920*100vw);
+  min-width: 85px;
+  min-height: 28px;
 }
 .el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
   background-color: #FEE4E7;
@@ -109,6 +111,17 @@
 }
 .el-date-editor .el-range-input{
   width: 50%;
+}
+.el-button--primary.el-button--small{
+  min-height: 28px;
+  min-width: 85px;
+}
+.el-button--primary.el-button--mini{
+  min-height: 28px;
+  min-width: 85px;
+}
+.el-picker-panel{
+  font-family: Roboto, 'Microsoft YaHei'
 }
 
 

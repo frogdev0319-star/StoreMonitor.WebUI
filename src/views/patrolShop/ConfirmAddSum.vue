@@ -510,17 +510,17 @@ $h1:#292e36;
 .sum-content{
     color: $black;
     .sum-submit{
-        margin-bottom: calc(30/1920*100vw);
+        margin-bottom: 30px;
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(40/1920*100vw);
         border: 1px solid $border;
-        padding-bottom: calc(30/1920*100vw);
+        padding-bottom: 30px;
         background-color: #fff;
         .submit-header{
             text-align: left;
-            height: calc(60/1920*100vw);
-            line-height: calc(60/1920*100vw);
+            height: 60px;
+            line-height: 60px;
             overflow: hidden;
             span{
                 font-size: calc(20/1920*100vw);
@@ -529,7 +529,7 @@ $h1:#292e36;
             }
             .sum-btn{
                 float: right;
-                margin-top: calc(18/1920*100vw);
+                margin-top: 18px;
                 height: calc(36/1920*100vw);
                 width: calc(130/1920*100vw);
                 line-height: calc(36/1920*100vw);
@@ -561,7 +561,7 @@ $h1:#292e36;
             .sug-label{
                 font-size: calc(12/1920*100vw);
                 display: block;
-                margin-bottom: calc(10/1920*100vw);
+                margin-bottom: 10px;
                 span{
                     color: $red;
                 }
@@ -575,13 +575,15 @@ $h1:#292e36;
     .sum-data{
         padding: calc(40/1920*100vw);
         border: 1px solid $border;
-        padding-top: calc(20/1920*100vw);
-        padding-bottom: calc(20/1920*100vw);
+        padding-top: 20px;
+        padding-bottom: 20px;
         background-color: #fff;
         min-height: calc(500/1920*100vw);
         .divider-content{
-            height: calc(40/1920*100vw);
-            line-height: calc(40/1920*100vw);
+            height: 40px;
+            line-height: 40px;
+            display: flex;
+            align-items: center;
             .divider-hr{
                 border: 0.5px solid $border;
             }
@@ -608,7 +610,7 @@ $h1:#292e36;
             }
             .table-bordered{
                 font-size: calc(14/1920*100vw);
-                margin-top: calc(20/1920*100vw);
+                margin-top: 20px;
                 th{
                     color: $tab;
                     text-align: left;
@@ -639,7 +641,7 @@ $h1:#292e36;
                 }
                 .icon-blag{
                     display: inline-block;
-                    width: calc(100/1920*100vw);
+                    width: 80px;;
                     padding:3px 6px;
                     text-align: center;
                     color: #fff;
@@ -649,9 +651,9 @@ $h1:#292e36;
             }
         }
         .row-footer{
-            padding-top: calc(20/1920*100vw);
-            padding-bottom: calc(10/1920*100vw);
-            margin-top: calc(10/1920*100vw);
+            padding-top: 20px;
+            padding-bottom: 10px;
+            margin-top: 10px;
             .details-content{
                 padding-right: calc(30/1920*100vw);
                 &:last-child{
@@ -660,14 +662,14 @@ $h1:#292e36;
             }
             .details{
                 position: relative;
-                height: calc(320/1920*100vw);
+                height: 320px;
                 border:1px solid $border;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
                 .item-header{
                     position: relative;
                     background-color: $background;
-                    height: calc(40/1920*100vw);
-                    line-height: calc(40/1920*100vw);
+                    height: 40px;
+                    line-height: 40px;
                     border-bottom: 1px solid $border;
                     padding-left: calc(20/1920*100vw);
                     text-align: left;
@@ -693,14 +695,14 @@ $h1:#292e36;
                     }
                 }
                 .item-content{
-                    padding-top: calc(20/1920*100vw);
-                    height:  calc(280/1920*100vw);
+                    padding-top: 20px;
+                    height:  280px;
                     .item-details{
                         height: auto;
                         font-size: calc(14/1920*100vw);
                         padding-left: calc(30/1920*100vw);
                         padding-right: calc(20/1920*100vw);
-                        margin-bottom:calc(30/1920*100vw);
+                        margin-bottom: 30px;
                         color: #4b5262;
                         text-align: left;
                         .item-blag{
@@ -731,6 +733,6 @@ $h1:#292e36;
         overflow-x: hidden;
     }
     .el-textarea__inner{
-        font-family: Arial, 'Microsoft YaHei';
+        font-family: Roboto,Arial, 'Microsoft YaHei';
     }
 </style>

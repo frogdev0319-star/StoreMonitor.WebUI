@@ -360,7 +360,7 @@
                                 </el-tooltip>
                             </div>
                         </div>
-                        <div class="storeList-content" v-else :style="!showFeedBack?{height:varyWindowHeight-100+'px'}:{'height':(varyWindowHeight)/2+'px'}">
+                        <div class="storeList-content" v-else>
                             <el-input
                                 size="small"
                                 class="el-search-input"
@@ -753,6 +753,7 @@ export default {
             console.log('confirm')
             if(to.name !='confirmSum' ){
               from.meta.keepAlive=false;
+              self.previewplayer && self.previewplayer.dispose()
             }
             else{
               from.meta.keepAlive = true;
@@ -3276,18 +3277,18 @@ export default {
             }
         }
         .lside{
-            @include point(padding-bottom,20);
-            @include point(margin-right,20);
+            padding-bottom: calc(25/1920*100vw);
+            margin-right: calc(25/1920*100vw);
             border: 1px solid $border;
             background-color: #fff;
             .el-header-title{
                 text-align: left;
                 position: relative;
-                @include point(height,60);
-                @include point(line-height,60);
+                height: 80px;
+                line-height: 80px;
                 border-bottom: 1px solid $border;
-                @include point(padding-left,20);
-                @include point(padding-right,20);
+                padding-left: calc(25/1920*100vw);
+                padding-right: calc(25/1920*100vw);
                 .lside-title{
                     font-weight: bold;
                     color:$h1;
@@ -3360,28 +3361,25 @@ export default {
                 }
                 .en-el-submit{
                     position: absolute;
-                    @include point(right,20);
+                    right: calc(30/1920*100vw);
                     width:calc(130/1920*100vw);
                     color: #fff;
                     height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
+                    min-height: 28px;
+                    top: 50%;
+                    transform: translate(0, -50%);
+                    min-width: 85px;
                 }
                 @media screen and(min-width: 1366px){
                     .el-submit{
                         top: 30%;
                     }
-                    .en-el-submit{
-                      top: 30%;
-                    }
                 }
                 @media screen and(max-width: 1366px){
                     .el-submit{
                         top: 20%;
-                    }
-                    .en-el-submit{
-                      top: 20%;
-                      //width:calc(160/1920*100vw);
                     }
                 }
             }
@@ -3390,8 +3388,7 @@ export default {
                 margin-bottom: 0;
                 height: auto;
                 position: relative;
-                @include point(min-width,500);
-                @include point(min-height,414);
+                min-height: 420px;
                 background-color: #232730;
                 color: $red;
                 z-index: 100;
@@ -3404,12 +3401,11 @@ export default {
                 }
             }
             .guide-content{
-                @include point(margin,20);
+                margin: calc(25/1920*100vw);
                 margin-bottom: 0;
                 height: auto;
                 position: relative;
-                @include point(min-width,500);
-                @include point(min-height,414);
+                min-height: 420px;
                 background-color: #000;
                 .guide-rside{
                     position: absolute;
@@ -3478,9 +3474,10 @@ export default {
             .video-content{
                 height: auto;
                 position: relative;
-                @include point(margin,20);
-                @include point(min-width,500);
-                @include point(min-height,408);
+                margin: calc(25/1920*100vw);
+                //@include point(min-width,500);
+                //@include point(min-height,408);
+                min-height: 420px;
                 background-color: #000;
                 margin-bottom: 0;
                 z-index: 100;
@@ -3555,8 +3552,9 @@ export default {
                     }
                 }
                 #previewVideo{
-                    @include point(min-width,500);
-                    @include point(min-height,405);
+                    //@include point(min-width,500);
+                    //@include point(min-height,405);
+                    min-height: 420px;
                 }
                 #channelName{
                     position: absolute;
@@ -3721,8 +3719,8 @@ export default {
                 border-right: 1px solid $border;
                 border-bottom: 1px solid $border;
                 margin: 0;
-                @include point(margin-left,20);
-                @include point(margin-right,20);
+                margin-left: calc(25/1920*100vw);
+                margin-right: calc(25/1920*100vw);
                 position: relative;
                 .guide-lside{
                     position: absolute;
@@ -4086,24 +4084,24 @@ export default {
                 text-align: left;
                 position: relative;
                 color:$black;
-                font-size: 16px;
-                @include point(height,60);
-                @include point(line-height,60);
+                font-size: calc(16/1920*100vw);
+                height: 80px;
+                line-height: 80px;
                 border-bottom: 1px solid $border;
-                @include point(padding-left,10);
+                padding-left: calc(10/1920*100vw);
                 span{
                     display: block;
-                    @include point(margin-left,25);
+                    margin-left: calc(30/1920*100vw);
                 }
             }
             #storetab-content, #en-storetab-content{
                 margin-top: 10px;
-                @include point(margin-left,15);
-                @include point(margin-right,15);
+                margin-left: calc(20/1920*100vw);
+                margin-right: calc(20/1920*100vw);
                 .storeList-content{
                     padding: 0 10px;
                     text-align: left;
-                    @include point(height,450);
+                    height: 545px;
                     color: $black;
                     .icon-info{
                         color: #FF9803;
@@ -4185,10 +4183,10 @@ export default {
                     span{
                         display: block;
                         text-align: left;
-                        @include point(margin-left,30);
+                        margin-left: 40px;
                         color: $black;
                         margin-bottom: 15px;
-                        font-size: 16px;
+                        font-size: calc(16/1920*100vw);
                     }
                     .channels-srollbar{
                         text-align: left;
@@ -4214,12 +4212,12 @@ export default {
                         .btn-details{
                             display: inline-block;
                             margin-bottom: 5px;
-                            @include point(margin-left,15);
+                            margin-left: calc(20/1920*100vw);
                             overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
                             &:last-child{
-                                @include point(margin-right,15);
+                              margin-right: calc(20/1920*100vw);
                             }
                         }
                     }
@@ -4312,14 +4310,14 @@ export default {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
-        font-family: Arial, 'Microsoft YaHei';
+        font-family:Roboto, Arial, 'Microsoft YaHei';
     }
   .score-menu.el-dropdown-menu{
     z-index: 0 !important;
   }
   .confirmClass{
     width: 28%;
-    font-family: Arial, 'Microsoft YaHei';
+    font-family: Roboto, Arial, 'Microsoft YaHei';
   }
   .confirmClass .el-message-box__header{
     border-bottom: 0.5px solid #dfe2e9;

@@ -55,23 +55,6 @@
                 >
                 </el-option>
               </el-select>
-              <!--              <div  class="stores-panel" >-->
-              <!--                <div class="month-content" @click="choiceStore">-->
-              <!--                  <div class="input-arrow-panel"></div>-->
-              <!--                  <el-input v-model="storeName" size="mini" id="elMonth" placeholder="请选择门店" :readonly=true></el-input>-->
-              <!--                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
-              <!--                </div>-->
-              <!--                <div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">-->
-              <!--                  <div class="month-details">-->
-              <!--                    <el-checkbox v-model="checkAllStore" @change="changeStoreItem(-1)"></el-checkbox> <span>{{$t('overview.all')}}</span>-->
-              <!--                  </div>-->
-              <!--                  <div class="month-details" v-for="(item,index) in storeDataList" :key="index">-->
-              <!--                    <el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>-->
-              <!--                    <span>{{item.label}}</span>-->
-              <!--                  </div>-->
-              <!--                </div>-->
-              <!--              </div>-->
-
             </div>
             <div class="charts-content">
               <v-chart  :options="storeEventsOptions"  class="result-content" :auto-resize='true' ref="storeEventRef"/>
@@ -1136,7 +1119,7 @@
     #{$poi}:checkRem($val);
   }
   *{
-    font-family: Arial,  "Microsoft YaHei";
+    font-family: Roboto, Arial,  "Microsoft YaHei";
     box-sizing: border-box;
   }
   .el-overview-content {

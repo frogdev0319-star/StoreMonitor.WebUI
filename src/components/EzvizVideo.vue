@@ -2018,8 +2018,7 @@
     margin-bottom: 0;
     height: auto;
     position: relative;
-    @include point(min-width,500);
-    @include point(min-height,414);
+    min-height: 420px;
     background-color: #232730;
     color: $red;
     z-index: 100;
@@ -2061,8 +2060,7 @@
     height: auto;
     position: relative;
     @include point(margin,20);
-    @include point(min-width,500);
-    @include point(min-height,408);
+    min-height: 420px;
     background-color: #000;
     z-index: 100;
     .getvideo-content{
@@ -2137,8 +2135,7 @@
       }
     }
     #myPlayer{
-      @include point(min-width,500);
-      @include point(min-height,405);
+      min-height: 420px;
     }
     #channelName{
       position: absolute;
