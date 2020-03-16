@@ -458,12 +458,6 @@ export default {
                   self.realTimeSpeed=self.realTimeSpeed+1;
                 },1000);
             }
-            else{
-                let errorCode=self.mpdurl.ErrorCode; //错误码
-                let errorText= util.getErrorText(errorCode);
-                self.errorText=errorText;
-                self.destroyVideo();
-            }
         },
         destroyVideo(){
           let self=this;
@@ -961,6 +955,7 @@ export default {
         showRelatedChannel(){
           let self = this;
           self.showRelatedChannelFlag = true;
+          self.channelRadio = self.relatedChannels[0].id;
         },
         cancelSelect(){
           let self = this;
@@ -1056,8 +1051,8 @@ $h1:#292e36;
 @mixin title-content{
     text-align: left;
     position: relative;
-    @include point(height,60);
-    @include point(line-height,60);
+    height: 80px;
+    line-height: 80px;
     border-bottom: 1px solid $border;
     @include point(padding-left,20);
     @include point(padding-right,20);
@@ -1084,9 +1079,9 @@ $h1:#292e36;
 .el-rate-container{
     background-color: #f7f8fa;
     @media screen and(min-width: 1366px){
-        .el-submit{
-            top: 30%;
-        }
+        /*.el-submit{*/
+            /*top: 30%;*/
+        /*}*/
         .storeInfo-details{
             height: 50px;
             line-height: 50px;
@@ -1103,9 +1098,9 @@ $h1:#292e36;
         }
     }
     @media screen and(max-width: 1366px){
-        .el-submit{
-            top: 20%;
-        }
+        /*.el-submit{*/
+            /*top: 20%;*/
+        /*}*/
         .storeInfo-details{
             height: 40px;
             line-height: 40px;
@@ -1157,7 +1152,6 @@ $h1:#292e36;
             .el-submit{
                 position: absolute;
                 @include point(right,20);
-                @include point(width,90);
                 color: #fff;
                 height: calc(36/1920*100vw);
                 width: calc(130/1920*100vw);
@@ -1351,14 +1345,16 @@ $h1:#292e36;
                 text-overflow: ellipsis;
             }
             .en-w3-content{
-              margin-right: 45px;
+              margin-right: calc(45/1920*100vw);
               overflow: hidden;
               display: inline-block;
               white-space: nowrap;
               text-overflow: ellipsis;
               width: calc(400/1920*100vw);
               //width: 200px;
-
+              @media screen and (min-width: 1280px) and(max-width: 1366px){
+                width: 270px;
+              }
             }
             .w3{
                 letter-spacing:0.3334em; /*如果需要y个字两端对齐，则为(x-y)/(y-1),这里是（4-3）/(3-1)=0.5em */
@@ -1436,12 +1432,12 @@ $h1:#292e36;
             @include point(padding-top,20);
             .dealInfo-label{
                 font-weight: bold;
-                @include point(margin-bottom,20);
+                margin-bottom: 25px;
                 display: block;
             }
             .btn-content{
-                @include point(margin-top,10);
-                @include point(margin-bottom,20);
+                margin-top: 10px;
+                margin-bottom: 25px;;
                 span{
                     display: inline-block;
                     @include point(margin-left,20);
@@ -1466,7 +1462,7 @@ $h1:#292e36;
             }
             .des-input{
                 @include point(margin-right,20);
-                @include point(margin-top,12);
+                margin-top: 15px;
                 width: 80%;
             }
         }
@@ -1490,7 +1486,7 @@ $h1:#292e36;
             }
             .description{
                 text-align: left;
-                font-family: Arial, 'Microsoft YaHei';
+                font-family: Roboto, Arial, 'Microsoft YaHei';
                 font-size: 12px;
                 white-space:pre-wrap; /* css3.0 */
                 white-space:-moz-pre-wrap; /* Firefox */
@@ -1704,7 +1700,7 @@ $h1:#292e36;
                         text-align: left;
                         @include point(margin-top,15);
                         @include point(margin-left,20);
-                        font-family:Arial, 'Microsoft YaHei';
+                        font-family: Roboto,Arial, 'Microsoft YaHei';
                         font-size: 12px;
                         white-space:pre-wrap; /* css3.0 */
                         white-space:-moz-pre-wrap; /* Firefox */
@@ -1737,6 +1733,12 @@ $h1:#292e36;
                             &:nth-child(2n+1){
                                 @include point(margin-left,15);
                             }
+                          @media screen and (min-width: 1280px) and(max-width: 1366px){
+                            width: 90px;
+                            .img-content .imgLittle{
+                              width: 85px;
+                            }
+                          }
                         }
                     }
                     .viedo-info{

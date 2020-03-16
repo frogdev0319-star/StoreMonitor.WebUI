@@ -1188,7 +1188,7 @@ $h1:#292e36;
            color:$tab;
         }
         .date-range{
-            width:320px;
+            width:280px;
         }
         .el-search{
             position:absolute;
@@ -1226,13 +1226,13 @@ $h1:#292e36;
             border-radius: 4px;
             top: calc(24/1920*100vw);
             .btn-area{
-              position: relative;
               padding: 0 calc(6/1920*100vw);
               height: calc(36/1920*100vw);
-              display: inline-flex;
+              display: flex;
               align-items: center;
+              justify-content: center;
               .icon-excel{
-                margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                margin-right: calc(18/1920*100vw);
                 font-size: calc(24/1920*100vw);
                 height: calc(24/1920*100vw);
                 width: calc(24/1920*100vw);
@@ -1250,7 +1250,6 @@ $h1:#292e36;
         border-color: $red;
         z-index: 990;
         height: calc(36/1920*100vw);
-        width: calc(130/1920*100vw);
         margin: 0;
         padding: 0;
         font-size: calc(14/1920*100vw);
@@ -1258,27 +1257,24 @@ $h1:#292e36;
         color: #ffffff;
         border-width: 0;
         border-radius: 4px;
+        width: calc(160/1920*100vw);
+        min-width: 120px;
         .btn-area{
           position: relative;
           padding: 0 calc(6/1920*100vw);
           height: calc(36/1920*100vw);
-          display: inline-flex;
+          display: flex;
           align-items: center;
+          justify-content: center;
           .icon-excel{
-            margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-            font-size: calc(24/1920*100vw);
+            margin-right: calc(18/1920*100vw);
+            width: calc(24/1920*100vw);
+            height: calc(24/1920*100vw);
           }
           .spanClass{
             font-size: calc(14/1920*100vw);
             display: inline-block;
           }
-        }
-
-        @media screen and (min-width: 1366px){
-          width: 160px;
-        }
-        @media screen and (max-width: 1366px){
-          width: 140px;
         }
       }
       .table-content{
