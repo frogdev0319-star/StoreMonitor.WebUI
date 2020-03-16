@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-container" :style="{'height':varyWindowHeight-150+'px'}">
+  <div class="setting-container">
     <div class="basic-info">
       <div class="title">
         <div class="title-info">
@@ -657,32 +657,21 @@
   $tab:#7d8cad;
   $color: #606266;
   $black:#182752;
-
-  @function rem($val){
-    @return $val/16+rem;
-  }
-  @function checkRem($val){
-    @if($val==auto){@return auto;}
-    @else if($val==0){@return 0;}
-    @else{@return rem($val);}
-  }
-  @mixin point($poi,$val){
-    #{$poi}:checkRem($val);
-  }
+  
   .setting-container{
-    height: 100%;
+    height: calc(100vh - 80px - 45px - calc(60/1920*100vw));
     display: flex;
     flex-direction: column;
     border: 1px solid $border;
     background-color: #fff;
     .basic-info{
       .title{
-        @include point(height, 50);
-        @include point(line-height, 50);
-        @include point(padding-left, 30);
-        @include point(padding-right, 20);
-        @include point(margin-bottom, 20);
-        font-size: 20px;
+        height: 70px;
+        line-height: 70px;
+        padding-left: calc(40/1920*100vw);
+        padding-right: calc(25/1920*100vw);
+        margin-bottom: 25px;
+        font-size: calc(20/1920*100vw);
         font-weight: bold;
         display: flex;
         justify-content: space-between;
@@ -702,9 +691,9 @@
       }
       .basic-information{
         text-align: left;
-        @include point(margin-left, 20);
-        @include point(margin-right, 20);
-        @include point(padding-left, 10);
+        margin-left: calc(25/1920*100vw);
+        margin-right: calc(25/1920*100vw);
+        padding-left: calc(15/1920*100vw);
         border-bottom: 1px solid $border;
         .comment-class .el-form-item__label:before{
             content: ' ';
@@ -715,71 +704,58 @@
     }
     .role-setting{
       flex-grow: 1;
-      @include point(margin-left, 20);
-      @include point(margin-right, 20);
+      margin-left: calc(25/1920*100vw);
+      margin-right: calc(25/1920*100vw);
+      margin-bottom: 25px;
       text-align: left;
+      height: calc(100% - 303px);
       .setting-title{
-        @include point(padding-left, 10);
-        font-size: 16px;
-        @include point(height, 50);
-        @include point(line-height, 50);
+        padding-left: calc(15/1920*100vw);
+        font-size: calc(16/1920*100vw);
+        height: 70px;
+        line-height: 70px;
       }
       .role-list{
         background-color: #F6F7FB;
         border:0.5px solid #e3e9f4;
         color: $black;
-
-        @media screen and (min-width: 1280px){
-          height: 410px;
-        }
-        @media screen and (min-width: 1440px){
-          height: 280px;
-        }
-        @media screen and (min-width: 1600px){
-          height: 260px;
-        }
-        @media screen and (min-width: 1680px){
-          height: 380px;
-        }
-        @media screen and (min-width: 1920px){
-          height: 380px;
-        }
-
+        height: calc(100% - 70px);
         .role-group{
           width: 60%;
-          @include point(margin-top,20);
-          @include point(margin-bottom,20);
+          margin-top: 25px;
+          margin-bottom: 25px;
           .role-all-checkbox{
-            @include point(margin-left,15);
+            margin-left: calc(20/1920*100vw);
             .group-name{
-              @include point(margin-left,10);
-              font-size: 14px;
+              margin-left: calc(15/1920*100vw);
+              font-size: calc(14/1920*100vw);
               font-weight: bold;
             }
           }
           .role-content{
-            @include point(margin-left,40);
+            margin-left: calc(50/1920*100vw);
             overflow: hidden;
             .role-detail{
               width: auto;
-              @include point(min-width,120);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              margin-left:calc(15/1920*100vw);
+              margin-top: 15px;
+              width: calc(180/1920*100vw);
+              min-width: 140px;
               float: left;
               .role-name{
-                @include point(margin-left,10);
-                font-size: 14px;
+                margin-left:calc(15/1920*100vw);
+                font-size: calc(14/1920*100vw);
               }
             }
             .en-role-detail{
               width: auto;
-              @include point(min-width,240);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              min-width:calc(320/1920*100vw);
+              margin-left:calc(15/1920*100vw);
+              margin-top: 15px;
               float: left;
               .role-name{
-                @include point(margin-left,10);
-                font-size: 14px;
+                margin-left:calc(15/1920*100vw);
+                font-size: calc(14/1920*100vw);
               }
             }
           }
@@ -812,6 +788,6 @@
     overflow-x: hidden;
   }
   .role-comment .el-textarea__inner{
-    font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei
+    font-family: Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei
   }
 </style>

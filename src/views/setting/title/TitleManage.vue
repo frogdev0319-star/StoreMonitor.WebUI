@@ -1,5 +1,5 @@
 <template>
-  <div class="title-container" :style="{'height':varyWindowWidth-150+'px'}">
+  <div class="title-container">
       <div class="btn-col">
         <div class="title-btns">
           <el-button
@@ -8,8 +8,10 @@
             type="primary"
             @click="addNewTitle"
           >
-            <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
-            <span>{{$t('titleView.addTitle')}}</span>
+            <div class="btn-area">
+              <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
+              <span>{{$t('titleView.addTitle')}}</span>
+            </div>
           </el-button>
           <el-button
             class="el-delete-btn"
@@ -17,8 +19,10 @@
             type="primary"
             @click="showDeleteDialogMethod(0)"
           >
-            <i style="margin-right:8px;" class="iconfont el-icon-delete"></i>
-            <span>{{$t('titleView.deleteTitle')}}</span>
+            <div class="btn-area">
+              <i style="margin-right:8px;" class="iconfont el-icon-delete"></i>
+              <span>{{$t('titleView.deleteTitle')}}</span>
+            </div>
           </el-button>
         </div>
       </div>
@@ -29,7 +33,6 @@
             align='left'
             stripe
             style="width:100%;"
-            :height="tableHieght"
             ref="titleTable"
             :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
             :cell-style="cellStyle"
@@ -320,73 +323,56 @@
   $background:#f4f5f9;
   $tab:#7d8cad;
 
-  @function rem($val){
-    @return $val/16+rem;
-  }
-  @function checkRem($val){
-    @if($val==auto){@return auto;}
-    @else if($val==0){@return 0;}
-    @else{@return rem($val);}
-  }
-  @mixin point($poi,$val){
-    #{$poi}:checkRem($val);
-  }
   .title-container{
     border: 1px solid $border;
     background-color: #fff;
+    min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
   }
   .btn-col{
     border-bottom:  1px solid $border;
     overflow: hidden;
-    @include point(height,50);
-    @include point(line-height,50);
+    height: 70px;
+    line-height: 70px;
   }
   .title-btns{
     float: right;
-    @include point(margin-right,10);
+    margin-right: calc(15/1920*100vw);
     width: auto;
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .el-add-btn{
       color: #fff;
       position: relative;
-      @include point(margin-right,10);
+      margin-right: calc(15/1920*100vw);
       height: calc(36/1920*100vw);
       width: calc(130/1920*100vw);
       padding: 0;
       .iconfont{
         font-size: calc(16/1920*100vw);
-        padding: calc(5/1920*100vw) 0;
       }
       span{
-        position: relative;
-        bottom: calc(1/1920*100vw);
         font-size: calc(14/1920*100vw);
-        @media screen and (max-width: 1680px) {
-          bottom:calc(-1/1920*100vw);
-        };
       }
       &:disabled{
         opacity: 0.5;
       }
-
     }
     .el-delete-btn {
       color: #fff;
       position: relative;
-      @include point(margin-right, 15);
+      margin-right: calc(20/1920*100vw);
       font-size: calc(14/1920*100vw);
       height: calc(36/1920*100vw);
       width: calc(130/1920*100vw);
       padding: 0;
       .iconfont{
         font-size: calc(16/1920*100vw);
-        padding: calc(5/1920*100vw) 0;
       }
       span{
-        position: relative;
-        bottom: calc(1/1920*100vw);
-        @media screen and (max-width: 1680px) {
-          bottom:calc(-1/1920*100vw);
-        };
+        font-size: calc(14/1920*100vw);
       }
       &:disabled {
         opacity: 0.5;
@@ -394,8 +380,8 @@
     }
   }
   .title-table{
-    @include point(margin, 15);
-    height: auto;
+    min-height: calc(100% - 75px);
+    margin: 20px calc(20/1920*100vw);
     .iconfont{
       font-size: calc(24/1920*100vw);
       color: $tab;
