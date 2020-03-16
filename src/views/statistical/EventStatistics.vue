@@ -31,7 +31,7 @@
           size="mini"
           :clearable=false
           :editable=false
-          format="yyyy/MM/dd HH:mm:ss"
+          format="yyyy/MM/dd"
           class="date-range"
           :popper-class="poperClass"
           :picker-options='dateOpt'
@@ -44,7 +44,7 @@
         </el-date-picker>
         <el-tooltip class="item" effect="dark"
                     placement="right">
-          <div slot="content">*{{$t('overview.dataRangeTips')}}</div>
+          <div slot="content">{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
         <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{$t('reportView.search')}}</el-button>
@@ -78,14 +78,14 @@
             </div>
           </div>
         </el-col>
-        <el-col :span="15" class="store-events">
+        <el-col :span="14" class="store-events">
           <div class="region-result">
             <div class="charts-content">
               <v-chart  :options="storeEventsOptions"  class="result-content" :auto-resize='true' ref="storeEventRef"/>
             </div>
           </div>
         </el-col>
-        <el-col :span="6" class="source-list">
+        <el-col :span="7" class="source-list">
           <div class="pct-content">
             <div class="pct-panel">
               <v-chart :auto-resize='true' :options="eventSourceOptions" class="chart-content" ref="eventSourceRef"></v-chart>
@@ -387,7 +387,9 @@
         cellClass: 'cell-class',
         rowClass: 'row-class',
         exportEventHeader: ['门店名称','所属区域','事件总数', '待处理事件数量','已处理事件数量', '已结案事件数量', '远程巡检', '现场巡检', '门店监控'],
-        hasNoData: false
+        hasNoData: false,
+        sidebarElm: null,
+        fontFamily: ''
       }
 
     },
@@ -566,6 +568,9 @@
             },
             backgroundColor: self.echartBackground,
           },
+          textStyle:{
+            fontFamily: self.fontFamily
+          },
           dataset: {
             source: [],
           },
@@ -680,10 +685,12 @@
       adjustChart(){
         let self = this;
         console.log('尺寸改变');
-        setTimeout(() => {
+        if (self.$refs.eventSourceRef) {
           self.$refs.eventSourceRef.resize()
+        }
+        if (self.$refs.storeEventRef) {
           self.$refs.storeEventRef.resize()
-        }, 20)
+        }
       },
       async getRegionInfo(){
         let self=this;
@@ -1258,6 +1265,9 @@
             },
             backgroundColor: self.echartBackground,
           },
+          textStyle:{
+            fontFamily: self.fontFamily
+          },
           series: [
             {
               name:'事件来源占比',
@@ -1377,6 +1387,11 @@
         self.params.filter={page:val-1,size:self.sizeNum};
         self.getEventTableData();
       },
+      handleSideBar(e){
+        if(e.target === e.currentTarget || e.target === this){
+          this.adjustChart();
+        }
+      }
     },
     async created(){
       let self = this;
@@ -1385,6 +1400,7 @@
       self.params.beginTs = start;
       self.params.endTs = end;
       self.params.timeMode = self.timeMode;
+      self.fontFamily = self.lang== 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initDaysRange();
       await self.getRegionInfo();
       self.initData();
@@ -1393,10 +1409,16 @@
     mounted(){
       let self=this;
       window.addEventListener("resize", self.adjustChart, false);
+      self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
+      self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
     },
     beforeDestroy(){
       let self = this;
       window.removeEventListener('resize', self.adjustChart);
+      self.adjustChart = null;
+      self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar,false)
+      self.$refs.eventSourceRef && self.$refs.eventSourceRef.dispose()
+      self.$refs.storeEventRef && self.$refs.storeEventRef.dispose()
     }
   }
 </script>
@@ -1428,8 +1450,8 @@
     #{$poi}:checkRem($val);
   }
   *{
-    font-family: Arial,  "Microsoft YaHei";
     box-sizing: border-box;
+    font-family: Roboto, Arial, 'Microsoft YaHei';
   }
   .el-overview-content {
     width: 100%;
@@ -1437,33 +1459,20 @@
     height: auto;
     /*background-color: #f6f9fe;*/
     font-size: calc(14/1920*100vw);
-    padding-bottom: calc(20/1920*100vw);
-    .sourceType-icon {
-      margin-right: calc(15/1920*100vw);
-      position: relative;
-      float: left;
-      @include point(bottom, 3);
-    }
-    .icon-span {
-      display: inline-block;
-      width: calc(60/1920*100vw);
-      height: calc(22/1920*100vw);
-      color: white;
-      font-size: calc(12/1920*100vw);
-    }
+    padding-bottom: 20px;
     .statistics-header{
-      margin-bottom: calc(30/1920*100vw);
+      margin-bottom: 30px;
       border-bottom: 1px solid $border;
       background-color: #fff;
-      padding-top: calc(30/1920*100vw);
-      padding-bottom: calc(30/1920*100vw);
+      padding-top: 30px;
+      padding-bottom: 30px;
       color: $black;
       .header-details1{
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(30/1920*100vw);
-        height: calc(20/1920*100vw);
-        line-height: calc(20/1920*100vw);
+        height: 20px;
+        line-height: 20px;
         span{
           font-size: calc(14/1920*100vw);
           margin-right: calc(20/1920*100vw);
@@ -1495,7 +1504,6 @@
             white-space: nowrap;
             font-size: 18px;
             margin: 0;
-            font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
             color: #fff;
             font-weight: 500;
             line-height: 1.1;
@@ -1509,7 +1517,6 @@
               font-size: 14px;
               margin: 0;
               list-style-type: none;
-              font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
               color: #fff;
             }
           }
@@ -1526,10 +1533,7 @@
           border: 1px solid #ccc;
           width: 200px;
           height: calc(35 / 1920 * 100vw);
-          /*.el-range-separator{*/
-          /*height: calc(35 / 1920 * 100vw);*/
-          /*line-height: calc(35 / 1920 * 100vw);*/
-          /*}*/
+          min-height: 28px;
         }
         .item {
           color: $tab;
@@ -1559,72 +1563,8 @@
         .el-province{
           width: calc(160/1920*100vw);
           margin-right: calc(15/1920*100vw);
-        }
-        .stores-panel{
-          position: relative;
-          display: inline-block;
-          .month-content{
-            width: calc(200/1920*100vw);
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            #elMonth{
-              width: 200px;
-              border-radius: 0px;
-              background-color: #f0f5f8;
-            }
-            .el-input{
-              width: calc(160/1920*100vw);
-              /deep/ .el-input__inner{
-                padding-right: 20px;
-                height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                background-color: #f4f5f9;
-                color: $tab;
-              }
-            }
-            .input-arrow-panel{
-              width: calc(160/1920*100vw);
-              height: calc(36/1920*100vw);
-              position: absolute;
-              background-color: transparent;
-              cursor: pointer;
-              z-index: 100;
-            }
-            .icon-input{
-              position: relative;
-              right: 25px;
-              top: 1px;
-              font-size: 12px;
-              color: #C0C4CC;
-            }
-          }
-          .month-panel{
-            position: absolute;
-            margin-top: 3px;
-            white-space:nowrap;
-            box-sizing: border-box;
-            height: 150px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            overflow: auto;
-            .month-details{
-              padding: 2px 0px;
-              span{
-                margin-left: 10px;
-                font-size: 14px;
-                color: #606266;
-              }
-              .el-checkbox{
-                margin-right: 0;
-              }
-            }
-          }
-        }
-        .search-input{
-          width: calc(150/1920*100vw);
+          min-width: 85px;
+          min-height: 28px;
         }
         .search-btn{
           width: calc(130/1920*100vw);
@@ -1644,85 +1584,28 @@
           margin-left: calc(20/1920*100vw);
           float: right;
         }
-        // .storename-str{
-        //     width: 100%;
-        //     white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-        //     overflow: hidden; //隐藏超出单元格的部分。
-        //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
-        // }
       }
       .header-details:nth-child(1){
         padding-right: calc(60/1920*100vw);
       }
       .header-details:nth-child(2){
-        padding-top:calc(15/1920*100vw);
-        padding-bottom: calc(30/1920*100vw);
+        padding-top:15px;
+        padding-bottom: 30px;
         padding-right: calc(60/1920*100vw);
       }
     }
     .el-overview {
       padding: 0 calc(25/1920*100vw);
       position: relative;
-      margin-bottom: calc(20/1920*100vw);
-      .pct-content{
-        height: calc(330/1920*100vw);
-        padding-top: calc(40/1920*100vw);
-        padding-bottom: calc(20/1920*100vw);
-        border-top: 1px solid $border;
-        width: 100%;
-        text-align: center;
-        .pct-panel{
-          height: calc(204/1920*100vw);
-          width: calc(204/1920*100vw);
-          margin: 0 auto;
-          border-radius: 50%;
-          background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
-          .chart-content{
-            width: 100%;
-            height: 100%;
-          }
-        }
-        .pct-nums{
-          margin-top: calc(28/1920*100vw);
-          padding: 0 calc(20/1920*100vw);
-          font-size: calc(12/1920*100vw);
-          display: flex;
-          justify-content: center;
-          .content-labels{
-            padding: 0 calc(10/1920*100vw);
-            font-size: calc(12/1920*100vw);
-            text-align: left;
-            .excellent_nums{
-              margin-left: calc(20/1920*100vw);
-              margin-bottom:calc(10/1920*100vw);
-              font-size: calc(14/1920*100vw);
-              line-height: calc(14/1920*100vw);
-            }
-            .excellent_labels{
-              line-height: 12px;
-              font-size: 0;
-              .labels{
-                height: 10px;
-                width: 10px;
-                display: inline-block;
-                margin-right: calc(10/1920*100vw);
-              }
-              .label-desc{
-                color: $tab;
-                font-size: 12px;
-              }
-            }
-          }
-        }
-      }
+      margin-bottom: 20px;
       .first-row{
         height: auto;
         border: 1px solid $border;
         background-color: #fff;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         .title{
-          height: calc(70/1920*100vw);
-          padding-top: calc(30/1920*100vw);
+          height: 70px;
+          padding-top: 30px;
           margin-left: calc(30/1920*100vw);
           font-size: calc(20/1920*100vw);
           text-align: left;
@@ -1730,17 +1613,17 @@
         }
         .kpi-list{
           height: 100%;
+          border-bottom: 1px solid $border;
           .kpi-content{
             height: auto;
-            border-top: 1px solid $border;
             border-right: 1px solid $border;
             display: flex;
             flex-direction: column;
             .event-list{
-              height:  calc(106/1920*100vw);
-              padding-top: calc(24/1920*100vw);
+              height:  106px;
+              padding-top: 24px;
               padding-left: calc(34/1920*100vw);
-              padding-bottom: calc(20/1920*100vw);
+              padding-bottom: 20px;
               border-bottom: 1px solid $border;
               &:last-child{
                 border-bottom: none;
@@ -1758,9 +1641,9 @@
                 height: calc(30/1920*100vw);
                 color: $h1;
                 text-align: left;
-                margin-top: calc(20/1920*100vw);
+                margin-top: 20px;
                 :last-child{
-                  padding-bottom: calc(20/1920*100vw);
+                  padding-bottom: 20px;
                 }
               }
             }
@@ -1768,11 +1651,13 @@
         }
         .store-events{
           height: auto;
+          @media screen and (max-width: 1536px){
+            width: 57%;
+          }
           .region-result{
-            border-top: 1px solid $border;
             border-right: 1px solid $border;
-            height: calc(424/1920*100vw);
-            padding: calc(20/1920*100vw) calc(30/1920*100vw) calc(30/1920*100vw) calc(30/1920*100vw);
+            height: 424px;
+            padding: 20px calc(30/1920*100vw) 30px calc(30/1920*100vw);
             .charts-content{
               height:100%;
               .result-content{
@@ -1784,16 +1669,18 @@
 
         }
         .source-list{
+          @media screen and (max-width: 1536px){
+            width: 30%;
+          }
           .pct-content{
-            height: calc(424/1920*100vw);
-            padding-top: calc(94/1920*100vw);
-            padding-bottom: calc(30/1920*100vw);
-            border-top: 1px solid $border;
+            height: 424px;
+            padding-top: 94px;
+            padding-bottom: 30px;
             width: 100%;
             text-align: center;
             .pct-panel{
-              height: calc(200/1920*100vw);
-              width: calc(200/1920*100vw);
+              height: 200px;
+              width: 200px;
               margin: 0 auto;
               border-radius: 50%;
               background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
@@ -1803,21 +1690,27 @@
               }
             }
             .pct-nums{
-              margin-top: calc(28/1920*100vw);
+              margin-top: 28px;
               padding: 0 calc(20/1920*100vw);
-              font-size: calc(12/1920*100vw);
+              font-size: 12px;
               display: flex;
               justify-content: center;
-              @media screen and (max-width: 1280px){
+              @media screen and (max-width: 1920px){
                 padding: 0;
+              }
+              @media screen and (max-width: 1440px){
+                justify-content: space-around;
               }
               .content-labels{
                 padding: 0 calc(10/1920*100vw);
-                font-size: calc(12/1920*100vw);
+                @media screen and (max-width: 1280px){
+                  padding: 0;
+                }
+                font-size: 12px;
                 text-align: left;
                 .excellent_nums{
                   margin-left: calc(20/1920*100vw);
-                  margin-bottom:calc(10/1920*100vw);
+                  margin-bottom:10px;
                   font-size: calc(14/1920*100vw);
                   line-height: calc(14/1920*100vw);
                 }
@@ -1829,6 +1722,9 @@
                     width: 10px;
                     display: inline-block;
                     margin-right: calc(10/1920*100vw);
+                    @media screen and (min-width: 1280px) and (max-width: 1366px) {
+                      margin-right: calc(2/1920*100vw);
+                    }
                   }
                   .label-desc{
                     color: $tab;
@@ -1846,8 +1742,11 @@
                 }
               }
               .en-label{
-                @media screen and (max-width: 1680px){
+                @media screen and (max-width: 1920px){
                   padding: 0 calc(5/1920*100vw);
+                }
+                @media screen and (max-width: 1660px){
+                  padding: 0 calc(1/1920*100vw);
                 }
               }
             }
@@ -1860,25 +1759,25 @@
           .empty-content{
             font-size: calc(14/1920*100vw);
             color: $tab;
-            padding-top: calc(140/1920*100vw);
+            padding-top: 140px;
             border-top: 1px solid $border;
           }
         }
       }
       .second-row {
         height: auto;
-        margin-top: calc(30 / 1920 * 100vw);
+        margin-top: 30px;
         background-color: #fff;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         .items-title{
-          height: calc(80 / 1920 * 100vw);
+          height: 70px;
           width: 100%;
           font-size: calc(20 / 1920 * 100vw);
           text-align: left;
           color: $black;
           border-bottom: 1px solid $border;
           .title {
-            padding-top: calc(30 / 1920 * 100vw);
+            padding-top: 30px;
             padding-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             text-align: left;
@@ -1886,7 +1785,7 @@
             display: inline-block;
           }
           .exprotBtn{
-            padding-top: calc(25 / 1920 * 100vw);
+            padding-top: 25px;
             padding-right: calc(30 / 1920 * 100vw);
             float: right;
             .export-btn{
@@ -1901,15 +1800,15 @@
               color: #ffffff;
               border-width: 0;
               border-radius: 4px;
-              top: calc(24/1920*100vw);
               .btn-area{
                 position: relative;
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  margin-right:calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
                   height: calc(24/1920*100vw);
                   width: calc(24/1920*100vw);
@@ -1924,7 +1823,7 @@
               border-color: $red;
               z-index: 990;
               height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
+              width: calc(160/1920*100vw);
               margin: 0;
               padding: 0;
               font-size: calc(14/1920*100vw);
@@ -1932,14 +1831,16 @@
               color: #ffffff;
               border-width: 0;
               border-radius: 4px;
+              min-width: 120px;
               .btn-area{
                 position: relative;
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
                   height: calc(24/1920*100vw);
                   width: calc(24/1920*100vw);
@@ -1948,13 +1849,6 @@
                   font-size: calc(14/1920*100vw);
                   display: inline-block;
                 }
-              }
-
-              @media screen and (min-width: 1366px){
-                width: 160px;
-              }
-              @media screen and (max-width: 1366px){
-                width: 140px;
               }
             }
           }
@@ -1974,7 +1868,7 @@
           }
           .toolbar{
             float: right;
-            margin: calc(30/1920*100vw);
+            margin: 30px calc(30/1920*100vw);
             margin-right: 0;
             height:13%;
           }

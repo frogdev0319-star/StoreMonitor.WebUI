@@ -42,7 +42,7 @@
           size="mini"
           :clearable=false
           :editable=false
-          format="yyyy/MM/dd HH:mm:ss"
+          format="yyyy/MM/dd"
           class="date-range"
           :popper-class="poperClass"
           :picker-options='dateOpt'
@@ -55,7 +55,7 @@
         </el-date-picker>
         <el-tooltip class="item" effect="dark"
                     placement="right">
-          <div slot="content">*{{$t('overview.dataRangeTips')}}</div>
+          <div slot="content">{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
         <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{$t('reportView.search')}}</el-button>
@@ -336,7 +336,9 @@
             headerClass: 'header-class',
             cellClass: 'cell-class',
             echartAxiasColor: '#e3e9f4',
-            rowClass: 'row-class'
+            rowClass: 'row-class',
+            fontFamily: '',
+            sidebarElm: null
           }
       },
       computed:{
@@ -1001,6 +1003,9 @@
                   },
                   backgroundColor: self.echartBackground,
                 },
+                textStyle:{
+                  fontFamily: self.fontFamily
+                },
                 series: [
                   {
                     name: self.$t('overview.itemsAssessment'),
@@ -1062,6 +1067,9 @@
                 align: 'left'
               },
               backgroundColor: self.echartBackground,
+            },
+            textStyle:{
+              fontFamily: self.fontFamily
             },
             legend: {
               data: ['inspect radar']
@@ -1275,12 +1283,14 @@
         },
         adjustChart(){
           let self = this;
-          console.log('尺寸改变');
-          setTimeout(() => {
-            self.$refs.itemsPie.resize()
-            self.$refs.itemsRadar.resize()
-          }, 20)
+          self.$refs.itemsPie && self.$refs.itemsPie.resize()
+          self.$refs.itemsRadar && self.$refs.itemsRadar.resize()
         },
+        handleSideBar(e){
+          if(e.target === e.currentTarget || e.target === this){
+            this.adjustChart();
+          }
+        }
       },
       async created(){
         let self = this;
@@ -1288,6 +1298,7 @@
         let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
+        self.fontFamily = self.lang== 'en' ? 'Roboto' : 'Microsoft YaHei'
         self.initDaysRange();
         await self.getRegionInfo();
         await self.initData();
@@ -1295,10 +1306,16 @@
       mounted(){
         let self = this;
         window.addEventListener("resize", self.adjustChart, false);
+        self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
+        self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
       },
       beforeDestroy(){
         let self = this;
         window.removeEventListener('resize', self.adjustChart);
+        self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar,false)
+        self.$refs.itemsPie && self.$refs.itemsPie.dispose()
+        self.$refs.itemsRadar && self.$refs.itemsRadar.dispose()
+        self.adjustChart = null;
       }
     }
 </script>
@@ -1316,22 +1333,23 @@
   $ignored: #cad1db;
   *{
     box-sizing: border-box;
+    font-family: Roboto, Arial, 'Microsoft YaHei';
   }
   .item-container{
-    padding-bottom: calc(20/1920*100vw);
+    padding-bottom: 20px;
     .statistics-header{
-      margin-bottom: calc(30/1920*100vw);
+      margin-bottom: 30px;
       border-bottom: 1px solid $border;
       background-color: #fff;
-      padding-top: calc(30/1920*100vw);
-      padding-bottom: calc(30/1920*100vw);
+      padding-top: 30px;
+      padding-bottom: 30px;
       color: $black;
       .header-details1{
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(30/1920*100vw);
-        height: calc(20/1920*100vw);
-        line-height: calc(20/1920*100vw);
+        height: 20px;
+        line-height: 20px;
         span{
           font-size: calc(14/1920*100vw);
           margin-right: calc(20/1920*100vw);
@@ -1363,7 +1381,6 @@
             white-space: nowrap;
             font-size: 18px;
             margin: 0;
-            font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
             color: #fff;
             font-weight: 500;
             line-height: 1.1;
@@ -1377,7 +1394,6 @@
               font-size: 14px;
               margin: 0;
               list-style-type: none;
-              font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
               color: #fff;
             }
           }
@@ -1394,6 +1410,7 @@
           border: 1px solid #ccc;
           width: 200px;
           height: calc(35 / 1920 * 100vw);
+          min-height: 28px;
           /*.el-range-separator{*/
           /*height: calc(35 / 1920 * 100vw);*/
           /*line-height: calc(35 / 1920 * 100vw);*/
@@ -1427,72 +1444,8 @@
         .el-province{
           width: calc(160/1920*100vw);
           margin-right: calc(15/1920*100vw);
-        }
-        .stores-panel{
-          position: relative;
-          display: inline-block;
-          .month-content{
-            width: calc(200/1920*100vw);
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            #elMonth{
-              width: 200px;
-              border-radius: 0px;
-              background-color: #f0f5f8;
-            }
-            .el-input{
-              width: calc(160/1920*100vw);
-              /deep/ .el-input__inner{
-                padding-right: 20px;
-                height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                background-color: #f4f5f9;
-                color: $tab;
-              }
-            }
-            .input-arrow-panel{
-              width: calc(160/1920*100vw);
-              height: calc(36/1920*100vw);
-              position: absolute;
-              background-color: transparent;
-              cursor: pointer;
-              z-index: 100;
-            }
-            .icon-input{
-              position: relative;
-              right: 25px;
-              top: 1px;
-              font-size: 12px;
-              color: #C0C4CC;
-            }
-          }
-          .month-panel{
-            position: absolute;
-            margin-top: 3px;
-            white-space:nowrap;
-            box-sizing: border-box;
-            height: 150px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            overflow: auto;
-            .month-details{
-              padding: 2px 0px;
-              span{
-                margin-left: 10px;
-                font-size: 14px;
-                color: #606266;
-              }
-              .el-checkbox{
-                margin-right: 0;
-              }
-            }
-          }
-        }
-        .search-input{
-          width: calc(150/1920*100vw);
+          min-width: 85px;
+          min-height: 28px;
         }
         .search-btn{
           width: calc(130/1920*100vw);
@@ -1523,8 +1476,8 @@
         padding-right: calc(60/1920*100vw);
       }
       .header-details:nth-child(2){
-        padding-top:calc(15/1920*100vw);
-        padding-bottom: calc(30/1920*100vw);
+        padding-top:15px;
+        padding-bottom: 30px;
         padding-right: calc(60/1920*100vw);
       }
     }
@@ -1538,24 +1491,24 @@
       }
       .items-row {
         .items-title{
-          height: calc(80 / 1920 * 100vw);
+          height: 70px;
           width: 100%;
           font-size: calc(20 / 1920 * 100vw);
           text-align: left;
           color: $black;
           border-bottom: 1px solid $border;
           .title {
-            padding-top: calc(30 / 1920 * 100vw);
             padding-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             text-align: left;
             color: $black;
             display: inline-block;
+            padding-top: 30px;
           }
           .exprotBtn{
-            padding-top: calc(25 / 1920 * 100vw);
             padding-right: calc(30 / 1920 * 100vw);
             float: right;
+            padding-top: 25px;
             .export-btn{
               border-color: $red;
               z-index: 990;
@@ -1569,14 +1522,17 @@
               border-width: 0;
               border-radius: 4px;
               top: calc(24/1920*100vw);
+              min-height: 28px;
+              min-width: 120px;
               .btn-area{
                 position: relative;
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
                   height: calc(24/1920*100vw);
                   width: calc(24/1920*100vw);
@@ -1591,7 +1547,7 @@
               border-color: $red;
               z-index: 990;
               height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
+              width: calc(160/1920*100vw);
               margin: 0;
               padding: 0;
               font-size: calc(14/1920*100vw);
@@ -1599,12 +1555,15 @@
               color: #ffffff;
               border-width: 0;
               border-radius: 4px;
+              min-height: 28px;
+              min-width: 120px;
               .btn-area{
                 position: relative;
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
                   height: calc(24/1920*100vw);
@@ -1615,13 +1574,6 @@
                   display: inline-block;
                 }
               }
-
-              @media screen and (min-width: 1366px){
-                width: 160px;
-              }
-              @media screen and (max-width: 1366px){
-                width: 140px;
-              }
             }
           }
         }
@@ -1631,18 +1583,18 @@
             /*float: left;*/
             padding-left: calc(30/1920*100vw);
             text-align: left;
-            padding-top: calc(20/1920*100vw);
+            padding-top: 20px;
             font-size:calc(14/1920*100vw) ;
             color: #7d8cad;
           }
           .pct-content {
             /*padding-top: calc(30 / 1920 * 100vw);*/
-            padding-bottom: calc(20 / 1920 * 100vw);
+            padding-bottom: 20px;
             width: 100%;
             text-align: center;
             .pct-panel {
-              height: calc(210 / 1920 * 100vw);
-              width: calc(210 / 1920 * 100vw);
+              height: 210px;
+              width: 210px;
               margin: 0 auto;
               border-radius: 50%;
               background: -webkit-radial-gradient(circle closest-side, #fff 60%, $background 40%);
@@ -1652,7 +1604,7 @@
               }
             }
             .pct-nums {
-              margin-top: calc(30 / 1920 * 100vw);
+              margin-top: 30px;
               /*padding: 0 calc(20/1920*100vw);*/
               font-size: calc(12 / 1920 * 100vw);
               display: flex;
@@ -1666,7 +1618,7 @@
                 text-align: left;
                 .excellent_nums {
                   margin-left: calc(20 / 1920 * 100vw);
-                  margin-bottom: calc(10 / 1920 * 100vw);
+                  margin-bottom: 10px;
                   font-size: calc(14 / 1920 * 100vw);
                   line-height: calc(14 / 1920 * 100vw);
                 }
@@ -1707,8 +1659,8 @@
           .data-empty{
             font-size: calc(14/1920*100vw);
             color: $tab;
-            height: calc(222/1920*100vw);
-            line-height: calc(222/1920*100vw);
+            height: 222px;
+            line-height: 222px;
           }
           .radar-title {
             text-align: left;
@@ -1717,7 +1669,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: calc(20/1920*100vw);
+            margin-top: 20px;
             margin-left: calc(30/1920*100vw);
           }
           .inspect-catergy {
@@ -1728,8 +1680,8 @@
 
               .radar-content {
                 width: 100%;
-                height: calc(220/1920*100vw);
-                width: calc(400/1920*100vw);
+                height: 220px;
+                width: 100%;
                 margin: 0 auto;
               }
             }
@@ -1882,7 +1834,7 @@
         }
         .toolbar{
           float: right;
-          margin: calc(30/1920*100vw);
+          margin: 30px calc(30/1920*100vw);
           margin-right: 0;
           height:13%;
         }

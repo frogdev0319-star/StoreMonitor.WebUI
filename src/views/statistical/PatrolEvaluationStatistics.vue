@@ -31,7 +31,7 @@
             size="mini"
             :clearable=false
             :editable=false
-            format="yyyy/MM/dd HH:mm:ss"
+            format="yyyy/MM/dd"
             class="date-range"
             :popper-class="poperClass"
             :picker-options='dateOpt'
@@ -44,7 +44,7 @@
           </el-date-picker>
           <el-tooltip class="item" effect="dark"
                       placement="right">
-            <div slot="content">*{{generateReportLang('timePlaceholder')}}</div>
+            <div slot="content">{{$t('overview.dataRangeTips')}}</div>
             <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
           </el-tooltip>
 
@@ -94,7 +94,7 @@
           </el-col>
           <el-col :span="15" class="charts-content">
             <div class="title">
-              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect" :limit="2"></limit-select>
+              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect" :limit="2" :inputSize="'medium'"></limit-select>
             </div>
             <div class="region-result">
               <div class="region-content">
@@ -449,7 +449,9 @@
         regionFilter: {"page": 0 , "size": 10},
         regionOrder: {"direction":"asc", "property": 'qualifiedRate'},
         storeFilter: {"page": 0 , "size": 10},
-        storeOrder: {"direction":"asc", "property": 'qualifiedRate'}
+        storeOrder: {"direction":"asc", "property": 'qualifiedRate'},
+        sidebarElm: null,
+        fontFamily: ''
       }
     },
     methods:{
@@ -1218,6 +1220,9 @@
             right:'5',//距离右边距
             bottom:'32',//距离下边距
           },
+          textStyle:{
+            fontFamily: self.fontFamily
+          },
           tooltip: {
             trigger: 'axis',
             axisPointer : {            // 坐标轴指示器，坐标轴触发有效
@@ -1607,6 +1612,9 @@
             },
             backgroundColor: self.echartBackground,
           },
+          textStyle:{
+            fontFamily: self.fontFamily
+          },
           series: [
             {
               name: self.$t('overview.itemsAssessment'),
@@ -1857,11 +1865,18 @@
       adjustChart(){
         let self = this;
         console.log('尺寸改变');
-        setTimeout(() => {
+        if(self.$refs.itemsPie){
           self.$refs.itemsPie.resize()
+        }
+        if(self.$refs.storeChart){
           self.$refs.storeChart.resize()
-        }, 20)
+        }
       },
+      handleSideBar(e){
+        if(e.target === e.currentTarget || e.target === this){
+          this.adjustChart();
+        }
+      }
     },
     async created(){
       let self = this;
@@ -1869,6 +1884,7 @@
       let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
       self.params.beginTs = start;
       self.params.endTs = end;
+      self.fontFamily = self.lang== 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initDaysRange();
       await self.getRegionInfo();
       await self.initData();
@@ -1876,10 +1892,16 @@
     mounted(){
       let self = this;
       window.addEventListener("resize", self.adjustChart, false);
+      self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
+      self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
     },
     beforeDestroy(){
       let self = this;
       window.removeEventListener('resize', self.adjustChart);
+      self.adjustChart = null;
+      self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar,false)
+      self.$refs.itemsPie &&  self.$refs.itemsPie.dispose()
+      self.$refs.storeChart && self.$refs.storeChart.dispose()
     }
   }
 </script>
@@ -1903,24 +1925,24 @@
 
   *{
     box-sizing: border-box;
-    font-family: Arial, 'Microsoft YaHei';
+    font-family: Roboto, Arial, 'Microsoft YaHei';
   }
   .statistics-container{
-    margin-bottom: calc(20/1920*100vw);
+    margin-bottom: 20px;
     .statistics-header{
       /*height: calc(180/1920*100vw);*/
-      margin-bottom: calc(20/1920*100vw);
+      margin-bottom: 20px;
       border-bottom: 1px solid $border;
       background-color: #fff;
-      padding-top: calc(30/1920*100vw);
-      padding-bottom: calc(30/1920*100vw);
+      padding-top: 30px;
+      padding-bottom: 30px;
       color: $black;
       .header-details1{
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(30/1920*100vw);
-        height: calc(20/1920*100vw);
-        line-height: calc(20/1920*100vw);
+        height: 20px;
+        line-height: 20px;
         span{
           font-size: calc(14/1920*100vw);
           margin-right: calc(20/1920*100vw);
@@ -1952,7 +1974,6 @@
             white-space: nowrap;
             font-size: 18px;
             margin: 0;
-            font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
             color: #fff;
             font-weight: 500;
             line-height: 1.1;
@@ -1966,7 +1987,6 @@
               font-size: 14px;
               margin: 0;
               list-style-type: none;
-              font-family: "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
               color: #fff;
             }
           }
@@ -1983,6 +2003,7 @@
           border: 1px solid #ccc;
           width: 200px;
           height: calc(35 / 1920 * 100vw);
+          min-height: 28px;
           /*.el-range-separator{*/
           /*height: calc(35 / 1920 * 100vw);*/
           /*line-height: calc(35 / 1920 * 100vw);*/
@@ -2016,72 +2037,8 @@
         .el-province{
           width: calc(160/1920*100vw);
           margin-right: calc(15/1920*100vw);
-        }
-        .stores-panel{
-          position: relative;
-          display: inline-block;
-          .month-content{
-            width: calc(200/1920*100vw);
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            #elMonth{
-              width: 200px;
-              border-radius: 0px;
-              background-color: #f0f5f8;
-            }
-            .el-input{
-              width: calc(160/1920*100vw);
-              /deep/ .el-input__inner{
-                padding-right: 20px;
-                height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                background-color: #f4f5f9;
-                color: $tab;
-              }
-            }
-            .input-arrow-panel{
-              width: calc(160/1920*100vw);
-              height: calc(36/1920*100vw);
-              position: absolute;
-              background-color: transparent;
-              cursor: pointer;
-              z-index: 100;
-            }
-            .icon-input{
-              position: relative;
-              right: 25px;
-              top: 1px;
-              font-size: 12px;
-              color: #C0C4CC;
-            }
-          }
-          .month-panel{
-            position: absolute;
-            margin-top: 3px;
-            white-space:nowrap;
-            box-sizing: border-box;
-            height: 150px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            overflow: auto;
-            .month-details{
-              padding: 2px 0px;
-              span{
-                margin-left: 10px;
-                font-size: 14px;
-                color: #606266;
-              }
-              .el-checkbox{
-                margin-right: 0;
-              }
-            }
-          }
-        }
-        .search-input{
-          width: calc(150/1920*100vw);
+          min-height: 28px;
+          min-width: 85px
         }
         .search-btn{
           width: calc(130/1920*100vw);
@@ -2109,8 +2066,8 @@
         // }
       }
       .header-details:nth-child(2){
-        padding-top:calc(15/1920*100vw);
-        padding-bottom: calc(30/1920*100vw);
+        padding-top:15px;
+        padding-bottom: 30px;
         padding-right: calc(60/1920*100vw);
       }
     }
@@ -2119,7 +2076,7 @@
       margin-right: calc(30/1920*100vw);
     }
     .region-header{
-      height: calc(80/1920*100vw);
+      height: 70px;
       text-align: left;
       padding-left: calc(30/1920*100vw);
       padding-right: calc(30/1920*100vw);
@@ -2127,12 +2084,12 @@
       .title{
         display: inline-block;
         font-size: calc(20/1920*100vw);
-        padding-top: calc(30/1920*100vw);
+        padding-top: 30px;
       }
       .exprotBtn{
         float: right;
         display: inline-block;
-        padding-top: calc(25/1920*100vw);
+        padding-top: 25px;
       }
       .export-btn{
         border-color: $red;
@@ -2147,14 +2104,16 @@
         border-width: 0;
         border-radius: 4px;
         top: calc(24/1920*100vw);
+        width: calc(160/1920*100vw);
+        min-width: 120px;
         .btn-area{
-          position: relative;
           padding: 0 calc(6/1920*100vw);
           height: calc(36/1920*100vw);
-          display: inline-flex;
+          display: flex;
           align-items: center;
+          justify-content: center;
           .icon-excel{
-            margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+            margin-right: calc(18/1920*100vw);
             font-size: calc(24/1920*100vw);
             height: calc(24/1920*100vw);
             width: calc(24/1920*100vw);
@@ -2169,7 +2128,6 @@
         border-color: $red;
         z-index: 990;
         height: calc(36/1920*100vw);
-        width: calc(130/1920*100vw);
         margin: 0;
         padding: 0;
         font-size: calc(14/1920*100vw);
@@ -2177,28 +2135,24 @@
         color: #ffffff;
         border-width: 0;
         border-radius: 4px;
+        width: calc(160/1920*100vw);
+        min-width: 120px;
         .btn-area{
           position: relative;
           padding: 0 calc(6/1920*100vw);
           height: calc(36/1920*100vw);
-          display: inline-flex;
+          display: flex;
           align-items: center;
+          justify-content: center;
           .icon-excel{
-            margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-            height: calc(24/1920*100vw);
+            margin-right: calc(18/1920*100vw);
             width: calc(24/1920*100vw);
+            height: calc(24/1920*100vw);
           }
           .spanClass{
             font-size: calc(14/1920*100vw);
             display: inline-block;
           }
-        }
-
-        @media screen and (min-width: 1366px){
-          width: 160px;
-        }
-        @media screen and (max-width: 1366px){
-          width: 140px;
         }
       }
     }
@@ -2210,13 +2164,13 @@
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       .evalution-pct {
         .pct-content {
-          padding-top: calc(90 / 1920 * 100vw);
-          padding-bottom: calc(25 / 1920 * 100vw);
+          padding-top: 90px;
+          padding-bottom: 25px;
           width: 100%;
           text-align: center;
           .pct-panel {
-            height: calc(210 / 1920 * 100vw);
-            width: calc(210 / 1920 * 100vw);
+            height: 210px;
+            width: 210px;
             margin: 0 auto;
             border-radius: 50%;
             background: -webkit-radial-gradient(circle closest-side, #fff 60%, $background 40%);
@@ -2226,7 +2180,7 @@
             }
           }
           .pct-nums {
-            margin-top: calc(30 / 1920 * 100vw);
+            margin-top: 30px;
             /*margin-left: calc(75 / 1920 * 100vw);*/
             font-size: calc(12 / 1920 * 100vw);
             display: flex;
@@ -2240,7 +2194,7 @@
               text-align: left;
               .excellent_nums {
                 margin-left: calc(20 / 1920 * 100vw);
-                margin-bottom: calc(10 / 1920 * 100vw);
+                margin-bottom: 10px;
                 font-size: calc(14 / 1920 * 100vw);
                 line-height: calc(14 / 1920 * 100vw);
               }
@@ -2282,12 +2236,12 @@
       .charts-content{
         padding:0 calc(30/1920*100vw);
         .title{
-          height: calc(70/1920*100vw);
+          height: 70px;
           text-align: right;
-          padding-top: calc(20/1920*100vw);
+          padding-top: 20px;
         }
         .region-result-panel{
-          height:calc(260/1920*100vw);
+          height:260px;
         }
         .result-content{
           height: 100%;
@@ -2297,12 +2251,12 @@
     }
     .region-list{
       background-color: #fff;
-      margin-top: calc(30/1920*100vw);
+      margin-top: 30px;
       border: 1px solid $border;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       .region-header{
         border-bottom: 1px solid $border;
-        margin-bottom: calc(30/1920*100vw);
+        margin-bottom: 30px;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);
@@ -2310,13 +2264,11 @@
       }
     }
     .store-list{
-      background-color: #fff;
-      margin-top: calc(30/1920*100vw);
-      border: 1px solid $border;
+      margin-top: 30px;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       .region-header{
         border-bottom: 1px solid $border;
-        margin-bottom: calc(30/1920*100vw);
+        margin-bottom: 30px;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);
@@ -2333,7 +2285,7 @@
     }
     .toolbar{
       float: right;
-      margin: calc(30/1920*100vw);
+      margin: 30px calc(30/1920*100vw);
       height:13%;
     }
   }
@@ -2342,7 +2294,7 @@
   .header-class{
     height: 40px;
     font-size: 12px;
-    font-family: Arial, 'Microsoft YaHei';
+    font-family: Roboto, Arial, 'Microsoft YaHei';
     font-weight: bold;
     color: #7d8cad;
     background-color: #f4f5f9 !important;

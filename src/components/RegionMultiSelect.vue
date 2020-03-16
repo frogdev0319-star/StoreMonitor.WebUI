@@ -142,6 +142,117 @@
   }
 </script>
 
+<!--<style scoped>-->
+  <!--*{-->
+    <!--padding: 0;-->
+    <!--margin: 0;-->
+    <!--box-sizing: border-box;-->
+  <!--}-->
+  <!--.content{-->
+    <!--text-align: left;-->
+    <!--display: inline-block;-->
+    <!--position: relative;-->
+    <!--top: calc(2/1920*100vw);-->
+    <!--width: calc(160/1920*100vw);-->
+    <!--margin-right: calc(15/1920*100vw);-->
+
+  <!--}-->
+  <!--.el-select-dropdown__item{-->
+    <!--padding: 0 20px 0 50px !important;-->
+    <!--/*color: #7d8cad;*/-->
+  <!--}-->
+  <!--.el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{-->
+    <!--font-family: "iconfont" !important;-->
+    <!--content: '\e6a2';-->
+    <!--left: 20px;-->
+    <!--font-size: 14px;-->
+    <!--font-style: normal;-->
+    <!-- -webkit-font-smoothing: antialiased;-->
+    <!-- -moz-osx-font-smoothing: grayscale;-->
+  <!--}-->
+  <!--.el-select-dropdown.is-multiple .el-select-dropdown__item::after{-->
+    <!--font-family: "iconfont" !important;-->
+    <!--position: absolute;-->
+    <!--left: 20px;-->
+    <!--content: "\e64a";-->
+    <!--font-weight: 700;-->
+    <!-- -webkit-font-smoothing: antialiased;-->
+    <!--font-size: 14px;-->
+    <!--font-style: normal;-->
+    <!-- -moz-osx-font-smoothing: grayscale;-->
+  <!--}-->
+  <!--.input-class{-->
+    <!--width: calc(160/1920*100vw - 30px);-->
+    <!--position: absolute;-->
+    <!--left: 0;-->
+  <!--}-->
+  <!--/deep/ .el-select__tags{-->
+    <!--opacity: 0;-->
+  <!--}-->
+  <!--/deep/ .input-class.el-input&#45;&#45;medium .el-input__inner{-->
+    <!--height: calc(36/1920*100vw);-->
+    <!--line-height: calc(36/1920*100vw);-->
+    <!--border: none;-->
+    <!--color: #7d8cad;-->
+    <!--background: #f4f5f9 !important;-->
+    <!--padding: 0 10px;-->
+    <!--font-size: 12px;-->
+    <!--min-height: 28px;-->
+    <!--min-width: 55px;-->
+  <!--}-->
+  <!--/deep/ .el-select.el-select&#45;&#45;medium .el-input .el-input__inner{-->
+    <!--position: relative;-->
+    <!--z-index: 1;-->
+    <!--background: transparent !important;-->
+    <!--border: none;-->
+    <!--font-size: 12px;-->
+    <!--height: calc(36/1920*100vw);-->
+    <!--line-height: calc(36/1920*100vw);-->
+    <!--bottom: calc(2/1920*100vw);-->
+  <!--}-->
+  <!--/deep/ .el-select.el-select&#45;&#45;mini .el-input .el-input__inner{-->
+    <!--position: relative;-->
+    <!--z-index: 1;-->
+    <!--background: transparent !important;-->
+    <!--border: none;-->
+    <!--font-size: 12px;-->
+    <!--height: calc(36/1920*100vw);-->
+    <!--line-height: calc(36/1920*100vw);-->
+    <!--bottom: calc(2/1920*100vw);-->
+  <!--}-->
+  <!--/deep/ .el-select.el-select&#45;&#45;medium .el-input .el-input__suffix-inner{-->
+    <!--position: relative;-->
+    <!--z-index: 1;-->
+  <!--}-->
+  <!--/deep/ .el-select.el-select&#45;&#45;mini .el-input .el-input__suffix-inner{-->
+    <!--position: relative;-->
+    <!--z-index: 1;-->
+  <!--}-->
+  <!--/deep/ .el-input&#45;&#45;medium .el-input__icon {-->
+    <!--line-height: calc(36/1920*100vw);-->
+    <!--height: calc(36/1920*100vw);-->
+  <!--}-->
+  <!--.el-select.el-select&#45;&#45;medium{-->
+    <!--color: #7d8cad;-->
+    <!--background: #f4f5f9 !important;-->
+    <!--height: calc(36/1920*100vw);-->
+    <!--line-height: calc(36/1920*100vw);-->
+    <!--border: 1px solid #E4E7ED !important;-->
+    <!--width: calc(160/1920*100vw);-->
+    <!--border-radius: 3px;-->
+    <!--min-width: 85px;-->
+    <!--min-height: 28px;-->
+  <!--}-->
+  <!--.el-select.el-select&#45;&#45;mini{-->
+    <!--color: #7d8cad;-->
+    <!--background: #f4f5f9 !important;-->
+    <!--height: calc(36/1920*100vw);-->
+    <!--line-height: calc(36/1920*100vw);-->
+    <!--border: 1px solid #E4E7ED !important;-->
+    <!--width: calc(160/1920*100vw);-->
+    <!--border-radius: 3px;-->
+  <!--}-->
+<!--</style>-->
 <style scoped>
   *{
     padding: 0;
@@ -154,8 +265,7 @@
     position: relative;
     top: calc(2/1920*100vw);
     width: calc(160/1920*100vw);
-    margin-right: calc(15/1920*100vw);
-
+    margin-right: calc(30/1920*100vw);
   }
   .el-select-dropdown__item{
     padding: 0 20px 0 50px !important;
@@ -198,6 +308,8 @@
     background: #f4f5f9 !important;
     padding: 0 10px;
     font-size: 12px;
+    min-width: 55px;
+    min-height: 28px;
   }
   /deep/ .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
@@ -208,28 +320,22 @@
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
+    min-height: 28px;
+    min-width: 85px;
   }
-  /deep/ .el-select.el-select--mini .el-input .el-input__inner{
-    position: relative;
-    z-index: 1;
-    background: transparent !important;
-    border: none;
-    font-size: 12px;
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    bottom: calc(2/1920*100vw);
+  @media screen and (max-width: 1560px) and (min-width: 1280px){
+    /deep/ .el-select.el-select--medium .el-input .el-input__inner{
+      width: 85px;
+    }
   }
   /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
-    position: relative;
-    z-index: 1;
-  }
-  /deep/ .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
   /deep/ .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
+    min-height: 28px;
   }
   .el-select.el-select--medium{
     color: #7d8cad;
@@ -239,17 +345,17 @@
     border: 1px solid #E4E7ED !important;
     width: calc(160/1920*100vw);
     border-radius: 3px;
+    min-height: 28px;
+    min-width: 85px;
   }
-  .el-select.el-select--mini{
-    color: #7d8cad;
-    background: #f4f5f9 !important;
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    border: 1px solid #E4E7ED !important;
-    width: calc(160/1920*100vw);
-    border-radius: 3px;
+  @media screen and (max-width: 1560px) and (min-width: 1280px){
+    .el-select.el-select--medium{
+      width: 85px;
+    }
   }
+
 </style>
+
 <style>
   @import '../assets/css/pagination.css';
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{

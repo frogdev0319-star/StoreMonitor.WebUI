@@ -2,8 +2,9 @@
 export default {
   // 导航栏
   route: {
-    meta: '看门店',
+    meta: '门店管理系统',
     title: '看门店管理系统',
+    mgt: '门店管理系统',
     brand: '品牌',
     overview: '总览',
     patrolManage: '巡店管理',
@@ -317,8 +318,9 @@ export default {
     lackParams: '缺少必要参数',
     noVideoSource: '设备无视频源',
     enterDesc: '请输入信息',
-    videoCannotPlay: '加密设备不支持播放'
-},
+    videoCannotPlay: '加密设备不支持播放',
+    channelPlaceholder: '请输入关键字搜索通道',
+  },
   //report management page language
   reportView:{
     selectStores: '门店选择',

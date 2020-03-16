@@ -1,8 +1,9 @@
 export default {
   //導航欄
   route: {
-    meta: 'ViuMo',
+    meta: 'Store Management System',
     title: 'ViuMo',
+    mgt: 'Store Management System',
     brand: 'Brand',
     overview: 'Overview',
     patrolManage: 'Patrol Management',
@@ -114,7 +115,7 @@ export default {
     all: 'All',
     times: '',
     orders: 'Ascending/descending order',
-    descendingOrder: 'DescendingOrder',
+    descendingOrder: 'Descending Order',
     ascendingOrder: 'Ascending Order',
     regionalAssessment : 'Regional Evaluation Statistics Chart',
     regionalList: 'Region List',
@@ -153,8 +154,8 @@ export default {
     eventGraph: 'Analysis of Event Trends',
     sumEvents: 'Total Events',
     sumUnprocessEvents: 'Pending Events',
-    sumProcessEvents: 'Number of Processed Events',
-    sumClosedEvents: 'Number of Closing Events',
+    sumProcessEvents: 'Processed Events',
+    sumClosedEvents: 'Closing Events',
     eventList: 'Event List',
     area: 'Region',
     numUnprocessEvents: 'Pending Events',
@@ -315,7 +316,8 @@ export default {
     lackParams: 'Lack of necessary parameters',
     noVideoSource: 'No video source device',
     enterDesc: 'Enter description',
-    videoCannotPlay: 'Video playback is not supported on encrypted devices'
+    videoCannotPlay: 'Video playback is not supported on encrypted devices',
+    channelPlaceholder: 'Enter keywords to search channels',
   },
 
   //report management page language

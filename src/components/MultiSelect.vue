@@ -189,6 +189,8 @@
     background: #f4f5f9 !important;
     padding: 0 10px;
     font-size: 12px;
+    min-width: 55px;
+    min-height: 28px;
   }
   /deep/ .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
@@ -199,6 +201,13 @@
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
+    min-height: 28px;
+    min-width: 85px;
+  }
+  @media screen and (max-width: 1560px) and (min-width: 1280px){
+    /deep/ .el-select.el-select--medium .el-input .el-input__inner{
+      width: 85px;
+    }
   }
   /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
@@ -207,6 +216,7 @@
   /deep/ .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
+    min-height: 28px;
   }
   .el-select.el-select--medium{
     color: #7d8cad;
@@ -216,6 +226,13 @@
     border: 1px solid #E4E7ED !important;
     width: calc(160/1920*100vw);
     border-radius: 3px;
+    min-height: 28px;
+    min-width: 85px;
+  }
+  @media screen and (max-width: 1560px) and (min-width: 1280px){
+    .el-select.el-select--medium{
+      width: 85px;
+    }
   }
 
 </style>

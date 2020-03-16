@@ -207,6 +207,8 @@
     background: #f4f5f9 !important;
     padding: 0 10px;
     font-size: 12px;
+    min-height: 28px;
+    min-width: 55px;
   }
   /deep/ .input-class.el-input--mini .el-input__inner{
     height: 26px;
@@ -226,6 +228,8 @@
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
+    min-height: 28px;
+    min-width: 85px;
   }
   /deep/ .el-select.el-select--mini .el-input .el-input__inner{
     position: relative;
@@ -256,6 +260,8 @@
     border: 1px solid #E4E7ED !important;
     width: calc(160/1920*100vw);
     border-radius: 3px;
+    min-height: 28px;
+    min-width: 85px;
   }
   .el-select.el-select--mini{
     color: #fff;

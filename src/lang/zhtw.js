@@ -2,8 +2,9 @@
 export default {
   // 导航栏
   route: {
-    meta: '看門店',
+    meta: '門店管理系統',
     title: '看門店管理系統',
+    mgt: '門店管理系統',
     brand: '品牌',
     overview: '總覽',
     patrolManage: '巡店管理',
@@ -317,7 +318,8 @@ export default {
     lackParams: '缺少必要參數',
     noVideoSource: '設備無視頻源',
     enterDesc: '請輸入信息',
-    videoCannotPlay: '加密設備不支持播放'
+    videoCannotPlay: '加密設備不支持播放',
+    channelPlaceholder: '請輸入關鍵字搜索通道',
   },
 
   //report management page language

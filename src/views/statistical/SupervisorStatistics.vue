@@ -11,7 +11,7 @@
           size="mini"
           :clearable=false
           :editable=false
-          format="yyyy/MM/dd HH:mm:ss"
+          format="yyyy/MM/dd"
           class="date-range"
           :popper-class="poperClass"
           :picker-options='dateOpt'
@@ -24,7 +24,7 @@
         </el-date-picker>
         <el-tooltip class="item" effect="dark"
                     placement="right">
-          <div slot="content">*{{$t('overview.dataRangeTips')}}</div>
+          <div slot="content">{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
       </el-col>
@@ -676,16 +676,16 @@
   $ignored: #cad1db;
   *{
     box-sizing: border-box;
-    font-family: Arial, 'Microsoft YaHei';
+    font-family: Roboto, Arial, 'Microsoft YaHei';
   }
   .item-container{
-    padding-bottom: calc(20/1920*100vw);
+    padding-bottom: 20px;
     .statistics-header{
-      margin-bottom: calc(30/1920*100vw);
+      margin-bottom: 30px;
       border-bottom: 1px solid $border;
       background-color: #fff;
-      padding-top: calc(30/1920*100vw);
-      padding-bottom: calc(30/1920*100vw);
+      padding-top: 30px;
+      padding-bottom: 30px;
       color: $black;
       .header-details{
         text-align: left;
@@ -698,6 +698,7 @@
           border: 1px solid #ccc;
           width: 200px;
           height: calc(35 / 1920 * 100vw);
+          min-height: 28px;
         }
         .item {
           color: $tab;
@@ -728,72 +729,8 @@
         .el-province{
           width: calc(160/1920*100vw);
           margin-right: calc(15/1920*100vw);
-        }
-        .stores-panel{
-          position: relative;
-          display: inline-block;
-          .month-content{
-            width: calc(200/1920*100vw);
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            #elMonth{
-              width: 200px;
-              border-radius: 0px;
-              background-color: #f0f5f8;
-            }
-            .el-input{
-              width: calc(160/1920*100vw);
-              /deep/ .el-input__inner{
-                padding-right: 20px;
-                height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                background-color: #f4f5f9;
-                color: $tab;
-              }
-            }
-            .input-arrow-panel{
-              width: calc(160/1920*100vw);
-              height: calc(36/1920*100vw);
-              position: absolute;
-              background-color: transparent;
-              cursor: pointer;
-              z-index: 100;
-            }
-            .icon-input{
-              position: relative;
-              right: 25px;
-              top: 1px;
-              font-size: 12px;
-              color: #C0C4CC;
-            }
-          }
-          .month-panel{
-            position: absolute;
-            margin-top: 3px;
-            white-space:nowrap;
-            box-sizing: border-box;
-            height: 150px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            overflow: auto;
-            .month-details{
-              padding: 2px 0px;
-              span{
-                margin-left: 10px;
-                font-size: 14px;
-                color: #606266;
-              }
-              .el-checkbox{
-                margin-right: 0;
-              }
-            }
-          }
-        }
-        .search-input{
-          width: calc(150/1920*100vw);
+          min-width: 85px;
+          min-height: 28px;
         }
         .search-btn{
           width: calc(130/1920*100vw);
@@ -818,8 +755,8 @@
         padding-right: calc(60/1920*100vw);
       }
       .header-details:nth-child(2){
-        padding-top:calc(15/1920*100vw);
-        padding-bottom: calc(30/1920*100vw);
+        padding-top:15px;
+        padding-bottom: 30px;
         padding-right: calc(60/1920*100vw);
       }
     }
@@ -832,15 +769,15 @@
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       }
         .items-title{
-          height: calc(80 / 1920 * 100vw);
+          height: 70px;
           width: 100%;
           font-size: calc(20 / 1920 * 100vw);
           text-align: left;
           color: $black;
           border-bottom: 1px solid $border;
-          margin-bottom: calc(30 / 1920 * 100vw);
+          margin-bottom: 30px;
           .title {
-            padding-top: calc(30 / 1920 * 100vw);
+            padding-top: 30px;
             padding-left: calc(30 / 1920 * 100vw);
             font-size: calc(20 / 1920 * 100vw);
             text-align: left;
@@ -848,8 +785,8 @@
             display: inline-block;
           }
           .exprotBtn{
-            padding-top: calc(25 / 1920 * 100vw);
             padding-right: calc(30 / 1920 * 100vw);
+            padding-top: 25px;
             float: right;
             .export-btn{
               border-color: $red;
@@ -865,11 +802,11 @@
               border-radius: 4px;
               top: calc(24/1920*100vw);
               .btn-area{
-                position: relative;
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
                   font-size: calc(24/1920*100vw);
@@ -886,7 +823,8 @@
               border-color: $red;
               z-index: 990;
               height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
+              width: calc(160/1920*100vw);
+              min-width: 120px;
               margin: 0;
               padding: 0;
               font-size: calc(14/1920*100vw);
@@ -898,24 +836,20 @@
                 position: relative;
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  margin-right: calc(18/1920*100vw);
                   height: calc(24/1920*100vw);
                   width: calc(24/1920*100vw);
+                  min-height: 18px;
+                  min-width: 18px;
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
                   display: inline-block;
                 }
-              }
-
-              @media screen and (min-width: 1366px){
-                width: 160px;
-              }
-              @media screen and (max-width: 1366px){
-                width: 140px;
               }
             }
           }
@@ -933,7 +867,7 @@
         }
         .toolbar{
           float: right;
-          margin: calc(30/1920*100vw);
+          margin: 30px calc(30/1920*100vw);
           margin-right: 0;
           height:13%;
         }
