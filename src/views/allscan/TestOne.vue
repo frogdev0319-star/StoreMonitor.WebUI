@@ -294,7 +294,8 @@
         storeEventLegend: ['日期',this.$t('overview.createdEvent'),this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
         echartAxiasColor: '#e3e9f4',
         echartBackground: 'rgba(30,34,52,0.75)',
-        sidebarElm: null
+        sidebarElm: null,
+        fontFamily: ''
       }
 
     },
@@ -582,6 +583,9 @@
             },
             backgroundColor: self.echartBackground,
           },
+          textStyle:{
+            fontFamily: self.fontFamily
+          },
           series: [
             {
               name:'事件来源占比',
@@ -670,6 +674,9 @@
               align:'left'
             },
             backgroundColor: self.echartBackground,
+          },
+          textStyle:{
+            fontFamily: self.fontFamily
           },
           series: [
             {
@@ -761,6 +768,9 @@
             left:'8',//距离左边距
             right:'0',//距离右边距
             bottom:'32',//距离下边距
+          },
+          textStyle:{
+            fontFamily: self.fontFamily
           },
           tooltip: {
             trigger: 'axis',
@@ -900,6 +910,9 @@
               height: 12,
               lineHeight: 12
             },
+          },
+          textStyle:{
+            fontFamily: self.fontFamily
           },
           grid: {
             containLabel: true,
@@ -1071,6 +1084,7 @@
       console.log(enSpan)
       self.isEnSpan = enSpan;
       console.log(self.isEnSpan)
+      self.fontFamily = self.lang == 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initData();
 
     },
@@ -1159,7 +1173,7 @@
         color: $black;
       }
       .iconbangzhu {
-        font-size: 20px;
+        font-size: calc(20 / 1920 * 100vw);
         position: relative;
         top: 2px;
         color: $tab;

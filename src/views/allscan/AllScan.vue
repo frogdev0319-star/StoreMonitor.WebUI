@@ -716,6 +716,9 @@
               bottom: '57',
               containLabel: true,
             },
+            textStyle:{
+              fontFamily: self.fontFamily
+            },
             tooltip: {
               trigger: 'axis',
               padding: 5,
@@ -906,6 +909,9 @@
               align: 'left'
             },
             backgroundColor: self.echartBackground,
+          },
+          textStyle:{
+            fontFamily: self.fontFamily
           },
           legend: {
             data: ['inspect radar']
@@ -1673,6 +1679,9 @@
               {name: self.$t("overview.excellentLess"), icon: 'rect'},
               {name: self.$t("overview.excellentMore"), icon: 'rect'}]
           },
+          textStyle:{
+            fontFamily: self.fontFamily
+          },
           color: [
             'rgba(243,29,101,1)', 'rgba(243,29,101,0.5)', 'rgba(87,231,143, 1)', 'rgba(87,231,143,0.5)'
           ],
@@ -1951,6 +1960,9 @@
               top: '10',
               bottom: '57',
               containLabel: true,
+            },
+            textStyle:{
+              fontFamily: self.fontFamily
             },
             tooltip: {
               trigger: 'axis',
@@ -2275,7 +2287,7 @@
         color: $black;
       }
       .iconbangzhu {
-        font-size: 20px;
+        font-size: calc(20 / 1920 * 100vw);
         position: relative;
         top: 2px;
         color: $tab;
