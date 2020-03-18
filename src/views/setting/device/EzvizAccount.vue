@@ -1,5 +1,5 @@
 <template>
-  <div class="detail-container"  :style="{'height':varyWindowHeight-350+'px'}" >
+  <div class="detail-container" :style="{'height':varyWindowHeight-350+'px'}">
     <el-row>
       <el-col :span="24" class="detail-title">
         <!--<span class="title-title ">{{totalMsg}}</span>-->
@@ -19,6 +19,7 @@
                    width="30%"
                    top="25vh"
                    left="40vh"
+                   class="add-dialog"
         >
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;"/>
@@ -87,7 +88,6 @@
             :highlight-current-row="true"
             align='left'
             stripe
-            :max-height="tableHieght"
             style="width:100%;text-algin:center;border: 0px solid #ebebeb;"
             :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
             :cell-style="cellStyle"
@@ -609,7 +609,10 @@
     #{$poi}:checkRem($val);
   }
   *{
-    font-family: Arial, "Microsoft YaHei";
+    font-family: Roboto, Arial, "Microsoft YaHei";
+  }
+  .detail-container{
+    //height: calc(100vh - 125px - calc(60/1920*100vw));
   }
   .detail-title{
     overflow: hidden;
@@ -679,16 +682,12 @@
     border-color:  $mainColor;
     color: #fff;
     position: absolute;
-    @include point(right, 5);
+    right: calc(10/1920*100vw);
     height: 24px;
-    @include point(top, 2);
     font-size: 12px;
-    @media screen and (min-width: 1920px){
-      top: 2px
-    }
   }
   .account-list{
-    padding: calc(20/1920*100vw);
+    padding: 20px calc(20/1920*100vw);
     border: 1px solid $border ;
     height: auto;
     position: relative;
@@ -698,128 +697,10 @@
       bottom: 0;
     }
   }
-  .data-content{
-    @include point(margin,15);
-    margin-left: 0px;
-    overflow: hidden;
-    .header-content{
-      width: 100%;
-      margin-top:0px;
-      @include point(margin-bottom,10);
-      float: left;
-      overflow: hidden;
-      text-align: left;
-      //@include point(padding-left,27);
-      padding-left: 27px;
-      @include point(padding-bottom,10);
-      border-bottom:1px solid #e3e9f4;
-      font-size: 14px;
-      .allcheckBox{
-        float: left;
-        margin-right: 0;
-      }
-      .name-title{
-        float: left;
-        //width: 16%;
-        width: 300px;
-        // @include point(margin-left,40);
-        margin-left: 40px;
-      }
-
-      .description-title{
-        float: left;
-        width: 51%;
-        //margin-left: 12%;
-      }
-      @media screen and(min-width:1280px) and(max-width:1440px){
-        .description-title{
-          width: 41%;
-        }
-      }
-      .score-title{
-        float: left;
-        width: 8%;
-        // margin-left: 7%;
-      }
-      .handle-title{
-        float: left;
-        width: 4%;
-        margin-left: 1%;
-      }
-      .en-handle-title{
-        float: left;
-        width: 4%;
-        @media screen and (min-width: 1366px){
-          margin-left: 1%;
-        }
-        @media screen and (max-width: 1366px){
-          margin-left: 0;
-        }
-      }
-    }
-    .table-header-title{
-      float:left;
-      @include point(margin-bottom,10);
-      // @include point(margin-left,27);
-      margin-left: 27px;
-      margin-right: 0;
-      .all-checkBox{
-        margin-right: 0;
-      }
-    }
-    .table-title{
-      @include point(margin-left,38);
-      margin-left: 38px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #424151;
-    }
-  }
-  .el-dropbtn1{
-    position: relative;
-    bottom: 2px;
-    @include point(margin-left,10);
-  }
-  .showNewContent{
-    position: absolute;
-    display: inline-block;
-    background-color: orange;
-    top: 0px;
-    left: 5px;
-    color: #fff;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 12px;
-    height: 12px;
-    padding-top: 0px;
-    line-height: 10px;
-  }
   .elradio{
     &:last-child{
       border-left: 1px solid #dcdfe6;
     }
-  }
-  .data-empty{
-    margin: 0 auto;
-    margin-top: 14%;
-    position: relative;
-    .empty-title{
-      font-weight: bold;
-      span{
-        color: $mainColor;
-        cursor: pointer;
-      }
-      .downLoad-btn{
-        color:  $mainColor;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    }
-  }
-  .tabName-input-content{
-    background: #fff;
-    @include point(height,73);
-    width: 100%;
   }
 </style>
 <style>
@@ -828,6 +709,12 @@
   }
   .el-dialog__body{
     padding: 0px;
+  }
+
+  @media screen  and (max-width: 1280px){
+    .add-dialog .el-dialog{
+      width: 40% !important;
+    }
   }
 
   .elradio .el-radio-button__inner{
@@ -844,6 +731,8 @@
   }
   .access-token .el-form-item__content{
     width: 70%;
+    display: inline-flex;
+    align-items: center;
   }
   .access-button .el-form-item__content{
     width: 100%;
@@ -857,10 +746,8 @@
   .ezviz-account .el-form-item , .nvrForm .el-form-item {
     margin-bottom: 15px;
   }
-  @media screen and (min-width: 1280px){
-    .nvrForm .el-radio__label , .nvrForm .el-form-item__label , .nvrForm .el-form-item__content{
-      font-size: 12px;
-    }
+  .nvrForm .el-radio__label , .nvrForm .el-form-item__label , .nvrForm .el-form-item__content{
+    font-size: calc(14/1920*100vw);
   }
   .nvrForm .radio-item {
     margin-bottom: 0px;

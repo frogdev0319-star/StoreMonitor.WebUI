@@ -20,7 +20,9 @@
     border-radius: 4px;
     margin-right: calc(20/1920*100vw);
     padding: 0;
-}
+    min-height: 28px;
+    min-width: 85px;
+  }
 .file-confirm-btn.el-button--primary.el-button--mini{
     width: calc(100/1920*100vw) !important;
     font-size: calc(14/1920*100vw);
@@ -98,13 +100,13 @@ input:disabled{
     color: #f31d65 !important;
 }
 
-@media screen and (min-width: 1450px){
+@media screen and (min-width: 1280px){
     #storetab-content .el-tabs__nav.is-top{
         margin-left: 10%;
         width: 80%;
     }
 }
-@media screen and (max-width: 1440px){
+@media screen and (max-width: 1270px){
     #storetab-content .el-tabs__nav.is-top{
         width: 100%;
     }

@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-device" :style="{'height':varyWindowHeight-170+'px'}">
+  <el-row class="el-device" :style="{'height':varyWindowHeight-170+'px'}">>
     <el-col :span="24" class="el-btns">
       <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-if="activeName=='device'">
         <el-input
@@ -11,8 +11,11 @@
         </el-input>
         <el-button v-for="(item,index) in btnList"
                    :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
-          <i :class="item.iconClass" style="font-size:24px;"></i>
-          <span>{{item.btnTitle}}</span>
+          <div class="btn-area">
+            <i :class="item.iconClass" style="font-size:24px;"></i>
+            <span>{{item.btnTitle}}</span>
+          </div>
+
         </el-button>
       </div>
       <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-else>
@@ -23,8 +26,10 @@
           type="primary"
           class="btn-class"
         >
-          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
-          <span>{{$t('deviceView.addEzvizAccount')}}</span>
+          <div class="btn-area">
+            <i class="iconfont el-icon-plus"></i>
+            <span>{{$t('deviceView.addEzvizAccount')}}</span>
+          </div>
         </el-button>
       </div>
       <el-col :span="varWindowWidth<1540?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
@@ -81,7 +86,7 @@
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn btn-class"
                          @click="showAddDialog">
-                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
+                <i class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -215,7 +220,7 @@
                 </el-dialog>
               </div>
             </el-scrollbar>
-            <div class="toolbar pagination" style="width:100%; margin-top:10px; margin-bottom:10px;">
+            <div class="toolbar pagination" style="width:100%; margin-top:10px; margin-bottom:20px;">
               <el-pagination
                 style="text-align:right;margin-right:15px;"
                 @size-change="sizeChange"
@@ -316,7 +321,7 @@
               <span class="info-title">{{generateDeviceLang('channelSetting')}}</span>
               <el-button type="primary" size="mini" class="add-btn btn-class"
                          @click="addNewChannel" :disabled="channelBtnDisabled">
-                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
+                <i class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
               </el-button>
             </div>
             <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
@@ -360,9 +365,9 @@
                       </el-option>
                     </el-select>
                   </div>
-                  <div class="nape-picture-data">
+                  <div class="nape-picture-data" :class="lang=='en'? 'en-nape-picture-data' : ''">
                     <span v-if="item.tempUrl">
-                      <el-image :src="item.tempUrl" class="img-class" v-if="isUpdate">
+                      <el-image :src="item.tempUrl" class="img-class" v-if="!isUpdate">
                         <div slot="error" class="image-slot">
                           <i class="el-icon-picture-outline"></i>
                         </div>
@@ -374,7 +379,7 @@
                       </el-image>
                     </span>
                     <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                      <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
+                      <span style="color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
                     <el-upload v-if="item.isClick"
                                class="upload-demo"
@@ -740,7 +745,7 @@
       },
       handleEditChange(file, fileList) {
         let self = this;
-        self.isUpdate = true;
+        self.isUpdate = false;
         this.channelList.forEach(item=>{
           if(item.isClick){
             item.tempUrl = file.url;
@@ -1930,8 +1935,8 @@
     #{$poi}:checkRem($val);
   }
   @mixin titleStyle{
-    @include point(height,48);
-    @include point(line-height,48);
+    height: 60px;
+    line-height: 60px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
@@ -1942,7 +1947,7 @@
     text-overflow: ellipsis;
   }
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto,Arial, Microsoft YaHei;
   }
   .noraml-color{
     color: #4b5262 !important;
@@ -1957,6 +1962,11 @@
     font-size: 12px;
     &:disabled{
       opacity: 0.6;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
   .en-el-delete-btn{
@@ -1979,6 +1989,11 @@
     span{
       position: relative;
     }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .active-color{
     color: $mainColor !important;
@@ -1996,26 +2011,11 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    position: relative;
-    top: 3px;
     height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
-    min-width: calc(110/1920*100vw);
-    @media screen and (min-width: 1366px){
-      //@include point(width, 90);
-      span{
-        position: relative;
-        @include point(bottom,3);
-      }
-    }
-    @media screen and (max-width: 1366px){
-      //@include point(width, 120);
-      span{
-        position: relative;
-        @include point(bottom,5);
-      }
-    }
+    min-width: 85px;
+    min-height: 28px;
     &:first-child{
       border-right-width: 0px;
     }
@@ -2027,6 +2027,11 @@
     }
     &:focus{
       background-color: #FEE4E7;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
   .en-el-handle-btn{
@@ -2034,27 +2039,12 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    position: relative;
-    top: 3px;
     height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
-    @media screen and (min-width: 1366px){
-      //@include point(width, 90);
-      span{
-        position: relative;
-        @include point(bottom,3);
-      }
-    }
-    @media screen and (max-width: 1366px){
-      //@include point(width, 120);
-      span{
-        position: relative;
-        @include point(bottom,5);
-      }
-    }
-
+    min-height: 28px;
+    min-width: 85px;
     &:first-child{
       border-right-width: 0px;
     }
@@ -2067,15 +2057,19 @@
     &:focus{
       background-color: #FEE4E7;
     }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .el-device{
+    height: calc(100vh - 126px - calc(60/1920*100vw));
     border: 1px solid $border;
     background-color: #fff;
     .el-btns{
-      @include point(padding-top,10);
-      @include point(padding-right,20);
       position: relative;
-      @include point(height,31);
+      height: calc(40/1920*100vw);
       .btns{
         position: absolute;
         @include point(right,25);
@@ -2088,11 +2082,10 @@
       background: $tab;
     }
     .el-tabPanels{
-      @include point(padding,20);
+      padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);
       height: auto;
       position: relative;
-      @include point(bottom,25);
-      @include point(padding-bottom,0);
+      bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
       }
@@ -2124,14 +2117,15 @@
       .nvr-info{
         @include titleStyle;
         position: relative;
-        @include point(padding-left,20);
+        padding-left: calc(25/1920*100vw);
+        background-color: #fff;
         .info-title{
-          font-size: 18px;
+          font-size: calc(18/1920*100vw);
           font-weight: bold;
         }
         .add-btn{
           position: absolute;
-          @include point(right, 20);
+          right: calc(25/1920*100vw);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
           padding: 0 0;
@@ -2141,6 +2135,7 @@
           margin: auto;
           .el-icon-plus{
             font-size: calc(16/1920*100vw);
+            margin-right: calc(8/1920*100vw);
           }
 
         }
@@ -2156,7 +2151,13 @@
         }
         .nvr-title{
           @include titleStyle;
-          font-size: 14px;
+          @media screen and (min-width: 1366px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 1366px) {
+            font-size: 12px;
+          }
+          background-color: #fff;
           .comment-title{
             width: 2%;
           }
@@ -2206,9 +2207,6 @@
             width: 15%;
           }
           @media screen and (max-width: 1680px) {
-            span{
-              font-size: 14px;
-            }
             .model-title{
               width: 18%;
             }
@@ -2243,7 +2241,7 @@
               width: 20%;
             }
             .en-count-title {
-              width: 22%;
+              width: 23%;
               span {
                 left: 0;
               }
@@ -2253,9 +2251,6 @@
             }
           }
           @media screen and (max-width: 1440px) {
-            span{
-              font-size: 14px;
-            }
             .model-title{
               width: 20%;
             }
@@ -2278,7 +2273,7 @@
               width: 18%;
             }
             .en-model-title {
-              width: 23%;
+              width: 25%;
               span {
                 left: 0;
               }
@@ -2301,9 +2296,6 @@
             }
           }
           @media screen and (max-width: 1280px) {
-            span{
-              font-size: 14px;
-            }
             .model-title{
               width: 20%;
             }
@@ -2450,7 +2442,6 @@
             left: 83%;
             .iconcontent{
               position: absolute;
-              @include point(margin-top,14);
               cursor: pointer;
               display: inline-block;
               .iconfont{
@@ -2466,8 +2457,8 @@
                 border-width: 1px 1px 1px 1px;
                 border-style: solid;
                 border-color: #ddd;
-                @include point(line-height,21);
-                @include point(height,21);
+                line-height: 60px;
+                height: 60px;
                 /deep/ el-button .add-btn{
                   font-size: 12px;
                 }
@@ -2480,8 +2471,8 @@
                 border-style: solid;
                 border-color: #ddd;
                 background-color: rgba(255, 255, 255, 0);
-                @include point(line-height,21);
-                @include point(height,21);
+                line-height: 60px;
+                height: 60px;
               }
             }
 
@@ -2568,18 +2559,15 @@
           padding-left: 1%;
           cursor: pointer;
           font-size: 14px;
-          height: calc(90/1920*100vw);
-          line-height: calc(90/1920*100vw);
+          height: 90px;
+          line-height: 90px;
 
           text-align: left;
           .nape-input{
-            @include point(width,180);
+            width: calc(160/1920*100vw);
             margin-left: 13%;
             position: relative;
             bottom: 2px;
-            @media screen and (max-width:1600px){
-              width: 100%;
-            }
           }
           .nape-name-data{
             width: 30%;
@@ -2610,43 +2598,45 @@
             position: relative;
             .img-class{
               height: 90%;
-              @include point(width, 80);
+              width: calc(100/1920*100vw);
+              min-width: 85px;
               vertical-align: middle;
               text-align: center;
-              line-height: calc(70/1920*100vw);
-              height: calc(70/1920*100vw);
+              line-height: 70px;
+              height: 70px;
               width: calc(100/1920*100vw);
               display: inline-block;
+              span{
+                font-size: calc(14/1920*100vw);
+              }
             }
             .upload-demo{
               position: absolute;
               bottom: 0;
               font-size: 12px;
-              @include point(width, 80);
+              width: calc(100/1920*100vw);
+              min-width: 85px;
               /deep/ .el-upload{
                 width: 100%;
               }
               /deep/ .el-button{
                 width: 100%;
-                @include point(height,20);
+                height: 28px;
                 opacity: 0.5;
                 position: absolute;
-                bottom: 0;
+                bottom: 10px;
                 left: 0;
               }
               /deep/ .el-button--mini{
                 padding: 7px;
               }
-              @media screen and (max-width: 1440px){
-                .edit-picture{
-                  position: relative;
-                  bottom: 4px;
-                }
-              }
             }
           }
+          .en-nape-picture-data{
+            width: 24%;
+          }
           .nape-items-handle{
-            width: 12%;
+            width: 13%;
             display: inline-block;
             .iconfont{
               font-size: calc(24/1920*100vw);
@@ -2664,18 +2654,16 @@
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
     .el-icon-plus{
-      padding: calc(5/1920*100vw) 0;
       font-size: calc(16/1920*100vw);
-    }
-    span{
-      position: relative;
-      bottom: calc(1/1920*100vw);
-      @media screen and (max-width: 1440px) {
-        bottom: 0;
-      };
+      margin-right: calc(8/1920*100vw);
     }
     @media screen and (max-width: 1440px) {
-      width: 125px !important;
+      width: 100px !important;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 </style>
@@ -2739,25 +2727,28 @@
     display: block;
   }
   .image-class{
-    height: calc(70/1920*100vw);
+    height: 70px;
     width: calc(100/1920*100vw);
+    min-width: 85px;
     border: 1px dashed #7d8cad;
   }
   .el-image__inner{
-    height: calc(70/1920*100vw);
+    height: 70px;
     width: calc(100/1920*100vw);
+    min-width: 85px;
   }
   .image-slot{
-    height: calc(70/1920*100vw);
+    height: 70px;
     width: calc(100/1920*100vw);
+    min-width: 85px;
     color: #7d8cad;
     font-size: 12px;
     text-align: center;
     overflow: hidden;
   }
   .image-span{
-    height: calc(70/1920*100vw);
-    line-height: calc(70/1920*100vw);
+    height: 70px;
+    line-height: 70px;
   }
   .el-tooltipClass.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
     border-bottom-color: rgba(30, 34, 52, 0.75) !important;

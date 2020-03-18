@@ -16,8 +16,10 @@
         </el-input>
         <el-button v-for="(item,index) in btnList"
                    :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
-          <i :class="item.iconClass" style="font-size: 24px;"></i>
-          <span>{{item.btnTitle}}</span>
+          <div class="btn-area">
+            <i :class="item.iconClass" style="font-size: 24px;"></i>
+            <span>{{item.btnTitle}}</span>
+          </div>
         </el-button>
       </div>
     </el-col>
@@ -88,7 +90,7 @@
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
                          @click="showAddDialog">
-                  <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
+                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -296,7 +298,7 @@
                   </div>
                   <div class="nape-picture-data">
                     <span v-if="item.tempUrl">
-                      <el-image :src="item.tempUrl" class="img-class" v-if="isUpdate">
+                      <el-image :src="item.tempUrl" class="img-class" v-if="!isUpdate">
                         <div slot="error" class="image-slot">
                           <i class="el-icon-picture-outline"></i>
                         </div>
@@ -308,8 +310,8 @@
                       </el-image>
                     </span>
                     <!--<span v-if="item.tempUrl">-->
-                       <!--<img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">-->
-                        <!--<img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">-->
+                    <!--<img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">-->
+                    <!--<img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">-->
                     <!--</span>-->
                     <span v-else class="img-class" style="display: inline-block;background: #cccc;">
                       <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
@@ -650,7 +652,7 @@
       },
       handleEditChange(file, fileList) {
         let self = this;
-        self.isUpdate = true;
+        self.isUpdate = false;
         this.channelList.forEach(item=>{
           if(item.isClick){
             item.tempUrl = file.url;
@@ -1751,7 +1753,7 @@
       },
       ivsIdChange(val){
         let self = this;
-        let comment = filterString.all(val,20);
+        let comment = filterString.all(val,30);
         console.log(comment);
         self.addNvrData.ivsId = comment;
       }
@@ -1796,8 +1798,8 @@
     #{$poi}:checkRem($val);
   }
   @mixin titleStyle{
-    @include point(height,48);
-    @include point(line-height,48);
+    height: 60px;
+    line-height: 60px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
@@ -1808,7 +1810,7 @@
     text-overflow: ellipsis;
   }
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto, Arial, Microsoft YaHei;
   }
   .noraml-color{
     color: #4b5262 !important;
@@ -1829,30 +1831,13 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    position: relative;
-    top: 3px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
     min-width: calc(110/1920*100vw);
-    @media screen and (min-width: 1366px){
-      //@include point(width, 90);
-      span{
-        position: relative;
-        @include point(bottom,3);
-      }
-    }
-    @media screen and (max-width: 1366px){
-      //@include point(width, 120);
-      span{
-        position: relative;
-        @include point(bottom,5);
-      }
-    }
-    span{
-      position: relative;
-    }
+    min-width: 85px;
+    min-height: 28px;
     &:first-child{
       border-right-width: 0px;
     }
@@ -1871,31 +1856,14 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    /*padding: 3px 5px !important;*/
-    position: relative;
-    top: 3px;
     border-right: 0;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
-    @media screen and (min-width: 1366px){
-      //@include point(width, 90);
-      span{
-        position: relative;
-        @include point(bottom,3);
-      }
-    }
-    @media screen and (max-width: 1366px){
-      //@include point(width, 120);
-      top: 6px;
-      span{
-        position: relative;
-        @include point(bottom,5);
-      }
-    }
-
+    min-width: 85px;
+    min-height: 28px;
     &:last-child{
       border-right: 1px solid;
     }
@@ -1911,10 +1879,8 @@
     border: 1px solid $border;
     background-color: #FFF;
     .el-btns{
-      @include point(padding-top,10);
-      @include point(padding-right,20);
+      height: calc(40/1920*100vw);
       position: relative;
-      @include point(height,31);
       .btns{
         position: absolute;
         @include point(right,25);
@@ -1926,11 +1892,10 @@
       }
     }
     .el-tabPanels{
-      @include point(padding,20);
+      padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);
       height: auto;
       position: relative;
-      @include point(bottom,25);
-      @include point(padding-bottom,0);
+      bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
       }
@@ -1997,6 +1962,7 @@
         }
       }
       .lisde{
+        background: #FAFAFA;
         height: auto;
         position: relative;
         .icon-filter{
@@ -2006,7 +1972,12 @@
         }
         .nvr-title{
           @include titleStyle;
-          font-size: 14px;
+          @media screen and (min-width: 1366px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 1366px) {
+            font-size: 12px;
+          }
           .name-title{
             width: 25%;
           }
@@ -2019,41 +1990,14 @@
           .operation-title{
             width: 15%;
           }
-          @media screen and (max-width: 1440px) {
-            .en-name-title{
-              width: 25%;
-            }
-            .en-store-title{
-              width: 35%;
-            }
-            .en-count-title{
-              width: 25%;
-            }
+          .en-name-title{
+            width: 27%;
           }
-          @media screen and (min-width: 1366px) {
-            .en-name-title{
-              width: 30%;
-            }
-            .en-store-title{
-              width: 30%;
-            }
-            .en-count-title{
-              width: 30%;
-            }
+          .en-store-title{
+            width: 28%;
           }
-          @media screen and (max-width: 1366px) {
-            .en-name-title{
-              font-size: 12px;
-              width: 30%;
-            }
-            .en-store-title{
-              width: 30%;
-              font-size: 12px;
-            }
-            .en-count-title{
-              width: 30%;
-              font-size: 12px;
-            }
+          .en-count-title{
+            width: 30%;
           }
         }
         .nvr-data{
@@ -2130,9 +2074,10 @@
             left: 83%;
             .iconcontent{
               position: absolute;
-              @include point(margin-top,14);
               cursor: pointer;
               display: inline-block;
+              display: inline-flex;
+              align-items: center;
               .iconfont{
                 font-size: calc(24/1920*100vw);
                 color: $tab;
@@ -2146,8 +2091,6 @@
                 border-width: 1px 1px 1px 1px;
                 border-style: solid;
                 border-color: #ddd;
-                @include point(line-height,21);
-                @include point(height,21);
               }
               .iconrised{
                 float: left;
@@ -2157,8 +2100,6 @@
                 border-style: solid;
                 border-color: #ddd;
                 background-color: rgba(255, 255, 255, 0);
-                @include point(line-height,21);
-                @include point(height,21);
               }
             }
 
@@ -2245,18 +2186,13 @@
           padding-left: 1%;
           cursor: pointer;
           font-size: 14px;
-          height: calc(90/1920*100vw);
-          line-height: calc(90/1920*100vw);
+          height: 90px;
+          line-height: 90px;
           //border-bottom: 1px solid red;
           text-align: left;
           .nape-input{
-            @include point(width,180);
+            width: calc(160/1920*100vw);
             margin-left: 13%;
-            position: relative;
-            bottom: 2px;
-            @media screen and (max-width:1600px){
-              width: 100%;
-            }
           }
           .nape-name-data{
             width: 30%;
@@ -2272,7 +2208,7 @@
             }
           }
           .nape-dep-data{
-            width: 26%;
+            width: 28%;
             display: inline-block;
             position: relative;
             span{
@@ -2287,37 +2223,38 @@
             left: 1%;
             .img-class{
               //height: 90%;
-              @include point(width, 80);
               vertical-align: middle;
               text-align: center;
-              line-height: calc(70/1920*100vw);
-              height: calc(70/1920*100vw);
+              line-height: 70px;
+              height: 70px;
               width: calc(100/1920*100vw);
               display: inline-block;
+              min-width: 85px;
             }
             .upload-demo{
               position: absolute;
               bottom: 0;
-              @include point(width, 80);
+              width: calc(100/1920*100vw);
+              min-width: 85px;
               /deep/ .el-upload{
                 width: 100%;
               }
               /deep/ .el-button{
                 width: calc(100/1920*100vw);
-                @include point(height,20);
+                height: 28px;
                 opacity: 0.5;
                 position: absolute;
-                bottom: calc(9/1920*100vw);
+                bottom: 10px;
                 left: 0;
               }
               /deep/ .el-button--mini{
                 padding: 2px;
               }
               /*@media screen and (max-width: 1280px){*/
-                /*.edit-picture{*/
-                  /*position: relative;*/
-                  /*bottom: 4px;*/
-                /*}*/
+              /*.edit-picture{*/
+              /*position: relative;*/
+              /*bottom: 4px;*/
+              /*}*/
               /*}*/
             }
           }
@@ -2332,6 +2269,11 @@
         }
 
       }
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 </style>
@@ -2394,21 +2336,23 @@
     display: block;
   }
   .image-class{
-    height: calc(70/1920*100vw);
+    height: 70px;
     width: calc(100/1920*100vw);
+    min-width: 85px;
     border: 1px dashed #7d8cad;
   }
   .el-image__inner{
+    height: 70px;
+    width: calc(100/1920*100vw);
+    min-width: 85px;
+  }
+  .image-slot{
     height: calc(70/1920*100vw);
     width: calc(100/1920*100vw);
-  }
-   .image-slot{
-     height: calc(70/1920*100vw);
-     width: calc(100/1920*100vw);
-     color: #7d8cad;
-     font-size: 12px;
-     text-align: center;
-     overflow: hidden;
+    color: #7d8cad;
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
   }
   .image-span{
     height: calc(70/1920*100vw);
