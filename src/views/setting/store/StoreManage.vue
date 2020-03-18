@@ -645,32 +645,34 @@ import {generateStoreLang} from '@/api/i18n'
         margin-right: 10px !important;
     }
     .seacrh-content{
-        @include point(padding-left,30);
-        @include point(height,60);
-        @include point(line-height,60);
+        padding-left: calc(40/1920*100vw);
+        height: 80px;
+        line-height: 80px;
         position: relative;
         text-align: left;
         border-bottom: 0.5px solid #e3e9f4;
+        display: flex;
+        align-items: center;
         .select-title{
             color: #424151;
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
         }
         .el-province{
             width: calc(160/1920*100vw);
-            @include point(margin-right,20);
-            @include point(margin-left,15);
-            position: relative;
-            @include point(bottom,1);
+            margin-right: calc(25/1920*100vw);
+            margin-left: calc(20/1920*100vw);
+            @media screen and (max-width: 1024px){
+              margin-right: 10px;
+              margin-left: 10px;
+            }
         }
         .el-search-btn{
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
             width: calc(130/1920*100vw);
             padding: 0 0;
-            @include point(margin-left,15);
+            margin-left: calc(20/1920*100vw);
             color: #fff;
-            position: relative;
-            @include point(bottom,1);
         }
         .en-el-search-btn{
           font-size: calc(14/1920*100vw);
@@ -678,57 +680,40 @@ import {generateStoreLang} from '@/api/i18n'
           width: calc(130/1920*100vw);
           padding: 0 0;
           text-align: center;
-          @include point(margin-left,15);
+          margin-left:calc(20/1920*100vw);
           color: #fff;
-          position: relative;
-          @include point(bottom,1);
         }
         .city-input{
-            width: calc(160/1920*100vw);
-            height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
-            background: #F4F5F9 !important;
-            cursor: pointer;
-            display:inline-block;
-            position: relative;
-            border: 1px solid #DCDFE6;
-            box-sizing: border-box;
-            vertical-align: middle;
-            border-radius: 3px;
+          width: calc(160/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          background: #F4F5F9 !important;
+          cursor: pointer;
+          border: 1px solid #E4E7ED;
+          box-sizing: border-box;
+          border-radius: 3px;
+          overflow: hidden;
+          min-height: 28px;
+          min-width: 85px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          span{
+            display: inline-block;
+            font-size: 12px;
+            color: #7d8cad;
+            margin-left: 15px;
+            width: calc(160/1920*100vw - 40px);
+            white-space: nowrap;
             overflow: hidden;
-            /*@media screen and (max-width: 1920px){*/
-            /*  top: 12px;*/
-            /*}*/
-            /*@media screen and (max-width: 1600px){*/
-            /*  top: 10px;*/
-            /*}*/
-            /*@media screen and (max-width: 1280px){*/
-            /*  top: 8px;*/
-            /*}*/
-            /*top: 8px;*/
-            span{
-                display: inline-block;
-                font-size: 12px;
-                color: #7d8cad;
-                margin-left: 15px;
-                @include point(width,130);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .icon-input{
-                position: absolute;
-                @include point(right,10);
-                top: 10px;
-                font-size: 14px;
-                color: #C0C4CC;
-              @media screen and(max-width: 1440px){
-                top: 6px;
-              }
-              @media screen and(max-width: 1280px){
-                top: 4px;
-              }
-            }
+            text-overflow: ellipsis;
+          }
+          .icon-input{
+            position: absolute;
+            right: calc(15/1920*100vw);
+            font-size: calc(14/1920*100vw);
+            color: #C0C4CC;
+          }
         }
         .el-search-input{
             @include point(width,180);

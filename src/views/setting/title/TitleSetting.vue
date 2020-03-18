@@ -657,7 +657,7 @@
   $tab:#7d8cad;
   $color: #606266;
   $black:#182752;
-  
+
   .setting-container{
     height: calc(100vh - 80px - 45px - calc(60/1920*100vw));
     display: flex;
@@ -699,7 +699,12 @@
             content: ' ';
             margin-right: 4px;
         }
-
+        /deep/ .el-form-item__label{
+          font-size: calc(14/1920*100vw);
+        }
+        /deep/ .el-radio__label{
+          font-size: calc(14/1920*100vw);
+        }
       }
     }
     .role-setting{

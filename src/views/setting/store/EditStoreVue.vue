@@ -407,19 +407,19 @@ export default {
     .el-storeEdit-content{
       border: 1px solid $border;
       background-color: #fff;
-        @include point(padding-left,30);
-        @include point(padding-top,20);
-        @include point(padding-right,10);
+        padding-left: calc(40/1920*100vw);
+        padding-top: 25px;
+        padding-right: calc(15/1920*100vw);
         .storeEdit-header{
             .store-title{
                 overflow: hidden;
                 text-align: left;
-                font-size: 18px;
+                font-size: calc(18/1920*100vw);
                 font-weight: bold;
                 color: #424151;
                 .sub-btn{
                     float: right;
-                    @include point(margin-right,20);
+                    margin-right: calc(25/1920*100vw);
                     font-size: calc(14/1920*100vw);
                     height: calc(36/1920*100vw);
                     padding: 0 0;
@@ -428,8 +428,8 @@ export default {
             }
             .store-info{
                 text-align: left;
-                @include point(margin-top,15);
-                font-size: 14px;
+                margin-top: 20px;
+                font-size: calc(14/1920*100vw);
                 span{
                     width:auto;
                     margin-right:20px;
@@ -478,12 +478,12 @@ export default {
             }
         }
         .storeEdit-content{
-            @include point(margin-top,20);
-            @include point(margin-bottom,20);
+            margin-top: 25px;
+            margin-bottom: 25px;
             background-color: #F6F7FB;
             .el-table-title{
-                @include point(line-height,50);
-                @include point(height,50);
+                line-height: 70px;
+                height: 70px;
                 text-align: left;
                 border-bottom: 1px solid #ddd;
                 margin:auto 10px;
@@ -498,13 +498,13 @@ export default {
                 }
             }
             .el-table-data{
-                @include point(padding-left,10);
-                @include point(padding-right,10);
+                padding-left: calc(15/1920*100vw);
+                padding-right: calc(15/1920*100vw);
                 text-align: left;
                 .grouptitle{
                     margin-left: 2%;
                     display: inline-block;
-                    @include point(margin-top,10);
+                    margin-top: 15px;
                     font-size: 15px;
                     font-weight: bold;
                     color: #424151;
@@ -513,8 +513,8 @@ export default {
                     margin-top: 5px;
                     .schedule-detials{
                         text-align: left;
-                        @include point(line-height,50);
-                        @include point(height,50);
+                        line-height: 70px;
+                        height: 70px;
                         border-bottom: 1px solid #ddd;
                         font-size: 14px;
                     }
@@ -525,12 +525,12 @@ export default {
                     }
                     .nape-value{
                         margin-left: 2%;
-                        width: 400px;
+                        width: calc(400/1920*100vw);
                         /deep/  .el-province{
-                          width: 400px;
+                          width: calc(400/1920*100vw);
                         }
                       /deep/ .input-class{
-                        width: 370px;
+                        width: calc(370/1920*100vw);
                       }
                     }
                   .nape-value.content{

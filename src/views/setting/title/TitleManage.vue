@@ -399,6 +399,7 @@
   .title-table .el-table .cell{
     padding-left: calc(20/1920*100vw);
     padding-right: calc(20/1920*100vw);
+    font-size: calc(14/1920*100vw);
   }
   .title-table .el-table .cell:first-child{
     padding-right: calc(10/1920*100vw);
