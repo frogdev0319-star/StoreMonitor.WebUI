@@ -847,7 +847,6 @@
           let unqualifiedPer = 0;
           let ignorePer = 0;
           let errCode = inspectItems.errCode;
-          let jsonArray = self.itemsLegend;
           let seriesData = [];
           if (errCode == 0) {
             let totalIgnored = 0;
@@ -868,75 +867,12 @@
               self.itemsTableData = resultData.content;
               self.total = resultData.totalElements;
               console.log(resultData.content);
-
-              seriesData = [
-                {value: totalExcellent, name: self.$t('overview.excellent')},
-                {value: totalQualified, name: self.$t('overview.pass')},
-                {value: totalUnqualified, name: self.$t('overview.failed')},
-                {value: totalIgnored, name: self.$t('overview.ignored')}
-              ];
-              //console.log(topFiveArray);
             }
             catch (e) {
               seriesData = [];
               self.itemsTableData = [];
             }
-            let totalArray = [totalExcellent, totalQualified, totalUnqualified, totalIgnored];
-            console.log(totalArray);
-            jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-            jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-            jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-            jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
-            // self.itemsOptions = {
-            //   tooltip: {
-            //     trigger: 'item',
-            //     formatter: '{a} <br/>{b} : {c} ({d}%)',
-            //     textStyle: {
-            //       align: 'left'
-            //     },
-            //     backgroundColor: self.echartBackground,
-            //   },
-            //   series: [
-            //     {
-            //       name: self.$t('overview.itemsAssessment'),
-            //       type: 'pie',
-            //       radius: ['70%', '85%'],
-            //       center: ['50%', '50%'],
-            //       hoverOffset: 5,
-            //       label: {
-            //         normal: {
-            //           show: false,
-            //           position: 'center'
-            //         },
-            //       },
-            //       labelLine: {
-            //         normal: {
-            //           show: false
-            //         }
-            //       },
-            //       data: seriesData,
-            //       itemStyle: {
-            //         emphasis: {
-            //           shadowBlur: 10,
-            //           shadowOffsetX: 0,
-            //           shadowColor: 'rgba(0, 0, 0, 0.5)'
-            //         },
-            //         normal: {
-            //           color: function (params) {
-            //             //自定义颜色
-            //             var colorList = ['#57e78f', '#72a1f3', '#ffd035', '#cad1db'];
-            //             return colorList[params.dataIndex]
-            //           }
-            //         }
-            //       }
-            //     }
-            //   ]
-            // }
-
           }
-          // self.itemsPerArray = jsonArray;
-          // console.log(self.itemsPerArray)
-          // self.getCatergyRadar();
         },
         async getInspectCharts(){
           let self = this;
@@ -1422,7 +1358,7 @@
           margin-right: calc(8 / 1920 * 100vw);
         }
         .iconbangzhu{
-          font-size: calc(20/1920*100vw);
+          font-size: calc(20 / 1920 * 100vw);
           position: relative;
           color: $tab;
         }
