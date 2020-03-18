@@ -2,16 +2,15 @@
   <div>
     <el-row class="container">
       <el-col class="header">
-        <el-col :span="10" class="logo-content" :class="collapsed?'logo-collapse-width':'logo-width'">
+        <div class="logo-content" :class="logoClass">
           <img :src="imgSrc" alt="logo" id="imgLogo" @click="routerHome">
-          <span class="sys-name" v-if="!collapsed" @click="routerHome">{{generateRoute('title')}}</span>
-          <!--<span class="sys-name" v-if="!collapsed" @click="routerHome">{{$t('navbar.title')}}</span>-->
-        </el-col>
+          <!--<span class="sys-name" v-if="!collapsed" @click="routerHome">{{generateRoute('title')}}</span>-->
+        </div>
         <el-col :span="1" class="el-traggle-content">
           <i class="iconfont icon-indent" @click="clickCollapse" v-if="collapsed"></i>
           <i class="iconfont icon-outdent" @click="clickCollapse" v-else></i>
         </el-col>
-        <el-col :span="10">
+        <el-col :span="isMobile? 7: 9">
           <el-breadcrumb separator="|" class="breadcrumb-inner" >
             <el-breadcrumb-item
               v-for="(item,index) in breadList"
@@ -21,7 +20,8 @@
             </el-breadcrumb-item>
           </el-breadcrumb>
         </el-col>
-        <el-col :span="5" class="headUrl-content">
+        <el-col :span="isMobile? 7: 6" class="headUrl-content">
+          <div class="system-name">{{$t('route.mgt')}}</div>
           <div class="bell-content">
             <i class="el-icon-bell"></i>
             <el-badge is-dot class="item"></el-badge>
@@ -40,7 +40,8 @@
       <el-col class="main" :span="24"
               :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit'||$route.path=='/datacenter')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
-        <aside :class="collapsed?'aside-collapse-width':'aside-width'">
+        <div v-if="isMobile&&!collapsed" class="drawer-bg" @click="handleClickOutside" />
+        <aside :class="classObj" class="aside-menu">
           <div class="brand-panel" v-if="!collapsed">
             <span class="brand-label">{{generateRoute('brand')}}</span>
             <el-select v-model="accountId" :placeholder="generateRoute('select')"   popper-class='brandSelect' class="brand-list" @change='changeAccount' :disabled="brandDisabled" ref="fieldSelect">
@@ -54,70 +55,69 @@
           </div>
           <div v-else class="collapsed-brand-panel"></div>
           <el-scrollbar style="height:100%;" id="el-menuscrollbar">
-          <el-menu :default-active="activePath"
-                   class="el-menu-vertical-demo"
-                   text-color="#eee"
-                   background-color="#222538"
-                   @open="handleopen" @close="handleclose" @select="handleselect"
-                   router :collapse="collapsed" :unique-opened="true"
-                   id="nav-menu"
-                   :collapse-transition="false" style="border:0px;min-height:800px;">
-            <template v-for="(item,index) in routerList">
-              <template v-if="!item.hidden">
-                <!--只有一个节点-->
-                <el-menu-item  v-if="item.leaf&&item.children.length>0" :id="lang=='en'? 'en-groupSubItem': 'groupSubItem'" class="submenu-item"
-                               :key="index"  :index="item.children[0].path"
-                               :disabled="item.isReadOnly"
-                               style="text-align:left;">
-                  <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                  <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                  <span>{{collapsed?'': generateRoute(item.children[0].name)}}</span>
-                </el-menu-item>
-                <!--多级节点 :disabled="item.name=='巡店管理'"-->
-                <el-submenu class="el-submenu-content" :key="index" :index="index+''"
-                            v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
-                  <template slot="title">
+            <el-menu :default-active="activePath"
+                     class="el-menu-vertical-demo"
+                     text-color="#eee"
+                     background-color="#222538"
+                     @open="handleopen" @close="handleclose" @select="handleselect"
+                     router :collapse="collapsed" :unique-opened="true"
+                     id="nav-menu"
+                     :collapse-transition="false" style="border:0px;min-height:800px;">
+              <template v-for="(item,index) in routerList">
+                <template v-if="!item.hidden">
+                  <!--只有一个节点-->
+                  <el-menu-item  v-if="item.leaf&&item.children.length>0" :id="lang=='en'? 'en-groupSubItem': 'groupSubItem'" class="submenu-item"
+                                 :key="index"  :index="item.children[0].path"
+                                 :disabled="item.isReadOnly"
+                                 style="text-align:left;">
                     <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
                     <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                    <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'">{{generateRoute(item.name)}}</span>
-                  </template>
-                  <el-menu-item :id="lang=='en'?'en-childSubItem':'childSubItem'" class="submenu-item" :style="groupHeight+'px'"
-                                v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                                :key="child.path" v-if="!child.hidden && !child.threeChild" style="padding-left: 30px;color:#a0a4ad;">
-                    <template slot="title">
-                      <!--<div :class="lang=='en' ? 'en-icon-content': 'icon-content'">-->
-                      <!--<div class="tag-icon"></div>-->
-                      <!--</div>-->
-                      <i class="iconfont icon-yuandian icon-content"></i>
-                      <span >{{generateRoute(child.name)}}</span>
-                      <div v-if="child.name=='storeManage'&&showTag"
-                           style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
-                    </template>
+                    <span>{{collapsed?'': generateRoute(item.children[0].name)}}</span>
                   </el-menu-item>
-                  <el-submenu  :class="lang== 'en' ? 'three-child el-submenu-group' : 'zh-three-child'" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                               :index="child.path"  :disabled="child.isReadOnly"
-                               :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
+                  <!--多级节点 :disabled="item.name=='巡店管理'"-->
+                  <el-submenu class="el-submenu-content" :key="index" :index="index+''"
+                              v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
                     <template slot="title">
-                      <i class="iconfont icon-yuandian icon-content"></i>
-                      <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" class="third-title">{{generateRoute(child.name)}}</span>
+                      <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                      <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
+                      <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'">{{generateRoute(item.name)}}</span>
                     </template>
-                    <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                                  v-for="grandChild in child.children" :index="grandChild.path"  :disabled="grandChild.isReadOnly"
-                                  :key="grandChild.path" >
-                      <template>
-                        <span :class="lang=='en' ? 'third-child-span' : 'zh-third-child-span'">{{generateRoute(grandChild.name)}}</span>
+                    <el-menu-item :id="lang=='en'?'en-childSubItem':'childSubItem'" class="submenu-item" :style="groupHeight+'px'"
+                                  v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
+                                  :key="child.path" v-if="!child.hidden && !child.threeChild" style="padding-left: 30px;color:#a0a4ad;">
+                      <template slot="title">
+                        <!--<div :class="lang=='en' ? 'en-icon-content': 'icon-content'">-->
+                        <!--<div class="tag-icon"></div>-->
+                        <!--</div>-->
+                        <i class="iconfont icon-yuandian icon-content"></i>
+                        <span >{{generateRoute(child.name)}}</span>
+                        <div v-if="child.name=='storeManage'&&showTag"
+                             style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
                       </template>
                     </el-menu-item>
+                    <el-submenu  :class="lang== 'en' ? 'three-child el-submenu-group' : 'zh-three-child'" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                                 :index="child.path"  :disabled="child.isReadOnly"
+                                 :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
+                      <template slot="title">
+                        <i class="iconfont icon-yuandian icon-content"></i>
+                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" class="third-title">{{generateRoute(child.name)}}</span>
+                      </template>
+                      <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                                    v-for="grandChild in child.children" :index="grandChild.path"  :disabled="grandChild.isReadOnly"
+                                    :key="grandChild.path" >
+                        <template>
+                          <span :class="lang=='en' ? 'third-child-span' : 'zh-third-child-span'">{{generateRoute(grandChild.name)}}</span>
+                        </template>
+                      </el-menu-item>
+                    </el-submenu>
                   </el-submenu>
-                </el-submenu>
+                </template>
               </template>
-            </template>
 
-          </el-menu>
+            </el-menu>
           </el-scrollbar>
         </aside>
-
-        <section :class="collapsed?'sec-collapsed':'sec-uncoll'">
+        <section :class="secClass">
           <el-col :class="wrapperAll
                     ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}" v-if="!showHeader">
             <keep-alive :max="1">
@@ -163,7 +163,7 @@
     data(){
       return{
         showTag:false,
-        imgSrc:require('../../../static/img/logo.png'),
+        imgSrc:require('../../../static/img/title_logo.png'),
         userName:'Admin',
         headUrl:'',
         breadList:[],
@@ -180,10 +180,32 @@
         accountId:'',
         roleId:0,
         lang: this.$i18n.locale,
-        title: ''
+        title: '',
+        isMobile: false
       }
     },
     computed:{
+      classObj(){
+        return{
+          'aside-collapse-width': this.collapsed,
+          'aside-width' : !this.collapsed,
+          'mobile' : this.isMobile
+        }
+      },
+      secClass(){
+        return{
+          'sec-collapsed': this.collapsed,
+          'sec-uncoll' :!this.collapsed,
+          'mobile-sec' : this.isMobile
+        }
+      },
+      logoClass(){
+        return{
+          'logo-collapse-width': this.collapsed,
+          'logo-width': !this.collapsed,
+          'logo-mobile': this.isMobile
+        }
+      },
       routerList(){
         console.log(this.$store.state.user.routes)
         return this.$store.state.user.routes.slice(2,this.$store.state.user.routes.length);
@@ -298,6 +320,9 @@
     },
     methods:{
       generateRoute,
+      handleClickOutside(){
+        this.collapsed = true;
+      },
       clickCollapse(){
         this.collapsed=!this.collapsed;
       },
@@ -323,6 +348,9 @@
       },
       handleselect(key, keyPath){
         console.log(key);
+        if(this.isMobile){
+          this.collapsed = true
+        }
       },
       selectItem(item,index){
         console.log(item);
@@ -454,7 +482,16 @@
       },
       updateTitle(){
         document.title = this.$t('route.meta')
-      }
+      },
+      $_isMobile(){
+        let { body } = document
+        const rect = body.getBoundingClientRect()
+        console.log(rect.width - 1 < 1280)
+        if(rect.width - 1 < 1280){
+          this.collapsed = true;
+        }
+        return this.isMobile = rect.width - 1 < 1280
+      },
     },
     created(){
       let self=this;
@@ -470,7 +507,9 @@
         if(data.changeStyle){ //当前为提交失败页面
           self.wapper=true;
         }
-      })
+      }),
+        window.addEventListener('resize', this.$_isMobile);
+      self.isMobile = self.$_isMobile();
     },
     mounted(){
       this.getUserName();
@@ -488,7 +527,7 @@
 <style lang="scss" scoped>
   $border: #393b4c;
   *{
-    font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family: Roboto, 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
   }
   $collapseWidth:5.5%;
   //rem(val)
@@ -522,19 +561,19 @@
     margin: 0px;
     padding:0px;
     border: 0;
-    font-family:Arial, Microsoft YaHei;
+    font-family: Roboto, Arial, Microsoft YaHei;
   }
   .navIcon{
     display:inline-block;
-    font-size: 32px;
+    font-size: calc(32/1920*100vw);
     color:#fff;
-    margin-right: calc(36/1920*100vw);
+    margin-right: 36px;
   }
   .en-navIcon{
     display:inline-block;
-    font-size: 32px;
+    font-size: calc(32/1920*100vw);
     color:#fff;
-    margin-right: calc(36/1920*100vw);
+    margin-right: 36px;
     /*<!--@media screen  and(min-width:1366px){-->*/
     /*<!--@include point(margin-left,25);-->*/
     /*<!--@include point(width,45);-->*/
@@ -556,15 +595,25 @@
       z-index:999;
       position:fixed;
       background-color:#fff;
-      height: calc(80/1920*100vw);
-      line-height: calc(80/1920*100vw);
+      height: 80px;
+      line-height: 80px;
       box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+      min-width: 1000px ;
       .logo-width{
-        width:calc(330/1920*100vw);
+        width:330px;
       }
       .logo-collapse-width{
         width:$collapseWidth;
-        width: calc(100/1920*100vw);
+        width: 100px;
+      }
+      .logo-collapse-width.logo-mobile{
+        width: 0;
+        img{
+          display: none;
+        }
+      }
+      .logo-width.logo-mobile{
+        width: 330px;
       }
       .logo{
         height: calc(80/1920*100vw);
@@ -572,18 +621,17 @@
       }
       .logo-content{
         height: 100%;
-        height: calc(80/1920*100vw);
-        line-height: calc(80/1920*100vw);
         border-bottom: 1px solid  $border;
         background-color:#222538;
         @include borderColor;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        float: left;
         #imgLogo{
-          position: relative;
-          top: calc(15/1920*100vw);
-          height: calc(43/1920*100vw);
-          max-height: calc(43/1920*100vw);
-          margin-right: calc(24/1920*100vw);
+          width: 210px;
+          height: 36px;
         }
         .sys-name{
           font-weight: bold;
@@ -592,7 +640,8 @@
         }
       }
       .logo-collapse-width #imgLogo{
-        margin: 0 auto;
+        width: 86px;
+        height: 16px;
       }
       .el-traggle-content{
         height: 100%;
@@ -607,8 +656,10 @@
       .breadcrumb-inner{
         float:left;
         .breadcrumb-item{
-          @include point(height,60);
-          @include point(line-height,60);
+          //@include point(height,60);
+          //@include point(line-height,60);
+          height: 80px;
+          line-height: 80px;
           &:first-child{
             @include point(margin-left,20);
           }
@@ -626,7 +677,16 @@
         color: #fff;
         position: relative;
         overflow: hidden;
-        width: 320px;
+        margin-right: calc(33/1920*100vw);
+        display: flex;
+        justify-content: flex-end;
+        /*width: 320px;*/
+        .system-name{
+          font-size: calc(14/1920*100vw);
+          margin-right: calc(20/1920*100vw);
+          color:#4b5262;
+          float: left;
+        }
         .bell-content{
           @include point(width,60);
           @include point(height,60);
@@ -650,7 +710,6 @@
           }
         }
         .el-user-drop{
-          margin-right: 20px;
           .username{
             color:#4b5262;
             margin: auto 10px;
@@ -675,23 +734,33 @@
     .main{
       display: flex;
       position: absolute;
-      @include point(top,60);
+      //@include point(top,60);
+      top: 80px;
       bottom:0px;
       background-color: #f4f5f9;
+      .drawer-bg{
+        background: #000;
+        opacity: .3;
+        width: 100%;
+        top: 0;
+        height: 100%;
+        position: fixed;
+        z-index: 999;
+      }
       .brand-panel{
         background-color: #222538;
         text-align: left;
-        padding: calc(30/1920*100vw) calc(40/1920*100vw) calc(30/1920*100vw) calc(50/1920*100vw);
+        padding: 30px 40px 30px 50px;
         border-bottom: 1px solid $border;
         .brand-label{
           display: block;
           color: #a0a4ad;
           margin-left: calc(2/1920*100vw);
           font-size: calc(16/1920*100vw);
-          margin-bottom: calc(15/1920*100vw);
+          margin-bottom: 15px;
         }
         .brand-list{
-          width: calc(240/1920*100vw);
+          width: 240px;
           text-align: center;
           margin-left: calc(2/1920*100vw);
         }
@@ -724,7 +793,7 @@
       }
       .icon-content{
         float:left;
-        margin-right: calc(48/1920*100vw);
+        margin-right: 48px;
         width: 10px;
         position: relative;
         height: 100%;
@@ -734,7 +803,7 @@
       }
       .en-icon-content{
         float:left;
-        margin-right: calc(48/1920*100vw);
+        margin-right: 48px;
         width: 10px;
         position: relative;
         height: 100%;
@@ -788,8 +857,8 @@
           background-color: #f31d65 !important;
           color: #fff !important;
         }
-        #en-groupSubItem.el-menu-item{
-          padding-left: calc(50/1920*100vw) !important;
+        &.aside-width #en-groupSubItem.el-menu-item{
+          padding-left: 50px !important;
         }
 
         .el-submenu-group{
@@ -807,8 +876,8 @@
           background-color: #f31d65 !important;
           color: #fff;
         }
-        #groupSubItem.el-menu-item{
-          padding-left: calc(50/1920*100vw) !important;
+        &.aside-width #groupSubItem.el-menu-item{
+          padding-left: 50px !important;
         }
 
         .en-el-submenu-group{
@@ -816,9 +885,15 @@
           span{
             font-size: calc(14/1920*100vw);
           }
+          @media screen and (max-width: 1440px){
+            font-size: 14px;
+          }
         }
         .el-submenu-group {
-          font-size: 16px;
+          font-size: calc(16/1920*100vw);
+          @media screen and (max-width: 1440px){
+            font-size: 14px;
+          }
           span {
             font-size: 14px;
           }
@@ -833,7 +908,10 @@
             background-color: #f31d65 !important;
           }
           span{
-            font-size: 16px;
+            font-size: calc(16/1920*100vw);
+            @media screen and (max-width: 1440px){
+              font-size: 14px;
+            }
           }
         }
         #en-groupSubItem.submenu-item{
@@ -842,17 +920,25 @@
           span{
             font-size: calc(16/1920*100vw)
           }
+          @media screen and (max-width: 1440px){
+            span{
+              font-size: 14px
+            }
+          }
         }
         #en-childSubItem.third-title{
           font-size: calc(14/1920*100vw) !important;
           color: #a0a4ad;
         }
         #childSubItem.third-title{
-          font-size: 14px !important;
+          font-size: calc(14/1920*100vw) !important;
           color: #a0a4ad;
+          @media screen and (max-width: 1440px){
+            font-size: 12px;
+          }
         }
         .three-child /deep/ .el-submenu__title {
-          padding-left: calc(60/1920*100vw) !important;
+          padding-left: 60px !important;
           text-align: left;
           position: relative;
           min-width: auto !important;
@@ -871,7 +957,7 @@
           color: #a0a4ad;
         }
         .zh-three-child /deep/ .el-submenu__title {
-          padding-left: calc(60/1920*100vw) !important;
+          padding-left: 60px !important;
           text-align: left;
           position: relative;
           min-width: auto !important;
@@ -890,7 +976,7 @@
         #childSubItem.submenu-item{
           position: relative;
           min-width: auto !important;
-          padding-left: calc(60/1920*100vw) !important;
+          padding-left:60px !important;
           border-bottom: 1px solid $border;
           &:hover{
             background-color: rgba(243,29,101,0.1) !important;
@@ -900,22 +986,20 @@
         #en-childSubItem.submenu-item{
           position: relative;
           min-width: auto !important;
-          padding-left: calc(60/1920*100vw) !important;
+          padding-left: 60px !important;
           border-bottom: 1px solid $border;
           span{
             font-size: calc(14/1920*100vw);
           }
-
-          /*height: calc(70/1920*100vw);*/
-          /*line-height: calc(70/1920*100vw);*/
-          /*
-          @media screen and(max-width:1366px){
-            //padding-left: 2px !important;
-            span{
-              @include point(font-size,12);
-            }
+        }
+        #childSubItem.submenu-item{
+          position: relative;
+          min-width: auto !important;
+          padding-left: 60px !important;
+          border-bottom: 1px solid $border;
+          span{
+            font-size: calc(14/1920*100vw);
           }
-          */
         }
       }
       .content-wrapper-all{
@@ -926,7 +1010,7 @@
         width:100%;
         //@include point(margin-right,50);
         background-color: #f4f5f9;
-        min-height: calc(100vh - 80 / 1920 * 100vw - 45px);
+        min-height: calc(100vh - 80px - 45px);
       }
       .content-wrapper{
         height: auto;
@@ -934,7 +1018,7 @@
         /*border-width: 0;*/
         width: 100%;
         background: #f4f5f9;
-        min-height: calc(100vh - 80 / 1920 * 100vw - 45px);
+        min-height: calc(100vh - 80px - 45px);
         //@include point(margin-right,50);
       }
       // .wrapper-all-header{
@@ -948,7 +1032,7 @@
         // width: 96.5%;
         padding-bottom: calc(10/1920*100vw);
         background-color: #f4f5f9;
-        min-height: calc(100vh - 80 / 1920 * 100vw - 45px);
+        min-height: calc(100vh - 80px - 45px);
       }
       .footercontent{
         padding:0px 0 30px 60px;
@@ -981,27 +1065,47 @@
       background-color:#f31d65 !important;
     }
     .aside-width{
-      width: calc(330/1920*100vw);
+      width: 330px;
       background-color: #222538;
       margin-top: -0.5px;
+      transition: width .1s;
       /*overflow: scroll;*/
+    }
+    .aside-width.mobile{
+      position: fixed;
+      z-index: 1000;
+      width: 330px;
     }
     .aside-collapse-width{
       width:$collapseWidth;
-      width: calc(100/1920*100vw);
+      width:100px;
       overflow: hidden !important;
       background-color: #222538;
+      transition: width .1s;
+    }
+    .aside-collapse-width.mobile{
+      transform: translate(calc(-330px), 0);
     }
     .sec-collapsed{
       margin-left:100px;
       width:95.5%;
       height: auto;
-      // width: auto;
+      min-width:calc(1000px - 100px);
+    }
+    .mobile-sec{
+      margin-left:0;
+      min-width:1000px;
+      width: 100%;
     }
     .sec-uncoll{
-      margin-left:calc(330/1920*100vw);
+      margin-left:330px;
       height: auto;
-      width:calc(100% - 330/1920*100vw);
+      width:calc(100% - 330px);
+      min-width:calc(1000px - 330px);
+    }
+    .sec-uncoll.mobile-sec{
+      margin-left:0;
+      width: 100%;
     }
     .menu li{
       margin-left: 80px;
@@ -1017,12 +1121,12 @@
   }
   .el-select-dropdown__item{
     font-size: calc(24/1920*100vw) !important;
-    font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family: 'Roboto','Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
   }
   .options{
     padding-left: 20px;
     font-size: calc(24/1920*100vw) !important;
-    font-family: 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family:'Roboto', 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
     height: 60px;
     line-height: 60px;
     color: #fff;
@@ -1045,6 +1149,11 @@
     background-color: transparent;
     border: none !important;
     font-size: calc(24/1920*100vw);
+  }
+  @media screen  and (max-width: 1280px){
+    .brand-list .el-input__inner{
+      font-size: 14px;
+    }
   }
   .brand-list .is-disabled .el-input__inner{
     background-color: #222538 !important;
@@ -1080,19 +1189,19 @@
     -ms-transform: rotate(-90deg);
     transform: rotateZ(-90deg);
     font-size: 16px;
-    right:calc(30/1920*100vw);
+    right:30px;
   }
   .el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
     -webkit-transform: rotateZ(0deg);
     -ms-transform: rotate(0deg);
     transform: rotateZ(0deg);
     font-size: 16px;
-    right:calc(30/1920*100vw);
+    right:30px;
   }
   .el-submenu__title{
     height: 70px;
     line-height: 70px;
-    padding-left: calc(50/1920*100vw) !important;
+    padding-left: 50px !important;
     padding-right: 0 !important;
     background-color: #222538 !important;
     /*border-bottom: 1px solid  #393b4c;*/
@@ -1128,24 +1237,24 @@
   }
 
   .el-menu--collapse{
-    width: calc(100/1920*100vw);
+    width: 100px;
   }
   .el-menu--collapse .el-submenu__title{
-    padding: 0 calc(50/1920*100vw - 16px) !important ;
+    padding: 0 34px !important ;
   }
 
   .container .main aside.aside-collapse-width  #en-groupSubItem.el-menu-item{
-    padding-left: calc(50/1920*100vw - 16px) !important;
+    padding-left: 34px !important;
   }
   .container .main aside.aside-collapse-width  #groupSubItem.el-menu-item{
-    padding-left: calc(50/1920*100vw - 16px) !important;
+    padding-left: 34px !important;
   }
   .el-menu.el-menu--popup.el-menu--popup-right-start #en-childSubItem.el-menu-item.submenu-item{
-    padding-left: calc(30/1920* 100vw) !important;
-    padding-right: calc(50/1920* 100vw) !important;
+    padding-left: 30px !important;
+    padding-right: 50px !important;
   }
   .el-menu.el-menu--popup.el-menu--popup-right-start .icon-content{
-    margin-right: calc(48/1920* 100vw);
+    margin-right: 48px;
     float: left;
     position: relative;
     height: 100%;
@@ -1159,6 +1268,7 @@
   .el-menu--popup .el-menu-item{
     height: 60px;
     line-height: 60px;
+    font-size: calc(14/1920*100vw);
   }
   .el-submenu.is-active .el-submenu__title{
     border-bottom-color: #393b4c !important;
@@ -1176,7 +1286,8 @@
   .el-menu--popup .three-child .el-submenu__title{
     height: 60px;
     line-height: 60px;
-    padding-left: calc(30/1920*100vw) !important;
+    padding-left: 30px !important;
+    font-size: calc(14/1920*100vw);
   }
   .three-child .el-menu-item.submenu-item{
     color: #a0a4ad !important;
@@ -1238,7 +1349,7 @@
     display: none;
   }
   .el-select .el-input--medium .el-input__inner{
-    height: calc(30/1920*100vw);
+    height: 30px;
     color: #fff;
   }
 
@@ -1290,6 +1401,7 @@
   }
   .el-menu--popup .zh-three-child .el-submenu__title span{
     color: #a0a4ad;
+    font-size: calc(14/1920*100vw);
   }
   .el-menu--popup .zh-three-child .el-submenu__title:hover span{
     color: #f31d65;
@@ -1408,10 +1520,10 @@
     margin-right: -4px !important;
   }
   .el-input__inner{
-    font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+    font-family:Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
   .el-select-dropdown__item{
-    font-family: Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+    font-family: Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
 </style>
 <style  lang="scss">

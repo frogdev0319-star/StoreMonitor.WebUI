@@ -36,7 +36,7 @@ export default {
     pointCheck: 'Check Schedule',
     lpsSechedule: 'LPS Schedule',
     patrolSechedule: 'Patrol Schedule',
-    leftBracket: '(',
+    leftBracket: ' (',
     rightBracket: ')',
     patrolOverview: 'Patrol Overview',
     eventOverview: 'Event Overview',
