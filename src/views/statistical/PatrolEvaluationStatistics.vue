@@ -2015,7 +2015,7 @@
           margin-right: calc(8 / 1920 * 100vw);
         }
         .iconbangzhu{
-          font-size: calc(20/1920*100vw);
+          font-size: calc(20 / 1920 * 100vw);
           position: relative;
           color: $tab;
         }

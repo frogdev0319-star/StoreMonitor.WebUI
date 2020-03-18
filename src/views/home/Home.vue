@@ -1535,5 +1535,6 @@
   }
   .el-table .cell{
     word-break: break-word;
+    font-size: calc(14/1920*100vw);
   }
 </style>

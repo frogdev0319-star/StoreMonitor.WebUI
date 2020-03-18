@@ -43,6 +43,7 @@
 .el-tooltip__popper.is-dark{
   background-color: rgb(78, 81, 95);
   font-size: calc(12/1920* 100vw) !important;
+  font-family: Roboto, 'Microsoft YaHei';
 }
 .el-range-editor--mini .el-range-separator{
   height: calc(36/1920*100vw);

@@ -1080,7 +1080,7 @@ $suggestBack:#F1F6FE;
                 width:280px;
             }
             .iconbangzhu{
-              font-size: 16px;
+              font-size: calc(20/1920*100vw);
               margin-right: calc(20/1920*100vw);
               @media screen and (min-width: 1280px) and (max-width: 1560px){
                 margin-right: 10px;

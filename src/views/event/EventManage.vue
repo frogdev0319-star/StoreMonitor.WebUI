@@ -1182,7 +1182,7 @@ $h1:#292e36;
         }
         .iconbangzhu{
            margin-left:10px;
-           font-size:20px;
+           font-size: calc(20/1920*100vw);
            position:relative;
            top:2px;
            color:$tab;

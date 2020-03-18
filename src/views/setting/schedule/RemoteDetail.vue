@@ -249,7 +249,7 @@
                 </el-switch>
               </div>
               <div class="el-bind-footer">
-                <div class="el-btn-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
+                <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
                     <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>

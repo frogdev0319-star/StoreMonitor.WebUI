@@ -1541,7 +1541,7 @@
           margin-right: calc(8 / 1920 * 100vw);
         }
         .iconbangzhu{
-          font-size: calc(20/1920*100vw);
+          font-size: calc(20 / 1920 * 100vw);
           position: relative;
           color: $tab;
         }
@@ -1881,22 +1881,6 @@
   @import '../../assets/css/pagination.css';
   .date-picker-poper .el-button--text{
     visibility: hidden !important;
-  }
-  .process-panel .el-progress-circle{
-    width: 150px !important;
-    height: 150px  !important;
-  }
-  @media screen and (max-width:1680px){
-    .process-panel .el-progress-circle{
-      width: 130px !important;
-      height: 130px !important;
-    }
-  }
-  @media screen and (max-width:1280px){
-    .process-panel .el-progress-circle{
-      width: 100px !important;
-      height: 100px !important;
-    }
   }
   .item-process .el-progress-bar .el-progress-bar__outer{
     background-color: #fff;
