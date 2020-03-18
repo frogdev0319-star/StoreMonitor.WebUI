@@ -862,6 +862,9 @@ export default {
           font-size: calc(24/1920*100vw);
           color: #7d8cad;
         }
+        .el-table{
+          font-size: calc(14/1920*100vw);
+        }
       }
         .table-title{
             @include point(margin-left,38);

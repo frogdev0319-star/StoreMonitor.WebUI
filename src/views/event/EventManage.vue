@@ -1282,6 +1282,9 @@ $h1:#292e36;
             text-align: center;
             /*height:300px;*/
             /*float:left;*/
+          &.el-table{
+            font-size: calc(14/1920*100vw);
+          }
         }
     }
     #tabs-content /deep/  .el-tabs__nav-scroll{
