@@ -1,5 +1,5 @@
 <template>
-    <el-row class="el-addrute" :style="{'min-height':varyWindowHeight-120+'px'}">
+    <el-row class="el-addrute">
         <el-col :span="24" class="el-rute-title">
             <span class="tab-name" v-if="!showEditTab">{{tabNameLang}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></span>
@@ -16,9 +16,14 @@
        <el-col :span="lang=='en'&& varyWindowWidth < 1366? 9: 7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
-                   <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
+                 <span class="level2"><i class="iconfont icon-wenjian icontitle"></i><span class="level2-name">{{groupTitle}}</span></span>
                    <div class="btn-content">
-                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup" type="primary" class="btn-class"><i class="el-icon-plus"></i><span style='margin-left:5px;'>{{generateInsSettingLang('addCategory')}}</span></el-button>
+                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup" type="primary" class="btn-class">
+                         <div class="btn-area">
+                           <i class="el-icon-plus"></i>
+                           <span>{{generateInsSettingLang('addCategory')}}</span>
+                         </div>
+                       </el-button>
                    </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -66,10 +71,22 @@
        <el-col :span="lang=='en'&& varyWindowWidth < 1366? 15: 17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
-                    <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
+                    <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
+                      <i class="iconfont icon-icon-test icontitle"></i>
+                      <span class="level2-name">{{napeTitle}}</span></span>
                     <div class="btn-content" v-if="groupList.length!=0">
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape" type="primary" class="btn-class"><i class="el-icon-plus"></i><span>{{generateInsSettingLang('addInsItem')}}</span></el-button>
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape" type="primary" class="btn-class"><i class="iconfont icon-shanchu"></i><span>{{generateInsSettingLang('deleteInsItem')}}</span></el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape" type="primary" class="btn-class">
+                          <div class="btn-area">
+                            <i class="el-icon-plus"></i>
+                            <span>{{generateInsSettingLang('addInsItem')}}</span>
+                          </div>
+                        </el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape" type="primary" class="btn-class">
+                          <div class="btn-area">
+                            <i class="iconfont icon-shanchu"></i>
+                            <span>{{generateInsSettingLang('deleteInsItem')}}</span>
+                          </div>
+                        </el-button>
                     </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -830,9 +847,11 @@ export default {
     .el-addrute{
         width: 100%;
         height: 100%;
+        min-height: calc(100vh - 125px - 60/1920*100vw);
         color: $black;
         border: 1px solid $border;
         background-color: #fff;
+        font-size: calc(18/1920*100vw);
         @media screen and (min-width:1366px){
             .tab-name{
                 font-size: 18px;
@@ -851,10 +870,10 @@ export default {
         }
         @media screen and (max-width:1366px){
             .tab-name{
-                @include point(font-size,18);
+              font-size: calc(18/1920*100vw);
             }
             .icon-tabname{
-                @include point(font-size,18);
+              font-size: calc(18/1920*100vw);
             }
             .iconlised{
                 height: 20px;
@@ -877,16 +896,18 @@ export default {
             width: 100%;
             @include point(height,60);
             @include point(line-height,60);
-            @include point(padding-left,15);
+            height: 80px;
+            line-height: 80px;
+            padding-left: calc(20/1920*100vw);
             border-bottom: 1px solid $border;
             text-align: left;
             .tab-name{
                 text-align: left ;
-                @include point(margin-left,10);
+                margin-left:calc(15/1920*100vw);
                 font-weight: bold;
             }
             .icon-tabname{
-                @include point(margin-left,20);
+                margin-left:calc(25/1920*100vw);
                 color: #ddd;
                 cursor: pointer;
             }
@@ -913,10 +934,8 @@ export default {
           width: calc(130/1920*100vw);
           .el-icon-plus{
             font-size:calc(24/1920*100vw);
-            padding: calc(5/1920*100vw) 0;
           }
           .icon-shanchu{
-            padding: calc(5/1920*100vw) 0;
             font-size:calc(24/1920*100vw);
           }
         }
@@ -936,14 +955,24 @@ export default {
             }
         }
         .title-content{
-            @include point(height,52);
-            @include point(line-height,52);
+            height: 60px;
+            line-height: 60px;
             text-align: left;
             position: relative;
             overflow: hidden;
             border-bottom: 1px solid $border;
-            span{
-                @include point(margin-left,10);
+            .level2{
+              margin-left: calc(15/1920*100vw);
+              .iconfont{
+                font-size: 16px;
+              }
+              .level2-name{
+                font-size: 16px;
+                margin-left: 0;
+                @media screen and (max-width:1440px){
+                    font-size: calc(16/1920*100vw);
+                }
+              }
             }
             .item-title{
                 text-overflow: ellipsis;
@@ -969,29 +998,29 @@ export default {
               }
             }
             .icontitle{
-                @include point(margin-right,10);
+                margin-right: calc(15/1920*100vw);
                 font-weight: normal;
-                font-size: 20px;
-                @include point(margin-left,15);
+                font-size: calc(20/1920*100vw);
+                margin-left: calc(20/1920*100vw);
             }
             .btn-content{
                 width: auto;
                 height: auto;
                 float: right;
-                @include point(margin-right,15);
+                margin-right: calc(20/1920*100vw);
             }
         }
         .el-rute-group{
             height: auto;
-            min-height:calc(100%-60px);
-            min-height: -webkit-calc(100%-60px);
-            min-height: -moz-calc(100%-60px);
+            min-height:calc(100% - 60px);
+            min-height: -webkit-calc(100% - 60px);
+            min-height: -moz-calc(100% - 60px);
             background-color: #FAFAFA;
             .group-items{
                 font-size: 14px;
                 .groupItem{
-                    @include point(height,50);
-                    @include point(line-height,50);
+                    height: 60px;
+                    line-height: 60px;
                     position: relative;
                     overflow: hidden;
                     border-bottom: 1px solid $border;
@@ -1005,23 +1034,22 @@ export default {
                         background-color: $red;
                     }
                     .group-input{
-                        max-width: 60%;
+                        max-width: 64%;
                         float: left;
-                        @include point(margin-left,20);
-
+                        margin-left: calc(25/1920*100vw);
                     }
                     span{
                         float: left;
-                        @include point(margin-left,25);
+                        margin-left: calc(30/1920*100vw);
                         width: 70%;
                         text-overflow: ellipsis;
                         overflow: hidden;
                         white-space: nowrap;
                     }
                     .iconcontent{
-                        @include point(margin-left,25);
+                        margin-left: calc(30/1920*100vw);
                         display: inline-block;
-                        @include point(margin-top,15);
+                        margin-top: 15px;
                         .iconlised{
                             @include iconContent;
                             background-color: $red;
@@ -1050,20 +1078,22 @@ export default {
                 }
             }
             .group-add{
-                @include point(margin-top,5);
+                margin-top: 5px;
                 position: relative;
                 overflow: hidden;
-                @include point(height,50);
-                @include point(line-height,50);
-                @include point(margin-bottom,20);
+                height: 60px;
+                line-height: 60px;
+                margin-bottom: 25px;
                 .groupName-input{
-                    max-width: 60%;
+                    max-width: 64%;
                     float: left;
-                    @include point(margin-left,20);
+                    margin-left: calc(25/1920*100vw);
                 }
                 .iconcontent{
-                    @include point(margin-left,20);
+                    margin-left:calc(30/1920*100vw);
                     display: inline-block;
+                    float: left;
+                    margin-top: 15px;
                     .iconlised{
                         @include iconContent;
                         background-color: $red;
@@ -1121,8 +1151,8 @@ export default {
                 }
             }
             .nape-items-title{
-                @include point(height,50);
-                @include point(line-height,50);
+                height: 60px;
+                line-height: 60px;
                 text-align: left;
                 font-size: 14px;
                 color: $tab;
@@ -1137,7 +1167,8 @@ export default {
                 font-size: 14px;
                 color: #424151;
                 height:auto;
-                @include point(min-height,50);
+                //@include point(min-height,50);
+                min-height: 60px;
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
@@ -1228,20 +1259,16 @@ export default {
         font-size: calc(14/1920*100vw);
         width: calc(130/1920*100vw);
         .el-icon-plus, .icon-shanchu{
-          padding: calc(5/1920*100vw) 0;
           font-size: calc(16/1920*100vw);
-          margin-right: 8px;
-        }
-        span{
-          position: relative;
-          bottom: calc(1/1920*100vw);
-          margin-left:0;
-          @media screen and (max-width: 1440px) {
-            bottom: 0;
-          };
+          margin-right: calc(8/1920*100vw);
         }
         @media screen and (max-width: 1440px) {
           width: 100px;
+        }
+        .btn-area{
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       }
     }
@@ -1255,6 +1282,6 @@ export default {
   overflow-x: hidden;
 }
 .nape-input .el-textarea__inner{
-    font-family: Arial, 'Microsoft YaHei';
+    font-family: Roboto, Arial, 'Microsoft YaHei';
 }
 </style>

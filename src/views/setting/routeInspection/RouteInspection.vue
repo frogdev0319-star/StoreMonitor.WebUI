@@ -2,18 +2,22 @@
     <el-row class="el-route-container">
         <el-col :span="24" class="el-route-header">
           <el-col :span="7" class="el-route-btns">
-              <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
-                <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class"
-                :disabled="elTableData[Number(activeName)].routeData.length==0" type="primary">
-                    <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
-                    <span>{{generateInsSettingLang('bindList')}}</span>
-                </el-button>
+            <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
+            <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class"
+            :disabled="elTableData[Number(activeName)].routeData.length==0" type="primary">
+              <div class="btn-area">
+                <i class="iconfont icon-quxiaolianjie"></i>
+                <span>{{generateInsSettingLang('bindList')}}</span>
+              </div>
+            </el-button>
             <input id="loadFile" type="file" ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
 
             <el-button v-for="(item,index) in btnList"
                 :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
+                  <div class="btn-area">
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
+                  </div>
             </el-button>
 
             <el-dialog :title= "generateInsSettingLang('import')"
@@ -818,7 +822,7 @@ export default {
     $border: #e3e9f4;
     $tab: #7d8cad;
     *{
-        font-family: Arial, Microsoft YaHei;
+        font-family: Roboto,Arial, Microsoft YaHei;
     }
     @function rem($val){
         @return $val/16+rem;
@@ -845,56 +849,53 @@ export default {
     }
 
     .el-route-container{
-        padding: 20px 15px 15px 15px;
+        padding: 20px calc(20/1920*100vw) 15px calc(20/1920*100vw);
         border: 1px solid $border;
         background-color: #fff;
         .el-route-header{
-            @include point(margin-top,10);
+            margin-top: calc(15/1920*100vw);
             .el-route-tabs{
                 width: 98%;
-                @include point(margin-left,10);
+                margin-left: calc(15/1920*100vw);
             }
             .el-route-btns{
                 position: absolute;
-                @include point(right,30);
+                right: calc(40/1920*100vw);
                 z-index: 10;
                 width: auto;
-                @include point(top,12);
+                top: 25px;
+                display: flex;
+                align-items: center;
                 .bind-title{
-                    @include point(margin-right,15);
+                    margin-right:calc(20/1920*100vw);
                     color:$tab;
                     font-size: 12px;
                 }
                 .en-bind-title{
-                  @include point(margin-right,0);
+                  margin-right:calc(20/1920*100vw);
                   color:$tab;
                   font-size: 12px;
                 }
                 .el-bind-btn{
-                    //background-color: $mainColor;
                     color: #fff;
                     border-color: $mainColor;
-                    position: relative;
                     border-radius: 3px;
-                    @include point(margin-right,15);
+                    margin-right:calc(20/1920*100vw);
                     font-size: 12px;
                     &:disabled{
                         opacity: 0.5;
                     }
                   @media screen and (max-width: 1440px) {
-                    width: 110px !important;
+                    width: 100px !important;
                   }
                 }
                 .en-el-bind-btn{
                   color: #fff;
                   border-color: $mainColor;
-                  position: relative;
                   border-radius: 3px;
-                  @include point(margin-right,15);
+                  margin-right: calc(20/1920*100vw);
                   .icon-quxiaolianjie{
                     font-size: calc(16/1920*100vw);
-                  }
-                  span{
                   }
                   &:disabled{
                     opacity: 0.5;
@@ -908,15 +909,12 @@ export default {
                   width: calc(130/1920*100vw);
                   .iconfont{
                     font-size: calc(16/1920*100vw);
-                    padding: calc(5/1920*100vw) 0;
+                    margin-right: calc(10/1920*100vw)
                   }
-                  span{
-                    position: relative;
-                    padding: calc(5/1920*100vw) 0;
-                    bottom: calc(1/1920*100vw);
-                    @media screen and (max-width: 1440px) {
-                      bottom: 0;
-                    };
+                  .btn-area{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                   }
                 }
                 .downLoad-btn{
@@ -925,9 +923,7 @@ export default {
                     color: $mainColor !important;
                     border-radius: 0px;
                     padding: 2px 5px !important;
-
                     position: relative;
-                    top: 3px;
                     display: inline-block;
                     text-decoration: none;
                     font-size: 12px;
@@ -951,36 +947,12 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    position: relative;
-                    top: 3px;
                     border-right: 0;
                     height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
-                    min-width: calc(110/1920*100vw);
-                    @media screen and (min-width: 1366px){
-                      //@include point(width, 90);
-                      span{
-                        position: relative;
-                        @include point(bottom,3);
-                      }
-                    }
-                    @media screen and (max-width: 1440px){
-                      //@include point(width, 120);
-                      top: 5px;
-                      span{
-                        position: relative;
-                        @include point(bottom,5);
-                      }
-                    }
-                    @media screen and (max-width: 1366px){
-                      //@include point(width, 120);
-                      top: 6px;
-                      span{
-                        position: relative;
-                        @include point(bottom,5);
-                      }
-                    }
+                    min-width: 85px;
+                    min-height: 28px;
                     &:last-child{
                         border-right: 1px solid;
                     }
@@ -991,35 +963,29 @@ export default {
                     &:focus{
                         background-color: #FEE4E7;
                     }
+                  .btn-area{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  }
                 }
               .en-el-handle-btn{
                 margin-left: 0px !important;
                 border-color: $mainColor !important;
                 color: $mainColor !important;
                 border-radius: 0px;
-                /*padding: 3px 5px !important;*/
-                position: relative;
-                top: 3px;
                 border-right: 0;
                 height: calc(36/1920*100vw);
                 /*line-height: calc(36/1920*100vw);*/
                 padding: 0 0;
                 font-size: calc(14/1920*100vw);
                 width: calc(130/1920*100vw);
-                @media screen and (min-width: 1366px){
-                  //@include point(width, 90);
-                  span{
-                    position: relative;
-                    @include point(bottom,3);
-                  }
-                }
-                @media screen and (max-width: 1366px){
-                  //@include point(width, 120);
-                  top: 6px;
-                  span{
-                    position: relative;
-                    @include point(bottom,5);
-                  }
+                min-width: 85px;
+                min-height: 28px;
+                .btn-area{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
                 }
 
                 &:last-child{
