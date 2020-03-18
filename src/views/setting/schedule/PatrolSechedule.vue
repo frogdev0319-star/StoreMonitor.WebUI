@@ -4,13 +4,19 @@
       <el-col :span="7" class="el-schedule-btns">
         <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
                    @click="addScheduleButton">
-          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
+          <div class="btn-area">
+            <i class="iconfont el-icon-plus"></i>
+            <span>{{generateScheduleLang('addSchedule')}}</span>
+          </div>
         </el-button>
         <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
                    @click="deleteScheduleButton"
                    :disabled="Number(activeName) == 0? true: false"
         >
-          <i style="margin-right:8px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
+          <div class="btn-area">
+            <i class="iconfont icon-shanchu"></i>
+            <span>{{generateScheduleLang('delete')}}</span>
+          </div>
         </el-button>
       </el-col>
       <el-col :span="18" class="el-schedule-tabs">
@@ -414,7 +420,7 @@
   $h1:#292e36;
   $mainColor:#f31d65;
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto,Arial, Microsoft YaHei;
   }
   @function rem($val){
     @return $val/16+rem;
@@ -458,34 +464,23 @@
     color: #fff;
     //border-color: $mainColor;
     position: relative;
-    @include point(margin-right,15);
+    margin-right:calc(20/1920*100vw);
     font-size: calc(14/1920*100vw);
     height: calc(36/1920*100vw);
     padding: 0 0;
     width: calc(160/1920*100vw);
-    .el-icon-plus{
-      font-size: calc(24/1920*100vw);
-      padding:  calc(5/1920*100vw) 0;
-    }
-    span{
-      position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(2/1920*100vw);
-      };
-    }
     &:disabled{
       opacity: 0.5;
     }
     @media screen and (max-width: 1680px){
-      width: 130px !important;
+      width: 110px !important;
     }
 
   }
   .el-delete-btn {
     color: #fff;
     position: relative;
-    @include point(margin-right, 15);
+    margin-right:calc(20/1920*100vw);
     font-size: calc(14/1920*100vw);
     height: calc(36/1920*100vw);
     padding: 0 0;
@@ -493,45 +488,20 @@
     @media screen and (max-width: 1680px){
       width: 120px;
     }
-    .icon-shanchu{
-      font-size: calc(24/1920*100vw);
-      padding:  calc(5/1920*100vw) 0;
-    }
-    span{
-      position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(2/1920*100vw);
-      };
-    }
     &:disabled {
       opacity: 0.5;
     }
   }
   .en-el-delete-btn{
-    //background-color: $mainColor;
     color: #fff;
-    //border-color: $mainColor;
     position: relative;
-    @include point(margin-right, 15);
-    // @include point(width, 120);
+    margin-right:calc(20/1920*100vw);
     font-size: calc(14/1920*100vw);
     height: calc(36/1920*100vw);
     padding: 0 0;
     width: calc(160/1920*100vw);
-    .icon-shanchu{
-      font-size: calc(24/1920*100vw);
-      padding:  calc(5/1920*100vw) 0;
-    }
-    span{
-      position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(2/1920*100vw);
-      };
-    }
     @media screen and (max-width: 1680px){
-      width: 130px;
+      width: 110px !important;
     }
     &:disabled {
       opacity: 0.5;
@@ -543,22 +513,20 @@
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
     .el-icon-plus, .icon-shanchu{
-      padding: calc(5/1920*100vw) 0;
       font-size: calc(16/1920*100vw);
-    }
-    span{
-      position: relative;
-      bottom: calc(1/1920*100vw);
-      @media screen and (max-width: 1440px) {
-        bottom: 0;
-      };
+      margin-right: calc(8/1920*100vw);
     }
   }
-  .en-el-delete-btn.btn-class, en-el-add-btn.btn-class{
-    width: 130px;
+  .btn-area{
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+  /*.en-el-delete-btn.btn-class, en-el-add-btn.btn-class{*/
+    /*width: 100px;*/
+  /*}*/
   .schedule-container{
-    padding: 20px 15px 15px 15px;
+    padding: 20px calc(15/1920*100vw) 25px 15px;
     /*height: calc(180 / 1920 * 100vw);*/
     border: 1px solid $border;
     background-color: #fff;
@@ -568,31 +536,6 @@
       .el-schedule-tabs {
         width: 98%;
         @include point(margin-left, 10);
-      }
-
-      .el-header-title {
-        font-size: 14px;
-        font-weight: bold;
-        // @include point(margin-left, 30);
-        position: absolute;
-        top: 5px;
-        display: inline;
-        color: $black;
-      }
-      .el-header-hr {
-        @include point(margin-bottom, 16);
-        border: 0.5px solid #e3e9f4;
-        position: relative;
-        top: 25px;
-      }
-      .choice-device {
-        @include point(margin-right, 30);
-        font-size: 12px;
-        color: $tab;
-        display: inline;
-        position: absolute;
-        @include point(right, 220);
-        @include point(margin-top, 10);
       }
       .el-schedule-btns {
         position: absolute;

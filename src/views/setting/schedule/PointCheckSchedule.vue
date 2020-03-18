@@ -2248,7 +2248,7 @@
   $h1:#292e36;
   $mainColor:#f31d65;
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto, Arial, Microsoft YaHei;
   }
   @function rem($val){
     @return $val/16+rem;

@@ -12,14 +12,14 @@
                  left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
           <hr style="border: 0.5px solid #dfe2e9;"/>
-          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <span>{{generateScheduleLang('scheduleName')}}</span>
+          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;display: inline-block;  vertical-align: middle">
+            <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('scheduleName')}}</span>
             <el-input v-model="scheduleName" :placeholder="generateScheduleLang('inputPlaceholder')" size="mini" ref="scheduleName"
                       class="el-schedule-name"></el-input>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
+          <el-button class="file-cancel-btn" @click="showAddDialog = false" size="mini">{{generateScheduleLang('cancel')}}</el-button>
           <el-button class="file-confirm-btn" @click="addSchedule" size="mini" type="primary">{{generateScheduleLang('confirm')}}</el-button>
         </div>
       </el-dialog>
@@ -146,9 +146,11 @@
                       <span>{{it.name}}</span>
                     </div>
                   </div>
-                  <span class="delete-time-btn" size="mini" v-if="" style="margin: 0 20px 0 30px"
+                  <span class="delete-time-btn" size="mini"
                         @click="deleteMonthAndDays(-1)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addMonth" type="primary"><i class="el-icon-plus"></i></el-button>
+                  <el-button class="time-btn" size="mini" @click="addMonth" type="primary">
+                    <i class="el-icon-plus"></i>
+                  </el-button>
                 </div>
               </el-col>
               <el-col :span="24" class="header-details"
@@ -185,60 +187,71 @@
                   </el-option>
                 </el-select>
               </el-col>
-            </div>
-            <hr class="el-header-hr"/>
-            <div class="el-bind-header" style="position: relative;top: 20px;">
-                <span class="el-header-title" style="left: 10px;font-size: 14px;margin-top: 10px;
-    margin-bottom: 10px;">{{generateScheduleLang('bindStore')}}</span>
-              <span class="el-prompt-title">{{generateScheduleLang('promptInfo')}}</span>
-              <span class="choice-device"><i class="iconfont icon-tishi1"
-                                             style="margin-right:10px;color:#93A2B6;"></i>{{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}</span>
-              <el-input
-                size="small"
-                class="el-search-input"
-                :clearable=true
-                :placeholder="generateScheduleLang('searchInfo')"
-                v-model="serachVale" @keyup.enter.native="searchStoreInput">
-                <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
-                   style="position:relative;top:6px;left:6px;font-size:18px;"></i>
-              </el-input>
-            </div>
-            <el-col style="margin-top: 65px;">
-              <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
-                <div  class="el-all-checkbox" v-if="storeList.length!=0">
-                  <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll" style="margin-right: 20px"></el-checkbox>
-                  <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
-                </div>
-                <div class="device-group" v-for="(item,index) in storeList" :key="index">
-                  <div class="device-all-checkbox" style="float: left;">
-                    <div style="display: block">
-                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)" style="margin-right: 20px"></el-checkbox>
-                      <span class="group-name">{{item.cityName}}</span>
-                    </div>
-                  </div>
-                  <div class="device-content" style="clear: left;margin-left: 60px;text-align: left">
-                    <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index" style="margin-top: 20px;">
-                      <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
-                                   @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
-                      <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
+              <el-col :span="24" class="el-header-hr"></el-col>
+              <el-col :span="24" class="el-bind-header">
+                <div style="display: flex">
+                  <!--<span class="el-header-title">{{generateScheduleLang('bindStore')}}</span>-->
+                  <!--<span class="el-prompt-title">{{generateScheduleLang('promptInfo')}}</span>-->
+                  <div class="el-header-title">{{generateScheduleLang('bindStore')}}</div>
+                  <div class="el-prompt-info">
+                    <div class="el-prompt-title">
+                      {{generateScheduleLang('promptInfo')}}
                     </div>
                   </div>
                 </div>
-              </div>
-              <div style="float: left;margin: 30px 0px 30px 20px;font-size: 14px;">
-                <span style="margin-right: 70px">{{generateScheduleLang('enable')}}</span>
-                <el-switch v-model="item.enable">
-                </el-switch>
-              </div>
-              <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
-                <div class="el-btn-content">
-                  <el-button :disabled="storeList.length==0" class="btn" type="primary" size="mini" @click="bindScheduleBtn">
-                    <sapn class="span-class">{{generateScheduleLang('saveAndApply')}}</sapn>
-                  </el-button>
+                <div class="select-info">
+                  <span class="choice-device">
+                    <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>
+                    {{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}
+                  </span>
+                  <el-input
+                    size="small"
+                    class="el-search-input"
+                    :clearable=true
+                    :placeholder="generateScheduleLang('searchInfo')"
+                    v-model="serachVale" @keyup.enter.native="searchStoreInput">
+                    <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
+                       style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                  </el-input>
                 </div>
-              </div>
-            </el-col>
-
+              </el-col>
+              <el-col :span="24">
+                <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
+                  <div  class="el-all-checkbox" v-if="storeList.length!=0">
+                    <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll"></el-checkbox>
+                    <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
+                  </div>
+                  <div class="device-group" v-for="(item,index) in storeList" :key="index">
+                    <div class="device-all-checkbox">
+                      <div style="display: block">
+                        <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"></el-checkbox>
+                        <span class="group-name">{{item.cityName}}</span>
+                      </div>
+                    </div>
+                    <div class="device-content" >
+                      <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
+                        <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
+                                     @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
+                        <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="enable-content">
+                  <span>{{generateScheduleLang('enable')}}</span>
+                  <el-switch
+                    v-model="item.enable">
+                  </el-switch>
+                </div>
+                <div class="el-bind-footer">
+                  <div class="el-btn-content">
+                    <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
+                      <span>{{generateScheduleLang('saveAndApply')}}</span>
+                    </el-button>
+                  </div>
+                </div>
+              </el-col>
+            </div>
           </el-tab-pane>
         </el-tabs>
         <el-dialog :title="generateScheduleLang('prompt')"
@@ -1338,7 +1351,7 @@
         self.monthValue = '';
         self.dayArray = [];
         self.isAdd = true;
-          console.log(self.paneList)
+        console.log(self.paneList)
         self.$emit('sendActiveName', self.activeName)
       },
       async searchStoreInput() {
@@ -2233,7 +2246,8 @@
   $h1:#292e36;
   $mainColor:#f31d65;
   *{
-    font-family: Arial, Microsoft YaHei;
+    margin: 0;
+    font-family: Roboto,Arial, Microsoft YaHei;
   }
   @function rem($val){
     @return $val/16+rem;
@@ -2262,19 +2276,17 @@
     }
   }
   .el-schedule-container{
-    margin: 0px 15px 15px 15px;
     height: calc(180 / 1920 * 100vw);
-
     .el-schedule-header {
-      //@include point(margin-top, 10);
-
       .el-schedule-tabs {
-        width: 98%;
-        @include point(margin-left,10);
+        width: 100%;
+        .schdule-info{
+          height: auto;
+        }
         .header-details{
           text-align: left;
-          height: calc(58 / 1920 * 100vw);
-          line-height: calc(50 / 1920 * 100vw);
+          height: 50px;
+          line-height: 50px;
           position: relative;
           #span {
             font-size: calc(14 / 1920 * 100vw);
@@ -2327,6 +2339,35 @@
             }
             .el-input{
               width: 200px;
+            }
+            .input-arrow-panel{
+              width: 200px;
+              height: 28px;
+              position: absolute;
+              background-color: transparent;
+              cursor: pointer;
+              z-index: 100;
+              top: 18px;
+            }
+            .icon-input{
+              position: relative;
+              right: 25px;
+            }
+          }
+          .self-content{
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            #elMonth{
+              width: 200px;
+              border-radius: 0px;
+              background-color: #f0f5f8;
+            }
+            .el-input{
+              width: 200px;
+              /deep/ .el-input__inner{
+                padding-right: 20px;
+              }
             }
             .input-arrow-panel{
               width: 200px;
@@ -2557,9 +2598,6 @@
                 margin-left: 10px;
                 font-size: 14px;
               }
-              .el-checkbox{
-                margin-right: 0;
-              }
             }
           }
 
@@ -2651,16 +2689,6 @@
           //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
           // }
         }
-        .el-search-input{
-          @include point(width,200);
-          @include point(margin-right,20);
-          position:absolute;
-          right: 0px;
-          top: 3px;
-        }
-        .el-search-input /deep/ .el-input__inner{
-          border-radius: 30px;
-        }
       }
 
       .el-bind-content {
@@ -2669,40 +2697,40 @@
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
         color: $black;
-
         .el-all-checkbox {
-          margin: 20px auto 20px 15px;
-          @include point(margin-left, 15);
+          margin: 20px auto 20px calc(25/1920*100vw);
           float: left;
           .all-device-title {
-            @include point(margin-left, 0);
             font-size: 14px;
+            margin-left: calc(20/1920*100vw);
           }
         }
 
         .device-group {
           clear: both;
           width: 100%;
-          @include point(margin-top, 40);
-          @include point(margin-bottom, 20);
-
+          margin-top: 25px;
+          margin-bottom: 25px;
           .device-all-checkbox {
-            @include point(margin-left, 15);
-
+            float: left;
+            margin-left: calc(25/1920*100vw);
             .group-name {
-              @include point(margin-left, 0);
+              margin-left:calc(20/1920*100vw);
               font-size: 14px;
               font-weight: bold;
             }
           }
           .device-content{
-            @include point(margin-left,40);
+            clear: left;
+            text-align: left;
+            margin-left:calc(55/1920*100vw);
             overflow: hidden;
             .device-detail{
               width: auto;
-              @include point(min-width,160);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              margin-top: 20px;
+              min-width: calc(220/1920*100vw);
+              margin-left: calc(15/1920*100vw);
+              margin-top: calc(15/1920*100vw);
               float: left;
               .device-name{
                 @include point(margin-left, 0);
@@ -2712,16 +2740,19 @@
           }
         }
       }
+      .enable-content{
+        float: left;
+        margin: 30px 0px 30px calc(20/1920*100vw);
+        font-size: calc(14/1920*100vw);
+        span{
+          margin-right: calc(70/1920*100vw);
+        }
+      }
       .el-bind-footer{
-        @include point(height,50);
-        @include point(line-height,50);
-        @include point(margin-bottom,25);
+        float: left;
+        clear: both;
         position: relative;
         .el-btn-content{
-          @include point(margin-left,25);
-          position: absolute;
-          @include point(margin-top,15);
-          @include point(margin-bottom,15);
           clear: both;
           .btn{
             //background-color: #f31d65;
@@ -2730,7 +2761,6 @@
             padding: 0 0;
             width: calc(130/1920*100vw);
             float: left;
-            margin: 0 calc(30/1920*100vw);
             .icon-quxiaolianjie{
               font-size: calc(24/1920*100vw);
               padding: calc(5/1920*100vw) 0;
@@ -2739,54 +2769,59 @@
           }
         }
       }
+      .el-bind-header{
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
       .el-header-title{
         font-size: 14px;
         font-weight: bold;
-        // @include point(margin-left, 30);
-        position: absolute;
-        top: 5px;
-        display: inline;
         color: $black;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        display: inline-block;
+        margin-left: calc(20/1920*100vw);
+      }
+      .el-prompt-info {
+        flex: 1;
+        min-width: 0;
+        align-self: center;
+        margin-top: 12px;
+      }
+      .el-prompt-info .el-prompt-title {
+        font-size: calc(14/1920*100vw);
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        color:#FEA316;
+      }
+      .select-info{
+        float: right;
+        margin-top: 20px;
       }
       .el-prompt-title{
-        font-size: 14px;
-        position: absolute;
-        top: 5px;
-        display: inline;
-        left: 100px;
-        margin-top: 10px;
-        margin-bottom: 10px;
+        font-size: calc(14/1920*100vw);
         color:#FEA316;
-        @media screen and (max-width: 1440px){
-          width: 500px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis ;
-        }
-        @media screen and (max-width: 1280px){
-          width: 450px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis ;
-        }
       }
       .el-header-hr {
-        @include point(margin-bottom, 16);
-        border: 0.5px solid #e3e9f4;
-        position: relative;
-        top: 25px;
+        margin-top: 30px;
+        border-bottom: 1px solid #e3e9f4;
       }
       .choice-device{
-        @include point(margin-right,30);
         font-size: 12px;
         color: $tab;
-        display: inline;
-        position: absolute;
-        @include point(right, 220);
-        @include point(margin-top, 10);
         .icon-tishi1{
           font-size: calc(16/1920*100vw);
         }
+      }
+      .el-search-input{
+        width: calc(200/1920*100vw);
+        margin-left: calc(30/1920*100vw);
+      }
+      .el-search-input /deep/ .el-input__inner{
+        border-radius: 30px;
       }
       .el-schedule-btns{
         position: absolute;
@@ -2935,13 +2970,13 @@
       }
     }
     .time-btn{
-      //background-color: $red;
       color: #fff;
       font-size: 12px;
-      width: 14px;
-      /deep/ span{
-        margin-left: -6px;
-      }
+      display: inline-flex;
+      align-items: center;
+      width: 20px;
+      min-width: 20px;
+      justify-content: center;
       .el-icon-plus{
         font-size:12px;
       }
@@ -2954,6 +2989,7 @@
       line-height: 22px;
       color: #e3e9f4;
       font-size: 12px;
+      margin: 0 calc(20/1920*100vw) 0 calc(30/1920*100vw);
       .el-icon-plus{
         font-size:12px;
       }
@@ -2965,7 +3001,7 @@
     padding: 0 0;
     margin: 0 12px;
     font-size: 12px;
-    font-family: "Microsoft YaHei";
+    font-family: Roboto, "Microsoft YaHei";
     width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3019,6 +3055,10 @@
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
+  }
+
+  /deep/ .el-checkbox__label{
+    font-size: calc(14/1920*100vw);
   }
 </style>
 <style>

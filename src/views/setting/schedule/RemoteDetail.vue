@@ -48,192 +48,193 @@
         <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
           <el-tab-pane v-for="(item,index) in paneList" :name="index.toString()"
                        :key="index" :label="`${item.name}`">
-            <div :style="{height:varyWindowHeight}">
-              <el-col :span="24" class="header-details">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-                <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
-                          class="el-type" @input="(val)=>scheduluNameChange(val,item)"></el-input>
-              </el-col>
-              <el-col :span="24" class="header-details">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-                <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
-                           class="el-type" >
-                  <el-option
-                    v-for="itemType in typeList"
-                    :key="itemType.value"
-                    :label="itemType.label"
-                    :value="itemType.value">
-                  </el-option>
-                </el-select>
-                <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">{{generateScheduleLang('execOnce')}}</el-checkbox>
-                <div class="day-detail" v-if="item.mode == 1">
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
-                  <div class="day-content" @click="choiceWeek">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+            <el-col :span="24" class="header-details">
+              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
+              <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                        class="el-type" @input="(val)=>scheduluNameChange(val,item)"></el-input>
+            </el-col>
+            <el-col :span="24" class="header-details">
+              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
+              <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
+                         class="el-type" >
+                <el-option
+                  v-for="itemType in typeList"
+                  :key="itemType.value"
+                  :label="itemType.label"
+                  :value="itemType.value">
+                </el-option>
+              </el-select>
+              <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">{{generateScheduleLang('execOnce')}}</el-checkbox>
+              <div class="day-detail" v-if="item.mode == 1">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
+                <div class="day-content" @click="choiceWeek">
+                  <div class="input-arrow-panel"></div>
+                  <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
+                  <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                </div>
+                <div :class="lang=='en'? 'en-week-panel': 'week-panel'" v-if="showWeekContent" @mouseleave="showWeekContent = false">
+                  <div class="week-details">
+                    <el-checkbox v-model="checkAllWeek" @change="allWeekChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
                   </div>
-                  <div :class="lang=='en'? 'en-week-panel': 'week-panel'" v-if="showWeekContent" @mouseleave="showWeekContent = false">
-                    <div class="week-details">
-                      <el-checkbox v-model="checkAllWeek" @change="allWeekChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
-                    </div>
-                    <div class="week-details" v-for="(item,index) in weekList" :key="index">
-                      <el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>
-                      <span>{{item.name}}</span>
-                    </div>
+                  <div class="week-details" v-for="(item,index) in weekList" :key="index">
+                    <el-checkbox v-model="item.checked" @change="changeWeekItem(item)"></el-checkbox>
+                    <span>{{item.name}}</span>
                   </div>
                 </div>
-                <div class="day-detail" v-if="item.mode == 2">
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
-                  <div class="month-content" @click="choiceMonthly">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                <!--<region-multi-select :options="weekList" :selected="selectWeek" :placeholder="generateScheduleLang('select')" :disabled="false" @changeInput="changeSelectWeek"></region-multi-select>-->
+              </div>
+              <div class="day-detail" v-if="item.mode == 2">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
+                <div class="month-content" @click="choiceMonthly">
+                  <div class="input-arrow-panel"></div>
+                  <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
+                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                </div>
+                <div :class="lang=='en'? 'en-month-panel':'month-panel'" v-if="showMonthContent" @mouseleave="showMonthContent = false">
+                  <div class="month-details">
+                    <el-checkbox v-model="checkAllMonth" @change="allMonthChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
                   </div>
-                  <div :class="lang=='en'? 'en-month-panel':'month-panel'" v-if="showMonthContent" @mouseleave="showMonthContent = false">
-                    <div class="month-details">
-                      <el-checkbox v-model="checkAllMonth" @change="allMonthChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
-                    </div>
-                    <div class="month-details" v-for="(itemMonth) in monthList" :key=" 'details-'+ itemMonth.value">
-                      <el-checkbox v-model="itemMonth.checked" @change="changeMonthlyItem(itemMonth)"></el-checkbox>
-                      <span>{{itemMonth.name}}</span>
-                    </div>
+                  <div class="month-details" v-for="(itemMonth) in monthList" :key=" 'details-'+ itemMonth.value">
+                    <el-checkbox v-model="itemMonth.checked" @change="changeMonthlyItem(itemMonth)"></el-checkbox>
+                    <span>{{itemMonth.name}}</span>
                   </div>
                 </div>
-              </el-col>
-              <el-col :span="24" class="header-details" v-if="item.mode== 3" v-for="(_item, _index) in item.schedule" :key="'mode3'+_index">
-                <div class="self-detail">
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
-                  <div class="month-content" @click="choiceSelfDefineMonth(_index)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="_item.showSelfDefineMonth" @mouseleave="_item.showSelfDefineMonth = false">
-                    <div class="month-details" v-for="(itemDay,indexs) in selfMonthList" :key="indexs">
-                      <el-checkbox v-model="itemDay.checked" @change="changeSelfDefineMonthItem(_index, indexs)" :disabled="itemDay.disabled"></el-checkbox>
-                      <span>{{itemDay.name}}</span>
-                    </div>
+              </div>
+            </el-col>
+            <el-col :span="24" class="header-details" v-if="item.mode== 3" v-for="(_item, _index) in item.schedule" :key="'mode3'+_index">
+              <div class="self-detail">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
+                <div class="month-content" @click="choiceSelfDefineMonth(_index)">
+                  <div class="input-arrow-panel"></div>
+                  <el-input v-model="_item.month" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
+                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                </div>
+                <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="_item.showSelfDefineMonth" @mouseleave="_item.showSelfDefineMonth = false">
+                  <div class="month-details" v-for="(itemDay,indexs) in selfMonthList" :key="indexs">
+                    <el-checkbox v-model="itemDay.checked" @change="changeSelfDefineMonthItem(_index, indexs)" :disabled="itemDay.disabled"></el-checkbox>
+                    <span>{{itemDay.name}}</span>
                   </div>
                 </div>
-                <div class="day-detail">
-                  <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
-                  <div class="month-content" @click="choiceSelfMonth(_index)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="_item.showMonthContent" @mouseleave="_item.showMonthContent = false">
-                    <div class="month-details" v-for="(itemDay,indexs) in monthList" :key="indexs">
-                      <el-checkbox v-model="itemDay.checked" @change="changeSelfMonthItem(_index)"></el-checkbox>
-                      <span>{{itemDay.name}}</span>
-                    </div>
-                  </div>
-                  <span class="delete-time-btn" size="mini" v-if="item.schedule.length > 1" style="margin: 0 20px 0 30px"
-                        @click="deleteMonthAndDays(_index)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addMonth" type="primary"
-                             v-if="!showAddMonth && (_index == item.schedule.length-1)"><i class="el-icon-plus"></i></el-button>
+              </div>
+              <div class="day-detail">
+                <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
+                <div class="month-content" @click="choiceSelfMonth(_index)">
+                  <div class="input-arrow-panel"></div>
+                  <el-input v-model="_item.monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
+                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                 </div>
-              </el-col>
-              <el-col :span="24" class="header-details" v-if="showAddMonth && item.mode == 3">
-                <div class="self-detail">
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
-                  <div class="month-content" @click="choiceSelfDefineMonth(-1)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="showSelfDefineMonth" @mouseleave="showSelfDefineMonth = false">
-                    <div class="month-details" v-for="(itemDay,indexs) in selfMonthList" :key="indexs">
-                      <el-checkbox v-model="itemDay.checked" @change="changeSelfDefineMonthItem(-1, indexs)" :disabled="itemDay.disabled"></el-checkbox>
-                      <span>{{itemDay.name}}</span>
-                    </div>
+                <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="_item.showMonthContent" @mouseleave="_item.showMonthContent = false">
+                  <div class="month-details" v-for="(itemDay,indexs) in monthList" :key="indexs">
+                    <el-checkbox v-model="itemDay.checked" @change="changeSelfMonthItem(_index)"></el-checkbox>
+                    <span>{{itemDay.name}}</span>
                   </div>
                 </div>
-                <div class="day-detail">
-                  <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
-                  <div class="month-content" @click="choiceMonth">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="showMonthContent" @mouseleave="hiddenSelfMonthPanel">
-                    <div class="month-details" v-for="(it,ind) in monthList" :key="ind">
-                      <el-checkbox v-model="it.checked" @change="changeMonthItem(it)"></el-checkbox>
-                      <span>{{it.name}}</span>
-                    </div>
-                  </div>
-                  <span class="delete-time-btn" size="mini" v-if="" style="margin: 0 20px 0 30px"
-                        @click="deleteMonthAndDays(-1)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" @click="addMonth" type="primary"><i class="el-icon-plus"></i></el-button>
+                <span class="delete-time-btn" size="mini" v-if="item.schedule.length > 1" style="margin: 0 20px 0 30px"
+                      @click="deleteMonthAndDays(_index)"><i class="el-icon-error"></i></span>
+                <el-button class="time-btn" size="mini" @click="addMonth" type="primary"
+                           v-if="!showAddMonth && (_index == item.schedule.length-1)"><i class="el-icon-plus"></i></el-button>
+              </div>
+            </el-col>
+            <el-col :span="24" class="header-details" v-if="showAddMonth && item.mode == 3">
+              <div class="self-detail">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectMonth')}}</span>
+                <div class="month-content" @click="choiceSelfDefineMonth(-1)">
+                  <div class="input-arrow-panel"></div>
+                  <el-input v-model="selfMonth" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
+                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
                 </div>
-              </el-col>
-              <el-col :span="24" class="header-details"
-                      :key="index">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('notifyTime')}}</span>
-                <el-time-select
-                  class="time-select"
-                  v-model="item.notifyTime"
-                  :picker-options="{
-                  start: '08:00',
-                  step: '00:15',
-                  end: '23:59'
-                }"
-                  :placeholder="generateScheduleLang('selectTime')"
-                  size="mini"
-                >
-                </el-time-select>
-                <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
-                            placement="bottom-end">
-                  <div slot="content">{{generateScheduleLang('notifyInfo')}}</div>
-                  <i class="iconfont icon-bangzhu iconbangzhu"></i>
-                </el-tooltip>
-                <el-checkbox v-model="item.ifNotifyOneDay">{{generateScheduleLang('notifyOneDayBefore')}}</el-checkbox>
-              </el-col>
-              <el-col :span="24" class="header-details">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('dueDays')}}</span>
-                <el-select v-model="item.dueDays"  placeholder="选择执行时效" size="mini"
-                           class="el-type" >
-                  <el-option
-                    v-for="item in dueDaysList"
-                    :key="item.value"
-                    :label="item.name"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </el-col>
-            </div>
-            <hr class="el-header-hr"/>
-            <div class="el-bind-header" style="position: relative;top: 20px;">
-                <span class="el-header-title" style="left: 10px;font-size: 14px;margin-top: 10px;
-    margin-bottom: 10px;">{{generateScheduleLang('bindStore')}}</span>
-              <span class="choice-device"><i class="iconfont icon-tishi1"
-                                             style="margin-right:10px;color:#93A2B6;"></i>{{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}</span>
-              <el-input
-                size="small"
-                class="el-search-input"
-                :clearable=true
-                :placeholder="generateScheduleLang('searchInfo')"
-                v-model="serachVale" @keyup.enter.native="searchStoreInput">
-                <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
-                   style="position:relative;top:6px;left:6px;font-size:18px;"></i>
-              </el-input>
-            </div>
-            <el-col style="margin-top: 65px;">
+                <div :class="lang=='en'? 'en-self-def-panel':'self-def-panel'" v-if="showSelfDefineMonth" @mouseleave="showSelfDefineMonth = false">
+                  <div class="month-details" v-for="(itemDay,indexs) in selfMonthList" :key="indexs">
+                    <el-checkbox v-model="itemDay.checked" @change="changeSelfDefineMonthItem(-1, indexs)" :disabled="itemDay.disabled"></el-checkbox>
+                    <span>{{itemDay.name}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="day-detail">
+                <!--<span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectDate')}}</span>-->
+                <div class="month-content" @click="choiceMonth">
+                  <div class="input-arrow-panel"></div>
+                  <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
+                  <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
+                </div>
+                <div :class="lang=='en'? 'en-self-month-panel':'self-month-panel'" v-if="showMonthContent" @mouseleave="hiddenSelfMonthPanel">
+                  <div class="month-details" v-for="(it,ind) in monthList" :key="ind">
+                    <el-checkbox v-model="it.checked" @change="changeMonthItem(it)"></el-checkbox>
+                    <span>{{it.name}}</span>
+                  </div>
+                </div>
+                <span class="delete-time-btn" size="mini"
+                      @click="deleteMonthAndDays(-1)"><i class="el-icon-error"></i></span>
+                <el-button class="time-btn" size="mini" @click="addMonth" type="primary">
+                  <i class="el-icon-plus"></i>
+                </el-button>
+              </div>
+            </el-col>
+            <el-col :span="24" class="header-details"
+                    :key="index">
+              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('notifyTime')}}</span>
+              <el-time-picker
+                class="time-select"
+                v-model="item.notifyTime"
+                :clearable="false"
+                :placeholder="generateScheduleLang('selectTime')"
+                size="mini"
+                format="HH:mm"
+              >
+              </el-time-picker>
+              <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
+                          placement="bottom-end">
+                <div slot="content">{{generateScheduleLang('notifyInfo')}}</div>
+                <i class="iconfont icon-bangzhu iconbangzhu"></i>
+              </el-tooltip>
+              <el-checkbox v-model="item.ifNotifyOneDay">{{generateScheduleLang('notifyOneDayBefore')}}</el-checkbox>
+            </el-col>
+            <el-col :span="24" class="header-details">
+              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('dueDays')}}</span>
+              <el-select v-model="item.dueDays"  placeholder="选择执行时效" size="mini"
+                         class="el-type" >
+                <el-option
+                  v-for="item in dueDaysList"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="24" class="el-header-hr"></el-col>
+            <el-col :span="24" class="el-bind-header">
+              <span class="el-header-title">{{generateScheduleLang('bindStore')}}</span>
+              <div class="select-info">
+                <span class="choice-device">
+                <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>
+                {{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}
+              </span>
+                <el-input
+                  size="small"
+                  class="el-search-input"
+                  :clearable=true
+                  :placeholder="generateScheduleLang('searchInfo')"
+                  v-model="serachVale" @keyup.enter.native="searchStoreInput">
+                  <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
+                     style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                </el-input>
+              </div>
+            </el-col>
+            <el-col :span="24">
               <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
                 <div  class="el-all-checkbox" v-if="storeList.length!=0">
-                  <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll" style="margin-right: 20px"></el-checkbox>
+                  <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll"></el-checkbox>
                   <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
                 </div>
                 <div class="device-group" v-for="(item,index) in storeList" :key="index">
-                  <div class="device-all-checkbox" style="float: left;">
+                  <div class="device-all-checkbox">
                     <div style="display: block">
-                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)" style="margin-right: 20px"></el-checkbox>
+                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"></el-checkbox>
                       <span class="group-name">{{item.cityName}}</span>
                     </div>
                   </div>
-                  <div class="device-content" style="clear: left;margin-left: 60px;text-align: left">
-                    <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index" style="margin-top: 20px;">
+                  <div class="device-content" >
+                    <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
                       <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
                                    @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
                       <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
@@ -241,21 +242,20 @@
                   </div>
                 </div>
               </div>
-              <div style="float: left;margin: 30px 0px 30px 20px;font-size: 14px;">
-                <span style="margin-right: 70px">{{generateScheduleLang('enable')}}</span>
+              <div class="enable-content">
+                <span>{{generateScheduleLang('enable')}}</span>
                 <el-switch
                 v-model="item.enable">
                 </el-switch>
               </div>
-              <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
-                <div class="el-btn-content">
+              <div class="el-bind-footer">
+                <div class="el-btn-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
                     <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>
               </div>
             </el-col>
-
           </el-tab-pane>
         </el-tabs>
         <el-dialog :title="generateScheduleLang('prompt')"
@@ -295,10 +295,12 @@
   import Nape from "../../../api/ApiPath";
   import util from '@/common/util'
   import filterString from '@/common/filterString'
+  import RegionMultiSelect from "@/components/RegionMultiSelect";
 
   export default {
     name: "RemoteDetail",
     components:{
+      RegionMultiSelect,
       DialogVue
     },
     data(){
@@ -503,37 +505,44 @@
           {
             'checked': false,
             'name': this.$t('scheduleView.mon'),
-            'value': '1',
+            'label': this.$t('scheduleView.mon'),
+            'value': 1,
           },
           {
             'checked': false,
             'name': this.$t('scheduleView.tues'),
-            'value': '2',
+            'label': this.$t('scheduleView.tues'),
+            'value': 2,
           },
           {
             'checked': false,
             'name': this.$t('scheduleView.wed'),
-            'value': '3',
+            'label': this.$t('scheduleView.wed'),
+            'value': 3,
           },
           {
             'checked': false,
             'name': this.$t('scheduleView.thur'),
-            'value': '4',
+            'label': this.$t('scheduleView.thur'),
+            'value': 4,
           },
           {
             'checked': false,
             'name':this.$t('scheduleView.fri'),
-            'value': '5',
+            'label':this.$t('scheduleView.fri'),
+            'value': 5,
           },
           {
             'checked': false,
             'name': this.$t('scheduleView.sat'),
-            'value': '6',
+            'label': this.$t('scheduleView.sat'),
+            'value': 6,
           },
           {
             'checked': false,
             'name': this.$t('scheduleView.sun'),
-            'value': '7',
+            'label': this.$t('scheduleView.sun'),
+            'value': 7,
           },
 
         ],
@@ -2421,7 +2430,8 @@
   $h1:#292e36;
   $mainColor:#f31d65;
   *{
-    font-family: Arial, Microsoft YaHei;
+    margin: 0;
+    font-family: Roboto,Arial, Microsoft YaHei;
   }
   @function rem($val){
     @return $val/16+rem;
@@ -2451,19 +2461,17 @@
     }
   }
   .el-schedule-container{
-    margin: 0px 15px 15px 15px;
     height: calc(180 / 1920 * 100vw);
-
     .el-schedule-header {
-      //@include point(margin-top, 10);
-
       .el-schedule-tabs {
-        width: 98%;
-        @include point(margin-left,10);
+        width: 100%;
+        .schdule-info{
+          height: auto;
+        }
         .header-details{
           text-align: left;
-          height: calc(58 / 1920 * 100vw);
-          line-height: calc(50 / 1920 * 100vw);
+          height: 50px;
+          line-height: 50px;
           position: relative;
           #span {
             font-size: calc(14 / 1920 * 100vw);
@@ -2866,58 +2874,48 @@
           //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
           // }
         }
-        .el-search-input{
-          @include point(width,200);
-          @include point(margin-right,20);
-          position:absolute;
-          right: 0px;
-          top: 3px;
-        }
-        .el-search-input /deep/ .el-input__inner{
-          border-radius: 30px;
-        }
       }
 
       .el-bind-content {
-        @include point(max-height, 450);
+        max-height: calc(415/1920*100vw);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
         color: $black;
-
         .el-all-checkbox {
-          margin: 20px auto 20px 15px;
-          @include point(margin-left, 15);
+          margin: 20px auto 20px calc(25/1920*100vw);
           float: left;
           .all-device-title {
-            @include point(margin-left, 0);
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
+            margin-left: calc(20/1920*100vw);
           }
         }
 
         .device-group {
           clear: both;
           width: 100%;
-          @include point(margin-top, 40);
-          @include point(margin-bottom, 20);
-
+          margin-top: 25px;
+          margin-bottom: 25px;
           .device-all-checkbox {
-            @include point(margin-left, 15);
-
+            float: left;
+            margin-left: calc(25/1920*100vw);
             .group-name {
-              @include point(margin-left, 0);
+              margin-left:calc(20/1920*100vw);
               font-size: 14px;
               font-weight: bold;
             }
           }
           .device-content{
-            @include point(margin-left,40);
+            clear: left;
+            text-align: left;
+            margin-left:calc(55/1920*100vw);
             overflow: hidden;
             .device-detail{
               width: auto;
-              @include point(min-width,160);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              margin-top: 20px;
+              min-width: calc(220/1920*100vw);
+              margin-left: calc(15/1920*100vw);
+              margin-top: calc(15/1920*100vw);
               float: left;
               .device-name{
                 @include point(margin-left, 0);
@@ -2927,16 +2925,19 @@
           }
         }
       }
+      .enable-content{
+        float: left;
+        margin: 30px 0px 30px calc(20/1920*100vw);
+        font-size: calc(14/1920*100vw);
+        span{
+          margin-right: calc(70/1920*100vw);
+        }
+      }
       .el-bind-footer{
-        @include point(height,50);
-        @include point(line-height,50);
-        @include point(margin-bottom,25);
+        float: left;
+        clear: both;
         position: relative;
         .el-btn-content{
-          @include point(margin-left,25);
-          position: absolute;
-          @include point(margin-top,15);
-          @include point(margin-bottom,15);
           clear: both;
           .btn{
             //background-color: #f31d65;
@@ -2945,7 +2946,6 @@
             padding: 0 0;
             width: calc(130/1920*100vw);
             float: left;
-            margin: 0 calc(30/1920*100vw);
             .icon-quxiaolianjie{
               font-size: calc(24/1920*100vw);
               padding: calc(5/1920*100vw) 0;
@@ -2954,35 +2954,39 @@
           }
         }
       }
-      .bind-title{
-
-      };
+      .el-bind-header{
+        text-align: left;
+      }
       .el-header-title{
         font-size: 14px;
         font-weight: bold;
-        // @include point(margin-left, 30);
-        position: absolute;
-        top: 5px;
-        display: inline;
         color: $black;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        display: inline-block;
+        margin-left: calc(20/1920*100vw);
+      }
+      .select-info{
+        float: right;
+        margin-top: 20px;
       }
       .el-header-hr {
-        @include point(margin-bottom, 16);
-        border: 0.5px solid #e3e9f4;
-        position: relative;
-        top: 25px;
+        margin-top: 30px;
+        border-bottom: 1px solid #e3e9f4;
       }
       .choice-device{
-        @include point(margin-right,30);
         font-size: 12px;
         color: $tab;
-        display: inline;
-        position: absolute;
-        @include point(right, 220);
-        @include point(margin-top, 10);
         .icon-tishi1{
           font-size: calc(16/1920*100vw);
         }
+      }
+      .el-search-input{
+        width: calc(200/1920*100vw);
+        margin-left: calc(30/1920*100vw);
+      }
+      .el-search-input /deep/ .el-input__inner{
+        border-radius: 30px;
       }
       .el-schedule-btns{
         position: absolute;
@@ -3131,13 +3135,13 @@
       }
     }
     .time-btn{
-      //background-color: $red;
       color: #fff;
       font-size: 12px;
-      width: 14px;
-      /deep/ span{
-        margin-left: -6px;
-      }
+      display: inline-flex;
+      align-items: center;
+      width: 20px;
+      min-width: 20px;
+      justify-content: center;
       .el-icon-plus{
         font-size:12px;
       }
@@ -3150,6 +3154,7 @@
       line-height: 22px;
       color: #e3e9f4;
       font-size: 12px;
+      margin: 0 calc(20/1920*100vw) 0 calc(30/1920*100vw);
       .el-icon-plus{
         font-size:12px;
       }
@@ -3163,7 +3168,7 @@
     padding: 0 0;
     margin: 0 12px;
     font-size: 12px;
-    font-family: "Microsoft YaHei";
+    font-family: Roboto,"Microsoft YaHei";
     width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3213,6 +3218,10 @@
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
+  }
+
+  /deep/ .el-checkbox__label{
+   font-size: calc(14/1920*100vw);
   }
 </style>
 <style>
