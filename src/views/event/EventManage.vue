@@ -109,7 +109,7 @@
                             <div slot="empty">
                                 <div>
                                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad','font-family':'Roboto, Microsoft YaHei'}">{{generateEventLang('noEvents')}}</span>
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{generateEventLang('noEvents')}}</span>
                                 </div>
                             </div>
                         </el-table>

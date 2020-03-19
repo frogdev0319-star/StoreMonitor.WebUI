@@ -143,7 +143,7 @@
               <div slot="empty">
                 <div>
                   <i class="iconfont icon-zhengque empty-data-icon"></i>
-                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Roboto,Microsoft YaHei'}">{{$t('overview.noData')}}</span>
+                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
                 </div>
               </div>
             </el-table>
@@ -199,7 +199,7 @@
                 <div slot="empty">
                   <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad','font-family':'Roboto,Microsoft YaHei'}">{{$t('overview.noData')}}</span>
+                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
                   </div>
                 </div>
               </el-table>
