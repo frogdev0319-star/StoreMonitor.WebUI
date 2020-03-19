@@ -1263,6 +1263,10 @@ export default {
             }
             let sessionId= await dashAPI.Online();
             self.sessionId=sessionId;
+            if(sessionId==null){
+              self.isLoading = false;
+              return;
+            }
             let dataonLine={
                 request: {
                     method: 'connection',
@@ -1277,6 +1281,10 @@ export default {
             };
             url=await dashAPI.playBack(1,dataonLine);
             self.mpdurl = url;
+            if(url == null){
+              self.isLoading = false;
+              return;
+            }
             console.log(self.mpdurl);
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
@@ -1324,6 +1332,10 @@ export default {
         }
         let sessionId= await dashAPI.Online();
         self.sessionId=sessionId;
+        if(sessionId==null){
+          self.isLoading = false;
+          return;
+        }
         let dataonLine={
           request: {
             method: 'connection',
@@ -1339,6 +1351,10 @@ export default {
         url=await dashAPI.playBack(1,dataonLine);
         self.mpdurl = url;
         console.log(self.mpdurl);
+        if(url == null){
+          self.isLoading = false;
+          return;
+        }
         if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
           console.log(self.mpdurl);
           self.playVideo(self.mpdurl);
@@ -1367,6 +1383,10 @@ export default {
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
+            if(sessionId == null){
+              self.isLoading = false;
+              return;
+            }
             let data= {
                 request: {
                     method: 'connection',
@@ -1381,6 +1401,10 @@ export default {
             };
             let url=await dashAPI.playBack(1,data);
             self.mpdurl=url;
+            if(url == null){
+              self.isLoading = false;
+              return;
+            }
             if(url.ErrorCode==undefined&&url.length!=0){
                 self.playVideo(self.mpdurl);
                 setTimeout(()=>{
@@ -2122,7 +2146,7 @@ export default {
             console.log(sessionId);
             self.sessionId=sessionId;
             if(sessionId == null){
-              self.isLoading = true;
+              self.isLoading = false;
               return
             }
             let data=null;
@@ -2150,9 +2174,13 @@ export default {
                     }
                 };
                 url=await dashAPI.playBack(1,data);
+                if(url == null){
+                  self.isLoading = false;
+                  return;
+                }
                 if(url.ErrorCode==undefined&&url.length!=0){
                     setTimeout(()=>{
-                      self.isLoading = false;;
+                      self.isLoading = false;
                     },1000);
                     self.timeid=window.setInterval(function(){  //播放视频的同时进度条进行
                         self.getProcess();
@@ -2174,6 +2202,10 @@ export default {
             }
             self.mpdurl = url;
             console.log(self.mpdurl);
+            if(self.mpdurl == null){
+              self.isLoading = false;
+              return;
+            }
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
@@ -2700,6 +2732,10 @@ export default {
                 await dashAPI.Offline(self.sessionId);
                 let sessionId= await dashAPI.Online();
                 self.sessionId=sessionId;
+                if(sessionId == null){
+                  self.isLoading = false;
+                  return;
+                }
                 let data=null;
                 data= {
                     request: {
@@ -2720,6 +2756,10 @@ export default {
                 await dashAPI.Offline(self.sessionId);
                 let sessionId= await dashAPI.Online();
                 self.sessionId=sessionId;
+                if(sessionId == null){
+                  self.isLoading = false;
+                  return;
+                }
                 let data=null;
                 data = {
                     request: {
@@ -2734,6 +2774,10 @@ export default {
                 url=await dashAPI.RealTime(1,data);
             }
             self.mpdurl = url;
+            if(self.mpdurl == null){
+              self.isLoading = false;
+              return;
+            }
             console.log(self.mpdurl);
             if (url.ErrorCode==undefined&&url.length!=0) {
                 self.playVideo(self.mpdurl);

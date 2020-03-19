@@ -2467,6 +2467,10 @@ export default {
             await dashAPI.Offline(self.sessionId);
             let sessionId= await dashAPI.Online();
             self.sessionId=sessionId;
+           if(sessionId == null){
+             self.isLoading = false;
+             return
+           }
             let data=null;
             data = {
                 request: {
@@ -2482,6 +2486,10 @@ export default {
 
             self.mpdurl = url;
             console.log(self.mpdurl);
+             if(self.mpdurl == null){
+               self.isLoading = false;
+               return;
+             }
             if (url.ErrorCode==undefined&&url.length!=0) {
                 self.isPlayingFlag=1;
                 self.playVideo(self.mpdurl);
@@ -3261,18 +3269,23 @@ export default {
         @mixin arrow-icon{
             .guide-num{
                 display: inline-block;
-                height: 28px;
-                width: 28px;
-                line-height: 28px;
+                height: calc(28/1920*100vw);
+                width: calc(28/1920*100vw);
+                line-height: calc(28/1920*100vw);
                 border-radius: 50%;
                 background-color: $red;
                 color: #fff;
                 margin-right: 15px;
                 font-size: 14px;
+                @media screen and (max-width: 1280px){
+                  height: 18px;
+                  width: 18px;
+                  line-height: 18px;
+                }
             }
             .guide-title{
                 color: $red;
-                font-size: 14px;
+                font-size: calc(14/1920*100vw);
                 font-weight: bold;
             }
         }
@@ -3449,7 +3462,7 @@ export default {
                             }
                         }
                         .en-iconright{
-                          width: 108px;
+                          width: 100px;
                           text-align: center;
                           margin-top: 30px;
                           height: 32px;
@@ -3745,7 +3758,7 @@ export default {
                     position: relative;
                     z-index: 100;
                 }
-                @media screen and (min-width: 1366px){
+                @media screen and (min-width: 1600px){
                     .inspect-header{
                         height: 50px;
                         line-height: 50px;
@@ -3756,11 +3769,11 @@ export default {
                         font-size: 14px;
                     }
                     .guide-lside{
-                        top: 20px;
-                        right:16%;
+                        top: 10px;
+                        right: 10%;
                     }
                 }
-                @media screen and (max-width: 1366px){
+                @media screen and (max-width: 1600px){
                      .inspect-header{
                         height: 40px;
                         line-height: 40px;
@@ -3780,10 +3793,10 @@ export default {
                           text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
                         }
                     }
-                    .guide-lside{
-                        top: 10px;
-                        right:3%;
-                    }
+                  .guide-lside{
+                    top: 10px;
+                    right: 3%;
+                  }
                 }
                 .inspect-content{
                     padding: 15px auto;

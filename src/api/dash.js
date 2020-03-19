@@ -41,8 +41,11 @@ async function Offline(sessionID) {
       method,
       data
     });
-
-    return ret.result;
+    if(ret == null){
+      return null
+    }else{
+      return ret.result;
+    }
 }
 
   async function Enum(sessionID) {
@@ -121,6 +124,9 @@ async function playBack(isStart,data){
     method,
     data
   });
+  if(ret == null){
+    return null;
+  }
   if ( isStart == 1 ){
     if ( ret.data.result.state == 'OK' ) {
       console.log(ret.data.result.mpd);
