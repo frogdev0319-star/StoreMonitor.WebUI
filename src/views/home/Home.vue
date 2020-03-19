@@ -1535,6 +1535,8 @@
   }
   .el-table .cell{
     word-break: break-word;
-    /*font-size: calc(14/1920*100vw);*/
+  }
+  .el-message__content, .el-button, .el-time-panel__btn, .el-time-panel, .el-popper{
+    font-family: Roboto, 'Microsoft YaHei';
   }
 </style>

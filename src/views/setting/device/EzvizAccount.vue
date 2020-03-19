@@ -108,7 +108,7 @@
             <div slot="empty">
               <div>
                 <i class="iconfont icon-zhengque empty-data-icon"></i>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{noData}}</span>
+                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Roboto,Microsoft YaHei'}">{{noData}}</span>
               </div>
             </div>
           </el-table>

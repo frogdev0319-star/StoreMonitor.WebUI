@@ -1286,6 +1286,7 @@
         padding-right: calc(30/1920*100vw);
         height: 20px;
         line-height: 20px;
+        position: relative;
         span{
           font-size: calc(14/1920*100vw);
           margin-right: calc(20/1920*100vw);
