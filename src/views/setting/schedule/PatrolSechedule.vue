@@ -23,8 +23,8 @@
         <el-tabs v-model="activePatrol" @tab-click="changePatrol" id="patrol-content">
           <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index" >
           </el-tab-pane>
-          <remote-detail v-if="activePatrol == '0'" ref="remoteHandle" v-on:sendActiveName = "changeActiveName"></remote-detail>
-          <onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>
+          <remote-detail ref="remoteHandle" v-on:sendActiveName = "changeActiveName" :active-patrol = 'activePatrol'></remote-detail>
+          <!--<onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>-->
         </el-tabs>
       </el-col>
     </div>
@@ -357,18 +357,11 @@
         monthAndDay: [{month: 1, days: []}]
       }
     },
-
     methods: {
       generateScheduleLang,
       addScheduleButton() {
         let self = this;
-        if (self.activePatrol == '0') {
-          self.$refs.remoteHandle.addSchedule();
-        }
-        else {
-          self.$refs.onsiteHandle.addSchedule();
-        }
-
+        self.$refs.remoteHandle.addSchedule();
       },
       changeActiveName(val) {
         console.log(val + 'from sun')
@@ -376,17 +369,17 @@
       },
       deleteScheduleButton() {
         let self = this;
-        if (self.activePatrol == '0') {
-          self.$refs.remoteHandle.deleteScheduleButton();
-        }
-        else {
-          self.$refs.onsiteHandle.deleteScheduleButton();
-        }
+        self.$refs.remoteHandle.deleteScheduleButton();
       },
       changePatrol(val){
         let self = this;
         self.activePatrol = val.index;
         self.activeName = '0';
+        self.$refs.remoteHandle.activeName = '0'
+        self.$refs.remoteHandle.isFirstLoad = true
+        self.$nextTick(()=>{
+          self.$refs.remoteHandle.getScheduleList();
+        })
       }
     },
     watch:{
@@ -396,6 +389,7 @@
         if(val!=0){
           self.activePatrol = '0';
           self.$refs.remoteHandle.isFirstLoad = true;
+          self.$refs.remoteHandle.activeName = "0";
           self.$refs.remoteHandle.getScheduleList();
         }
       }
@@ -444,13 +438,6 @@
     .icon-shanchu{
       font-size: calc(24/1920*100vw);
       padding:  calc(5/1920*100vw) 0;
-    }
-    span{
-      position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(2/1920*100vw);
-      };
     }
     &:disabled{
       opacity: 0.5;
