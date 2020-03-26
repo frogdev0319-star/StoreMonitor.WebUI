@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-device" :style="{'height':varyWindowHeight-170+'px'}">>
+  <el-row class="el-device" :style="{'height':varyWindowHeight-170+'px'}">
     <el-col :span="24" class="el-btns">
       <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-if="activeName=='device'">
         <el-input

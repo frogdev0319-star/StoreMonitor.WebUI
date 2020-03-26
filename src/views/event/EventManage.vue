@@ -1311,7 +1311,7 @@ $h1:#292e36;
   }
 }
 .el-select-content{
-    @include point(width,120);
+    //@include point(width,120);
 }
 .empty-data-icon{
     @include point(font-size,22);

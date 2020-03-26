@@ -1104,13 +1104,21 @@ $suggestBack:#F1F6FE;
             .el-province{
                 width: calc(160/1920*100vw);
                 margin-right: calc(15/1920*100vw);
-                @media screen and (min-width: 1280px) and (max-width: 1560px){
+                @media screen and (min-width: 1280px) and (max-width: 1360px){
                   width: 85px;
                 };
                 @media screen and (max-width: 1022px){
                   margin-right: 10px;
                 };
             }
+          /deep/ .content .el-select.el-select--medium{
+            @media screen and (min-width: 1280px) and (max-width: 1360px){
+              width: 85px;
+            };
+            @media screen and (max-width: 1022px){
+              margin-right: 10px;
+            };
+          }
           .stores-panel{
             position: relative;
             display: inline-block;
@@ -1176,7 +1184,7 @@ $suggestBack:#F1F6FE;
           }
             .search-input{
                 width: calc(160/1920*100vw);
-                @media screen and (min-width: 1280px) and (max-width: 1560px){
+                @media screen and (min-width: 1280px) and (max-width: 1360px){
                   width: 85px;
                 };
             }
@@ -1194,7 +1202,7 @@ $suggestBack:#F1F6FE;
               padding: 0 0;
               font-size: calc(14/1920*100vw);
               margin-left: calc(20/1920*100vw);
-              @media screen and (min-width: 1280px) and (max-width: 1560px){
+              @media screen and (min-width: 1280px) and (max-width: 1360px){
                 width: 85px;
               };
               @media screen and (max-width: 1024px){

@@ -13,9 +13,9 @@
             </el-option>
           </el-select>
           <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                               style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0"></region-multi-select>
+                               style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
           <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                               style="display: inline" ref="citySelect" :disabled="curProvince.length==0 "></region-multi-select>
+                               style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect"></multi-select>
@@ -94,7 +94,7 @@
           </el-col>
           <el-col :span="15" class="charts-content">
             <div class="title">
-              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect" :limit="2" :inputSize="'medium'"></limit-select>
+              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect" :limit="2" :inputSize="'mini'"></limit-select>
             </div>
             <div class="region-result">
               <div class="region-content">
