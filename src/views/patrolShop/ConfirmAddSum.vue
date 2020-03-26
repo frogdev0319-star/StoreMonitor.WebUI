@@ -158,37 +158,63 @@ export default {
             let bucketName = self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
-            let url=`http://${bucketName}.${endpoint}/${fileName}`;
-            return url;
+            if (self.oss.ossVendor == 2){
+              return `https://${endpoint}/${bucketName}/${fileName}`;
+            }
+            else {
+              return `http://${bucketName}.${endpoint}/${fileName}`;
+            }
         },
         upLoadFile(fileItem){
             let self=this;
             self.percentage=0;
-            let OSS = require('ali-oss');
-            const client = new OSS({
+            if(self.oss.ossVendor == null){
+              self.oss.ossVendor = 1; //1 -aliyun  2-azure
+            }
+            if(self.oss.ossVendor == 1){
+              let OSS = require('ali-oss');
+              const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
                 accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
                 //bucket: 'viumo-'+self.accountId,
                 bucket: self.oss.ossBucketName
-            })
-            let name=fileItem.fileName;
-            return new Promise((resolve,reject)=>{
+              })
+              let name=fileItem.fileName;
+              return new Promise((resolve,reject)=>{
                 client.put(name,fileItem.file,{
-                progress: function* (percentage, cpt) {
-                   self.percentage = percentage
-                    }
+                  progress: function* (percentage, cpt) {
+                    self.percentage = percentage
+                  }
                 })
-                .then((results) => {
+                  .then((results) => {
                     // 上传完成
                     const url = self.getFileUrl(results.name);
                     console.log(url);
                     resolve(url);
-                })
-                .catch((err) => {
+                  })
+                  .catch((err) => {
                     console.log(err)
-                })
-            })
+                  })
+              })
+            }
+            else{
+              let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+              let containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential));
+              let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+              return new Promise((resolve,reject)=>{
+                azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+                  .then((results) => {
+                    // 上传完成
+                    const url = self.getFileUrl(fileItem.fileName);
+                    console.log(url);
+                    resolve(url);
+                  })
+                  .catch((err) => {
+                    console.log(err)
+                  })
+              })
+            }
         },
         clickSum(item,index){
             let self=this;
