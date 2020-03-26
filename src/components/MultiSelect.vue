@@ -144,9 +144,8 @@
     text-align: left;
     display: inline-block;
     position: relative;
-    top: calc(2/1920*100vw);
     width: calc(160/1920*100vw);
-    margin-right: calc(30/1920*100vw);
+    margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
     padding: 0 20px 0 50px !important;
@@ -204,11 +203,11 @@
     min-height: 28px;
     min-width: 85px;
   }
-  @media screen and (max-width: 1560px) and (min-width: 1280px){
-    /deep/ .el-select.el-select--medium .el-input .el-input__inner{
-      width: 85px;
-    }
-  }
+  /*@media screen and (max-width: 1560px) and (min-width: 1280px){*/
+    /*/deep/ .el-select.el-select--medium .el-input .el-input__inner{*/
+      /*width: 85px;*/
+    /*}*/
+  /*}*/
   /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
@@ -229,11 +228,11 @@
     min-height: 28px;
     min-width: 85px;
   }
-  @media screen and (max-width: 1560px) and (min-width: 1280px){
-    .el-select.el-select--medium{
-      width: 85px;
-    }
-  }
+  /*@media screen and (max-width: 1560px) and (min-width: 1280px){*/
+    /*.el-select.el-select--medium{*/
+      /*width: 85px;*/
+    /*}*/
+  /*}*/
 
 </style>
 <style>

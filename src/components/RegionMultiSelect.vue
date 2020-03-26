@@ -1,12 +1,12 @@
 <template>
   <div class="content">
     <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler"
-               :placeholder="placeHolder" class="el-province" :disabled="disabled">
-      <el-option :label="$t('overview.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
+               :placeholder="placeHolder" class="el-province" :disabled="disabled" :size="inputSize">
+      <el-option :label="$t('scheduleView.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.value' :disabled="item.disabled"></el-option>
     </el-select>
     <el-input placeholder="" readonly
-              v-model="input" class="input-class">
+              v-model="input" class="input-class" :size="inputSize">
     </el-input>
   </div>
 </template>
@@ -27,6 +27,14 @@
       },
       disabled:{
         type: Boolean
+      },
+      inputSize:{
+        type: String,
+        default: 'medium'
+      },
+      all: {
+        type: String,
+        default: ''
       }
     },
 
@@ -59,9 +67,12 @@
           }
         })
         if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
-          this.input = this.$t('overview.all')
+          this.input = this.all
           this.selectedArray.unshift('-1')
-        } else {
+        } else if(this.selectedArray.includes('-1')){
+          this.input = this.all
+        }
+        else {
           this.input = ''
           this.selectedArray.forEach(item => {
             this.options.forEach(_item => {
@@ -85,7 +96,7 @@
             this.selectedArray.push(item.value)
             // }
           })
-          this.input = this.$t('overview.all')
+          this.input = this.all
           this.selectedArray.unshift('-1')
         } else {
           this.selectedArray = []
@@ -96,7 +107,7 @@
         console.log(val)
         this.changed = true;
         if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
-          this.input = this.$t('overview.all')
+          this.input = this.all
           this.selectedArray.unshift('-1')
         } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
           this.selectedArray = this.selectedArray.filter((item) => {
@@ -263,9 +274,8 @@
     text-align: left;
     display: inline-block;
     position: relative;
-    top: calc(2/1920*100vw);
     width: calc(160/1920*100vw);
-    margin-right: calc(30/1920*100vw);
+    margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
     padding: 0 20px 0 50px !important;
@@ -323,11 +333,11 @@
     min-height: 28px;
     min-width: 85px;
   }
-  @media screen and (max-width: 1560px) and (min-width: 1280px){
-    /deep/ .el-select.el-select--medium .el-input .el-input__inner{
-      width: 85px;
-    }
-  }
+  /*@media screen and (max-width: 1560px) and (min-width: 1280px){*/
+    /*/deep/ .el-select.el-select--medium .el-input .el-input__inner{*/
+      /*width: 85px;*/
+    /*}*/
+  /*}*/
   /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
@@ -348,12 +358,47 @@
     min-height: 28px;
     min-width: 85px;
   }
-  @media screen and (max-width: 1560px) and (min-width: 1280px){
-    .el-select.el-select--medium{
-      width: 85px;
-    }
+  /*@media screen and (max-width: 1560px) and (min-width: 1280px){*/
+    /*.el-select.el-select--medium{*/
+      /*width: 85px;*/
+    /*}*/
+  /*}*/
+  .input-class.el-input--mini{
+    width: calc(200px - 30px);
+    position: absolute;
+    top: 0;
+  }
+  /deep/ .el-select__tags{
+    opacity: 0;
+  }
+  /deep/ .input-class.el-input--mini .el-input__inner{
+    border: none;
+    color: #7d8cad;
+    background: #fff !important;
+    padding: 0 10px;
+    font-size: 12px;
   }
 
+  /deep/ .el-select.el-select--mini .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 12px;
+  }
+  /deep/ .el-select.el-select--mini .el-input .el-input__suffix-inner{
+    position: relative;
+    z-index: 1;
+  }
+  .el-select.el-select--mini{
+    color: #fff;
+    background: #fff !important;
+    width: 200px;
+  }
+ /deep/ .el-province .el-input--mini .el-input__inner{
+    height: 28px;
+    line-height: 28px;
+  }
 </style>
 
 <style>

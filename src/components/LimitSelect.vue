@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' placeholder='请选择' @visible-change="visibileHandler" class="el-province" :size="inputSize" @focus="clickSelect">
+    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler" class="el-province" :size="inputSize" @focus="clickSelect">
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.value' :disabled="item.disabled"></el-option>
     </el-select>
     <el-input placeholder="" readonly  :size="inputSize"
@@ -27,7 +27,7 @@
       inputSize:{
         type: String,
         default: 'medium'
-      }
+      },
     },
     watch: {
       selected(val, oldVal){
@@ -188,7 +188,7 @@
   .input-class{
     width: calc(160/1920*100vw - 30px);
     position: absolute;
-    left: 0;
+    top: 0;
   }
   /deep/ .el-select__tags{
     opacity: 0;

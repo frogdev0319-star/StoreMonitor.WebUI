@@ -162,7 +162,9 @@ export default {
     numProcessEvents: 'Processed Events',
     numClosedEvents: 'Closing Events',
     emptyEventList: 'The event list is empty, please refilter the data',
-    none: 'None'
+    none: 'None',
+    allZoneI: 'All Region I',
+    allZoneII: 'All Region I'
   },
   //remote Patrol page language
   remotePatrol:{

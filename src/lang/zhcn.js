@@ -163,7 +163,9 @@ export default {
     numProcessEvents: '已处理事件数量',
     numClosedEvents: '已结案事件数量',
     emptyEventList: '事件列表为空，请重新筛选数据',
-    none: '无'
+    none: '无',
+    allZoneI: '全部区域一',
+    allZoneII: '全部区域二'
   },
   //remote Patrol page language
   remotePatrol:{
