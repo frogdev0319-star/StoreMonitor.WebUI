@@ -54,7 +54,7 @@
             </el-select>
           </div>
           <div v-else class="collapsed-brand-panel"></div>
-          <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+          <el-scrollbar id="el-menuscrollbar">
             <el-menu :default-active="activePath"
                      class="el-menu-vertical-demo"
                      text-color="#eee"
@@ -62,7 +62,7 @@
                      @open="handleopen" @close="handleclose" @select="handleselect"
                      router :collapse="collapsed" :unique-opened="true"
                      id="nav-menu"
-                     :collapse-transition="false" style="border:0px;min-height:1000px;">
+                     :collapse-transition="false" style="border:0px;min-height:800px;">
               <template v-for="(item,index) in routerList">
                 <template v-if="!item.hidden">
                   <!--只有一个节点-->
@@ -753,6 +753,9 @@
         position: fixed;
         z-index: 999;
       }
+      .aside-menu{
+        height: calc(100vh - 80px);
+      }
       .brand-panel{
         background-color: #222538;
         text-align: left;
@@ -776,7 +779,7 @@
         }
       }
       .collapsed-brand-panel{
-        height: calc(40/1920*100vw);
+        height: 40px;
         border-bottom: 1px solid $border;
       }
       .brand-title{
@@ -1151,6 +1154,18 @@
   .el-select-dropdown__item.selected{
     background-color: rgba(243,29,101,0.1) !important;
     color: #f31d65 !important;
+  }
+  #el-menuscrollbar{
+    height: calc(100% - 125px);
+  }
+  .aside-collapse-width #el-menuscrollbar{
+    height: calc(100% - 40px);
+  }
+  /deep/ #el-menuscrollbar .el-scrollbar__wrap{
+    overflow-x: hidden;
+  }
+  /deep/ #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal{
+    display: none !important;
   }
 </style>
 <style>
