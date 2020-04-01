@@ -97,6 +97,11 @@
               }
             })
           }
+          else{
+            self.options.forEach(item => {
+              item.disabled = false
+            })
+          }
         }
 
       },
@@ -124,6 +129,11 @@
               if (item.value === this.selectedArray[0]) {
                 item.disabled = true
               }
+            })
+          }
+          else{
+            self.options.forEach(item => {
+              item.disabled = false
             })
           }
         }
@@ -189,6 +199,7 @@
     width: calc(160/1920*100vw - 30px);
     position: absolute;
     top: 0;
+    left: 0;
   }
   /deep/ .el-select__tags{
     opacity: 0;
