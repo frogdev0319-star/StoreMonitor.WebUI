@@ -362,7 +362,7 @@
         ascending: require('../../../static/img/ascending.png'),
         currentIndex: 0,
         sidebarElm: null,
-        fontFamily: ''
+        fontFamily: 'Roboto, Microsoft YaHei'
       }
 
     },
@@ -1016,10 +1016,16 @@
         let seriesValue = [];
         if (result.errCode == 0) {
           let resultData = result.data;
+          let max = 0;
+          resultData.map(function (item, index) {
+            if (item.numOfUnqualified > max) {
+              max = item.numOfUnqualified
+            }
+          })
           resultData.forEach(item => {
             let obj = {};
             obj.name = item.regionName;
-            obj.max = item.numOfUnqualified * 2;
+            obj.max = max;
             tempIndicator.push(obj);
             seriesValue.push(item.numOfUnqualified);
           })
@@ -2190,10 +2196,10 @@
       let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
       self.params.beginTs = start;
       self.params.endTs = end;
-      let enSpan = this.lang == 'en' && (this.varWindowWidth < 1440);
-      console.log(enSpan)
-      self.isEnSpan = enSpan;
-      self.fontFamily = self.lang == 'en' ? 'Roboto' : 'Microsoft YaHei'
+      // let enSpan = this.lang == 'en' && (this.varWindowWidth < 1440);
+      // console.log(enSpan)
+      // self.isEnSpan = enSpan;
+      // self.fontFamily = self.lang == 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initData();
     },
     mounted() {
@@ -2256,7 +2262,6 @@
     font-size: calc(14 / 1920 * 100vw);
     height: auto;
     /*background-color: #f6f9fe;*/
-    padding-bottom: calc(20 / 1920 * 100vw);
     .sourceType-icon {
       margin-right: calc(15 / 1920 * 100vw);
       position: relative;
@@ -2833,9 +2838,9 @@
       .star-row {
         height: 400px;
         margin-top: 30px;
-        @media screen and (min-width: 1280px) and(max-width: 1440px) {
-          height: 420px;
-        }
+        /*@media screen and (min-width: 1280px) and(max-width: 1440px) {*/
+          /*height: 420px;*/
+        /*}*/
         .stores-list {
           display: flex;
           border: 1px solid $border;
@@ -2881,6 +2886,10 @@
             font-size: calc(30 / 1920 * 100vw);
             margin-top: 20px;
             color: #292e36;
+            max-width: calc(100% - 100px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
           .pass-pct {
             font-size: calc(16 / 1920 * 100vw);
