@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import App from './App'
 import './assets/font/iconfont.css'
+import '../static/Roboto/css.css'
 import ElementUI from 'element-ui';
 // import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 import '../theme/index.css'
@@ -11,11 +12,14 @@ import 'vue-video-player/src/custom-theme.css'
 import 'videojs-flash'
 import router from './router'
 
-import rem from '@/common/rem'
+//import rem from '@/common/rem'
 //const ElementUI=require('element-ui');
 import axios from 'axios'
-import BootstrapVue from 'bootstrap-vue'
-Vue.use(BootstrapVue)
+// import BootstrapVue from 'bootstrap-vue'
+// Vue.use(BootstrapVue)
+
+import { ProgressPlugin } from 'bootstrap-vue'
+Vue.use(ProgressPlugin)
 
 import store from './store/index.js';
 import i18n from './lang'
