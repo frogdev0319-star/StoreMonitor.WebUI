@@ -1077,7 +1077,7 @@ $suggestBack:#F1F6FE;
                 display: inline-block;
             }
             .date-range{
-                width:280px;
+                width:290px;
             }
             .iconbangzhu{
               font-size: calc(20/1920*100vw);
@@ -1230,7 +1230,7 @@ $suggestBack:#F1F6FE;
             padding-top: 20px;
             padding-right: calc(20/1920*100vw);
             min-height: calc(100vh - 125px - 230px);
-            margin-bottom: calc(20/1920*100vw);
+            /*margin-bottom: calc(20/1920*100vw);*/
             padding-bottom: 20px;
             //height: calc(730/1080*100vh);
         }

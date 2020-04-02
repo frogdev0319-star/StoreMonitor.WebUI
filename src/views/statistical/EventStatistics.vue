@@ -389,7 +389,7 @@
         exportEventHeader: ['门店名称','所属区域','事件总数', '待处理事件数量','已处理事件数量', '已结案事件数量', '远程巡检', '现场巡检', '门店监控'],
         hasNoData: false,
         sidebarElm: null,
-        fontFamily: ''
+        fontFamily: 'Roboto, Microsoft YaHei'
       }
 
     },
@@ -1400,7 +1400,6 @@
       self.params.beginTs = start;
       self.params.endTs = end;
       self.params.timeMode = self.timeMode;
-      self.fontFamily = self.lang== 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initDaysRange();
       await self.getRegionInfo();
       self.initData();
@@ -1597,7 +1596,6 @@
     .el-overview {
       padding: 0 calc(25/1920*100vw);
       position: relative;
-      margin-bottom: 20px;
       .first-row{
         height: auto;
         border: 1px solid $border;

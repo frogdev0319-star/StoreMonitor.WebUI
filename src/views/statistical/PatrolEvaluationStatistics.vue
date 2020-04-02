@@ -451,7 +451,7 @@
         storeFilter: {"page": 0 , "size": 10},
         storeOrder: {"direction":"asc", "property": 'qualifiedRate'},
         sidebarElm: null,
-        fontFamily: ''
+        fontFamily: 'Roboto, Microsoft YaHei'
       }
     },
     methods:{
@@ -1884,7 +1884,6 @@
       let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
       self.params.beginTs = start;
       self.params.endTs = end;
-      self.fontFamily = self.lang== 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initDaysRange();
       await self.getRegionInfo();
       await self.initData();
@@ -1928,7 +1927,7 @@
     font-family: Roboto, Arial, 'Microsoft YaHei';
   }
   .statistics-container{
-    margin-bottom: 20px;
+    /*margin-bottom: 20px;*/
     .statistics-header{
       /*height: calc(180/1920*100vw);*/
       margin-bottom: 20px;

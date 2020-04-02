@@ -320,6 +320,9 @@
           tooltip: {
             backgroundColor: 'rgba(30,34,52,0.75)'
           },
+          textStyle:{
+            fontFamily: 'Roboto, Microsoft YaHei'
+          },
           legend: {
             data: ['inspect radar']
           },

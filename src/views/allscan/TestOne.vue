@@ -295,7 +295,7 @@
         echartAxiasColor: '#e3e9f4',
         echartBackground: 'rgba(30,34,52,0.75)',
         sidebarElm: null,
-        fontFamily: ''
+        fontFamily: 'Roboto, Microsoft YaHei'
       }
 
     },
@@ -1078,13 +1078,6 @@
       let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
       self.params.beginTs = start;
       self.params.endTs = end;
-      console.log(this.lang=='en')
-      console.log(this.varWindowWidth <1680)
-      let enSpan = this.lang=='en' && (this.varWindowWidth< 1680 );
-      console.log(enSpan)
-      self.isEnSpan = enSpan;
-      console.log(self.isEnSpan)
-      self.fontFamily = self.lang == 'en' ? 'Roboto' : 'Microsoft YaHei'
       self.initData();
 
     },
@@ -1142,7 +1135,6 @@
     height: auto;
     /*background-color: #f6f9fe;*/
     font-size: calc(14/1920*100vw);
-    padding-bottom: 20px;
     .sourceType-icon {
       margin-right: calc(15/1920*100vw);
       position: relative;

@@ -337,7 +337,7 @@
             cellClass: 'cell-class',
             echartAxiasColor: '#e3e9f4',
             rowClass: 'row-class',
-            fontFamily: '',
+            fontFamily: 'Roboto, Microsoft YaHei',
             sidebarElm: null
           }
       },
@@ -1234,7 +1234,6 @@
         let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
-        self.fontFamily = self.lang== 'en' ? 'Roboto' : 'Microsoft YaHei'
         self.initDaysRange();
         await self.getRegionInfo();
         await self.initData();
@@ -1419,8 +1418,7 @@
       }
     }
     .items-content{
-      padding: calc(30/1920*100vw);
-      padding-top: 0;
+      padding: 0 calc(30/1920*100vw) 0;
       .contents-container{
         background-color: #fff;
         border: 1px solid $border;

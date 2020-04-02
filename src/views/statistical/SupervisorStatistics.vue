@@ -761,8 +761,7 @@
       }
     }
     .items-content{
-      padding: calc(30/1920*100vw);
-      padding-top: 0;
+      padding: 0 calc(30/1920*100vw) 0;
       .contents-container{
         background-color: #fff;
         border: 1px solid $border;
