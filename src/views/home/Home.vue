@@ -1,16 +1,16 @@
 <template>
   <div>
     <el-row class="container">
-      <el-col class="header">
+      <div class="header">
         <div class="logo-content" :class="logoClass">
           <img :src="imgSrc" alt="logo" id="imgLogo" @click="routerHome">
           <!--<span class="sys-name" v-if="!collapsed" @click="routerHome">{{generateRoute('title')}}</span>-->
         </div>
-        <el-col :span="1" class="el-traggle-content">
+        <div class="el-traggle-content">
           <i class="iconfont icon-indent" @click="clickCollapse" v-if="collapsed"></i>
           <i class="iconfont icon-outdent" @click="clickCollapse" v-else></i>
-        </el-col>
-        <el-col :span="isMobile? 7: 9">
+        </div>
+        <div>
           <el-breadcrumb separator="|" class="breadcrumb-inner" >
             <el-breadcrumb-item
               v-for="(item,index) in breadList"
@@ -19,8 +19,8 @@
               <span  :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ generateRoute(item.name) }}</span>
             </el-breadcrumb-item>
           </el-breadcrumb>
-        </el-col>
-        <el-col :span="isMobile? 7: 6" class="headUrl-content">
+        </div>
+        <div class="headUrl-content">
           <div class="system-name">{{$t('route.mgt')}}</div>
           <div class="bell-content">
             <i class="el-icon-bell"></i>
@@ -35,8 +35,8 @@
               <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">{{generateRoute('logOut')}}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-        </el-col>
-      </el-col>
+        </div>
+      </div>
       <el-col class="main" :span="24"
               :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit'||$route.path=='/datacenter')?
             {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
@@ -62,7 +62,7 @@
                      @open="handleopen" @close="handleclose" @select="handleselect"
                      router :collapse="collapsed" :unique-opened="true"
                      id="nav-menu"
-                     :collapse-transition="false" style="border:0px;min-height:800px;">
+                     :collapse-transition="false" style="border:0px;">
               <template v-for="(item,index) in routerList">
                 <template v-if="!item.hidden">
                   <!--只有一个节点-->
@@ -651,10 +651,12 @@
       }
       .el-traggle-content{
         height: 100%;
+        width: 80px;
+        float: left;
         border-right: 1px solid #e3e9f4;
         position: relative;
         .icon-outdent, .icon-indent{
-          font-size: calc(24/1920*100vw);
+          font-size: 24px;
           cursor: pointer;
           color: #7d8cad;
         }
@@ -666,15 +668,10 @@
           //@include point(line-height,60);
           height: 80px;
           line-height: 80px;
-          &:first-child{
-            @include point(margin-left,20);
-          }
-        }
-        @media screen  and(min-width:1366px){
           font-size: 16px;
-        }
-        @media screen  and(max-width:1366px){
-          @include point(font-size,16);
+          &:first-child{
+            margin-left: 30px;
+          }
         }
       }
       .headUrl-content{
@@ -684,11 +681,11 @@
         position: relative;
         overflow: hidden;
         margin-right: calc(33/1920*100vw);
-        display: flex;
+        display: inline-flex;
         justify-content: flex-end;
         /*width: 320px;*/
         .system-name{
-          font-size: calc(14/1920*100vw);
+          font-size: 14px;
           margin-right: calc(20/1920*100vw);
           color:#4b5262;
           float: left;
@@ -905,10 +902,10 @@
             font-size: 14px;
           }
           span {
-            font-size: 14px;
-          }
-          .third-child-span{
             font-size: calc(14/1920*100vw);
+            @media screen and (max-width: 1645px){
+              font-size: 12px;
+            }
           }
         }
         #groupSubItem.submenu-item{
@@ -919,6 +916,7 @@
           }
           span{
             font-size: calc(16/1920*100vw);
+            color: #fff;
             @media screen and (max-width: 1680px){
               font-size: 14px;
             }
@@ -928,22 +926,24 @@
           height: 70px;
           line-height: 70px;
           span{
-            font-size: calc(16/1920*100vw)
-          }
-          @media screen and (max-width: 1680px){
-            span{
+            font-size: calc(16/1920*100vw);
+            color: #fff;
+            @media screen and (max-width: 1680px){
               font-size: 14px
             }
           }
         }
         #en-childSubItem.third-title{
-          font-size: calc(14/1920*100vw) !important;
+          font-size: calc(14/1920*100vw) ;
           color: #a0a4ad;
+          @media screen and (max-width: 1645px){
+            font-size: 12px;
+          }
         }
         #childSubItem.third-title{
-          font-size: calc(14/1920*100vw) !important;
+          font-size: calc(14/1920*100vw) ;
           color: #a0a4ad;
-          @media screen and (max-width: 1680px){
+          @media screen and (max-width: 1645px){
             font-size: 12px;
           }
         }
@@ -1000,6 +1000,9 @@
           border-bottom: 1px solid $border;
           span{
             font-size: calc(14/1920*100vw);
+            @media screen and (max-width: 1645px){
+              font-size: 12px;
+            }
           }
         }
         #childSubItem.submenu-item{
@@ -1009,12 +1012,15 @@
           border-bottom: 1px solid $border;
           span{
             font-size: calc(14/1920*100vw);
+            @media screen and (max-width: 1645px){
+              font-size: 12px;
+            }
           }
         }
       }
       .content-wrapper-all{
         height: auto;
-        padding: calc(30/1920*100vw);
+        padding: 30px calc(30/1920*100vw);
         /*border: solid #e3e9f4;*/
         /*border-width: 0;*/
         width:100%;
@@ -1024,7 +1030,7 @@
       }
       .content-wrapper{
         height: auto;
-        padding: calc(30/1920*100vw);
+        padding: 30px calc(30/1920*100vw);
         /*border-width: 0;*/
         width: 100%;
         background: #f4f5f9;
@@ -1040,7 +1046,7 @@
         height: auto;
         // border:1px solid #e3e9f4;
         // width: 96.5%;
-        padding-bottom: calc(10/1920*100vw);
+        padding-bottom: 30px;
         background-color: #f4f5f9;
         min-height: calc(100vh - 80px - 45px);
       }
@@ -1049,6 +1055,12 @@
         color:#777;
         font-size:12px;
         background-color: #f4f5f9;
+      }
+    }
+    .zh-third-child-span {
+      font-size: calc(14/1920*100vw);
+      @media screen and (max-width: 1645px){
+        font-size: 12px;
       }
     }
     /*    .el-submenu:hover{
@@ -1218,6 +1230,7 @@
     transform: rotateZ(-90deg);
     font-size: 16px;
     right:30px;
+    color: #fff;
   }
   .el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
     -webkit-transform: rotateZ(0deg);
@@ -1225,6 +1238,7 @@
     transform: rotateZ(0deg);
     font-size: 16px;
     right:30px;
+    color: #fff;
   }
   .el-submenu__title{
     height: 70px;
@@ -1232,6 +1246,7 @@
     padding-left: calc(50/1920*100vw) !important;
     padding-right: 0 !important;
     background-color: #222538 !important;
+    color: #fff !important;
     /*border-bottom: 1px solid  #393b4c;*/
   }
   .el-submenu__title:hover{
@@ -1297,6 +1312,11 @@
     height: 60px;
     line-height: 60px;
     font-size: calc(14/1920*100vw);
+  }
+  @media screen and (max-width: 1645px){
+    .el-menu--popup .el-menu-item{
+      font-size: 12px;
+    }
   }
   .el-submenu.is-active .el-submenu__title{
     border-bottom-color: #393b4c !important;
@@ -1431,6 +1451,11 @@
     color: #a0a4ad;
     font-size: calc(14/1920*100vw);
   }
+  @media screen and (max-width: 1645px){
+    .el-menu--popup .zh-three-child .el-submenu__title span{
+      font-size: 12px;
+    }
+  }
   .el-menu--popup .zh-three-child .el-submenu__title:hover span{
     color: #f31d65;
   }
@@ -1564,7 +1589,7 @@
   .el-table .cell{
     word-break: break-word;
   }
-  .el-message__content, .el-button, .el-time-panel__btn, .el-time-panel, .el-popper{
+  .el-message__content, .el-button, .el-time-panel__btn, .el-time-panel, .el-popper, .el-range-input{
     font-family: Roboto, 'Microsoft YaHei';
   }
 </style>
