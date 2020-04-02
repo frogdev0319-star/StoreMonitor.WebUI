@@ -727,10 +727,10 @@
         let notifyTime = self.paneList[tabIndex].notifyTime;
         let dayArray = [];
         if(mode==1){
-          dayArray = self.paneList[tabIndex].schedule.filter(item=> item != '-1');
+          dayArray = self.paneList[tabIndex].schedule.day.filter(item=> item != '-1');
         }
         else if(mode==2){
-          dayArray = self.paneList[tabIndex].schedule.filter(item=> item != '-1');
+          dayArray = self.paneList[tabIndex].schedule.day.filter(item=> item != '-1');
         }
         let name = self.paneList[tabIndex].name;
         let schedule = self.paneList[tabIndex].schedule;
@@ -1657,7 +1657,8 @@
         let tabIndex = Number(self.activeName);
         params.id = self.paneList[tabIndex].schId;
         params.name = self.paneList[tabIndex].name;
-        params.comment = '远程巡检计划';
+        params.comment = parseInt(self.activePatrol) == 0 ? '远程巡检计划': '现场巡检计划';
+        params.category = parseInt(self.activePatrol);
         params.enable = Number(self.paneList[tabIndex].enable);
         params.mode = self.paneList[tabIndex].mode;
         let execOnce = self.paneList[tabIndex].execOnce;
@@ -1669,6 +1670,7 @@
           params.aheadNotification = 0; //不提前通知
         }
         let year = self.paneList[tabIndex].from; //年self.paneList[tabIndex].from; //年
+        let strYear = self.$moment(year).format('YYYY'); //年
         params.from = self.$moment(year).startOf('year').valueOf();
         params.to =  -1;
         if(self.paneList[tabIndex].notifyTime !== null){
@@ -1705,7 +1707,7 @@
             let month = Number(item.month); //选择的月份
             let days = item.day; //选择的日期数组
             days.forEach(_item=>{
-              let dayOfYear = self.$moment([year, month-1, _item]).dayOfYear();
+              let dayOfYear = self.$moment([strYear, month-1, _item]).dayOfYear();
               let obj = {};
               obj.day = dayOfYear;
               obj.period = [];
@@ -1836,11 +1838,11 @@
       },
       changeSelectWeek(val, item){
         let self = this;
-        item.schedule = Array.from(val)[0];
+        item.schedule.day = Array.from(val)[0];
       },
       changeSelectMonth(val, item){
         let self = this;
-        item.schedule = Array.from(val)[0];
+        item.schedule.day = Array.from(val)[0];
       },
       changeSelfDefinedDay(val, item){
         item.day = val;
@@ -2451,6 +2453,7 @@
         margin-bottom: 20px;
         display: inline-block;
         margin-left: calc(20/1920*100vw);
+        margin-right: calc(30/1920*100vw);
       }
       .el-prompt-info {
         flex: 1;
@@ -2459,7 +2462,7 @@
         margin-top: 12px;
       }
       .el-prompt-info .el-prompt-title {
-        font-size: calc(14/1920*100vw);
+        font-size: 12px;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;

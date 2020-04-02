@@ -1188,7 +1188,7 @@ $h1:#292e36;
            color:$tab;
         }
         .date-range{
-            width:280px;
+            width:290px;
         }
         .el-search{
             position:absolute;

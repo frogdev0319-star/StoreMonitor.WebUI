@@ -387,9 +387,10 @@
         console.log(val);
         let self=this;
         if(val!=0){
-          self.activePatrol = '0';
+          // self.activePatrol = '0';
           self.$refs.remoteHandle.isFirstLoad = true;
           self.$refs.remoteHandle.activeName = "0";
+          self.activeName = '0';
           self.$refs.remoteHandle.getScheduleList();
         }
       }
