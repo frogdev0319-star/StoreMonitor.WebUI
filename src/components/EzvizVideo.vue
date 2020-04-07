@@ -391,6 +391,7 @@
         isLoaded: false,
         editCount: 0,
         showEventNameInfo: false,
+        changeId: false
       }
     },
     async mounted(){
@@ -530,6 +531,7 @@
         //首先查看视频是否加密
         await self.getEzvizAccessToken(self.storeId);
         if(newValue!== null && old != undefined ){
+          self.changeId = true;
           await self.checkIfEncry();
         }
       },
@@ -673,7 +675,7 @@
         if(self.ivsId == 0){
           return;
         }
-        obj.deviceSerial= self.ivsId; //设备序列号
+        obj.deviceSerial = self.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
         console.log(result);
         let suportUpdatePass = false;
@@ -702,7 +704,7 @@
             }
           }
           else{
-            //不存在密码
+            //不支持修改密码
             self.isLoading = false;
             self.showError = true;
             self.errorMsg = self.$t('storeMonitor.videoCannotPlay');
@@ -712,7 +714,8 @@
           self.showError = false;
           self.videoPassword = '';
           self.times = 0;
-          self.startTs = self.curTime; //切换通道，仍然从最初的时间播放视频
+          self.ifIsEncrypt = false
+          self.changeId && (self.startTs = self.curTime); //切换通道，仍然从最初的时间播放视频
           if(self.playState) {
             self.decoder.stop();
             self.playState = false
