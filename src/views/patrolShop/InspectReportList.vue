@@ -4,49 +4,48 @@
             <el-col :span="24" class="header-details">
                 <span>{{generateReportLang('selectStores')}}</span>
                 <el-select v-model="curCountry"  :placeholder="generateReportLang('country')" size="mini"
-                class="el-province" @change="changeCountry" @clear="clearCountry">
+                class="el-province" @change="changeCountry">
+                    <!--<el-option-->
+                    <!--v-for="item in countryList"-->
+                    <!--:key="item.value"-->
+                    <!--:label="item.label"-->
+                    <!--:value="item.value">-->
+                    <!--</el-option>-->
+                  <el-option-group
+                    v-for="group in countryList"
+                    :key="group.label"
+                    :label="group.label">
                     <el-option
-                    v-for="item in countryList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                      v-for="item in group.countryList"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
                     </el-option>
+                  </el-option-group>
                 </el-select>
-                <el-select v-model="curProvince"  :placeholder="generateReportLang('regionI')" size="mini" :disabled="curCountry.length==0"
-                class="el-province" @change="changePro" @clear="cleaPro">
-                    <el-option
-                    v-for="item in provinceList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                    </el-option>
-                </el-select>
-                <el-select v-model="curCity"  :placeholder="generateReportLang('regionII')" size="mini" :disabled="curProvince.length==0"
-                class="el-province" @change="changeCity" @clear="clearCity">
-                    <el-option
-                    v-for="item in cityList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                    </el-option>
-                </el-select>
-                <!--<div  class="stores-panel" >-->
-                  <!--<div class="month-content" @click="choiceStore">-->
-                    <!--<div class="input-arrow-panel"></div>-->
-                    <!--<el-input v-model="storeName" size="mini" id="elMonth" :placeholder="generateReportLang('stores')" :readonly=true></el-input>-->
-                    <!--<i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>-->
-                  <!--</div>-->
-                  <!--<div class="month-panel" v-if="showStoreContent" @mouseleave="showStoreContent=false; showMonthDrap= false">-->
-                    <!--<div class="month-details">-->
-                      <!--<el-checkbox v-model="checkAllStore" @change="allStoreChecked"></el-checkbox> <span>{{$t('overview.all')}}</span>-->
-                    <!--</div>-->
-                    <!--<div class="month-details" v-for="(item,index) in storeDataList" :key="index">-->
-                      <!--<el-checkbox v-model="item.checked" @change="changeStoreItem(item)"></el-checkbox>-->
-                      <!--<span>{{item.label}}</span>-->
-                    <!--</div>-->
-                  <!--</div>-->
-                <!--</div>-->
-                <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleChange" style="display: inline" ref="multiSelect">
+                <!--<el-select v-model="curProvince"  :placeholder="generateReportLang('regionI')" size="mini" :disabled="curCountry.length==0"-->
+                <!--class="el-province" @change="changePro" @clear="cleaPro">-->
+                    <!--<el-option-->
+                    <!--v-for="item in provinceList"-->
+                    <!--:key="item.value"-->
+                    <!--:label="item.label"-->
+                    <!--:value="item.value">-->
+                    <!--</el-option>-->
+                <!--</el-select>-->
+                <!--<el-select v-model="curCity"  :placeholder="generateReportLang('regionII')" size="mini" :disabled="curProvince.length==0"-->
+                <!--class="el-province" @change="changeCity" @clear="clearCity">-->
+                    <!--<el-option-->
+                    <!--v-for="item in cityList"-->
+                    <!--:key="item.value"-->
+                    <!--:label="item.label"-->
+                    <!--:value="item.value">-->
+                    <!--</el-option>-->
+                <!--</el-select>-->
+                <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
+                                     style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
+                <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
+                                     style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
+                <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleStoreChange" style="display: inline" ref="multiSelect">
 
                 </multi-select>
               <!--<el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"-->
@@ -112,7 +111,7 @@
                     <span>{{generateReportLang('keywords')}}</span>
                     <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
                 </div>
-                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{generateReportLang('search')}}</el-button>
+                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
             </el-col>
             <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -182,10 +181,14 @@ import {Message} from 'element-ui'
 import {generateReportLang} from '@/api/i18n'
 import {mapGetters} from 'vuex'
 import MultiSelect from '@/components/MultiSelect'
+import RegionMultiSelect from '@/components/RegionMultiSelect'
 
 export default {
     name:'InspectReportList',
-    components: {MultiSelect},
+    components: {
+      MultiSelect,
+      RegionMultiSelect
+    },
     data(){
         return{
             varyWindowWidth:window.innerWidth,
@@ -223,9 +226,9 @@ export default {
 
             curCountry:'',
             countryList:[],
-            curProvince:'',
+            curProvince: [],
             provinceList:[],
-            curCity:'',
+            curCity:[],
             cityList:[],
             curStore:[],
             storeList:[],
@@ -301,9 +304,9 @@ export default {
             let self=this;
             self.curCountry='';
             self.countryList=[];
-            self.curProvince='';
+            self.curProvince= [];
             self.provinceList=[];
-            self.curCity='';
+            self.curCity= [];
             self.cityList=[];
             self.curStore=[];
             self.storeList=[];
@@ -312,10 +315,6 @@ export default {
         },
         initData(){
           let self=this;
-          self.varyWindowWidth = window.innerWidth;
-          if(self.varyWindowWidth<1600){
-            self.searchContent=true;
-          }
           self.changeBrand();
           self.defaultTime=[];
           self.storeStr = '';
@@ -449,6 +448,10 @@ export default {
             self.params.beginTs=start;
             self.params.endTs=end;
             self.params.filter={page:0,size:self.sizeNum};
+            console.log(self.curStore)
+            let storeIds = self.curStore.filter(item=> item!= -1)
+            console.log(storeIds)
+            self.params.clause = {storeId: storeIds}
             self.getReportList(self.params);
         },
         async getRegionInfo(){
@@ -465,7 +468,7 @@ export default {
 
             let getCountry=storeList=>{
                 let temp=[];
-                temp.push({label:self.$t('reportView.country'), value:''})
+                // temp.push({label:self.$t('reportView.country'), value:''})
                 storeList.forEach(item=>{
                     if(temp.map(x=>x.value).indexOf(item.country)==-1){
                         let obj={
@@ -491,24 +494,112 @@ export default {
                 tempStore.push(obj);
             })
             self.storeDataList=tempStore;
-            self.countryList=countryList;
+            // self.countryList=countryList;
+            self.countryList[0] = {}
+            self.countryList[0].label= self.$t('reportView.country');
+            self.countryList[0].countryList = countryList
+            console.log(self.countryList);
+            self.curCountry = '中国';
+            self.selectAllProAndCity(self.curCountry);
         },
-        clearStoreInfo(){
-            let self=this;
-            self.curStore=[];
-            self.storeStr='';
-            self.$refs.multiSelect.selectedArray = [];
-            self.$refs.multiSelect.input=''
+        handleStoreChange (arr) {
+          console.log(arr)
+          this.curStore = arr
+          this.changeStore(arr)
+        },
+        handleProChange(arr){
+          console.log(arr)
+          this.curProvince = arr
+          this.changePro(arr)
+        },
+        handleCityChange(arr){
+          console.log(arr)
+          this.curCity = arr
+          this.changeCity(arr)
+        },
+        changeStore(val){
+          let self=this;
+          console.log(val);
+          let str='';
+          self.storeList.forEach((item,index)=>{
+            val.forEach(_item=>{
+              if(item.storeId==_item){
+                str+=item.name+'，'
+              }
+            })
+          })
+          str=str.substr(0,str.length-1)
+          self.storeStr=str;
+        },
+        changePro(val){
+          console.log(val)
+          let self=this;
+          self.curCity= [];
+          self.clearCityInfo();
+          self.clearStoreInfo();
+
+          let storeList=self.storeList;
+          let temp=[];
+          let tempStore=[];
+          if(val == ''){
+            storeList.forEach(item=>{
+              if(item.country==self.curCountry){
+                if(temp.map(x=>x.value).indexOf(item.province)==-1){
+                  let obj={
+                    label:item.province,
+                    value:item.province
+                  }
+                  temp.push(obj);
+                }
+                let obj={
+                  storeId:item.storeId,
+                  label:item.name,
+                  value:item.name,
+                  userId:item.userId,
+                  userName:item.userName
+                };
+                tempStore.push(obj);
+              }
+            })
+            self.provinceList=temp;
+            self.checkAllStore = false;
+          }
+          else{
+            val.forEach(_item=>{
+              storeList.forEach(item=>{
+                if(item.province==_item){
+                  if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                    let obj={
+                      label:item.city,
+                      value:item.city
+                    }
+                    temp.push(obj);
+                  }
+                  let obj={
+                    storeId:item.storeId,
+                    label:item.name,
+                    value:item.name,
+                    userId:item.userId,
+                    userName:item.userName
+                  };
+                  tempStore.push(obj);
+                }
+              })
+            })
+            self.cityList=temp;
+          }
+          self.storeDataList=tempStore;
         },
         changeCountry(val){
           let self=this;
           console.log(val);
-          self.curProvince='';
-          self.curCity='';
+          self.curProvince= [];
+          self.curCity=[];
           let storeList=self.storeList;
           let tempStore=[];
           let temp=[];
-
+          self.clearProviceInfo();
+          self.clearCityInfo();
           self.clearStoreInfo();
           if(val== ''){
             storeList.forEach(item=>{
@@ -545,144 +636,39 @@ export default {
               }
             })
           }
-
-          temp.length > 0 ? temp.unshift({label:self.$t('reportView.regionI'), value:''}): temp;
           self.provinceList=temp;
           self.storeDataList=tempStore;
 
         },
-        clearCountry(){
-            let self=this;
-            self.curProvince='';
-            self.curCity='';
-            self.clearStoreInfo();
-
-            let storeList=self.storeList;
-            let tempStore=[];
-            storeList.forEach(item=>{
-                let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    userName:item.userName
-                }
-                tempStore.push(obj);
-            })
-            self.storeDataList=tempStore;
-
-        },
-        changePro(val){
-            let self=this;
-            self.curCity='';
-            self.clearStoreInfo();
-
-            let storeList=self.storeList;
-            let temp=[];
-            let tempStore=[];
-            if(val == ''){
-              storeList.forEach(item=>{
-                if(item.country==self.curCountry){
-                  if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                    let obj={
-                      label:item.province,
-                      value:item.province
-                    }
-                    temp.push(obj);
-                  }
-                  let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    userName:item.userName
-                  };
-                  tempStore.push(obj);
-                }
-              })
-              temp.length >0 ? temp.unshift({label:self.$t('reportView.regionI'), value:''}): temp;
-              self.provinceList=temp;
-              self.checkAllStore = false;
-            }
-            else{
-              storeList.forEach(item=>{
-                if(item.province==val){
-                  if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                    let obj={
-                      label:item.city,
-                      value:item.city
-                    }
-                    temp.push(obj);
-                  }
-                  let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    userName:item.userName
-                  };
-                  tempStore.push(obj);
-                }
-              })
-              temp.length > 0 ? temp.unshift({label:self.$t('reportView.regionII'), value:''}) : temp;
-              self.cityList=temp;
-            }
-            self.storeDataList=tempStore;
-        },
-        cleaPro(){
-            let self=this;
-            self.curCity='';
-            self.clearStoreInfo();
-
-            let storeList=self.storeList;
-            let temp=[];
-            let tempStore=[];
-            storeList.forEach(item=>{
-                if(item.country==self.curCountry){
-                    if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                        let obj={
-                            label:item.province,
-                            value:item.province
-                        }
-                        temp.push(obj);
-                    }
-                    let obj={
-                        storeId:item.storeId,
-                        label:item.name,
-                        value:item.name,
-                        userId:item.userId,
-                        userName:item.userName
-                    };
-                    tempStore.push(obj);
-                }
-            })
-            self.provinceList=temp;
-            self.storeDataList=tempStore;
-        },
         changeCity(val){
-            let self=this;
-            self.clearStoreInfo();
+          let self=this;
+          self.clearStoreInfo();
+          console.log(val)
+          let storeList=self.storeList;
+          let temp=[];
+          if(val.length == 0){
+            console.log(self.curProvince)
+            self.curProvince.forEach(_item=>{
+              console.log(_item)
 
-            let storeList=self.storeList;
-            let temp=[];
-            if(val == ''){
               storeList.forEach(item=>{
-                if(item.province==self.curProvince){
-                  let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    userName:item.userName
-                  };
+                console.log(item)
+                if(item.province==_item){
+                  let obj = {};
+                  obj.storeId = item.storeId;
+                  obj.label = item.name;
+                  obj.value = item.name;
+                  obj.userId = item.userId;
+                  obj.userName = item.userName;
                   temp.push(obj);
                 }
               })
-              self.checkAllStore = false;
-            }
-            else{
+            })
+          }
+          else{
+            val.forEach(_item=>{
               storeList.forEach(item=>{
-                if(item.city==val){
+                if(item.city==_item){
                   if(temp.map(x=>x.value).indexOf(item.city)==-1){
                     let obj={
                       storeId:item.storeId,
@@ -695,110 +681,90 @@ export default {
                   }
                 }
               })
-            }
-            self.storeDataList=temp;
+            })
+          }
+          console.log(temp)
+          self.storeDataList=temp;
         },
-        clearCity(){
-            let self=this;
-            self.clearStoreInfo();
-
-            let storeList=self.storeList;
-            let tempStore=[];
-            storeList.forEach(item=>{
-                if(item.province==self.curProvince){
-                    let obj={
-                        storeId:item.storeId,
-                        label:item.name,
-                        value:item.name,
-                        userId:item.userId,
-                        userName:item.userName
-                    };
-                    tempStore.push(obj);
+        clearStoreInfo(){
+          let self=this;
+          self.curStore=[];
+          self.storeStr='';
+          self.$refs.multiSelect.selectedArray = [];
+          self.$refs.multiSelect.input=''
+        },
+        clearProviceInfo(){
+          let self=this;
+          self.curProvince=[];
+          self.$refs.proviceSelect.selectedArray = [];
+          self.$refs.proviceSelect.input=''
+        },
+        clearCityInfo(){
+          let self=this;
+          self.curCity=[];
+          self.$refs.citySelect.selectedArray = [];
+          self.$refs.citySelect.input=''
+        },
+        selectAllProAndCity(val){
+          let self = this;
+          let storeList = self.storeList;
+          let temp = [];
+          let tempStore = [];
+          storeList.forEach(item=>{
+            if(item.country==val){
+              if(temp.map(x=>x.value).indexOf(item.province)==-1){
+                let obj={
+                  label:item.province,
+                  value:item.province
                 }
-            })
-            self.storeDataList=tempStore;
-        },
-        choiceStore(){
-          let self = this;
-          self.showStoreContent = !self.showStoreContent;
-          self.showMonthDrap = true;
-        },
-        allStoreChecked(val){
-          /**
-           * 选择所有门店
-           * @type {default.methods}
-           */
-          let self = this;
-          console.log(val);
-          let selectedStores = [];
-          let daysStr = "";
-          if(val){
-            self.storeDataList.forEach(item=>{
-              item.checked = true;
-              selectedStores.push(item.storeId);
-              daysStr = daysStr  + item.label + ',';
-            })
-            daysStr = daysStr.substr(0,daysStr.length-1)
-            self.storeStr = daysStr;
-          }
-          else{
-            self.storeDataList.forEach(item=>{
-              item.checked = false
-            })
-            self.storeStr = '';
-          }
-          self.storeName = val ? self.$t('overview.all') : '';
-          self.curStore = val ? selectedStores: [] ;
-          console.log(self.storeName);
-          console.log(self.curStore)
-        },
-        changeStoreItem(item){
-          let self = this;
-          console.log(item);
-          let daysStr = "";
-          let count = 0;
-          let selectedMonths = [];
-          self.storeDataList.forEach(item => {
-            if (item.checked) {
-              daysStr = daysStr  + item.label + ',';
-              selectedMonths.push(item.storeId);
-              count++;
+                temp.push(obj);
+              }
+              let obj={
+                storeId:item.storeId,
+                label:item.name,
+                value:item.name,
+                userId:item.userId,
+                userName:item.userName
+              };
+              tempStore.push(obj);
             }
           })
-          self.curStore = selectedMonths;
-          console.log(daysStr);
-          console.log(self.curStore)
-          if (daysStr.length != 0) {
-            daysStr = daysStr.substr(0,daysStr.length-1)
-            self.storeStr = daysStr;
-            self.storeName = self.storeStr;
-            if (count == self.storeDataList.length) {
-              self.storeName = self.$t('overview.all');
-              self.checkAllStore = true;
-            }
-            else{
-              self.checkAllStore = false;
-            }
-          }
-          else {
-            self.storeStr = '';
-            self.storeName = '';
-            self.checkAllStore = false;
-          }
-        },
-        changeStore(val){
-            let self=this;
-            console.log(val);
-            let str='';
-            self.storeList.forEach((item,index)=>{
-                val.forEach(_item=>{
-                    if(item.storeId==_item){
-                        str+=item.name+'，'
-                    }
-                })
+          self.provinceList = temp;
+          console.log(self.provinceList)
+          let cityTemp = [];
+          self.provinceList.forEach(_item=>{
+            storeList.forEach(item=>{
+              if(item.province==_item.value){
+                if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
+                  let obj={
+                    label:item.city,
+                    value:item.city
+                  }
+                  cityTemp.push(obj);
+                }
+              }
             })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
+          })
+          self.cityList = cityTemp;
+          let provinceArr = [];
+          self.provinceList.forEach(item=>{
+            provinceArr.push(item.value)
+          })
+          self.curProvince = provinceArr;
+
+          let cityArr = [];
+          self.cityList.forEach(item=>{
+            cityArr.push(item.value)
+          })
+          self.curCity = cityArr;
+          self.storeDataList = tempStore;
+          let storeArr = [];
+          self.storeDataList.forEach(item=>{
+            storeArr.push(item.storeId)
+          })
+          self.curStore = storeArr;
+          console.log('create 调用完毕')
+          self.changeStore(self.curStore)
         },
         clearStore(){
             let self=this;
@@ -869,25 +835,14 @@ export default {
             self.params.beginTs=start;
             self.params.endTs=end;
 
-
-            // if(self.curCountry.length!=0){
-            //     self.params.clause=
-            // }
             console.log(self.storeDataList);
             self.page=1;
             let clause={};
-            if(self.curCountry.length!=0){
-                if(self.curStore.length!=0){
-                    clause.storeId=self.curStore;
-                }
-                else{
-                    clause.storeId=self.storeDataList.map(x=>x.storeId);
-                }
+            if(self.curStore.length!=0){
+              clause.storeId= self.curStore.filter(item=> item!= -1)
             }
             else{
-                if(self.curStore.length!=0){
-                    clause.storeId=self.curStore.includes("-1")? self.storeDataList.map(x=>x.storeId) : self.curStore;
-                }
+              clause.storeId=self.storeDataList.map(x=>x.storeId);
             }
             console.log(self.curReportType);
             if(self.curReportType!== null && self.curReportType!== -1){
@@ -936,11 +891,6 @@ export default {
                 duration:time
             });
         },
-        handleChange (arr) {
-          console.log(arr)
-          this.curStore = arr
-          this.changeStore(arr)
-        }
     },
     beforeRouteEnter (to, from, next) {
       if(from.name=='reportDetails'&& to.name == 'reports'){
@@ -967,14 +917,11 @@ export default {
         });
       }
     },
-    mounted(){
+    async mounted(){
         console.log(this.sortTypeList);
         let self=this;
-        if(self.varyWindowWidth<1600){
-            self.searchContent=true;
-        }
         //self.getDeafultTime();
-        self.getRegionInfo();
+        await self.getRegionInfo();
         self.getInitReportList();
     },
     activated(){
@@ -1197,7 +1144,6 @@ $suggestBack:#F1F6FE;
             }
             .en-search-btn{
               width: calc(130/1920*100vw);
-              border-color: $red;
               height: calc(36/1920*100vw);
               padding: 0 0;
               font-size: calc(14/1920*100vw);
@@ -1369,15 +1315,6 @@ $suggestBack:#F1F6FE;
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
       background: rgb(162, 162, 163);
-    }
-    /deep/ .el-input.is-disabled .el-input__inner::-webkit-input-placeholder {
-      color: #7d8cad;
-    }
-    /deep/ .el-input.is-disabled .el-input__inner::-ms-input-placeholder {
-      color: #7d8cad;
-    }
-    /deep/ .el-input.is-disabled .el-input__inner::placeholder {
-      color: #7d8cad;
     }
 </style>
 <style>
