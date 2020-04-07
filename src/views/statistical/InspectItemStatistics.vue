@@ -5,12 +5,23 @@
         <span>{{$t('reportView.selectStores')}}</span>
         <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
                    class="el-province" @change="changeCountry">
-          <el-option
-            v-for="item in countryList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
+          <!--<el-option-->
+            <!--v-for="item in countryList"-->
+            <!--:key="item.value"-->
+            <!--:label="item.label"-->
+            <!--:value="item.value">-->
+          <!--</el-option>-->
+          <el-option-group
+            v-for="group in countryList"
+            :key="group.label"
+            :label="group.label">
+            <el-option
+              v-for="item in group.countryList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-option-group>
         </el-select>
         <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
@@ -58,7 +69,7 @@
           <div slot="content">{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
-        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{$t('reportView.search')}}</el-button>
+        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0">{{$t('reportView.search')}}</el-button>
       </el-col>
       <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -433,7 +444,7 @@
 
           let getCountry=storeList=>{
             let temp=[];
-            temp.push({label:self.$t('reportView.country'), value:''})
+            // temp.push({label:self.$t('reportView.country'), value:''})
             storeList.forEach(item=>{
               if(temp.map(x=>x.value).indexOf(item.country)==-1){
                 let obj={
@@ -459,7 +470,9 @@
             tempStore.push(obj);
           })
           self.storeDataList=tempStore;
-          self.countryList=countryList;
+          self.countryList[0] = {}
+          self.countryList[0].label= self.$t('reportView.country');
+          self.countryList[0].countryList = countryList
           self.curCountry = '中国';
           self.selectAllProAndCity(self.curCountry);
         },
@@ -485,20 +498,18 @@
           let end = typeof(val[1]) === 'object' ? val[1].getTime() : val[1];
           let daysDiff = self.$moment(end).diff(start, 'days');
           if (daysDiff < 6) {  //当前选择的时间范围不到7天
-            Message({
+            self.$message({
               message: self.$t('overview.changeTimeRange'),
-              type: 'warning',
-              duration: 3 * 1000
+              type:'warning',
             })
             start = end - 3600 * 24 * 6 * 1000;
             start = self.$moment(start).startOf('d').toDate().valueOf();
             self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
           }
           if (daysDiff > 364) {  //当前选择的时间范围超过365天
-            Message({
+            self.$message({
               message: self.$t('overview.changeTimeRange'),
-              type: 'warning',
-              duration: 3 * 1000
+              type:'warning',
             })
             start = end - 3600 * 24 * 364 * 1000;
             start = self.$moment(start).startOf('d').toDate().valueOf();
@@ -737,11 +748,6 @@
           let self = this;
           console.log(self.curStore)
           let storeIds = [];
-          if(self.curProvince.length == 0){
-            self.hasNoData = true;
-            self.itemsTableData = [];
-            return;
-          }
           if(self.curStore.length == 0 ){
             self.storeDataList.forEach(item=>{
               storeIds.push(item.storeId)
@@ -1179,10 +1185,14 @@
         export2Excel(){
           var that = this;
           if(that.itemsTableData.length==0){
-            Message({
+            // Message({
+            //   message: that.$t('overview.emptyItemList'),
+            //   type:'warning',
+            //   duration:3*1000
+            // })
+            that.$message({
               message: that.$t('overview.emptyItemList'),
               type:'warning',
-              duration:3*1000
             })
             return false;
           }

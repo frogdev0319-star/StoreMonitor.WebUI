@@ -433,20 +433,28 @@
         let end = typeof(val[1]) === 'object' ? val[1].getTime() : val[1];
         let daysDiff = self.$moment(end).diff(start, 'days');
         if (daysDiff < 6) {  //当前选择的时间范围不到7天
-          Message({
+          // Message({
+          //   message: self.$t('overview.changeTimeRange'),
+          //   type: 'warning',
+          //   duration: 3 * 1000
+          // })
+          self.$message({
             message: self.$t('overview.changeTimeRange'),
-            type: 'warning',
-            duration: 3 * 1000
+            type:'warning',
           })
           start = end - 3600 * 24 * 6 * 1000;
           start = self.$moment(start).startOf('d').toDate().valueOf();
           self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
         }
         if (daysDiff > 364) {  //当前选择的时间范围超过365天
-          Message({
+          // Message({
+          //   message: self.$t('overview.changeTimeRange'),
+          //   type: 'warning',
+          //   duration: 3 * 1000
+          // })
+          self.$message({
             message: self.$t('overview.changeTimeRange'),
-            type: 'warning',
-            duration: 3 * 1000
+            type:'warning',
           })
           start = end - 3600 * 24 * 364 * 1000;
           start = self.$moment(start).startOf('d').toDate().valueOf();
@@ -544,10 +552,14 @@
       export2Excel(){
         var that = this;
         if(that.supervisorTableData.length==0){
-          Message({
+          // Message({
+          //   message: that.$t('overview.emptyPatrolList'),
+          //   type:'warning',
+          //   duration:3*1000
+          // })
+          that.$message({
             message: that.$t('overview.emptyPatrolList'),
             type:'warning',
-            duration:3*1000
           })
           return false;
         }
