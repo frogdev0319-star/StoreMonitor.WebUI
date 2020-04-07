@@ -50,7 +50,11 @@ export default {
     patrolItemsStat: '巡檢項統計',
     eventStat: '事件處理統計',
     supervisorStat:'督導效率統計',
-    customers: '店客'
+    customers: '店客',
+    networkError: '網絡異常，請檢查網絡連接狀況！',
+    serverException: '服務器異常，請刷新後重試！',
+    noAuthority : '無操作權限！',
+    loginAbnormal: '登錄信息異常，請重新登錄！'
   },
   overview:{
     'date': '時間自定',
@@ -242,7 +246,8 @@ export default {
     videoLicense: "無視頻訪問權限，請聯繫上級管理員",
     suggestEmpty: '請輸入本次巡檢建議！',
     changPageInfo: '當前巡檢尚未完成，確認是否離開頁面？',
-    videoLoading: '視頻加載中...'
+    videoLoading: '視頻加載中...',
+    dashServerError: 'Dash視頻服務器請求異常，請刷新後重試！'
   },
 
   // Store Monitor page language

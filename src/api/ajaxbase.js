@@ -3,6 +3,7 @@ import {getDashServerInfo} from './device.js'
 import {Message} from 'element-ui'
 import store from '../store/index.js';
 import i18n from '@/lang'
+import {message} from '@/common/singleton-message'
 
 axiosA.defaults.withCredentials = false
 
@@ -103,22 +104,8 @@ async function ajax4dash({method,url,data}){
         ret = res;
     }).catch((err) => {
         console.log(err);
-        let msg = '';
-        let lang = i18n.locale;
-        if(lang == 'zh'){
-          msg = 'Dash视频服务器请求异常，请刷新后重试！';
-        }
-        else if(lang == 'en'){
-          msg = 'Dash video server request exception, please refresh and try again!';
-        }
-        else if(lang == 'zhtw'){
-          msg = 'Dash視頻服務器請求異常，請刷新後重試！';
-        }
-        else{
-          msg = 'Dash视频服务器请求异常，请刷新后重试！';
-        }
-        Message({
-            message: msg,
+        message({
+            message: i18n.t('remotePatrol.dashServerError'),
             type:'error',
             duration:5*1000
         })

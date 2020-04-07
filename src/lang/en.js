@@ -49,7 +49,11 @@ export default {
     patrolItemsStat: 'Inspection Items Statistics',
     eventStat: 'Event Processing Statistics',
     supervisorStat: 'Supervisory Work Statistics',
-    customers: 'Customers'
+    customers: 'Customers',
+    networkError: 'Network error, please check network connection status!',
+    serverException: 'Server exception, please refresh and try again!',
+    noAuthority : 'No authority!',
+    loginAbnormal: 'The login information is abnormal, please sign in again!'
   },
   overview:{
     'date': 'Date',
@@ -241,7 +245,8 @@ export default {
     videoLicense: "Please contact your supervisor for video access license",
     suggestEmpty: 'Please enter suggestions for this inspection !',
     changPageInfo: 'Not finish yet, confirm leaving the page? ',
-    videoLoading: 'Video loading...'
+    videoLoading: 'Video loading...',
+    dashServerError: 'Dash video server request exception, please refresh and try again!'
   },
   // Store Monitor page language
   storeMonitor:{

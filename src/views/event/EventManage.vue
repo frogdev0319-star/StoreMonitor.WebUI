@@ -322,7 +322,7 @@ export default {
             let end=new Date(endStr).getTime();
 
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                Message({
+                self.$message({
                     message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
@@ -354,7 +354,7 @@ export default {
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                Message({
+                self.$message({
                     message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
@@ -874,7 +874,7 @@ export default {
             if(ret.data!=undefined&&ret.data.isLogin){
                 let tabIndex=Number(that.activeName);
                 if(that.tableDataList[tabIndex].tableData.length==0){
-                    Message({
+                  that.$message({
                         message: this.$t('eventView.noEvents'),
                         type:'warning',
                         duration:3*1000

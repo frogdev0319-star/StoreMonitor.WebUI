@@ -72,6 +72,10 @@ new Vue({
 })
 import {getToken} from '@/common/auth'
 import { resolve } from 'url';
+import {message} from '@/common/singleton-message'
+
+Vue.prototype.$message = message;
+
 router.beforeEach((to,from,next)=>{
   if(to.matched.some(r => r.meta.requireAuth)){ //要跳转的页面需要登陆权限
     if(getToken()){  //通过vuex state 获取当前的token信息

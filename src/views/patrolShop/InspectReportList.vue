@@ -827,7 +827,7 @@ export default {
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
 
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                Message({
+                self.$message({
                     message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
