@@ -53,7 +53,10 @@
             if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
               this.input = this.$t('overview.all')
               this.selectedArray.unshift('-1')
-            } else {
+            }  else if(this.selectedArray.includes('-1')){
+              this.input = this.$t('overview.all')
+            }
+            else {
               this.input = ''
               this.selectedArray.forEach(item => {
                 this.options.forEach(_item => {
@@ -238,8 +241,9 @@
 <style>
   @import '../assets/css/pagination.css';
    .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
-    color: #7d8cad;
-  }
+      color: #7d8cad;
+      font-weight: normal;
+   }
   el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
     background-color: #FEE4E7;
   }

@@ -3364,6 +3364,7 @@ export default {
                     border: none;
                     top: 50%;
                     transform: translate(0, -50%);
+                    outline: none;
                 }
             }
             /*截图区域css*/
@@ -4172,6 +4173,7 @@ export default {
                     width: 120px;
                     padding: 6px 0;
                     height: 28px;
+                    outline: none;
                   }
                 }
               .date-picker-content{

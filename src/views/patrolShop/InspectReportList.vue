@@ -448,7 +448,6 @@ export default {
             self.params.beginTs=start;
             self.params.endTs=end;
             self.params.filter={page:0,size:self.sizeNum};
-            console.log(self.curStore)
             let storeIds = self.curStore.filter(item=> item!= -1)
             console.log(storeIds)
             self.params.clause = {storeId: storeIds}
@@ -519,7 +518,6 @@ export default {
         },
         changeStore(val){
           let self=this;
-          console.log(val);
           let str='';
           self.storeList.forEach((item,index)=>{
             val.forEach(_item=>{
@@ -763,7 +761,6 @@ export default {
             storeArr.push(item.storeId)
           })
           self.curStore = storeArr;
-          console.log('create 调用完毕')
           self.changeStore(self.curStore)
         },
         clearStore(){

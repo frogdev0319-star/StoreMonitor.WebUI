@@ -168,7 +168,7 @@ export default {
     emptyEventList: 'The event list is empty, please refilter the data',
     none: 'None',
     allZoneI: 'All Region I',
-    allZoneII: 'All Region I'
+    allZoneII: 'All Region II'
   },
   //remote Patrol page language
   remotePatrol:{

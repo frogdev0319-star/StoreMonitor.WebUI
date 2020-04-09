@@ -405,5 +405,6 @@
   @import '../assets/css/pagination.css';
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
     color: #7d8cad;
+    font-weight: normal;
   }
 </style>
