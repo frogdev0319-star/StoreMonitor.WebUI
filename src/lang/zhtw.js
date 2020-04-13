@@ -2,9 +2,9 @@
 export default {
   // 导航栏
   route: {
-    meta: '門店管理系統',
+    meta: '智慧巡店',
     title: '看門店管理系統',
-    mgt: '門店管理系統',
+    mgt: '智慧巡店',
     brand: '品牌',
     overview: '總覽',
     patrolManage: '巡店管理',

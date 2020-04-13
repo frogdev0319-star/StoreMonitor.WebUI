@@ -1,9 +1,9 @@
 export default {
   //導航欄
   route: {
-    meta: 'Store Management System',
+    meta: 'Store Auditing',
     title: 'ViuMo',
-    mgt: 'Store Management System',
+    mgt: 'Store Auditing',
     brand: 'Brand',
     overview: 'Overview',
     patrolManage: 'Patrol Management',

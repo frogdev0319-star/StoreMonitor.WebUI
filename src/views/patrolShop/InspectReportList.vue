@@ -1165,7 +1165,7 @@ $suggestBack:#F1F6FE;
       }
     }
     .report-content{
-        padding-right: calc(50/1920*100vw);
+        padding-right: calc(20/1920*100vw);
         padding-left: calc(20/1920*100vw);
         .card-content{
             border: 1px solid $border;

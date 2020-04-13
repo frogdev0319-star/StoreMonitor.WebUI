@@ -21,7 +21,7 @@
           </el-breadcrumb>
         </div>
         <div class="headUrl-content">
-          <div class="system-name">{{$t('route.mgt')}}</div>
+          <!--<div class="system-name">{{$t('route.mgt')}}</div>-->
           <div class="bell-content">
             <i class="el-icon-bell"></i>
             <el-badge is-dot class="item"></el-badge>
