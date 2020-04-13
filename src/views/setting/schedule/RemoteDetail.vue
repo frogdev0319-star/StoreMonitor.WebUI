@@ -170,26 +170,28 @@
               </div>
             </el-col>
             <el-col :span="24">
-              <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
-                <div  class="el-all-checkbox" v-if="storeList.length!=0">
-                  <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll"></el-checkbox>
-                  <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
-                </div>
-                <div class="device-group" v-for="(item,index) in storeList" :key="index">
-                  <div class="device-all-checkbox">
-                    <div style="display: block">
-                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"></el-checkbox>
-                      <span class="group-name">{{item.cityName}}</span>
+              <div class="el-bind-content">
+                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                  <div  class="el-all-checkbox" v-if="storeList.length!=0">
+                    <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll"></el-checkbox>
+                    <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
+                  </div>
+                  <div class="device-group" v-for="(item,index) in storeList" :key="index">
+                    <div class="device-all-checkbox">
+                      <div style="display: block">
+                        <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"></el-checkbox>
+                        <span class="group-name">{{item.cityName}}</span>
+                      </div>
+                    </div>
+                    <div class="device-content" >
+                      <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
+                        <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
+                                     @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
+                        <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
+                      </div>
                     </div>
                   </div>
-                  <div class="device-content" >
-                    <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
-                      <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
-                                   @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
-                      <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
-                    </div>
-                  </div>
-                </div>
+                </el-scrollbar>
               </div>
               <div class="enable-content">
                 <span>{{generateScheduleLang('enable')}}</span>
@@ -1773,6 +1775,7 @@
         self.notifyTime = self.paneList[0].notifyTime;
         console.log(self.scheduleId)
         self.getHasBoundStroeIds()
+        self.searchStore();
       },
       /**
        * 获取指定月份的第一天和最后一天的秒数
@@ -2362,7 +2365,7 @@
       }
 
       .el-bind-content {
-        max-height: calc(415/1920*100vw);
+        height: calc(415/1920*100vw);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
@@ -2489,6 +2492,7 @@
       }
       .el-search-input /deep/ .el-input__inner{
         border-radius: 30px;
+        text-overflow: ellipsis;
       }
       .el-schedule-btns{
         position: absolute;
