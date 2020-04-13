@@ -678,7 +678,8 @@ export default {
               return time.getTime() > Date.now();
             },
           },
-          dateValue: new Date()
+          dateValue: new Date(),
+          changeFlag: false
         }
     },
   created(){
@@ -860,6 +861,7 @@ export default {
             self.hideNext=false;
             self.evBtns[0].isActive=true;
             self.evBtns[1].isActive=false;
+            self.changeFlag = true;
             self.getInitStoreData();
             self.getFaStoreData();
             self.backCurDate();
@@ -1456,7 +1458,8 @@ export default {
             }
             else{
               console.log('ezviz')
-              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
+              self.changeFlag = false
+              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime,self.changeFlag);
             }
         },
         afterCurDate(sindex,item){
@@ -2992,7 +2995,9 @@ export default {
             else{
               //萤石云
               self.playBackTime = 0;
-              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
+              self.$nextTick(()=>{
+                self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime, self.changeFlag);
+              })
             }
         },
         forWard(){

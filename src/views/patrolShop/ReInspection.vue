@@ -763,6 +763,9 @@ export default {
               window.clearInterval(self.timerPlayReal);
               self.timerPlayReal=null;
             }
+            if(self.isEzviz && !self.showGuide){
+              self.$refs.ezvizVideo.stopRealTime();
+            }
             next()
           }).catch(() => {
             // 如果取消跳转地址栏会变化，这时保持地址栏不变
