@@ -18,8 +18,8 @@
         <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
         <div class="icon-footer" v-if="showInfoContent|| playBackState">
           <div class="iconlside">
-            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-if="playState"></i>
+            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-else></i>
           </div>
           <div class="iconlside">
             <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
@@ -590,7 +590,7 @@
     },
     methods: {
       generatePatrolLang,
-      changeHistoryTime(newValue){
+      changeHistoryTime(newValue,flag){
         console.log("curTime")
         let self = this;
         if(!self.id || !self.ivsId){
@@ -610,12 +610,14 @@
           self.decoder.stop();
           self.playState = false
         }
-        self.$nextTick(()=> {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer)
-          //self.initVideo();
-          self.checkIfEncry();
-        })
+        if(flag == false){
+          self.$nextTick(()=> {
+            self.decoder = null;
+            console.log(self.$refs.myPlayer)
+            //self.initVideo();
+            self.checkIfEncry();
+          })
+        }
       },
       visibleChange(){
         console.log('子组件退出')
