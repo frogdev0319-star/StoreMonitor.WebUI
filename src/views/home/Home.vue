@@ -230,10 +230,21 @@
       },
       showHeader(){
         let flag=false;
-        if((this.$route.path=='/report' || this.$route.path == '/patrolOverview' || this.$route.path == '/eventOverview')
-          || this.$route.path == '/patrolEvaluation' || this.$route.path == '/patrolItem' || this.$route.path == '/supervisorStat'
-          || this.$route.path == '/eventStat'){
-          flag= true;
+        switch(this.$route.path){
+          case '/report':
+          case '/patrolOverview':
+          case '/eventOverview':
+          case '/patrolEvaluation':
+          case '/patrolItem':
+          case '/supervisorStat':
+          case '/eventStat':
+          {
+            flag= true;
+            break
+          }
+          default:{
+            break
+          }
         }
         return flag;
       },
