@@ -409,7 +409,6 @@
     },
     watch:{
       async accountChanged(val,oldVal){
-        console.log(val);
         let self=this;
         if(val!=0){
           self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date).endOf('d').toDate()];
@@ -426,7 +425,6 @@
     methods:{
       dateChange(val){
         let self=this;
-        console.log(val);
         let start= typeof(val[0])==='object'?val[0].getTime():val[0];
         let end= typeof(val[1])==='object'?val[1].getTime():val[1];
         let daysDiff = self.$moment(end).diff(start, 'days');
@@ -508,36 +506,6 @@
               resolve(res);
             }
           }).catch(res => {
-            resolve(res);
-          })
-        })
-      },
-      async getEventStatsStatics(){
-        let self = this;
-        let eventResult = await self.getEventStatsOverview(self.params);
-        console.log(eventResult);
-        if(eventResult.errCode == 0){
-          let result = eventResult.data;
-          if(result){
-            self.eventKPIs[0].eventNum = result.numOfNewEventsToday;
-            self.eventKPIs[1].eventNum = result.numOfClosedEventsToday;
-            self.eventKPIs[2].eventNum = result.numOfOpenEvents;
-            self.numOfStores = result.numOfStores;
-            self.eventBySource = result.eventBySource;
-            self.eventByStatus = result.eventByStatus;
-          }
-          else{
-            self.eventKPIs.forEach(item=>{
-              item.eventNum = 0;
-            })
-          }
-        }
-        self.getEventBySourcePie();
-        self.getEventByStatusPie();
-      },
-      getEventStatsOverview(params){
-        return new Promise((resolve,reject)=>{
-          getEventStatsOverview(params).then(res=>{
             resolve(res);
           })
         })
@@ -661,7 +629,6 @@
         };
         if(storeEventResult.errCode == 0){
           let result = storeEventResult.data;
-          console.log(result);
           self.storeEventList = result;
           let soureceList = [];
           soureceList.push(self.storeEventLegend)
@@ -682,7 +649,6 @@
             itemArray.push(sumOfClosedEvents);
             soureceList.push(itemArray);
           })
-          console.log(soureceList);
           option.dataset.source = soureceList;
         }
         self.storeEventsOptions = option;
@@ -696,7 +662,6 @@
       },
       adjustChart(){
         let self = this;
-        console.log('尺寸改变');
         if (self.$refs.eventSourceRef) {
           self.$refs.eventSourceRef.resize()
         }
@@ -747,7 +712,6 @@
         self.countryList[0] = {}
         self.countryList[0].label= self.$t('reportView.country');
         self.countryList[0].countryList = countryList
-        console.log(self.countryList);
         self.curCountry = '中国';
         self.selectAllProAndCity(self.curCountry);
       },
@@ -766,23 +730,19 @@
         })
       },
       handleStoreChange (arr) {
-        console.log(arr)
         this.curStore = arr
         this.changeStore(arr)
       },
       handleProChange(arr){
-        console.log(arr)
         this.curProvince = arr
         this.changePro(arr)
       },
       handleCityChange(arr){
-        console.log(arr)
         this.curCity = arr
         this.changeCity(arr)
       },
       changeStore(val){
         let self=this;
-        console.log(val);
         let str='';
         self.storeList.forEach((item,index)=>{
           val.forEach(_item=>{
@@ -795,7 +755,6 @@
         self.storeStr=str;
       },
       changePro(val){
-        console.log(val)
         let self=this;
         self.curCity= [];
         self.clearCityInfo();
@@ -855,7 +814,6 @@
       },
       changeCountry(val){
         let self=this;
-        console.log(val);
         self.curProvince= [];
         self.curCity=[];
         let storeList=self.storeList;
@@ -906,16 +864,11 @@
       changeCity(val){
         let self=this;
         self.clearStoreInfo();
-        console.log(val)
         let storeList=self.storeList;
         let temp=[];
         if(val.length == 0){
-          console.log(self.curProvince)
           self.curProvince.forEach(_item=>{
-            console.log(_item)
-
             storeList.forEach(item=>{
-              console.log(item)
               if(item.province==_item){
                 let obj = {};
                 obj.storeId = item.storeId;
@@ -946,7 +899,6 @@
             })
           })
         }
-        console.log(temp)
         self.storeDataList=temp;
       },
       clearStoreInfo(){
@@ -993,7 +945,6 @@
           }
         })
         self.provinceList = temp;
-        console.log(self.provinceList)
         let cityTemp = [];
         self.provinceList.forEach(_item=>{
           storeList.forEach(item=>{
@@ -1026,7 +977,6 @@
           storeArr.push(item.storeId)
         })
         self.curStore = storeArr;
-        console.log('create 调用完毕')
         self.changeStore(self.curStore)
       },
 
@@ -1055,7 +1005,6 @@
       },
       async searchData(){
         let self = this;
-        console.log(self.curStore)
         let storeIds = [];
         // if(self.curProvince.length == 0){
         //   self.hasNoData = true;
@@ -1073,7 +1022,6 @@
         else{
           storeIds = self.curStore;
         }
-        console.log(storeIds)
         self.params.storeIds = storeIds;
 
         self.params.filter={page:self.page - 1,size:self.sizeNum};
@@ -1100,21 +1048,17 @@
           let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
           weekList.splice(0, 1, firstWeekStr);
           weekList.splice(arrLength - 1, 1, lastWeekStr);
-          console.log(weekList);
           self.daysRangeList = weekList;
 
         }
         else if (self.timeMode == 2) {
           let monthArray = util.getMonthBetween(startDay, endDay)
-          console.log(monthArray)
           self.daysRangeList = monthArray;
         }
       },
       async initData(){
         let self = this;
-        console.log(self.curStore)
         let storeIds = self.curStore.filter(item=> item!= -1)
-        console.log(storeIds)
         self.params.storeIds = storeIds;
         self.params.filter={page:self.page - 1,size:self.sizeNum};
         self.params.order = {direction: self.direction, property: self.property}
@@ -1125,7 +1069,6 @@
       async getEventTableData(){
         let self = this;
         let eventResult = await self.getEventTableDataInfo(self.params);
-        console.log(eventResult);
         let excellentPer = 0;
         let qualifiedPer = 0;
         let unqualifiedPer = 0;
@@ -1167,7 +1110,6 @@
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
         params.timeMode = self.timeMode;
-        console.log(self.curStore)
         let storeIds = [];
         if(self.curProvince.length == 0){
           self.hasNoData = true;
@@ -1185,14 +1127,12 @@
         else{
           storeIds = self.curStore;
         }
-        console.log(storeIds)
         params.storeIds = storeIds;
 
         params.filter={page:self.page - 1,size:self.total};
         params.order = {direction: self.direction, property: self.property}
         if(self.total > 0){
           let eventResult = await self.getEventTableDataInfo(params);
-          console.log(eventResult);
           let errCode = eventResult.errCode;
           if(errCode === 0){
             let result = eventResult.data;
@@ -1255,7 +1195,6 @@
           allStoreEventNum += item.numOfVideo;
         })
         let totalArray = [allRemoteEventNum, allOnsiteEventNum, allStoreEventNum];
-        console.log(totalArray);
         jsonArray[0].percent = util.getPercentValue(totalArray,0,2);
         jsonArray[1].percent = util.getPercentValue(totalArray,1,2);
         jsonArray[2].percent = util.getPercentValue(totalArray,2,2);
@@ -1319,7 +1258,6 @@
           ]
         }
         self.sourcePerArray = jsonArray;
-        console.log(self.sourcePerArray)
       },
       getEventTableDataInfo(params){
         return new Promise((resolve, reject) => {
@@ -1329,7 +1267,6 @@
         })
       },
       sortChange(col){
-        console.log(col);
         let self=this;
         let column = col.column;
         let order = col.order;
