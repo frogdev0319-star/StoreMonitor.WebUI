@@ -23,3 +23,11 @@ export const getEventStatsOverStore=data=>{
     data
   })
 }
+
+export const getEventStatsOverStoreV2 =data=>{
+  return request({
+    url: `v2.0/statistics/event/store`,
+    method: 'post',
+    data
+  })
+}

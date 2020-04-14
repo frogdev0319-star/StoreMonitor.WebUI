@@ -3,15 +3,15 @@
     <el-button>
       <div class="box">
         <i class="iconfont icon-gengduo " style="cursor: pointer; margin-right: 20px"></i>
-        <span class="text">垂直居中</span>
+        <div class="text">垂直居中</div>
       </div>
     </el-button>
-    <button>
+<!--    <button>
       <div class="box">
         <i class="iconfont icon-gengduo " style="cursor: pointer; margin-right: 20px"></i>
         <span class="text">垂直居中2</span>
       </div>
-    </button>
+    </button>-->
   </div>
 
 </template>
@@ -36,14 +36,23 @@
 
 <style scoped>
   .box{
-    font-size: calc(14/1920*100vw);
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
-    width: calc(160/1920*100vw);
+    position: relative;
+    padding: 0 calc(6 / 1920 * 100vw);
+    height: calc(40 / 1920 * 100vw);
+    width: calc(130 / 1920 * 100vw);
   }
-  .iconfont{ font-size: calc(24/1920*100vw)}
+  .iconfont{
+    position: absolute;
+    top: 0;
+    margin: calc(8 / 1920 * 100vw);
+    height: calc(24 / 1920 * 100vw);
+    width: calc(24 / 1920 * 100vw);
+  }
   .text{
-    font-size: calc(14/1920*100vw);
+    position: absolute;
+    top: 0;
+    left: calc(52 / 1920 * 100vw);
+    display: inline-block;
   }
 </style>

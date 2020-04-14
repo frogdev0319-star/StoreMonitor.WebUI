@@ -3,7 +3,8 @@ let version = 'v1.0';
 
 let _Environments = {
   Debug_XA: {
-    BASE_URL: 'http://172.21.81.117:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://172.21.81.117:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.21.81.117:8081/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
@@ -16,28 +17,38 @@ let _Environments = {
   },
   Preview: {
     //BASE_URL: 'http://13.76.227.211:8081/storemonitor/api/',
-    BASE_URL: 'http://47.103.135.242:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     USHOP_URL: 'https://preview.ushop-plus.com/',
     POST_URL: 'http://preview-pos.ushop-plus.com/',
     VERSION: version,
   },
   Stable: {
-    BASE_URL: 'http://47.103.41.236:8081/storemonitor/api/',
+    //BASE_URL: 'http://47.103.41.236:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://52.187.122.98:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://mgmt.storevue.com:8081/storemonitor/api/',
     USHOP_URL: 'https://portals.ushop-plus.com/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version,
   },
   QA: {
-    BASE_URL: 'http://172.21.81.176:19085/storemonitor/api/',
+    //BASE_URL: 'http://172.21.81.176:19085/storemonitor/api/',
+    // 部署到QA环境使用外网IP
+    CHINA_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
-  }
+  },
 }
 
-function getEnvironment() {
-  return _Environments.Preview;
-}
+let environJSON = _Environments.Debug_XA;
+let isGlobalWebsite = false;
 
-var Environment = getEnvironment()
-module.exports = Environment
+let Environment;
+export default Environment = {
+  USHOP_URL: environJSON.USHOP_URL,
+  POST_URL: environJSON.POST_URL,
+  VERSION: environJSON.VERSION,
+  BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
+}

@@ -45,6 +45,24 @@
                     </div>
                 </div>
             </el-dialog>
+          <el-dialog  :title="$t('eventView.associatedChannel')" :visible.sync="showRelatedChannelFlag" :close-on-click-modal="false" v-if="showRelatedChannelFlag"
+                      width="540px" top=18% @close='showRelatedChannelFlag = false' class='rate-video-dialog'>
+            <div class="video-dialog-content" style="overflow:hidden;">
+              <hr class="dialog-hr"/>
+              <div class="channel-content" >
+                <el-radio-group v-model="channelRadio" class="radio-group">
+                  <el-radio v-for="(item, index) in relatedChannels" :label="item.id" :key="index" class="radio-class">
+                    <img :src="cameraImg" class="radio-img">
+                    <span class="radio-span">{{item.name}}</span>
+                  </el-radio>
+                </el-radio-group>
+              </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+              <el-button id="cancelBtn" @click="cancelSelect" size="mini">{{$t('storeMonitor.cancel')}}</el-button>
+              <el-button id="confirmBtn" @click="confirmSelect" size="mini" type="primary">{{$t('storeMonitor.confirm')}}</el-button>
+            </span>
+          </el-dialog>
             <!-- <transition name="fade">
                 <div id="outerdiv" style="" v-show="showOuter">
                     <div id="innerdiv" style="position:absolute;">
@@ -83,8 +101,18 @@
                     </div>
                 </div>
                 <div class="storeInfo-details">
+                  <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'">
                     <dd><span :class="lang=='en'? 'en-w4': 'w4'">{{generateEventLang('submitTime')}}：</span></dd>
                     <span class="details-info">{{event.createDate}}</span>
+                  </div>
+                  <div :class="lang == 'en' ? 'en-w3-content' : 'w3-content'" v-if="event.sourceType == 1 && relatedChannels.length > 0">
+                    <dd :class="lang=='en'? 'en-w3': 'w3'" >
+                      <div :class="lang == 'en' ? 'en-related-channel': 'related-channel'" @click="showRelatedChannel">
+                        <img :src="cameraImg" class="img-class">
+                        <span class="related-span">{{$t('eventView.associatedChannel')}}</span>
+                      </div>
+                    </dd>
+                  </div>
                 </div>
             </div>
             <div class="eventInfo-content">
@@ -115,9 +143,15 @@
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
                                 <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
+                            <div class="viedo-info" v-if="event.sourceType == 1">
+                              <div @click="checkVideo(item, index)">
+                                <i class="iconfont icon-bofang icon-video"></i>
+                                <span class="ahref">{{item.name+'区域'}}</span>
+                              </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="viedo-info">
+                    <div class="viedo-info" v-if="event.sourceType != 1">
                         <div v-if="showCheckVideo" @click="checkVideo">
                             <i class="iconfont icon-bofang icon-video"></i>
                             <span class="ahref">{{curChannel.name+'区域'}}</span>
@@ -259,7 +293,13 @@ export default {
             isEvent: true,
             channelInfo: {},
             subBtnList:[],
-            tooltipClass:'event-tooltip-class'
+            tooltipClass:'event-tooltip-class',
+            cameraImg: require('../../../../static/img/camera.png'),
+            showRelatedChannelFlag: false,
+            relatedChannels: [],
+            channelRadio: '',
+            timerPlayReal: null,
+            realTimeSpeed: 0
         }
     },
     computed: {
@@ -315,6 +355,16 @@ export default {
         return self.$store.state.user.isEzviz
       }
     },
+    watch:{
+      realTimeSpeed(val,oldVal){
+        let self=this;
+        console.log(val);
+        if(val >= 300){
+          self.stopRealTime();
+          self.showControlInfo=false;
+        }
+      },
+    },
     methods:{
         generateEventLang,
         onPlayerPlay(player){
@@ -342,9 +392,9 @@ export default {
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
-            setTimeout(() => {
-                self.showControlInfo=false;
-            }, 3000);
+            // setTimeout(() => {
+            //     self.showControlInfo=false;
+            // }, 3000);
         },
 
         stopCommentVideo(){
@@ -383,6 +433,7 @@ export default {
         async realTime(){
             let self=this;
             console.log('实时播放');
+            self.realTimeSpeed   = 0;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             self.sessionId=sessionId;
@@ -401,7 +452,18 @@ export default {
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal = window.setInterval(()=>{
+                  console.log(self.realTimeSpeed)
+                  self.realTimeSpeed=self.realTimeSpeed+1;
+                },1000);
             }
+        },
+        destroyVideo(){
+          let self=this;
+          var video = document.getElementById("previewVideo");
+          this.previewplayer = videojs(video);
+          self.previewplayer.dispose();
         },
         stopVideo(){
             let self=this;
@@ -416,6 +478,7 @@ export default {
               if(self.playState){
                 self.stopRealTime();
               }
+              self.previewplayer.dispose();
             }
             else{
               self.$refs.ezvizVideo.stopRealTime();
@@ -435,6 +498,9 @@ export default {
             };
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+            self.realTimeSpeed=0;
+            window.clearInterval(self.timerPlayReal);
+            self.timerPlayReal = null
         },
         gonggeScreen(){
 
@@ -549,10 +615,26 @@ export default {
                     // self.audio.audioRef='audioRef';
                 }
                 else{
+                  deviceList.forEach(_item=>{
+                    if(_item.id == item.deviceId){
+                      item.channelId = _item.channelId;
+                      item.name = _item.name;
+                      item.ivsId = _item.ivsId;
+                    }
+                  })
                     temp.push(item);
                 }
             })
             self.sourceList=temp;
+            let relatedDeviceIds = event.relatedDeviceIds.sort();
+            self.relatedChannels = [];
+            relatedDeviceIds.forEach(item=>{
+              deviceList.forEach(_item=>{
+                if(_item.id == item){
+                  self.relatedChannels.push(_item)
+                }
+              })
+            })
             console.log(self.event);
         },
         getDuration(){
@@ -560,23 +642,35 @@ export default {
             if(self.showAudio){
                 let audio=self.$refs.audioRef;
                 let du=audio.duration;
+                console.log(du)
+                console.log(typeof(du)=='string')
                 if(isNaN(du)){
                     self.showAudio=false;
                 }
                 else{
+                    let duration = Math.floor(du);
+                    if(duration === 0){
+                      du = 1;
+                    }
                     self.audioOftenText=parseInt(du)+'"';
                 }
             }
         },
         getCommentDuration(item){
             let self=this;
+            console.log(item)
             if(item.showAudio){
                 let audio=self.$refs[item.audio.audioRef][0];
                 let du=audio.duration;
+                console.log(du)
                 if(isNaN(du)){
                     item.showAudio=false;
                 }
                 else{
+                    let duration = Math.floor(du);
+                    if(duration === 0){
+                      du = 1;
+                    }
                     item.audio.audioOftenText=parseInt(du)+'"';
                     console.log(item.audio.audioOftenText);
                 }
@@ -629,9 +723,12 @@ export default {
                 }
             })
         },
-        checkVideo(){
+        checkVideo(item, index){
             let self=this;
             self.dialogFormVisible=true;
+            if(index != undefined){
+              self.curChannel = item
+            }
             if(!self.isEzviz){
               self.realTime();
             }
@@ -642,6 +739,7 @@ export default {
         getCommentList(){
             let self=this;
             let eventIds=[];
+            self.commentList = [];
             eventIds.push(self.event.id);
             let params={
                 "eventIds":eventIds
@@ -755,15 +853,41 @@ export default {
                 self.notify(this.$t('eventView.emptyInfo'),'warning',3000);
                 return false;
             }
-            if(self.subBtnList[0].isActive==true){
-                status=1;
-            }
-            else if(self.subBtnList[1].isActive==true){
-                status=2;
-            }
-            else{  //追加状态，需判断当前状态
+            if(self.subBtnList[0].isActive){
+              if(status = self.subBtnList[0].order==0){
+                status = 1;
+              }
+              else if(self.subBtnList[0].order==1){
+                status = 2;
+              }
+              else{
+                //追加状态，需判断当前状态
                 status=self.curStatus;
+              }
             }
+            else if(self.subBtnList[1].isActive){
+              if(self.subBtnList[1].order == 1){
+                status = 2;
+              }
+              else{
+                //追加状态，需判断当前状态
+                status=self.curStatus;
+              }
+            }
+            else{
+              //追加状态，需判断当前状态
+              status=self.curStatus;
+            }
+            console.log(status)
+            // if(self.subBtnList[0].isActive==true){
+            //     status=1;
+            // }
+            // else if(self.subBtnList[1].isActive==true){
+            //     status=2;
+            // }
+            // else{  //追加状态，需判断当前状态
+            //     status=self.curStatus;
+            // }
             self.addComment(status,description);
         },
         checkFull(){
@@ -791,6 +915,7 @@ export default {
         destroyedBeforeunloadHandler() {
             //window.removeEventListener('beforeunload', e => this.beforeunloadHandler(e));//错误方法，无法移除
             window.removeEventListener('beforeunload', this.beforeunloadHandler, false);
+            this.beforeunloadHandler = null
             //this.rowEditEnable = 0;
         },
 
@@ -812,17 +937,47 @@ export default {
             let tempBtnList = [];
             PermissionHelper.enableEventHandle()  && tempBtnList.push({
               name:this.$t('eventView.handling'),
+              order: 0,
             });
             PermissionHelper.enableEventClose()  && tempBtnList.push({
               name:this.$t('eventView.closing'),
+              order: 1,
             })
             PermissionHelper.enableEventAdd() && tempBtnList.push({
               name:this.$t('eventView.adding'),
+              order: 2
             })
             tempBtnList.forEach((item, index)=>{
               item.isActive = index == 0 ? true: false;
             })
           self.subBtnList = tempBtnList;
+        },
+        showRelatedChannel(){
+          let self = this;
+          self.showRelatedChannelFlag = true;
+          self.channelRadio = self.relatedChannels[0].id;
+        },
+        cancelSelect(){
+          let self = this;
+          self.showRelatedChannelFlag = false;
+          self.channelRadio = ''
+        },
+        confirmSelect(){
+          let self = this;
+          self.showRelatedChannelFlag = false;
+          console.log('播放对应通道视频');
+          let channel = self.relatedChannels.filter(item=>item.id == self.channelRadio)
+          console.log(channel)
+          self.curChannel = channel[0];
+          self.dialogFormVisible=true;
+          self.channelRadio = ''
+          if(!self.isEzviz){
+            self.realTime();
+          }
+          else{
+            self.channelInfo = {};
+            self.channelInfo = self.curChannel;
+          }
         }
     },
     // beforeRouteLeave (to, from, next) {
@@ -869,6 +1024,7 @@ export default {
     },
     beforeDestroy(){
         window.clearInterval(this.timeid);
+        window.onresize = null;
     }
 }
 </script>
@@ -895,11 +1051,13 @@ $h1:#292e36;
 @mixin title-content{
     text-align: left;
     position: relative;
-    @include point(height,60);
-    @include point(line-height,60);
+    height: 80px;
+    line-height: 80px;
     border-bottom: 1px solid $border;
     @include point(padding-left,20);
     @include point(padding-right,20);
+    display: flex;
+    align-items: center;
 }
 #outerdiv{
     position:fixed;
@@ -921,9 +1079,9 @@ $h1:#292e36;
 .el-rate-container{
     background-color: #f7f8fa;
     @media screen and(min-width: 1366px){
-        .el-submit{
-            top: 30%;
-        }
+        /*.el-submit{*/
+            /*top: 30%;*/
+        /*}*/
         .storeInfo-details{
             height: 50px;
             line-height: 50px;
@@ -940,9 +1098,9 @@ $h1:#292e36;
         }
     }
     @media screen and(max-width: 1366px){
-        .el-submit{
-            top: 20%;
-        }
+        /*.el-submit{*/
+            /*top: 20%;*/
+        /*}*/
         .storeInfo-details{
             height: 40px;
             line-height: 40px;
@@ -968,7 +1126,7 @@ $h1:#292e36;
             @include title-content;
             .title-img{
                 position: relative;
-                @include point(top,8);
+                //@include point(top,8);
                 @include point(margin-left,20);
             }
             .event-title{
@@ -976,6 +1134,10 @@ $h1:#292e36;
                 font-weight: bold;
                 color: $black;
                 margin-left: 20px;
+                max-width: 50%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .event-score{
                 background-color: #FCBA3F;
@@ -984,11 +1146,12 @@ $h1:#292e36;
                 font-size: 12px;
                 font-weight: bold;
                 border-radius: 12px;
+                height: 12px;
+                line-height: 12px;
             }
             .el-submit{
                 position: absolute;
                 @include point(right,20);
-                @include point(width,90);
                 color: #fff;
                 height: calc(36/1920*100vw);
                 width: calc(130/1920*100vw);
@@ -1018,7 +1181,7 @@ $h1:#292e36;
             margin: auto;
             .dialog-hr{
                 border: 0.5px solid ;
-                border-color: rgba(251,76,93,0.3);
+                border-color: #dfe2e9;
                 margin-bottom:10px;
                 bottom: 5px;
                 margin-top: 0;
@@ -1094,7 +1257,58 @@ $h1:#292e36;
                     }
                 }
             }
+            .channel-content{
+              margin: 20px 30px;
+              padding-top: 0;
+              position: relative;
+              .radio-group{
+                display: grid;
+                grid-template-columns: 240px 240px;
+                grid-template-rows: 30px;
+              }
+              .radio-class{
+                display: flex;
+                align-items: center;
+                /deep/ .el-radio__label{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .radio-img{
+                  height: 26px;
+                  width: 26px;
+                  margin-right: 10px;
+                }
+                .radio-span{
+                  display: inline-block;
+                  max-width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-size: 14px;
+                  color: #94a4b4;
+                }
+              }
+            }
         }
+      /deep/ .el-dialog__footer{
+        line-height: 24px;
+        padding: 30px;
+        padding-top: 20px;
+        #cancelBtn{
+          @include point(width,76);
+          @include point(margin-right,20);
+          background-color: #EAEDF2 !important;
+          color: #708090 !important;
+          font-size: 12px;
+          line-height: 12px;
+        }
+        #confirmBtn{
+          @include point(width,76);
+          font-size: 12px;
+          line-height: 12px;
+        }
+      }
         #previewVideo{
             @include point(min-width,450);
             @include point(min-height,360);
@@ -1131,14 +1345,16 @@ $h1:#292e36;
                 text-overflow: ellipsis;
             }
             .en-w3-content{
-              margin-right: 45px;
+              margin-right: calc(45/1920*100vw);
               overflow: hidden;
               display: inline-block;
               white-space: nowrap;
               text-overflow: ellipsis;
               width: calc(400/1920*100vw);
               //width: 200px;
-
+              @media screen and (min-width: 1280px) and(max-width: 1366px){
+                width: 270px;
+              }
             }
             .w3{
                 letter-spacing:0.3334em; /*如果需要y个字两端对齐，则为(x-y)/(y-1),这里是（4-3）/(3-1)=0.5em */
@@ -1155,6 +1371,54 @@ $h1:#292e36;
                 margin-left: 15px;
                 color: $tab;
             }
+            .related-channel{
+              width: 110px;
+              height: 30px;
+              line-height: 30px;
+              margin: 10px;
+              margin-left: 0;
+              font-size: 12px;
+              color: #6097F4;
+              border-radius: 15px;
+              background-color: $background;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              letter-spacing:0;
+              cursor: pointer;
+              .img-class{
+                height: 26px;
+                width: 26px;
+                margin-right: 10px;
+              }
+              .related-span{
+                font-weight: bolder;
+              }
+            }
+            .en-related-channel{
+              width: 180px;
+              height: 30px;
+              line-height: 30px;
+              margin: 10px;
+              margin-left: 0;
+              font-size: 12px;
+              color: #6097F4;
+              border-radius: 15px;
+              background-color: $background;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              letter-spacing:0;
+              cursor: pointer;
+              .img-class{
+                height: 26px;
+                width: 26px;
+                margin-right: 10px;
+              }
+              .related-span{
+                font-weight: bolder;
+              }
+            }
         }
         .submit-content{
             background-color: $background;
@@ -1168,12 +1432,12 @@ $h1:#292e36;
             @include point(padding-top,20);
             .dealInfo-label{
                 font-weight: bold;
-                @include point(margin-bottom,20);
+                margin-bottom: 25px;
                 display: block;
             }
             .btn-content{
-                @include point(margin-top,10);
-                @include point(margin-bottom,20);
+                margin-top: 10px;
+                margin-bottom: 25px;;
                 span{
                     display: inline-block;
                     @include point(margin-left,20);
@@ -1198,7 +1462,7 @@ $h1:#292e36;
             }
             .des-input{
                 @include point(margin-right,20);
-                @include point(margin-top,12);
+                margin-top: 15px;
                 width: 80%;
             }
         }
@@ -1222,7 +1486,7 @@ $h1:#292e36;
             }
             .description{
                 text-align: left;
-                font-family:'Microsoft YaHei';
+                font-family: Roboto, Arial, 'Microsoft YaHei';
                 font-size: 12px;
                 white-space:pre-wrap; /* css3.0 */
                 white-space:-moz-pre-wrap; /* Firefox */
@@ -1279,6 +1543,21 @@ $h1:#292e36;
                     //     left: 0;
                     //     clip: rect(0px 130px 100px 0px);
                     // }
+                  .icon-video{
+                    font-size: 18px;
+                    color: $red;
+                    /*position: relative;*/
+                    /*top: 2px;*/
+                    margin-right: 5px;
+                    display: inline-block;
+                    vertical-align: middle;
+                  }
+                  .ahref{
+                    text-decoration: underline;
+                    color: $red;
+                    vertical-align: bottom;
+                    display: inline-block;
+                  }
                 }
             }
             .viedo-info{
@@ -1294,13 +1573,17 @@ $h1:#292e36;
                     .icon-video{
                         font-size: 18px;
                         color: $red;
-                        position: relative;
-                        top: 2px;
+                        /*position: relative;*/
+                        /*top: 2px;*/
                         margin-right: 5px;
+                        display: inline-block;
+                        vertical-align: middle;
                     }
                     .ahref{
-                        text-decoration: underline;
-                        color: $red;
+                      text-decoration: underline;
+                      color: $red;
+                      vertical-align: bottom;
+                      display: inline-block;
                     }
                 }
             }
@@ -1417,7 +1700,7 @@ $h1:#292e36;
                         text-align: left;
                         @include point(margin-top,15);
                         @include point(margin-left,20);
-                        font-family:'Microsoft YaHei';
+                        font-family: Roboto,Arial, 'Microsoft YaHei';
                         font-size: 12px;
                         white-space:pre-wrap; /* css3.0 */
                         white-space:-moz-pre-wrap; /* Firefox */
@@ -1450,6 +1733,12 @@ $h1:#292e36;
                             &:nth-child(2n+1){
                                 @include point(margin-left,15);
                             }
+                          @media screen and (min-width: 1280px) and(max-width: 1366px){
+                            width: 90px;
+                            .img-content .imgLittle{
+                              width: 85px;
+                            }
+                          }
                         }
                     }
                     .viedo-info{
@@ -1467,6 +1756,7 @@ $h1:#292e36;
 </style>
 <style>
 @import '../../../assets/css/importfile.css';
+@import '../../../assets/css/videoBar.css';
 .el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
 }

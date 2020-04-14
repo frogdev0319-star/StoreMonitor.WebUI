@@ -6,18 +6,18 @@
                   {{itemNum}} {{generateInsSettingLang('item')}}</span>
                 <div class="route-btns">
                      <el-button
-                    :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
-                    @click="deleteNapes"
-                    size="mini" :disabled="routeData.length==0">
-                       <i style="margin-right:8px;" class="iconfont icon-shanchu"></i>
+                        :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
+                        @click="deleteNapes"
+                        size="mini" :disabled="routeData.length==0">
+                       <i class="iconfont icon-shanchu"></i>
                        <span>{{generateInsSettingLang('deleteItem')}}</span>
                     </el-button>
                      <el-button
-                    :class="lang=='en'? 'en-el-set-btn':'el-set-btn'" class="btn-class"
-                    @click="setItem"
-                    type="primary"
-                    size="mini" :disabled="routeData.length==0">
-                        <i style="margin-right:8px;" class="iconfont icon-button"></i>
+                        :class="lang=='en'? 'en-el-set-btn':'el-set-btn'" class="btn-class"
+                        @click="setItem"
+                        type="primary"
+                        size="mini" :disabled="routeData.length==0">
+                        <i class="iconfont icon-button"></i>
                         <span>{{generateInsSettingLang('setItem')}}</span>
                     </el-button>
                 </div>
@@ -29,10 +29,10 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>{{generateInsSettingLang('confirmSelecDel')}}</span>
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('confirmSelecDel')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -49,10 +49,10 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>{{generateInsSettingLang('confirmCurDel')}}</span>
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;" >{{generateInsSettingLang('confirmCurDel')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -117,7 +117,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -329,7 +329,7 @@ export default {
                             objChild.id=itemChild.id;
                             objChild.checked=false;
                             objChild.name=itemChild.subject;
-                            objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
+                            objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
                             objChild.score=itemChild.itemScore+'分';
                             tempChild.push(objChild);
                         })
@@ -462,6 +462,7 @@ export default {
                     self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
+                self.allchecked = false;
             })
         },
         changeValue(value){
@@ -696,6 +697,9 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
+    *{
+      font-family:Roboto, Arial,  'Microsoft YaHei';
+    }
     .iconfont{
       font-size: calc(24/1920*100vw);
     }
@@ -703,17 +707,19 @@ export default {
         overflow: hidden;
         .title-title{
             display: block;
-            @include point(margin-top,10);
             margin-left: 0px;
-            @include point(margin-bottom,15);
+            margin-top: 15px;
+            margin-bottom: 20px;
             float: left;
-            font-size: 18px;
+            font-size: calc(18/1920*100vw);
             font-weight: bold;
             color: #424151;
         }
         .route-btns{
             float: right;
-            @include point(margin-right,15);
+            margin-right:calc(20/1920*100vw);
+            display: flex;
+            align-items: center;
             .noAllow{
                 cursor:not-allowed;
                 opacity: 0.6;
@@ -723,7 +729,7 @@ export default {
                 border-color:  $mainColor;
                 color: $mainColor;
                 border-radius: 0px;
-                @include point(margin-right,8);
+                margin-right:calc(10/1920*100vw);
                 font-size: 12px;
                 &:disabled{
                     opacity: 0.5;
@@ -734,16 +740,12 @@ export default {
               border-color:  $mainColor;
               color: $mainColor;
               border-radius: 0px;
-              @include point(margin-right,8);
+              margin-right:calc(10/1920*100vw);
               font-size: calc(14/1920*100vw);
-              height: calc(36/1920*100vw);
-              line-height: calc(36/1920*100vw);
               padding: 0 0;
               width: calc(130/1920*100vw);
               .icon-shanchu{
                 font-size: calc(24/1920*100vw);
-              }
-              span{
               }
               &:disabled{
                 opacity: 0.5;
@@ -780,97 +782,75 @@ export default {
               }
               @media screen and (max-width: 1440px) {
                   width: 125px;
-                  span{
-                    position: relative;
-                    bottom: 1px
-                  }
               }
             }
             .btn-class{
               height: calc(36/1920*100vw);
-              line-height: calc(36/1920*100vw);
               padding: 0;
               font-size: calc(14/1920*100vw);
               width: calc(130/1920*100vw);
+              border-radius: 3px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 28px;
               .iconfont{
-                padding: calc(5/1920*100vw) 0;
-              }
-              span{
-                position: relative;
-                bottom: calc(4/1920*100vw);
-                @media screen and (max-width: 1280px) {
-                  bottom: calc(3/1920*100vw);
-                };
+                font-size: calc(16/1920*100vw);
+                margin-right: cal(8/1920*100vw);
               }
               @media screen and (max-width: 1440px) {
-                width: 125px;
+                width: 100px;
               }
           }
         }
     }
     .data-content{
-        @include point(margin,15);
+        margin: 20px calc(20/1920*100vw);
         margin-left: 0px;
         overflow: hidden;
         .header-content{
             width: 100%;
             margin-top:0px;
-            @include point(margin-bottom,10);
+            margin-bottom: 15px;
             float: left;
             overflow: hidden;
             text-align: left;
-            //@include point(padding-left,27);
             padding-left: 27px;
-            @include point(padding-bottom,10);
+            padding-bottom:15px;
             border-bottom:1px solid #e3e9f4;
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
             .allcheckBox{
                 float: left;
                 margin-right: 0;
             }
             .name-title{
                 float: left;
-                //width: 16%;
                 width: 300px;
-                // @include point(margin-left,40);
                 margin-left: 40px;
             }
 
             .description-title{
                 float: left;
-                width: 51%;
-                //margin-left: 12%;
-            }
-            @media screen and(min-width:1280px) and(max-width:1440px){
-                .description-title{
-                    width: 41%;
-                }
+                width: 50%;
+                width: calc((100% - 405px) * 20/29);
             }
             .score-title{
                 float: left;
-                width: 8%;
-                // margin-left: 7%;
+                width: calc((100% - 405px) * 4/29);
+                padding: 0 10px;
             }
             .handle-title{
                 float: left;
-                width: 4%;
-                margin-left: 1%;
+                width: calc((100% - 405px) * 5/29);
             }
             .en-handle-title{
               float: left;
-              width: 4%;
-              @media screen and (min-width: 1366px){
-                margin-left: 1%;
-              }
-              @media screen and (max-width: 1366px){
-                margin-left: 0;
-              }
+              width: calc((100% - 405px) * 5/29);
             }
         }
         .table-header-title{
             float:left;
-            @include point(margin-bottom,10);
-            // @include point(margin-left,27);
+            margin-bottom:calc(15/1920*100vw);
             margin-left: 27px;
             margin-right: 0;
             .all-checkBox{
@@ -881,6 +861,9 @@ export default {
         .iconfont{
           font-size: calc(24/1920*100vw);
           color: #7d8cad;
+        }
+        .el-table{
+          font-size: calc(14/1920*100vw);
         }
       }
         .table-title{

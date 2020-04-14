@@ -11,7 +11,7 @@
                           @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
-                <el-input type="textarea" resize='none' :autosize="{ minRows: 2}" v-model="suggest" class="sug-input"  @input="adviceChanged"
+                <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
                           :placeholder="generatePatrolLang('adviceInfo')"></el-input>
             </div>
         </el-col>
@@ -43,7 +43,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
                             <td class="icon-td"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua? pass : fail }}</div></td>
                             <td><span>{{item.numOfExcellentItems}}</span></td>
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
@@ -68,7 +68,8 @@
                                 <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
                                     <div class="item-blag"></div>
                                     <span class="item-name">{{index!=2?_item.name:_item.subject}}</span>
-                                    <span class="item-des">{{_item.description}}</span>
+                                    <!--<span class="item-des">{{_item.description}}</span>-->
+                                    <span class="item-des"></span>
                                 </div>
                             </el-scrollbar>
                         </div>
@@ -157,37 +158,63 @@ export default {
             let bucketName = self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
             let key=fileName;
-            let url=`http://${bucketName}.${endpoint}/${fileName}`;
-            return url;
+            if (self.oss.ossVendor == 2){
+              return `https://${endpoint}/${bucketName}/${fileName}`;
+            }
+            else {
+              return `http://${bucketName}.${endpoint}/${fileName}`;
+            }
         },
         upLoadFile(fileItem){
             let self=this;
             self.percentage=0;
-            let OSS = require('ali-oss');
-            const client = new OSS({
+            if(self.oss.ossVendor == null){
+              self.oss.ossVendor = 1; //1 -aliyun  2-azure
+            }
+            if(self.oss.ossVendor == 1){
+              let OSS = require('ali-oss');
+              const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
                 accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
                 accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
                 //bucket: 'viumo-'+self.accountId,
                 bucket: self.oss.ossBucketName
-            })
-            let name=fileItem.fileName;
-            return new Promise((resolve,reject)=>{
+              })
+              let name=fileItem.fileName;
+              return new Promise((resolve,reject)=>{
                 client.put(name,fileItem.file,{
-                progress: function* (percentage, cpt) {
-                   self.percentage = percentage
-                    }
+                  progress: function* (percentage, cpt) {
+                    self.percentage = percentage
+                  }
                 })
-                .then((results) => {
+                  .then((results) => {
                     // 上传完成
                     const url = self.getFileUrl(results.name);
                     console.log(url);
                     resolve(url);
-                })
-                .catch((err) => {
+                  })
+                  .catch((err) => {
                     console.log(err)
-                })
-            })
+                  })
+              })
+            }
+            else{
+              let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+              let containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential));
+              let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+              return new Promise((resolve,reject)=>{
+                azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+                  .then((results) => {
+                    // 上传完成
+                    const url = self.getFileUrl(fileItem.fileName);
+                    console.log(url);
+                    resolve(url);
+                  })
+                  .catch((err) => {
+                    console.log(err)
+                  })
+              })
+            }
         },
         clickSum(item,index){
             let self=this;
@@ -213,6 +240,10 @@ export default {
             if(!flag){
                 self.notify(self.$t('remotePatrol.summaryInfo'),'warning',3000);
                 return false;
+            }
+            if(self.suggest.length == 0){
+              self.notify(self.$t('remotePatrol.suggestEmpty'),'warning',3000);
+              return false;
             }
             let storageParams = {};
             storageParams.storeId = self.store.storeId;
@@ -240,11 +271,13 @@ export default {
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=2;
                                 obj.url=url;
+                                obj.deviceId = inspectList[i].items[j].sourceList[k].deviceId;
                             }
                             else if(inspectList[i].items[j].sourceList[k].mediaType==1){
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=1;
                                 obj.url=url;
+                                obj.deviceId = inspectList[i].items[j].sourceList[k].deviceId;
                             }
                             tempFileUrl.push(obj);
                         }
@@ -269,13 +302,14 @@ export default {
                     let url=await self.upLoadFile(self.eventList[i].sourceObj);
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
-                        url:url
+                        url:url,
+                        deviceId: self.eventList[i].sourceObj.deviceId
                     }
                     commentTemp.push(commentObj);
-                    obj.deviceId=self.channel.id;
+                    obj.deviceId = self.eventList[i].sourceObj.deviceId;
                 }
                 else{                        //通过加号创建的问题反馈
-                    obj.diviceId=-1;
+                    //obj.diviceId=-1;
                 }
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
@@ -501,19 +535,18 @@ $h1:#292e36;
 }
 .sum-content{
     color: $black;
-    background-color: #f6f9fe;
     .sum-submit{
-        margin-bottom: calc(30/1920*100vw);
+        margin-bottom: 30px;
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(40/1920*100vw);
         border: 1px solid $border;
-        padding-bottom: calc(30/1920*100vw);
+        padding-bottom: 30px;
         background-color: #fff;
         .submit-header{
             text-align: left;
-            height: calc(60/1920*100vw);
-            line-height: calc(60/1920*100vw);
+            height: 60px;
+            line-height: 60px;
             overflow: hidden;
             span{
                 font-size: calc(20/1920*100vw);
@@ -522,12 +555,14 @@ $h1:#292e36;
             }
             .sum-btn{
                 float: right;
-                margin-top: calc(18/1920*100vw);
+                margin-top: 18px;
                 height: calc(36/1920*100vw);
                 width: calc(130/1920*100vw);
                 line-height: calc(36/1920*100vw);
                 font-size: calc(14/1920*100vw);
                 padding: 0 0;
+                outline: none;
+                border-radius: 4px;
             }
         }
         .submit-content{
@@ -552,10 +587,13 @@ $h1:#292e36;
             .sug-label{
                 font-size: calc(12/1920*100vw);
                 display: block;
-                margin-bottom: calc(10/1920*100vw);
+                margin-bottom: 10px;
                 span{
                     color: $red;
                 }
+            }
+            .sug-input{
+              width: 99.5%;
             }
         }
 
@@ -563,13 +601,15 @@ $h1:#292e36;
     .sum-data{
         padding: calc(40/1920*100vw);
         border: 1px solid $border;
-        padding-top: calc(20/1920*100vw);
-        padding-bottom: calc(20/1920*100vw);
+        padding-top: 20px;
+        padding-bottom: 20px;
         background-color: #fff;
         min-height: calc(500/1920*100vw);
         .divider-content{
-            height: calc(40/1920*100vw);
-            line-height: calc(40/1920*100vw);
+            height: 40px;
+            line-height: 40px;
+            display: flex;
+            align-items: center;
             .divider-hr{
                 border: 0.5px solid $border;
             }
@@ -596,7 +636,7 @@ $h1:#292e36;
             }
             .table-bordered{
                 font-size: calc(14/1920*100vw);
-                margin-top: calc(20/1920*100vw);
+                margin-top: 20px;
                 th{
                     color: $tab;
                     text-align: left;
@@ -627,7 +667,7 @@ $h1:#292e36;
                 }
                 .icon-blag{
                     display: inline-block;
-                    width: calc(80/1920*100vw);
+                    width: 80px;;
                     padding:3px 6px;
                     text-align: center;
                     color: #fff;
@@ -637,9 +677,9 @@ $h1:#292e36;
             }
         }
         .row-footer{
-            padding-top: calc(20/1920*100vw);
-            padding-bottom: calc(10/1920*100vw);
-            margin-top: calc(10/1920*100vw);
+            padding-top: 20px;
+            padding-bottom: 10px;
+            margin-top: 10px;
             .details-content{
                 padding-right: calc(30/1920*100vw);
                 &:last-child{
@@ -648,14 +688,14 @@ $h1:#292e36;
             }
             .details{
                 position: relative;
-                height: calc(320/1920*100vw);
+                height: 320px;
                 border:1px solid $border;
                 box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
                 .item-header{
                     position: relative;
                     background-color: $background;
-                    height: calc(40/1920*100vw);
-                    line-height: calc(40/1920*100vw);
+                    height: 40px;
+                    line-height: 40px;
                     border-bottom: 1px solid $border;
                     padding-left: calc(20/1920*100vw);
                     text-align: left;
@@ -681,14 +721,14 @@ $h1:#292e36;
                     }
                 }
                 .item-content{
-                    padding-top: calc(20/1920*100vw);
-                    height:  calc(280/1920*100vw);
+                    padding-top: 20px;
+                    height:  280px;
                     .item-details{
                         height: auto;
                         font-size: calc(14/1920*100vw);
                         padding-left: calc(30/1920*100vw);
                         padding-right: calc(20/1920*100vw);
-                        margin-bottom:calc(30/1920*100vw);
+                        margin-bottom: 30px;
                         color: #4b5262;
                         text-align: left;
                         .item-blag{
@@ -719,6 +759,6 @@ $h1:#292e36;
         overflow-x: hidden;
     }
     .el-textarea__inner{
-        font-family: 'Microsoft YaHei';
+        font-family: Roboto,Arial, 'Microsoft YaHei';
     }
 </style>

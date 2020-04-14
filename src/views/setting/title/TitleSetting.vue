@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-container" :style="{'height':varyWindowHeight-150+'px'}">
+  <div class="setting-container">
     <div class="basic-info">
       <div class="title">
         <div class="title-info">
@@ -22,7 +22,7 @@
           </el-form-item>
           <el-form-item :label="$t('titleView.comment')" prop="comment" class="comment-class">
             <label slot="label" class="comment-label">{{$t('titleView.comment')}}</label>
-            <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  @input="commentChange" ></el-input>
+              <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  class="role-comment" @input="commentChange" :autosize="{minRows: 2, maxRows: 4}" ></el-input>
             <span class="text" style="float: right;color: #909399;">{{curLength}}/200</span>
           </el-form-item>
         </el-form>
@@ -70,7 +70,31 @@
               console.log(reg.test(value))
               let commentLength = filterString.getContentLength(value)
               if (reg.test(value) && commentLength <=20) {
-                callback()
+                //let titleList = JSON.parse(sessionStorage.getItem('titleList'));
+                if(self.isAdd){
+                  // add title
+                  if(self.titleList.includes(value)){
+                    return callback(new Error(self.$t('titleView.titleExist')))
+                  }
+                  else{
+                    callback()
+                  }
+                }
+                else{
+                  //update title
+                  let oldTitleName = JSON.parse(sessionStorage.getItem('titleInfo')).title;
+                  if(value == oldTitleName){
+                    callback()
+                  }
+                  else{
+                    if(self.titleList.includes(value)){
+                      return callback(new Error(self.$t('titleView.titleExist')))
+                    }
+                    else{
+                      callback()
+                    }
+                  }
+                }
               } else {
                 return callback(new Error(self.$t('titleView.titleValidateInfo')))
               }
@@ -168,6 +192,11 @@
                     roleName: this.$t('route.storeChecking'),
                     checked: false,
                     disabled: true,
+                  },
+                  {
+                    roleName: this.$t('route.customers'),
+                    checked: false,
+                    disabled: false,
                   }
                 ]
               },
@@ -253,9 +282,11 @@
                 ]
               }
             ],
+            tempRoleNameList: [],
             authorityInfoLists:[],
             isAdd: this.$route.params.isAdd,
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            titleList: JSON.parse(sessionStorage.getItem('titleList'))
           }
 
       },
@@ -263,10 +294,12 @@
         'infoForm.roleId'(newValue, old){
           let self = this;
           console.log(newValue);
+          console.log(self.tempRoleNameList);
           if(self.isAdd){
+            self.roleNameList = self.tempRoleNameList;
+            console.log(self.roleNameList)
             self.roleNameList.forEach(item=>{
               item.checked = false;
-              item.display = false;
               item.children.forEach(_item=>{
                 _item.checked = false;
                 _item.disabled = false;
@@ -279,7 +312,7 @@
       methods:{
         commentChange(val){
           let self = this;
-          let comment = filterString.all(val,100);
+          let comment = filterString.all(val,200);
           console.log(comment);
           let commentLength = filterString.getContentLength(comment)
           self.curLength = commentLength;
@@ -295,9 +328,10 @@
                   console.log(res);
                   if(res.errCode == 0){
                     self.notify(self.$t('titleView.saveSuss'),'success',3000);
+                    self.titleList.push(self.infoForm.title);
                   }
                   else{
-                    self.notify(res.errorMsg,'warning',3000);
+                    self.notify(self.$t('titleView.saveFail'),'warning',3000);
                   }
                 }).catch(error=>{
                 });
@@ -309,7 +343,7 @@
                     self.notify(self.$t('titleView.saveSuss'),'success',3000);
                   }
                   else{
-                    self.notify(res.errorMsg,'warning',3000);
+                    self.notify(self.$t('titleView.saveFail'),'warning',3000);
                   }
                 }).catch(error=>{
                 });
@@ -374,6 +408,10 @@
             console.log(JSON.parse(data));
             self.infoForm = JSON.parse(data);
             console.log(self.infoForm);
+            let comment = filterString.all(self.infoForm.comment,200);
+            console.log(comment);
+            let commentLength = filterString.getContentLength(comment)
+            self.curLength = commentLength;
           }
           let roleId = self.infoForm.roleId;
           console.log(roleId)
@@ -389,6 +427,7 @@
           self.roleNameList[1].children[4].disabled = PermissionHelper.enableStoreMonitor() ? false :  true;
           self.roleNameList[1].children[5].disabled = PermissionHelper.enableTransactionPatrol() ? false :  true;
           self.roleNameList[1].children[6].disabled = PermissionHelper.enableStorePointCheck() ? false :  true;
+          self.roleNameList[1].children[7].disabled = PermissionHelper.enableCustomers() ? false : true;
 
           self.roleNameList[2].children[0].disabled = PermissionHelper.enableEventHandle() ? false : true;
           self.roleNameList[2].children[1].disabled = PermissionHelper.enableEventClose() ? false : true;
@@ -435,7 +474,7 @@
             self.roleNameList[2].children[0].checked = true;
             self.roleNameList[2].children[0].disabled = true;
           }
-
+          console.log(self.roleNameList)
           self.roleNameList.forEach(item=>{
             let disabledNum = 0;
             item.children.forEach(_item=>{
@@ -445,6 +484,9 @@
             })
             if(disabledNum == item.children.length){
               item.disabled = true;
+            }
+            else{
+              item.disabled = false;
             }
           })
           //show the maxmium roleList
@@ -461,6 +503,7 @@
           else{
             // check has selected roles
             PermissionHelper.setData(self.infoForm.authorities)
+            console.log(self.infoForm.authorities)
             self.roleNameList[0].children[0].checked = PermissionHelper.enableRemoteOverview() ? true : false;
             self.roleNameList[0].children[1].checked = PermissionHelper.enableEventOverview() ? true : false;
 
@@ -471,6 +514,7 @@
             self.roleNameList[1].children[4].checked = PermissionHelper.enableStoreMonitor() ? true : false;
             self.roleNameList[1].children[5].checked = PermissionHelper.enableTransactionPatrol() ? true : false;
             self.roleNameList[1].children[6].checked = PermissionHelper.enableStorePointCheck() ? true : false;
+            self.roleNameList[1].children[7].checked = PermissionHelper.enableCustomers() ? true : false;
 
             self.roleNameList[2].children[0].checked = PermissionHelper.enableEventHandle() ? true : false;
             self.roleNameList[2].children[1].checked = PermissionHelper.enableEventClose() ? true : false;
@@ -487,36 +531,56 @@
             self.roleNameList[4].children[3].checked = PermissionHelper.enableScheduleSetting() ? true : false;
             self.roleNameList[4].children[4].checked = PermissionHelper.enableTitleSetting() ? true : false;
           }
-          self.roleNameList.forEach((item,index)=>{
-            let parentDisable = self.roleNameList[index].disabled;
+          self.roleNameList.forEach(item=>{
+            let childrenMustNum = 0;
             let childrenCheckedNum = 0;
-            let childrenDisableNum = 0;
-            item.children.forEach(_item=>{
-              if(_item.checked){
-                childrenCheckedNum++;
+            let childrenUncheckedNum = 0;
+            let childrenNoAuthorityNum = 0;
+            item.children.forEach(_item=> {
+              if(_item.disabled){
+                _item.checked ? childrenMustNum++ : childrenNoAuthorityNum ++;
               }
-              else if(_item.disabled){
-                childrenDisableNum++;
+              else{
+                _item.checked ? childrenCheckedNum++ : childrenUncheckedNum ++;
               }
             })
-            let sumCheckAndDis = childrenCheckedNum + childrenDisableNum;
-            if(childrenDisableNum== item.children.length){
-              item.disabled = true;
-            }
-            if(sumCheckAndDis == item.children.length){
+            if( childrenMustNum + childrenNoAuthorityNum + childrenCheckedNum == item.children.length )  {
               item.checked = true;
             }
-            // if(sumCheckAndDis == item.children.length && !parentDisable){
-            //   if(childrenDisableNum > 0){
-            //     item.disabled = true;
-            //     item.checked = false;
-            //   }
-            //   else{
-            //     item.disabled = false;
-            //     item.checked = true;
-            //   }
-            // }
+            else{
+              item.checked = false;
+            }
           })
+          // self.roleNameList.forEach((item,index)=>{
+          //   let parentDisable = self.roleNameList[index].disabled;
+          //   let childrenCheckedNum = 0;
+          //   let childrenDisableNum = 0;
+          //   item.children.forEach(_item=>{
+          //     if(_item.checked){
+          //       childrenCheckedNum++;
+          //     }
+          //     else if(_item.disabled){
+          //       childrenDisableNum++;
+          //     }
+          //   })
+          //   let sumCheckAndDis = childrenCheckedNum + childrenDisableNum;
+          //   if(childrenDisableNum== item.children.length){
+          //     item.disabled = true;
+          //   }
+          //   if(sumCheckAndDis == item.children.length){
+          //     item.checked = true;
+          //   }
+          //   // if(sumCheckAndDis == item.children.length && !parentDisable){
+          //   //   if(childrenDisableNum > 0){
+          //   //     item.disabled = true;
+          //   //     item.checked = false;
+          //   //   }
+          //   //   else{
+          //   //     item.disabled = false;
+          //   //     item.checked = true;
+          //   //   }
+          //   // }
+          // })
         },
         checkAllChildrenRole(index, val){
           let self=this;
@@ -546,8 +610,8 @@
           let sumCheckAndDis = childrenCheckedNum + childrenDisableNum;
           if(sumCheckAndDis == self.roleNameList[index].children.length && !parentDisable){
             if(childrenDisableNum > 0){
-              self.roleNameList[index].disabled = true;
-              self.roleNameList[index].checked = false;
+              self.roleNameList[index].disabled = false;
+              self.roleNameList[index].checked = true;
             }
             else{
               self.roleNameList[index].disabled = false;
@@ -580,6 +644,7 @@
       },
       mounted(){
           let self = this;
+          self.tempRoleNameList = JSON.parse(JSON.stringify(self.roleNameList));
           self.getAuthorityInfoList();
       }
     }
@@ -593,31 +658,20 @@
   $color: #606266;
   $black:#182752;
 
-  @function rem($val){
-    @return $val/16+rem;
-  }
-  @function checkRem($val){
-    @if($val==auto){@return auto;}
-    @else if($val==0){@return 0;}
-    @else{@return rem($val);}
-  }
-  @mixin point($poi,$val){
-    #{$poi}:checkRem($val);
-  }
   .setting-container{
-    height: 100%;
+    height: calc(100vh - 80px - 45px - calc(60/1920*100vw));
     display: flex;
     flex-direction: column;
     border: 1px solid $border;
     background-color: #fff;
     .basic-info{
       .title{
-        @include point(height, 50);
-        @include point(line-height, 50);
-        @include point(padding-left, 30);
-        @include point(padding-right, 20);
-        @include point(margin-bottom, 20);
-        font-size: 20px;
+        height: 70px;
+        line-height: 70px;
+        padding-left: calc(40/1920*100vw);
+        padding-right: calc(25/1920*100vw);
+        margin-bottom: 25px;
+        font-size: calc(20/1920*100vw);
         font-weight: bold;
         display: flex;
         justify-content: space-between;
@@ -631,91 +685,82 @@
             vertical-align: middle;
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             padding: 0 0;
           }
         }
       }
       .basic-information{
         text-align: left;
-        @include point(margin-left, 20);
-        @include point(margin-right, 20);
-        @include point(padding-left, 10);
+        margin-left: calc(25/1920*100vw);
+        margin-right: calc(25/1920*100vw);
+        padding-left: calc(15/1920*100vw);
         border-bottom: 1px solid $border;
         .comment-class .el-form-item__label:before{
             content: ' ';
             margin-right: 4px;
         }
-
+        /deep/ .el-form-item__label{
+          font-size: calc(14/1920*100vw);
+        }
+        /deep/ .el-radio__label{
+          font-size: calc(14/1920*100vw);
+        }
       }
     }
     .role-setting{
       flex-grow: 1;
-      @include point(margin-left, 20);
-      @include point(margin-right, 20);
+      margin-left: calc(25/1920*100vw);
+      margin-right: calc(25/1920*100vw);
+      margin-bottom: 25px;
       text-align: left;
+      height: calc(100% - 303px);
       .setting-title{
-        @include point(padding-left, 10);
-        font-size: 16px;
-        @include point(height, 50);
-        @include point(line-height, 50);
+        padding-left: calc(15/1920*100vw);
+        font-size: calc(16/1920*100vw);
+        height: 70px;
+        line-height: 70px;
       }
       .role-list{
         background-color: #F6F7FB;
         border:0.5px solid #e3e9f4;
         color: $black;
-
-        @media screen and (min-width: 1280px){
-          height: 410px;
-        }
-        @media screen and (min-width: 1440px){
-          height: 280px;
-        }
-        @media screen and (min-width: 1600px){
-          height: 260px;
-        }
-        @media screen and (min-width: 1680px){
-          height: 380px;
-        }
-        @media screen and (min-width: 1920px){
-          height: 380px;
-        }
-
+        height: calc(100% - 70px);
         .role-group{
           width: 60%;
-          @include point(margin-top,20);
-          @include point(margin-bottom,20);
+          margin-top: 25px;
+          margin-bottom: 25px;
           .role-all-checkbox{
-            @include point(margin-left,15);
+            margin-left: calc(20/1920*100vw);
             .group-name{
-              @include point(margin-left,10);
-              font-size: 14px;
+              margin-left: calc(15/1920*100vw);
+              font-size: calc(14/1920*100vw);
               font-weight: bold;
             }
           }
           .role-content{
-            @include point(margin-left,40);
+            margin-left: calc(50/1920*100vw);
             overflow: hidden;
             .role-detail{
               width: auto;
-              @include point(min-width,120);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              margin-left:calc(15/1920*100vw);
+              margin-top: 15px;
+              width: calc(180/1920*100vw);
+              min-width: 140px;
               float: left;
               .role-name{
-                @include point(margin-left,10);
-                font-size: 14px;
+                margin-left:calc(15/1920*100vw);
+                font-size: calc(14/1920*100vw);
               }
             }
             .en-role-detail{
               width: auto;
-              @include point(min-width,240);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              min-width:calc(320/1920*100vw);
+              margin-left:calc(15/1920*100vw);
+              margin-top: 15px;
               float: left;
               .role-name{
-                @include point(margin-left,10);
-                font-size: 14px;
+                margin-left:calc(15/1920*100vw);
+                font-size: calc(14/1920*100vw);
               }
             }
           }
@@ -735,7 +780,7 @@
   .role-group .el-checkbox{
     margin-right: 0;
   }
-  .role-group .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
+  .role-group /deep/ .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
     background-color:#f31d65 ;
     border-color: #f31d65;
   }
@@ -746,5 +791,8 @@
   }
   .role-list #el-menuscrollbar .el-scrollbar__wrap{
     overflow-x: hidden;
+  }
+  .role-comment .el-textarea__inner{
+    font-family: Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei
   }
 </style>

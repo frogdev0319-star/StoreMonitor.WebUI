@@ -65,12 +65,34 @@ export const bindInspectItem=data=>{
         data
     })
 }
+export const bindInspectItemV2=data=>{
+  return request({
+    url:`v2.0/inspect/item/bind`,
+    method:'post',
+    data
+  })
+}
 export const checkOutInspectItem=params=>{
     return request({
         url:`${version}/inspect/checkout`,
         method:'get',
         params
     })
+}
+
+export const checkOutInspectItemV3=params=>{
+  return request({
+    url:`v3.0/inspect/checkout`,
+    method:'get',
+    params
+  })
+}
+export const unbindInspectItemV2=data=>{
+  return request({
+    url: `v2.0/inspect/item/unbind`,
+    method: 'post',
+    data
+  })
 }
 export const deleteInspectGroup=data=>{
     return request({

@@ -252,7 +252,7 @@ export default {
                 msg='用户不在线';
               }
               else if(lang == 'en'){
-                msg='Wrong user name or password';
+                msg='User offline';
               }
               else if(lang == 'zhtw'){
                 msg='用戶不在線';

@@ -1,5 +1,5 @@
 <template>
-  <div class="detail-container"  :style="{'height':varyWindowHeight-350+'px'}" >
+  <div class="detail-container" :style="{'height':varyWindowHeight-350+'px'}">
     <el-row>
       <el-col :span="24" class="detail-title">
         <!--<span class="title-title ">{{totalMsg}}</span>-->
@@ -19,9 +19,10 @@
                    width="30%"
                    top="25vh"
                    left="40vh"
+                   class="add-dialog"
         >
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #f31d65;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
             <el-form class="nvrForm" label-position="top"  :model="ezvizAccountInfo" :rules="rules" ref="accountForm" size="mini">
                 <el-form-item :label="$t('deviceView.selectAccountType')" v-if="isAdd" required class="radio-item">
                   <el-radio-group v-model="ezvizAccountInfo.scope">
@@ -87,10 +88,9 @@
             :highlight-current-row="true"
             align='left'
             stripe
-            border
-            :max-height="tableHieght"
             style="width:100%;text-algin:center;border: 0px solid #ebebeb;"
-            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+            :cell-style="cellStyle"
           >
             <el-table-column v-for="(item,index) in tableInfoData" :key="index"
                              :prop="item.prop" :label="item.label"  :min-width="item.width">
@@ -108,7 +108,7 @@
             <div slot="empty">
               <div>
                 <i class="iconfont icon-zhengque empty-data-icon"></i>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{$t('deviceView.noData')}}</span>
+                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{noData}}</span>
               </div>
             </div>
           </el-table>
@@ -133,10 +133,10 @@
                   top="35vh"
                   left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #FB4C5D;"/>
+          <hr style="border: 0.5px solid #dfe2e9;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-            <span>{{$t('deviceView.confirmDelete')}}</span>
+            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+            <span style="display: inline-block; vertical-align: middle">{{$t('deviceView.confirmDelete')}}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -158,12 +158,33 @@
         name: "EzvizAccount",
         data(){
           const validateEzvizAccount =(rule,value,callback)=>{
+            let self = this;
             const reg = /^1[3|4|5|7|8|9][0-9]\d{8}$/
             console.log(reg.test(value))
-            if (reg.test(value)) {
-              callback()
-            } else {
-              return callback(new Error(this.$t('deviceView.enterCorrentAccount')))
+            if(value == undefined){
+              return callback(new Error(this.$t('deviceView.enterAccount')))
+            }
+            else{
+              if(self.isAdd){
+                if(self.accountList.includes(value)) {
+                  return callback(new Error(this.$t('deviceView.accountExist')))
+                }
+              }
+              else{
+                if(self.ezvizAccountInfo.oldEzvizAccount == value){
+                  callback()
+                }
+                else{
+                  if(self.accountList.includes(value)) {
+                    return callback(new Error(this.$t('deviceView.accountExist')))
+                  }
+                }
+              }
+              if (reg.test(value)) {
+                callback()
+              } else{
+                return callback(new Error(this.$t('deviceView.enterCorrentAccount')))
+              }
             }
           }
           const validateAccountName =(rule,value,callback)=>{
@@ -262,10 +283,24 @@
             userAccountNum : 0,
             storeviuNum: 0,
             curLength: 0,
-            totalMsg: ''
+            totalMsg: '',
+            noData: '',
+            accountList: []
           }
         },
         methods:{
+          cellStyle({ row, column, rowIndex, columnIndex}){
+            console.log(row);
+            console.log(columnIndex);
+            let obj = {};
+            if(columnIndex == 0){
+              obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+            }
+            else{
+              obj = {'border-right':'1px solid #e3e9f4'}
+            }
+            return obj;
+          },
           generateDeviceLang,
           showAddEzvizAccount(){
             let self = this;
@@ -310,6 +345,15 @@
             self.totalMsg = totalMsg;
             console.log(accountList)
             self.tableData = accountList;
+            if(self.tableData.length == 0){
+              self.noData = self.$t('deviceView.noData');
+            }
+            let listArray = [];
+            self.tableData.forEach(item=>{
+              listArray.push(item.ezvizAccount)
+            })
+            self.accountList = listArray;
+            console.log(self.accountList);
           },
           getEzvizAccountList(){
             return new Promise((resolve,reject)=>{
@@ -420,7 +464,7 @@
                     self.showAddAccount = false;
                   }
                   else {
-                    self.notify(res.errMsg, 'warning', 3000);
+                    self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
                     self.showAddAccount = false;
                   }
                 }
@@ -444,7 +488,7 @@
                     self.showAddAccount = false;
                   }
                   else {
-                    self.notify(`${self.$t('deviceView.editFail')} : ${res.errMsg}`, 'warning', 3000);
+                    self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
                     self.showAddAccount = false;
                   }
                 }
@@ -469,6 +513,7 @@
             self.ezvizAccountInfo.appSecret = row.appSecret;
             self.ezvizAccountInfo.scope = row.scope;
             self.ezvizAccountInfo.comment = row.comment;
+            self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
             let commentLength = filterString.getContentLength(row.comment)
             self.curLength = commentLength;
             self.deleteId = row.id;
@@ -564,7 +609,10 @@
     #{$poi}:checkRem($val);
   }
   *{
-    font-family: Arial, "Microsoft YaHei";
+    font-family: Roboto, Arial, "Microsoft YaHei";
+  }
+  .detail-container{
+    //height: calc(100vh - 125px - calc(60/1920*100vw));
   }
   .detail-title{
     overflow: hidden;
@@ -619,7 +667,6 @@
     }
   }
   .el-table-content{
-    border: 1px solid $border;
     border-bottom: none;
     .iconfont{
       font-size: calc(24/1920*100vw);
@@ -635,16 +682,12 @@
     border-color:  $mainColor;
     color: #fff;
     position: absolute;
-    @include point(right, 5);
+    right: calc(10/1920*100vw);
     height: 24px;
-    @include point(top, 2);
     font-size: 12px;
-    @media screen and (min-width: 1920px){
-      top: 2px
-    }
   }
   .account-list{
-    padding: calc(20/1920*100vw);
+    padding: 20px calc(20/1920*100vw);
     border: 1px solid $border ;
     height: auto;
     position: relative;
@@ -654,128 +697,10 @@
       bottom: 0;
     }
   }
-  .data-content{
-    @include point(margin,15);
-    margin-left: 0px;
-    overflow: hidden;
-    .header-content{
-      width: 100%;
-      margin-top:0px;
-      @include point(margin-bottom,10);
-      float: left;
-      overflow: hidden;
-      text-align: left;
-      //@include point(padding-left,27);
-      padding-left: 27px;
-      @include point(padding-bottom,10);
-      border-bottom:1px solid #e3e9f4;
-      font-size: 14px;
-      .allcheckBox{
-        float: left;
-        margin-right: 0;
-      }
-      .name-title{
-        float: left;
-        //width: 16%;
-        width: 300px;
-        // @include point(margin-left,40);
-        margin-left: 40px;
-      }
-
-      .description-title{
-        float: left;
-        width: 51%;
-        //margin-left: 12%;
-      }
-      @media screen and(min-width:1280px) and(max-width:1440px){
-        .description-title{
-          width: 41%;
-        }
-      }
-      .score-title{
-        float: left;
-        width: 8%;
-        // margin-left: 7%;
-      }
-      .handle-title{
-        float: left;
-        width: 4%;
-        margin-left: 1%;
-      }
-      .en-handle-title{
-        float: left;
-        width: 4%;
-        @media screen and (min-width: 1366px){
-          margin-left: 1%;
-        }
-        @media screen and (max-width: 1366px){
-          margin-left: 0;
-        }
-      }
-    }
-    .table-header-title{
-      float:left;
-      @include point(margin-bottom,10);
-      // @include point(margin-left,27);
-      margin-left: 27px;
-      margin-right: 0;
-      .all-checkBox{
-        margin-right: 0;
-      }
-    }
-    .table-title{
-      @include point(margin-left,38);
-      margin-left: 38px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #424151;
-    }
-  }
-  .el-dropbtn1{
-    position: relative;
-    bottom: 2px;
-    @include point(margin-left,10);
-  }
-  .showNewContent{
-    position: absolute;
-    display: inline-block;
-    background-color: orange;
-    top: 0px;
-    left: 5px;
-    color: #fff;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 12px;
-    height: 12px;
-    padding-top: 0px;
-    line-height: 10px;
-  }
   .elradio{
     &:last-child{
       border-left: 1px solid #dcdfe6;
     }
-  }
-  .data-empty{
-    margin: 0 auto;
-    margin-top: 14%;
-    position: relative;
-    .empty-title{
-      font-weight: bold;
-      span{
-        color: $mainColor;
-        cursor: pointer;
-      }
-      .downLoad-btn{
-        color:  $mainColor;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    }
-  }
-  .tabName-input-content{
-    background: #fff;
-    @include point(height,73);
-    width: 100%;
   }
 </style>
 <style>
@@ -784,6 +709,12 @@
   }
   .el-dialog__body{
     padding: 0px;
+  }
+
+  @media screen  and (max-width: 1280px){
+    .add-dialog .el-dialog{
+      width: 40% !important;
+    }
   }
 
   .elradio .el-radio-button__inner{
@@ -800,6 +731,8 @@
   }
   .access-token .el-form-item__content{
     width: 70%;
+    display: inline-flex;
+    align-items: center;
   }
   .access-button .el-form-item__content{
     width: 100%;
@@ -813,10 +746,8 @@
   .ezviz-account .el-form-item , .nvrForm .el-form-item {
     margin-bottom: 15px;
   }
-  @media screen and (min-width: 1280px){
-    .nvrForm .el-radio__label , .nvrForm .el-form-item__label , .nvrForm .el-form-item__content{
-      font-size: 12px;
-    }
+  .nvrForm .el-radio__label , .nvrForm .el-form-item__label , .nvrForm .el-form-item__content{
+    font-size: calc(14/1920*100vw);
   }
   .nvrForm .radio-item {
     margin-bottom: 0px;
@@ -833,7 +764,11 @@
   .nvrForm .el-form-item__error{
     left: 0;
   }
-  .el-table--border th:first-child .cell, .el-table--border td:first-child .cell {
-    padding-left: 20px;
+  .el-table-content .el-table::before{
+    height: 0px !important;
+  }
+  .el-table-content .el-table .cell {
+    padding-left: calc(20/1920*100vw);
+    padding-right: calc(20/1920*100vw);
   }
 </style>

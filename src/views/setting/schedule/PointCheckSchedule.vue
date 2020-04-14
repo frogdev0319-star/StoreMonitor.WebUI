@@ -19,10 +19,10 @@
                  top="35vh"
                  left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #f31d65;"/>
+          <hr style="border: 0.5px solid #dfe2e9;"/>
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-            <span>{{generateScheduleLang('saveInfo')}}</span>
+            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803; display: inline-block;  vertical-align: middle"></i>
+            <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('saveInfo')}}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -39,12 +39,12 @@
             <div :style="{height:varyWindowHeight}">
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-                <el-input v-model="paneItem.name" clearable  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                <el-input v-model="paneItem.name"   :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
                           class="el-type"></el-input>
               </el-col>
               <el-col :span="24" class="header-details">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-                <el-select v-model="paneItem.mode" clearable  placeholder="选择类型" size="mini" :disabled="paneItem.modeDisabled" @change="searchStore"
+                <el-select v-model="paneItem.mode"   placeholder="选择类型" size="mini" :disabled="paneItem.modeDisabled" @change="searchStore"
                            class="el-type" >
                   <el-option
                     v-for="item in typeList"
@@ -107,7 +107,7 @@
                 <span class="delete-time-btn" size="mini" v-if="paneItem.weeklySchedule.length > 1" style="margin: 0 20px 0 30px"
                       @click="deleteWeekDays(_index)"><i class="el-icon-error"></i>
                 </span>
-                <el-button class="time-btn" size="mini" type="primary"  @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                <el-button  class="time-btn" size="mini" type="primary"  @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
                            v-if="_index == paneItem.weeklySchedule.length-1 && !showAddWeek"><i class="el-icon-plus"></i></el-button>
               </el-col>
 
@@ -234,8 +234,7 @@
               </div>
               <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
                 <div class="el-btn-content">
-                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn"><i
-                    class="iconfont icon-quxiaolianjie" style="margin-right:8px;"></i>
+                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
                     <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>
@@ -252,10 +251,10 @@
                    top="35vh"
                    left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #f31d65;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-              <span>{{generateScheduleLang('confirmBind')}}</span>
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"></i>
+              <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('confirmBind')}}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -2249,7 +2248,7 @@
   $h1:#292e36;
   $mainColor:#f31d65;
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto, Arial, Microsoft YaHei;
   }
   @function rem($val){
     @return $val/16+rem;
@@ -2544,23 +2543,18 @@
           position: absolute;
           @include point(margin-top,15);
           @include point(margin-bottom,15);
+          clear: both;
           .btn{
             //background-color: #f31d65;
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             padding: 0 0;
             width: calc(130/1920*100vw);
+            float: left;
+            margin: 0 calc(30/1920*100vw);
             .icon-quxiaolianjie{
               font-size: calc(24/1920*100vw);
               padding: calc(5/1920*100vw) 0;
-            }
-            span{
-              position: relative;
-              bottom: calc(4/1920*100vw);
-              @media screen and (max-width: 1280px) {
-                bottom: calc(3/1920*100vw);
-              };
             }
             color: #fff;
           }
@@ -2635,7 +2629,6 @@
           @include point(margin-right,15);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
           padding: 0 0;
           width: calc(160/1920*100vw);
           .el-icon-plus{
@@ -2653,7 +2646,7 @@
             opacity: 0.5;
           }
           @media screen and (max-width: 1680px){
-            width: 130px;
+            width: 130px !important;
           }
 
         }
@@ -2663,14 +2656,13 @@
           @include point(margin-right, 15);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
           padding: 0 0;
           width: calc(130/1920*100vw);
           @media screen and (max-width: 1680px){
             width: 120px;
           }
           .icon-shanchu{
-            font-size: calc(24/1920*100vw);
+            font-size: calc(26/1920*100vw);
             padding:  calc(5/1920*100vw) 0;
           }
           span{
@@ -2746,15 +2738,18 @@
           width: calc(130/1920*100vw);
           .el-icon-plus, .icon-shanchu{
             padding: calc(5/1920*100vw) 0;
-            font-size: calc(24/1920*100vw);
+            font-size: calc(16/1920*100vw);
           }
           span{
             position: relative;
-            bottom: calc(4/1920*100vw);
-            @media screen and (max-width: 1280px) {
-              bottom: calc(3/1920*100vw);
+            bottom: calc(1/1920*100vw);
+            @media screen and (max-width: 1440px) {
+              bottom: 0;
             };
           }
+        }
+        .en-el-delete-btn.btn-class, en-el-add-btn.btn-class{
+          width: 130px;
         }
         .downLoad-btn{
           margin-left: 0px !important;
@@ -2850,7 +2845,7 @@
       font-size: 12px;
       width: 14px;
       /deep/ span{
-        margin-left: -5px;
+        margin-left: -6px;
       }
       .el-icon-plus{
         font-size:12px;
@@ -2868,12 +2863,25 @@
         font-size:12px;
       }
     }
-
+    #patrltabs-content /deep/ .el-tabs__header.is-top{
+      width: 70%;
+    }
+    #patrltabs-content /deep/ .el-tabs__header.is-top::after{
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 143%;;
+      z-index: 1;
+      height: 2px;
+      background-color: #E4E7ED;
+    }
     #patrltabs-content /deep/ .el-tabs__nav-scroll{
       height: 40px;
     }
     #patrltabs-content /deep/ .el-tabs__item {
       padding: 0 0;
+      margin: 0 12px;
       font-size: 14px;
       width: 100px;
       overflow: hidden;
@@ -2920,6 +2928,10 @@
 <style>
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
+  }
+  .el-switch.is-checked .el-switch__core{
+    border-color: #00FF00;
+    background-color: #00FF00;
   }
 
 </style>

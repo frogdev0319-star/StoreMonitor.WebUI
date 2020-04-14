@@ -69,11 +69,12 @@
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
                     <div class="dialog-event-content">
-                        <span class="event-title">{{generatePatrolLang('name')}}</span>
-                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName"></el-input>
+                        <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
-                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows: 7}"
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
@@ -112,11 +113,12 @@
                         </div>
                     </div>
                     <div class="event-content">
-                        <span class="event-title">{{generatePatrolLang('name')}}</span>
-                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName"></el-input>
+                        <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
-                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                        maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows: 7}"
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
                 <div slot="footer">
@@ -136,7 +138,7 @@
                         <span class="event-title">{{generatePatrolLang('name')}}</span>
                         <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
-                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
                         maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
                     </div>
                 </div>
@@ -152,7 +154,9 @@
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
             <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
-            <div class="guide-content" v-if="showGuide">
+            <dialog-vue :dialog-title='leaveObj.title' :show-info='leaveObj.showInfo' :is-warning='leaveObj.isWarning' :dialog-closed='leaveObj.dialogCosed' @confirmed='leaveDialog' @canceled='cancelLeave'></dialog-vue>
+            <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
+          <div class="guide-content" v-if="showGuide">
                 <div class="guide-rside">
                     <div class="num-content">
                         <span class="guide-num">2</span>
@@ -166,7 +170,7 @@
                             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
                             <span>{{generatePatrolLang('snapshot')}}</span>
                         </div>
-                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
                             <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
                             <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                           <span>{{generatePatrolLang('record')}}</span>
@@ -206,14 +210,14 @@
                     </div>
                   </transition>
                   <transition name="fade">
-                    <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo">
+                    <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo" style="display: none">
                       <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;margin-left: -15px;"></i>
                       <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
                       <span>{{generatePatrolLang('record')}}</span>
                     </div>
                   </transition>
                   <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
-                          class="video-js vjs-fill" >
+                          class="video-js vjs-fill" @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)">
                   </video >
                 </div>
               </div>
@@ -264,7 +268,8 @@
                                     <div class="dropdown-model" v-if="item.disabled"></div>
                                     <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
-                                            {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}<i class="el-icon-arrow-down el-icon--right"></i>
+                                            {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
+                                            <i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
                                         <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
@@ -291,8 +296,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                        maxlength="300" v-model="item.inspectInput" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled"></el-input>
+                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
+                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled"></el-input>
                                 </div>
                             </div>
                             <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else-if="showFeedBackInfo">
@@ -338,7 +343,7 @@
             <div class="el-header-title">
                 <span>{{generatePatrolLang('selectStrore')}}</span>
             </div>
-            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" :style="showFeedBack?{'height':'50%'}:{}">
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%">
                 <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
                     <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                         <div class="storeList-content" v-if="index!=2">
@@ -355,7 +360,7 @@
                                 </el-tooltip>
                             </div>
                         </div>
-                        <div class="storeList-content" v-else :style="!showFeedBack?{height:varyWindowHeight-100+'px'}:{'height':(varyWindowHeight)/2+'px'}">
+                        <div class="storeList-content" v-else>
                             <el-input
                                 size="small"
                                 class="el-search-input"
@@ -380,7 +385,7 @@
                     </el-scrollbar>
                 </el-tab-pane>
             </el-tabs>
-            <div class="channelbar-content" v-if="showFeedBack">
+            <div class="channelbar-content">
                 <hr class="rside-hr"/>
                 <div class="channel-content">
                     <span>{{generatePatrolLang('zoneList')}}</span>
@@ -404,7 +409,7 @@
     </el-row>
 </template>
 <script>
-import {checkOutInspectItem,submitInspectItem} from '@/api/inspect'
+import {checkOutInspectItem,submitInspectItem, checkOutInspectItemV3} from '@/api/inspect'
 import util from '@/common/util'
 import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore, getVideoAuthority} from '@/api/store'
 import {getUserInfo} from '@/api/login'
@@ -420,6 +425,7 @@ import RecordRTC from '../../../static/RecordRTC.js'
 import {validateInput} from '@/common/validate'
 import {generatePatrolLang} from '@/api/i18n'
 import EzvizVideo from '@/components/EzvizVideo.vue'
+import filterString from '@/common/filterString.js'
 
 export default {
     name:'ReInspection',
@@ -454,7 +460,7 @@ export default {
             checkImgSrc:'',
             showOuter:false,
             showModelContent:false,
-            showInfoContent:false,
+            showInfoContent:true,
             activeIndex:'0',
             serachVale:'',
             varyWindowHeight:window.innerHeight,
@@ -625,6 +631,18 @@ export default {
               isWarning:false,
               dialogCosed:false
             },
+            leaveObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.changPageInfo'),
+              isWarning:true,
+              dialogCosed:false
+            },
+            videoLoadingObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.videoLoading'),
+              isWarning:true,
+              dialogCosed:false
+            },
             recorder:null,
             videoCanvasSrc:'',
             isRecordingStarted : false,
@@ -647,6 +665,7 @@ export default {
             eventList:[],
             channelBtns:[],
             showChannelBtns:[],
+            allChannelBtns: [],
             hideLast:false,
             hideNext:false,
             eventName:'',
@@ -659,7 +678,10 @@ export default {
             initEzviz: false,
             sourceListLength: 0,
             realTimeSpeed: 0,
-            videoAuthority: false
+            videoAuthority: false,
+            isLoading: false,
+            showEventNameInfo: false,
+            fromName: ''
         }
     },
     computed:{
@@ -685,6 +707,11 @@ export default {
             let self=this;
             if(val!=0){
                 self.changeBrand();
+                window.setTimeout(function(){
+                  self.$route.meta.keepAlive = true;
+                  console.log(self.$route.meta.keepAlive);
+                },
+                300)
             }
         },
         realTimeSpeed(val,oldVal){
@@ -697,10 +724,74 @@ export default {
             }
         },
     },
+    beforeRouteEnter(to, from, next){
+      console.log(to.meta.keepAlive)
+      if(from.name !== 'submitEvent'){
+        //to.meta.keepAlive = true
+      }
+      //to.meta.keepAlive = true
+      next(vm=>{
+    //     vm.fromName = from.name;
+    //     if(from.name == 'submitEvent' && !to.meta.keepAlive){
+    //       vm.$destroy()
+    //     }
+      })
+     },
     beforeRouteLeave(to, from, next){
         let self=this;
+        console.log(from.meta.keepAlive)
+        let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
+        if(canLeave && to.name !='confirmSum'){
+          self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
+            confirmButtonText: self.$t('remotePatrol.confirm'),
+            cancelButtonText: self.$t('remotePatrol.cancel'),
+            type: 'warning',
+            customClass: 'confirmClass',
+            cancelButtonClass: 'cancelBtn',
+            confirmButtonClass: 'confirmBtn'
+          }).then(() => {
+            console.log('confirm')
+            if(to.name !='confirmSum' ){
+              from.meta.keepAlive=false;
+              self.previewplayer && self.previewplayer.dispose()
+            }
+            else{
+              from.meta.keepAlive = true;
+            }
+            if(self.playState){
+              self.stopRealTime();
+              window.clearInterval(self.timerPlayReal);
+              self.timerPlayReal=null;
+            }
+            if(self.isEzviz && !self.showGuide){
+              self.$refs.ezvizVideo.stopRealTime();
+            }
+            next()
+          }).catch(() => {
+            // 如果取消跳转地址栏会变化，这时保持地址栏不变
+            console.log('cancel')
+            next(false)
+          })
+        }
+        else{
+          if(to.name !='confirmSum'){
+            from.meta.keepAlive=false;
+          }
+          else{
+            from.meta.keepAlive=true;
+          }
+          if(self.playState){
+            self.stopRealTime();
+            window.clearInterval(self.timerPlayReal);
+            self.timerPlayReal=null;
+          }
+          if(self.isEzviz && !self.showGuide){
+            self.$refs.ezvizVideo.stopRealTime();
+          }
+          next();
+        }
         // if(self.editCount!=0){
-        //     let confirm=window.confirm('当前巡检项尚未提交，确认是否离开页面？');
+        //     let confirm=window.confirm('当前巡检尚未完成，确认是否离开页面？');
         //     if(confirm==true){
         //         if(to.name!='巡检提交事件'){
         //             from.meta.keepAlive=false;
@@ -714,16 +805,16 @@ export default {
         //         next(false);
         //     }
         // }
-        self.isPlayingFlag=-1;
-        if(to.name!='confirmSum'){
-            from.meta.keepAlive=false;
-        }
-        if(self.playState){
-            self.stopRealTime();
-            window.clearInterval(self.timerPlayReal);
-            self.timerPlayReal=null;
-        }
-        next();
+        // self.isPlayingFlag=-1;
+        // if(to.name!='confirmSum'){
+        //     from.meta.keepAlive=false;
+        // }
+        // if(self.playState){
+        //     self.stopRealTime();
+        //     window.clearInterval(self.timerPlayReal);
+        //     self.timerPlayReal=null;
+        // }
+        // next();
     },
     async mounted(){
         let self=this;
@@ -753,28 +844,48 @@ export default {
          /**
          * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
          */
-           window.addEventListener("visibilitychange",()=>{
-             console.log(self.isEzviz)
-             if(!self.isEzviz){
-               if(document.hidden){
-                 console.log("我暂时离开页面了");
-                 if(self.playState){  //当前播放的是实时视频
-                   self.stopRealTimeVisPage();
-                   window.clearInterval(self.timerPlayReal);
-                 }
-               }else{
-                 console.log("我进入页面了");
-                 console.log(self.isPlayingFlag);
-                 if(self.isPlayingFlag==1){
-                   self.realTime();
-                 }
-               }
-             }
-
-           })
+         window.addEventListener("visibilitychange", self.visibilityChange, false)
+           // window.addEventListener("visibilitychange",()=>{
+           //   console.log(self.isEzviz)
+           //   if(!self.isEzviz){
+           //     if(document.hidden){
+           //       console.log("我暂时离开页面了");
+           //       if(self.playState){  //当前播放的是实时视频
+           //         self.stopRealTimeVisPage();
+           //         window.clearInterval(self.timerPlayReal);
+           //       }
+           //     }else{
+           //       console.log("我进入页面了");
+           //       console.log(self.isPlayingFlag);
+           //       if(self.isPlayingFlag==1){
+           //         self.realTime();
+           //       }
+           //     }
+           //   }
+           //
+           // })
          },
     methods:{
         generatePatrolLang,
+        visibilityChange(){
+          let self = this;
+          console.log(self.isEzviz)
+          if(!self.isEzviz){
+            if(document.hidden){
+              console.log("我暂时离开页面了");
+              if(self.playState){  //当前播放的是实时视频
+                self.stopRealTimeVisPage();
+                window.clearInterval(self.timerPlayReal);
+              }
+            }else{
+              console.log("我进入页面了");
+              console.log(self.isPlayingFlag);
+              if(self.isPlayingFlag==1){
+                self.realTime();
+              }
+            }
+          }
+        },
         changeBrand(){
             let self=this;
             if(self.playState){
@@ -785,6 +896,7 @@ export default {
             self.activeIndex='0';
             self.showGuide=true;
             self.accountId=localStorage.getItem('oss_bucket');
+            self.showChannelBtns = [];
             //self.getInitStoreData();
             self.getFaStoreData();
             //self.videoEl=document.getElementById('previewVideo').children[0];
@@ -857,6 +969,7 @@ export default {
             self.showFeedDialog1=true;
             self.eventName='';
             self.eventDes='';
+            self.showEventNameInfo = false;
         },
         confirmAddFeedBack3(){
             let self=this;
@@ -885,7 +998,8 @@ export default {
                 height:'100px',
                 width:'140px',
                 fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
-                file:util.base64ToBlob(src)
+                file:util.base64ToBlob(src),
+                deviceId: self.channel.id
             }
 
             let obj={
@@ -894,7 +1008,8 @@ export default {
                 sourceObj:srcObj
             }
             if(self.eventName.trim().length==0){
-                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                self.showEventNameInfo = true;
                 return false;
             }
             self.eventList.push(obj);
@@ -909,7 +1024,8 @@ export default {
                 sourceObj:null
             }
             if(self.eventName.trim().length==0){
-                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                self.showEventNameInfo = true;
+                //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
             self.eventList.push(obj);
@@ -1206,6 +1322,7 @@ export default {
                 self.showFeedDialog2=true;
                 self.eventName='';
                 self.eventDes='';
+                self.showEventNameInfo = false;
                 this.$nextTick(()=>{
                     self.canvasEl=document.getElementById('icanvas');
                     var ctx = self.canvasEl.getContext('2d');
@@ -1298,6 +1415,7 @@ export default {
             obj.width='140px';
             obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
             obj.file=util.base64ToBlob(obj.src);
+            obj.deviceId = self.channel.id;
             self.sourceList.push(obj);
             self.showCutDialog=false;
             console.log(self.curItemId);
@@ -1706,9 +1824,10 @@ export default {
                 }
                 self.showGuide=false;
                 console.log(self.channel);
+                self.channelBtns = self.allChannelBtns.concat();
                 self.channelBtns.forEach((_item,_index)=>{
                     if(self.channel!=null){
-                        if(_item.channelId==self.channel.channelId){
+                        if(_item.id==self.channel.id){
                             _item.isClick=true;
                         }
                         else{
@@ -1726,7 +1845,10 @@ export default {
                 self.curItemIndex=0;
                 self.inspectItemList=item.items;
                 self.showFeedBack=false;
-
+                self.hideNext = false;
+                self.hideLast = false;
+                self.channelBtns = [];
+                self.showChannelBtns = [];
                 item.isClick=true;
                 this.$nextTick(()=>{
                     self.anchorLinkTo();
@@ -1740,11 +1862,16 @@ export default {
         },
         getDeviceById(deviceId){
             let self=this;
-            let device=null;
+            let device= [];
             self.deviceList.forEach(item=>{
-                if(deviceId==item.id){
-                    device=item;
+                // if(deviceId==item.id){
+                //     device=item;
+                // }
+              deviceId.forEach(_item=>{
+                if(_item==item.id){
+                  device.push(item);
                 }
+              })
             })
             return device;
         },
@@ -1780,7 +1907,8 @@ export default {
         },
         ignoreItem(item,index){
             let self=this;
-            self.editCount=self.editCount+1;
+            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            //self.editCount=self.editCount+1;
             self.curItemIndex=index;
             self.curItem=item;
             if(item.isIgnore){
@@ -1804,6 +1932,10 @@ export default {
         clickBtn(item,index){
             let self=this;
             console.log(item);
+            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
             let obj={
                 id:item.id,
                 channelId:item.channelId,
@@ -1812,10 +1944,12 @@ export default {
             };
             self.channel=obj;
             item.isClick=true;
-            self.inspectItemList.forEach(_item=>{
+            if(self.showFeedBack){
+              self.inspectItemList.forEach(_item=>{
                 _item.checked=false;
                 _item.disabled=true;
-            })
+              })
+            }
             self.showChannelBtns.forEach((_item,_index)=>{
                 if(_index!=index){
                     _item.isClick=false;
@@ -1836,22 +1970,47 @@ export default {
             }
         },
         clickItem(item,index){
+            console.log(item)
             let self=this;
             if(item.isIgnore){
                 return false;
             }
+            if(self.isLoading || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed = true;
+              return false;
+            }
             self.sourceList=[];
             self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
             let obj={};
-            if(item.deviceId!=-1){  //当前选择的巡检项已绑定设备
+            if(!item.deviceId.includes(-1)){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
-                if(device!=null){
-                    obj.id=device.id;
-                    obj.ivsId=device.ivsId;
-                    obj.channelName=device.name;
-                    obj.channelId=device.channelId;
+                if(device.length > 0){
+                    obj.id=device[0].id;
+                    obj.ivsId=device[0].ivsId;
+                    obj.channelName=device[0].name;
+                    obj.channelId=device[0].channelId;
                     self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
-
+                    self.channelBtns = []
+                    device.forEach(item=>{
+                      self.allChannelBtns.forEach(_item=>{
+                        if(item.id == _item.id){
+                          self.channelBtns.push(_item)
+                        }
+                      })
+                    })
+                    self.$nextTick(()=>{
+                      self.getshowBtns(self.channelBtns);
+                    })
+                    self.channelBtns.forEach((_item,_index)=>{
+                      if(self.channel!=null){
+                        if(_item.id == self.channel.id){
+                          _item.isClick=true;
+                        }
+                        else{
+                          _item.isClick=false;
+                        }
+                      }
+                    })
                     item.checked=true;
                     self.curItem=item;
                     self.curItemIndex=index;
@@ -1908,9 +2067,9 @@ export default {
                 storeId:self.store.storeId,
                 mode:0
             }
-            checkOutInspectItem(params).then(res=>{
+          checkOutInspectItemV3(params).then(res=>{
                 if(res.errCode==0){
-                    let data=res.data;
+                    let data=res.data.groups;
                     let temp=[];
                     data.forEach((item,index)=>{
                         let obj={};
@@ -1933,7 +2092,8 @@ export default {
                             itemObj.description=_item.description;
                             itemObj.itemScore='--';
                             itemObj.itemScoreTitle='--';
-                            itemObj.deviceId=_item.deviceId;
+                            //itemObj.deviceId=_item.deviceId;
+                            itemObj.deviceId=_item.deviceIds;
                             itemObj.inspectInput='';
                             itemObj.inputCount=0;
                             itemObj.disabled=true;
@@ -1958,6 +2118,15 @@ export default {
                 }
             })
         },
+        leaveDialog(){
+          let self=this;
+          self.leaveObj.dialogCosed=false;
+          self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+        },
+        cancelLeave(){
+          let self=this;
+          self.leaveObj.dialogCosed = false;
+        },
         noAllInspectDialog(){
             let self=this;
             self.noAllInspectObj.dialogCosed=false;
@@ -1973,6 +2142,14 @@ export default {
         cancelAllIgnore(){
           let self=this;
           self.allIgnoreObj.dialogCosed=false;
+        },
+        videoLoadingDialog(){
+          let self=this;
+          self.videoLoadingObj.dialogCosed=false;
+        },
+        cancelVideoLoading(){
+          let self=this;
+          self.videoLoadingObj.dialogCosed=false;
         },
         async submit1(){
             let self=this;
@@ -2042,11 +2219,13 @@ export default {
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=2;
                                 obj.url=url;
+                                obj.deviceId = self.channel.id;
                             }
                             else if(inspectList[i].items[j].sourceList[k].mediaType==1){
                                 let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
                                 obj.mediaType=1;
                                 obj.url=url;
+                                obj.deviceId = self.channel.id;
                             }
                             tempFileUrl.push(obj);
                         }
@@ -2071,13 +2250,14 @@ export default {
                     let url=await self.upLoadFile(self.eventList[i].sourceObj);
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
-                        url:url
+                        url:url,
+                        deviceId: self.channel.id
                     }
                     commentTemp.push(commentObj);
                     obj.deviceId=self.channel.id;
                 }
                 else{                        //通过加号创建的问题反馈
-                    obj.diviceId=-1;
+                    obj.diviceId = -1;
                 }
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
@@ -2125,16 +2305,16 @@ export default {
             let self=this;
             console.log('playvideo enter!');
             self.showModelContent=true;
-            self.showInfoContent=true;
+            //self.showInfoContent=true;
             self.playState=true;
             var video = document.getElementById("previewVideo");
             this.previewplayer = videojs(video);
             this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
             this.previewplayer.play();
-            setTimeout(() => {
-                self.showModelContent=true;
-                self.showInfoContent=false;
-            }, 3000);
+            // setTimeout(() => {
+            //     self.showModelContent=true;
+            //     //self.showInfoContent=false;
+            // }, 3000);
         },
         destroyVideo(){
             let self=this;
@@ -2144,18 +2324,19 @@ export default {
         },
         hiddenModel(){
             let self=this;
-            self.showModelContent=false;
-            self.showInfoContent=false;
+            //self.showModelContent=false;
+            //self.showInfoContent=false;
         },
         showModel(){
             let self=this;
-            self.showInfoContent=true;
-            if(self.playState){
-                self.showModelContent=true;
-            }
+            //self.showInfoContent=true;
+            // if(self.playState){
+            //     self.showModelContent=true;
+            // }
         },
         async realTime(){
             let self=this;
+            self.showError = false;
             // if(!self.videoAuthority){
             //   self.showError = true;
             //   self.errorText = self.$t('remotePatrol.videoLicense');
@@ -2166,11 +2347,16 @@ export default {
             }
             window.clearInterval(self.timerPlayReal);
             self.realTimeSpeed=0;
+            self.isLoading = true;
             let sessionId= await dashAPI.Online();
             console.log(sessionId);
             // if(!self.showVideo){
             //     self.showVideo=true;
             // }
+            if(sessionId == null){
+              self.isLoading = false;
+              return;
+            }
             self.sessionId=sessionId;
             const data = {
                 request: {
@@ -2184,11 +2370,16 @@ export default {
             };
             self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
             console.log(self.mpdurl);
+            if(self.mpdurl == null){
+              self.isLoading = false;
+              return;
+            }
             if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
                 self.isPlayingFlag=1;
+                self.isLoading = false;
                 window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal=window.setInterval(()=>{
                   console.log(self.realTimeSpeed)
@@ -2198,6 +2389,7 @@ export default {
             else{
                 self.showGuide=false;
                 self.showError=true;
+                self.isLoading = false;
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
@@ -2247,6 +2439,8 @@ export default {
             self.isPlayingFlag=-1;
             let ret=await dashAPI.RealTime(0,data);
             await dashAPI.Offline(self.sessionId);
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
             //self.showVideo=false;
             //self.destroyVideo();
             //self.showGuide=true;
@@ -2258,6 +2452,7 @@ export default {
            //   self.errorText = self.$t('remotePatrol.videoLicense');
            //   return false;
            // }
+            self.isLoading = true;
             self.stopVideo();
             const dataDis = {
                 request: {
@@ -2275,6 +2470,10 @@ export default {
             await dashAPI.Offline(self.sessionId);
             let sessionId= await dashAPI.Online();
             self.sessionId=sessionId;
+           if(sessionId == null){
+             self.isLoading = false;
+             return
+           }
             let data=null;
             data = {
                 request: {
@@ -2290,11 +2489,15 @@ export default {
 
             self.mpdurl = url;
             console.log(self.mpdurl);
+             if(self.mpdurl == null){
+               self.isLoading = false;
+               return;
+             }
             if (url.ErrorCode==undefined&&url.length!=0) {
                 self.isPlayingFlag=1;
                 self.playVideo(self.mpdurl);
                 self.realTimeSpeed=0;
-
+                self.isLoading = false;
                 self.timerPlayReal=window.setInterval(()=>{
                     console.log(self.realTimeSpeed)
                     self.realTimeSpeed=self.realTimeSpeed+1;
@@ -2303,6 +2506,7 @@ export default {
             else{   //当前视频如果返回失败，需处于暂停状态
                 self.showGuide=false;
                 self.showError=true;
+                self.isLoading = false;
                 let errorCode=self.mpdurl.ErrorCode; //错误码
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
@@ -2314,10 +2518,10 @@ export default {
             if(!self.fullScreen){
                 self.fullWindowScreen();
                 self.fullScreen=true;
-                setTimeout(() => {
-                    self.showModelContent=false;
-                    self.showInfoContent=false;
-                }, 3000);
+                // setTimeout(() => {
+                //     self.showModelContent=false;
+                //     //self.showInfoContent=false;
+                // }, 3000);
             }
             else{
                 self.exitFullscreen();
@@ -2438,7 +2642,15 @@ export default {
             let self=this;
             _item.isActive=true;
             self.showStoreUp=true;
-            self.editCount=0;
+            if(!self.isEzviz){
+              self.editCount=0;
+            }
+            else{
+              if(!self.showGuide){
+                self.$refs.ezvizVideo.editCount = 0
+              }
+            }
+            //self.editCount=0;
             self.showError=false;
             self.curDeviceId=-1;
             self.showFeedBack=false;
@@ -2592,6 +2804,7 @@ export default {
                 temp.push(obj);
             })
             self.channelBtns=temp;
+            self.allChannelBtns = temp;
         },
         cancelNoUser(){
             let self=this;
@@ -2611,7 +2824,11 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
-            if(self.editCount!=0){
+            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
+            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -2653,6 +2870,7 @@ export default {
           obj.width='140px';
           obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
           obj.file=util.base64ToBlob(obj.src);
+          obj.deviceId = self.channel.id;
           self.sourceList.push(obj);
           console.log(self.curItemId);
           let tempId=self.getIndexById(self.curItemId);
@@ -2681,7 +2899,8 @@ export default {
           height:'100px',
           width:'140px',
           fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
-          file:util.base64ToBlob(src)
+          file:util.base64ToBlob(src),
+          deviceId: self.channel.id
         }
 
         let picObj={
@@ -2750,7 +2969,40 @@ export default {
             console.log(error);
           })
         })
+      },
+      itemDescriptionChanged(val, item){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        item.inspectInput = content;
+      },
+      eventNameChanged(val){
+        let self = this;
+        let content = filterString.standard(val,50);
+        console.log(content);
+        self.eventName = content;
+        self.showEventNameInfo = false;
+      },
+      eventDesChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.eventDes = content;
+      },
+      onPlayerWaiting(e){
+        console.log('video is loading')
+        this.showModelContent = false
+      },
+      onPlayerPlaying(e){
+        console.log('video is playing')
+        this.showModelContent = true
       }
+    },
+    beforeDestroy() {
+      let self = this;
+      window.removeEventListener('visibilitychange', self.visibilityChange);
+      window.onresize = null;
+      self.visibilityChange = null;
     }
 }
 </script>
@@ -2847,7 +3099,7 @@ export default {
 
             .dialog-hr{
                 border: 0.5px solid ;
-                border-color: rgba(251,76,93,0.3);
+                border-color: #dfe2e9;
                 margin-bottom:0px;
                 position: relative;
                 bottom: 5px;
@@ -2858,6 +3110,16 @@ export default {
             .dialog-img-content{
                 @include point(padding,15);
             }
+            .is-required{
+              color: $red;
+            }
+            .error-class{
+              @include point(margin-left,20);
+              font-size: 10px;
+              margin-top: 5px;
+              color: #ff2400;
+              display: block;
+            }
             .dialog-event-content{
                 text-align: left;
                 @include point(margin-bottom,20);
@@ -2866,15 +3128,18 @@ export default {
                     display: block;
                     margin: 15px;
                     @include point(margin-left,20);
+                    @include point(margin-right,20);
                     font-size: 14px;
                 }
                 .name-input{
-                    @include point(width,150);
+                    @include point(width,200);
                     @include point(margin-left,20);
                 }
                 .des-input{
-                    width: 90%;
+                    display: block;
+                    width: auto;
                     @include point(margin-left,20);
+                    @include point(margin-right,20);
                 }
             }
             .feed-canvas-content{
@@ -2897,6 +3162,8 @@ export default {
                 float: left;
                 text-align: left;
                 margin-left: 1%;
+                padding-right: 20px;
+                box-sizing: border-box;
                 .event-title{
                     color: $black;
                     display: block;
@@ -2904,12 +3171,16 @@ export default {
                     margin-left: 0;
                     font-size: 14px;
                 }
+                .error-class {
+                  margin-left: 0;
+                }
                 .name-input{
-                    @include point(width,150);
-                    @include point(margin-bottom,15);
+                  width: 100%;
+                    //@include point(width,150);
+                    //@include point(margin-bottom,15);
                 }
                 .des-input{
-                    width: 80%;
+                    width: 100%;
                 }
             }
             #previewCutVideo{
@@ -3001,34 +3272,39 @@ export default {
         @mixin arrow-icon{
             .guide-num{
                 display: inline-block;
-                height: 28px;
-                width: 28px;
-                line-height: 28px;
+                height: calc(28/1920*100vw);
+                width: calc(28/1920*100vw);
+                line-height: calc(28/1920*100vw);
                 border-radius: 50%;
                 background-color: $red;
                 color: #fff;
                 margin-right: 15px;
                 font-size: 14px;
+                @media screen and (max-width: 1280px){
+                  height: 18px;
+                  width: 18px;
+                  line-height: 18px;
+                }
             }
             .guide-title{
                 color: $red;
-                font-size: 14px;
+                font-size: calc(14/1920*100vw);
                 font-weight: bold;
             }
         }
         .lside{
-            @include point(padding-bottom,20);
-            @include point(margin-right,20);
+            padding-bottom: calc(25/1920*100vw);
+            margin-right: calc(25/1920*100vw);
             border: 1px solid $border;
             background-color: #fff;
             .el-header-title{
                 text-align: left;
                 position: relative;
-                @include point(height,60);
-                @include point(line-height,60);
+                height: 80px;
+                line-height: 80px;
                 border-bottom: 1px solid $border;
-                @include point(padding-left,20);
-                @include point(padding-right,20);
+                padding-left: calc(25/1920*100vw);
+                padding-right: calc(25/1920*100vw);
                 .lside-title{
                     font-weight: bold;
                     color:$h1;
@@ -3096,35 +3372,30 @@ export default {
                     color: #fff;
                     width:calc(130/1920*100vw);
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
                 }
                 .en-el-submit{
                     position: absolute;
-                    @include point(right,20);
+                    right: calc(30/1920*100vw);
                     width:calc(130/1920*100vw);
                     color: #fff;
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
+                    min-height: 28px;
+                    top: 50%;
+                    transform: translate(0, -50%);
+                    min-width: 85px;
                 }
                 @media screen and(min-width: 1366px){
                     .el-submit{
                         top: 30%;
                     }
-                    .en-el-submit{
-                      top: 30%;
-                    }
                 }
                 @media screen and(max-width: 1366px){
                     .el-submit{
                         top: 20%;
-                    }
-                    .en-el-submit{
-                      top: 20%;
-                      width:calc(160/1920*100vw);
                     }
                 }
             }
@@ -3133,10 +3404,10 @@ export default {
                 margin-bottom: 0;
                 height: auto;
                 position: relative;
-                @include point(min-width,500);
-                @include point(min-height,414);
+                min-height: 420px;
                 background-color: #232730;
                 color: $red;
+                z-index: 100;
                 span{
                     position: absolute;
                     top: 50%;
@@ -3146,12 +3417,11 @@ export default {
                 }
             }
             .guide-content{
-                @include point(margin,20);
+                margin: calc(25/1920*100vw);
                 margin-bottom: 0;
                 height: auto;
                 position: relative;
-                @include point(min-width,500);
-                @include point(min-height,414);
+                min-height: 420px;
                 background-color: #000;
                 .guide-rside{
                     position: absolute;
@@ -3171,7 +3441,8 @@ export default {
                         width: auto;
                         height: auto;
                         position: absolute;
-                        top: 30%;
+                        //top: 30%;
+                        top: 60%;
                         right: 0;
                         .iconright{
                             width: 80px;
@@ -3194,7 +3465,7 @@ export default {
                             }
                         }
                         .en-iconright{
-                          width: 108px;
+                          width: 100px;
                           text-align: center;
                           margin-top: 30px;
                           height: 32px;
@@ -3219,11 +3490,13 @@ export default {
             .video-content{
                 height: auto;
                 position: relative;
-                @include point(margin,20);
-                @include point(min-width,500);
-                @include point(min-height,408);
+                margin: calc(25/1920*100vw);
+                //@include point(min-width,500);
+                //@include point(min-height,408);
+                min-height: 420px;
                 background-color: #000;
                 margin-bottom: 0;
+                z-index: 100;
                 .getvideo-content{
                     position: absolute;
                     z-index: 930;
@@ -3295,8 +3568,9 @@ export default {
                     }
                 }
                 #previewVideo{
-                    @include point(min-width,500);
-                    @include point(min-height,405);
+                    //@include point(min-width,500);
+                    //@include point(min-height,405);
+                    min-height: 420px;
                 }
                 #channelName{
                     position: absolute;
@@ -3361,7 +3635,8 @@ export default {
                     border-radius: 4px;
                     text-align: center;
                     background-color: rgba($color: #24293d, $alpha: 0.6);
-                    top: 40%;
+                    //top: 40%;
+                    top: 45%;
                     span{
                         // font-size: 12px;
                         margin-left: 12px;
@@ -3387,7 +3662,8 @@ export default {
                 margin-bottom: 40px;
                 border-radius: 4px;
                 background-color: rgba($color: #24293d, $alpha: 0.6);
-                top: 40%;
+                //top: 40%;
+                top: 45%;
                 span{
                   // font-size: 12px;
                   margin-left: 12px;
@@ -3459,13 +3735,13 @@ export default {
                 border-right: 1px solid $border;
                 border-bottom: 1px solid $border;
                 margin: 0;
-                @include point(margin-left,20);
-                @include point(margin-right,20);
+                margin-left: calc(25/1920*100vw);
+                margin-right: calc(25/1920*100vw);
                 position: relative;
                 .guide-lside{
                     position: absolute;
                     width: auto;
-                    z-index: 20;
+                    z-index: 1000;
                     img{
                         @include point(height,42);
                         position: relative;
@@ -3482,8 +3758,10 @@ export default {
                     color: $tab;
                     background-color: $background;
                     border-bottom:1px solid $border;
+                    position: relative;
+                    z-index: 100;
                 }
-                @media screen and (min-width: 1366px){
+                @media screen and (min-width: 1600px){
                     .inspect-header{
                         height: 50px;
                         line-height: 50px;
@@ -3494,11 +3772,11 @@ export default {
                         font-size: 14px;
                     }
                     .guide-lside{
-                        top: 20px;
-                        right:16%;
+                        top: 10px;
+                        right: 10%;
                     }
                 }
-                @media screen and (max-width: 1366px){
+                @media screen and (max-width: 1600px){
                      .inspect-header{
                         height: 40px;
                         line-height: 40px;
@@ -3518,10 +3796,10 @@ export default {
                           text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
                         }
                     }
-                    .guide-lside{
-                        top: 10px;
-                        right:3%;
-                    }
+                  .guide-lside{
+                    top: 10px;
+                    right: 3%;
+                  }
                 }
                 .inspect-content{
                     padding: 15px auto;
@@ -3761,24 +4039,40 @@ export default {
                             cursor: not-allowed;
                         }
                         .item-score{
+                            box-sizing: border-box;
                             position: absolute;
                             @include point(right,46);
                             @include point(top,12);
                             font-size: 12px;
                             margin-right: 20px;
-                            width: 96px;
+                            //width: 96px;
+                            width: 110px;
                             height: 22px;
                             // @include point(width,86);
-
-                            @include point(padding-left,10);
+                            //@include point(padding-left,10);
                             background-color: orange;
                             line-height: 22px;
                             color: #fff;
                             border-radius: 13px;
                             cursor: pointer;
                             .iconscore{
-                                margin-left: 10px;
+                                //margin-left: 10px;
                             }
+                          .el-dropdown-link{
+                            display: inline-block;
+                            font-size: 12px;
+                            margin-right: 20px;
+                            width: 120px;
+                            height: 22px;
+                            background-color: orange;
+                            line-height: 22px;
+                            color: #fff;
+                            border-radius: 13px;
+                            cursor: pointer;
+                            padding-right: 10px;
+                            box-sizing: border-box;
+                            padding-left: 10px
+                          }
                         }
                         .score-menu{
                             max-height: 160px;
@@ -3806,24 +4100,24 @@ export default {
                 text-align: left;
                 position: relative;
                 color:$black;
-                font-size: 16px;
-                @include point(height,60);
-                @include point(line-height,60);
+                font-size: calc(16/1920*100vw);
+                height: 80px;
+                line-height: 80px;
                 border-bottom: 1px solid $border;
-                @include point(padding-left,10);
+                padding-left: calc(10/1920*100vw);
                 span{
                     display: block;
-                    @include point(margin-left,25);
+                    margin-left: calc(30/1920*100vw);
                 }
             }
             #storetab-content, #en-storetab-content{
                 margin-top: 10px;
-                @include point(margin-left,15);
-                @include point(margin-right,15);
+                margin-left: calc(20/1920*100vw);
+                margin-right: calc(20/1920*100vw);
                 .storeList-content{
                     padding: 0 10px;
                     text-align: left;
-                    @include point(height,450);
+                    height: 545px;
                     color: $black;
                     .icon-info{
                         color: #FF9803;
@@ -3905,10 +4199,10 @@ export default {
                     span{
                         display: block;
                         text-align: left;
-                        @include point(margin-left,30);
+                        margin-left: 40px;
                         color: $black;
                         margin-bottom: 15px;
-                        font-size: 16px;
+                        font-size: calc(16/1920*100vw);
                     }
                     .channels-srollbar{
                         text-align: left;
@@ -3930,12 +4224,16 @@ export default {
                     .btn-content{
                         width: 86%;
                         float: left;
+                        display: flex;
                         .btn-details{
                             display: inline-block;
                             margin-bottom: 5px;
-                            @include point(margin-left,15);
+                            margin-left: calc(20/1920*100vw);
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
                             &:last-child{
-                                @include point(margin-right,15);
+                              margin-right: calc(20/1920*100vw);
                             }
                         }
                     }
@@ -3998,7 +4296,7 @@ export default {
 }
 .item-score .el-icon--right{
     position: absolute !important;
-    right: 8px !important;
+    right: 1px !important;
     top: 6px !important;
 }
 #storetab-content .el-tabs__active-bar .is-top{
@@ -4028,9 +4326,49 @@ export default {
         overflow-x: hidden;
     }
     .des-input .el-textarea__inner{
-        font-family: 'Microsoft YaHei';
+        font-family:Roboto, Arial, 'Microsoft YaHei';
     }
-  /*.score-menu.el-dropdown-menu{*/
-    /*z-index: 0 !important;*/
-  /*}*/
+  .score-menu.el-dropdown-menu{
+    z-index: 0 !important;
+  }
+  .confirmClass{
+    width: 28%;
+    font-family: Roboto, Arial, 'Microsoft YaHei';
+  }
+  .confirmClass .el-message-box__header{
+    border-bottom: 0.5px solid #dfe2e9;
+    padding: 20px;
+    padding-bottom: 17px;
+    font-size: 14px;
+  }
+  .confirmClass .el-message-box__content{
+    padding: 20px;
+  }
+  .confirmClass .el-message-box__header .el-message-box__title{
+    font-size: 14px;
+    line-height: 24px;
+  }
+  .confirmClass .cancelBtn{
+    width: 4.75rem;
+    margin-right: calc(20/1920*100vw);
+    background-color: #EAEDF2 !important;
+    color: #708090 !important;
+    font-size: 12px;
+    line-height: 12px;
+  }
+ .confirmClass .confirmBtn{
+    width: 4.75rem;
+    background-color: #f31d65;;
+    color: #fff !important;
+    font-size: 12px;
+    line-height: 12px;
+    }
+  .confirmClass .el-message-box__btns{
+    padding: 20px;
+    padding-top: 10px;
+  }
+  .confirmClass .el-message-box__headerbtn{
+    font-size: calc(20/1920*100vw);
+    top: 20px;
+  }
 </style>

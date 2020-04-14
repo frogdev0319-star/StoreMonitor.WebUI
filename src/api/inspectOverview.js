@@ -53,3 +53,35 @@ export const GetInspectStatsOverPerson=data=>{
       data
     })
   }
+
+export const getInspectStatsOverviewWithRegionV2=data=>{
+  return request({
+    url: `v2.0/statistics/inspect/report/region/overview`,
+    method: 'post',
+    data
+  })
+}
+
+export const getInspectStatsItemOverviewV2 =data=>{
+  return request({
+    url: `v2.0/statistics/inspect/item/overview`,
+    method: 'post',
+    data
+  })
+}
+
+export const getInspectStatsOverPersonV2 =data=>{
+  return request({
+    url: `v2.0/statistics/inspect/report/person`,
+    method: 'post',
+    data
+  })
+}
+
+export const getInspectScheduleOverview=data=>{
+  return request({
+    url: `${version}/inspect/schedule/list`,
+    method: 'post',
+    data
+  })
+}

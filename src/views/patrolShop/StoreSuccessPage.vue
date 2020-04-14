@@ -34,35 +34,35 @@
             </div>
             <div class="details">
                 <span :class="lang==='en'? 'en-event-label':'event-label'">{{generateStoreMonitorLang('description')}}:</span>
-                <div v-for="(item,index) in commentList" :key="index" class="comment-details">
+                  <div v-for="(item,index) in commentList" :key="index" class="comment-details" v-show="item.eventDes.length > 0">
                     <div class="circle-content" :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}">
-                        <div class="circle"></div>
+                      <div class="circle"></div>
                     </div>
                     <div class="lside">
 
                     </div>
                     <div class="rside">
-                        <div class="event-name">
-                          <span>{{item.eventDes}}</span>
+                      <div class="event-name">
+                        <span>{{item.eventDes}}</span>
+                      </div>
+                      <div class="source-content">
+                        <div class="source-details" v-for="(_item,_index) in sourceList" :key="_index">
+                          <div class="img-content" v-if="_item.mediaType==2">
+                            <img :src="_item.url"  height="100" width="140"/>
+                          </div>
+                          <div class="img-content" v-if="_item.mediaType==1">
+                            <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
+                            <img :src="videoImgSrc" height="100"/>
+                          </div>
                         </div>
-                        <div class="source-content">
-                            <div class="source-details" v-for="(_item,_index) in sourceList" :key="_index">
-                                <div class="img-content" v-if="_item.mediaType==2">
-                                    <img :src="_item.url"  height="100" width="140"/>
-                                </div>
-                                <div class="img-content" v-if="_item.mediaType==1">
-                                    <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
-                                    <img :src="videoImgSrc" height="100"/>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="event-ts">{{item.ts}}</span>
+                      </div>
+                      <span class="event-ts">{{item.ts}}</span>
                     </div>
-                </div>
+                  </div>
             </div>
              <div class="details" v-if="showLeader">
-               <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 65px;">{{generateStoreMonitorLang('copy')}}:</span>
-               <span class="event-label" v-else  style="margin-right:30px;">{{generateStoreMonitorLang('copy')}}：</span>
+               <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 70px;">{{generateStoreMonitorLang('copy')}}:</span>
+               <span class="event-label" v-else  style="margin-right:38px;">{{generateStoreMonitorLang('copy')}}：</span>
                 <span>{{leader}}</span>
             </div>
         </div>
@@ -235,6 +235,8 @@ export default {
     .el-sucPage-content{
         width: 100%;
         height: 100%;
+        overflow: hidden;
+        background-color: #fff;
         .canvas-content{
             position: relative;
             #previewCutVideo{
@@ -243,7 +245,7 @@ export default {
             }
             .dialog-hr{
                 border: 0.5px solid ;
-                border-color: rgba(251,76,93,0.3);
+                border-color: #dfe2e9;
                 margin-bottom:10px;
                 position: relative;
                 bottom: 5px;
@@ -255,7 +257,7 @@ export default {
             position: relative;
             .icon-content{
                 margin:0 auto;
-                margin-top: 50px;
+                padding-top: 50px;
                 .suc-icon{
                     height: 80px;
                 }
@@ -384,6 +386,7 @@ export default {
         .page-err-btn{
             .retry-btn{
                 margin-top: 30px;
+                margin-bottom: 50px;
             }
         }
     }

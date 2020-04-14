@@ -236,7 +236,7 @@ export default {
                                 PermissionHelper.setData(resultData.authorities);
                               }
                             })
-                            self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId, ezvizAppKey: resData.ezvizAppKey}});
+                            self.$router.push({path:'/',query: {token: resData.token,userId:resData.userId, ezvizProtrol: resData.ezvizProtrol, lang: resData.lang}});
 
                             //self.$router.push({path:self.redirect||'/'});
                             //setCookie('UserId',resData.userId);
@@ -294,8 +294,8 @@ export default {
                     docEl.style.fontSize = (docEl.clientWidth/90)+'px';
                 };
             //绑定浏览器缩放与加载时间
-            window.addEventListener(resizeEvt, recalc, false);
-            document.addEventListener('DOMContentLoaded', recalc, false);
+            //window.addEventListener(resizeEvt, recalc, false);
+            //document.addEventListener('DOMContentLoaded', recalc, false);
         },
         hrefToWebiste(){
 
@@ -411,7 +411,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 *{
-    font-family:'Microsoft YaHei';
+    font-family: Roboto,Arial, 'Microsoft YaHei';
 }
 $dark_gray:#889aa4;
 $light_gray:#eee;
@@ -647,7 +647,7 @@ $red:#fb4c5d;
  .el-select-dropdown__item.selected{
     color: #FB4C5D !important;
 }
-.el-form-item__error{
+.login-form /deep/ .el-form-item__error{
     color: #fff !important;
     font-size: 12px !important;
     line-height: 1 !important;

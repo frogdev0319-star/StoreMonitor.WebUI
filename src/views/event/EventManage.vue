@@ -47,7 +47,7 @@
         <div class="el-table-content">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
               <div class="btn-area">
-                <i style="" class="iconfont icon-excel"></i>
+                <img :src="exportPng" class="icon-excel">
                 <span class="spanClass">{{generateEventLang('exportReport')}}</span>
               </div>
             </el-button>
@@ -60,14 +60,14 @@
                             :highlight-current-row="true"
                             empty-text='没有事件数据'
                             align='left'
-                            border
                             stripe
                             :height="windowHeight-260"
                             @sort-change='sortChange'
                             @row-click='rowClickItem'
                             style=""
                             class="table-content"
-                            :header-cell-style="{background:'#f4f5f9',color:'#7d8cad'}"
+                            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+                            :cell-style="cellStyle"
                         >
                                 <el-table-column
                                     min-width="80"
@@ -84,8 +84,10 @@
                                     :label="generateEventLang('name')"
                                     min-width="220"
                                     sortable='custom'
-                                    align="left">
-                                    <template slot-scope="scope">
+                                    align="left"
+                                    :class-name = "selfClassName"
+                                >
+                                  <template slot-scope="scope">
                                         <img class='sourceType-icon' v-if="scope.row.sourceType==0" :src='videoSrc'/>
                                         <img class='sourceType-icon' v-else-if="scope.row.sourceType==1" :src='inspectSrc'/>
                                         <img class='sourceType-icon' v-else :src='insiteInspectSrc'/>
@@ -101,25 +103,25 @@
                                 min-width="80"
                                 align="left">
                                 <template slot-scope="scope">
-                                    <i class="iconfont icon-gengduo" style="font-size:24px;cursor: pointer;color: #7d8cad" @click="toEventDetail(scope.row)"></i>
+                                    <i class="iconfont icon-gengduo" @click="toEventDetail(scope.row)"></i>
                                 </template>
                             </el-table-column>
                             <div slot="empty">
                                 <div>
                                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{generateEventLang('noEvents')}}</span>
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{generateEventLang('noEvents')}}</span>
                                 </div>
                             </div>
                         </el-table>
                     </div>
-                    <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:13%;margin-bottom:0px;">
+                    <div class="toolbar pagination clearfix" style="width:100%; margin:10px 15px 0px 0px;height:13%;">
                         <el-pagination background small
                             :page-sizes="[10, 20, 50, 100]"
                             @size-change="sizeChange"
                             @current-change="currentChange"
                             :current-page="item.page"
                         layout="jumper,total, prev, pager, next,sizes"
-                        :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;">
+                        :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;margin-right: 10px;">
                         </el-pagination>
                     </div>
                 </el-tab-pane>
@@ -138,6 +140,9 @@ import {getCookie} from '@/common/auth';
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {generateEventLang} from '@/api/i18n'
+// require(['bootstrap-multiselect'], function(purchase){
+//   $('#example-multiple-selected').multiselect();
+// });
 export default {
     name: "ExceptEvent",
     data(){
@@ -225,6 +230,8 @@ export default {
           numberOfElements: 0,
           totalElements: 0,
           sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }],
+          exportPng: require('../../../static/img/icon_excel.png'),
+          selfClassName: 'self-class-name'
         }
 
     },
@@ -268,6 +275,18 @@ export default {
         }
     },
     methods:{
+      cellStyle({ row, column, rowIndex, columnIndex}){
+        console.log(row);
+        console.log(columnIndex);
+        let obj = {};
+        if(columnIndex == 0){
+          obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+        }
+        else{
+          obj = {'border-right':'1px solid #e3e9f4'}
+        }
+        return obj;
+      },
         generateEventLang,
         /*focusDate(val){
             let self=this;
@@ -303,7 +322,7 @@ export default {
             let end=new Date(endStr).getTime();
 
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                Message({
+                self.$message({
                     message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
@@ -335,7 +354,7 @@ export default {
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
             if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                Message({
+                self.$message({
                     message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
@@ -708,7 +727,8 @@ export default {
                         subject:item.subject,
                         score:item.score,
                         sourceType:item.sourceType,
-                        initialComment:item.initialComment
+                        initialComment:item.initialComment,
+                        relatedDeviceIds: item.relatedDeviceIds
                     }
                     temp.push(obj);
                 })
@@ -854,7 +874,7 @@ export default {
             if(ret.data!=undefined&&ret.data.isLogin){
                 let tabIndex=Number(that.activeName);
                 if(that.tableDataList[tabIndex].tableData.length==0){
-                    Message({
+                  that.$message({
                         message: this.$t('eventView.noEvents'),
                         type:'warning',
                         duration:3*1000
@@ -992,7 +1012,7 @@ export default {
         let self=this;
         console.log('mounted')
         self.getDeafultTime();
-        await self.isLoginIn();
+        //await self.isLoginIn();
         let windowHeight=window.innerHeight;
         if(windowHeight>800){
             self.tableHeight=770+'px';
@@ -1023,6 +1043,16 @@ export default {
     }
     else{
       self.getEventList(self.params);
+      let status=[];
+      let selectValue=self.value;
+      switch(selectValue){
+        case 0:status=[0,1,2];break;
+        default:status=selectValue-1;break;
+      }
+      let like=self.params.like;
+      let start = self.params.beginTs;
+      let end = self.params.endTs;
+      self.getEventCount(start,end,status);
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
@@ -1120,7 +1150,7 @@ $h1:#292e36;
         margin-right: calc(20/1920*100vw);
         position: relative;
         float: left;
-        @include point(bottom,2);
+        //@include point(bottom,2);
         height: calc(28/1920*100vw);
         width: calc(24/1920*100vw);
     }
@@ -1133,6 +1163,9 @@ $h1:#292e36;
     }
     .icon-gengduo{
       font-size: calc(24/1920*100vw);
+      vertical-align: middle;
+      cursor: pointer;
+      color: #7d8cad;
     }
     .el-date{
         height: 70px;
@@ -1149,13 +1182,13 @@ $h1:#292e36;
         }
         .iconbangzhu{
            margin-left:10px;
-           font-size:20px;
+           font-size: calc(20/1920*100vw);
            position:relative;
            top:2px;
            color:$tab;
         }
         .date-range{
-            width:320px;
+            width:290px;
         }
         .el-search{
             position:absolute;
@@ -1175,7 +1208,7 @@ $h1:#292e36;
         width: 100%;
         background-color: #fff;
         position: relative;
-        @include point(padding-top,20);
+        padding-top: calc(30/1920*100vw);
         .export-btn{
             position: absolute;
             @include point(right,20);
@@ -1190,16 +1223,19 @@ $h1:#292e36;
             line-height: calc(36/1920*100vw);
             color: #ffffff;
             border-width: 0;
-            border-radius: 3px;
+            border-radius: 4px;
+            top: calc(24/1920*100vw);
             .btn-area{
-              position: relative;
               padding: 0 calc(6/1920*100vw);
               height: calc(36/1920*100vw);
-              display: inline-flex;
+              display: flex;
               align-items: center;
+              justify-content: center;
               .icon-excel{
-                margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                margin-right: calc(18/1920*100vw);
                 font-size: calc(24/1920*100vw);
+                height: calc(24/1920*100vw);
+                width: calc(24/1920*100vw);
               }
               .spanClass{
                 font-size: calc(14/1920*100vw);
@@ -1214,35 +1250,31 @@ $h1:#292e36;
         border-color: $red;
         z-index: 990;
         height: calc(36/1920*100vw);
-        width: calc(130/1920*100vw);
         margin: 0;
         padding: 0;
         font-size: calc(14/1920*100vw);
         line-height: calc(36/1920*100vw);
         color: #ffffff;
         border-width: 0;
-        border-radius: 3px;
+        border-radius: 4px;
+        width: calc(160/1920*100vw);
+        min-width: 120px;
         .btn-area{
           position: relative;
           padding: 0 calc(6/1920*100vw);
           height: calc(36/1920*100vw);
-          display: inline-flex;
+          display: flex;
           align-items: center;
+          justify-content: center;
           .icon-excel{
-            margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-            font-size: calc(24/1920*100vw);
+            margin-right: calc(18/1920*100vw);
+            width: calc(24/1920*100vw);
+            height: calc(24/1920*100vw);
           }
           .spanClass{
             font-size: calc(14/1920*100vw);
             display: inline-block;
           }
-        }
-
-        @media screen and (min-width: 1366px){
-          width: 160px;
-        }
-        @media screen and (max-width: 1366px){
-          width: 140px;
         }
       }
       .table-content{
@@ -1250,6 +1282,9 @@ $h1:#292e36;
             text-align: center;
             /*height:300px;*/
             /*float:left;*/
+          &.el-table{
+            font-size: calc(14/1920*100vw);
+          }
         }
     }
     #tabs-content /deep/  .el-tabs__nav-scroll{
@@ -1264,15 +1299,19 @@ $h1:#292e36;
       background-color: #f31d65 !important;
     }
   .el-table-panel{
-    border: none;
-    border-right: 1px solid $border;
-    border-bottom: 1px solid $border;
     @include point(margin-left,15);
     @include point(margin-right,15);
   }
+  .clearfix{
+    content: "";
+    display: block;
+    height: 0;
+    clear:both;
+    overflow: auto;
+  }
 }
 .el-select-content{
-    @include point(width,120);
+    //@include point(width,120);
 }
 .empty-data-icon{
     @include point(font-size,22);
@@ -1312,58 +1351,15 @@ $h1:#292e36;
         color: #f31d65 !important;
         border: 1px solid #f31d65 !important;
     }
-    /*#tabs-content .el-tabs__nav-scroll{*/
-        /*margin-left:40px;*/
-    /*}*/
-    /*#tabs-content .el-tabs__header{*/
-        /*margin-bottom:0px !important;*/
-    /*}*/
-
-    /*.el-tabs__active-bar{*/
-        /*height: 4px !important;*/
-        /*background-color: #f31d65 !important;*/
-    /*}*/
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }
      .select-poper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-    .current-row > td {
-        background: #FEE7E4 !important;
-    }
-    .el-table tbody tr:hover>td {
-        background-color: #FDE8EF !important;
-    }
-    .el-table--border th{
-        border-right: 0 !important;
-    }
-    /*.el-table--border, .el-table--group{*/
-        /*border: none !important;*/
-    /*}*/
-    /*.el-table__header-wrapper th:nth-last-of-type(2){*/
-        /*border-right: none !important;*/
-    /*}*/
-    .el-table--border td:nth-last-of-type(1){
-        border-right: none !important;
-    }
-    .el-table--border::after, .el-table--group::after{
-        width: 0 !important;
-    }
-    .el-table__row{
-      height: calc(60/1920*100vw);
-      font-size: calc(14/1920*100vw);
-      color: #182752;
-    }
- .el-table .cell{
-   padding-left: calc(20/1920*100vw);
-   padding-right: calc(20/1920*100vw);
- }
- .el-table--striped .el-table__body tr.el-table__row--striped td{
-   background-color: #f7f8fb;
- }
-  .el-table__header{
-    font-size: calc(12/1920*100vw);
-  }
+   .self-class-name  /deep/ .cell{
+     display: flex ;
+     align-items: center;
+   }
 </style>
 

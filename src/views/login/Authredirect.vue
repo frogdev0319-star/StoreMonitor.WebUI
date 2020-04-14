@@ -20,7 +20,7 @@ export default{
                   let obj = self.queryURL(hash);
                   console.log(obj);
                     this.$store.commit('SET_TOKEN',obj.token);
-                    if(obj.ezvizProtocol){
+                    if(obj.ezvizProtocol == "true"){
                       this.$store.commit('SET_ISEZVIZ',true);
                       setCookie('isEzviz',true);
                     }

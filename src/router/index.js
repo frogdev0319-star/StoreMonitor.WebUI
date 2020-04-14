@@ -13,15 +13,15 @@ Vue.use(Router)
  * all roles can be accessed
  */
 export const constantRoutes = [
-  // {
-  //   path:'/login',
-  //   name:'Login',
-  //   hidden: true,
-  //   component:LoginForm,
-  //   meta:{
-  //     requireAuth: false,
-  //   }
-  // },
+  {
+    path:'/login',
+    name:'Login',
+    hidden: true,
+    component:LoginForm,
+    meta:{
+      requireAuth: false,
+    }
+  },
   {
     path:'*',
     redirect: '/'
@@ -240,7 +240,7 @@ export default router
         {
           path:'/statistical',
           name:'statistics',
-          component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve),
+          component:resolve=>require(['@/views/statistical/PatrolEvaluationStatistics'],resolve),
           meta:{
             requireAuth: true,
           }

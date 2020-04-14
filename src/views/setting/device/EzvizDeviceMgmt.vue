@@ -11,8 +11,11 @@
         </el-input>
         <el-button v-for="(item,index) in btnList"
                    :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
-          <i :class="item.iconClass" style="font-size:24px;"></i>
-          <span>{{item.btnTitle}}</span>
+          <div class="btn-area">
+            <i :class="item.iconClass" style="font-size:24px;"></i>
+            <span>{{item.btnTitle}}</span>
+          </div>
+
         </el-button>
       </div>
       <div style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;" v-else>
@@ -23,8 +26,10 @@
           type="primary"
           class="btn-class"
         >
-          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i>
-          <span>{{$t('deviceView.addEzvizAccount')}}</span>
+          <div class="btn-area">
+            <i class="iconfont el-icon-plus"></i>
+            <span>{{$t('deviceView.addEzvizAccount')}}</span>
+          </div>
         </el-button>
       </div>
       <el-col :span="varWindowWidth<1540?12:10" class="dash-content" :style="varWindowWidth<1366?{'font-size':'12px'}:{'font-size':'14px'}">
@@ -37,7 +42,7 @@
                    top="35vh"
                    left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #FB4C5D;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
             <p style="margin-left:26px;margin-bottom:0px;">{{generateDeviceLang('selectFilePos')}}</p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -56,11 +61,11 @@
                     top="35vh"
                     left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #FB4C5D;"/>
+            <hr style="border: 0.5px solid #dfe2e9;"/>
 
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-              <span>{{generateDeviceLang('clearInfo')}}</span>
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+              <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('clearInfo')}}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -76,12 +81,12 @@
           <ezviz-account ref="ezvizAccount"></ezviz-account>
         </el-tab-pane>
         <el-tab-pane :label="generateDeviceLang('deviceManage')" name="device">
-          <el-col :span="lang=='en' && varWindowWidth<1920? 11: 10" class="lisde">
+          <el-col :span="lang=='en' && varWindowWidth<1920? 11: 11" class="lisde">
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn btn-class"
                          @click="showAddDialog">
-                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
+                <i class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addDevice')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -94,9 +99,12 @@
                    :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}" @click="filterNVR"></i>
               </div>
               <div :class="lang=='en' ? 'en-model-title titles': 'model-title titles'">
-                <span>{{generateDeviceLang('deviceModel')}}</span>
+                <!--<span>{{generateDeviceLang('deviceModel')}}</span>-->
+                <!--<i class="icon-filter"-->
+                   <!--:class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}" @click="filterModel"></i>-->
+                <span>{{generateDeviceLang('EzvizAccount')}}</span>
                 <i class="icon-filter"
-                   :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}" @click="filterModel"></i>
+                   :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}" @click="filterAccount"></i>
               </div>
               <div :class="lang=='en' ? 'en-store-title titles': 'store-title titles'" >
                 <span>{{generateDeviceLang('store')}}</span>
@@ -104,7 +112,7 @@
                    :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterStore"></i>
               </div>
               <div :class="lang=='en' ? 'en-count-title titles': 'count-title titles'" >
-                <span>{{generateDeviceLang('deviceChannelNum')}}</span>
+                <span>{{generateDeviceLang('channelNum')}}</span>
                 <!--<i class="icon-filter"-->
                 <!--:class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}" @click="filterChannelNum"></i>-->
               </div>
@@ -120,59 +128,70 @@
                   <div class="proper-flag" v-if="item.isClick"></div>
                   <div class="comment-data titles" :style="{visibility: (item.comment!= '') ? 'visible': 'hidden' }">
                     <el-tooltip effect="dark" :content="item.comment"
-                                placement="bottom">
+                                placement="bottom" :popper-class="elTooltipClass">
+                      <div slot="content">{{generateDeviceLang('failedReason')}}<br/>{{item.comment}}</div>
                       <span style="margin-left: 10%; color: #fea316;"><i class="iconfont icon-jinggao2"></i></span>
                     </el-tooltip>
                   </div>
                   <div class="name-data titles">
-                    <span v-if="!item.isEditing">{{item.tempNvrName.length>15?item.tempNvrName.substr(0,15)+'...':item.tempNvrName}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>
+                    <el-tooltip class="item" effect="dark" :content="item.tempNvrName"
+                                placement="bottom" :popper-class="elTooltipClass">
+                      <span>{{item.tempNvrName.length>15?item.tempNvrName.substr(0,15)+'...':item.tempNvrName}}</span>
+                    </el-tooltip>
+                    <!--<el-input size="mini" maxlength='15' v-model="item.tempNvrName" class="nvr-input" :placeholder="generateDeviceLang('inputDeviceName')" v-if="item.isEditing"></el-input>-->
                   </div>
                   <div class="model-data titles">
-                    <el-tooltip class="item" effect="dark" :content="item.deviceModel" placement="right">
-                      <span>{{item.deviceModel}}</span>
-                    </el-tooltip>
+                      <span>{{item.tempEzvizAccount}}</span>
                   </div>
                   <div class="store-data titles">
-                    <span>{{item.store}}</span>
+                    <el-tooltip class="item" effect="dark" :content="item.store" :popper-class="elTooltipClass"
+                                placement="bottom">
+                    <span>{{item.store.length>7?item.store.substr(0,7)+'...':item.store}}</span>
+                    </el-tooltip>
+                    <!--<span>{{item.store}}</span>-->
                   </div>
                   <div class="count-data titles">
-                    <span v-if="!item.isEditing">{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>
-                    <el-select v-model="item.tempChannelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" class="nvr-select" v-if="item.isEditing">
-                      <el-option
-                        v-for="numList in editNvrChannelNumList"
-                        :key="numList.value"
-                        :label="numList.label"
-                        :value="numList.value"
-                        :disabled="numList.disabled"
-                      >
-                      </el-option>
-                    </el-select>
+                    <span>{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>
+                    <!--<span v-if="!item.isEditing">{{item.tempChannelCount}}{{$t('deviceView.unit')}}</span>-->
+                    <!--<el-select v-model="item.tempChannelCount" :placeholder="generateDeviceLang('selectChannelNum')" size="mini" class="nvr-select" v-if="item.isEditing">-->
+                      <!--<el-option-->
+                        <!--v-for="numList in editNvrChannelNumList"-->
+                        <!--:key="numList.value"-->
+                        <!--:label="numList.label"-->
+                        <!--:value="numList.value"-->
+                        <!--:disabled="numList.disabled"-->
+                      <!--&gt;-->
+                      <!--</el-option>-->
+                    <!--</el-select>-->
                   </div>
                   <div class="operation-data titles">
-                    <div class="iconcontent" v-if="item.isEditing">
-                      <div class="iconlised"  @click.stop="confirmEditNvr(index,item)">
-                        <i class="el-icon-check"></i>
-                      </div>
-                      <div class="iconrised" @click.stop="cancelEditNvr(index,item)">
-                        <i class="el-icon-close"></i>
-                      </div>
-                    </div>
-                    <div class="iconcontent" v-if="!item.isEditing && !item.ifCanAdd">
-                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; background-color: #fff; color:#2c3e50;font-weight: normal;" :style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }">
+                    <!--<div class="iconcontent" v-if="item.isEditing">-->
+                      <!--<div class="iconlised"  @click.stop="confirmEditNvr(index,item)">-->
+                        <!--<i class="el-icon-check"></i>-->
+                      <!--</div>-->
+                      <!--<div class="iconrised" @click.stop="cancelEditNvr(index,item)">-->
+                        <!--<i class="el-icon-close"></i>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="iconcontent" v-if="!item.isEditing && !item.ifCanAdd">-->
+                      <!--<div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; background-color: #fff; color:#2c3e50;font-weight: normal;" :style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }">-->
+                        <!--<i class="iconfont icon-bianji"></i>-->
+                      <!--</div>-->
+                      <!--<div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">-->
+                        <!--<i class="iconfont icon-shanchu"></i>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                    <div class="iconcontent" v-if="!item.ifCanAdd">
+                      <!--<div class="" style="float:left;">-->
+                        <!--<el-button @click.stop="addAgain(index, item)" class="add-btn" size="mini" style=" border: none; background-color: #f31d65; color:#fff; width: 65px; ">-->
+                          <!--<span style="position: relative;left: -10px;">{{generateDeviceLang('addAgain')}}</span>-->
+                        <!--</el-button>-->
+                      <!--</div>-->
+                      <div class="iconlised"  @click.stop="editSingleNvr(index,item)" style=" border: none; color:#2c3e50;font-weight: normal;background-color: rgba(255,255,255,0)">
+                           <!--:style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }"-->
                         <i class="iconfont icon-bianji"></i>
                       </div>
-                      <div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
-                        <i class="iconfont icon-shanchu"></i>
-                      </div>
-                    </div>
-                    <div class="add-again" v-if="!item.isEditing && item.ifCanAdd">
-                      <div class="" style="float:left;">
-                        <el-button @click.stop="addAgain(index, item)" class="add-btn" size="mini" style=" border: none; background-color: #f31d65; color:#fff; width: 65px; ">
-                          <span style="position: relative;left: -10px;">{{generateDeviceLang('addAgain')}}</span>
-                        </el-button>
-                      </div>
-                      <div class="iconrised" @click.stop="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
+                      <div class="iconrised" @click="showConfirmDelete=true" style="border: none; color:#2c3e50; font-weight: normal;">
                         <i class="iconfont icon-shanchu"></i>
                       </div>
                     </div>
@@ -182,15 +201,15 @@
                             :visible.sync="showConfirmDelete" v-if="showConfirmDelete"
                             :append-to-body='true'
                             :close-on-click-modal="false"
-                            width="28%"
+                            width="510px"
                             top="35vh"
                             left="40vh">
                   <div class="dialog-content" style="overflow:hidden;width:100%;">
-                    <hr style="border: 0.5px solid #FB4C5D;"/>
+                    <hr style="border: 0.5px solid #dfe2e9;"/>
 
                     <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                      <span>{{generateDeviceLang('deleteInfo')}}</span>
+                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                      <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteInfo')}}</span>
                       <!--<el-checkbox v-model="deleteFromEzviz">是否从萤石云平台删除？</el-checkbox>-->
                     </p>
                   </div>
@@ -201,7 +220,7 @@
                 </el-dialog>
               </div>
             </el-scrollbar>
-            <div class="toolbar pagination" style="width:100%; margin-top:10px;">
+            <div class="toolbar pagination" style="width:100%; margin-top:10px; margin-bottom:20px;">
               <el-pagination
                 style="text-align:right;margin-right:15px;"
                 @size-change="sizeChange"
@@ -215,38 +234,48 @@
               </el-pagination>
             </div>
           </el-col>
-          <el-dialog :title="generateDeviceLang('addDevice')"
+          <el-dialog :title="isAddAgain? generateDeviceLang('updateDevice') : generateDeviceLang('addDevice')"
                      :visible.sync="showAddNvrDialog" v-if="showAddNvrDialog"
                      :append-to-body='true'
                      :close-on-click-modal="false"
-                     width="28%"
+                     width="510px"
                      top="35vh"
                      left="40vh" customClass="addNvr"
           >
             <div class="dialog-content" style="overflow:hidden;width:100%;">
-              <hr style="border: 0.5px solid #f31d65;"/>
+              <hr style="border: 0.5px solid #dfe2e9;"/>
               <el-form :model="addDeviceData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="serialNumber" :label="generateDeviceLang('serialNum')">
-                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain"></el-input>
+                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain" @input="(val)=>serialNumberChange(val)"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="validationCode" :label="generateDeviceLang('validationCode')">
-                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;"></el-input>
+                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;" @input="validateCodeChange"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="name" :label="generateDeviceLang('deviceName')">
-                      <el-input  v-model="addDeviceData.name" style="width: 100%;"></el-input>
+                      <el-input  v-model="addDeviceData.name" style="width: 100%;" @input="deviceNameChange"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item prop="channelCount" :label="generateDeviceLang('deviceChannelNum')">
-                      <el-select v-model="addDeviceData.channelCount"  size="mini" :disabled="isAddAgain">
+                      <el-select v-model="addDeviceData.channelCount"  size="mini" v-if="isAddAgain">
+                        <el-option
+                          v-for="numList in editNvrChannelNumList"
+                          :key="numList.value"
+                          :label="numList.label"
+                          :value="numList.value"
+                          :disabled="numList.disabled"
+                        >
+                        </el-option>channelNumList
+                      </el-select>
+                      <el-select v-model="addDeviceData.channelCount"  size="mini"  v-else>
                         <el-option
                           v-for="numList in channelNumList"
                           :key="numList.value"
@@ -258,7 +287,7 @@
                   </el-col>
                 </el-form-item>
                 <el-form-item :label="generateDeviceLang('EzvizAccount')" prop="ezvizAccount">
-                  <el-select v-model="addDeviceData.ezvizAccount" style="width: 100%;" :disabled="isAddAgain">
+                  <el-select v-model="addDeviceData.ezvizAccount" style="width: 100%;">
                     <el-option
                       v-for="item in ezvizAccountList"
                       :key="item.id"
@@ -287,12 +316,12 @@
               <el-button class="file-confirm-btn" @click="addSingleNvr" size="mini" type="primary">{{generateDeviceLang('confirm')}}</el-button>
             </div>
           </el-dialog>
-          <el-col :span="lang=='en' && varWindowWidth<1920? 13: 14" class="risde">
+          <el-col :span="lang=='en' && varWindowWidth<1920? 13: 13" class="risde">
             <div class="nvr-info">
               <span class="info-title">{{generateDeviceLang('channelSetting')}}</span>
               <el-button type="primary" size="mini" class="add-btn btn-class"
                          @click="addNewChannel" :disabled="channelBtnDisabled">
-                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
+                <i class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addChannel')}}</span>
               </el-button>
             </div>
             <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
@@ -322,7 +351,7 @@
                      :key="index">
                   <div class="nape-name-data">
                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" :placeholder="generateDeviceLang('inputInspectName')" v-if="item.isClick"></el-input>
+                    <el-input size="mini" @input="(val)=>channelNameChange(val,item)" v-model="item.tempName" class="nape-input input-details" :placeholder="generateDeviceLang('inputInspectName')" v-if="item.isClick"></el-input>
                   </div>
                   <div class="nape-dep-data">
                     <span class="nape-dep" v-if="item.id != 0 ">{{item.channelId}}</span>
@@ -336,13 +365,21 @@
                       </el-option>
                     </el-select>
                   </div>
-                  <div class="nape-picture-data">
+                  <div class="nape-picture-data" :class="lang=='en'? 'en-nape-picture-data' : ''">
                     <span v-if="item.tempUrl">
-                       <img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">
-                        <img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">
+                      <el-image :src="item.tempUrl" class="img-class" v-if="!isUpdate">
+                        <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
+                      <el-image :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class" v-else>
+                         <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
                     </span>
-                    <span v-else="!item.tempUrl" class="img-class" style="display: inline-block;background: #cccc;">
-                      <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
+                    <span v-else class="img-class" style="display: inline-block;background: #cccc;">
+                      <span style="color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
                     <el-upload v-if="item.isClick"
                                class="upload-demo"
@@ -380,15 +417,15 @@
                         :visible.sync="showDeleteChannel" v-if="showDeleteChannel"
                         :append-to-body='true'
                         :close-on-click-modal="false"
-                        width="28%"
+                        width="510px"
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
 
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                  <span style="margin: 20px;">{{generateDeviceLang('deleteChannel')}}</span>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                  <span style="margin: 20px;display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteChannel')}}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -400,17 +437,17 @@
                        :visible.sync="showAddChannelDialog" v-if="showAddChannelDialog"
                        :append-to-body='true'
                        :close-on-click-modal="false"
-                       width="28%"
+                       width="510px"
                        top="35vh"
                        left="40vh" customClass="addNvr"
             >
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #f31d65;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <el-form :model="addChannelData" :rules="channelRules" ref="channelForm" class="nvrForm" label-position="top" size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
                       <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input  v-model="addChannelData.name" style="width: 100%;"></el-input>
+                        <el-input  v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
@@ -447,7 +484,12 @@
                           <el-button  size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
                             <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('selectPicture')}}</span>
                           </el-button>
-                          <img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">
+                          <!--<img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">-->
+                          <el-image :src="addChannelData.pictureUrl" class="image-class">
+                            <div slot="error" class="image-slot">
+                              <span class="image-span">{{$t('deviceView.preview')}}</span>
+                            </div>
+                          </el-image>
                         </el-upload>
                       </el-form-item>
                     </el-col>
@@ -477,6 +519,7 @@
   import {generateDeviceLang} from '@/api/i18n'
   import {getStoreList} from '@/api/store'
   import EzvizAccount from "./EzvizAccount";
+  import filterString from '@/common/filterString'
 
   export default {
     name:'NvrDeviceMgmt',
@@ -642,6 +685,8 @@
         deviceNameTemp: '',
         channelCountTemp: 0,
         ezvizAccountList: [],
+        elTooltipClass: 'el-tooltipClass',
+        curIndex: 0
       }
     },
     watch:{
@@ -700,7 +745,7 @@
       },
       handleEditChange(file, fileList) {
         let self = this;
-        self.isUpdate = true;
+        self.isUpdate = false;
         this.channelList.forEach(item=>{
           if(item.isClick){
             item.tempUrl = file.url;
@@ -772,6 +817,7 @@
         console.log('点击NVR')
         item.isClick=true;
         self.curNVRItem=item;
+        self.curIndex = index;
         self.channelCountTemp = item.channelCount;
         console.log(item.serialNumber)
         self.getChannelListByDevice(item.serialNumber);
@@ -861,6 +907,24 @@
         };
         self.getDeviceList(params);
       },
+      filterAccount(){
+        let self=this;
+        self.modelFilter=!self.modelFilter;
+        console.log(self.modelFilter);
+        self.page=1;
+        self.nvrFilterName='ezvizAccount';
+        let params={
+          "filter": {
+            "page": self.page-1,
+            "size": self.sizeNum
+          },
+          "order": {
+            "direction": self.modelFilter?"asc":"desc",
+            "property": "ezvizAccount"
+          }
+        };
+        self.getDeviceList(params);
+      },
       filterStore(){
         let self=this;
         self.storeFilter=!self.storeFilter;
@@ -932,6 +996,8 @@
         return new Promise((resolve,reject)=>{
           ezvizRESTful.addEzivzDevice(params).then(resDevice=>{
             resolve(resDevice);
+          }).catch((err)=>{
+
           })
         })
       },
@@ -1011,8 +1077,9 @@
           })
         }
         let res1= await self.addEzivzDevice(paramsNVR);
+        console.log(res1);
         let res2= await self.addDevice(paramsDevice);
-        if(res1.errMsg=='Success'&&res2.errMsg=='Success'){
+        if(res1.errCode === 0 &&res2.errCode === 0){
           self.notify(self.$t('deviceView.importSuss'),'success',3000);
           self.showImportContent=false;
         }
@@ -1086,6 +1153,7 @@
                   channelCount:item["通道数"],
                   storeId:item["StoreID"],
                   validationCode: item['设备验证码'],
+                  ezvizAccount: item['萤石账号']
                 }
                 nvrDataTemp.push(obj);
               }
@@ -1122,8 +1190,8 @@
         var that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const tHeader = ['StoreID','所属门店', '序列号','设备名称','设备验证码','通道数','通道名称','通道序号']; // 导出的表头名
-          const filterVal = ['storeId','storeName','serialNumber','name', 'validationCode' ,'channelCount','channelName','channelNum']; // 导出的表头字段名
+          const tHeader = ['StoreID','所属门店', '序列号','设备名称','设备验证码','通道数','通道名称','通道序号', '萤石账号']; // 导出的表头名
+          const filterVal = ['storeId','storeName','serialNumber','name', 'validationCode' ,'channelCount','channelName','channelNum', 'ezvizAccount']; // 导出的表头字段名
           console.log(that.activeName);
           let deviceData=await that.getAllDeviceData();
           let channelData=that.channelData;
@@ -1141,6 +1209,7 @@
                   obj.channelCount=item.channelCount;
                   obj.channelName=_item.name;
                   obj.channelNum=_item.channelId;
+                  obj.ezvizAccount = item.ezvizAccount;
                   excelData.push(obj);
                 }
 
@@ -1280,24 +1349,26 @@
               obj.store=item.storeName;
               obj.storeId=item.storeId;
               obj.deviceModel=item.deviceModel;
+              obj.ezvizAccount = item.ezvizAccount;
+              obj.tempEzvizAccount = item.ezvizAccount;
               obj.channelCount = item.channelCount;
               obj.tempChannelCount = item.channelCount;
               obj.channelNum=item.channelCount+'个';
               obj.comment = item.comment; //错误提示信息
               console.log(obj.comment);
-              obj.ifCanEdit = false;
+              obj.ifCanEdit = true;
               obj.ifCanAdd = false;
-              if(obj.comment.length > 0){
-                if(obj.comment.indexOf('20010')!= -1){
-                  obj.ifCanAdd = true;
-                }
-                else{
-                  obj.ifCanAdd = false;
-                }
-              }
-              else{
-                obj.ifCanEdit = true;
-              }
+              // if(obj.comment.length > 0){
+              //   if(obj.comment.indexOf('20010')!= -1){
+              //     obj.ifCanAdd = true;
+              //   }
+              //   else{
+              //     obj.ifCanAdd = false;
+              //   }
+              // }
+              // else{
+              //   obj.ifCanEdit = true;
+              // }
               obj.isEditing = false;
               if(index==0){
                 obj.isClick=true;
@@ -1476,10 +1547,19 @@
             if (errMsg != undefined && errMsg == 'Success') {
               self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
               self.showAddNvrDialog = false;
+              self.isAddAgain = false;
+              console.log(self.nvrData[self.curIndex])
+              self.nvrData[self.curIndex].tempNvrName = obj.name;
+              self.nvrData[self.curIndex].tempEzvizAccount = obj.ezvizAccount;
+              self.nvrData[self.curIndex].tempChannelCount = obj.channelCount;
             }
             else {
               self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
               self.showAddNvrDialog = false;
+              self.isAddAgain = false;
+              self.nvrData[self.curIndex].name = obj.tempNvrName;
+              self.nvrData[self.curIndex].ezvizAccount = obj.tempEzvizAccount;
+              self.nvrData[self.curIndex].channelCount = obj.tempChannelCount;
             }
           })
             .then(async () => {
@@ -1621,15 +1701,31 @@
       editSingleNvr(index, item){
         let self=this;
         item.isEditing = true;
+        item.isClick = true;
         self.nvrData.forEach((_item,_index)=>{
           if(index!=_index){
             _item.isEditing=false;
+            _item.isClick = false;
           }
         })
+        item.name = item.tempNvrName;
+        item.ezvizAccount = item.tempEzvizAccount;
+        item.channelCount = item.tempChannelCount;
+        self.curNVRItem=item;
+        self.channelCountTemp = item.channelCount;
+        self.curIndex = index;
+        console.log(item.serialNumber)
+        self.getChannelListByDevice(item.serialNumber);
+        // show update dialog
+        self.addDeviceData = item;
+        self.isAddAgain = true;
+        console.log(self.addDeviceData)
+        self.showAddNvrDialog = true;
       },
       showAddDialog(){
         let self = this;
         self.showAddNvrDialog = true;
+        self.isAddAgain = false;
         self.addDeviceData = {name: '', validationCode: '', storeId: self.storeDataList[0].storeId, serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount};
       },
       confirmEditNvr(index,item){
@@ -1770,7 +1866,35 @@
           duration:time
         });
       },
-
+      channelNameChange(val,item){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        if(0 == Object.keys(item).length){
+          self.addChannelData.name = comment;
+        }
+        else{
+          item.tempName = comment;
+        }
+      },
+      serialNumberChange(val){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        self.addDeviceData.serialNumber = comment;
+      },
+      validateCodeChange(val){
+        let self = this;
+        let comment = filterString.all(val,10);
+        console.log(comment);
+        self.addDeviceData.validationCode = comment;
+      },
+      deviceNameChange(val){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        self.addDeviceData.name = comment;
+      }
     },
 
     mounted(){
@@ -1811,8 +1935,8 @@
     #{$poi}:checkRem($val);
   }
   @mixin titleStyle{
-    @include point(height,48);
-    @include point(line-height,48);
+    height: 60px;
+    line-height: 60px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
@@ -1823,11 +1947,11 @@
     text-overflow: ellipsis;
   }
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto,Arial, Microsoft YaHei;
   }
   .noraml-color{
     color: #4b5262 !important;
-    background-color: #FAFAFA;
+    background-color: #f4f5f9;
     cursor: pointer;
   }
   .el-delete-btn{
@@ -1838,6 +1962,11 @@
     font-size: 12px;
     &:disabled{
       opacity: 0.6;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
   .en-el-delete-btn{
@@ -1860,6 +1989,11 @@
     span{
       position: relative;
     }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .active-color{
     color: $mainColor !important;
@@ -1877,27 +2011,11 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    position: relative;
-    top: 3px;
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
-    width: calc(130/1920*100vw);
-    @media screen and (min-width: 1366px){
-      //@include point(width, 90);
-      span{
-        position: relative;
-        @include point(bottom,3);
-      }
-    }
-    @media screen and (max-width: 1366px){
-      //@include point(width, 120);
-      span{
-        position: relative;
-        @include point(bottom,5);
-      }
-    }
+    min-width: 85px;
+    min-height: 28px;
     &:first-child{
       border-right-width: 0px;
     }
@@ -1909,6 +2027,11 @@
     }
     &:focus{
       background-color: #FEE4E7;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
   .en-el-handle-btn{
@@ -1916,28 +2039,12 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    position: relative;
-    top: 3px;
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0 0;
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
-    @media screen and (min-width: 1366px){
-      //@include point(width, 90);
-      span{
-        position: relative;
-        @include point(bottom,3);
-      }
-    }
-    @media screen and (max-width: 1366px){
-      //@include point(width, 120);
-      span{
-        position: relative;
-        @include point(bottom,5);
-      }
-    }
-
+    min-height: 28px;
+    min-width: 85px;
     &:first-child{
       border-right-width: 0px;
     }
@@ -1950,15 +2057,19 @@
     &:focus{
       background-color: #FEE4E7;
     }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .el-device{
+    height: calc(100vh - 126px - calc(60/1920*100vw));
     border: 1px solid $border;
     background-color: #fff;
     .el-btns{
-      @include point(padding-top,10);
-      @include point(padding-right,20);
       position: relative;
-      @include point(height,31);
+      height: calc(40/1920*100vw);
       .btns{
         position: absolute;
         @include point(right,25);
@@ -1971,11 +2082,10 @@
       background: $tab;
     }
     .el-tabPanels{
-      @include point(padding,20);
+      padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);
       height: auto;
       position: relative;
-      @include point(bottom,25);
-      @include point(padding-bottom,0);
+      bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
       }
@@ -2007,39 +2117,27 @@
       .nvr-info{
         @include titleStyle;
         position: relative;
-        @include point(padding-left,20);
+        padding-left: calc(25/1920*100vw);
+        background-color: #fff;
         .info-title{
-          font-size: 18px;
+          font-size: calc(18/1920*100vw);
           font-weight: bold;
         }
         .add-btn{
           position: absolute;
-          @include point(right, 20);
+          right: calc(25/1920*100vw);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
           padding: 0 0;
           width: calc(130/1920*100vw);
           top: 0;
           bottom: 0;
           margin: auto;
           .el-icon-plus{
-            font-size: calc(24/1920*100vw);
+            font-size: calc(16/1920*100vw);
+            margin-right: calc(8/1920*100vw);
           }
-          span{
-          }
-          @media screen and (max-width: 1680px){
-            span{
-              position: relative;
-              @include point(bottom, 1)
-            }
-          }
-          @media screen and (max-width: 1280px){
-            span{
-              position: relative;
-              @include point(bottom, 1)
-            }
-          }
+
         }
       }
       .lisde{
@@ -2053,7 +2151,13 @@
         }
         .nvr-title{
           @include titleStyle;
-          font-size: 14px;
+          @media screen and (min-width: 1366px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 1366px) {
+            font-size: 12px;
+          }
+          background-color: #fff;
           .comment-title{
             width: 2%;
           }
@@ -2103,9 +2207,6 @@
             width: 15%;
           }
           @media screen and (max-width: 1680px) {
-            span{
-              font-size: 14px;
-            }
             .model-title{
               width: 18%;
             }
@@ -2140,7 +2241,7 @@
               width: 20%;
             }
             .en-count-title {
-              width: 22%;
+              width: 23%;
               span {
                 left: 0;
               }
@@ -2150,9 +2251,6 @@
             }
           }
           @media screen and (max-width: 1440px) {
-            span{
-              font-size: 14px;
-            }
             .model-title{
               width: 20%;
             }
@@ -2175,7 +2273,7 @@
               width: 18%;
             }
             .en-model-title {
-              width: 23%;
+              width: 25%;
               span {
                 left: 0;
               }
@@ -2198,9 +2296,6 @@
             }
           }
           @media screen and (max-width: 1280px) {
-            span{
-              font-size: 14px;
-            }
             .model-title{
               width: 20%;
             }
@@ -2246,6 +2341,9 @@
             }
           }
         }
+        .nvr-title .titles{
+          color: $tab;
+        }
         .nvr-data{
           @include titleStyle;
           position: relative;
@@ -2275,18 +2373,18 @@
             width: 4%;
             height: 100%;
             span{
-              display: inline-block;
+              //display: inline-block;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
             }
           }
           .name-data{
-            width: 25%;
+            width: 20%;
             height: 100%;
             position: absolute;
             span{
-              display: inline-block;
+              //display: inline-block;
               width: 70%;
               overflow: hidden;
               white-space: nowrap;
@@ -2311,9 +2409,9 @@
             width: 20%;
             height: 100%;
             position: absolute;
-            left: 44%;
+            left: 43%;
             span{
-              display: inline-block;
+              //display: inline-block;
               width: 70%;
               overflow: hidden;
               white-space: nowrap;
@@ -2344,7 +2442,6 @@
             left: 83%;
             .iconcontent{
               position: absolute;
-              @include point(margin-top,14);
               cursor: pointer;
               display: inline-block;
               .iconfont{
@@ -2360,8 +2457,8 @@
                 border-width: 1px 1px 1px 1px;
                 border-style: solid;
                 border-color: #ddd;
-                @include point(line-height,21);
-                @include point(height,21);
+                line-height: 60px;
+                height: 60px;
                 /deep/ el-button .add-btn{
                   font-size: 12px;
                 }
@@ -2373,9 +2470,9 @@
                 border-width: 1px 1px 1px 0px;
                 border-style: solid;
                 border-color: #ddd;
-                background-color: #fff;
-                @include point(line-height,21);
-                @include point(height,21);
+                background-color: rgba(255, 255, 255, 0);
+                line-height: 60px;
+                height: 60px;
               }
             }
 
@@ -2420,7 +2517,7 @@
           @include titleStyle;
           font-size: 14px;
           .nape-name-title{
-            width: 34%;
+            width: 30%;
           }
           .nape-dep-title{
             width: 30%;
@@ -2453,24 +2550,24 @@
             width: 15%;
           }
         }
+        .nape-items-title .titles, .en-nape-items-title .titles{
+          color: $tab;
+        }
         .nape-items-data{
           overflow: hidden;
           position: relative;
           padding-left: 1%;
           cursor: pointer;
           font-size: 14px;
-          @include point(height,49);
-          @include point(line-height,49);
+          height: 90px;
+          line-height: 90px;
 
           text-align: left;
           .nape-input{
-            @include point(width,180);
+            width: calc(160/1920*100vw);
             margin-left: 13%;
             position: relative;
             bottom: 2px;
-            @media screen and (max-width:1600px){
-              width: 100%;
-            }
           }
           .nape-name-data{
             width: 30%;
@@ -2495,45 +2592,51 @@
             }
           }
           .nape-picture-data{
-            width: 25%;
+            width: 20%;
             height: 100%;
             display: inline-block;
             position: relative;
             .img-class{
               height: 90%;
-              @include point(width, 80);
+              width: calc(100/1920*100vw);
+              min-width: 85px;
               vertical-align: middle;
               text-align: center;
+              line-height: 70px;
+              height: 70px;
+              width: calc(100/1920*100vw);
+              display: inline-block;
+              span{
+                font-size: calc(14/1920*100vw);
+              }
             }
             .upload-demo{
               position: absolute;
               bottom: 0;
               font-size: 12px;
-              @include point(width, 80);
+              width: calc(100/1920*100vw);
+              min-width: 85px;
               /deep/ .el-upload{
                 width: 100%;
               }
               /deep/ .el-button{
                 width: 100%;
-                @include point(height,20);
+                height: 28px;
                 opacity: 0.5;
                 position: absolute;
-                bottom: 0;
+                bottom: 10px;
                 left: 0;
               }
               /deep/ .el-button--mini{
                 padding: 7px;
               }
-              @media screen and (max-width: 1440px){
-                .edit-picture{
-                  position: relative;
-                  bottom: 4px;
-                }
-              }
             }
           }
+          .en-nape-picture-data{
+            width: 24%;
+          }
           .nape-items-handle{
-            width: 12%;
+            width: 13%;
             display: inline-block;
             .iconfont{
               font-size: calc(24/1920*100vw);
@@ -2547,23 +2650,20 @@
   }
   .btn-class{
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
     padding: 0;
     font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
     .el-icon-plus{
-      padding: calc(5/1920*100vw) 0;
-      font-size: calc(24/1920*100vw);
+      font-size: calc(16/1920*100vw);
+      margin-right: calc(8/1920*100vw);
     }
-    span{
-      position: relative;
-      bottom: calc(4/1920*100vw);
-      @media screen and (max-width: 1280px) {
-        bottom: calc(3/1920*100vw);
-      };
+    @media screen and (max-width: 1440px) {
+      width: 100px !important;
     }
-    @media screen and (max-width: 1280px) {
-      width: 125px;
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 </style>
@@ -2625,6 +2725,47 @@
     width: 100px;
     height: 100px;
     display: block;
+  }
+  .image-class{
+    height: 70px;
+    width: calc(100/1920*100vw);
+    min-width: 85px;
+    border: 1px dashed #7d8cad;
+  }
+  .el-image__inner{
+    height: 70px;
+    width: calc(100/1920*100vw);
+    min-width: 85px;
+  }
+  .image-slot{
+    height: 70px;
+    width: calc(100/1920*100vw);
+    min-width: 85px;
+    color: #7d8cad;
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .image-span{
+    height: 70px;
+    line-height: 70px;
+  }
+  .el-tooltipClass.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
+    border-bottom-color: rgba(30, 34, 52, 0.75) !important;
+  }
+
+  .el-tooltipClass.el-tooltip__popper[x-placement^='bottom'] .popper__arrow:after {
+    border-bottom-color: rgba(30, 34, 52, 0.75) !important;
+  }
+
+  .el-tooltipClass.el-tooltip__popper.is-dark {
+    background: rgba(30, 34, 52, 0.75) !important;
+    font-size: 14px !important;
+    /*line-height: 21px;*/
+    padding: 5px;
+  }
+  .el-icon-picture-outline{
+    font-size: 16px;
   }
 </style>
 <style scoped>

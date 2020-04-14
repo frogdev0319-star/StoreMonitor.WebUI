@@ -244,7 +244,7 @@ const user={
               },
               {
                 path:'/reinspection',
-                  name:'remotePatrol',
+                name:'remotePatrol',
                 component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
                 hidden:true,
                 meta:{
@@ -260,7 +260,7 @@ const user={
               },
               {
                 path:'/reinspection',
-                  name:'remotePatrol',
+                name:'remotePatrol',
                 component:resolve=>require(['@/views/patrolShop/ReInspectDealPage'],resolve),
                 hidden:true,
                 children:[
@@ -365,29 +365,68 @@ const user={
           );
           accessedRoutes.push(route3);
 
-          // let route4 = {
-          //     path: '/home',
-          //     name:'statistics',
-          //     component:Home,
-          //     iconCls:'iconfont icon-tongjifenxi',
-          //     styles:'font-size:22px',
-          //     leaf:true,
-          //     isReadOnly:true,
-          //     hidden: false,
-          //     children:[
-          //       {
-          //         path:'/statistical',
-          //         name:'statistics',
-          //         component:resolve=>require(['@/views/statistical/StatisticalAnaly'],resolve),
-          //         meta:{
-          //           requireAuth: true,
-          //         }
-          //       }
-          //     ]
-          //   };
-          // PermissionHelper.enablePatrolEvaStatistics() || PermissionHelper.enableInspectStatistics()
-          // || PermissionHelper.enableEventStatistics()  || PermissionHelper.enableSupervisionEffStatistics()
-          // && route4.children.push()
+          let route4 = {
+              path: '/home',
+              name:'statistics',
+              component:Home,
+              iconCls:'iconfont icon-tongjifenxi',
+              styles:'font-size:22px',
+              leaf: false,
+              hidden: false,
+              children:[]
+            };
+          PermissionHelper.enablePatrolEvaStatistics() && route4.children.push(
+            {
+              path:'/patrolEvaluation',
+              name:'patrolAppraisalStat',
+              component:resolve=>require(['@/views/statistical/PatrolEvaluationStatistics'],resolve),
+              hidden:false,
+              meta:{
+                requireAuth: true,
+                keepAlive:false,
+              }
+            }
+          )
+          PermissionHelper.enableInspectStatistics() && route4.children.push(
+            {
+              path:'/patrolItem',
+              name:'patrolItemsStat',
+              component:resolve=>require(['@/views/statistical/InspectItemStatistics'],resolve),
+              hidden:false,
+              meta:{
+                requireAuth: true,
+                keepAlive:false,
+              }
+            }
+          )
+
+          PermissionHelper.enableSupervisionEffStatistics() && route4.children.push(
+            {
+              path:'/supervisorStat',
+              name:'supervisorStat',
+              component:resolve=>require(['@/views/statistical/SupervisorStatistics'],resolve),
+              hidden:false,
+              meta:{
+                requireAuth: true,
+                keepAlive:false,
+              }
+            }
+          )
+
+          PermissionHelper.enableEventStatistics() && route4.children.push(
+            {
+              path:'/eventStat',
+              name:'eventStat',
+              component:resolve=>require(['@/views/statistical/EventStatistics'],resolve),
+              hidden:false,
+              meta:{
+                requireAuth: true,
+                keepAlive:false,
+              }
+            }
+          )
+
+          route4.children.length > 0 ? accessedRoutes.push(route4): '';
 
           let route5 = {
             path: '/home',
@@ -497,7 +536,8 @@ const user={
                 {
                   path:'/pointCheck',
                   name:'pointCheck',
-                  component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve)
+                  component:resolve=>require(['@/views/setting/schedule/PointCheckSchedule'],resolve),
+                  isReadOnly:true,
                 },
                 // {
                 //   path:'/lpsSechedule',

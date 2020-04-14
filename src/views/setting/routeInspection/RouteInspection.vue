@@ -2,18 +2,22 @@
     <el-row class="el-route-container">
         <el-col :span="24" class="el-route-header">
           <el-col :span="7" class="el-route-btns">
-              <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
-                <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class"
-                :disabled="elTableData[Number(activeName)].routeData.length==0" type="primary">
-                    <i style="margin-right:10px;" class="iconfont icon-quxiaolianjie"></i>
-                    <span>{{generateInsSettingLang('bindList')}}</span>
-                </el-button>
+            <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
+            <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class"
+            :disabled="elTableData[Number(activeName)].routeData.length==0" type="primary">
+              <div class="btn-area">
+                <i class="iconfont icon-quxiaolianjie"></i>
+                <span>{{generateInsSettingLang('bindList')}}</span>
+              </div>
+            </el-button>
             <input id="loadFile" type="file" ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
 
             <el-button v-for="(item,index) in btnList"
                 :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
+                  <div class="btn-area">
                     <i :class="item.iconClass" style="font-size:24px;"></i>
                     <span>{{item.btnTitle}}</span>
+                  </div>
             </el-button>
 
             <el-dialog :title= "generateInsSettingLang('import')"
@@ -24,7 +28,7 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
                         <div style="margin-left:20px;">
                             <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
@@ -56,10 +60,10 @@
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #f31d65;"/>
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
                         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                            <span>{{generateInsSettingLang('clearInfo')}}</span>
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('clearInfo')}}</span>
                         </p>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -89,6 +93,8 @@ import {validateInput,validateInspectGroup} from '@/common/validate'
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {generateInsSettingLang} from '@/api/i18n'
+import filterString from '@/common/filterString'
+
 export default {
     name:'RouteInspection',
     components:{
@@ -96,7 +102,8 @@ export default {
     },
     data(){
         return{
-            elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
+            //elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
+            elTableData:[],
             radioList:[
                 {
                     'value':'1',
@@ -178,13 +185,21 @@ export default {
             }
         });
     },
+    created(){
+      let self=this;
+      self.getTagList();
+      let tabIndex=sessionStorage.getItem('TabIndex');
+      self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+      self.initData();
+      //self.getDownLoadURL();
+    },
     mounted(){
-        let self=this;
-        self.getTagList();
-        let tabIndex=sessionStorage.getItem('TabIndex');
-        self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-        self.initData();
-        self.getDownLoadURL();
+        // let self=this;
+        // self.getTagList();
+        // let tabIndex=sessionStorage.getItem('TabIndex');
+        // self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+        // self.initData();
+        // self.getDownLoadURL();
     },
     methods:{
         generateInsSettingLang,
@@ -285,7 +300,7 @@ export default {
                                 objChild.id=itemChild.id;
                                 objChild.checked=false;
                                 objChild.name=itemChild.subject;
-                                objChild.description=(itemChild.description==undefined||itemChild.length==0)?'---':itemChild.description;
+                                objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
                                 //objChild.score=itemChild.itemScore+'分';
                                 if(self.lang == 'en'){
                                   objChild.score=itemChild.itemScore ;
@@ -304,12 +319,18 @@ export default {
                         let obj={};
                         obj.label=item;
                         obj.routeData=temp;
+                        if(temp.length == 0){
+                          self.getDownLoadURL();
+                        }
                         self.elTableData[0]=obj;
                     }
                     else if(item=='现场巡检'){
                         let obj={};
                         obj.label=item;
                         obj.routeData=temp;
+                        if(temp.length == 0){
+                          self.getDownLoadURL();
+                        }
                         self.elTableData[1]=obj;
                     }
                     else{
@@ -321,7 +342,8 @@ export default {
                 self.elTableData=self.elTableData.concat(tempAllData);
             }
             else{
-                self.elTableData=[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}];
+              self.getDownLoadURL();
+              self.elTableData=[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}];
             }
             self.getBindStoreList();
         },
@@ -623,11 +645,12 @@ export default {
                     let typeName=[];
                     let flaggroupLength=false,flaggroupRex=false;
                     let flagItemName=false,flagItemRex=false,flagItemLength=false;
+                    let flagDescName = false, flagDesLength=false;
                     arr.forEach((item,index)=>{
                         if(item['检查分类']!=undefined&&item["检查分类"].length!=0){
                             indexArry.push(index);
                             typeName.push(item['检查分类']);
-                            if(item['检查分类'].toString().trim().length>10){
+                            if(filterString.getContentLength(item['检查分类'].toString().trim()) > 30){
                                 flaggroupLength=true;
                             }
                             if(validateInput(item['检查分类'])){
@@ -638,13 +661,21 @@ export default {
                             flagItemName=true;
                         }
                         else{
-                            if(item['检查项目名称'].toString().trim().length>25){
+                            if(filterString.getContentLength(item['检查项目名称'].toString().trim()) > 100){
                                 flagItemLength=true;
                             }
                             if(validateInput(item['检查项目名称'])){
                                 flagItemRex=true;
                             }
                         }
+                      if(item['检查项目详细说明（选填，不填为空）']==undefined){
+                        flagDescName=true;
+                      }
+                      else{
+                        if(filterString.getContentLength(item['检查项目详细说明（选填，不填为空）'].toString().trim()) > 300){
+                          flagDesLength=true;
+                        }
+                      }
                     })
 
                     if(flaggroupLength){
@@ -671,6 +702,11 @@ export default {
                         _this.$refs.loadFile.value = '';
                         _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
                         return false;
+                    }
+                    if(flagDesLength){
+                      _this.$refs.loadFile.value = '';
+                      _this.notify(_this.$t('insSettingView.excelIllegalDes'),'warning',3000);
+                      return false;
                     }
 
                     let dataArry=[];
@@ -784,8 +820,9 @@ export default {
 <style lang="scss" scoped>
     $mainColor:#f31d65;
     $border: #e3e9f4;
+    $tab: #7d8cad;
     *{
-        font-family: Arial, Microsoft YaHei;
+        font-family: Roboto,Arial, Microsoft YaHei;
     }
     @function rem($val){
         @return $val/16+rem;
@@ -812,56 +849,53 @@ export default {
     }
 
     .el-route-container{
-        padding: 20px 15px 15px 15px;
+        padding: 20px calc(20/1920*100vw) 15px calc(20/1920*100vw);
         border: 1px solid $border;
         background-color: #fff;
         .el-route-header{
-            @include point(margin-top,10);
+            margin-top: calc(15/1920*100vw);
             .el-route-tabs{
                 width: 98%;
-                @include point(margin-left,10);
+                margin-left: calc(15/1920*100vw);
             }
             .el-route-btns{
                 position: absolute;
-                @include point(right,30);
+                right: calc(40/1920*100vw);
                 z-index: 10;
                 width: auto;
-                @include point(top,12);
+                top: 25px;
+                display: flex;
+                align-items: center;
                 .bind-title{
-                    @include point(margin-right,15);
-                    color:#A2AEBC;
+                    margin-right:calc(20/1920*100vw);
+                    color:$tab;
                     font-size: 12px;
                 }
                 .en-bind-title{
-                  @include point(margin-right,0);
-                  color:#A2AEBC;
+                  margin-right:calc(20/1920*100vw);
+                  color:$tab;
                   font-size: 12px;
                 }
                 .el-bind-btn{
-                    //background-color: $mainColor;
                     color: #fff;
                     border-color: $mainColor;
-                    position: relative;
-                    border-radius: 0px;
-                    @include point(margin-right,15);
+                    border-radius: 3px;
+                    margin-right:calc(20/1920*100vw);
                     font-size: 12px;
                     &:disabled{
                         opacity: 0.5;
                     }
                   @media screen and (max-width: 1440px) {
-                    width: 125px !important;
+                    width: 100px !important;
                   }
                 }
                 .en-el-bind-btn{
                   color: #fff;
                   border-color: $mainColor;
-                  position: relative;
-                  border-radius: 0px;
-                  @include point(margin-right,15);
+                  border-radius: 3px;
+                  margin-right: calc(20/1920*100vw);
                   .icon-quxiaolianjie{
-                    font-size: calc(24/1920*100vw);
-                  }
-                  span{
+                    font-size: calc(16/1920*100vw);
                   }
                   &:disabled{
                     opacity: 0.5;
@@ -870,19 +904,17 @@ export default {
                 }
                 .btn-class{
                   height: calc(36/1920*100vw);
-                  line-height: calc(36/1920*100vw);
                   padding: 0;
                   font-size: calc(14/1920*100vw);
                   width: calc(130/1920*100vw);
                   .iconfont{
-                    padding: calc(5/1920*100vw) 0;
+                    font-size: calc(16/1920*100vw);
+                    margin-right: calc(10/1920*100vw)
                   }
-                  span{
-                    position: relative;
-                    bottom: calc(4/1920*100vw);
-                    @media screen and (max-width: 1280px) {
-                      bottom: calc(3/1920*100vw);
-                    };
+                  .btn-area{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                   }
                 }
                 .downLoad-btn{
@@ -891,9 +923,7 @@ export default {
                     color: $mainColor !important;
                     border-radius: 0px;
                     padding: 2px 5px !important;
-
                     position: relative;
-                    top: 3px;
                     display: inline-block;
                     text-decoration: none;
                     font-size: 12px;
@@ -917,28 +947,12 @@ export default {
                     border-color: $mainColor !important;
                     color: $mainColor !important;
                     border-radius: 0px;
-                    position: relative;
-                    top: 3px;
                     border-right: 0;
                     height: calc(36/1920*100vw);
-                    line-height: calc(36/1920*100vw);
                     padding: 0 0;
                     font-size: calc(14/1920*100vw);
-                    width: calc(130/1920*100vw);
-                    @media screen and (min-width: 1366px){
-                      //@include point(width, 90);
-                      span{
-                        position: relative;
-                        @include point(bottom,3);
-                      }
-                    }
-                    @media screen and (max-width: 1366px){
-                      //@include point(width, 120);
-                      span{
-                        position: relative;
-                        @include point(bottom,5);
-                      }
-                    }
+                    min-width: 85px;
+                    min-height: 28px;
                     &:last-child{
                         border-right: 1px solid;
                     }
@@ -949,34 +963,29 @@ export default {
                     &:focus{
                         background-color: #FEE4E7;
                     }
+                  .btn-area{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  }
                 }
               .en-el-handle-btn{
                 margin-left: 0px !important;
                 border-color: $mainColor !important;
                 color: $mainColor !important;
                 border-radius: 0px;
-                /*padding: 3px 5px !important;*/
-                position: relative;
-                top: 3px;
                 border-right: 0;
                 height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
+                /*line-height: calc(36/1920*100vw);*/
                 padding: 0 0;
                 font-size: calc(14/1920*100vw);
                 width: calc(130/1920*100vw);
-                @media screen and (min-width: 1366px){
-                  //@include point(width, 90);
-                  span{
-                    position: relative;
-                    @include point(bottom,3);
-                  }
-                }
-                @media screen and (max-width: 1366px){
-                  //@include point(width, 120);
-                  span{
-                    position: relative;
-                    @include point(bottom,5);
-                  }
+                min-width: 85px;
+                min-height: 28px;
+                .btn-area{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
                 }
 
                 &:last-child{

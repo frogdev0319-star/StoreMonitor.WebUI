@@ -16,8 +16,10 @@
         </el-input>
         <el-button v-for="(item,index) in btnList"
                    :key="index" size="mini" @click="handleNVR(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn'" :disabled="index==2">
-          <i :class="item.iconClass"></i>
-          <span>{{item.btnTitle}}</span>
+          <div class="btn-area">
+            <i :class="item.iconClass" style="font-size: 24px;"></i>
+            <span>{{item.btnTitle}}</span>
+          </div>
         </el-button>
       </div>
     </el-col>
@@ -46,11 +48,11 @@
                        :visible.sync="showImportContent" v-if="showImportContent"
                        :close-on-click-modal="false"
                        :append-to-body='true'
-                       width="28%"
+                       width="510px"
                        top="35vh"
                        left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <p style="margin-left:26px;margin-bottom:0px;">{{generateDeviceLang('selectFilePos')}}</p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -65,15 +67,14 @@
                         :visible.sync="showConfirmImport" v-if="showConfirmImport"
                         :append-to-body='true'
                         :close-on-click-modal="false"
-                        width="28%"
+                        width="510px"
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
-
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                  <span>{{generateDeviceLang('clearInfo')}}</span>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                  <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('clearInfo')}}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -89,7 +90,7 @@
               <span class="info-title">{{generateDeviceLang('deviceInfo')}}</span>
               <el-button type="primary" size="mini" class="add-btn"
                          @click="showAddDialog">
-                  <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
+                <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('addNvr')}}</span>
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
@@ -120,7 +121,7 @@
                   <div class="proper-flag" v-if="item.isClick"></div>
                   <div class="name-data titles">
                     <span v-if="!item.isEditing">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempDeviceName" class="nvr-input" :placeholder="generateDeviceLang('inputNvrName')" v-if="item.isEditing"></el-input>
+                    <el-input size="mini"  v-model="item.tempDeviceName"  @input="(val)=>nvrNameChange(val,item)"class="nvr-input" :placeholder="generateDeviceLang('inputNvrName')" v-if="item.isEditing"></el-input>
                   </div>
                   <div class="store-data titles">
                     <span>{{item.store}}</span>
@@ -148,7 +149,7 @@
                       </div>
                     </div>
                     <div class="iconcontent" v-if="!item.isEditing">
-                      <div class="iconlised"  @click="editSingleNvr(index,item)"  style=" border: none; background-color: #fff; color:#2c3e50; font-weight: normal">
+                      <div class="iconlised"  @click="editSingleNvr(index,item)"  style=" border: none; background-color: rgba(255, 255, 255, 0); color:#2c3e50; font-weight: normal">
                         <i class="iconfont icon-bianji"></i>
                       </div>
                       <div class="iconrised" @click="showConfirmDelete=true" style="border: none; color:#2c3e50;font-weight: normal">
@@ -161,15 +162,15 @@
                             :visible.sync="showConfirmDelete" v-if="showConfirmDelete"
                             :append-to-body='true'
                             :close-on-click-modal="false"
-                            width="28%"
+                            width="510px"
                             top="35vh"
                             left="40vh">
                   <div class="dialog-content" style="overflow:hidden;width:100%;">
-                    <hr style="border: 0.5px solid #FB4C5D;"/>
+                    <hr style="border: 0.5px solid #dfe2e9;"/>
 
                     <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                      <span>{{generateDeviceLang('deleteNvrInfo')}}</span>
+                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;;display: inline-block; vertical-align: middle"></i>
+                      <span style="display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteNvrInfo')}}</span>
                     </p>
                   </div>
                   <div slot="footer" class="dialog-footer">
@@ -197,20 +198,20 @@
                      :visible.sync="showAddNvrDialog" v-if="showAddNvrDialog"
                      :append-to-body='true'
                      :close-on-click-modal="false"
-                     width="28%"
+                     width="510px"
                      top="35vh"
                      left="40vh" customClass="addNvr"
           >
             <div class="dialog-content" style="overflow:hidden;width:100%;">
-              <hr style="border: 0.5px solid #f31d65;"/>
+              <hr style="border: 0.5px solid #dfe2e9;"/>
               <el-form :model="addNvrData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item label="IVS ID" prop="ivsId">
-                  <el-input v-model="addNvrData.ivsId"></el-input>
+                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"></el-input>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item prop="name" :label="generateDeviceLang('nvr')">
-                      <el-input v-model="addNvrData.name" style="width: 100%;"></el-input>
+                      <el-input v-model="addNvrData.name" style="width: 100%;" @input="(val)=>nvrNameChange(val, {})"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
@@ -281,7 +282,7 @@
                      :key="index">
                   <div class="nape-name-data">
                     <span class="nape-name" v-if="!item.isClick">{{item.name.length>15?item.name.substr(0,15)+'...':item.name}}</span>
-                    <el-input size="mini" maxlength='15' v-model="item.tempName" class="nape-input input-details" v-if="item.isClick"></el-input>
+                    <el-input size="mini" @input="(val)=>channelNameChange(val,item)" v-model="item.tempName" class="nape-input input-details" v-if="item.isClick"></el-input>
                   </div>
                   <div class="nape-dep-data">
                     <span class="nape-dep" v-if="item.id != 0 ">{{item.channelId}}</span>
@@ -297,10 +298,22 @@
                   </div>
                   <div class="nape-picture-data">
                     <span v-if="item.tempUrl">
-                       <img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">
-                        <img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">
+                      <el-image :src="item.tempUrl" class="img-class" v-if="!isUpdate">
+                        <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
+                      <el-image :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class" v-else>
+                        <div slot="error" class="image-slot">
+                          <i class="el-icon-picture-outline"></i>
+                        </div>
+                      </el-image>
                     </span>
-                    <span v-else="!item.tempUrl" class="img-class" style="display: inline-block;background: #cccc;">
+                    <!--<span v-if="item.tempUrl">-->
+                    <!--<img v-if="isUpdate"  :src="item.tempUrl"  class="img-class">-->
+                    <!--<img v-else :src="`${item.tempUrl +'?'+Math.random()}`"  class="img-class">-->
+                    <!--</span>-->
+                    <span v-else class="img-class" style="display: inline-block;background: #cccc;">
                       <span style="font-size: 14px;color: #94a4b4;">{{generateDeviceLang('noImage')}}</span>
                     </span>
                     <el-upload v-if="item.isClick"
@@ -339,15 +352,15 @@
                         :visible.sync="showDeleteChannel" v-if="showDeleteChannel"
                         :append-to-body='true'
                         :close-on-click-modal="false"
-                        width="28%"
+                        width="510px"
                         top="35vh"
                         left="40vh">
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #FB4C5D;"/>
+                <hr style="border: 0.5px solid #dfe2e9;;"/>
 
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                  <span style="margin: 20px;">{{generateDeviceLang('deleteChannel')}}</span>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"></i>
+                  <span style="margin: 20px;display: inline-block; vertical-align: middle">{{generateDeviceLang('deleteChannel')}}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
@@ -359,17 +372,17 @@
                        :visible.sync="showAddChannelDialog" v-if="showAddChannelDialog"
                        :append-to-body='true'
                        :close-on-click-modal="false"
-                       width="28%"
+                       width="510px"
                        top="35vh"
                        left="40vh" customClass="addNvr"
             >
               <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #f31d65;"/>
+                <hr style="border: 0.5px solid #dfe2e9;"/>
                 <el-form :model="addChannelData" :rules="channelRules" ref="channelForm" class="nvrForm" label-position="top" size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
                       <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;"></el-input>
+                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
@@ -388,7 +401,7 @@
                     </el-col>
                   </el-form-item>
                   <el-from-item>
-                    <el-col :span="6">
+                    <el-col :span="8">
                       <el-form-item :label="generateDeviceLang('thumbnail')" ref="uploadElement" prop="pictureUrl">
                         <el-input v-model="addChannelData.pictureUrl" v-if="false"></el-input>
                         <el-upload
@@ -403,15 +416,22 @@
                           accept="image/png,image/jpg,image/jpeg"
                           list-type="picture"
                           :data="addChannelData">
-                          <el-button  size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
+                          <el-button  size="mini" type="primary" style=" margin-bottom: 0px;position: relative;margin-right: 0px;">
                             <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"></i><span>{{generateDeviceLang('selectPicture')}}</span>
                           </el-button>
-                          <img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">
+                          <!--<img :src="addChannelData.pictureUrl" class="avatar" style="border: 1px dashed #d9d9d9;">-->
                         </el-upload>
+                        <el-image :src="addChannelData.pictureUrl" class="image-class">
+                          <div slot="error" class="image-slot">
+                            <span class="image-span">{{$t('deviceView.preview')}}</span>
+                          </div>
+                        </el-image>
                       </el-form-item>
                     </el-col>
-                    <el-col :span="varWindowWidth<1440? 14: 16" :offset="varWindowWidth<1440? 3: 1">
-                      <span class="picture-tips">*{{generateDeviceLang('thumbnailInfo')}}</span>
+                    <el-col :span="16" :offset="varWindowWidth<1440? 3: 0">
+                      <el-form-item label="">
+                        <span class="picture-tips">*{{generateDeviceLang('thumbnailInfo')}}</span>
+                      </el-form-item>
                     </el-col>
                   </el-from-item>
 
@@ -435,6 +455,7 @@
   import { mapMutations,mapGetters} from 'vuex'
   import {generateDeviceLang} from '@/api/i18n'
   import {getStoreList} from '@/api/store'
+  import filterString from '@/common/filterString'
 
 
   export default {
@@ -581,7 +602,7 @@
             { required: true, message: this.$t('deviceView.inputChannelName'), trigger: 'blur' }
           ],
           channelId: [
-            {required: true, message: '请选择NVR通道号', trigger: 'change' }
+            {required: true, message: this.$t('deviceView.selectNvrChannel'), trigger: 'change' }
           ],
           pictureUrl: [
             {required: true, message: this.$t('deviceView.uploadImage'), trigger: 'blur' }
@@ -631,7 +652,7 @@
       },
       handleEditChange(file, fileList) {
         let self = this;
-        self.isUpdate = true;
+        self.isUpdate = false;
         this.channelList.forEach(item=>{
           if(item.isClick){
             item.tempUrl = file.url;
@@ -1588,6 +1609,7 @@
       confirmEditNvr(index,item){
         let self=this;
         console.log(item);
+        item.name = item.tempDeviceName;
         let obj={};
         obj.ivsId = item.ivsId;
         obj.name  = item.tempDeviceName;
@@ -1706,7 +1728,35 @@
           duration:time
         });
       },
-      ...mapMutations( [ 'SET_DASHURL'] )
+      ...mapMutations( [ 'SET_DASHURL'] ),
+      nvrNameChange(val, item){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        if(0 == Object.keys(item).length){
+          self.addNvrData.name = comment;
+        }
+        else{
+          item.tempDeviceName = comment;
+        }
+      },
+      channelNameChange(val,item){
+        let self = this;
+        let comment = filterString.all(val,20);
+        console.log(comment);
+        if(0 == Object.keys(item).length){
+          self.addChannelData.name = comment;
+        }
+        else{
+          item.tempName = comment;
+        }
+      },
+      ivsIdChange(val){
+        let self = this;
+        let comment = filterString.all(val,30);
+        console.log(comment);
+        self.addNvrData.ivsId = comment;
+      }
     },
     created(){
       // this.varWindowWidth=window.innerWidth;
@@ -1748,8 +1798,8 @@
     #{$poi}:checkRem($val);
   }
   @mixin titleStyle{
-    @include point(height,48);
-    @include point(line-height,48);
+    height: 60px;
+    line-height: 60px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
@@ -1760,12 +1810,13 @@
     text-overflow: ellipsis;
   }
   *{
-    font-family: Arial, Microsoft YaHei;
+    font-family: Roboto, Arial, Microsoft YaHei;
   }
   .noraml-color{
     color: #4b5262 !important;
     background-color: #FAFAFA;
     cursor: pointer;
+    background-color: #f4f5f9;
   }
   .active-color{
     color: $mainColor !important;
@@ -1780,12 +1831,13 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    padding: 3px 10px !important;
-    position: relative;
-    top: 3px;
-    span{
-      position: relative;
-    }
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    font-size: calc(14/1920*100vw);
+    min-width: calc(110/1920*100vw);
+    min-width: 85px;
+    min-height: 28px;
     &:first-child{
       border-right-width: 0px;
     }
@@ -1804,44 +1856,31 @@
     border-color: $mainColor !important;
     color: $mainColor !important;
     border-radius: 0px;
-    padding: 3px 10px !important;
-    position: relative;
-    top: 3px;
+    border-right: 0;
     height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    padding: 0 0;
+    font-size: calc(14/1920*100vw);
     width: calc(130/1920*100vw);
-    .iconfont{
-      font-size: calc(24/1920*100vw);
-      vertical-align: middle;
-    }
-    span{
-      font-size: calc(14/1920*100vw);
-      vertical-align: middle;
+    min-width: 85px;
+    min-height: 28px;
+    &:last-child{
+      border-right: 1px solid;
     }
 
-    &:first-child{
-      border-right-width: 0px;
-    }
-    &:last-child{
-      border-left-width: 0px;
-    }
     &:hover{
       background-color: #FEE4E7;
     }
     &:focus{
       background-color: #FEE4E7;
     }
-    &:disabled{
-      opacity: 0.5;
-    }
   }
   .el-device{
     border: 1px solid $border;
     background-color: #FFF;
     .el-btns{
-      @include point(padding-top,10);
-      @include point(padding-right,20);
+      height: calc(40/1920*100vw);
       position: relative;
-      @include point(height,31);
       .btns{
         position: absolute;
         @include point(right,25);
@@ -1853,13 +1892,15 @@
       }
     }
     .el-tabPanels{
-      @include point(padding,20);
+      padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);
       height: auto;
       position: relative;
-      @include point(bottom,25);
-      @include point(padding-bottom,0);
+      bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
+      }
+      .nvr-title .titles{
+        color: $tab;
       }
       .titles{
         display: inline-block;
@@ -1904,15 +1945,15 @@
           bottom: 0;
           margin: auto;
           .el-icon-plus{
-            font-size: calc(24/1920*100vw);
+            font-size: calc(16/1920*100vw);
             padding: calc(5/1920*100vw) 0;
           }
           span{
             font-size: calc(14/1920*100vw);
             position: relative;
-            bottom: calc(4/1920*100vw);
+            bottom: calc(1/1920*100vw);
             @media screen and (max-width: 1280px) {
-              bottom: calc(2/1920*100vw);
+              bottom: 0;
             };
           }
           @media screen and (max-width: 1680px){
@@ -1921,7 +1962,7 @@
         }
       }
       .lisde{
-        background-color: #FAFAFA;
+        background: #FAFAFA;
         height: auto;
         position: relative;
         .icon-filter{
@@ -1931,7 +1972,12 @@
         }
         .nvr-title{
           @include titleStyle;
-          font-size: 14px;
+          @media screen and (min-width: 1366px) {
+            font-size: 14px;
+          }
+          @media screen and (max-width: 1366px) {
+            font-size: 12px;
+          }
           .name-title{
             width: 25%;
           }
@@ -1944,41 +1990,14 @@
           .operation-title{
             width: 15%;
           }
-          @media screen and (max-width: 1440px) {
-            .en-name-title{
-              width: 25%;
-            }
-            .en-store-title{
-              width: 35%;
-            }
-            .en-count-title{
-              width: 25%;
-            }
+          .en-name-title{
+            width: 27%;
           }
-          @media screen and (min-width: 1366px) {
-            .en-name-title{
-              width: 30%;
-            }
-            .en-store-title{
-              width: 30%;
-            }
-            .en-count-title{
-              width: 30%;
-            }
+          .en-store-title{
+            width: 28%;
           }
-          @media screen and (max-width: 1366px) {
-            .en-name-title{
-              font-size: 12px;
-              width: 30%;
-            }
-            .en-store-title{
-              width: 30%;
-              font-size: 12px;
-            }
-            .en-count-title{
-              width: 30%;
-              font-size: 12px;
-            }
+          .en-count-title{
+            width: 30%;
           }
         }
         .nvr-data{
@@ -2018,10 +2037,10 @@
             }
           }
           .store-data{
-            width: 40%;
+            width: 35%;
             height: 100%;
             position: absolute;
-            left: 27%;
+            /*left: 27%;*/
             span{
               display: inline-block;
               width: 70%;
@@ -2031,10 +2050,10 @@
             }
           }
           .count-data{
-            width: 15%;
+            width: 20%;
             height: 100%;
             position: absolute;
-            left: 65%;
+            left: 60%;
             span{
               display: inline-block;
               width: 70%;
@@ -2055,9 +2074,10 @@
             left: 83%;
             .iconcontent{
               position: absolute;
-              @include point(margin-top,14);
               cursor: pointer;
               display: inline-block;
+              display: inline-flex;
+              align-items: center;
               .iconfont{
                 font-size: calc(24/1920*100vw);
                 color: $tab;
@@ -2071,8 +2091,6 @@
                 border-width: 1px 1px 1px 1px;
                 border-style: solid;
                 border-color: #ddd;
-                @include point(line-height,21);
-                @include point(height,21);
               }
               .iconrised{
                 float: left;
@@ -2081,9 +2099,7 @@
                 border-width: 1px 1px 1px 0px;
                 border-style: solid;
                 border-color: #ddd;
-                background-color: #fff;
-                @include point(line-height,21);
-                @include point(height,21);
+                background-color: rgba(255, 255, 255, 0);
               }
             }
 
@@ -2140,6 +2156,9 @@
             width: 15%;
           }
         }
+        .nape-items-title .titles, en-nape-items-title .titles{
+          color: $tab;
+        }
         .en-nape-items-title{
           @include titleStyle;
           @media screen and (min-width: 1366px) {
@@ -2167,18 +2186,13 @@
           padding-left: 1%;
           cursor: pointer;
           font-size: 14px;
-          @include point(height,49);
-          @include point(line-height,49);
-
+          height: 90px;
+          line-height: 90px;
+          //border-bottom: 1px solid red;
           text-align: left;
           .nape-input{
-            @include point(width,180);
+            width: calc(160/1920*100vw);
             margin-left: 13%;
-            position: relative;
-            bottom: 2px;
-            @media screen and (max-width:1600px){
-              width: 100%;
-            }
           }
           .nape-name-data{
             width: 30%;
@@ -2194,7 +2208,7 @@
             }
           }
           .nape-dep-data{
-            width: 30%;
+            width: 28%;
             display: inline-block;
             position: relative;
             span{
@@ -2202,40 +2216,46 @@
             }
           }
           .nape-picture-data{
-            width:25%;
+            width:26%;
             height: 100%;
             display: inline-block;
             position: relative;
+            left: 1%;
             .img-class{
-              height: 90%;
-              @include point(width, 80);
+              //height: 90%;
               vertical-align: middle;
               text-align: center;
+              line-height: 70px;
+              height: 70px;
+              width: calc(100/1920*100vw);
+              display: inline-block;
+              min-width: 85px;
             }
             .upload-demo{
               position: absolute;
               bottom: 0;
-              @include point(width, 80);
+              width: calc(100/1920*100vw);
+              min-width: 85px;
               /deep/ .el-upload{
                 width: 100%;
               }
               /deep/ .el-button{
-                width: 100%;
-                @include point(height,20);
+                width: calc(100/1920*100vw);
+                height: 28px;
                 opacity: 0.5;
                 position: absolute;
-                bottom: 0;
+                bottom: 10px;
                 left: 0;
               }
               /deep/ .el-button--mini{
-                padding: 7px;
+                padding: 2px;
               }
-              @media screen and (max-width: 1280px){
-                .edit-picture{
-                  position: relative;
-                  bottom: 4px;
-                }
-              }
+              /*@media screen and (max-width: 1280px){*/
+              /*.edit-picture{*/
+              /*position: relative;*/
+              /*bottom: 4px;*/
+              /*}*/
+              /*}*/
             }
           }
           .nape-items-handle{
@@ -2250,7 +2270,11 @@
 
       }
     }
-
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 </style>
 <style>
@@ -2310,6 +2334,32 @@
     width: 100px;
     height: 100px;
     display: block;
+  }
+  .image-class{
+    height: 70px;
+    width: calc(100/1920*100vw);
+    min-width: 85px;
+    border: 1px dashed #7d8cad;
+  }
+  .el-image__inner{
+    height: 70px;
+    width: calc(100/1920*100vw);
+    min-width: 85px;
+  }
+  .image-slot{
+    height: calc(70/1920*100vw);
+    width: calc(100/1920*100vw);
+    color: #7d8cad;
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .image-span{
+    height: calc(70/1920*100vw);
+    line-height: calc(70/1920*100vw);
+  }
+  .el-icon-picture-outline{
+    font-size: 16px;
   }
 </style>
 <style scoped>

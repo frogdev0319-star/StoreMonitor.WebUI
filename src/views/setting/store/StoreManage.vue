@@ -2,7 +2,7 @@
     <div class="el-event-content" :style="{'height':windowHeight-142+'px'}">
        <div class="seacrh-content">
             <span class="select-title">{{generateStoreLang('provinceTitle')}}</span>
-            <el-select v-model="curProvince" clearable  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
+            <el-select v-model="curProvince"  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
              class="el-province" @change="changePro" @clear="clearCitys">
                     <el-option
                     v-for="item in provinceList"
@@ -26,7 +26,7 @@
                             <span>{{item.cityName}}</span>
                         </div>
                     </div>
-                <div slot="reference" @click="choiceCity" class="city-input"><span :style="multeCityList.length!=0?'color:#606266':'color:#C0C4CC'">{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
+                <div slot="reference" @click="choiceCity" class="city-input"><span>{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
             </el-popover>
 
             <el-button :size="varyWindowWidth>1680?'small':'mini'"  :class="lang=='en'? 'en-el-search-btn': 'el-search-btn'" @click="searchStore" type="primary">{{generateStoreLang('searchButton')}}</el-button>
@@ -44,16 +44,16 @@
             :highlight-current-row="true"
             :empty-text="generateStoreLang('noStoreData')"
             align='left'
-            border
             stripe
             :height="tableHieght"
             @sort-change='sortChange'
             @row-click='rowClickItem'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;"
-            :header-cell-style="{background:'#f4f5f9',color:'#7a8cad'}"
+            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+            :cell-style="cellStyle"
             >
                 <el-table-column
-                    min-width="120"
+                    min-width="140"
                     header-align="center"
                     align="center">
                         <template slot-scope="scope" v-if="scope.row.showTag">
@@ -102,13 +102,13 @@
                 min-width="100"
             >
                 <template slot-scope="scope">
-                    <i class="iconfont icon-gengduo" style="cursor: pointer;" @click="toEventDetail(scope.row)"></i>
+                    <i class="iconfont icon-gengduo" style="cursor: pointer; vertical-align: middle" @click="toEventDetail(scope.row)"></i>
                 </template>
             </el-table-column>
             <div slot="empty">
                 <div>
                     <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262','font-family':'Microsoft YaHei'}">{{generateStoreLang('noStoreData')}}</span>
+                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{noData}}</span>
                 </div>
             </div>
         </el-table>
@@ -190,7 +190,8 @@ import {generateStoreLang} from '@/api/i18n'
                 isChecked:false,
                 curCitys:'城市',
                 showPopoVer:true,
-                lang: this.$i18n.locale
+                lang: this.$i18n.locale,
+                noData: ''
             }
         },
         watch:{
@@ -219,13 +220,33 @@ import {generateStoreLang} from '@/api/i18n'
             ...mapGetters({accountChanged:'accountChanged'})
         },
         methods:{
+          cellStyle({ row, column, rowIndex, columnIndex}){
+            console.log(row);
+            console.log(columnIndex);
+            let obj = {};
+            if(columnIndex == 0){
+              obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+            }
+            else{
+              obj = {'border-right':'1px solid #e3e9f4'}
+            }
+            return obj;
+          },
             generateStoreLang,
             changePro(val){
                 let self=this;
-                self.getCityByProvince(val);
-                self.curCitys=this.$t('storeView.cityPlaceholder');
-                self.multeCityList.length=0;
-                self.allCityChecked=false;
+                if(val == ''){
+                  self.cityList=[];
+                  self.showCityContent=false;
+                  self.curCitys=this.$t('storeView.cityPlaceholder');
+                  self.multeCityList.length=0;
+                }
+                else{
+                  self.getCityByProvince(val);
+                  self.curCitys=this.$t('storeView.cityPlaceholder');
+                  self.multeCityList.length=0;
+                  self.allCityChecked=false;
+                }
             },
             clearCitys(){
                 let self=this;
@@ -396,6 +417,7 @@ import {generateStoreLang} from '@/api/i18n'
                         }
                     })
                 }
+                temp.length>0 ? temp.unshift({value:'', label:self.$t('storeView.provincePlaceholder'),}) : temp;
                 self.provinceList=temp;
             },
             clearPage(){
@@ -441,7 +463,7 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
                     obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
-                    obj.schedue='---',
+                    obj.schedue='--',
                     obj.device=item.device;
                     temp.push(obj);
                 })
@@ -451,6 +473,9 @@ import {generateStoreLang} from '@/api/i18n'
                 let tempStoreId=temp.map(x=>x.storeId);
                 self.tableData=temp;
                 console.log(self.tableData)
+                if(self.tableData.length == 0){
+                  self.noData = self.$t('storeView.noStoreData')
+                }
                 self.total=self.storeData.totalElements;
                 if(paramsGetBind.storeIds.length!=0){
                     getInspectBindCount(paramsGetBind).then(res=>{
@@ -553,7 +578,9 @@ import {generateStoreLang} from '@/api/i18n'
                 this.tableHeight=770+'px';
                 this.sizeNum=20;
             }
-            await this.isLoginIn();
+            self.getProvinceList();
+            self.getInitData();
+            //await this.isLoginIn();
             // if(!this.timeid){
             //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
             // }
@@ -618,83 +645,75 @@ import {generateStoreLang} from '@/api/i18n'
         margin-right: 10px !important;
     }
     .seacrh-content{
-        @include point(padding-left,30);
-        @include point(height,60);
-        @include point(line-height,60);
+        padding-left: calc(40/1920*100vw);
+        height: 80px;
+        line-height: 80px;
         position: relative;
         text-align: left;
         border-bottom: 0.5px solid #e3e9f4;
+        display: flex;
+        align-items: center;
         .select-title{
             color: #424151;
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
         }
         .el-province{
             width: calc(160/1920*100vw);
-            @include point(margin-right,20);
-            @include point(margin-left,15);
-            position: relative;
-            @include point(bottom,1);
+            margin-right: calc(25/1920*100vw);
+            margin-left: calc(20/1920*100vw);
+            @media screen and (max-width: 1024px){
+              margin-right: 10px;
+              margin-left: 10px;
+            }
         }
         .el-search-btn{
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
             width: calc(130/1920*100vw);
             padding: 0 0;
-            @include point(margin-left,15);
+            margin-left: calc(20/1920*100vw);
             color: #fff;
-            position: relative;
-            @include point(bottom,1);
         }
         .en-el-search-btn{
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
           width: calc(130/1920*100vw);
           padding: 0 0;
           text-align: center;
-          @include point(margin-left,15);
+          margin-left:calc(20/1920*100vw);
           color: #fff;
-          position: relative;
-          @include point(bottom,1);
         }
         .city-input{
-            width: calc(160/1920*100vw);
-            height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
-            background: #F4F5F9 !important;
-            cursor: pointer;
-            display:inline-block;
-            position: relative;
-            border: 1px solid #DCDFE6;
-            box-sizing: border-box;
-            @media screen and (max-width: 1920px){
-              top: 12px;
-            }
-            @media screen and (max-width: 1600px){
-              top: 10px;
-            }
-            @media screen and (max-width: 1280px){
-              top: 8px;
-            }
-            top: 8px;
-            span{
-                display: inline-block;
-                font-size: 12px;
-                color: #C0C4CC;
-                margin-left: 15px;
-                @include point(width,130);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .icon-input{
-                position: absolute;
-                @include point(right,10);
-                top: 6px;
-                font-size: 14px;
-                color: #C0C4CC;
-            }
+          width: calc(160/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          background: #F4F5F9 !important;
+          cursor: pointer;
+          border: 1px solid #E4E7ED;
+          box-sizing: border-box;
+          border-radius: 3px;
+          overflow: hidden;
+          min-height: 28px;
+          min-width: 85px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          span{
+            display: inline-block;
+            font-size: 12px;
+            color: #7d8cad;
+            margin-left: 15px;
+            width: calc(160/1920*100vw - 40px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .icon-input{
+            position: absolute;
+            right: calc(15/1920*100vw);
+            font-size: calc(14/1920*100vw);
+            color: #C0C4CC;
+          }
         }
         .el-search-input{
             @include point(width,180);
@@ -789,7 +808,7 @@ import {generateStoreLang} from '@/api/i18n'
       font-size: calc(14/1920*100vw);
       color: #182752;
     }
-    .el-table .cell{
+    .el-table-content .el-table .cell{
       padding-left: calc(20/1920*100vw);
       padding-right: calc(20/1920*100vw);
     }

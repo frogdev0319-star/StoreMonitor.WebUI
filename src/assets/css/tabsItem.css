@@ -1,6 +1,6 @@
 #en-storetab-content /deep/ .el-tabs__item {
   padding: 0 0;
-  font-size: 14px;
+  font-size: calc(14/1920*100vw);
 }
 #en-storetab-content /deep/ .is-active {
   border-bottom: 4px solid #f31d65;

@@ -1,5 +1,5 @@
 <template>
-    <el-row class="el-addrute" :style="{'min-height':varyWindowHeight-120+'px'}">
+    <el-row class="el-addrute">
         <el-col :span="24" class="el-rute-title">
             <span class="tab-name" v-if="!showEditTab">{{tabNameLang}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></span>
@@ -16,9 +16,14 @@
        <el-col :span="lang=='en'&& varyWindowWidth < 1366? 9: 7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
-                   <span class="level2"><i class="iconfont icon-wenjian icontitle"></i>{{groupTitle}}</span>
+                 <span class="level2"><i class="iconfont icon-wenjian icontitle"></i><span class="level2-name">{{groupTitle}}</span></span>
                    <div class="btn-content">
-                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup" type="primary" class="btn-class"><i class="el-icon-plus"></i><span style='margin-left:5px;'>{{generateInsSettingLang('addCategory')}}</span></el-button>
+                       <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addGroup" type="primary" class="btn-class">
+                         <div class="btn-area">
+                           <i class="el-icon-plus"></i>
+                           <span>{{generateInsSettingLang('addCategory')}}</span>
+                         </div>
+                       </el-button>
                    </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -28,7 +33,7 @@
                    :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
                             <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
-                        <el-input  size="mini" maxlength='10' v-model="item.groupName" class="group-input" v-if="item.isEdit"></el-input>
+                        <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
                         <div v-if="item.showEdit" class="show-edit">
                             <div class="nape-items-handle" v-if="!item.isEdit">
                                 <i class="iconfont icon-bianji"
@@ -48,7 +53,7 @@
                         </div>
                     </div>
                     <div class="group-add" v-if="showAddGroup">
-                        <el-input  size="mini" maxlength="10" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput"></el-input>
+                        <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" @click="confirmAddGroup">
                                     <i class="el-icon-check"></i>
@@ -66,10 +71,22 @@
        <el-col :span="lang=='en'&& varyWindowWidth < 1366? 15: 17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
-                    <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2"><i class="iconfont icon-icon-test icontitle"></i>{{napeTitle}}</span>
+                    <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
+                      <i class="iconfont icon-icon-test icontitle"></i>
+                      <span class="level2-name">{{napeTitle}}</span></span>
                     <div class="btn-content" v-if="groupList.length!=0">
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape" type="primary" class="btn-class"><i class="el-icon-plus"></i><span>{{generateInsSettingLang('addInsItem')}}</span></el-button>
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape" type="primary" class="btn-class"><i class="iconfont icon-shanchu"></i><span>{{generateInsSettingLang('deleteInsItem')}}</span></el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape" type="primary" class="btn-class">
+                          <div class="btn-area">
+                            <i class="el-icon-plus"></i>
+                            <span>{{generateInsSettingLang('addInsItem')}}</span>
+                          </div>
+                        </el-button>
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape" type="primary" class="btn-class">
+                          <div class="btn-area">
+                            <i class="iconfont icon-shanchu"></i>
+                            <span>{{generateInsSettingLang('deleteInsItem')}}</span>
+                          </div>
+                        </el-button>
                     </div>
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
@@ -91,11 +108,11 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input maxlength="25" size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" v-if="item.isClick"></el-input>
+                            <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
-                           <el-input type="textarea" maxlength="70" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick"></el-input>
+                           <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
                             <div class="iconcontent" v-if="item.isClick">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
                                     <i class="el-icon-check"></i>
@@ -118,11 +135,11 @@
                     top="35vh"
                     left="40vh">
                         <div  style="overflow:hidden;">
-                            <hr style="border: 0.5px solid #f31d65;"/>
+                            <hr style="border: 0.5px solid #dfe2e9;;"/>
 
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                <span>{{generateInsSettingLang('confirmCurDel')}}</span>
+                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                                <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('confirmCurDel')}}</span>
                             </p>
                         </div>
                         <div slot="footer" class="dialog-footer">
@@ -139,11 +156,11 @@
                     top="35vh"
                     left="40vh">
                         <div  style="overflow:hidden;">
-                            <hr style="border: 0.5px solid #f31d65;"/>
+                            <hr style="border: 0.5px solid #dfe2e9;"/>
 
                             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803"></i>
-                                <span>{{generateInsSettingLang('deleteGroup')}}</span>
+                                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803; display: inline-block; vertical-align: middle;"></i>
+                                <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('deleteGroup')}}</span>
                             </p>
                         </div>
                         <div slot="footer" class="dialog-footer">
@@ -154,10 +171,10 @@
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <el-input maxlength="25" size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" ></el-input>
+                            <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" @input="(val)=>napeNameChange(val, {})"></el-input>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input maxlength="70" type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')"></el-input>
+                           <el-input type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})"></el-input>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -182,6 +199,7 @@ import {validateInput} from '@/common/validate'
 import {inpectRESTful} from '@/api/index'
 import PubSub from 'pubsub-js'
 import {generateInsSettingLang} from '@/api/i18n'
+import filterString from '@/common/filterString'
 
 export default {
     name:'AddRuteInspect',
@@ -288,11 +306,11 @@ export default {
                 console.log(res);
                 let codeMsg=res.errMsg;
                 if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify(self.$t('insSettingView.editSuss'),'success',3000);
+                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
                     item.isEdit=false;
                 }
                 else{
-                    self.notify(self.$t('insSettingView.editFail'),'warning',3000);
+                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
                     return false;
                 }
             })
@@ -753,6 +771,39 @@ export default {
                 duration:time
             });
         },
+        groupNameChange(val, item){
+          let self = this;
+          let comment = filterString.all(val,30);
+          console.log(comment);
+          if(0 == Object.keys(item).length){
+            self.groupNameInput = comment;
+          }
+          else{
+            item.groupName = comment;
+          }
+        },
+        napeNameChange(val, item){
+          let self = this;
+          let comment = filterString.all(val,100);
+          console.log(comment);
+          if(0 == Object.keys(item).length){
+            self.newNapeName = comment;
+          }
+          else{
+            item.napeName = comment;
+          }
+        },
+        napeDepChange(val, item){
+          let self = this;
+          let comment = filterString.all(val,300);
+          console.log(comment);
+          if(0 == Object.keys(item).length){
+            self.newNapeDep = comment;
+          }
+          else{
+            item.napeDep = comment;
+          }
+        }
     },
     mounted(){
         let self=this;
@@ -796,9 +847,11 @@ export default {
     .el-addrute{
         width: 100%;
         height: 100%;
+        min-height: calc(100vh - 125px - 60/1920*100vw);
         color: $black;
         border: 1px solid $border;
         background-color: #fff;
+        font-size: calc(18/1920*100vw);
         @media screen and (min-width:1366px){
             .tab-name{
                 font-size: 18px;
@@ -817,10 +870,10 @@ export default {
         }
         @media screen and (max-width:1366px){
             .tab-name{
-                @include point(font-size,18);
+              font-size: calc(18/1920*100vw);
             }
             .icon-tabname{
-                @include point(font-size,18);
+              font-size: calc(18/1920*100vw);
             }
             .iconlised{
                 height: 20px;
@@ -843,16 +896,18 @@ export default {
             width: 100%;
             @include point(height,60);
             @include point(line-height,60);
-            @include point(padding-left,15);
+            height: 80px;
+            line-height: 80px;
+            padding-left: calc(20/1920*100vw);
             border-bottom: 1px solid $border;
             text-align: left;
             .tab-name{
                 text-align: left ;
-                @include point(margin-left,10);
+                margin-left:calc(15/1920*100vw);
                 font-weight: bold;
             }
             .icon-tabname{
-                @include point(margin-left,20);
+                margin-left:calc(25/1920*100vw);
                 color: #ddd;
                 cursor: pointer;
             }
@@ -879,10 +934,8 @@ export default {
           width: calc(130/1920*100vw);
           .el-icon-plus{
             font-size:calc(24/1920*100vw);
-            padding: calc(5/1920*100vw) 0;
           }
           .icon-shanchu{
-            padding: calc(5/1920*100vw) 0;
             font-size:calc(24/1920*100vw);
           }
         }
@@ -902,14 +955,24 @@ export default {
             }
         }
         .title-content{
-            @include point(height,52);
-            @include point(line-height,52);
+            height: 60px;
+            line-height: 60px;
             text-align: left;
             position: relative;
             overflow: hidden;
             border-bottom: 1px solid $border;
-            span{
-                @include point(margin-left,10);
+            .level2{
+              margin-left: calc(15/1920*100vw);
+              .iconfont{
+                font-size: 16px;
+              }
+              .level2-name{
+                font-size: 16px;
+                margin-left: 0;
+                @media screen and (max-width:1440px){
+                    font-size: calc(16/1920*100vw);
+                }
+              }
             }
             .item-title{
                 text-overflow: ellipsis;
@@ -935,29 +998,29 @@ export default {
               }
             }
             .icontitle{
-                @include point(margin-right,10);
+                margin-right: calc(15/1920*100vw);
                 font-weight: normal;
-                font-size: 20px;
-                @include point(margin-left,15);
+                font-size: calc(20/1920*100vw);
+                margin-left: calc(20/1920*100vw);
             }
             .btn-content{
                 width: auto;
                 height: auto;
                 float: right;
-                @include point(margin-right,15);
+                margin-right: calc(20/1920*100vw);
             }
         }
         .el-rute-group{
             height: auto;
-            min-height:calc(100%-60px);
-            min-height: -webkit-calc(100%-60px);
-            min-height: -moz-calc(100%-60px);
+            min-height:calc(100% - 60px);
+            min-height: -webkit-calc(100% - 60px);
+            min-height: -moz-calc(100% - 60px);
             background-color: #FAFAFA;
             .group-items{
                 font-size: 14px;
                 .groupItem{
-                    @include point(height,50);
-                    @include point(line-height,50);
+                    height: 60px;
+                    line-height: 60px;
                     position: relative;
                     overflow: hidden;
                     border-bottom: 1px solid $border;
@@ -971,23 +1034,22 @@ export default {
                         background-color: $red;
                     }
                     .group-input{
-                        max-width: 60%;
+                        max-width: 64%;
                         float: left;
-                        @include point(margin-left,20);
-
+                        margin-left: calc(25/1920*100vw);
                     }
                     span{
                         float: left;
-                        @include point(margin-left,25);
+                        margin-left: calc(30/1920*100vw);
                         width: 70%;
                         text-overflow: ellipsis;
                         overflow: hidden;
                         white-space: nowrap;
                     }
                     .iconcontent{
-                        @include point(margin-left,25);
+                        margin-left: calc(30/1920*100vw);
                         display: inline-block;
-                        @include point(margin-top,15);
+                        margin-top: 15px;
                         .iconlised{
                             @include iconContent;
                             background-color: $red;
@@ -1016,20 +1078,22 @@ export default {
                 }
             }
             .group-add{
-                @include point(margin-top,5);
+                margin-top: 5px;
                 position: relative;
                 overflow: hidden;
-                @include point(height,50);
-                @include point(line-height,50);
-                @include point(margin-bottom,20);
+                height: 60px;
+                line-height: 60px;
+                margin-bottom: 25px;
                 .groupName-input{
-                    max-width: 60%;
+                    max-width: 64%;
                     float: left;
-                    @include point(margin-left,20);
+                    margin-left: calc(25/1920*100vw);
                 }
                 .iconcontent{
-                    @include point(margin-left,20);
+                    margin-left:calc(30/1920*100vw);
                     display: inline-block;
+                    float: left;
+                    margin-top: 15px;
                     .iconlised{
                         @include iconContent;
                         background-color: $red;
@@ -1066,6 +1130,9 @@ export default {
                     position: relative;
                     left: 10%;
                 }
+              @media screen and (max-width: 1280px){
+                  width: 49%;
+              }
             }
             .nape-handle-title{
                 width: 10%;
@@ -1084,8 +1151,8 @@ export default {
                 }
             }
             .nape-items-title{
-                @include point(height,50);
-                @include point(line-height,50);
+                height: 60px;
+                line-height: 60px;
                 text-align: left;
                 font-size: 14px;
                 color: $tab;
@@ -1100,7 +1167,8 @@ export default {
                 font-size: 14px;
                 color: #424151;
                 height:auto;
-                @include point(min-height,50);
+                //@include point(min-height,50);
+                min-height: 60px;
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
@@ -1191,18 +1259,16 @@ export default {
         font-size: calc(14/1920*100vw);
         width: calc(130/1920*100vw);
         .el-icon-plus, .icon-shanchu{
-          padding: calc(5/1920*100vw) 0;
-          font-size: calc(24/1920*100vw);
-        }
-        span{
-          position: relative;
-          bottom: calc(4/1920*100vw);
-          @media screen and (max-width: 1280px) {
-            bottom: calc(3/1920*100vw);
-          };
+          font-size: calc(16/1920*100vw);
+          margin-right: calc(8/1920*100vw);
         }
         @media screen and (max-width: 1440px) {
-          width: 125px;
+          width: 100px;
+        }
+        .btn-area{
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       }
     }
@@ -1216,6 +1282,6 @@ export default {
   overflow-x: hidden;
 }
 .nape-input .el-textarea__inner{
-    font-family: 'Microsoft YaHei';
+    font-family: Roboto, Arial, 'Microsoft YaHei';
 }
 </style>

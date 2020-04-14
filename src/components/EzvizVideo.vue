@@ -1,6 +1,6 @@
 <template>
   <div >
-    <div class="errorVideo-model" v-if="showError">
+    <div class="errorVideo-model" v-if="showError" :class="isEvent? 'event-error': ''">
       <span>{{errorMsg}}</span>
     </div>
     <div v-else>
@@ -18,8 +18,8 @@
         <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
         <div class="icon-footer" v-if="showInfoContent|| playBackState">
           <div class="iconlside">
-            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-if="playState"></i>
+            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-else></i>
           </div>
           <div class="iconlside">
             <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
@@ -138,7 +138,7 @@
           </transition>
         </div>
         <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
-                @mousemove="mouseMoveAction($event)"></canvas>
+                @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)"></canvas>
         <img :src="imgSrc" id="imgTest" style="display: none"/>
         <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
                     'margin-left':47*percentHeight+'px'}">
@@ -174,7 +174,7 @@
             </transition>
           </div>
           <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)" @mouseup="mouseUpHandler"
-                  @mousemove="mouseMoveAction($event)"></canvas>
+                  @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)"></canvas>
           <img :src="imgSrc" id="imgTest" style="display: none"/>
           <div class="cancel-content" v-if="showCancelContent" :style="{'width':520*percentHeight+'px',
                         'margin-left':47*percentHeight+'px'}">
@@ -189,11 +189,12 @@
           </div>
         </div>
         <div class="event-content">
-          <span class="event-title">{{generatePatrolLang('name')}}</span>
-          <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+          <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
+          <el-input size="mini" class="name-input" v-model="eventName" @input="eventNameChanged"></el-input>
+          <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
           <span class="event-title">{{generatePatrolLang('description')}}</span>
-          <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                    maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+          <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
+                    @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
         </div>
       </div>
       <div slot="footer">
@@ -210,7 +211,7 @@
                 top="35vh"
                 left="40vh">
       <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #FB4C5D;"/>
+        <hr style="border: 0.5px solid #dfe2e9;"/>
         <div style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
           <p>{{$t("storeMonitor.contactInfo") }}</p>
           <el-input :placeholder="$t('storeMonitor.enterPassword')" v-model="videoPassword" show-password size="mini"></el-input>
@@ -247,12 +248,13 @@
 
 <script>
   import  EZUIKit from '../../static/ezuikit/ezuikit.js'
-  import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword} from '@/api/ezviz'
+  import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword,getDeviceCapacity} from '@/api/ezviz'
   import {generatePatrolLang} from '@/api/i18n'
   import {mapGetters} from 'vuex'
   import qs from 'qs'
   import {getCookie} from "../common/auth";
   import RecordRTC from '../../static/RecordRTC.js'
+  import filterString from "../common/filterString";
 
   export default {
     name: "EzvizVideo",
@@ -385,7 +387,11 @@
         isStoppedRecording: true,
         blob: null,
         ezvizExpireTime: 0,
-        currentStoreId: null
+        currentStoreId: null,
+        isLoaded: false,
+        editCount: 0,
+        showEventNameInfo: false,
+        changeId: false
       }
     },
     async mounted(){
@@ -418,6 +424,8 @@
       // 清除增加屏幕大小变化时的监听器
       window.removeEventListener('resize', self.resizeFun);
       window.removeEventListener("visibilitychange",self.visibleChange)
+      self.resizeFun = null;
+      self.visibleChange = null;
     },
     watch: {
       accountChanged(val,oldVal){
@@ -477,35 +485,36 @@
           self.playBackState = false;
         }
       },
-      curTime(newValue, oldValue){
-        console.log("curTime")
-        let self = this;
-        if(!self.id || !self.ivsId){
-          self.showError = true;
-          self.errorMsg = self.$t('storeMonitor.lackParams')
-          return;
-        }
-        self.showError = false;
-        self.times = 0;
-        console.log('new:', newValue);
-        console.log(self.curTime)
-        self.startTs = newValue;
-        if(self.playState){
-          self.decoder.stop();
-          self.playState = false
-        }
-        self.$nextTick(()=> {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer)
-          self.initVideo();
-        })
-      },
-      storeId(newValue, oldValue){
+      // curTime(newValue, oldValue){
+      //   console.log("curTime")
+      //   let self = this;
+      //   if(!self.id || !self.ivsId){
+      //     self.showError = true;
+      //     self.errorMsg = self.$t('storeMonitor.lackParams')
+      //     return;
+      //   }
+      //   self.showError = false;
+      //   self.times = 0;
+      //   console.log('new:', newValue);
+      //   console.log(self.curTime)
+      //   self.startTs = newValue;
+      //   if(self.playState){
+      //     self.decoder.stop();
+      //     self.playState = false
+      //   }
+      //   self.$nextTick(()=> {
+      //     self.decoder = null;
+      //     console.log(self.$refs.myPlayer)
+      //     //self.initVideo();
+      //     self.checkIfEncry();
+      //   })
+      // },
+      async storeId(newValue, oldValue){
         console.log(newValue);
         console.log(oldValue);
         let self = this;
         if(newValue.length > 0){
-          self.getEzvizAccessToken(newValue)
+          await self.getEzvizAccessToken(newValue)
         }
       },
       async id(newValue, old) {
@@ -520,7 +529,9 @@
         //stop video
         self.stopRealTime();
         //首先查看视频是否加密
-        if(self.accessToken.length > 0){
+        await self.getEzvizAccessToken(self.storeId);
+        if(newValue!== null && old != undefined ){
+          self.changeId = true;
           await self.checkIfEncry();
         }
       },
@@ -579,6 +590,35 @@
     },
     methods: {
       generatePatrolLang,
+      changeHistoryTime(newValue,flag){
+        console.log("curTime")
+        let self = this;
+        if(!self.id || !self.ivsId){
+          self.showError = true;
+          self.errorMsg = self.$t('storeMonitor.lackParams')
+          return;
+        }
+        self.showError = false;
+        self.times = 0;
+        console.log('new:', newValue);
+        console.log(self.curTime)
+        self.startTs = newValue;
+        if(newValue == 0){
+          self.playBack =  false;
+        }
+        if(self.playState){
+          self.decoder.stop();
+          self.playState = false
+        }
+        if(flag == false){
+          self.$nextTick(()=> {
+            self.decoder = null;
+            console.log(self.$refs.myPlayer)
+            //self.initVideo();
+            self.checkIfEncry();
+          })
+        }
+      },
       visibleChange(){
         console.log('子组件退出')
         let self = this;
@@ -617,11 +657,11 @@
           }else{
             getEzvizAccessToken(params)
               .then(result => {
-                resolve(result.data.accessToken);
-
                 self.currentStoreId = storeId;
                 self.accessToken = result.data.accessToken;
+                //self.accessToken = 'at.1zxfxzy03nm6ld1t1s5s3es203455czn-45ft0jzwlk-06lc2eq-7rzulbgak';
                 self.ezvizExpireTime = result.data.expireTime;
+                resolve(result.data.accessToken);
               })
               .catch(error => {
                 reject();
@@ -634,33 +674,50 @@
         let obj={};
         console.log(self.accessToken)
         obj.accessToken= self.accessToken;// token
-        obj.deviceSerial= self.ivsId; //设备序列号
+        if(self.ivsId == 0){
+          return;
+        }
+        obj.deviceSerial = self.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
         console.log(result);
+        let suportUpdatePass = false;
         if(result == 1){
-          //已加密设备先从缓存中查看是否已经有验证码，有验证码直接取出，没有验证码要弹出对话框
-          let deviceObj = {};
-          deviceObj.deviceSerial = self.ivsId;
-          deviceObj.channelId = self.channelId;
-          let result = self.getDeviceValidateCode(deviceObj);
-          console.log('从缓存中取得的验证码' + result)
-          if(result.length > 0){
-            self.videoPassword = result;
-            self.verifyEnterPassword(); //验证密码是否正确
+          suportUpdatePass = await getDeviceCapacity(qs.stringify(obj));
+        }
+        console.log(suportUpdatePass)
+        if(result == 1){
+          if( suportUpdatePass ){
+            //已加密设备先从缓存中查看是否已经有验证码，有验证码直接取出，没有验证码要弹出对话框
+            let deviceObj = {};
+            deviceObj.deviceSerial = self.ivsId;
+            deviceObj.channelId = self.channelId;
+            let result = self.getDeviceValidateCode(deviceObj);
+            console.log('从缓存中取得的验证码' + result)
+            if(result.length > 0){
+              self.videoPassword = result;
+              self.verifyEnterPassword(); //验证密码是否正确
+            }
+            else{
+              //不存在密码
+              self.isLoading = false;
+              self.showError = true;
+              self.errorMsg = self.$t('storeMonitor.videoEncrypted');
+              self.showInputPassword = true;
+            }
           }
           else{
-            //不存在密码
+            //不支持修改密码
             self.isLoading = false;
             self.showError = true;
-            self.errorMsg = self.$t('storeMonitor.videoEncrypted');
-            self.showInputPassword = true;
+            self.errorMsg = self.$t('storeMonitor.videoCannotPlay');
           }
         }
         else{
           self.showError = false;
           self.videoPassword = '';
           self.times = 0;
-          self.startTs = self.curTime; //切换通道，仍然从最初的时间播放视频
+          self.ifIsEncrypt = false
+          self.changeId && (self.startTs = self.curTime); //切换通道，仍然从最初的时间播放视频
           if(self.playState) {
             self.decoder.stop();
             self.playState = false
@@ -731,6 +788,7 @@
               self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
             }
           }
+          console.log(self.videoUrl);
           if(self.accessToken == ''){
             self.notify(self.$t('storeMonitor.getAccessTokenError'), 'warning',3000)
             return;
@@ -838,6 +896,7 @@
       handleSuccess(){
         console.log("播放成功回调函数，此处可执行播放成功后续动作");
         let self = this;
+        self.editCount ++;
         self.showError = false;
         self.errorMsg = '';
         self.realTimeSpeed=0;
@@ -854,7 +913,7 @@
           self.playState = true;
           self.isLoading = false;
           self.showModelContent=true;
-          self.showInfoContent=false;
+          //self.showInfoContent=false;
           // self.ifOpenSound = false;
           if(self.fullWindow){
             if(self.ifOpenSound){
@@ -879,6 +938,7 @@
       handleFullWindowSuccess(){
         console.log("全屏播放成功回调函数，此处可执行播放成功后续动作");
         let self = this;
+        self.editCount ++;
         // self.playState = true;
         self.showError = false;
         self.errorMsg = '';
@@ -893,7 +953,7 @@
 
         setTimeout(() => {
           self.showModelContent=true;
-          self.showInfoContent=false;
+          //self.showInfoContent=false;
           self.isLoading = false;
           if(self.ifOpenSound){
             self.fullDecoder.openSound()
@@ -908,7 +968,7 @@
         self.showError = false;
         self.errorMsg = '';
         if(self.clickSnapshot){
-          self.stopRealTime()
+          //self.stopRealTime()
           self.isLoading = false;
           self.showModelContent=false;
         }
@@ -924,7 +984,7 @@
         setTimeout(() => {
           self.isLoading = false;
           self.showModelContent=true;
-          self.showInfoContent=false;
+          //self.showInfoContent=false;
           if(self.ifOpenSound){
             self.decoder.openSound()
           }
@@ -936,7 +996,7 @@
           self.fullWindowScreen();
           setTimeout(() => {
             self.showModelContent=false;
-            self.showInfoContent=false;
+            //self.showInfoContent=false;
           }, 3000);
         }
         else{
@@ -1013,11 +1073,24 @@
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
             console.log('历史视频')
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('加入验证码历史视频' + self.videoUrl)
+            }
+            else {
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('历史视频' + self.videoUrl)
+            }
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+              console.log('加入验证码实时视频' + self.videoUrl)
+            }
+            else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            }
+            //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
           }
           // 初始化视频方法
           self.decoder = new EZUIKit.EZUIPlayer({
@@ -1054,16 +1127,29 @@
           playerEle.style.height = screen.height + 'px';
           console.log(width);
           console.log(height)
+          console.log(playerEle);
           console.log(self.playState)
           if(self.playBack){
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
             console.log('历史视频')
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('加入验证码历史视频' + self.videoUrl)
+            }
+            else {
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('历史视频' + self.videoUrl)
+            }
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+              console.log('加入验证码实时视频' + self.videoUrl)
+            }
+            else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            }
           }
           // 初始化视频方法
           self.fullDecoder = new EZUIKit.EZUIPlayer({
@@ -1093,7 +1179,7 @@
       },
       showModel(){
         let self=this;
-        self.showInfoContent=true;
+        //self.showInfoContent=true;
         if(self.playState){
           self.showModelContent=true;
         }
@@ -1101,14 +1187,15 @@
       hiddenModel(){
         let self=this;
         self.showModelContent=false;
-        self.showInfoContent=false;
+        //self.showInfoContent=false;
       },
       //关闭实时视频
       async realTime(){
         let self = this;
         self.times = 0;
-        if(self.isStoreMonitor){
+        if(self.isStoreMonitor && !self.isLoaded){
           self.checkIfEncry();
+          self.isLoaded = true;
         }
         else{
           if(self.fullWindow){
@@ -1140,11 +1227,24 @@
             self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
             self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
             console.log('历史视频')
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('加入验证码历史视频' + self.videoUrl)
+            }
+            else {
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+              console.log('历史视频' + self.videoUrl)
+            }
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            if(self.videoPassword.length > 0){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+              console.log('加入验证码实时视频' + self.videoUrl)
+            }
+            else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+            }
+            //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
           }
           // 初始化视频方法
           self.fullDecoder = new EZUIKit.EZUIPlayer({
@@ -1183,7 +1283,7 @@
         }
         self.ifOpenSound = false;
         self.showModelContent=false;
-        self.showInfoContent=false;
+        //self.showInfoContent=false;
         self.playState = false;
         self.curBack = '';
         self.currentTimeValue = 0;
@@ -1241,6 +1341,7 @@
           self.showFeedDialog2=true;
           self.eventName='';
           self.eventDes='';
+          self.showEventNameInfo = false;
           this.$nextTick(()=>{
             self.canvasEl = document.getElementById('icanvas');
             var ctx = self.canvasEl.getContext('2d');
@@ -1248,7 +1349,7 @@
             setTimeout(() => {
               self.imgSrc = sessionStorage.getItem('fileUrl');
               let img = document.getElementById('imgTest');
-              self.stopRealTime();
+              //self.stopRealTime();
               if(self.fullWindow){
                 self.exitFullscreen();
                 self.fullWindow=false;
@@ -1278,7 +1379,7 @@
             let img = new Image();
             setTimeout(() => {
               self.imgSrc = sessionStorage.getItem('fileUrl');
-              self.stopRealTime();
+              //self.stopRealTime();
               let img = document.getElementById('imgTest');
               if(self.fullWindow){
                 self.exitFullscreen();
@@ -1623,6 +1724,11 @@
         }
         self.flag=0;
       },
+      mouseLeaveAction(e){
+        console.log(e)
+        let self=this;
+        self.isMouseDown=false;
+      },
       drawLine(x,y,x1,y1){
         let self=this;
         var ctx=self.canvasEl.getContext('2d');
@@ -1660,7 +1766,8 @@
           src: src
         }
         if(self.eventName.trim().length==0){
-          self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+          //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+          self.showEventNameInfo = true;
           return false;
         }
         self.$emit('ezvizCutPictureFeedback', obj);
@@ -1779,6 +1886,7 @@
         let self = this;
         let obj = {};
         obj.accessToken = self.accessToken;
+        //obj.accessToken = 'at.1zxfxzy03nm6ld1t1s5s3es203455czn-45ft0jzwlk-06lc2eq-7rzulbgak';
         obj.deviceSerial = self.ivsId;
         obj.oldPassword = self.videoPassword;
         obj.newPassword = self.videoPassword;
@@ -1869,7 +1977,19 @@
         console.log(validateCode)
         return validateCode;
       },
-
+      eventNameChanged(val){
+        let self = this;
+        let content = filterString.standard(val,50);
+        console.log(content);
+        self.eventName = content;
+        self.showEventNameInfo = false;
+      },
+      eventDesChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.eventDes = content;
+      }
     }
   }
 </script>
@@ -1900,13 +2020,13 @@
   }
   .errorVideo-model{
     @include point(margin,20);
-    /*margin-bottom: 0;*/
+    margin-bottom: 0;
     height: auto;
     position: relative;
-    @include point(min-width,500);
-    @include point(min-height,414);
+    min-height: 420px;
     background-color: #232730;
     color: $red;
+    z-index: 100;
     span{
       position: absolute;
       top: 50%;
@@ -1914,6 +2034,9 @@
       font-size: 12px;
       transform: translate(-50%, -50%);
     }
+  }
+  .event-error{
+    @include point(margin-bottom,20);
   }
   #cancelBtn{
     @include point(width,76);
@@ -1941,10 +2064,10 @@
   .video-content{
     height: auto;
     position: relative;
-    @include point(margin,20);
-    @include point(min-width,500);
-    @include point(min-height,408);
+    margin:calc(25/1920*100vw);
+    min-height: 420px;
     background-color: #000;
+    z-index: 100;
     .getvideo-content{
       position: absolute;
       z-index: 930;
@@ -2017,8 +2140,7 @@
       }
     }
     #myPlayer{
-      @include point(min-width,500);
-      @include point(min-height,405);
+      min-height: 420px;
     }
     #channelName{
       position: absolute;
@@ -2117,7 +2239,8 @@
       margin-bottom: 40px;
       border-radius: 4px;
       background-color: rgba($color: #24293d, $alpha: 0.6);
-      top: 40%;
+      //top: 40%;
+      top: 45%;
       text-align: center;
       span{
         // font-size: 12px;
@@ -2144,7 +2267,8 @@
       margin-bottom: 40px;
       border-radius: 4px;
       background-color: rgba($color: #24293d, $alpha: 0.6);
-      top: 40%;
+      //top: 40%;
+      top: 45%;
       text-align: center;
       span{
         // font-size: 12px;
@@ -2245,7 +2369,7 @@
 
     .dialog-hr{
       border: 0.5px solid ;
-      border-color: rgba(251,76,93,0.3);
+      border-color: #dfe2e9;
       margin-bottom:0px;
       position: relative;
       bottom: 5px;
@@ -2302,9 +2426,19 @@
         margin-left: 0;
         font-size: 14px;
       }
+      .is-required{
+        color: $red;
+      }
+      .error-class{
+        font-size: 10px;
+        margin-top: 5px;
+        color: #ff2400;
+        display: block;
+      }
       .name-input{
-        @include point(width,150);
-        @include point(margin-bottom,15);
+        width: 80%;
+        //@include point(width,150);
+        //@include point(margin-bottom,15);
       }
       .des-input{
         width: 80%;
