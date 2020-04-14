@@ -294,8 +294,8 @@ export default {
                     docEl.style.fontSize = (docEl.clientWidth/90)+'px';
                 };
             //绑定浏览器缩放与加载时间
-            window.addEventListener(resizeEvt, recalc, false);
-            document.addEventListener('DOMContentLoaded', recalc, false);
+            //window.addEventListener(resizeEvt, recalc, false);
+            //document.addEventListener('DOMContentLoaded', recalc, false);
         },
         hrefToWebiste(){
 
@@ -411,7 +411,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 *{
-    font-family:Arial, 'Microsoft YaHei';
+    font-family: Roboto,Arial, 'Microsoft YaHei';
 }
 $dark_gray:#889aa4;
 $light_gray:#eee;
