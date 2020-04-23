@@ -680,9 +680,9 @@
               item.tempUrl = item.pictureUrl;
             }
           })
-          if(self.showAddChannelDialog){
-            self.addChannelData.pictureUrl = '';
-            self.addChannelData.file = '';
+          if(this.showAddChannelDialog){
+            this.addChannelData.pictureUrl = '';
+            this.addChannelData.file = '';
           }
           return (isJPEG || isJPG || isPNG)
         }

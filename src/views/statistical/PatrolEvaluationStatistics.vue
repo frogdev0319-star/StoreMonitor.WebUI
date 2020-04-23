@@ -5,12 +5,6 @@
           <span>{{generateReportLang('selectStores')}}</span>
           <el-select v-model="curCountry"  :placeholder="generateReportLang('country')" size="mini"
                      class="el-province" @change="changeCountry" @clear="clearCountry">
-            <!--<el-option-->
-              <!--v-for="item in countryList"-->
-              <!--:key="item.value"-->
-              <!--:label="item.label"-->
-              <!--:value="item.value">-->
-            <!--</el-option>-->
             <el-option-group
               v-for="group in countryList"
               :key="group.label"
@@ -29,7 +23,7 @@
                                style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                        style="display: inline" ref="multiSelect"></multi-select>
+                        style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
 
         </el-col>
         <el-col :span="24" class="header-details">
@@ -105,7 +99,8 @@
           </el-col>
           <el-col :span="15" class="charts-content">
             <div class="title">
-              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect" :limit="2" :inputSize="'mini'"></limit-select>
+              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect"
+                            :limit="2" :inputSize="'mini'"></limit-select>
             </div>
             <div class="region-result">
               <div class="region-content">
@@ -665,7 +660,7 @@
         self.countryList[0] = {}
         self.countryList[0].label= self.$t('reportView.country');
         self.countryList[0].countryList = countryList
-        self.curCountry = '中国';
+        self.curCountry = countryList[0].label;
         self.selectAllProAndCity(self.curCountry);
       },
       selectAllProAndCity(val){
@@ -1035,6 +1030,8 @@
           self.storeDataList.forEach(item=>{
             storeIds.push(item.storeId)
           })
+          self.curStore = storeIds.concat()
+          self.changeStore(storeIds)
         }
         else if(self.curStore.includes("-1")){
           self.storeDataList.forEach(item=>{

@@ -29,7 +29,7 @@
                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
 
         <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                      style="display: inline" ref="multiSelect"></multi-select>
+                      :disabled="curProvince.length==0 " style="display: inline" ref="multiSelect"></multi-select>
       </el-col>
 
       <el-col :span="24" class="header-details">
@@ -58,7 +58,8 @@
           <div slot="content">{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
-        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{$t('reportView.search')}}</el-button>
+        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
+                   type="primary" :disabled="curProvince.length == 0 ">{{$t('reportView.search')}}</el-button>
       </el-col>
       <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -712,7 +713,7 @@
         self.countryList[0] = {}
         self.countryList[0].label= self.$t('reportView.country');
         self.countryList[0].countryList = countryList
-        self.curCountry = '中国';
+        self.curCountry = countryList[0].label;
         self.selectAllProAndCity(self.curCountry);
       },
       getStoreData(params){
@@ -1015,6 +1016,8 @@
           self.storeDataList.forEach(item=>{
             storeIds.push(item.storeId)
           })
+          self.curStore = storeIds.concat();
+          self.changeStore(storeIds)
         }
         else if(self.curStore.includes("-1")){
           storeIds = self.curStore.filter(item=> item!= -1)

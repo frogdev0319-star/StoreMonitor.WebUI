@@ -29,7 +29,7 @@
                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 ":all="$t('overview.allZoneII')"></region-multi-select>
 
         <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                      style="display: inline" ref="multiSelect"></multi-select>
+                      style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
         <span>{{$t('overview.patrolType')}}</span>
         <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini"
                    class="el-province" @change="changeType">
@@ -473,7 +473,7 @@
           self.countryList[0] = {}
           self.countryList[0].label= self.$t('reportView.country');
           self.countryList[0].countryList = countryList
-          self.curCountry = '中国';
+          self.curCountry = countryList[0].label;
           self.selectAllProAndCity(self.curCountry);
         },
         getStoreData(params){
@@ -752,6 +752,8 @@
             self.storeDataList.forEach(item=>{
               storeIds.push(item.storeId)
             })
+            self.curStore = storeIds.concat()
+            self.changeStore(storeIds)
           }
           else if(self.curStore.includes("-1")){
             storeIds = self.curStore.filter(item=> item!= -1)
@@ -888,6 +890,54 @@
           params.storeIds = self.params.storeIds;
           params.mode = self.params.mode;
           console.log(self.total)
+          self.itemsOptions = {
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)',
+              textStyle: {
+                align: 'left'
+              },
+              backgroundColor: self.echartBackground,
+            },
+            textStyle:{
+              fontFamily: self.fontFamily
+            },
+            series: [
+              {
+                name: self.$t('overview.itemsAssessment'),
+                type: 'pie',
+                radius: ['70%', '85%'],
+                center: ['50%', '50%'],
+                hoverOffset: 5,
+                label: {
+                  normal: {
+                    show: false,
+                    position: 'center'
+                  },
+                },
+                labelLine: {
+                  normal: {
+                    show: false
+                  }
+                },
+                data: [],
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  },
+                  normal: {
+                    color: function (params) {
+                      //自定义颜色
+                      var colorList = ['#57e78f', '#72a1f3', '#ffd035', '#cad1db'];
+                      return colorList[params.dataIndex]
+                    }
+                  }
+                }
+              }
+            ]
+          }
           if(self.total > 0){
             self.hasNoData = false;
             params.filter = {
@@ -936,55 +986,7 @@
               jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
               jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
               jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
-              self.itemsOptions = {
-                tooltip: {
-                  trigger: 'item',
-                  formatter: '{a} <br/>{b} : {c} ({d}%)',
-                  textStyle: {
-                    align: 'left'
-                  },
-                  backgroundColor: self.echartBackground,
-                },
-                textStyle:{
-                  fontFamily: self.fontFamily
-                },
-                series: [
-                  {
-                    name: self.$t('overview.itemsAssessment'),
-                    type: 'pie',
-                    radius: ['70%', '85%'],
-                    center: ['50%', '50%'],
-                    hoverOffset: 5,
-                    label: {
-                      normal: {
-                        show: false,
-                        position: 'center'
-                      },
-                    },
-                    labelLine: {
-                      normal: {
-                        show: false
-                      }
-                    },
-                    data: seriesData,
-                    itemStyle: {
-                      emphasis: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                      },
-                      normal: {
-                        color: function (params) {
-                          //自定义颜色
-                          var colorList = ['#57e78f', '#72a1f3', '#ffd035', '#cad1db'];
-                          return colorList[params.dataIndex]
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-
+              self.itemsOptions.series[0].data = seriesData;
             }
             console.log(inspectItems);
 
@@ -993,7 +995,12 @@
             self.getCatergyRadar(resultData.content);
           }
           else{
-            self.itemsPerArray = self.itemsLegend;
+            let jsonArray = self.itemsLegend;
+            jsonArray[0].percent = 0;
+            jsonArray[1].percent = 0;
+            jsonArray[2].percent = 0;
+            jsonArray[3].percent = 0;
+            self.itemsPerArray = jsonArray;
             self.hasNoData = true;
           }
 

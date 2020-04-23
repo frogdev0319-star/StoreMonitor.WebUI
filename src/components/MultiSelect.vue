@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler"
-               :placeholder="$t('reportView.stores')" class="el-province">
+               :placeholder="$t('reportView.stores')" class="el-province" :disabled="disabled">
       <el-option :label="$t('overview.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.storeId' :disabled="item.disabled"></el-option>
     </el-select>
@@ -21,6 +21,10 @@
           },
           selected: {
             type: Array
+          },
+          disabled: {
+            type: Boolean,
+            default: false
           }
         },
         data () {

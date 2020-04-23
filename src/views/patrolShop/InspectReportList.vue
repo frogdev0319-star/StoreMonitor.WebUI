@@ -45,8 +45,9 @@
                                      style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
                 <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
                                      style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
-                <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleStoreChange" style="display: inline" ref="multiSelect">
-
+                <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleStoreChange" style="display: inline" ref="multiSelect"
+                          :disabled="curProvince.length==0"
+                >
                 </multi-select>
               <!--<el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"-->
                 <!--class="el-province select-store" @change="changeStore" @clear="clearStore">-->
@@ -111,7 +112,8 @@
                     <span>{{generateReportLang('keywords')}}</span>
                     <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
                 </div>
-                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
+                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary"
+                           :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
             </el-col>
             <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -498,7 +500,7 @@ export default {
             self.countryList[0].label= self.$t('reportView.country');
             self.countryList[0].countryList = countryList
             console.log(self.countryList);
-            self.curCountry = '中国';
+            self.curCountry = countryList[0].label;
             self.selectAllProAndCity(self.curCountry);
         },
         handleStoreChange (arr) {
@@ -840,6 +842,8 @@ export default {
             }
             else{
               clause.storeId=self.storeDataList.map(x=>x.storeId);
+              self.curStore = (clause.storeId).concat();
+              self.changeStore(clause.storeId)
             }
             console.log(self.curReportType);
             if(self.curReportType!== null && self.curReportType!== -1){
