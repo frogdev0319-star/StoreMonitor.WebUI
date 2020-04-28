@@ -1,6 +1,6 @@
 <template>
   <div >
-    <div class="errorVideo-model" v-if="showError" :class="isEvent? 'event-error': ''">
+    <div class="errorVideo-model" v-if="showError" :class="isEvent? 'event-error': ''" ref="errorModel">
       <span>{{errorMsg}}</span>
     </div>
     <div v-else>
@@ -15,7 +15,7 @@
           <canvas id="vcanvas"  :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'"></canvas>
           <img :src="imgSrc" id="imgTest" :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'" style="display: none"/>
         </div>
-        <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
+        <span id="channelName" v-if="showInfoContent">{{channelInfo.channelName}}</span>
         <div class="icon-footer" v-if="showInfoContent|| playBackState">
           <div class="iconlside">
             <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-if="playState"></i>
@@ -69,7 +69,7 @@
            @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel"  v-else
            v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0.8)">
         <div class="video-model">
-          <span id="channelName" v-if="showInfoContent">{{channelName}}</span>
+          <span id="channelName" v-if="showInfoContent">{{channelInfo.channelName}}</span>
           <div class="icon-footer" v-if="showInfoContent">
             <div class="iconlside">
               <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
@@ -403,7 +403,6 @@
         self.checkIfEncry();
       }
       else{
-
       }
       window.addEventListener("resize", self.resizeFun, false);
       /**
@@ -458,7 +457,7 @@
         }
 
       },
-      //监听父组件的数值变化
+      //监听播放时间
       realTimeSpeed(val,oldVal){
         let self=this;
         console.log(val);
@@ -485,54 +484,12 @@
           self.playBackState = false;
         }
       },
-      // curTime(newValue, oldValue){
-      //   console.log("curTime")
-      //   let self = this;
-      //   if(!self.id || !self.ivsId){
-      //     self.showError = true;
-      //     self.errorMsg = self.$t('storeMonitor.lackParams')
-      //     return;
-      //   }
-      //   self.showError = false;
-      //   self.times = 0;
-      //   console.log('new:', newValue);
-      //   console.log(self.curTime)
-      //   self.startTs = newValue;
-      //   if(self.playState){
-      //     self.decoder.stop();
-      //     self.playState = false
-      //   }
-      //   self.$nextTick(()=> {
-      //     self.decoder = null;
-      //     console.log(self.$refs.myPlayer)
-      //     //self.initVideo();
-      //     self.checkIfEncry();
-      //   })
-      // },
       async storeId(newValue, oldValue){
         console.log(newValue);
         console.log(oldValue);
         let self = this;
         if(newValue.length > 0){
           await self.getEzvizAccessToken(newValue)
-        }
-      },
-      async id(newValue, old) {
-        let self = this;
-        console.log("id")
-        console.log(newValue)
-        console.log(old)
-        self.videoPassword = '';
-        if(newValue == undefined){
-          return false;
-        }
-        //stop video
-        self.stopRealTime();
-        //首先查看视频是否加密
-        await self.getEzvizAccessToken(self.storeId);
-        if(newValue!== null && old != undefined ){
-          self.changeId = true;
-          await self.checkIfEncry();
         }
       },
     },
@@ -546,39 +503,6 @@
       percentHeight:function(){
         return this.varyWindowHeight/758;
       },
-      id(){
-        if(this.channelInfo != null){
-          return this.channelInfo.id;
-        }
-        else{
-          return 0;
-        }
-      },
-      //监听父组件的数值变化
-      channelId() {
-        if(this.channelInfo != null){
-          return this.channelInfo.channelId;
-        }
-        else{
-          return 0;
-        }
-      },
-      channelName(){
-        if(this.channelInfo != null){
-          return this.channelInfo.channelName;
-        }
-        else{
-          return '';
-        }
-      },
-      ivsId(){
-        if(this.channelInfo != null){
-          return this.channelInfo.ivsId;
-        }
-        else{
-          return 0;
-        }
-      },
       ...mapGetters({
         accountChanged:'accountChanged'
       }),
@@ -590,10 +514,10 @@
     },
     methods: {
       generatePatrolLang,
-      changeHistoryTime(newValue,flag){
+      async changeHistoryTime(newValue){
         console.log("curTime")
         let self = this;
-        if(!self.id || !self.ivsId){
+        if(!self.channelInfo.id || !self.channelInfo.ivsId){
           self.showError = true;
           self.errorMsg = self.$t('storeMonitor.lackParams')
           return;
@@ -610,14 +534,12 @@
           self.decoder.stop();
           self.playState = false
         }
-        if(flag == false){
-          self.$nextTick(()=> {
-            self.decoder = null;
-            console.log(self.$refs.myPlayer)
-            //self.initVideo();
-            self.checkIfEncry();
-          })
-        }
+        self.$nextTick(()=> {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer)
+          //self.initVideo();
+          self.checkIfEncry();
+        })
       },
       visibleChange(){
         console.log('子组件退出')
@@ -674,10 +596,10 @@
         let obj={};
         console.log(self.accessToken)
         obj.accessToken= self.accessToken;// token
-        if(self.ivsId == 0){
+        if(self.channelInfo.ivsId == 0){
           return;
         }
-        obj.deviceSerial = self.ivsId; //设备序列号
+        obj.deviceSerial = self.channelInfo.ivsId; //设备序列号
         let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
         console.log(result);
         let suportUpdatePass = false;
@@ -689,8 +611,8 @@
           if( suportUpdatePass ){
             //已加密设备先从缓存中查看是否已经有验证码，有验证码直接取出，没有验证码要弹出对话框
             let deviceObj = {};
-            deviceObj.deviceSerial = self.ivsId;
-            deviceObj.channelId = self.channelId;
+            deviceObj.deviceSerial = self.channelInfo.ivsId;
+            deviceObj.channelId = self.channelInfo.channelId;
             let result = self.getDeviceValidateCode(deviceObj);
             console.log('从缓存中取得的验证码' + result)
             if(result.length > 0){
@@ -748,6 +670,7 @@
       async initVideo() {
         let self = this
         console.log("调用初始化方法")
+        self.showError = false;
         //调用密码设置方法
         console.log(self.playBack)
         self.showModelContent=false;
@@ -759,35 +682,14 @@
         }
         else{
           self.isLoading = true;
-          let o = self.$refs.myPlayer;
+          let o = self.$refs.myPlayer || self.$refs.errorModel;
           let width = o.offsetWidth;
           let height = o.offsetHeight;
           self.initPlayerWidth = width;
           self.initPlayerHeight = height;
           console.log(width);
           console.log(height)
-          if(self.playBack){
-            self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
-            self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-            console.log('历史视频')
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('加入验证码历史视频' + self.videoUrl)
-            }
-            else {
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('历史视频' + self.videoUrl)
-            }
-          }
-          else{
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-              console.log('加入验证码实时视频' + self.videoUrl)
-            }
-            else{
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-            }
-          }
+          self.getVideoUrl()
           console.log(self.videoUrl);
           if(self.accessToken == ''){
             self.notify(self.$t('storeMonitor.getAccessTokenError'), 'warning',3000)
@@ -1069,29 +971,7 @@
           self.isLoading = true;
           console.log(self.initPlayerWidth);
           console.log(self.initPlayerHeight)
-          if(self.playBack){
-            self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
-            self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-            console.log('历史视频')
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('加入验证码历史视频' + self.videoUrl)
-            }
-            else {
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('历史视频' + self.videoUrl)
-            }
-          }
-          else{
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-              console.log('加入验证码实时视频' + self.videoUrl)
-            }
-            else{
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-            }
-            //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-          }
+          self.getVideoUrl()
           // 初始化视频方法
           self.decoder = new EZUIKit.EZUIPlayer({
             id: 'myPlayer',
@@ -1129,28 +1009,7 @@
           console.log(height)
           console.log(playerEle);
           console.log(self.playState)
-          if(self.playBack){
-            self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
-            self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-            console.log('历史视频')
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('加入验证码历史视频' + self.videoUrl)
-            }
-            else {
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('历史视频' + self.videoUrl)
-            }
-          }
-          else{
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-              console.log('加入验证码实时视频' + self.videoUrl)
-            }
-            else{
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-            }
-          }
+          self.getVideoUrl()
           // 初始化视频方法
           self.fullDecoder = new EZUIKit.EZUIPlayer({
             id: 'fullPlayer',
@@ -1223,29 +1082,7 @@
           console.log(width);
           console.log(height)
           self.isLoading = true;
-          if(self.playBack){
-            self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
-            self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-            console.log('历史视频')
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('加入验证码历史视频' + self.videoUrl)
-            }
-            else {
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-              console.log('历史视频' + self.videoUrl)
-            }
-          }
-          else{
-            if(self.videoPassword.length > 0){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-              console.log('加入验证码实时视频' + self.videoUrl)
-            }
-            else{
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-            }
-            //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
-          }
+          self.getVideoUrl()
           // 初始化视频方法
           self.fullDecoder = new EZUIKit.EZUIPlayer({
             id: 'fullPlayer',
@@ -1886,8 +1723,7 @@
         let self = this;
         let obj = {};
         obj.accessToken = self.accessToken;
-        //obj.accessToken = 'at.1zxfxzy03nm6ld1t1s5s3es203455czn-45ft0jzwlk-06lc2eq-7rzulbgak';
-        obj.deviceSerial = self.ivsId;
+        obj.deviceSerial = self.channelInfo.ivsId;
         obj.oldPassword = self.videoPassword;
         obj.newPassword = self.videoPassword;
         let params = qs.stringify(obj)
@@ -1904,8 +1740,8 @@
           // }
           //保存验证码到本地
           let deviceObj = {};
-          deviceObj.deviceSerial = self.ivsId;
-          deviceObj.channelId = self.channelId;
+          deviceObj.deviceSerial = self.channelInfo.ivsId;
+          deviceObj.channelId = self.channelInfo.channelId;
           deviceObj.validateCode = self.videoPassword;
           self.saveDeviceValidateCode(deviceObj);
           self.$nextTick(()=> {
@@ -1989,6 +1825,32 @@
         let content = filterString.all(val,200);
         console.log(content);
         self.eventDes = content;
+      },
+      getVideoUrl(){
+        let self = this;
+        if(self.playBack){
+          self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
+          self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
+          console.log('历史视频')
+          if(self.videoPassword.length > 0){
+            self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            console.log('加入验证码历史视频' + self.videoUrl)
+          }
+          else {
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            console.log('历史视频' + self.videoUrl)
+          }
+        }
+        else{
+          if(self.videoPassword.length > 0){
+            self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
+            console.log('加入验证码实时视频' + self.videoUrl)
+          }
+          else{
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
+          }
+          //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
+        }
       }
     }
   }

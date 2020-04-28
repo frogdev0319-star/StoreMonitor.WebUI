@@ -1967,6 +1967,17 @@ export default {
             }
             else{
               //萤石云平台，切换摄像头
+              if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                self.$refs.ezvizVideo.stopRealTime();
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+              else{
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
             }
         },
         clickItem(item,index){
@@ -2030,6 +2041,17 @@ export default {
                       }
                       else{
                         //萤石云平台
+                        if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                          self.$refs.ezvizVideo.stopRealTime();
+                          self.$nextTick(()=>{
+                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                          })
+                        }
+                        else{
+                          self.$nextTick(()=>{
+                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                          })
+                        }
                       }
                         self.curDeviceId=item.deviceId;
                     }

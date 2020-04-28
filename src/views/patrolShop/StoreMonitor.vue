@@ -198,7 +198,8 @@
                 </div>
               </div>
             </div>
-            <ezviz-video v-else :store-id="store.storeId" :channel-info="channel" :source-list-length= "sourceList.length" :is-store-monitor="true" :play-back="playBackState"
+            <ezviz-video v-else :store-id="store.storeId" :channel-info="channel" :source-list-length= "sourceList.length"
+                         :is-store-monitor="true" :play-back="playBackState"
                          :cur-time="playBackTime"
                          @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo" ref="ezvizVideo">
 
@@ -864,7 +865,7 @@ export default {
             self.changeFlag = true;
             self.getInitStoreData();
             self.getFaStoreData();
-            self.backCurDate();
+            self.backCurDateAccount();
         },
         getUpLoadBucketInfo(){
             let self=this;
@@ -1459,7 +1460,7 @@ export default {
             else{
               console.log('ezviz')
               self.changeFlag = false
-              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime,self.changeFlag);
+              self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
             }
         },
         afterCurDate(sindex,item){
@@ -2689,6 +2690,8 @@ export default {
               }
             }
             else{
+              self.$refs.ezvizVideo.showError = false;
+              self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
               if(self.$refs.ezvizVideo.playState){
                 self.$refs.ezvizVideo.stopRealTime();
               }
@@ -2871,13 +2874,18 @@ export default {
             }
             else{
               //萤石云处理
-              // if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-              //   self.$refs.ezvizVideo.stopRealTime();
-              //   self.$refs.ezvizVideo.realTime();
-              // }
-              // else{
-              //   self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-              // }
+              self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
+              if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                self.$refs.ezvizVideo.stopRealTime();
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+              else{
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
             }
         },
         getIndexById(id){
@@ -2996,10 +3004,33 @@ export default {
               //萤石云
               self.playBackTime = 0;
               self.$nextTick(()=>{
-                self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime, self.changeFlag);
+                self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
               })
             }
         },
+      backCurDateAccount(){
+        let self=this;
+        self.dateValue = new Date();
+        self.curTime=new Date();  //点击回到当前时间，首先时间控件恢复，选择的日期回到当前日期，停止播放历史视频。
+        self.playBackState=false;
+        self.showModelContent=true;
+        self.curYear=new Date().getFullYear();
+        self.curMonth=new Date().getMonth()+1;
+        self.getWeekDay();
+        if(!self.isEzviz){
+          if(self.store.storeId!=undefined){
+            if(self.playState){
+              self.stopAndRealTime();
+            }
+            else{
+              self.realTime();
+            }
+          }
+        }
+        else{
+          //萤石云
+        }
+      },
         forWard(){
             let self=this;
             if(self.curMonth==1){
