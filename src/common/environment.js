@@ -40,6 +40,13 @@ let _Environments = {
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
   },
+  XA:{
+    CHINA_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
+    USHOP_URL: 'http://172.21.73.207/',
+    POST_URL: 'http://pos.ushop-plus.com/',
+    VERSION: version
+  }
 }
 
 let environJSON = _Environments.Debug_XA;
