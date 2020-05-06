@@ -540,16 +540,11 @@
       padding: 0 0;
       font-size: 14px;
       width: 120px;
-      overflow: hidden;
       text-overflow: ellipsis;
-
-    }
-    #patrol-content /deep/ .is-active {
-      border-bottom: 4px solid #f31d65;
     }
 
     #patrol-content /deep/ .el-tabs__active-bar{
-      height: 0 !important;
+      height: 4px;
     }
   }
   /* 浏览器滚动条样式 */

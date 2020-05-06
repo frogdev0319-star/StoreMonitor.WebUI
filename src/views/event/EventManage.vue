@@ -1287,16 +1287,16 @@ $h1:#292e36;
           }
         }
     }
+    #tabs-content /deep/ .el-tabs__item {
+      padding: 0 0;
+      font-size: 14px;
+      width: 160px;
+    }
     #tabs-content /deep/  .el-tabs__nav-scroll{
       margin-left:40px;
     }
-    #tabs-content  /deep/ .el-tabs__header{
-      margin-bottom:0px !important;
-    }
-
     #tabs-content  /deep/ .el-tabs__active-bar{
-      height: 4px !important;
-      background-color: #f31d65 !important;
+      height: 4px;
     }
   .el-table-panel{
     @include point(margin-left,15);

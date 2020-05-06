@@ -2,51 +2,26 @@
   padding: 0 0;
   font-size: calc(14/1920*100vw);
 }
-#en-storetab-content /deep/ .is-active {
-  border-bottom: 4px solid #f31d65;
-}
 
 #en-storetab-content /deep/ .el-tabs__active-bar{
-    height: 0;
-    transform: translateX(0px);
-}
-#en-storetab-content /deep/ .el-tabs__nav{
-  -moz-transform: none;
-  -webkit-transform: none;
-  -o-transform: none;
-  -ms-transform: none;
-  transform: none;
+    height: 4px;
 }
 #storetab-content /deep/ .el-tabs__item {
   padding: 0 0;
   font-size: 14px;
 }
-#storetab-content /deep/ .is-active {
-  border-bottom: 4px solid #f31d65;
+#storetab-content /deep/ .el-tabs__active-bar{
+  height: 4px;
 }
 
-#storetab-content /deep/ .el-tabs__active-bar{
-  height: 0;
-  transform: translateX(0px);
-}
-#storetab-content /deep/ .el-tabs__nav{
-  -moz-transform: none;
-  -webkit-transform: none;
-  -o-transform: none;
-  -ms-transform: none;
-  transform: none;
-}
 #en-devicetabs-content /deep/ .el-tabs__item {
   padding: 0 0;
   font-size: 14px;
   width: 160px;
 }
-#en-devicetabs-content /deep/ .is-active {
-  border-bottom: 4px solid #f31d65;
-}
 
 #en-devicetabs-content /deep/ .el-tabs__active-bar{
-  height: 0 !important;
+  height: 4px;
 }
 
 #en-tabs-content  /deep/ .el-tabs__nav-scroll{
@@ -55,40 +30,12 @@
 #en-tabs-content .el-tabs__nav.is-top{
   margin-left: 0;
 }
-#en-tabs-content div#tab-0{
-  width:160px;
-}
-#en-tabs-content div#tab-1{
-  width:160px;
-}
-#en-tabs-content div#tab-2{
-  width:160px;
-}
 #en-tabs-content /deep/ .el-tabs__item {
   padding: 0 0;
   font-size: 14px;
   width:160px;
 }
-#en-tabs-content /deep/ .is-active {
-  border-bottom: 4px solid #f31d65;
-}
 
 #en-tabs-content /deep/ .el-tabs__active-bar{
-  height: 0 !important;
-}
-
-
-#el-schedule-tabs /deep/ .el-tabs__item {
-  padding: 0 0;
-  font-size: 16px;
-  font-family: "Microsoft YaHei";
-  font-weight: bold;
-  width: 160px;
-}
-#el-schedule-tabs /deep/ .is-active {
-  border-bottom: 4px solid #f31d65;
-}
-
-#el-schedule-tabs /deep/ .el-tabs__active-bar{
-  height: 0 !important;
+  height: 4px;
 }

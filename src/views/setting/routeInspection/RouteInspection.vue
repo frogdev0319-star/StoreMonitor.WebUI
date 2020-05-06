@@ -1011,17 +1011,13 @@ export default {
       font-size: 14px;
       width: calc(160/1920*100vw);
       display: inline-block;
-      overflow: hidden;
+      /*overflow: hidden;*/
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    #en-patrltabs-content /deep/ .is-active {
-      border-bottom: 4px solid #f31d65;
-
-    }
 
     #en-patrltabs-content /deep/ .el-tabs__active-bar{
-      height: 0 !important;
+      height: 4px;
     }
     .el-dropbtn{
         position: relative;
