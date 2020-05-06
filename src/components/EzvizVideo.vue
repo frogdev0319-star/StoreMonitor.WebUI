@@ -1206,7 +1206,8 @@
         else {
           self.showCancelContent = false;
           if (self.sourceListLength >= 5) {
-            self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+            let msg = self.isStoreMonitor ? self.$t('storeMonitor.maximumAttach'): self.$t('remotePatrol.maximumAttach')
+            self.notify(msg, 'warning', 3000);
             return false;
           }
           self.showCutDialog = true;
