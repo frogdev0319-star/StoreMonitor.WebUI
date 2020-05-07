@@ -970,7 +970,7 @@
           color:#fff !important;
         }
         .three-child /deep/ .el-menu{
-          text-align: center !important;
+          text-align: left !important;
         }
         .zh-third-title{
           font-size: 14px !important;
@@ -991,12 +991,12 @@
           /*}*/
         }
         .zh-three-child /deep/ .el-menu{
-          text-align: center !important;
+          text-align: left !important;
         }
         #childSubItem.submenu-item{
           position: relative;
           min-width: auto !important;
-          padding-left:60px !important;
+          padding-left:calc(60/1920*100vw) !important;
           border-bottom: 1px solid $border;
           &:hover{
             background-color: rgba(243,29,101,0.1) !important;
@@ -1069,6 +1069,14 @@
     }
     .zh-third-child-span {
       font-size: calc(14/1920*100vw);
+      padding-left: calc(90/1920*100vw);
+      @media screen and (max-width: 1645px){
+        font-size: 12px;
+      }
+    }
+    .third-child-span{
+      font-size: calc(14/1920*100vw);
+      padding-left: calc(90/1920*100vw);
       @media screen and (max-width: 1645px){
         font-size: 12px;
       }
@@ -1587,6 +1595,40 @@
   }
   .el-select-dropdown__item{
     font-family: Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+  }
+  /**
+  add style to schedule setting
+   */
+  li[class*="three-child"]  /deep/ .el-menu.el-menu--inline::before{
+    display: table;
+    content: "";
+    position: absolute;
+    height: calc(100% - 60px);
+    top: 30px;
+    left: calc(90/1920*100vw);
+    border-left: 1px solid #9a9ea7;
+    z-index: 1;
+  }
+  li[class*="three-child"] .el-menu--inline /deep/ li::before{
+    content: '';
+    position: absolute;
+    width: calc(40/1920*100vw);
+    border-bottom: 1px solid #9a9ea7;
+    left: calc(90/1920*100vw);
+    top: 50%;
+  }
+  li[class*="three-child"].is-active .el-menu--inline /deep/ li.is-active::before{
+    border-bottom: 1px solid #f31d65;
+  }
+  li[class*="three-child"] .el-menu--inline .el-menu-item:hover::before{
+    border-bottom: 1px solid #f31d65;
+  }
+  .el-submenu .el-menu-item:first-child{
+    margin-top: 10px;
+    border-top: 1px solid #393b4c;
+  }
+  li[class*="three-child"] .el-menu-item:first-child{
+    margin-top: 0px;
   }
 </style>
 <style  lang="scss">
