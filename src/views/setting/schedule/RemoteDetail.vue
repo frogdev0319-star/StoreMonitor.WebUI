@@ -75,12 +75,12 @@
               </el-select>
               <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">{{generateScheduleLang('execOnce')}}</el-checkbox>
               <div class="day-detail" v-if="item.mode == 1">
-                <region-multi-select :options="weekList" :selected="item.schedule.day" :placeholder="generateScheduleLang('select')" :disabled="false"
+                <region-multi-select :options="weekList" :selected="item.schedule[0].day" :placeholder="generateScheduleLang('select')" :disabled="false"
                                      :inputSize="`mini`"  @changeInput="changeSelectWeek(arguments,item)" :all="$t('scheduleView.everyDay')"></region-multi-select>
               </div>
               <div class="day-detail" v-if="item.mode == 2">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
-                <region-multi-select :options="bigMonthList.slice(0, 28)" :selected="item.schedule.day" :placeholder="generateScheduleLang('select')" :disabled="false"
+                <region-multi-select :options="bigMonthList.slice(0, 28)" :selected="item.schedule[0].day" :placeholder="generateScheduleLang('select')" :disabled="false"
                                      :inputSize="`mini`"  @changeInput="changeSelectMonth(arguments,item)" :all="$t('scheduleView.everyDay')"></region-multi-select>
               </div>
             </el-col>
@@ -106,7 +106,7 @@
               </div>
               <span class="delete-time-btn" size="mini" v-if="item.schedule.length > 1" style="margin: 0 20px 0 30px"
                     @click="deleteMonthAndDays(_index)"><i class="el-icon-error"></i></span>
-              <el-button class="time-btn" size="mini" @click="addMonth" type="primary"
+              <el-button class="time-btn" size="mini" @click="addMonth()" type="primary"
                          v-if="_index == item.schedule.length-1"><i class="el-icon-plus"></i></el-button>
             </el-col>
             <el-col :span="24" class="header-details"
@@ -273,15 +273,14 @@
         showAddTime: false,
         scheduleList: ['点检排程一'],
         paneList:[],
-        timeArray: ['08:00'], //选中的执行时间
         lang: this.$i18n.locale ,
-        hasSelectMonth: false,
-        bigMonthList:[{
-          'checked': false,
-          value: 1,
-          name: '1',
-          label: 1
-        },
+        bigMonthList:[
+          {
+            'checked': false,
+            value: 1,
+            name: '1',
+            label: 1
+          },
           {
             'checked': false,
             value: 2,
@@ -465,11 +464,7 @@
         ],
         monthList: [],
         value: '',
-        input4:'',
         checked:false,
-        checkAll: false,
-        isIndeterminate: true,
-        checkAll1: false,
         activeName: '0',
         curType: 1,
         typeList:[
@@ -486,10 +481,6 @@
             label: this.$t('scheduleView.userDefined')
           }
         ],
-        monthDays: [],
-        showDrap: false,
-        showMonthDrap: false,
-        showMonthContent: false,
         weekList: [
           {
             'checked': false,
@@ -535,21 +526,14 @@
           },
 
         ],
-        weekValue:  this.$t('scheduleView.everyDay'),
-        monthValue: this.$t('scheduleView.everyMonth'),
         weekDays:[],
-        showWeekContent:false,
         showAddDialog:false,
         showDeleteDialog:false,
         scheduleName: '',
         storeCount: 0,
         serachVale: '',
         scheduleId: -1,
-        bindStoreId:[],
         selectTab: '',
-        selectWeek: [],
-        selectMonth: [],
-        enable: false,
         isFirstLoad: true,
         isDisabled: true,
         showBindDialog: false,
@@ -627,9 +611,6 @@
             'value': '12',
           },
         ], //自定义模式月份
-        showSelfMonthContent: false,
-        showSelfMonthDrap: false,
-        selfMonth: '',
         toolTipClass: 'page-login-toolTipClass',
         schedule: [
           {
@@ -657,10 +638,6 @@
             name: `7${this.$t('scheduleView.days')}`
           },
         ],
-        execOnce: false, //是否执行一次
-        scheduleSelf: [], //自定义排程格式（月份和日期数组）
-        notifyTime: '', //执行时间
-        dueDays: -1, //执行时效
         hasBoundStoreIds: [], //已经绑定过周、月模式的门店id
         selectWeekObj:{
           title:'提示',
@@ -680,10 +657,7 @@
           isWarning:false,
           dialogCosed:false
         },
-        checkAllWeek: false,
-        checkAllMonth: false,
         isAdd: false,
-        showSelfDefineMonth: false, //是否显示自定义月份框
       }
     },
 
@@ -728,11 +702,9 @@
         let mode = self.paneList[tabIndex].mode;
         let notifyTime = self.paneList[tabIndex].notifyTime;
         let dayArray = [];
-        if(mode==1){
-          dayArray = self.paneList[tabIndex].schedule.day.filter(item=> item != '-1');
-        }
-        else if(mode==2){
-          dayArray = self.paneList[tabIndex].schedule.day.filter(item=> item != '-1');
+        let dayArrayLength = self.paneList[tabIndex].schedule[0].day.length
+        if(mode==1 || mode==2 && dayArrayLength > 0){
+          dayArray = self.paneList[tabIndex].schedule[0].day.filter(item=> item != '-1');
         }
         let name = self.paneList[tabIndex].name;
         let schedule = self.paneList[tabIndex].schedule;
@@ -742,21 +714,21 @@
           self.$refs.scheduleName[tabIndex].focus();
           return false;
         }
-        // if(notifyTime == ''){
-        //   self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning',3000);
-        //   return false;
-        // }
+        if(notifyTime == ''){
+          self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning',3000);
+          return false;
+        }
         console.log(dayArray)
 
         if(mode==1 || mode == 2){
-          //周模式
+          //weekly or monthly mode
           if(dayArray.length == 0 ){
             self.notify(self.$t('scheduleView.emptyDate'), 'warning',3000);
             return false;
           }
         }
         if(mode == 3){
-          //自定义模式
+          //self defined mode
           let lackMonth = false;
           let lackDay = false;
           schedule.forEach( item =>{
@@ -782,14 +754,12 @@
       handleClick(val) {
         let self = this;
         self.activeName = val.index;
-        console.log(self.activeName)
         self.selectTab = val.label;
         let tabIndex = Number(self.activeName);
-        //self.echoMonthAndWeek();
         self.scheduleId = self.paneList[tabIndex].schId;
-        //self.enable = self.paneList[tabIndex].enable;
         self.$emit('sendActiveName', self.activeName)
         self.searchStore();
+        self.changeSelectSelfMonth(self.paneList[tabIndex], self.paneList[tabIndex].schedule)
       },
 
       addMonth(){
@@ -833,7 +803,7 @@
         let tempSchedule = [];
         if(params.mode == 1 || params.mode == 2){
           //周模式
-          let selectedWeek = self.paneList[tabIndex].schedule.day;
+          let selectedWeek = self.paneList[tabIndex].schedule[0].day;
           selectedWeek.forEach(item=>{
             let tempSche = {};
             if(item != '-1'){
@@ -912,8 +882,8 @@
         self.scheduleId = 0;
         self.isDisabled = false;
         self.searchStore();
-        self.isAdd = true,
-          console.log(self.paneList)
+        self.isAdd = true
+        console.log(self.paneList)
         self.$emit('sendActiveName', self.activeName)
       },
       async searchStoreInput() {
@@ -1007,7 +977,6 @@
             cityList.push(item.city);
           }
         })
-        console.log(cityList);
         let temp = [];
         cityList.forEach(item => {
           let obj = {};
@@ -1025,10 +994,8 @@
           obj.store = _temp;
           temp.push(obj);
         })
-        console.log(temp);
         let groupTemp = [];
         let mode = self.paneList[Number(self.activeName)].mode;
-        console.log(mode + "..." + mode);
         temp.forEach(item => {
           let groupObj = {};
           groupObj.province = item.province;
@@ -1193,12 +1160,12 @@
 
       async bindSchedule() {
         //门店绑定排程
-        let scheId;
         let self = this;
+        let scheId = self.paneList[Number(self.activeName)].schId;
         self.showBindDialog = false;
         let isAdd = false;
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
-        if(self.isAdd){
+        if(scheId == 0){
           isAdd = true;
           scheId = await self.addScheduleService();
           self.paneList[Number(self.activeName)].schId = scheId;
@@ -1207,7 +1174,7 @@
           self.isAdd = false;
         }
         else{
-          scheId = self.paneList[Number(self.activeName)].schId;
+          //
         }
         if(!isAdd){
           await self.updateScheduleInfo();
@@ -1551,8 +1518,8 @@
               tempScheduleData.schedule = scheduleSelf;
             }
             else{
-              tempScheduleData.schedule = {};
-              tempScheduleData.schedule.day = dayArray;
+              tempScheduleData.schedule = [{}];
+              tempScheduleData.schedule[0].day = dayArray;
             }
             console.log(timeArray);
             console.log(dayArray);
@@ -1571,7 +1538,6 @@
           self.getHasBoundStroeIds();
         }
         else if(data.length == 0){
-          console.log(self.paneList)
           self.scheduleName = self.$t('scheduleView.newSchedule');
           let selfMonth = self.selfMonthList.slice(0);
           selfMonth.forEach(item=>{item.disabled = false});
@@ -1599,6 +1565,7 @@
           self.scheduleId = 0;
           self.isDisabled = false;
           self.isAdd = true;
+          self.hasBoundStoreIds = [];
           self.searchStore();
         }
       },
@@ -1685,7 +1652,7 @@
         let tempSchedule = [];
         if(params.mode == 1 || params.mode == 2){
           //周模式
-          let selectedWeek = self.paneList[tabIndex].schedule.day;
+          let selectedWeek = self.paneList[tabIndex].schedule[0].day;
           selectedWeek.forEach(item=>{
             let tempSche = {};
             if(item != '-1'){
@@ -1778,30 +1745,6 @@
         self.searchStore();
       },
       /**
-       * 获取指定月份的第一天和最后一天的秒数
-       * @param month
-       * @returns {number[]}
-       */
-      getMonthFirstLastDay(month){
-        var year = new Date().getFullYear();
-        var firstDay = new Date(year,month-1,1);//这个月的第一天
-        var currentMonth=firstDay.getMonth(); //取得月份数
-        var lastDay=new Date(firstDay.getFullYear(),currentMonth+1,0);//是0而不是-1
-        var firstDay = firstDay.getTime();
-        var lastDay = lastDay.getTime(); //返回第一天和最后一天的秒数
-        return [firstDay,lastDay];
-      },
-      /**
-       * 从秒数里获得月份
-       * @param second
-       * @returns {number}
-       */
-      getMonthFromSecond(second){
-        let month  = new Date(second).getMonth();
-        console.log(month);
-        return Number(month) + 1;
-      },
-      /**
        * 将‘月-日’数组，合并成月，多个日的json数组
        * @param array
        * @returns {Array}
@@ -1841,11 +1784,11 @@
       },
       changeSelectWeek(val, item){
         let self = this;
-        item.schedule.day = Array.from(val)[0];
+        item.schedule[0].day = Array.from(val)[0];
       },
       changeSelectMonth(val, item){
         let self = this;
-        item.schedule.day = Array.from(val)[0];
+        item.schedule[0].day = Array.from(val)[0];
       },
       changeSelfDefinedDay(val, item){
         item.day = val;
