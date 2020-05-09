@@ -36,203 +36,111 @@
         <el-tabs v-model="activeName" @tab-click="handleClick" id='patrltabs-content'>
           <el-tab-pane v-for="(paneItem,index) in paneList" :name="index.toString()"
                        :key="index" :label="`${paneItem.name}`">
-            <div :style="{height:varyWindowHeight}">
-              <el-col :span="24" class="header-details">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-                <el-input v-model="paneItem.name"   :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
-                          class="el-type"></el-input>
-              </el-col>
-              <el-col :span="24" class="header-details">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-                <el-select v-model="paneItem.mode"   placeholder="选择类型" size="mini" :disabled="paneItem.modeDisabled" @change="searchStore"
-                           class="el-type" >
-                  <el-option
-                    v-for="item in typeList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-                <div  class="day-detail" v-if="paneItem.mode == 2">
-                  <span>{{generateScheduleLang('execDays')}}</span>
-                  <div class="month-content" @click="choiceMonth">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="monthValue" size="mini" id="elMonth" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showMonthDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="month-panel" v-if="showMonthContent" @mouseleave="showMonthContent=false">
-                    <div class="month-details">
-                      <el-checkbox v-model="checkAllMonth" @change="allMonthChecked"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
-                    </div>
-                    <div class="month-details" v-for="(item,index) in monthList" :key="index">
-                      <el-checkbox v-model="item.checked" @change="changeMonthItem(item)"></el-checkbox>
-                      <span>{{item.name}}</span>
-                    </div>
-                  </div>
-                </div>
-              </el-col>
-              <!-- 周模式下 天和日期都可以多选 开始-->
-              <el-col :span="24" class="header-details" v-if="paneItem.mode == 1" v-for="(_item, _index) in paneItem.weeklySchedule" :key="'mode1'+_index">
-                <div class="day-detail">
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
-                  <div class="day-content" @click="choiceWeek(_index)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.dateStr" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                      <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="week-panel" v-if="_item.showWeekContent" @mouseleave="_item.showWeekContent = false">
-                    <div class="week-details">
-                      <el-checkbox v-model="checkAllWeek" @change="allWeekChecked(_index)"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
-                    </div>
-                    <div class="week-details" v-for="(item,index) in weekList" :key="index">
-                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="changeWeekItem(_index)"></el-checkbox>
-                      <span>{{item.name}}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="day-detail" >
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
-                  <div class="day-content" @click="choiceTime(_index)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="_item.timeArray.toString()" size="mini" id="elWeek" :placeholder="generateScheduleLang('exectionTime')" :readonly=true></el-input>
-                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="week-panel" v-if="_item.showTimeContent" @mouseleave="_item.showTimeContent=false">
-                    <div class="week-details" v-for="(timeItem,timeIndex) in weeklyTimeArray" :key="'time'+ timeIndex">
-                      <el-checkbox v-model="timeItem.checked" @change="changeTimeItem(_index)"></el-checkbox>
-                      <span>{{timeItem.name}}</span>
-                    </div>
-                  </div>
-                </div>
-                <span class="delete-time-btn" size="mini" v-if="paneItem.weeklySchedule.length > 1" style="margin: 0 20px 0 30px"
-                      @click="deleteWeekDays(_index)"><i class="el-icon-error"></i>
-                </span>
-                <el-button  class="time-btn" size="mini" type="primary"  @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
-                           v-if="_index == paneItem.weeklySchedule.length-1 && !showAddWeek"><i class="el-icon-plus"></i></el-button>
-              </el-col>
-
-              <el-col :span="24" class="header-details" v-if="showAddWeek && paneItem.mode == 1">
-                <div class="day-detail">
-                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
-                  <div class="day-content" @click="choiceWeek(-1)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="weekValue" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="week-panel" v-if="showWeekContent" @mouseleave="showWeekContent = false">
-                    <div class="week-details">
-                      <el-checkbox v-model="checkAllWeek" @change="allWeekChecked(-1)"></el-checkbox> <span>{{generateScheduleLang('all')}}</span>
-                    </div>
-                    <div class="week-details" v-for="(item,index) in weekList" :key="index">
-                      <el-checkbox v-model="item.checked" :disabled="item.disabled"  @change="changeWeekItem(-1)"></el-checkbox>
-                      <span>{{item.name}}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="day-detail">
-                    <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
-                    <div class="day-content" @click="choiceTime(-1)">
-                      <div class="input-arrow-panel"></div>
-                      <el-input v-model="timeArray.toString()" size="mini" id="elWeek" :placeholder="generateScheduleLang('select')" :readonly=true></el-input>
-                      <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                    </div>
-                    <div class="week-panel" v-if="showTimeContent" @mouseleave="hideTimePanel">
-                      <div class="week-details" v-for="(timeItem,timeIndex) in weeklyTimeArray" :key="'time'+ timeIndex">
-                        <el-checkbox v-model="timeItem.checked"  @change="changeTimeItem(-1)"></el-checkbox>
-                        <span>{{timeItem.name}}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="delete-time-btn" size="mini" v-if="" style="margin: 0 20px 0 30px"
-                        @click="deleteWeekDays(-1)"><i class="el-icon-error"></i></span>
-                  <el-button class="time-btn" size="mini" type="primary"  @click="addWeekDays(-1)"><i class="el-icon-plus"></i></el-button>
-              </el-col>
-              <!-- 日模式和月模式 -->
-              <el-col :span="24" class="header-details" v-if="paneItem.timeList.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeList"
+            <el-col :span="24" class="header-details">
+              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
+              <el-input v-model="paneItem.name"   :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                        class="el-type"></el-input>
+            </el-col>
+            <el-col :span="24" class="header-details">
+              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
+              <el-select v-model="paneItem.mode"   placeholder="选择类型" size="mini" :disabled="paneItem.modeDisabled" @change="searchStore"
+                         class="el-type" >
+                <el-option
+                  v-for="item in typeList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+              <div  class="day-detail" v-if="paneItem.mode == 2">
+                <span>{{generateScheduleLang('execDays')}}</span>
+                <region-multi-select :options="monthList" :selected="selectMonth" :placeholder="generateScheduleLang('select')" :disabled="false"
+                                     :inputSize="`mini`"  @changeInput="changeSelectMonth(arguments,paneItem)" :all="$t('scheduleView.everyDay')"></region-multi-select>
+              </div>
+            </el-col>
+            <!-- 周模式下 天和日期都可以多选 开始-->
+            <el-col :span="24" class="header-details" v-if="paneItem.mode == 1" v-for="(_item, _index) in paneItem.weeklySchedule" :key="'mode1'+_index">
+              <div class="day-detail">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
+                <region-multi-select :options="weekList" :selected="_item.dayArray" :placeholder="generateScheduleLang('select')" :disabled="false" class="week-days"
+                                     :inputSize="`mini`"  @changeInput="changeSelectWeek(arguments,_item)" :all="$t('scheduleView.everyDay')" :isPointCheck="true"></region-multi-select>
+              </div>
+              <div class="day-detail" >
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
+                <limit-select :selected="_item.timeArray" :options="weeklyTimeArray" :inputSize="`mini`" class="week-time"
+                              @changeInput="changeSelectWeekTime($event, _item)"  :placeholder="generateScheduleLang('exectionTime')"></limit-select>
+              </div>
+              <span class="delete-time-btn" size="mini" type="primary"  v-if="paneItem.weeklySchedule.length > 1" style="margin: 0 20px 0 30px"
+                    @click="deleteWeekDays(_index)"><i class="el-icon-error"></i></span>
+              <el-button class="time-btn" size="mini" type="primary" @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                         v-if="_index == paneItem.weeklySchedule.length-1"><i class="el-icon-plus"></i></el-button>
+            </el-col>
+            <!-- 日模式和月模式 -->
+            <el-col :span="24" class="header-details" v-if="paneItem.timeList.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeList"
                       :key="timeIndex">
                 <div class="day-detail">
                   <span  :id="lang=='en'? 'en-span': 'span'" :style="timeIndex==0 ? 'visibility: visable' :'visibility: hidden'">{{generateScheduleLang('exectionTime')}}</span>
-                  <div class="day-content" @click="choiceDayTime(timeIndex)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="timeItem.time" size="mini" id="elWeek" :placeholder="generateScheduleLang('exectionTime')" :readonly=true></el-input>
-                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="week-panel" v-if="timeItem.showTimeContent" @mouseleave="timeItem.showTimeContent=false">
-                    <div class="week-details" v-for="(timeIt,timeIn) in weeklyTimeArray" :key="'time'+ timeIn">
-                      <el-checkbox v-model="timeIt.checked" @change="changeDayTime(timeIndex, timeIn)" :disabled="timeIt.disabled"></el-checkbox>
-                      <span>{{timeIt.name}}</span>
-                    </div>
-                  </div>
+                  <el-select v-model="timeItem.time" class="time-select" @change="choiceDayTime(timeIndex)" >
+                    <el-option v-for="(timeIt,timeIn) in weeklyTimeArray" :key="timeIn" :label="timeIt.value" :value="timeIt.value" :disabled="timeIt.disabled"></el-option>
+                  </el-select>
                 </div>
                 <span class="delete-time-btn" size="mini" type="primary"  v-if="paneItem.timeList.length > 1" style="margin: 0 20px 0 30px"
                       @click="deleteCurTime(timeIndex)"><i class="el-icon-error"></i></span>
                 <el-button class="time-btn" size="mini" type="primary" @click="addTime" :style="paneItem.timeList.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
-                           v-if="timeIndex == paneItem.timeList.length-1 && !showAddTime"><i class="el-icon-plus"></i></el-button>
+                           v-if="timeIndex == paneItem.timeList.length-1"><i class="el-icon-plus"></i></el-button>
               </el-col>
-              <el-col v-if="showAddTime && paneItem.mode != 1" :span="24" class="header-details">
-                <div class="day-detail">
-                  <span style="visibility: hidden;" :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
-                  <div class="day-content" @click="choiceDayTime(-1)">
-                    <div class="input-arrow-panel"></div>
-                    <el-input v-model="dayTime" size="mini" id="elWeek" :placeholder="generateScheduleLang('exectionTime')" :readonly=true></el-input>
-                    <i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i>
-                  </div>
-                  <div class="week-panel" v-if="showDayTimeContent" @mouseleave="addDayTimeToList">
-                    <div class="week-details" v-for="(timeIt,timeIn) in weeklyTimeArray" :key="'time'+ timeIn">
-                      <el-checkbox v-model="timeIt.checked" @change="changeDayTime(-1, timeIn)" :disabled="timeIt.disabled"></el-checkbox>
-                      <span>{{timeIt.name}}</span>
-                    </div>
-                  </div>
-                </div>
-                  <span class="delete-time-btn" size="mini" @click="deleteCurTime(-1)" style="margin: 0 20px 0 30px"><i class="el-icon-error" ></i></span>
-                  <el-button class="time-btn" size="mini" type="primary" @click="addTime"><i class="el-icon-plus"></i></el-button>
-              </el-col>
-            </div>
-            <hr class="el-header-hr"/>
-            <div class="el-bind-header" style="position: relative;top: 20px;">
-                <span class="el-header-title" style="left: 10px;font-size: 14px;margin-top: 10px;
-                margin-bottom: 10px;">{{generateScheduleLang('bindStore')}}</span>
-              <span class="choice-device"><i class="iconfont icon-tishi1"
-                                             style="margin-right:10px;color:#93A2B6;"></i>{{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}</span>
-              <el-input
-                size="small"
-                class="el-search-input"
-                :clearable=true
-                :placeholder="generateScheduleLang('searchInfo')"
-                v-model="serachVale" @keyup.enter.native="searchStoreInput">
-                <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
-                   style="position:relative;top:6px;left:6px;font-size:18px;"></i>
-              </el-input>
-            </div>
-            <el-col style="margin-top: 65px;">
-              <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.44+'px'}">
-                <div  class="el-all-checkbox" v-if="storeList.length!=0">
-                  <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll" style="margin-right: 20px"></el-checkbox>
-                  <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
-                </div>
-                <div class="device-group" v-for="(item,index) in storeList" :key="index">
-                  <div class="device-all-checkbox" style="float: left;">
-                    <div style="display: block">
-                      <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)" style="margin-right: 20px"></el-checkbox>
-                      <span class="group-name">{{item.cityName}}</span>
-                    </div>
-                  </div>
-                  <div class="device-content" style="clear: left;margin-left: 60px;text-align: left">
-                    <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index" style="margin-top: 20px;">
-                      <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
-                                   @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
-                      <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
-                    </div>
-                  </div>
-                </div>
+            <el-col :span="24" class="el-header-hr"></el-col>
+            <el-col :span="24" class="el-bind-header">
+              <div style="display: flex">
+                <div class="el-header-title">{{generateScheduleLang('bindStore')}}</div>
               </div>
-              <div style="float: left;margin: 30px 0px 30px 20px;font-size: 14px;">
-                <span style="margin-right: 70px">{{generateScheduleLang('enable')}}</span>
+              <div class="select-info">
+                <span class="choice-device">
+                  <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>
+                  {{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}
+                </span>
+                <el-input
+                  size="small"
+                  class="el-search-input"
+                  :clearable=true
+                  :placeholder="generateScheduleLang('searchInfo')"
+                  v-model="serachVale" @keyup.enter.native="searchStoreInput">
+                  <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
+                     style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                </el-input>
+              </div>
+            </el-col>
+            <el-col :span="24">
+              <div class="el-bind-content">
+                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
+                  <div  class="el-all-checkbox" v-if="storeList.length!=0">
+                    <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll"></el-checkbox>
+                    <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
+                  </div>
+                  <div class="device-group" v-for="(item,index) in storeList" :key="index">
+                    <div class="device-all-checkbox">
+                      <div style="display: block">
+                        <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"></el-checkbox>
+                        <span class="group-name">{{item.cityName}}</span>
+                      </div>
+                    </div>
+                    <div class="device-content" >
+                      <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
+                        <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
+                                     @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
+                        <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </el-scrollbar>
+              </div>
+              <div class="enable-content">
+                <span>{{generateScheduleLang('enable')}}</span>
                 <el-switch
                   v-model="paneItem.enable">
                 </el-switch>
               </div>
-              <div class="el-bind-footer" style="right: 30px;margin-top: 50px;">
+              <div class="el-bind-footer">
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
                     <span>{{generateScheduleLang('saveAndApply')}}</span>
@@ -240,7 +148,6 @@
                 </div>
               </div>
             </el-col>
-
           </el-tab-pane>
         </el-tabs>
         <el-dialog :title="generateScheduleLang('prompt')"
@@ -280,11 +187,15 @@
   import DialogVue from '@/components/DialogVue.vue'
   import util from '@/common/util'
   import {mapGetters} from 'vuex'
+  import RegionMultiSelect from "@/components/RegionMultiSelect";
+  import LimitSelect from "@/components/LimitSelect"
 
   export default {
     name: "PointCheckSch",
     components:{
-      DialogVue
+      DialogVue,
+      RegionMultiSelect,
+      LimitSelect
     },
     data(){
       return {
@@ -304,158 +215,171 @@
           {
             'checked': false,
             value: 1,
-            name: '1'
+            name: '1',
+            label: 1
           },
           {
             'checked': false,
             value: 2,
-            name: '2'
+            name: '2',
+            label: 2
           },
           {
             'checked': false,
             value: 3,
-            name: '3'
+            name: '3',
+            label: 3
           },
           {
             'checked': false,
             value: 4,
-            name: '4'
+            name: '4',
+            label: '4'
           },
           {
             'checked': false,
             value: 5,
-            name: '5'
+            name: '5',
+            label: '5'
           },
           {
             'checked': false,
             value: 6,
-            name: '6'
+            name: '6',
+            label: '6'
           },
           {
             'checked': false,
             value: 7,
-            name: '7'
+            name: '7',
+            label: '7'
           },
           {
             'checked': false,
             value: 8,
-            name: '8'
+            name: '8',
+            label: '8'
           },
           {
             'checked': false,
             value: 9,
-            name: '9'
+            name: '9',
+            label: '9'
           },
           {
             'checked': false,
             value: 10,
-            name: '10'
+            name: '10',
+            label: '10'
           },
           {
             'checked': false,
             value: 11,
-            name: '11'
+            name: '11',
+            label: '11'
           },
           {
             'checked': false,
             value: 12,
-            name: '12'
+            name: '12',
+            label: '12'
           },
           {
             'checked': false,
             value: 13,
-            name: '13'
+            name: '13',
+            label: '13'
           },
           {
             'checked': false,
             value: 14,
-            name: '14'
+            name: '14',
+            label: '14'
           },
           {
             'checked': false,
             value: 15,
-            name: '15'
+            name: '15',
+            label: '15'
           },
           {
             'checked': false,
             value: 16,
-            name: '16'
+            name: '16',
+            label: '16'
           },
           {
             'checked': false,
             value: 17,
-            name: '17'
+            name: '17',
+            label: '17'
           },
           {
             'checked': false,
             value: 18,
-            name: '18'
+            name: '18',
+            label: '18'
           },
           {
             'checked': false,
             value: 19,
-            name: '19'
+            name: '19',
+            label: '19'
           },
           {
             'checked': false,
             value: 20,
-            name: '20'
+            name: '20',
+            label: '20'
           },
           {
             'checked': false,
             value: 21,
-            name: '21'
+            name: '21',
+            label: '21'
           },
           {
             'checked': false,
             value: 22,
-            name: '22'
+            name: '22',
+            label: '22'
           },
           {
             'checked': false,
             value: 23,
-            name: '23'
+            name: '23',
+            label: '23'
           },
           {
             'checked': false,
             value: 24,
-            name: '24'
+            name: '24',
+            label: '24'
           },
           {
             'checked': false,
             value: 25,
-            name: '25'
+            name: '25',
+            label: '25'
           },
           {
             'checked': false,
             value: 26,
-            name: '26'
+            name: '26',
+            label: '26'
           },
           {
             'checked': false,
             value: 27,
-            name: '27'
+            name: '27',
+            label: '27'
           },
           {
             'checked': false,
             value: 28,
-            name: '28'
-          },
-          // {
-          //   'checked': false,
-          //   value: 29,
-          //   name: '29'
-          // },
-          // {
-          //   'checked': false,
-          //   value: 30,
-          //   name: '30'
-          // },
-          // {
-          //   'checked': false,
-          //   value: 31,
-          //   name: '31'
-          // },
+            name: '28',
+            label: '28'
+          }
         ],
         value: '',
         input4:'',
@@ -486,45 +410,45 @@
         weekList: [
           {
             'checked': false,
-            'disabled': false,
             'name': this.$t('scheduleView.mon'),
-            'value': '1',
+            'label': this.$t('scheduleView.mon'),
+            'value': 1,
           },
           {
             'checked': false,
-            'disabled': false,
             'name': this.$t('scheduleView.tues'),
-            'value': '2',
+            'label': this.$t('scheduleView.tues'),
+            'value': 2,
           },
           {
             'checked': false,
-            'disabled': false,
             'name': this.$t('scheduleView.wed'),
-            'value': '3',
+            'label': this.$t('scheduleView.wed'),
+            'value': 3,
           },
           {
             'checked': false,
-            'disabled': false,
             'name': this.$t('scheduleView.thur'),
-            'value': '4',
+            'label': this.$t('scheduleView.thur'),
+            'value': 4,
           },
           {
             'checked': false,
-            'disabled': false,
-            'name': this.$t('scheduleView.fri'),
-            'value': '5',
+            'name':this.$t('scheduleView.fri'),
+            'label':this.$t('scheduleView.fri'),
+            'value': 5,
           },
           {
             'checked': false,
-            'disabled': false,
             'name': this.$t('scheduleView.sat'),
-            'value': '6',
+            'label': this.$t('scheduleView.sat'),
+            'value': 6,
           },
           {
             'checked': false,
-            'disabled': false,
             'name': this.$t('scheduleView.sun'),
-            'value': '7',
+            'label': this.$t('scheduleView.sun'),
+            'value': 7,
           },
 
         ],
@@ -837,79 +761,29 @@
 
       choiceWeek(index){
         let self = this;
-        self.checkAllWeek = false;
         let tabIndex = Number(self.activeName);
         let actPanList = self.paneList[tabIndex];
         let schedule = actPanList.weeklySchedule;
         let count = 0;
-        if(index == -1){
-          self.showWeekContent = true;
-          self.checkAllWeek = false;
-          self.weekList.forEach(item=>{
-            item.checked = false;
-            item.disabled = false;
-            self.selectWeek.forEach(_item=>{
-              if (item.value == _item) {
-                item.checked = true;
-                count++;
-              }
-            })
+        //不能勾选的周
+        self.weekList.forEach(item=>{
+          item.disabled = false
+        })
+        let selectedWeek = [];
+        schedule.forEach(item=>{
+          let dayArr = item.dayArray;
+          dayArr.forEach(_item=>{
+            selectedWeek.push(_item);
           })
-          if (count == self.weekList.length) {
-            self.checkAllWeek = true;
-          }
-          //不能勾选的日期
-          let selectedWeek = [];
-          schedule.forEach(item=>{
-            let dayArr = item.dayArray;
-            dayArr.forEach(_item=>{
-              selectedWeek.push(_item);
-            })
+        })
+        console.log(selectedWeek);
+        selectedWeek.forEach(item=>{
+          self.weekList.forEach(_item=>{
+            if(item == _item.value){
+              _item.disabled = true;
+            }
           })
-          console.log(selectedWeek);
-          selectedWeek.forEach(item=>{
-            self.weekList.forEach(_item=>{
-              if(item == _item.value){
-                _item.disabled = true;
-              }
-            })
-          })
-
-        }
-        else{
-          schedule[index].showWeekContent = !schedule[index].showWeekContent;
-          self.weekList.forEach(item => {
-            item.checked = false;
-            item.disabled = false;
-            schedule[index].day.split(',').forEach(_item=>{
-              if (item.value == _item) {
-                item.checked = true;
-                count++;
-              }
-            })
-          })
-          if (count == self.weekList.length) {
-            self.checkAllWeek = true;
-          }
-          //不能勾选的日期
-          let selectedWeek = [];
-          schedule.forEach((sItem, sIndex)=>{
-            let dayArr = sItem.dayArray;
-            dayArr.forEach(_item=>{
-              if(index != sIndex){
-                selectedWeek.push(_item);
-              }
-            })
-          })
-          console.log(selectedWeek);
-          selectedWeek.forEach(item=>{
-            self.weekList.forEach(_item=>{
-              if(item == _item.value){
-                _item.disabled = true;
-              }
-            })
-          })
-        }
+        })
       },
       choiceTime(index){
         let self = this;
@@ -1006,171 +880,13 @@
           item.checked = false;
           item.disabled = false;
         })
-        if(index == -1){
-          self.showDayTimeContent = true;
-          actPanList.timeList.forEach(item=>{
-            self.weeklyTimeArray.forEach(_item=>{
-              if(item.time == _item.value){
-                _item.disabled = true;
-              }
-            });
+        actPanList.timeList.forEach(_item=>{
+          self.weeklyTimeArray.forEach(item => {
+            if(_item.time == item.value){
+              item.disabled = true;
+            }
           });
-        }
-        else{
-          let timeJsonList = actPanList.timeList[index];
-          console.log(actPanList.timeList);
-          timeJsonList.showTimeContent = !timeJsonList.showTimeContent;
-          actPanList.timeList.forEach(_item=>{
-            self.weeklyTimeArray.forEach(item => {
-              if(_item.time == item.value){
-                item.disabled = true;
-              }
-              if (item.value == timeJsonList.time) {
-                item.checked = true;
-                item.disabled = false;
-              }
-            });
-          });
-        }
-      },
-      //更新时间选择
-      changeDayTime(index, timeIndex){
-        let self = this;
-        console.log(timeIndex)
-        let tabIndex = Number(self.activeName);
-        let actPanList = self.paneList[tabIndex];
-        let timeJsonList = actPanList.timeList[index];
-        console.log(actPanList.timeList);
-        if(index != -1){
-          self.weeklyTimeArray.forEach(item=>{
-            item.checked = false;
-          })
-          timeJsonList.time = self.weeklyTimeArray[timeIndex].value;
-          self.weeklyTimeArray[timeIndex].checked = true;
-          console.log(actPanList.timeList);
-        }
-        else{
-          //新增时间
-          self.weeklyTimeArray.forEach(item=>{
-            item.checked = false;
-          })
-          self.dayTime = self.weeklyTimeArray[timeIndex].value;
-          self.weeklyTimeArray[timeIndex].checked = true;
-        }
-      },
-      //增加时间
-      addDayTimeToList(){
-        let self = this;
-        self.showDayTimeContent = false;
-        let tabIndex = Number(self.activeName);
-        let actPanList = self.paneList[tabIndex];
-        let timeJsonList = actPanList.timeList;
-        let timeJson = {};
-        timeJson.time = self.dayTime;
-        timeJson.showTimeContent = false;
-        timeJsonList.push(timeJson);
-        self.dayTime = '';
-        self.showAddTime = false;
-        console.log(timeJsonList)
-      },
-      changeWeekItem(index) {
-        let self = this;
-        console.log(index);
-        let tabIndex = Number(self.activeName);
-        let actPanList = self.paneList[tabIndex];
-        let schedule = actPanList.weeklySchedule[index];
-        let dateStr = "";
-        let count = 0;
-        let selectedWeek = [];
-        if(index == -1){
-          self.weekList.forEach(item => {
-            if (item.checked) {
-              dateStr = dateStr + item.name + ',';
-              selectedWeek.push(item.value)
-              count++;
-            }
-          })
-          self.selectWeek = selectedWeek;
-          console.log(self.selectWeek)
-          //self.dayArray = self.selectWeek;
-          if (dateStr.length != 0) {
-            self.weekValue = self.getDateStrByArr(self.selectWeek);
-            if (count == self.weekList.length) {
-              self.weekValue = self.$t('scheduleView.everyDay');
-              self.checkAllWeek = true;
-            }
-            else{
-              self.checkAllWeek = false;
-            }
-          }
-          else{
-            self.weekValue = '';
-            self.checkAllWeek = false;
-          }
-        }
-        else{
-          self.weekList.forEach(item => {
-            if (item.checked) {
-              dateStr = dateStr + item.value + ',';
-              selectedWeek.push(item.value)
-              count++;
-            }
-          })
-          schedule.dayArray = selectedWeek;
-          schedule.day = schedule.dayArray.toString();
-          schedule.dateStr = self.getDateStrByArr(schedule.dayArray);
-          if (dateStr.length != 0) {
-            self.weekValue = dateStr;
-            if (count == self.weekList.length) {
-              self.weekValue = self.$t('scheduleView.everyDay');
-              self.checkAllWeek = true;
-            }
-            else{
-              self.checkAllWeek = false;
-            }
-          }
-          else{
-            self.weekValue = '';
-            self.checkAllWeek = false;
-          }
-        }
-
-      },
-
-      choiceMonth(){
-        let self = this;
-        self.showMonthContent = !self.showMonthContent;
-      },
-      changeMonthItem(item){
-        let self = this;
-        console.log(item);
-        let daysStr = "";
-        let count = 0;
-        let selectedMonths = [];
-        self.monthList.forEach(item => {
-          if (item.checked) {
-            daysStr = daysStr  + item.value + ',';
-            selectedMonths.push(item.value);
-            count++;
-          }
-        })
-        self.selectMonth = selectedMonths;
-        console.log(daysStr);
-        console.log(self.selectMonth)
-        if (daysStr.length != 0) {
-          self.monthValue = daysStr;
-          if (count == self.monthList.length) {
-            self.monthValue = self.$t('scheduleView.everyMonth');
-            self.checkAllMonth = true;
-          }
-          else{
-            self.checkAllMonth = false;
-          }
-        }
-        else {
-          self.monthValue = '';
-          self.checkAllMonth = false;
-        }
+        });
       },
       addScheduleService() {
         let params = {};
@@ -1194,10 +910,12 @@
           timeSelect.forEach(item=>{
             console.log(item);
             let time = item.time;
-            let seconds = self.hourToSecond(time);
-            let obj = {};
-            obj.from = seconds;
-            tempPeriod.push(obj);
+            if(time.length> 0){
+              let seconds = self.hourToSecond(time);
+              let obj = {};
+              obj.from = seconds;
+              tempPeriod.push(obj);
+            }
           })
           tempSchedule.push({
             "day": 1,
@@ -1210,7 +928,7 @@
           console.log(schedule);
           schedule.forEach(item=>{
             let timeArray = item.timeArray;
-            let selectedWeek = item.dayArray;
+            let selectedWeek = item.dayArray.filter(item=>item!= '-1');
             selectedWeek.forEach(_item=>{
               console.log(_item);
               let timePeriod = [];
@@ -1241,10 +959,12 @@
             timeSelected.forEach(_item=>{
               console.log(_item);
               let time = _item.time;
-              let seconds = self.hourToSecond(time);
-              let obj = {};
-              obj.from = seconds;
-              timePeriod.push(obj);
+              if(time.length> 0){
+                let seconds = self.hourToSecond(time);
+                let obj = {};
+                obj.from = seconds;
+                timePeriod.push(obj);
+              }
             })
             tempSche.day = Number(item);
             tempSche.period = timePeriod;
@@ -1549,19 +1269,22 @@
         let self = this;
         self.showAddTime = true;
         console.log(self.showAddTime);
+        self.paneList[Number(self.activeName)].timeList.push({
+          time:'',
+          showTimeContent: false
+        });
       },
       addWeekDays(index){
         let self = this;
         self.showAddWeek = true;
-        self.weekValue = ''
-        // if(index != -1){
-        //   self.showAddWeek = true;
-        //   self.weekValue = '';
-        // }
-        // else{
-        //   self.showAddWeek = true;
-        // }
-
+        self.paneList[Number(self.activeName)].weeklySchedule.push({
+          dayArray:[], day: '',
+          showWeekContent: false,
+          showTimeContent: false,
+          dateStr: '',
+          timeArray:[]
+        });
+        self.choiceWeek(index)
       },
       deleteWeekDays(index){
         console.log(index)
@@ -1572,6 +1295,7 @@
         else{
           self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1); //删除时间
           console.log(self.paneList[Number(self.activeName)].weeklySchedule);
+          self.choiceWeek(index)
         }
       },
       bindScheduleToStore(params){
@@ -1693,6 +1417,7 @@
         else{
           self.paneList[Number(self.activeName)].timeList.splice(index, 1); //删除时间
           console.log(self.paneList[Number(self.activeName)].timeList)
+          self.choiceDayTime(index)
         }
       },
       changTime() {
@@ -2070,7 +1795,7 @@
           console.log(schedule);
           schedule.forEach(item=>{
             let timeArray = item.timeArray;
-            let selectedWeek = item.dayArray;
+            let selectedWeek = item.dayArray.filter(item=>item !== '-1');
             selectedWeek.forEach(_item=>{
               console.log(_item);
               let timePeriod = [];
@@ -2195,6 +1920,7 @@
           let timeJson = {};
           timeJson.value = item;
           timeJson.name = item;
+          timeJson.label = item;
           timeJson.checked = false;
           timeJson.disabled = false;
           self.weeklyTimeArray.push(timeJson);
@@ -2224,7 +1950,22 @@
 
         }
         return dateStr;
-      }
+      },
+      changeSelectMonth(val, item){
+        let self = this;
+        console.log(Array.from(val)[0])
+        self.selectMonth = Array.from(val)[0];
+      },
+      changeSelectWeek(val, item){
+        let self = this;
+        item.dayArray = Array.from(val)[0];
+      },
+      changeSelectWeekTime(val, item){
+        let self = this;
+        console.log(val)
+        item.timeArray = val;
+        console.log(item.timeArray)
+      },
     },
     mounted(){
       let self = this;
@@ -2248,6 +1989,7 @@
   $h1:#292e36;
   $mainColor:#f31d65;
   *{
+    margin: 0;
     font-family: Roboto, Arial, Microsoft YaHei;
   }
   @function rem($val){
@@ -2278,20 +2020,19 @@
     }
   }
   .el-schedule-container{
-    padding: 20px 15px 15px 15px;
+    padding: 20px calc(15/1920*100vw) 25px 15px;
     /*height: calc(180 / 1920 * 100vw);*/
     border: 1px solid $border;
     background-color: #fff;
     .el-schedule-header {
       @include point(margin-top, 10);
-
       .el-schedule-tabs {
         width: 98%;
         @include point(margin-left,10);
         .header-details{
           text-align: left;
-          height: calc(58 / 1920 * 100vw);
-          line-height: calc(50 / 1920 * 100vw);
+          height: 50px;
+          line-height: 50px;
           position: relative;
           span {
             font-size: calc(14 / 1920 * 100vw);
@@ -2314,6 +2055,22 @@
               height: 30px !important;
             }
           }
+          /deep/ .el-input__inner{
+            height: 30px !important;
+            width: 200px;
+            border-radius: 3px !important;;
+          }
+          /deep/ .el-select.el-select--mini{
+            height: 30px !important;
+            width: 200px;
+          }
+          .content{
+            width: 199px;
+          }
+          /deep/ .content .input-class{
+            width: 170px;
+            overflow: hidden;
+          }
           .time-select{
             width: 200px;
           }
@@ -2329,112 +2086,16 @@
             /*span {
               margin-right: 12px;
             }*/
-          }
-          .day-content{
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            #elWeek{
-              width: 200px;
-              border-radius: 0px;
-              background-color: #f0f5f8;
-            }
-            .el-input{
+            .week-days{
               width: 200px;
             }
-            .input-arrow-panel{
+            .week-time .el-select.el-select--mini{
               width: 200px;
-              height: 28px;
-              position: absolute;
-              background-color: transparent;
-              cursor: pointer;
-              z-index: 100;
-              top: 18px;
             }
-            .icon-input{
-              position: relative;
-              right: 25px;
-              top: 1px;
+            .el-input__inner{
+              border-radius: 3px !important;
             }
           }
-          .month-content{
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            #elMonth{
-              width: 200px;
-              border-radius: 0px;
-              background-color: #f0f5f8;
-            }
-            .el-input{
-              width: 200px;
-              /deep/ .el-input__inner{
-                padding-right: 20px;
-              }
-            }
-            .input-arrow-panel{
-              width: 200px;
-              height: 28px;
-              position: absolute;
-              background-color: transparent;
-              cursor: pointer;
-              z-index: 100;
-              top: 18px;
-            }
-            .icon-input{
-              position: relative;
-              right: 25px;
-              top: 1px;
-            }
-          }
-          .month-panel{
-            position: absolute;
-            margin-top: 3px;
-            right: 17px;
-            width: 188px;
-            height: 150px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            overflow: auto;
-            .month-details{
-              padding: 2px 10px;
-              @include point(height,24);
-              span{
-                margin-left: 10px;
-                font-size: 14px;
-              }
-              .el-checkbox{
-                margin-right: 0;
-              }
-            }
-          }
-          .week-panel{
-            position: absolute;
-            margin-top: 3px;
-            right: 17px;
-            width: 188px;
-            height: 150px;
-            z-index: 980;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            overflow: auto;
-            .week-details{
-              padding: 2px 10px;
-              @include point(height,24);
-              span{
-                margin-left: 10px;
-                font-size: 14px;
-              }
-              .el-checkbox{
-                margin-right: 0;
-              }
-            }
-          }
-
-
 
           @media screen and(max-width: 1366px) {
             .en-span-class {
@@ -2464,65 +2125,57 @@
             width: calc(120/1920*100vw);
             margin-left: calc(20/1920*100vw);
           }
-          // .storename-str{
-          //     width: 100%;
-          //     white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-          //     overflow: hidden; //隐藏超出单元格的部分。
-          //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
-          // }
         }
         .el-search-input{
-          @include point(width,200);
-          @include point(margin-right,20);
-          position:absolute;
-          right: 0px;
-          top: 3px;
+          width: calc(200/1920*100vw);
+          margin-left: calc(30/1920*100vw);
         }
         .el-search-input /deep/ .el-input__inner{
           border-radius: 30px;
+          text-overflow: ellipsis;
         }
       }
 
       .el-bind-content {
-        @include point(max-height, 450);
+        height: calc(415/1920*100vw);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
         color: $black;
-
         .el-all-checkbox {
-          margin: 20px auto 20px 15px;
-          @include point(margin-left, 15);
+          margin: 20px auto 20px calc(25/1920*100vw);
           float: left;
           .all-device-title {
-            @include point(margin-left, 0);
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
+            margin-left: calc(20/1920*100vw);
           }
         }
 
         .device-group {
-          width: 100%;
           clear: both;
-          @include point(margin-top, 40);
-          @include point(margin-bottom, 20);
-
+          width: 100%;
+          margin-top: 25px;
+          margin-bottom: 25px;
           .device-all-checkbox {
-            @include point(margin-left, 15);
-
+            float: left;
+            margin-left: calc(25/1920*100vw);
             .group-name {
-              @include point(margin-left, 0);
+              margin-left:calc(20/1920*100vw);
               font-size: 14px;
               font-weight: bold;
             }
           }
           .device-content{
-            @include point(margin-left,40);
+            clear: left;
+            text-align: left;
+            margin-left:calc(55/1920*100vw);
             overflow: hidden;
             .device-detail{
               width: auto;
-              @include point(min-width,160);
-              @include point(margin-left,10);
-              @include point(margin-top,10);
+              margin-top: 20px;
+              min-width: calc(220/1920*100vw);
+              margin-left: calc(15/1920*100vw);
+              margin-top: calc(15/1920*100vw);
               float: left;
               .device-name{
                 @include point(margin-left, 0);
@@ -2532,17 +2185,19 @@
           }
         }
       }
+      .enable-content{
+        float: left;
+        margin: 30px 0px 30px calc(20/1920*100vw);
+        font-size: calc(14/1920*100vw);
+        span{
+          margin-right: calc(70/1920*100vw);
+        }
+      }
       .el-bind-footer{
-        text-align: left;
-        @include point(height,50);
-        @include point(line-height,50);
-        @include point(margin-bottom,25);
+        float: left;
+        clear: both;
         position: relative;
         .el-btn-content{
-          @include point(margin-left,25);
-          position: absolute;
-          @include point(margin-top,15);
-          @include point(margin-bottom,15);
           clear: both;
           .btn{
             //background-color: #f31d65;
@@ -2551,7 +2206,6 @@
             padding: 0 0;
             width: calc(130/1920*100vw);
             float: left;
-            margin: 0 calc(30/1920*100vw);
             .icon-quxiaolianjie{
               font-size: calc(24/1920*100vw);
               padding: calc(5/1920*100vw) 0;
@@ -2560,32 +2214,33 @@
           }
         }
       }
-      .bind-title{
-
-      };
+      .el-bind-header{
+        text-align: left;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
       .el-header-title{
         font-size: 14px;
         font-weight: bold;
-        // @include point(margin-left, 30);
-        position: absolute;
-        top: 5px;
-        display: inline;
         color: $black;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        display: inline-block;
+        margin-left: calc(20/1920*100vw);
+        margin-right: calc(30/1920*100vw);
+      }
+      .select-info{
+        float: right;
+        margin-top: 20px;
       }
       .el-header-hr {
-        @include point(margin-bottom, 16);
-        border: 0.5px solid #e3e9f4;
-        position: relative;
-        top: 25px;
+        margin-top: 30px;
+        border-bottom: 1px solid #e3e9f4;
       }
       .choice-device{
-        @include point(margin-right,30);
         font-size: 12px;
         color: $tab;
-        display: inline;
-        position: absolute;
-        @include point(right, 220);
-        @include point(margin-top, 10);
         .icon-tishi1{
           font-size: calc(16/1920*100vw);
         }
@@ -2840,13 +2495,13 @@
       }
     }
     .time-btn{
-      //background-color: $red;
       color: #fff;
       font-size: 12px;
-      width: 14px;
-      /deep/ span{
-        margin-left: -6px;
-      }
+      display: inline-flex;
+      align-items: center;
+      width: 20px;
+      min-width: 20px;
+      justify-content: center;
       .el-icon-plus{
         font-size:12px;
       }
@@ -2924,6 +2579,9 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
   }
+  /deep/ .el-checkbox__label{
+    font-size: calc(14/1920*100vw);
+  }
 </style>
 <style>
   #el-menuscrollbar .el-scrollbar__wrap {
@@ -2933,5 +2591,7 @@
     border-color: #00FF00;
     background-color: #00FF00;
   }
-
+  .time-select.el-select .el-input--medium .el-input__inner{
+    color: #606266;
+  }
 </style>

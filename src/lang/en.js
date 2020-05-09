@@ -676,6 +676,8 @@ export default {
     fri: 'Fri.',
     sat: 'Sat.',
     all: 'All',
+    workdays: 'Workdays',
+    weekends: 'Weekends',
     cancel: 'Cancel',
     confirm: 'Confirm',
     saveInfo: 'This will delete the schedule,continue?',

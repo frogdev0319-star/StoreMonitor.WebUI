@@ -140,7 +140,7 @@
           </el-col>
           <el-col :sapn='24' class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">Version 1.0.1&copy; 2018-2019 Storeviu Corp. All rights reserved</p>
+              <p style="text-align:left;">v1.0.3 &copy; 2018-2019 StoreVue Ltd. All rights reserved.</p>
             </footer>
           </el-col>
 
@@ -1061,10 +1061,10 @@
         min-height: calc(100vh - 80px - 45px);
       }
       .footercontent{
-        padding:0px 0 30px 60px;
-        color:#777;
-        font-size:12px;
+        padding:0px 0 30px calc(60 / 1920 * 100vw);
+        font-size:14px;
         background-color: #f4f5f9;
+        color: #444;
       }
     }
     .zh-third-child-span {

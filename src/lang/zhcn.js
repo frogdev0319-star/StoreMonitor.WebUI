@@ -702,6 +702,8 @@ export default {
     fri: '周五',
     sat: '周六',
     all: '全选',
+    workdays: '工作日',
+    weekends: '周末',
     enable: '启用',
     prompt: '提示',
     execOnce: '仅执行一次',

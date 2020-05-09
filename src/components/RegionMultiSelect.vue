@@ -2,7 +2,7 @@
   <div class="content">
     <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler"
                :placeholder="placeHolder" class="el-province" :disabled="disabled" :size="inputSize">
-      <el-option :label="$t('scheduleView.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
+      <el-option :label="$t('scheduleView.all')" value='-1' @click.native='selectAll' v-if="options.length > 0" :disabled="allDisabled"></el-option>
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.value' :disabled="item.disabled"></el-option>
     </el-select>
     <el-input placeholder="" readonly
@@ -35,6 +35,10 @@
       all: {
         type: String,
         default: ''
+      },
+      isPointCheck: {
+        type: Boolean,
+        default:false
       }
     },
 
@@ -44,7 +48,8 @@
         disabledLength: 0,
         placeHolder: this.placeholder,
         selectedArray: this.selected,
-        changed: false
+        changed: false,
+        allDisabled: false
       }
     },
     watch:{
@@ -61,16 +66,34 @@
       initData(){
         this.disabledLength = 0
         let self = this;
+        this.allDisabled = false
         this.options.forEach(item => {
           if (item.disabled) {
             self.disabledLength++
           }
         })
         if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
-          this.input = this.all
-          this.selectedArray.unshift('-1')
+          if(this.options.length === this.disabledLength){
+            this.input='';
+            this.allDisabled = true
+          }
+          else{
+            this.input = this.all
+            this.selectedArray.unshift('-1')
+          }
+
         } else if(this.selectedArray.includes('-1')){
           this.input = this.all
+          let tempArray = [...this.selectedArray.filter(item=>item != '-1')];
+
+          if(this.isPointCheck && tempArray.sort().toString() == [6,7].toString()){
+            this.input = this.$t('scheduleView.weekends')
+          }
+          else{
+            if(this.isPointCheck && tempArray.sort().toString() == [1,2,3,4,5].toString()){
+              this.input = this.$t('scheduleView.workdays')
+            }
+          }
         }
         else {
           this.input = ''
@@ -82,6 +105,16 @@
             })
           })
           this.input = this.input.slice(0, this.input.length - 1)
+          let tempArray = [...this.selectedArray];
+
+          if(this.isPointCheck && tempArray.sort().toString() == [6,7].toString()){
+            this.input = this.$t('scheduleView.weekends')
+          }
+          else{
+            if(this.isPointCheck && tempArray.sort().toString() == [1,2,3,4,5].toString()){
+              this.input = this.$t('scheduleView.workdays')
+            }
+          }
         }
         if(this.options.length === 0){
           this.input = ''
@@ -108,6 +141,15 @@
         this.changed = true;
         if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
           this.input = this.all
+          let tempArray = [...this.selectedArray];
+          if(this.isPointCheck && tempArray.sort().toString() == [6,7].toString()){
+            this.input = this.$t('scheduleView.weekends')
+          }
+          else{
+            if(this.isPointCheck && tempArray.sort().toString() == [1,2,3,4,5].toString()){
+              this.input = this.$t('scheduleView.workdays')
+            }
+          }
           this.selectedArray.unshift('-1')
         } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
           this.selectedArray = this.selectedArray.filter((item) => {
@@ -132,6 +174,16 @@
             })
           })
           this.input = this.input.slice(0, this.input.length - 1)
+          let tempArray = [...this.selectedArray];
+
+          if(this.isPointCheck && tempArray.sort().toString() == [6,7].toString()){
+            this.input = this.$t('scheduleView.weekends')
+          }
+          else{
+            if(this.isPointCheck && tempArray.sort().toString() == [1,2,3,4,5].toString()){
+              this.input = this.$t('scheduleView.workdays')
+            }
+          }
         }
       },
       visibileHandler (val) {
