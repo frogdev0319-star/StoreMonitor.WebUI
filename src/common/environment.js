@@ -24,9 +24,10 @@ let _Environments = {
     VERSION: version,
   },
   Stable: {
-    //BASE_URL: 'http://47.103.41.236:8081/storemonitor/api/',
-    CHINA_WEBSITE: 'http://52.187.122.98:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://mgmt.storevue.com:8081/storemonitor/api/',
+    //CHINA_WEBSITE: 'http://52.187.122.98:8081/storemonitor/api/',
+    //CHINA_WEBSITE: 'http://47.103.41.236:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://mgmt.storevue.com.cn:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://mgmt.storevue.com/storemonitor/api/',
     USHOP_URL: 'https://portals.ushop-plus.com/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version,
