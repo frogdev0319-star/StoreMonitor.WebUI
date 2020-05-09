@@ -48,7 +48,7 @@
         </el-col>
       </el-row>
       <el-row class="row-footer">
-        <el-col :span="isInsiteInspect? 6 : 8" v-for="(item,index) in tempList" :key="index" class="details-content">
+        <el-col :span="tempList.length == 4 ? 6 : 8" v-for="(item,index) in tempList" :key="index" class="details-content">
           <div class="details" v-if="index < 3">
             <div class="item-header">
               <i class="iconfont icontemp" :class="item.iconSrc"></i>
@@ -282,7 +282,7 @@
           })
           self.summary = summaryTemp;
           let tempArray = [];
-          self.isInsiteInspect ? tempArray = new Array(4) : tempArray = new Array(3);
+          self.isInsiteInspect && data.signature ? tempArray = new Array(4) : tempArray = new Array(3);
           tempArray[0] = {
             itemTitleName: self.$t('reportView.notableItem'),
             iconSrc: 'icon-zhongxindingwei',
@@ -301,7 +301,7 @@
             itemCount: data.feedback.length,
             itemList: data.feedback
           }
-          if (self.isInsiteInspect) {
+          if (self.isInsiteInspect && data.signature) {
             tempArray[3] = {
               itemTitleName: self.$t('reportView.signature'),
               iconSrc: 'icon-fankui',
