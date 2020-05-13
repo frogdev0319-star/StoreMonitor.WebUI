@@ -86,14 +86,26 @@
           this.input = this.all
           let tempArray = [...this.selectedArray.filter(item=>item != '-1')];
 
-          if(this.isPointCheck && tempArray.sort().toString() == [6,7].toString()){
-            this.input = this.$t('scheduleView.weekends')
-          }
-          else{
-            if(this.isPointCheck && tempArray.sort().toString() == [1,2,3,4,5].toString()){
+          if(this.isPointCheck){
+            if(tempArray.sort().toString() == [6,7].toString()){
+              this.input = this.$t('scheduleView.weekends')
+            }
+            else if(tempArray.sort().toString() == [1,2,3,4,5].toString()){
               this.input = this.$t('scheduleView.workdays')
             }
+            else{
+              this.input = ''
+              this.selectedArray.forEach(item => {
+                this.options.forEach(_item => {
+                  if (item === _item.value) {
+                    this.input += _item.label + ','
+                  }
+                })
+              })
+              this.input = this.input.slice(0, this.input.length - 1)
+            }
           }
+
         }
         else {
           this.input = ''
@@ -125,11 +137,30 @@
         if (this.selectedArray.length < this.options.length - this.disabledLength) {
           this.selectedArray = []
           this.options.forEach((item) => {
-            // if (!item.disabled) {
-            this.selectedArray.push(item.value)
-            // }
+            if (!item.disabled) {
+              this.selectedArray.push(item.value)
+            }
           })
           this.input = this.all
+          let tempArray = [...this.selectedArray];
+          if(this.isPointCheck){
+            if(tempArray.sort().toString() == [6,7].toString()){
+              this.input = this.$t('scheduleView.weekends')
+            }
+            else if(tempArray.sort().toString() == [1,2,3,4,5].toString()){
+              this.input = this.$t('scheduleView.workdays')
+            }
+            else{
+              this.selectedArray.forEach(item => {
+                this.options.forEach(_item => {
+                  if (item === _item.value) {
+                    this.input += _item.label + ','
+                  }
+                })
+              })
+              this.input = this.input.slice(0, this.input.length - 1)
+            }
+          }
           this.selectedArray.unshift('-1')
         } else {
           this.selectedArray = []

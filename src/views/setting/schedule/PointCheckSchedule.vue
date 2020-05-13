@@ -7,7 +7,7 @@
           <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
         </el-button>
         <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
-                   @click="deleteScheduleButton" :disabled="Number(activeName) == 0? true: false">
+                   @click="deleteScheduleBtn" :disabled="Number(activeName) == 0? true: false">
           <i style="margin-right:8px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
         </el-button>
       </el-col>
@@ -58,14 +58,14 @@
                                      :inputSize="`mini`"  @changeInput="changeSelectMonth(arguments,paneItem)" :all="$t('scheduleView.everyDay')"></region-multi-select>
               </div>
             </el-col>
-            <!-- 周模式下 天和日期都可以多选 开始-->
+            <!-- Weekly Mode-->
             <el-col :span="24" class="header-details" v-if="paneItem.mode == 1" v-for="(_item, _index) in paneItem.weeklySchedule" :key="'mode1'+_index">
               <div class="day-detail">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
-                <region-multi-select :options="weekList" :selected="_item.dayArray" :placeholder="generateScheduleLang('select')" :disabled="false" class="week-days"
+                <region-multi-select :options="_item.weekList" :selected="_item.dayArray" :placeholder="generateScheduleLang('select')" :disabled="false" class="week-days"
                                      :inputSize="`mini`"  @changeInput="changeSelectWeek(arguments,_item)" :all="$t('scheduleView.everyDay')" :isPointCheck="true"></region-multi-select>
               </div>
-              <div class="day-detail" >
+              <div class="day-detail">
                 <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
                 <limit-select :selected="_item.timeArray" :options="weeklyTimeArray" :inputSize="`mini`" class="week-time"
                               @changeInput="changeSelectWeekTime($event, _item)"  :placeholder="generateScheduleLang('exectionTime')"></limit-select>
@@ -75,13 +75,13 @@
               <el-button class="time-btn" size="mini" type="primary" @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
                          v-if="_index == paneItem.weeklySchedule.length-1"><i class="el-icon-plus"></i></el-button>
             </el-col>
-            <!-- 日模式和月模式 -->
+            <!-- Daily and Monthly Mode -->
             <el-col :span="24" class="header-details" v-if="paneItem.timeList.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeList"
                       :key="timeIndex">
                 <div class="day-detail">
                   <span  :id="lang=='en'? 'en-span': 'span'" :style="timeIndex==0 ? 'visibility: visable' :'visibility: hidden'">{{generateScheduleLang('exectionTime')}}</span>
                   <el-select v-model="timeItem.time" class="time-select" @change="choiceDayTime(timeIndex)" >
-                    <el-option v-for="(timeIt,timeIn) in weeklyTimeArray" :key="timeIn" :label="timeIt.value" :value="timeIt.value" :disabled="timeIt.disabled"></el-option>
+                    <el-option v-for="(timeIt,timeIn) in timeItem.timeArray" :key="timeIn" :label="timeIt.value" :value="timeIt.value" :disabled="timeIt.disabled"></el-option>
                   </el-select>
                 </div>
                 <span class="delete-time-btn" size="mini" type="primary"  v-if="paneItem.timeList.length > 1" style="margin: 0 20px 0 30px"
@@ -171,9 +171,6 @@
             </el-button>
           </div>
         </el-dialog>
-        <dialog-vue :dialog-title='selectDayObj.title' :show-info='selectDayObj.showInfo' :is-warning='selectDayObj.isWarning' :dialog-closed='selectDayObj.dialogClosed' @confirmed='noTimeDialog' @canceled='cancelNoTime'></dialog-vue>
-        <dialog-vue :dialog-title='selectWeekObj.title' :show-info='selectWeekObj.showInfo' :is-warning='selectWeekObj.isWarning' :dialog-closed='selectWeekObj.dialogClosed' @confirmed='noWeekDialog' @canceled='cancelNoWeek'></dialog-vue>
-        <dialog-vue :dialog-title='selectMonthObj.title' :show-info='selectMonthObj.showInfo' :is-warning='selectMonthObj.isWarning' :dialog-closed='selectMonthObj.dialogClosed' @confirmed='noMonthDialog' @canceled='cancelNoMonth'></dialog-vue>
       </el-col>
     </div>
   </el-row>
@@ -184,7 +181,6 @@
   import {generateScheduleLang} from '@/api/i18n'
   import {getScheduleBindList, addNewSchedule, getScheduleListService, bindScheduleAndStore, unbindScheduleAndStore, updateSchedule,deleteScheduleService} from '@/api/schedule'
   import {getStoreList} from '@/api/store'
-  import DialogVue from '@/components/DialogVue.vue'
   import util from '@/common/util'
   import {mapGetters} from 'vuex'
   import RegionMultiSelect from "@/components/RegionMultiSelect";
@@ -193,7 +189,6 @@
   export default {
     name: "PointCheckSch",
     components:{
-      DialogVue,
       RegionMultiSelect,
       LimitSelect
     },
@@ -205,11 +200,8 @@
         allDisabled: false,
         storeList:[],
         tempStoreList :[],
-        showAddTime: false,
-        newTime: '',
         scheduleList: ['点检排程一'],
         paneList:[],
-        timeArray: [], //选中的执行时间
         lang: this.$i18n.locale ,
         monthList:[
           {
@@ -381,12 +373,7 @@
             label: '28'
           }
         ],
-        value: '',
-        input4:'',
         checked:false,
-        checkAll: false,
-        isIndeterminate: true,
-        checkAll1: false,
         activeName: '0',
         curType: 0,
         typeList:[
@@ -403,60 +390,51 @@
             label: this.$t('scheduleView.monthly')
           }
         ],
-        monthDays: [],
-        showDrap: false,
-        showMonthDrap: false,
-        showMonthContent: false,
         weekList: [
           {
-            'checked': false,
+            'disabled': false,
             'name': this.$t('scheduleView.mon'),
             'label': this.$t('scheduleView.mon'),
             'value': 1,
           },
           {
-            'checked': false,
+            'disabled': false,
             'name': this.$t('scheduleView.tues'),
             'label': this.$t('scheduleView.tues'),
             'value': 2,
           },
           {
-            'checked': false,
+            'disabled': false,
             'name': this.$t('scheduleView.wed'),
             'label': this.$t('scheduleView.wed'),
             'value': 3,
           },
           {
-            'checked': false,
+            'disabled': false,
             'name': this.$t('scheduleView.thur'),
             'label': this.$t('scheduleView.thur'),
             'value': 4,
           },
           {
-            'checked': false,
+            'disabled': false,
             'name':this.$t('scheduleView.fri'),
             'label':this.$t('scheduleView.fri'),
             'value': 5,
           },
           {
-            'checked': false,
+            'disabled': false,
             'name': this.$t('scheduleView.sat'),
             'label': this.$t('scheduleView.sat'),
             'value': 6,
           },
           {
-            'checked': false,
+            'disabled': false,
             'name': this.$t('scheduleView.sun'),
             'label': this.$t('scheduleView.sun'),
             'value': 7,
           },
 
         ],
-        weekValue: this.$t('scheduleView.everyDay'),
-        monthValue: this.$t('scheduleView.everyMonth'),
-        weekDays:[],
-        showWeekContent:false,
-        showAddDialog:false,
         showDeleteDialog:false,
         scheduleName: '',
         storeCount: 0,
@@ -466,40 +444,11 @@
         selectTab: '',
         selectWeek: [],
         selectMonth: [],
-        enable: false,
         isFirstLoad: true,
         isDisabled: true,
         showBindDialog: false,
-        dataModel: [],
         hasBoundStoreIds: [], //已经绑定过周、月模式的门店id
-        selectDayObj: {
-          title:'提示',
-          showInfo:'请选择执行时间',
-          isWarning:false,
-          dialogClosed:false
-        },
-        selectWeekObj:{
-          title:'提示',
-          showInfo:'请选择周模式下的执行日期！',
-          isWarning:false,
-          dialogClosed:false
-        },
-        selectMonthObj:{
-          title:'提示',
-          showInfo:'请选择执行时间！',
-          isWarning:false,
-          dialogClosed:false
-        },
-        checkAllWeek: false,
-        checkAllMonth: false,
         weeklyTimeArray: [], //自定义时间数组
-        selfWeeklyTimeArray:[],
-        selectedWeeklyTimeArr: [], //周模式下选择的时间数组
-        weeklySchedule: [], //周模式下的执行天数和执行时间
-        showAddWeek: false,
-        showTimeContent: false,
-        showDayTimeContent: false,
-        dayTime: '',
         isAdd: false,
       }
     },
@@ -521,35 +470,6 @@
     },
     methods: {
       generateScheduleLang,
-      noTimeDialog(val){
-        let self=this;
-        self.selectDayObj.dialogClosed=false;
-      },
-      cancelNoTime(){
-        let self=this;
-        self.selectDayObj.dialogClosed=false;
-      },
-      noWeekDialog(val){
-        let self=this;
-        self.selectWeekObj.dialogClosed=false;
-      },
-      cancelNoWeek(val){
-        let self=this;
-        self.selectWeekObj.dialogClosed=false;
-      },
-      noMonthDialog(){
-        let self=this;
-        self.selectMonthObj.dialogClosed=false;
-      },
-      cancelNoMonth(val){
-        let self=this;
-        self.selectMonthObj.dialogClosed=false;
-      },
-
-      deleteScheduleButton() {
-        let self = this;
-        self.showDeleteDialog = true;
-      },
       async bindScheduleBtn(){
         let self = this;
         let tabIndex = Number(self.activeName);
@@ -604,96 +524,15 @@
         }
         self.showBindDialog = true;
       },
-      allWeekChecked(index){
-        let self = this;
-        console.log(self.checkAllWeek);
-        let selectedWeek = [];
-        if(index === -1){
-          if(self.checkAllWeek){
-            self.weekList.forEach(item=>{
-              if(!item.disabled){
-                item.checked = true;
-                selectedWeek.push(item.value)
-              }
-            })
-          }
-          else{
-            self.weekList.forEach(item=>{
-              item.checked = false
-            })
-          }
-          self.weekValue = self.checkAllWeek ? this.$t('scheduleView.everyDay') : '';
-          self.selectWeek = self.checkAllWeek ? selectedWeek: [] ;
-          console.log(self.weekValue);
-          console.log(self.selectWeek)
-        }
-        else{
-          let tabIndex = Number(self.activeName);
-          let actPanList = self.paneList[tabIndex];
-          let schedule = actPanList.weeklySchedule[index];
-          if(self.checkAllWeek){
-            self.weekList.forEach(item=>{
-              if(!item.disabled){
-                item.checked = true;
-                selectedWeek.push(item.value)
-              }
-            })
-            schedule.dayArray = selectedWeek;
-            schedule.day = schedule.dayArray.toString();
-            schedule.dateStr = self.getDateStrByArr(schedule.dayArray);
-          }
-          else{
-            self.weekList.forEach(item=>{
-              item.checked = false
-            })
-          }
-        }
-      },
-      allMonthChecked(val){
-        /**
-         * 选择所有的日期
-         * @type {default.methods}
-         */
-        let self = this;
-        console.log(val);
-        let selectedDates = [];
-        if(val){
-          self.monthList.forEach(item=>{
-            item.checked = true;
-            selectedDates.push(item.value)
-          })
-        }
-        else{
-          self.monthList.forEach(item=>{
-            item.checked = false
-          })
-        }
-        self.monthValue = val ? self.$t('scheduleView.everyMonth') : '';
-        self.selectMonth = val ? selectedDates: [] ;
-        console.log(self.monthValue);
-        console.log(self.selectMonth)
-      },
       handleClick(val) {
         console.log(val)
         let self = this;
         self.activeName = val.index;
         self.selectTab = val.label;
         let tabIndex = Number(self.activeName);
-        self.weekList.forEach(item=>{
-          item.checked = false;
-        })
-        self.monthList.forEach(item=>{
-          item.checked = false;
-        })
-        self.showAddTime = false;
-        self.monthValue = '';
-        self.weekValue = '';
         self.dayArray =  self.paneList[tabIndex].dayArray;
         self.echoMonthAndWeek();
         self.scheduleId = self.paneList[tabIndex].schId;
-        self.showMonthContent = false;
-        self.showWeekContent = false;
-        self.showAddWeek = false;
         self.searchStore();
       },
       echoMonthAndWeek(){
@@ -705,57 +544,16 @@
           let selectedWeek = self.dayArray;
           self.selectWeek = selectedWeek;
           console.log(selectedWeek + 'selectedWeek');
-          self.weekList.forEach(item => {
-            selectedWeek.forEach(_item=>{
-              if(item.value == _item){
-                dateStr = dateStr + item.name + ',';
-                item.checked = true;
-                count++;
-              }
-            })
-          })
-          if (dateStr.length != 0) {
-            if (count == self.weekList.length) {
-              self.weekValue = self.$t('scheduleView.everyDay');
-              self.checkAllWeek = true;
-            }
-            else {
-              self.weekValue = dateStr;
-              self.checkAllWeek = false;
-            }
-          }
-          else{
-            self.checkAllWeek = false;
-          }
-          console.log(self.weekValue)
+          self.choiceWeek()
         }
         else if(type == 2){
           let selectedMonth = self.dayArray;
           console.log(selectedMonth + 'selectedMonth');
           self.selectMonth = selectedMonth;
-          self.monthList.forEach(item => {
-            selectedMonth.forEach(_item=>{
-              if(item.value == _item){
-                dateStr = dateStr + item.value + ',';
-                item.checked = true;
-                count++;
-              }
-            })
-          })
-          if (dateStr.length != 0) {
-            self.monthValue = dateStr;
-            if (count == self.monthList.length) {
-              self.monthValue = self.$t('scheduleView.everyMonth');
-              self.checkAllMonth= true;
-            }
-            else{
-              self.checkAllMonth= false;
-            }
-          }
-          else{
-            self.monthValue = '';
-            self.checkAllMonth= false;
-          }
+          self.choiceDayTime()
+        }
+        else{
+          self.choiceDayTime()
         }
       },
 
@@ -766,9 +564,6 @@
         let schedule = actPanList.weeklySchedule;
         let count = 0;
         //不能勾选的周
-        self.weekList.forEach(item=>{
-          item.disabled = false
-        })
         let selectedWeek = [];
         schedule.forEach(item=>{
           let dayArr = item.dayArray;
@@ -777,116 +572,74 @@
           })
         })
         console.log(selectedWeek);
-        selectedWeek.forEach(item=>{
-          self.weekList.forEach(_item=>{
-            if(item == _item.value){
-              _item.disabled = true;
-            }
+        schedule.forEach(item=>{
+          item.weekList.forEach(_item=>{
+              _item.disabled = false;
           })
         })
-      },
-      choiceTime(index){
-        let self = this;
-        console.log(index);
-        let tabIndex = Number(self.activeName);
-        let actPanList = self.paneList[tabIndex];
-        self.weeklyTimeArray.forEach(item=>{
-          item.checked = false;
-        })
-        if(index == -1){
-          self.showTimeContent = true;
-          self.weeklyTimeArray.forEach(item=>{
-            item.checked = false;
-            self.selectWeek.forEach(_item=>{
-              if (item.value == _item) {
-                item.checked = true;
+        selectedWeek.forEach(item=>{
+          console.log(item);
+          schedule.forEach(sche=>{
+            console.log(sche);
+            sche.weekList.forEach(week=>{
+              if(week.value == item){
+                week.disabled = true;
               }
             })
           })
-        }
-        else{
-          actPanList.weeklySchedule[index].showTimeContent = !actPanList.weeklySchedule[index].showTimeContent;
-          actPanList.weeklySchedule[index].timeArray.forEach(_item=>{
-            self.weeklyTimeArray.forEach(item => {
-              if (item.value == _item) {
-                item.checked = true;
+        })
+        schedule.forEach(item=>{
+          console.log(item);
+          item.dayArray.forEach(day=>{
+            console.log(day);
+            item.weekList.forEach(week=>{
+              if(week.value == day){
+                week.disabled = false;
               }
-            });
-          });
-        }
-      },
-      changeTimeItem(index){
-        let self = this;
-        let timeValue = '';
-        let selectedTime = [];
-        if(index == -1){
-          self.weeklyTimeArray.forEach(item => {
-            if (item.checked) {
-              timeValue = timeValue + item.value + ',';
-              selectedTime.push(item.value)
-            }
+            })
           })
-          self.timeArray = selectedTime;
-          console.log(self.timeArray)
-        }
-        else{
-          let tabIndex = Number(self.activeName);
-          let actPanList = self.paneList[tabIndex];
-          let schedule = actPanList.weeklySchedule[index];
-          let tempTimeArray = [];
-          self.weeklyTimeArray.forEach(item => {
-            if (item.checked) {
-              tempTimeArray.push(item.value)
-            }
-          })
-          schedule.timeArray = tempTimeArray;
-        }
+        })
       },
-      hideTimePanel(){
+      // choiceTime(index){
+      //   let self = this;
+      //   console.log(index);
+      //   let tabIndex = Number(self.activeName);
+      //   let actPanList = self.paneList[tabIndex];
+      //   self.weeklyTimeArray.forEach(item=>{
+      //     item.checked = false;
+      //   })
+      //   actPanList.weeklySchedule[index].timeArray.forEach(_item=>{
+      //     self.weeklyTimeArray.forEach(item => {
+      //       if (item.value == _item) {
+      //         item.checked = true;
+      //       }
+      //     });
+      //   });
+      // },
+      //日、月模式修改时间
+      choiceDayTime(){
         let self = this;
-        self.showTimeContent = false;
-        if(self.weekValue.length > 0 ){
-          let json = {};
-          json.dayArray = self.selectWeek;
-          json.day = json.dayArray.toString();//设置选择的天数
-          json.showWeekContent = false; //是否显示面板
-          json.showTimeContent = false; //是否显示时间面板
-          json.timeArray = self.timeArray;
-          json.dateStr = self.getDateStrByArr(json.dayArray)
-          console.log(json);
-          self.paneList[Number(self.activeName)].weeklySchedule.push(json); //添加时间
-          console.log(self.paneList[Number(self.activeName)].weeklySchedule)
-          self.selectWeek = [];
-          self.weekValue = ''
-          self.timeArray = [];
-          self.showAddWeek = false;
-        }
-        else{
-          self.selectWeek = [];
-          self.weekValue = ''
-          self.timeArray = [];
-          self.weekList.forEach(item=>{
-            item.checked = false
-          })
-        }
-      },
-      //日、月模式修改日期
-      choiceDayTime(index){
-        let self = this;
-        console.log(index);
         let tabIndex = Number(self.activeName);
         let actPanList = self.paneList[tabIndex];
-        self.weeklyTimeArray.forEach(item=>{
-          item.checked = false;
-          item.disabled = false;
+        let selectTime = [];
+        actPanList.timeList.forEach(item=>{
+          selectTime.push(item.time)
+          item.timeArray.forEach(_item=>{
+            _item.disabled = false;
+          })
         })
-        actPanList.timeList.forEach(_item=>{
-          self.weeklyTimeArray.forEach(item => {
-            if(_item.time == item.value){
-              item.disabled = true;
-            }
-          });
-        });
+        selectTime.forEach(item=>{
+          console.log(item);
+          actPanList.timeList.forEach(schedule=>{
+            console.log(schedule);
+            schedule.timeArray.forEach(time=>{
+              if(time.value == item){
+                time.disabled = true;
+              }
+              console.log(time);
+            })
+          })
+        })
       },
       addScheduleService() {
         let params = {};
@@ -904,7 +657,7 @@
         self.isDisabled = true;
         let tempSchedule = [];
         if(params.mode == 0){
-          //日模式
+          //Daily Mode
           let tempPeriod = [];
           let timeSelect = self.paneList[tabIndex].timeList;
           timeSelect.forEach(item=>{
@@ -923,7 +676,7 @@
           });
         }
         else if(params.mode == 1){
-          //周模式
+          //Weekly Mode
           let schedule = self.paneList[tabIndex].weeklySchedule;
           console.log(schedule);
           schedule.forEach(item=>{
@@ -948,7 +701,7 @@
           console.log(tempSchedule);
         }
         else if(params.mode == 2){
-          //月模式
+          //Monthly mode
           let timeSelected = self.paneList[tabIndex].timeList;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
@@ -992,40 +745,27 @@
         let self = this;
         self.scheduleName = self.$t('scheduleView.newSchedule');
         self.isAdd = true;
-        self.checkAllWeek = false;
-        self.checkAllMonth = false;
         let scheduleInfo = {
           name: self.scheduleName,
           mode: 0,
           modeDisabled: false,
           schId: 0,
           dayArray: [],
-          timeArray: ['8:00'],
           enable: false,
           to: -1,
           dueDays: 1,
-          weeklySchedule: [{dayArray:[], day: '', showWeekContent: false, showTimeContent: false, dateStr: '',timeArray:[]}],
-          timeList: [{time:'', showTimeContent: false}]
+          weeklySchedule: [{dayArray:[],timeArray:[], weekList: JSON.parse(JSON.stringify(self.weekList))}],
+          timeList: [{time:'', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))}]
         };
         self.paneList.push(scheduleInfo);
         let pane = self.paneList;
         self.dayArray = [];
         self.curType = 0;
-        self.weekValue = this.$t('scheduleView.everyDay'),
-        self.monthValue = this.$t('scheduleView.everyMonth'),
         self.activeName = (pane.length -1).toString() ;
         self.selectTab = self.scheduleName;
         self.scheduleId = 0;
         self.isDisabled = false;
         self.searchStore();
-        self.weekList.forEach(item=>{
-          item.checked = false
-        })
-        self.monthList.forEach(item=>{
-          item.checked = false
-        })
-        self.monthValue = '';
-        self.weekValue = '';
         self.selectWeek = [];
         self.selectMonth = [];
         console.log(self.paneList)
@@ -1271,32 +1011,26 @@
         console.log(self.showAddTime);
         self.paneList[Number(self.activeName)].timeList.push({
           time:'',
-          showTimeContent: false
+          timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))
         });
+        self.choiceDayTime()
       },
       addWeekDays(index){
         let self = this;
         self.showAddWeek = true;
         self.paneList[Number(self.activeName)].weeklySchedule.push({
-          dayArray:[], day: '',
-          showWeekContent: false,
-          showTimeContent: false,
-          dateStr: '',
-          timeArray:[]
+          dayArray:[],
+          timeArray:[],
+          weekList: JSON.parse(JSON.stringify(self.weekList))
         });
         self.choiceWeek(index)
       },
       deleteWeekDays(index){
         console.log(index)
         let self = this;
-        if(index == -1){
-          self.showAddWeek = false;
-        }
-        else{
-          self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1); //删除时间
-          console.log(self.paneList[Number(self.activeName)].weeklySchedule);
-          self.choiceWeek(index)
-        }
+        self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1); //删除时间
+        console.log(self.paneList[Number(self.activeName)].weeklySchedule);
+        self.choiceWeek(index)
       },
       bindScheduleToStore(params){
         return new Promise((resolve,reject)=>{
@@ -1315,12 +1049,12 @@
 
       async bindSchedule() {
         //门店绑定排程
-        let scheId;
         let self = this;
+        let scheId = self.paneList[Number(self.activeName)].schId;
         self.showBindDialog = false;
         let isAdd = false;
         //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
-        if(self.isAdd){
+        if(scheId == 0){
           isAdd = true;
           scheId = await self.addScheduleService();
           self.paneList[Number(self.activeName)].schId = scheId;
@@ -1329,7 +1063,7 @@
           self.isAdd = false;
         }
         else{
-          scheId = self.scheduleId;
+          // scheId = self.scheduleId;
         }
         if(!isAdd){
           await self.updateScheduleInfo();
@@ -1411,26 +1145,9 @@
       deleteCurTime(index) {
         console.log(index)
         let self = this;
-        if(index == -1){
-          self.showAddTime = false;
-        }
-        else{
-          self.paneList[Number(self.activeName)].timeList.splice(index, 1); //删除时间
-          console.log(self.paneList[Number(self.activeName)].timeList)
-          self.choiceDayTime(index)
-        }
-      },
-      changTime() {
-        let self = this;
-        self.showAddTime = false;
-        let timeArray = self.paneList[Number(self.activeName)].timeArray;
-        if(timeArray.indexOf(self.newTime) == -1){
-          timeArray.push(self.newTime);
-        }
-        else{
-          self.notify('执行时间已存在，请重新添加','warning',3000);
-        }
-        console.log(self.paneList[Number(self.activeName)].timeArray)
+        self.paneList[Number(self.activeName)].timeList.splice(index, 1); //删除时间
+        console.log(self.paneList[Number(self.activeName)].timeList)
+        self.choiceDayTime(index)
       },
 
       async searchStore() {
@@ -1613,7 +1330,6 @@
             })
             let weeklySchedule = self.transformArray(weeklyScheduleArray);
             console.log(weeklySchedule);
-            console.log(timeArray);
             console.log(dayArray);
             tempScheduleData.timeArray = timeArray;
 
@@ -1621,7 +1337,7 @@
             timeArray.forEach(_item=>{
               let timeJson = {};
               timeJson.time = _item;
-              timeJson.showTimeContent = false;
+              timeJson.timeArray = JSON.parse(JSON.stringify(self.weeklyTimeArray));
               timeList.push(timeJson);
             })
             tempScheduleData.timeList = timeList;
@@ -1642,24 +1358,22 @@
             self.echoMonthAndWeek() //回显初次加载时选择的月和周
             self.searchStore();
           }
-          //self.timeArray = self.paneList[0].timeArray
           console.log(self.paneList);
           self.getHasBoundStroeIds();
         }
         else if(data.length == 0){
           console.log(self.paneList)
           let scheduleInfo = {
-            name: "点检计划一",
+            name: self.$t('scheduleView.newSchedule'),
             mode: 0,
             modeDisabled: false,
             schId: 0,
             dayArray: [],
-            timeArray: ['8:00'],
             enable: false,
             to: -1,
             dueDays: 1,
-            weeklySchedule: [{dayArray:[], day: '', showWeekContent: false, showTimeContent: false, dateStr: '',timeArray:[]}],
-            timeList: [{time:'', showTimeContent: false}]
+            weeklySchedule: [{dayArray:[], timeArray:[], weekList:JSON.parse(JSON.stringify(self.weekList))}],
+            timeList: [{time:'', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))}]
           };
           self.paneList.push(scheduleInfo);
           self.scheduleName = "点检计划一";
@@ -1694,45 +1408,43 @@
         console.log(arr);
         arr.forEach(item=>{
           item.dayArray.sort();
-          item.day = item.dayArray.toString();//设置选择的天数
-          item.dateStr = self.getDateStrByArr(item.dayArray); //设置选择的日期
-          item.showWeekContent = false; //是否显示面板
-          item.showTimeContent = false; //是否显示时间面板
+          // item.day = item.dayArray.toString();//设置选择的天数
+          item.weekList = JSON.parse(JSON.stringify(self.weekList))
         })
         return arr;
     },
-  getHasBoundStroeIds(){
-        let self = this;
-        self.hasBoundStoreIds = [];
-        self.paneList.forEach(item=>{
-          let sheduleId = item.schId;
-          let mode = item.mode;
-          console.log(sheduleId + '....' + mode)
-          //获取绑定周、月模式商店的id
-          if (mode !== 3) {
-            let params = {};
-            params.scheduleId = sheduleId;
-            return new Promise((resolve, reject) => {
-              getScheduleBindList(params).then(res => {
-                console.log(res);
-                let errMsg = res.errMsg;
-                let data = res.data;
-                console.log(data);
-                data.forEach(_item=>{
-                  if(self.hasBoundStoreIds.indexOf(_item) == -1){
-                    self.hasBoundStoreIds.push(_item);
-                  }
-                  else{
-                    // do nothing
-                  }
+      getHasBoundStroeIds(){
+            let self = this;
+            self.hasBoundStoreIds = [];
+            self.paneList.forEach(item=>{
+              let sheduleId = item.schId;
+              let mode = item.mode;
+              console.log(sheduleId + '....' + mode)
+              //获取绑定周、月模式商店的id
+              if (mode !== 3) {
+                let params = {};
+                params.scheduleId = sheduleId;
+                return new Promise((resolve, reject) => {
+                  getScheduleBindList(params).then(res => {
+                    console.log(res);
+                    let errMsg = res.errMsg;
+                    let data = res.data;
+                    console.log(data);
+                    data.forEach(_item=>{
+                      if(self.hasBoundStoreIds.indexOf(_item) == -1){
+                        self.hasBoundStoreIds.push(_item);
+                      }
+                      else{
+                        // do nothing
+                      }
+                    })
+                    resolve(data);
+                  })
                 })
-                resolve(data);
-              })
+              }
             })
-          }
-        })
-        console.log(self.hasBoundStoreIds)
-      },
+            console.log(self.hasBoundStoreIds)
+          },
       secondsToHour(second){
         //秒数转化为时分秒
         console.log(second)
@@ -1771,9 +1483,8 @@
         params.to =  -1;
         params.notityTime = 0;
         let tempSchedule = [];
-        //日模式
+        //Daily Mode
         if(mode == 0){
-          //日模式
           let tempPeriod = [];
           let timeSelect = self.paneList[tabIndex].timeList;
           timeSelect.forEach(item=>{
@@ -1790,7 +1501,7 @@
           });
         }
         else if(mode == 1){
-          //周模式
+          //Weekly Mode
           let schedule = self.paneList[tabIndex].weeklySchedule;
           console.log(schedule);
           schedule.forEach(item=>{
@@ -1815,7 +1526,7 @@
           console.log(tempSchedule);
         }
         else if(mode == 2){
-          //月模式
+          //Monthly Mode
           let timeSelected = self.paneList[tabIndex].timeList;
           let selectedMonth = self.selectMonth;
           self.paneList[tabIndex].dayArray = self.selectMonth;
@@ -1852,6 +1563,9 @@
           })
         })
 
+      },
+      deleteScheduleBtn(){
+        this.showDeleteDialog = true
       },
       deleteSchedule(){
         let self = this;
@@ -1900,10 +1614,6 @@
         console.log(self.scheduleId)
         self.getHasBoundStroeIds()
       },
-      hiddenMonthPanel(){
-        let self = this;
-        self.showMonthContent = false
-      },
       getSelectTimeArray(){
         let self = this;
         let date = self.$moment().format('YYYY-MM-DD');
@@ -1921,35 +1631,10 @@
           timeJson.value = item;
           timeJson.name = item;
           timeJson.label = item;
-          timeJson.checked = false;
           timeJson.disabled = false;
           self.weeklyTimeArray.push(timeJson);
         })
         console.log(self.weeklyTimeArray)
-      },
-      getDateStrByArr(arr){
-        let self = this;
-        let dateStr = '';
-        self.weekList.forEach(item=>{
-          arr.forEach(_item=>{
-            if(item.value == _item){
-              dateStr += item.name + ','
-            }
-          })
-        })
-        if(dateStr == '周六,周日,'){
-          dateStr = '周末';
-        }
-        else if(dateStr == '周一,周二,周三,周四,周五,'){
-          dateStr = '工作日';
-        }
-        else if(dateStr == '周一,周二,周三,周四,周五,周六,周日,'){
-          dateStr = '每天';
-        }
-        else{
-
-        }
-        return dateStr;
       },
       changeSelectMonth(val, item){
         let self = this;
@@ -1959,6 +1644,7 @@
       changeSelectWeek(val, item){
         let self = this;
         item.dayArray = Array.from(val)[0];
+        self.choiceWeek()
       },
       changeSelectWeekTime(val, item){
         let self = this;
@@ -1967,11 +1653,10 @@
         console.log(item.timeArray)
       },
     },
-    mounted(){
+    created(){
       let self = this;
       self.getSelectTimeArray();
       self.getScheduleList();
-      //self.hiddenPanel();
     }
 
   }
@@ -2262,13 +1947,6 @@
             font-size: calc(24/1920*100vw);
             padding:  calc(5/1920*100vw) 0;
           }
-          span{
-            position: relative;
-            bottom: calc(4/1920*100vw);
-            @media screen and (max-width: 1280px) {
-              bottom: calc(2/1920*100vw);
-            };
-          }
           &:disabled{
             opacity: 0.5;
           }
@@ -2281,34 +1959,23 @@
           color: #fff;
           //border-color: $mainColor;
           position: relative;
-          @include point(margin-right,15);
+          margin-right:calc(20/1920*100vw);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
           padding: 0 0;
           width: calc(160/1920*100vw);
-          .el-icon-plus{
-            font-size: calc(24/1920*100vw);
-            padding:  calc(5/1920*100vw) 0;
-          }
-          span{
-            position: relative;
-            bottom: calc(4/1920*100vw);
-            @media screen and (max-width: 1280px) {
-              bottom: calc(2/1920*100vw);
-            };
-          }
           &:disabled{
             opacity: 0.5;
           }
           @media screen and (max-width: 1680px){
-            width: 130px !important;
+            width: 110px !important;
           }
 
         }
         .el-delete-btn {
           color: #fff;
           position: relative;
-          @include point(margin-right, 15);
+          margin-right:calc(20/1920*100vw);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
           padding: 0 0;
@@ -2316,75 +1983,24 @@
           @media screen and (max-width: 1680px){
             width: 120px;
           }
-          .icon-shanchu{
-            font-size: calc(26/1920*100vw);
-            padding:  calc(5/1920*100vw) 0;
-          }
-          span{
-            position: relative;
-            bottom: calc(4/1920*100vw);
-            @media screen and (max-width: 1280px) {
-              bottom: calc(2/1920*100vw);
-            };
-          }
           &:disabled {
             opacity: 0.5;
           }
         }
         .en-el-delete-btn{
-          //background-color: $mainColor;
           color: #fff;
-          //border-color: $mainColor;
           position: relative;
-          @include point(margin-right, 15);
-          // @include point(width, 120);
+          margin-right:calc(20/1920*100vw);
           font-size: calc(14/1920*100vw);
           height: calc(36/1920*100vw);
           padding: 0 0;
           width: calc(160/1920*100vw);
-          .icon-shanchu{
-            font-size: calc(24/1920*100vw);
-            padding:  calc(5/1920*100vw) 0;
-          }
-          span{
-            position: relative;
-            bottom: calc(4/1920*100vw);
-            @media screen and (max-width: 1280px) {
-              bottom: calc(2/1920*100vw);
-            };
-          }
           @media screen and (max-width: 1680px){
-            width: 130px;
+            width: 110px !important;
           }
           &:disabled {
             opacity: 0.5;
           }
-        }
-        .en-el-bind-btn{
-          //background-color: $mainColor;
-          color: #fff;
-          //border-color: $mainColor;
-          position: relative;
-          @include point(margin-right,15);
-          font-size: 12px;
-          width:120px;
-          &:disabled{
-            opacity: 0.5;
-          }
-          @media screen and (min-width: 1366px){
-            @include point(width, 90);
-            span{
-              position: relative;
-              @include point(bottom,1);
-            }
-          }
-          @media screen and (max-width: 1366px){
-            span{
-              position: relative;
-              @include point(bottom, 2)
-            }
-          }
-
         }
         .btn-class{
           height: calc(36/1920*100vw);
@@ -2392,105 +2008,14 @@
           font-size: calc(14/1920*100vw);
           width: calc(130/1920*100vw);
           .el-icon-plus, .icon-shanchu{
-            padding: calc(5/1920*100vw) 0;
             font-size: calc(16/1920*100vw);
-          }
-          span{
-            position: relative;
-            bottom: calc(1/1920*100vw);
-            @media screen and (max-width: 1440px) {
-              bottom: 0;
-            };
+            margin-right: calc(8/1920*100vw);
           }
         }
-        .en-el-delete-btn.btn-class, en-el-add-btn.btn-class{
-          width: 130px;
-        }
-        .downLoad-btn{
-          margin-left: 0px !important;
-          border-color: $mainColor !important;
-          color: $mainColor !important;
-          border-radius: 0px;
-          padding: 2px 5px !important;
-
-          position: relative;
-          top: 3px;
-          display: inline-block;
-          text-decoration: none;
-          font-size: 12px;
-          border: 1px solid;
-          border-left-width: 0px;
-          @include point(right,5);
-          cursor: pointer;
-          &:hover{
-            background-color: #FEE4E7;
-          }
-          &:focus{
-            background-color: #FEE4E7;
-          }
-          span{
-            position: relative;
-            bottom: 3px;
-          }
-        }
-        .el-handle-btn{
-          margin-left: 0px !important;
-          border-color: $mainColor !important;
-          color: $mainColor !important;
-          border-radius: 0px;
-          padding: 3px 5px !important;
-          position: relative;
-          top: 3px;
-          border-right: 0;
-          span{
-            position: relative;
-            @include point(bottom,3);
-          }
-          &:last-child{
-            border-right: 1px solid;
-          }
-
-          &:hover{
-            background-color: #FEE4E7;
-          }
-          &:focus{
-            background-color: #FEE4E7;
-          }
-        }
-        .en-el-handle-btn{
-          margin-left: 0px !important;
-          border-color: $mainColor !important;
-          color: $mainColor !important;
-          border-radius: 0px;
-          padding: 3px 5px !important;
-          position: relative;
-          top: 3px;
-          border-right: 0;
-          @media screen and (min-width: 1366px){
-            @include point(width, 90);
-            span{
-              position: relative;
-              @include point(bottom,3);
-            }
-          }
-          @media screen and (max-width: 1366px){
-            @include point(width, 120);
-            span{
-              position: relative;
-              @include point(bottom,5);
-            }
-          }
-
-          &:last-child{
-            border-right: 1px solid;
-          }
-
-          &:hover{
-            background-color: #FEE4E7;
-          }
-          &:focus{
-            background-color: #FEE4E7;
-          }
+        .btn-area{
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       }
     }
@@ -2531,24 +2056,16 @@
       height: 2px;
       background-color: #E4E7ED;
     }
-    #patrltabs-content /deep/ .el-tabs__nav-scroll{
-      height: 40px;
-    }
     #patrltabs-content /deep/ .el-tabs__item {
-      padding: 0 0;
-      margin: 0 12px;
+      padding: 0 5px;
       font-size: 14px;
       width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
-
+      box-sizing: content-box;
     }
-    #patrltabs-content /deep/ .is-active {
-      border-bottom: 4px solid #f31d65;
-    }
-
     #patrltabs-content /deep/ .el-tabs__active-bar{
-      height: 0 !important;
+      height: 4px;
     }
   }
   /deep/ .el-input--mini .el-input__inner{
