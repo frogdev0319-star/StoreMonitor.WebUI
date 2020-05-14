@@ -1364,7 +1364,7 @@
         else if(data.length == 0){
           console.log(self.paneList)
           let scheduleInfo = {
-            name: self.$t('scheduleView.newSchedule'),
+            name: "点检计划一",
             mode: 0,
             modeDisabled: false,
             schId: 0,
