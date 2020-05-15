@@ -19,7 +19,6 @@
                 @change="dateChange"
                 :default-time="defaultTime">
             </el-date-picker>
-            <!--<input type="text" id="dateinput" v-model="dateInputStr" readonly @focus="getNewestDate">-->
             <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
                 placement="bottom-end">
                 <div slot="content">*{{generateEventLang('timePlaceholder')}}</div>
@@ -148,7 +147,6 @@ export default {
     data(){
         return{
             dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
-            dateInputStr:'',
             dateOpt: {
                 disabledDate:(time)=>{
                     return time.getTime() > Date.now();
@@ -288,65 +286,6 @@ export default {
         return obj;
       },
         generateEventLang,
-        /*focusDate(val){
-            let self=this;
-            console.log(val);
-        },*/
-        dealDateStr(val){
-            let dateRet='';
-            let startStr=val.split('~')[0];
-            let endStr=val.split('~')[1];
-            let start=new Date(startStr).getTime();
-            let end=new Date(endStr).getTime();
-
-            let todayFullYear=new Date().getFullYear();
-            let todayMonth=(new Date().getMonth()+1)<10?'0'+(new Date().getMonth()+1):(new Date().getMonth()+1);
-            let todayDate=new Date().getDate()<10?'0'+(new Date().getDate()):(new Date().getDate());
-            let nowHour=new Date().getHours()<10?'0'+(new Date().getHours()):(new Date().getHours());
-            let nowMin=new Date().getMinutes()<10?'0'+(new Date().getMinutes()):(new Date().getMinutes());
-            let nowSec=new Date().getSeconds()<10?'0'+(new Date().getSeconds()):(new Date().getSeconds());
-
-            let endFullYear=new Date(endStr).getFullYear();
-            let endMonth=new Date(endStr).getMonth()+1<10?('0'+(new Date(endStr).getMonth()+1)):new Date(endStr).getMonth()+1;
-            let endDate=new Date(endStr).getDate()<10?'0'+new Date(endStr).getDate():new Date(endStr).getDate();
-            if(todayFullYear==endFullYear&&todayMonth==endMonth&&todayDate==endDate){  //截至日期选的是今天
-                //dateRet=startStr
-            }
-        },
-        dateChangeInput(val){
-            let self=this;
-            console.log(val);
-            let startStr=val.split('~')[0];
-            let endStr=val.split('~')[1];
-            let start=new Date(startStr).getTime();
-            let end=new Date(endStr).getTime();
-
-            if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                self.$message({
-                    message: this.$t('eventView.changeTimeRange'),
-                    type:'warning',
-                    duration:3*1000
-                })
-                start=end-3600*24*30*1000;
-                let initDateStr=util.getDateStr1(start)+' ~ '+util.getDateStr1(end);
-                self.dateInputStr=initDateStr;
-            }
-            self.serachData='';
-            let tabIndex=Number(self.activeName);
-            self.tableDataList[tabIndex].page=1;
-            self.params.like={};
-            self.params.beginTs=start;
-            self.params.endTs=end;
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            let selectValue=self.value;
-            let status=[];
-            self.getEventList(self.params);
-            switch(selectValue){
-                case 0:status=[0,1,2];break;
-                default:status=selectValue-1;break;
-            }
-            self.getEventCount(start,end,status);
-        },
         dateChange(val){
             let self=this;
             console.log(val);
@@ -922,41 +861,6 @@ export default {
                 console.log(err);
             })
         },
-        getInitDateStr(){
-            let self=this;
-            let dateRetStr='';
-            let startStr=self.dateInputStr.split('~')[0];
-            let endStr=self.dateInputStr.split('~')[1];
-            let formatDate=function(datetype){
-                return datetype<10?('0'+datetype):datetype;
-            }
-            let getDateObj=dateStr=>{
-                let obj={
-                    year:new Date(dateStr).getFullYear(),
-                    month:formatDate(new Date(dateStr).getMonth()+1),
-                    date:formatDate(new Date(dateStr).getDate()),
-                    hour:formatDate(new Date(dateStr).getHours()),
-                    minutes:formatDate(new Date(dateStr).getMinutes()),
-                    second:formatDate(new Date(dateStr).getSeconds())
-                }
-                return obj;
-            }
-            let nowHours=formatDate(new Date().getHours());
-            let nowMin=formatDate(new Date().getMinutes());
-            let nowSecond=formatDate(new Date().getSeconds());
-            let start=getDateObj(startStr);
-            let end=getDateObj(endStr);
-            let startRet=start.year+'-'+start.month+'-'+start.date+' '+nowHours+':'+nowMin+':'+nowSecond;
-            let endRet=end.year+'-'+end.month+'-'+end.date+' '+nowHours+':'+nowMin+':'+nowSecond;
-            dateRetStr=startRet+' ~ '+endRet;
-            return dateRetStr;
-        },
-        getNewestDate(){
-            let self=this;
-            let dateStr=self.getInitDateStr();
-            console.log(dateStr);
-            //self.dateInputStr=dateStr;
-        },
        initData(){
         let self=this;
         self.activeName = '0';
@@ -1005,26 +909,21 @@ export default {
       }
     },
     created(){
-      console.log('created')
       this.isFirstLoad = true
     },
     async mounted(){
         let self=this;
-        console.log('mounted')
         self.getDeafultTime();
         //await self.isLoginIn();
         let windowHeight=window.innerHeight;
         if(windowHeight>800){
             self.tableHeight=770+'px';
         }
-        console.log(self.tableHeight);
         self.getUserId();
         self.getInitList();
-
-        let initDateStr=util.getDateStr1(new Date().getTime()-3600*1000*24)+' ~ '+util.getDateStr1(new Date().getTime());
-        self.dateInputStr=initDateStr;
     },
   beforeRouteEnter (to, from, next) {
+    to.meta.keepAlive = true
     if(from.name=='eventDetails'&& to.name == 'eventManage'){
       to.meta.isBack = true;
       next();
@@ -1036,10 +935,9 @@ export default {
   },
   activated(){
     let self=this;
-    console.log('调用')
     self.windowHeight = window.innerHeight;
     if(!self.$route.meta.isBack || self.isFirstLoad){
-      console.log('调用initData')
+      self.initData()
     }
     else{
       self.getEventList(self.params);
@@ -1059,65 +957,19 @@ export default {
   },
     beforeRouteLeave (to, from, next) {
       console.log(this.params);
-        if(to.name != 'eventDetails'){
-          from.meta.keepAlive = false;
-          next(vm=>{
-            console.log(vm)
-          });
-        }
-        else{
-          from.meta.keepAlive = true;
-          next(vm=>{
-            console.log(vm)
-          });
-        }
+      if(to.name != 'eventDetails'){
+        from.meta.keepAlive = false;
+        next(vm=>{
+          console.log(vm)
+        });
+      }
+      else{
+        from.meta.keepAlive = true;
+        next(vm=>{
+          console.log(vm)
+        });
+      }
     },
-    // beforeRouteEnter (to, from, next) {
-    //   console.log(to);
-    //   to.meta.keepAlive=true;
-    //   next(vm => {
-    //     console.log(vm);
-    //     // let queryStr = sessionStorage.getItem('queryparams')
-    //     // vm.params = JSON.parse(queryStr);
-    //     // if(from.name=='eventDetails' && to.name == 'eventManage'){
-    //     //   console.log(vm.params)
-    //     //   vm.getEventList(vm.params);
-    //     // }
-    //   });
-    // },
-    // activated(){
-    //     let self=this;
-    //     self.getEventList(self.params);
-    // }
-    // beforeRouteLeave (to, from, next) {
-    //   if(to.name=='eventDetails'){
-    //     if(!from.meta.keepAlive){
-    //       from.meta.keepAlive=true;
-    //     }
-    //   }
-    //   else{
-    //     from.meta.keepAlive=false;
-    //     //this.$destroy();
-    //   }
-    //   next();
-    // },
-    // beforeRouteEnter (to, from, next) {
-    //   if(from.name!='eventDetails'&&from.path!='/'){
-    //     to.meta.keepAlive=false;
-    //   }
-    //   else{
-    //     to.meta.keepAlive=true;
-    //   }
-    //   next(vm => {
-    //     console.log(vm);
-    //   });
-    // },
-    // activated(){
-    //   console.log('activated 调用')
-    //   let self=this;
-    //   console.log(self.params);
-    //   self.getEventList(self.params);
-    // }
 }
 </script>
 
