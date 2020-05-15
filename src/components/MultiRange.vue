@@ -69,6 +69,9 @@
         this.$emit('getTimeArray', timeArray)
       },
     },
+    beforeDestroy(){
+      this.slider.off('change', this.changeSlider)
+    },
     mounted () {
       this.addSlider()
     }
