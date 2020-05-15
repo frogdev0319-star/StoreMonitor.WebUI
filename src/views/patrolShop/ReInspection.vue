@@ -2029,8 +2029,8 @@ export default {
                     item.disabled=false;
                     self.showError=false;
                     self.showGuide=false;
-                    //萤石云处理
-                    if(item.deviceId!=self.curDeviceId){
+                    if(item.deviceId[0] != self.curDeviceId){
+                      //Dash
                       if(!self.isEzviz){
                         if(self.playState){
                           self.stopAndRealTime();
@@ -2040,7 +2040,7 @@ export default {
                         }
                       }
                       else{
-                        //萤石云平台
+                        //Ezviz
                         if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
                           self.$refs.ezvizVideo.stopRealTime();
                           self.$nextTick(()=>{
@@ -2053,7 +2053,7 @@ export default {
                           })
                         }
                       }
-                        self.curDeviceId=item.deviceId;
+                        self.curDeviceId=item.deviceId[0];
                     }
                     // else{
                     //   if(!self.videoAuthority){
