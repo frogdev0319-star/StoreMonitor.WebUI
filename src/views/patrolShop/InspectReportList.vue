@@ -894,6 +894,7 @@ export default {
         },
     },
     beforeRouteEnter (to, from, next) {
+      to.meta.keepAlive = true
       if(from.name=='reportDetails'&& to.name == 'reports'){
         to.meta.isBack = true;
         next();
@@ -928,16 +929,16 @@ export default {
     activated(){
       let self=this;
       if(!self.$route.meta.isBack || self.isFirstLoad){
-        // self.initData();
-        // self.getRegionInfo();
-        // self.getInitReportList();
+        self.initData();
+        self.getRegionInfo();
+        self.getInitReportList();
       }
       else{
         //
       }
       self.$route.meta.isBack = false;
       self.isFirstLoad = false;
-    }
+    },
 }
 </script>
 <style lang="scss" scoped>
