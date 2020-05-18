@@ -168,7 +168,8 @@ export default {
     emptyEventList: 'The event list is empty, please refilter the data',
     none: 'None',
     allZoneI: 'All Region I',
-    allZoneII: 'All Region II'
+    allZoneII: 'All Region II',
+    dataZoomInfo: 'Scroll the mouse in the coordinate system to zoom the data area and see the data details'
   },
   //remote Patrol page language
   remotePatrol:{

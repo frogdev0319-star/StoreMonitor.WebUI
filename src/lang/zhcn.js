@@ -169,7 +169,8 @@ export default {
     emptyEventList: '事件列表为空，请重新筛选数据',
     none: '无',
     allZoneI: '全部区域一',
-    allZoneII: '全部区域二'
+    allZoneII: '全部区域二',
+    dataZoomInfo: '坐标系内滚动鼠标实现数据区域缩放，查看数据细节'
   },
   //remote Patrol page language
   remotePatrol:{

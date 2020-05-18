@@ -214,14 +214,10 @@
           <div class="inspect-cycle">
             <div class="cycle-title">{{$t('overview.avgPatrlCycle')}}</div>
             <div class="cycle-panel">
+              <div class="panel-info">*{{$t('overview.dataZoomInfo')}}</div>
               <div class="panel-bubble">
                 <v-chart :options="cycleOption" class="radar-content" :auto-resize='true' ref="cycleChart"/>
               </div>
-              <!--<div class="cycle-label">-->
-              <!--<div class="cycle-labels" v-for="(item, index) in passRateList" :key="index">-->
-              <!--<span class="label-rect" :class="`label-${index}`"></span>-->
-              <!--{{item.desc}}</div>-->
-              <!--</div>-->
               <div class="cycle-axis">{{$t('overview.cycle')}}</div>
               <div class="pass-rate-axis">{{$t('overview.passRate')}}</div>
             </div>
@@ -1666,6 +1662,20 @@
         // };
         let options = {
           backgroundColor: '#fff',
+          dataZoom: [
+            {
+              id: 'dataZoomX',
+              type: 'inside',
+              xAxisIndex: [0],
+              filterMode: 'filter',
+            },
+            // {
+            //   id: 'dataZoomY',
+            //   type: 'inside',
+            //   yAxisIndex: [0],
+            //   filterMode: 'filter',
+            // },
+          ],
           legend: {
             x: 'center',
             y: 'bottom',
@@ -1706,16 +1716,44 @@
               type: 'line'        // 默认为直线，可选为：'line' | 'shadow'
             },
             formatter: function (obj) {
-              var value = obj.value;
-              console.log(value);
+              let value = obj.value;
               if (value[0] == undefined) {
                 return;
               }
-              return schema[4].text + ': ' + value[4] + '<br>'
-                + schema[0].text + '：' + value[1] + self.$t("overview.day") + '<br>'
-                + schema[1].text + '：' + value[0] + '%<br>'
-                + schema[2].text + '：' + value[2] + '%<br>'
-                + schema[3].text + '：' + value[3] + '%<br>';
+              let htmlRegion = `${schema[4].text}: ` //region
+              let execellentStr = `${schema[2].text}: ` //excellent rate
+              let dangerousStr = `${schema[3].text}: ` //dangerous rate
+              let allData = [...options.series[0].data, ...options.series[1].data, ...options.series[2].data, ...options.series[3].data]
+              allData.forEach(item => {
+                if (value[0] === item[0] && value[1] === item[1]) {
+                  htmlRegion += `${item[4]},`
+                  execellentStr += `${item[2]}%,`
+                  dangerousStr += `${item[3]}%,`
+                }
+              });
+              htmlRegion = htmlRegion.substr(0, htmlRegion.length -1)
+              execellentStr = execellentStr.substr(0, execellentStr.length -1)
+              dangerousStr = dangerousStr.substr(0, dangerousStr.length - 1)
+              let htmlF = ''
+              if(value[0] > 50){
+                htmlF = `${htmlRegion}<br>
+                          ${execellentStr}<br>
+                          ${schema[0].text}: ${value[1]}${self.$t("overview.day")}<br>
+                          ${schema[1].text}: ${value[0]}%<br>`
+              }
+              else{
+                htmlF = `${htmlRegion}<br>
+                          ${dangerousStr}<br>
+                          ${schema[0].text}: ${value[1]}${self.$t("overview.day")}<br>
+                          ${schema[1].text}: ${value[0]}%<br>`
+              }
+
+              return htmlF;
+              // return schema[4].text + ': ' + value[4] + '<br>'
+              //   + schema[0].text + '：' + value[1] + self.$t("overview.day") + '<br>'
+              //   + schema[1].text + '：' + value[0] + '%<br>'
+              //   + schema[2].text + '：' + value[2] + '%<br>'
+              //   + schema[3].text + '：' + value[3] + '%<br>';
             },
             backgroundColor: self.echartBackground,
           },
@@ -2187,7 +2225,7 @@
         if(e.target === e.currentTarget || e.target === this){
           this.adjustPatrolChart();
         }
-      }
+      },
     },
     created() {
       let self = this;
@@ -2915,8 +2953,9 @@
           }
           .cycle-panel {
             height: 325px;
-            padding: 30px calc(50 / 1920 * 100vw) 0 20px;
+            padding: 0px calc(50 / 1920 * 100vw) 0 20px;
             position: relative;
+            text-align: left;
             .panel-bubble {
               height: 270px;
               position: relative;
@@ -2924,6 +2963,12 @@
                 height: 100%;
                 width: 100%;
               }
+            }
+            .panel-info{
+              height: 30px;
+              line-height: 30px;
+              font-size: 12px;
+              color: #7d8cad;
             }
             .cycle-label {
               font-size: calc(12 / 1920 * 100vw);
