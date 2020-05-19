@@ -559,9 +559,7 @@
       },
       resizeFun(){
         let self = this;
-        console.log('屏幕大小变化');
         if(!self.checkFull() && self.fullWindow){
-          console.log('退出全屏1111');
           self.fullWindow=false;
           var playerEle =  self.$refs.myPlayer;
           playerEle.style.width = self.initPlayerWidth + 'px'; //动态设置HTML元素高度
@@ -581,7 +579,6 @@
               .then(result => {
                 self.currentStoreId = storeId;
                 self.accessToken = result.data.accessToken;
-                //self.accessToken = 'at.1zxfxzy03nm6ld1t1s5s3es203455czn-45ft0jzwlk-06lc2eq-7rzulbgak';
                 self.ezvizExpireTime = result.data.expireTime;
                 resolve(result.data.accessToken);
               })
@@ -669,7 +666,6 @@
       },
       async initVideo() {
         let self = this
-        console.log("调用初始化方法")
         self.showError = false;
         //调用密码设置方法
         console.log(self.playBack)
@@ -713,7 +709,6 @@
 
       },
       handleError(e){
-        console.log('捕获到错误',e)
         console.log(e.msg)
         let self = this;
         self.isLoading = false;
@@ -1832,20 +1827,16 @@
         if(self.playBack){
           self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
           self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-          console.log('历史视频')
           if(self.videoPassword.length > 0){
             self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('加入验证码历史视频' + self.videoUrl)
           }
           else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            console.log('历史视频' + self.videoUrl)
           }
         }
         else{
           if(self.videoPassword.length > 0){
             self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
-            console.log('加入验证码实时视频' + self.videoUrl)
           }
           else{
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';

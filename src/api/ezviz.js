@@ -60,7 +60,7 @@ export const getEzvizAccountList=data=> {
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 const instance = axios.create({
   baseURL: 'https://open.ys7.com/api/',
-  timeout: 1000,
+  timeout: 3*1000,
   withCredentials: false, // 默认的
   headers: {
     "Accept":"application/json",
@@ -70,18 +70,7 @@ const instance = axios.create({
 function getMsg() {
   let lang = i18n.locale;
   let msg = '';
-  if(lang == 'zh'){
-    msg = '无效的设备，请联系管理员';
-  }
-  else if(lang == 'en'){
-    msg = 'Invalid device, please contact administrator';
-  }
-  else if(lang == 'zhtw'){
-    msg = '無效的設備，請聯繫管理員';
-  }
-  else{
-    msg = '无效的设备，请联系管理员';
-  }
+  msg = i18n.t('storeMonitor.noDevice')
   return msg;
 }
 export async function getDeviceCapacity(data){
