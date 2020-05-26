@@ -156,7 +156,7 @@
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <dialog-vue :dialog-title='leaveObj.title' :show-info='leaveObj.showInfo' :is-warning='leaveObj.isWarning' :dialog-closed='leaveObj.dialogCosed' @confirmed='leaveDialog' @canceled='cancelLeave'></dialog-vue>
             <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
-          <div class="guide-content" v-if="showGuide">
+          <div class="guide-content" v-if="showGuide && inspectList.length > 0">
                 <div class="guide-rside">
                     <div class="num-content">
                         <span class="guide-num">2</span>
@@ -230,7 +230,7 @@
               </ezviz-video>
             </div>
             <div class="el-inspect">
-                <div class="guide-lside" v-if="showGuide">
+                <div class="guide-lside" v-if="showGuide && inspectList.length > 0">
                     <div class="num-content">
                         <span class="guide-num">1</span>
                         <span class="guide-title">
@@ -1993,7 +1993,7 @@ export default {
             self.sourceList=[];
             self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
             let obj={};
-            if(!item.deviceId.includes(-1)){  //当前选择的巡检项已绑定设备
+            if(item.deviceId.length > 0){  //当前选择的巡检项已绑定设备
                 let device=self.getDeviceById(item.deviceId);
                 if(device.length > 0){
                     obj.id=device[0].id;
@@ -2063,7 +2063,7 @@ export default {
                     // }
                 }
             }
-            else if(item.deviceId==-1){
+            else if(item.deviceId.length == 0){
                 self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
@@ -3819,8 +3819,8 @@ export default {
                         }
                     }
                   .guide-lside{
-                    top: 10px;
-                    right: 3%;
+                    top: 5px;
+                    right: 5%;
                   }
                 }
                 .inspect-content{
@@ -3963,7 +3963,7 @@ export default {
                         @media screen and(min-width:1366px) {
                             .titles{
                                 font-size: 14px;
-                                width: 65%;
+                                width: 55%;
                                 display: inline-block;
                                 overflow: hidden;
                                 white-space: nowrap;
@@ -4050,12 +4050,11 @@ export default {
                         }
                         .dropdown-model{
                             position: absolute;
-                            @include point(right,46);
+                            @include point(right,60);
                             @include point(top,12);
-                            margin-right: 20px;
-                            max-width: 80px;
+                            margin-right: 10px;
+                            width: 120px;
                             height: 22px;
-                            @include point(width,76);
                             background-color: transparent;
                             z-index: 20;
                             cursor: not-allowed;
@@ -4063,7 +4062,7 @@ export default {
                         .item-score{
                             box-sizing: border-box;
                             position: absolute;
-                            @include point(right,46);
+                            @include point(right,60);
                             @include point(top,12);
                             font-size: 12px;
                             margin-right: 20px;
