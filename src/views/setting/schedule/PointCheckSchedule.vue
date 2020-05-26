@@ -1936,13 +1936,11 @@
         z-index: 10;
         width: auto;
         @include point(top,20);
+        display: flex;
         .el-add-btn{
-          //background-color: $mainColor;
           color: #fff;
-          //border-color: $mainColor;
           position: relative;
-          @include point(margin-right,15);
-          // @include point(width, 98);
+          margin-right:calc(20/1920*100vw);
           .icon-shanchu{
             font-size: calc(24/1920*100vw);
             padding:  calc(5/1920*100vw) 0;
@@ -1955,9 +1953,7 @@
           }
         }
         .en-el-add-btn{
-          //background-color: $mainColor;
           color: #fff;
-          //border-color: $mainColor;
           position: relative;
           margin-right:calc(20/1920*100vw);
           font-size: calc(14/1920*100vw);

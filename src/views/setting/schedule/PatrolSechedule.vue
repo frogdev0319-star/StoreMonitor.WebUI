@@ -131,16 +131,13 @@
   }
 
   .el-add-btn{
-    //background-color: $mainColor;
     color: #fff;
-    //border-color: $mainColor;
     position: relative;
-    @include point(margin-right,15);
-    // @include point(width, 98);
-    .icon-shanchu{
-      font-size: calc(24/1920*100vw);
-      padding:  calc(5/1920*100vw) 0;
-    }
+    margin-right:calc(20/1920*100vw);
+    font-size: calc(14/1920*100vw);
+    height: calc(36/1920*100vw);
+    padding: 0 0;
+    width: calc(130/1920*100vw);
     &:disabled{
       opacity: 0.5;
     }
@@ -149,9 +146,7 @@
     }
   }
   .en-el-add-btn{
-    //background-color: $mainColor;
     color: #fff;
-    //border-color: $mainColor;
     position: relative;
     margin-right:calc(20/1920*100vw);
     font-size: calc(14/1920*100vw);
@@ -232,6 +227,7 @@
         z-index: 10;
         width: auto;
         @include point(top, 20);
+        display: flex;
       }
     }
     #patrol-content /deep/ .el-tabs__nav-scroll{
