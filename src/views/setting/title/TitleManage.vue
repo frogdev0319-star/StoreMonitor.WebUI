@@ -20,7 +20,7 @@
             @click="showDeleteDialogMethod(0)"
           >
             <div class="btn-area">
-              <i style="margin-right:8px;" class="iconfont el-icon-delete"></i>
+              <i style="margin-right:8px;" class="iconfont icon-shanchu"></i>
               <span>{{$t('titleView.deleteTitle')}}</span>
             </div>
           </el-button>
