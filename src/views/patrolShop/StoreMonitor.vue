@@ -667,7 +667,7 @@ export default {
             videoLoadingObj:{
               title: this.$t('remotePatrol.prompt'),
               showInfo: this.$t('remotePatrol.videoLoading'),
-              isWarning:true,
+              isWarning:false,
               dialogCosed:false
             },
             isLoading: false,
