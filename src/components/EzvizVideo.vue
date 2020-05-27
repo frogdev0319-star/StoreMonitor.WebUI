@@ -15,7 +15,7 @@
           <canvas id="vcanvas"  :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'"></canvas>
           <img :src="imgSrc" id="imgTest" :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'" style="display: none"/>
         </div>
-        <span id="channelName" v-if="showInfoContent">{{channelInfo.channelName}}</span>
+        <span id="channelName" v-if="showInfoContent && channelInfo">{{channelInfo.channelName}}</span>
         <div class="icon-footer" v-if="showInfoContent|| playBackState">
           <div class="iconlside">
             <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-if="playState"></i>
@@ -591,9 +591,8 @@
       async checkIfEncry(){
         let self = this;
         let obj={};
-        console.log(self.accessToken)
         obj.accessToken= self.accessToken;// token
-        if(self.channelInfo.ivsId == 0){
+        if(self.channelInfo == null){
           return;
         }
         obj.deviceSerial = self.channelInfo.ivsId; //设备序列号
@@ -791,7 +790,6 @@
         return msg;
       },
       handleSuccess(){
-        console.log("播放成功回调函数，此处可执行播放成功后续动作");
         let self = this;
         self.editCount ++;
         self.showError = false;
@@ -833,7 +831,6 @@
       },
 
       handleFullWindowSuccess(){
-        console.log("全屏播放成功回调函数，此处可执行播放成功后续动作");
         let self = this;
         self.editCount ++;
         // self.playState = true;
@@ -859,8 +856,6 @@
         }, 2000);
       },
       handleExitFullScreenSuccess(){
-        console.log("退出全屏播放成功回调函数，此处可执行播放成功后续动作");
-
         let self = this;
         self.showError = false;
         self.errorMsg = '';

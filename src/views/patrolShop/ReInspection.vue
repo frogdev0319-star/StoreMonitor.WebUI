@@ -637,10 +637,10 @@ export default {
               isWarning:true,
               dialogCosed:false
             },
-            videoLoadingObj:{
+          videoLoadingObj:{
               title: this.$t('remotePatrol.prompt'),
               showInfo: this.$t('remotePatrol.videoLoading'),
-              isWarning:true,
+              isWarning:false,
               dialogCosed:false
             },
             recorder:null,
@@ -2041,7 +2041,7 @@ export default {
                       }
                       else{
                         //Ezviz
-                        if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                        if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
                           self.$refs.ezvizVideo.stopRealTime();
                           self.$nextTick(()=>{
                             self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
