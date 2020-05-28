@@ -460,10 +460,29 @@
         fontFamily: 'Roboto, Microsoft YaHei'
       }
     },
+    computed:{
+      ...mapGetters({accountChanged:'accountChanged'})
+    },
+    watch: {
+      async accountChanged(val, oldVal) {
+        console.log(val);
+        let self = this;
+        if (val != 0) {
+          let self = this;
+          self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date).endOf('d').toDate()];
+          let start = typeof(self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+          let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+          self.params.beginTs = start;
+          self.params.endTs = end;
+          self.initDaysRange();
+          await self.getRegionInfo();
+          await self.initData();
+        }
+      }
+    },
     methods:{
       generateReportLang,
       regionSortChange(col){
-        console.log(col);
         let self=this;
         let column = col.column;
         let order = col.order;
@@ -509,7 +528,6 @@
         self.getInspectStatsOverviewOfRegionTable();
       },
       storeSortChange(col){
-        console.log(col);
         let self=this;
         let column = col.column;
         let order = col.order;
@@ -556,7 +574,6 @@
       },
       dateChange(val) {
         let self = this;
-        console.log(val);
         self.currentIndex = 0;
         let start = typeof(val[0]) === 'object' ? val[0].getTime() : val[0];
         let end = typeof(val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -584,7 +601,6 @@
         }
         daysDiff = self.$moment(end).diff(start, 'days');
         daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-        console.log(self.timeMode);
         self.params.beginTs = start;
         self.params.endTs = end;
         self.initDaysRange();
@@ -607,13 +623,11 @@
           let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
           weekList.splice(0, 1, firstWeekStr);
           weekList.splice(arrLength - 1, 1, lastWeekStr);
-          console.log(weekList);
           self.daysRangeList = weekList;
 
         }
         else if (self.timeMode == 2) {
           let monthArray = util.getMonthBetween(startDay, endDay)
-          console.log(monthArray)
           self.daysRangeList = monthArray;
         }
       },
@@ -688,7 +702,6 @@
           }
         })
         self.provinceList = temp;
-        console.log(self.provinceList)
         let cityTemp = [];
         self.provinceList.forEach(_item=>{
           storeList.forEach(item=>{
@@ -721,7 +734,6 @@
           storeArr.push(item.storeId)
         })
         self.curStore = storeArr;
-        console.log('create 调用完毕')
         self.changeStore(self.curStore)
       },
       getStoreData(params){
@@ -739,23 +751,19 @@
         })
       },
       handleStoreChange (arr) {
-        console.log(arr)
         this.curStore = arr
         this.changeStore(arr)
       },
       handleProChange(arr){
-        console.log(arr)
         this.curProvince = arr
         this.changePro(arr)
       },
       handleCityChange(arr){
-        console.log(arr)
         this.curCity = arr
         this.changeCity(arr)
       },
       changeStore(val){
         let self=this;
-        console.log(val);
         let str='';
         self.storeList.forEach((item,index)=>{
           val.forEach(_item=>{
@@ -769,7 +777,6 @@
       },
       changeCountry(val){
         let self=this;
-        console.log(val);
         self.curProvince= [];
         self.curCity=[];
         let storeList=self.storeList;
@@ -839,7 +846,6 @@
 
       },
       changePro(val){
-        console.log(val)
         let self=this;
         self.curCity= [];
         self.clearCityInfo();
@@ -930,16 +936,11 @@
       changeCity(val){
         let self=this;
         self.clearStoreInfo();
-        console.log(val)
         let storeList=self.storeList;
         let temp=[];
         if(val.length == 0){
-          console.log(self.curProvince)
           self.curProvince.forEach(_item=>{
-            console.log(_item)
-
             storeList.forEach(item=>{
-              console.log(item)
               if(item.province==_item){
                 let obj = {};
                 obj.storeId = item.storeId;
@@ -970,7 +971,6 @@
             })
           })
         }
-        console.log(temp)
         self.storeDataList=temp;
       },
       clearCity(){
@@ -1041,7 +1041,6 @@
         else{
           storeIds = self.curStore;
         }
-        console.log(storeIds)
         self.params.storeIds = storeIds;
 
         self.getInspectStatsOverviewOfRegion();
@@ -1076,7 +1075,6 @@
             region = 1;
           }
           params.regionMode = region;
-          console.log(params)
           params.storeIds = self.params.storeIds;
           let regionResult = await that.getInspectStatsOverviewWithRegion(params);
           let curData = [];
@@ -1086,7 +1084,6 @@
               result.content.forEach(item=>{
                 item.qualifiedRatePer = item.qualifiedRate + '%'
               })
-              console.log(result.content)
               curData= result.content;
             }
           }
@@ -1130,7 +1127,6 @@
               result.content.forEach(item=>{
                 item.qualifiedRatePer = item.qualifiedRate + '%'
               })
-              console.log(result.content)
               curData = result.content
             }
           }
@@ -1147,11 +1143,9 @@
           "size": size
         };
         self.params.regionMode = 3;
-        console.log(self.params)
         self.getInspectStatsOverviewWithRegion(self.params);
         return new Promise((resolve,reject)=>{
           eventRESTful.getEventList(self.params).then((res)=>{
-            console.log(res);
             let data=res.data.content;
             let temp=[];
             data.forEach(item=>{
@@ -1200,7 +1194,6 @@
         params.region = region;
         params.timeMode = self.timeMode;
         let regionResult = await self.getInspectResultOverRegion(params);
-        console.log(regionResult)
         let option = {
           color: ['#f31d65', '#6097f4'],
           legend: {
@@ -1354,13 +1347,10 @@
         };
         if(regionResult.errCode == 0){
           let result = regionResult.data;
-          console.log(result);
           let soureceList = [];
-          console.log(result);
           let sortedProviceOrCity = [];
           sortedProviceOrCity = region == 1 ?  JSON.parse(JSON.stringify(self.curProvince)) : JSON.parse(JSON.stringify(self.curCity))
           let filterResult = self.jsonArrayHasSpecifiedValue(sortedProviceOrCity, result);
-          console.log(filterResult);
           self.regionDataList = filterResult; //过滤出已选择区域的记录
           let regionArray = [];
           filterResult[0].regions.forEach(item=>{
@@ -1371,16 +1361,11 @@
             regionArray.push(json)
           })
           self.regionsList = regionArray;
-          console.log(self.curRegion)
           self.curRegion = [];
           self.regionsList.length > 0 ? self.curRegion.push(self.regionsList[0].value) : self.curRegion;
           self.regionsList.length > 1 ? self.curRegion.push(self.regionsList[1].value): self.curRegion;
-          console.log(self.curRegion);
           //过滤出前两条记录
           let filterTwoResult = self.jsonArrayHasSpecifiedValue(self.curRegion, filterResult);
-          console.log(filterTwoResult);
-          console.log(soureceList);
-          console.log(self.regionDataList)
 
           let regionData1 = [];
           let regionData2 = [];
@@ -1414,8 +1399,6 @@
           })
           option.series[0].data = regionData1;
           option.series[1].data = regionData2;
-          console.log(regionData1)
-          console.log(regionData2)
         }
         self.regionsChartsOptions = option;
       },
@@ -1430,20 +1413,16 @@
           regions.sort((item1, item2) => {
             return item1.region < item2.region ? 1 : -1;
           })
-          console.log(regions)
           specifiedValue.forEach(_item=>{
             regions.forEach(regionItem=>{
-              console.log(regionItem)
               if(regionItem.region == _item){
                 tempRegions.push(regionItem);
               }
             })
           })
-          console.log(tempRegions)
           tempJson.regions = tempRegions;
           tempData.push(tempJson);
         })
-        console.log(tempData)
         return tempData;
       },
       async getInspectStatsOverviewOfRegion(){
@@ -1459,7 +1438,6 @@
           region = 1;
         }
         params.regionMode = region;
-        console.log(params)
         params.storeIds = self.params.storeIds;
         let storeResult = await self.getInspectStatsOverviewWithRegion(params);
         if (storeResult.errCode == 0) {
@@ -1469,7 +1447,6 @@
             result.content.forEach(item=>{
               item.qualifiedRatePer = item.qualifiedRate + '%'
             })
-            console.log(result.content)
             self.regionTableData = result.content;
           }
         }
@@ -1496,7 +1473,6 @@
           region = 1;
         }
         params.regionMode = region;
-        console.log(params)
         params.storeIds = self.params.storeIds;
         let storeResult = await self.getInspectStatsOverviewWithRegion(params);
         if (storeResult.errCode == 0) {
@@ -1505,7 +1481,6 @@
             result.content.forEach(item=>{
               item.qualifiedRatePer = item.qualifiedRate + '%'
             })
-            console.log(result.content)
             self.regionTableData = result.content;
           }
         }
@@ -1533,7 +1508,6 @@
             result.content.forEach(item=>{
               item.qualifiedRatePer = item.qualifiedRate + '%'
             })
-            console.log(result.content)
             self.storeTableData = result.content;
           }
         }
@@ -1586,8 +1560,6 @@
               {value: totalExcellent, name: self.$t('overview.excellent')}
             ];
             let totalArray = [totalDargerous, totalImproved, totalQualified, totalExcellent];
-            console.log(totalArray);
-            console.log(seriesData);
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
             jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -1661,9 +1633,7 @@
       },
       handleRegionsChange(val){
         let self = this;
-        console.log(val)
         self.curRegion = val;
-        console.log(self.curRegion)
         let option = {
           color: ['#f31d65', '#6097f4'],
           legend: {
@@ -1814,8 +1784,6 @@
         };
         //过滤出对应区域记录
         let filterResult = self.jsonArrayHasSpecifiedValue(self.curRegion, self.regionDataList);
-        console.log(filterResult);
-        console.log(self.regionDataList)
 
         let regionData1 = [];
         let regionData2 = [];
@@ -1849,8 +1817,6 @@
         })
         option.series[0].data = regionData1;
         option.series[1].data = regionData2;
-        console.log(regionData1)
-        console.log(regionData2)
         self.regionsChartsOptions = option;
       },
       initData(){
@@ -1860,7 +1826,6 @@
         self.params.beginTs=start;
         self.params.endTs=end;
         let storeIds = self.curStore.filter(item=> item!= -1)
-        console.log(storeIds)
         self.params.storeIds = storeIds;
         self.params.filter={page:0,size:self.sizeNumStore};
 
@@ -1870,7 +1835,6 @@
       },
       adjustChart(){
         let self = this;
-        console.log('尺寸改变');
         if(self.$refs.itemsPie){
           self.$refs.itemsPie.resize()
         }
