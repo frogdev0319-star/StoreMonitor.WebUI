@@ -2336,4 +2336,10 @@
   .cell-class:first-child .cell{
     padding-left: calc(70/1920*100vw) !important;
   }
+  .el-table__empty-block{
+    border-bottom: 1px solid #e3e9f4;
+  }
+  .el-table-panel .el-table.el-table--striped.el-table--border.el-table--enable-row-hover.el-table--mini{
+    border-right: 1px solid #e3e9f4;
+  }
 </style>
