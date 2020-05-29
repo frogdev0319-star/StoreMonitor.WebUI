@@ -3,8 +3,8 @@ let version = 'v1.0';
 
 let _Environments = {
   Debug_XA: {
-    CHINA_WEBSITE: 'http://172.21.81.117:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.117:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://172.21.81.43:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.21.81.43:8081/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
@@ -36,13 +36,6 @@ let _Environments = {
     //BASE_URL: 'http://172.21.81.176:19085/storemonitor/api/',
     // 部署到QA环境使用外网IP
     CHINA_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
-    USHOP_URL: 'http://172.21.73.207/',
-    POST_URL: 'http://pos.ushop-plus.com/',
-    VERSION: version
-  },
-  XA:{
-    CHINA_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
