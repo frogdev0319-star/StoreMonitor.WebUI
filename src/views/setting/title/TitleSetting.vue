@@ -41,7 +41,7 @@
               </div>
               <div class="role-content">
                 <div :class="lang=='en'? 'en-role-detail': 'role-detail'" v-for="(_item,_index) in item.children" :key="_index" v-show="_item.disabled == false || (_item.disabled == true && _item.checked == true)">
-                  <el-checkbox v-model="_item.checked" @change="" :disabled="_item.disabled" @change="(val)=>checkParentRole(index, val)"></el-checkbox>
+                  <el-checkbox v-model="_item.checked" :disabled="_item.disabled" @change="(val)=>checkParentRole(index, val)"></el-checkbox>
                   <span class="role-name">{{_item.roleName}}</span>
                 </div>
               </div>
