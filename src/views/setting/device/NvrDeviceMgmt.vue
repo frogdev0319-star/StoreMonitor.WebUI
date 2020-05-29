@@ -1889,6 +1889,7 @@
         height: calc(36/1920*100vw);
         font-size: calc(14/1920*100vw);
         padding: 0;
+        top: 23px;
       }
     }
     .el-tabPanels{
@@ -1920,6 +1921,7 @@
           .dash-label{
             width: 30%;
             float: left;
+            min-width: 140px;
           }
           .dash-input{
             width: 50%;
