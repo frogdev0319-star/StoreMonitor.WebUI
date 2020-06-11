@@ -247,20 +247,23 @@
               <el-form :model="addDeviceData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
-                    <el-form-item prop="serialNumber" :label="generateDeviceLang('serialNum')">
-                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain" @input="(val)=>serialNumberChange(val)"></el-input>
+                    <el-form-item prop="serialNumber" :label="generateDeviceLang('serialNum')" style="margin-bottom:0;">
+                      <el-input v-model="addDeviceData.serialNumber" style="width: 100%;" :disabled="isAddAgain" @input="(val)=>serialNumberChange(val)" @blur="notShowInputRuleTips('serialNum')"></el-input>
+                      <span class="rules" v-if="serialRuletip">{{generateDeviceLang('NvrnameRuletip')}}</span>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
-                    <el-form-item prop="validationCode" :label="generateDeviceLang('validationCode')">
-                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;" @input="validateCodeChange"></el-input>
+                    <el-form-item prop="validationCode" :label="generateDeviceLang('validationCode')" style="margin-bottom:0;">
+                      <el-input  v-model="addDeviceData.validationCode" style="width: 100%;" @input="validateCodeChange" @blur="notShowInputRuleTips('validationCode')"></el-input>
+                      <span class="rules" v-if="validateRuletip">{{generateDeviceLang('validateRuletip')}}</span>
                     </el-form-item>
                   </el-col>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
-                    <el-form-item prop="name" :label="generateDeviceLang('deviceName')">
-                      <el-input  v-model="addDeviceData.name" style="width: 100%;" @input="deviceNameChange"></el-input>
+                    <el-form-item prop="name" :label="generateDeviceLang('deviceName')" style="margin-bottom:0;">
+                      <el-input  v-model="addDeviceData.name" style="width: 100%;" @input="deviceNameChange" @blur="notShowInputRuleTips('deviceName')"></el-input>
+                      <span class="rules" v-if="deviceRuletip">{{generateDeviceLang('NvrnameRuletip')}}</span>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
@@ -446,8 +449,9 @@
                 <el-form :model="addChannelData" :rules="channelRules" ref="channelForm" class="nvrForm" label-position="top" size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
-                      <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input  v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})"></el-input>
+                      <el-form-item prop="name" :label="generateDeviceLang('channelName')" style="margin-bottom:0;">
+                        <el-input  v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})" @blur="notShowInputRuleTips('channelName')"></el-input>
+                        <span class="rules" v-if="channelNameRuletip">{{generateDeviceLang('NvrnameRuletip')}}</span>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
@@ -686,7 +690,11 @@
         channelCountTemp: 0,
         ezvizAccountList: [],
         elTooltipClass: 'el-tooltipClass',
-        curIndex: 0
+        curIndex: 0,
+        channelNameRuletip:false,
+        serialRuletip:false,
+        validateRuletip:false,
+        deviceRuletip:false
       }
     },
     watch:{
@@ -1876,24 +1884,59 @@
         else{
           item.tempName = comment;
         }
+        let length = filterString.getContentLength(val);
+        if(length>20){
+              this.channelNameRuletip=true
+          }else{
+              this.channelNameRuletip=false
+          }
       },
       serialNumberChange(val){
         let self = this;
         let comment = filterString.all(val,20);
         console.log(comment);
         self.addDeviceData.serialNumber = comment;
+        let length = filterString.getContentLength(val);
+        if(length>20){
+              this.serialRuletip=true
+          }else{
+              this.serialRuletip=false
+          }
       },
       validateCodeChange(val){
         let self = this;
         let comment = filterString.all(val,10);
         console.log(comment);
         self.addDeviceData.validationCode = comment;
+        let length = filterString.getContentLength(val);
+        if(length>10){
+              this.validateRuletip=true
+          }else{
+              this.validateRuletip=false
+          }
       },
       deviceNameChange(val){
         let self = this;
         let comment = filterString.all(val,20);
         console.log(comment);
         self.addDeviceData.name = comment;
+        let length = filterString.getContentLength(val);
+        if(length>20){
+              this.deviceRuletip=true
+          }else{
+              this.deviceRuletip=false
+          }
+      },
+      notShowInputRuleTips(e){
+        if(e=='channelName'){
+          this.channelNameRuletip=false
+        }else if(e=='serialNum'){
+          this.serialRuletip=false
+        }else if(e=='validationCode'){
+          this.validateRuletip=false
+        }else if(e=='deviceName'){
+          this.deviceRuletip=false
+        }
       }
     },
 
@@ -2696,6 +2739,14 @@
     margin-top: 20px;
     line-height: 24px;
   }
+  .addNvr .rules{
+    font-size: 10px;
+    color:#ff2400;
+    font-weight: 400;
+    line-height: 10px;
+    margin-top: 3px;
+    display: block;
+}
   .el-dialog__body .dialog-content .nvrForm /deep/ label{
     padding: 0;
   }

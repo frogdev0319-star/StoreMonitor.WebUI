@@ -190,11 +190,13 @@
         </div>
         <div class="event-content">
           <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
-          <el-input size="mini" class="name-input" v-model="eventName" @input="eventNameChanged"></el-input>
+          <el-input size="mini" class="name-input" v-model="eventName" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"></el-input>
+          <span class="rules" style="margin-left:0;" v-if="eventNameRuletip">{{generatePatrolLang('eventNameRuletip')}}</span>
           <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
           <span class="event-title">{{generatePatrolLang('description')}}</span>
           <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
-                    @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                    @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')" @blur="notShowInputRuleTips('eventDes')"></el-input>
+          <span class="rules" style="margin-left:0;"  v-if="eventDesRuletip">{{generatePatrolLang('comentRuletip')}}</span>
         </div>
       </div>
       <div slot="footer">
@@ -391,7 +393,9 @@
         isLoaded: false,
         editCount: 0,
         showEventNameInfo: false,
-        changeId: false
+        changeId: false,
+        eventNameRuletip:false,
+        eventDesRuletip:false
       }
     },
     async mounted(){
@@ -1810,12 +1814,31 @@
         console.log(content);
         self.eventName = content;
         self.showEventNameInfo = false;
+        let length = filterString.getContentLength(val);
+        if(length>50){
+              this.eventNameRuletip=true
+          }else{
+              this.eventNameRuletip=false
+          }
       },
       eventDesChanged(val){
         let self = this;
         let content = filterString.all(val,200);
         console.log(content);
         self.eventDes = content;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              this.eventDesRuletip=true
+          }else{
+              this.eventDesRuletip=false
+          }
+      },
+      notShowInputRuleTips(e){
+        if(e=='eventName'){
+            this.eventNameRuletip=false
+        }else if(e=='eventDes'){
+            this.eventDesRuletip=false
+        }
       },
       getVideoUrl(){
         let self = this;
@@ -2215,7 +2238,13 @@
   }
   .canvas-content{
     position: relative;
-
+    .rules{
+        margin-left: 20px;
+        font-size: 10px;
+        margin-top: 5px;
+        color: #ff2400;
+        display: block;
+    }
     .dialog-hr{
       border: 0.5px solid ;
       border-color: #dfe2e9;

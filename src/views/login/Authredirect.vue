@@ -1,3 +1,6 @@
+<template>
+  
+</template>
 <script>
 import { mapMutations } from 'vuex'
 import {setCookie} from '@/common/auth'

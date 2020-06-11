@@ -142,6 +142,31 @@
                         </a>
                     </div>
                 </el-dialog>
+                <el-dialog :title="generateInsSettingLang('importFailTitle')"
+                :visible.sync="showFailInfo" v-if="showFailInfo"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="28%"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                            <i class="el-icon-warning" style="font-size:40px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{generateInsSettingLang('FailTitle')}}</span>
+                            <ul class="ul_style">
+                                <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
+                                    <div class="list_style"></div>
+                                    {{item}}
+                                </li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showFailInfo = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="showFailInfo = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
             </el-col>
         </el-row>
     </div>
@@ -151,6 +176,7 @@ import api from '@/api/index'
 import {inpectRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
 import {generateInsSettingLang} from '@/api/i18n'
+import filterString from '@/common/filterString'
 
 export default {
     name:'RouteDetail',
@@ -168,6 +194,8 @@ export default {
             showSingleDeleteContent:false,
             multeSection:[],
             showImportContent:false,
+            showFailInfo:false,
+            FileInfo:[],
             radioList:[
                 {
                     'value':'1',
@@ -499,6 +527,7 @@ export default {
       importfxx(obj) {
         let _this = this;
         let inputDOM = this.$refs.inputer;
+        _this.FileInfo=[]
         // 通过DOM取文件数据
         this.file = event.currentTarget.files[0];
         var rABS = false; //是否将文件读取为二进制字符串
@@ -528,21 +557,21 @@ export default {
               });
             }
             outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
-            if(!outdata[0].hasOwnProperty('检查分类')){
-              _this.notify(_this.$t('insSettingView.templateError'),'warning',3000);
-              return false;
-            }
             let arr=outdata;
             let indexArry=[];
             let typeName=[];
             let flaggroupLength=false,flaggroupRex=false;
             let flagItemName=false,flagItemRex=false,flagItemLength=false;
+            let flagDescName = false, flagDesLength=false;
             arr.forEach((item,index)=>{
               if(item['检查分类']!=undefined&&item['检查分类'].length!=0){
                 indexArry.push(index);
                 typeName.push(item['检查分类']);
-                if(item['检查分类'].toString().trim().length>10){
-                  flaggroupLength=true;
+                // if(item['检查分类'].toString().trim().length>10){
+                //   flaggroupLength=true;
+                // }
+                if(filterString.getContentLength(item['检查分类'].toString().trim()) > 30){
+                   flaggroupLength=true;
                 }
                 if(validateInput(item['检查分类'])){
                   flaggroupRex=true;
@@ -552,41 +581,52 @@ export default {
                 flagItemName=true;
               }
               else{
-                if(item['检查项目名称'].toString().trim().length>25){
-                  flagItemLength=true;
+                // if(item['检查项目名称'].toString().trim().length>25){
+                //   flagItemLength=true;
+                // }
+                if(filterString.getContentLength(item['检查项目名称'].toString().trim()) > 100){
+                    flagItemLength=true;
                 }
                 if(validateInput(item['检查项目名称'])){
                   flagItemRex=true;
                 }
               }
+              if(item['检查项目详细说明（选填，不填为空）']==undefined){
+                        flagDescName=true;
+                }
+                else{
+                if(filterString.getContentLength(item['检查项目详细说明（选填，不填为空）'].toString().trim()) > 300){
+                    flagDesLength=true;
+                }
+                }
             })
-
-            if(flaggroupLength){
-              _this.$refs.loadFile.value = '';
-              _this.notify(_this.$t('insSettingView.excelLongCategory'),'warning',3000);
-              return false;
-            }
-            if(flaggroupRex){
-              _this.$refs.loadFile.value = '';
-              _this.notify(_this.$t('insSettingView.excelIllegalCategory'),'warning',3000);
-              return false;
-            }
-            if(flagItemName){
-              _this.$refs.loadFile.value = '';
-              _this.notify(_this.$t('insSettingView.excelEmpty'),'warning',3000);
-              return false;
-            }
-            if(flagItemLength){
-              _this.$refs.loadFile.value = '';
-              _this.notify(_this.$t('insSettingView.excelLongItem'),'warning',3000);
-              return false;
-            }
-            if(flagItemRex){
-              _this.$refs.loadFile.value = '';
-              _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
-              return false;
-            }
-
+            if(!outdata[0].hasOwnProperty('检查分类')||flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
+                        _this.showFailInfo=true
+                        if(!outdata[0].hasOwnProperty('检查分类')){
+                            _this.FileInfo.push(_this.$t('insSettingView.templateError'))
+                        }
+                        if(flaggroupLength){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
+                        }
+                        if(flaggroupRex||flagItemRex){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
+                        }
+                        if(flagItemName){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelEmpty'))
+                        }
+                        if(flagItemLength){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelLongItem'))
+                        }
+                        if(flagDesLength){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalDes'))
+                        }
+                        return false
+                    }
             let dataArry=[];
             for(var i=0;i<indexArry.length;i++){
               if(i<indexArry.length){
@@ -702,6 +742,26 @@ export default {
     }
     .iconfont{
       font-size: calc(24/1920*100vw);
+    }
+    .ul_style{
+        background-color:#f7f8fb;
+        border:1px solid #dfe2e9;
+        border-radius:2px;
+        min-height:150px;
+        padding:20px 0 0 20px;
+        .li_style{
+            color:#7d8cad;
+            margin-bottom:10px;
+            list-style:none;
+            .list_style{
+                width:10px;
+                height:10px;
+                border-radius:50%;
+                background-color:#dfe2e9;
+                display:inline-block;
+                margin-right:10px;
+            }
+        }
     }
     .detail-title{
         overflow: hidden;

@@ -206,12 +206,14 @@
               <hr style="border: 0.5px solid #dfe2e9;"/>
               <el-form :model="addNvrData" :rules="rules" ref="nvrForm" class="nvrForm" label-position="top" size="mini">
                 <el-form-item label="IVS ID" prop="ivsId">
-                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"></el-input>
+                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)" @blur="notShowInputRuleTips('ivsId')"></el-input>
+                  <span class="rules" v-if="ivsIdRuletip">{{$t('scheduleView.scheduleNameRuletip')}}</span>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
-                    <el-form-item prop="name" :label="generateDeviceLang('nvr')">
-                      <el-input v-model="addNvrData.name" style="width: 100%;" @input="(val)=>nvrNameChange(val, {})"></el-input>
+                    <el-form-item prop="name" :label="generateDeviceLang('nvr')" style="margin-bottom:0;">
+                      <el-input v-model="addNvrData.name" style="width: 100%;" @input="(val)=>nvrNameChange(val, {})" @blur="notShowInputRuleTips('Nvrname')"></el-input>
+                      <span class="rules" v-if="NvrnameRuletip">{{generateDeviceLang('NvrnameRuletip')}}</span>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
@@ -381,8 +383,9 @@
                 <el-form :model="addChannelData" :rules="channelRules" ref="channelForm" class="nvrForm" label-position="top" size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
-                      <el-form-item prop="name" :label="generateDeviceLang('channelName')">
-                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})"></el-input>
+                      <el-form-item prop="name" :label="generateDeviceLang('channelName')" style="margin-bottom:0;">
+                        <el-input :placeholder="generateDeviceLang('inputChannelName')" v-model="addChannelData.name" style="width: 100%;" @input="(val)=>channelNameChange(val,{})" @blur="notShowInputRuleTips('tempName')"></el-input>
+                        <span class="rules" v-if="channelNameRuletip">{{generateDeviceLang('NvrnameRuletip')}}</span>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
@@ -583,7 +586,7 @@
         showConfirmDelete: false, //删除NVR时的提示信息
         rules: {
           ivsId: [
-            { required: true, message: this.$t('deviceView.inputIvsId'), trigger: 'blur' },
+            { required: true, message: this.$t('deviceView.inputIvsId'), trigger: 'blur' }
           ],
           name: [
             { required: true, message: this.$t('deviceView.inputNvrName'), trigger: 'blur' }
@@ -614,6 +617,9 @@
         isUpdate: false,
         nvrNameTemp: '',
         nvrChannelCountTemp: 0,
+        channelNameRuletip:false,
+        NvrnameRuletip:false,
+        ivsIdRuletip:false
       }
     },
     watch:{
@@ -1739,6 +1745,12 @@
         else{
           item.tempDeviceName = comment;
         }
+        let length = filterString.getContentLength(val);
+        if(length>20){
+              this.NvrnameRuletip=true
+          }else{
+              this.NvrnameRuletip=false
+          }
       },
       channelNameChange(val,item){
         let self = this;
@@ -1750,12 +1762,33 @@
         else{
           item.tempName = comment;
         }
+        let length = filterString.getContentLength(val);
+        if(length>20){
+              this.channelNameRuletip=true
+          }else{
+              this.channelNameRuletip=false
+          }
       },
       ivsIdChange(val){
         let self = this;
         let comment = filterString.all(val,30);
         console.log(comment);
         self.addNvrData.ivsId = comment;
+        let length = filterString.getContentLength(val);
+        if(length>30){
+              this.ivsIdRuletip=true
+          }else{
+              this.ivsIdRuletip=false
+          }
+      },
+      notShowInputRuleTips(e){
+        if(e=='ivsId'){
+          this.ivsIdRuletip=false
+        }else if(e=='tempName'){
+          this.channelNameRuletip=false
+        }else if(e=='Nvrname'){
+          this.NvrnameRuletip=false
+        }
       }
     },
     created(){
@@ -2308,6 +2341,14 @@
     margin-top: 20px;
     line-height: 24px;
   }
+  .addNvr .rules{
+    font-size: 10px;
+    color:#ff2400;
+    font-weight: 400;
+    line-height: 10px;
+    margin-top: 3px;
+    display: block;
+}
   .el-dialog__body .dialog-content .nvrForm /deep/ label{
     padding: 0;
   }

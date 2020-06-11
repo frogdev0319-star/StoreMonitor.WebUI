@@ -12,7 +12,8 @@
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
                 <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
-                          :placeholder="generatePatrolLang('adviceInfo')"></el-input>
+                          :placeholder="generatePatrolLang('adviceInfo')" @blur="notShowInputRuleTips"></el-input>
+                <span class="rules" v-if="adviceInfoRuletip">{{generatePatrolLang('comentRuletip')}}</span>
             </div>
         </el-col>
         <el-col :span="24" class="sum-data">
@@ -148,7 +149,8 @@ export default {
             varyWindowWidth:window.innerWidth,
             pass: this.$t('remotePatrol.pass'),
             fail: this.$t('remotePatrol.failed'),
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            adviceInfoRuletip:false
         }
     },
     methods:{
@@ -487,11 +489,20 @@ export default {
                 duration:time
             });
         },
+        notShowInputRuleTips(){
+            this.adviceInfoRuletip=false
+        },
       adviceChanged(val){
         let self = this;
         let content = filterString.all(val,200);
+        let length = filterString.getContentLength(val);
         console.log(content);
         self.suggest = content;
+        if(length>200){
+              this.adviceInfoRuletip=true
+          }else{
+              this.adviceInfoRuletip=false
+          }
       }
     },
     mounted(){
@@ -591,6 +602,12 @@ $h1:#292e36;
                 span{
                     color: $red;
                 }
+            }
+            .rules{
+                font-size: 10px;
+                color:#ff2400;
+                font-weight: 400;
+                line-height: 12px;
             }
             .sug-input{
               width: 99.5%;

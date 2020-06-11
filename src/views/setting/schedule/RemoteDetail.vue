@@ -48,8 +48,11 @@
                        :key="index" :label="`${item.name}`">
             <el-col :span="24" class="header-details">
               <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-              <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
-                        class="el-type" @input="(val)=>scheduluNameChange(val,item)"></el-input>
+              <div class="NameInput">
+                <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
+                        class="el-type" @input="(val)=>scheduluNameChange(val,item)" @blur="notShowInputRuleTips(item)"></el-input>
+                <span class="rules" v-if="item.Ruletip">{{generateScheduleLang('scheduleNameRuletip')}}</span>
+              </div>
             </el-col>
             <el-col :span="24" class="header-details">
               <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
@@ -871,7 +874,8 @@
           notifyTime: '',
           execOnce: false,
           ifNotifyOneDay: false,
-          modeDisabled: false
+          modeDisabled: false,
+          Ruletip:false
         };
         self.paneList.push(addInfo);
         let pane = self.paneList;
@@ -1555,7 +1559,8 @@
             notifyTime: '',
             execOnce: false,
             ifNotifyOneDay: false,
-            modeDisabled: false
+            modeDisabled: false,
+            Ruletip:false
           };
           self.paneList.push(addInfo);
           self.scheduleName = "远程巡检排程一";
@@ -1779,6 +1784,15 @@
         let self = this;
         let comment = filterString.all(val,30);
         item.name = comment;
+        let length = filterString.getContentLength(val);
+        if(length>30){
+              item.Ruletip=true
+          }else{
+              item.Ruletip=false
+          }
+      },
+      notShowInputRuleTips(item){
+            item.Ruletip=false
       },
       changeSelectWeek(val, item){
         let self = this;
@@ -1999,6 +2013,18 @@
           }
           .el-select{
             width: 200px;
+          }
+          .NameInput{
+            display: inline-block;
+            position: relative;
+            .rules{
+                font-size: 10px;
+                color: #ff2400;
+                line-height: 10px;
+                position: absolute;
+                top:45px;
+                left:0;
+            }
           }
         }
       }

@@ -53,15 +53,16 @@
                         </div>
                     </div>
                     <div class="group-add" v-if="showAddGroup">
-                        <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})"></el-input>
-                            <div class="iconcontent">
-                                <div class="iconlised" @click="confirmAddGroup">
-                                    <i class="el-icon-check"></i>
-                                </div>
-                                <div class="iconrised" @click="cancelAddGroup">
-                                    <i class="el-icon-close"></i>
-                                </div>
+                        <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"></el-input>
+                        <span class="rules" v-if="enterNameRuletip">{{generateInsSettingLang('enterNameRuletip')}}</span>
+                        <div class="iconcontent">
+                            <div class="iconlised" @click="confirmAddGroup">
+                                <i class="el-icon-check"></i>
                             </div>
+                            <div class="iconrised" @click="cancelAddGroup">
+                                <i class="el-icon-close"></i>
+                            </div>
+                        </div>
                     </div>
                </div>
                </el-scrollbar>
@@ -171,10 +172,17 @@
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" @input="(val)=>napeNameChange(val, {})"></el-input>
+                            <div class="inputcontent">
+                                <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
+                                <span class="rules" v-if="enterListNameRuletip">{{generateInsSettingLang('enterListNameRuletip')}}</span>
+                            </div>
                        </div>
                        <div class="nape-dep-data">
-                           <el-input type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})"></el-input>
+                            <div class="inputcontent">
+                                <el-input type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})" @blur="notShowInputRuleTips('description')"></el-input>
+                                <div style="clear:both;"></div>
+                                <span class="rules" v-if="descriptionRuletip">{{generateInsSettingLang('descriptionRuletip')}}</span>
+                            </div>
                             <div class="iconcontent">
                                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
                                     <i class="el-icon-check"></i>
@@ -215,6 +223,9 @@ export default {
             napeList:[],
             napeDepTemp:'', //临时存放
             showAddGroup:false,
+            enterNameRuletip:false,
+            enterListNameRuletip:false,
+            descriptionRuletip:false,
             showAddNape:false,
             newNapeChecked:false,
             newNapeName:'',
@@ -774,36 +785,63 @@ export default {
         groupNameChange(val, item){
           let self = this;
           let comment = filterString.all(val,30);
-          console.log(comment);
+          let length = filterString.getContentLength(val);
+          console.log(comment,length);
           if(0 == Object.keys(item).length){
             self.groupNameInput = comment;
           }
           else{
             item.groupName = comment;
           }
+          if(length>30){
+              this.enterNameRuletip=true
+          }else{
+              this.enterNameRuletip=false
+          }
         },
         napeNameChange(val, item){
           let self = this;
           let comment = filterString.all(val,100);
-          console.log(comment);
+          let length = filterString.getContentLength(val);
+          console.log(comment,length);
           if(0 == Object.keys(item).length){
             self.newNapeName = comment;
           }
           else{
             item.napeName = comment;
           }
+          if(length>100){
+              this.enterListNameRuletip=true
+          }else{
+              this.enterListNameRuletip=false
+          }
         },
         napeDepChange(val, item){
           let self = this;
           let comment = filterString.all(val,300);
-          console.log(comment);
+          let length = filterString.getContentLength(val);
+          console.log(comment,length);
           if(0 == Object.keys(item).length){
             self.newNapeDep = comment;
           }
           else{
             item.napeDep = comment;
           }
-        }
+          if(length>300){
+              this.descriptionRuletip=true
+          }else{
+              this.descriptionRuletip=false
+          }
+        },
+        notShowInputRuleTips(e){
+            if(e=='enterName'){
+                this.enterNameRuletip=false
+            }else if(e=='enterListName'){
+                this.enterListNameRuletip=false
+            }else if(e=='description'){
+                this.descriptionRuletip=false
+            }
+        },
     },
     mounted(){
         let self=this;
@@ -1084,10 +1122,20 @@ export default {
                 height: 60px;
                 line-height: 60px;
                 margin-bottom: 25px;
+                position: relative;
                 .groupName-input{
                     max-width: 64%;
                     float: left;
                     margin-left: calc(25/1920*100vw);
+                }
+                .rules{
+                    font-size: 10px;
+                    color:#ff2400;
+                    font-weight: 400;
+                    line-height: 10px;
+                    position: absolute;
+                    top: 50px;
+                    left:calc(25/1920*100vw);
                 }
                 .iconcontent{
                     margin-left:calc(30/1920*100vw);
@@ -1176,12 +1224,10 @@ export default {
                     @include point(width,220);
                     float: left;
                     @include point(margin-left,10);
-                    @include point(margin-bottom,10);
-
+                    @include point(margin-bottom,3);
                 }
                 .nape-name-data{
                     width: 36%;
-                    display: inline-block;
                     position: relative;
                     float: left;
                     @include point(line-height,20);
@@ -1196,11 +1242,20 @@ export default {
                         text-align: left;
                         width: 80%;
                     }
+                    .inputcontent{
+                        width:90%;
+                        .rules{
+                            font-size: 10px;
+                            color:#ff2400;
+                            font-weight: 400;
+                            line-height: 12px;
+                            margin-left:25px;
+                        }
+                    }
                 }
                 .nape-dep-data{
                     width: 50%;
                     height: 100%;
-                    display: inline-block;
                     position: relative;
                     float: left;
                     overflow: hidden;
@@ -1210,6 +1265,16 @@ export default {
                         float: left;
                         @include point(margin-left,25);
                         text-align: left;
+                    }
+                    .inputcontent{
+                        float: left;
+                        .rules{
+                            font-size: 10px;
+                            color:#ff2400;
+                            font-weight: 400;
+                            line-height: 10px;
+                            margin-left:10px;
+                        }
                     }
                 }
                 .nape-items-handle{

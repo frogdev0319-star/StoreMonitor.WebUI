@@ -22,8 +22,9 @@
           </el-form-item>
           <el-form-item :label="$t('titleView.comment')" prop="comment" class="comment-class">
             <label slot="label" class="comment-label">{{$t('titleView.comment')}}</label>
-              <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  class="role-comment" @input="commentChange" :autosize="{minRows: 2, maxRows: 4}" ></el-input>
+              <el-input v-model="infoForm.comment" style="width: 100%;" type="textarea"  class="role-comment" @input="commentChange" :autosize="{minRows: 2, maxRows: 4}" @blur="notShowInputRuleTips"></el-input>
             <span class="text" style="float: right;color: #909399;">{{curLength}}/200</span>
+            <span class="rules" v-if="commentRuletip">{{$t('titleView.commentRuletip')}}</span>
           </el-form-item>
         </el-form>
       </div>
@@ -102,6 +103,7 @@
           }
           return{
             varyWindowHeight:window.innerHeight,
+            commentRuletip:false,
             infoForm:{
               title: '',
               roleId: 1,
@@ -313,10 +315,19 @@
         commentChange(val){
           let self = this;
           let comment = filterString.all(val,200);
-          console.log(comment);
           let commentLength = filterString.getContentLength(comment)
           self.curLength = commentLength;
           self.infoForm.comment = comment;
+          let length = filterString.getContentLength(val);
+          console.log(comment,length);
+          if(length>200){
+                this.commentRuletip=true
+            }else{
+                this.commentRuletip=false
+            }
+        },
+        notShowInputRuleTips(){
+          this.commentRuletip=false
         },
         saveBasicInfo(){
           let self = this;
@@ -499,6 +510,12 @@
                 }
               })
             })
+            if(roleId == 4){// 门店运营时，远程巡检和现场巡检取消默认选中
+              self.roleNameList[1].children[0].checked = false;
+              self.roleNameList[1].children[0].disabled = false;
+              self.roleNameList[1].children[1].checked = false;
+              self.roleNameList[1].children[1].disabled = false;
+            }
           }
           else{
             // check has selected roles
@@ -695,6 +712,12 @@
         margin-right: calc(25/1920*100vw);
         padding-left: calc(15/1920*100vw);
         border-bottom: 1px solid $border;
+        .rules{
+            font-size: 10px;
+            line-height: 20px;
+            color: #ff2400;
+            display: block;
+        }
         .comment-class .el-form-item__label:before{
             content: ' ';
             margin-right: 4px;

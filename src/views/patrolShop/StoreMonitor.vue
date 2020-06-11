@@ -215,13 +215,15 @@
                     <div class="lside-scrollbar">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                             <span class="event-title"><span class="is-required">*</span>{{generateStoreMonitorLang('title')}}</span>
-                            <el-input size="mini" class="name-input" @input="eventNameChanged" :disabled="corEvent" v-model="eventName"></el-input>
+                            <el-input size="mini" class="name-input" @input="eventNameChanged" :disabled="corEvent" v-model="eventName" @blur="notShowInputRuleTips('eventName')"></el-input>
+                            <span class="rules" v-if="eventNameRuletip">{{generateStoreMonitorLang('eventNameRuletip')}}</span>
                             <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                             <span v-if="!corEvent" class="event-title">{{generateStoreMonitorLang('description')}}</span>
                             <span v-else class="event-title"><span class="is-required">*</span>{{generateStoreMonitorLang('description')}}</span>
                             <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
-                             v-model="eventDes" :placeholder="generateStoreMonitorLang('descPlaceholder')" @input="eventDesChanged"></el-input>
+                             v-model="eventDes" :placeholder="generateStoreMonitorLang('descPlaceholder')" @input="eventDesChanged" @blur="notShowInputRuleTips('eventDes')"></el-input>
                             <span class="error-class" v-if="showEventDescInfo">{{$t('storeMonitor.enterDesc')}}</span>
+                            <span class="rules" v-if="eventDesRuletip">{{generateStoreMonitorLang('eventDesRuletip')}}</span>
 
                           <div class="source-content">
                                 <div class="source-details" v-for="(item,index) in sourceList" :key="index">
@@ -680,7 +682,9 @@ export default {
             },
           },
           dateValue: new Date(),
-          changeFlag: false
+          changeFlag: false,
+          eventNameRuletip:false,
+          eventDesRuletip:false
         }
     },
   created(){
@@ -3194,6 +3198,12 @@ export default {
         console.log(content);
         self.eventName = content;
         self.showEventNameInfo = false;
+        let length = filterString.getContentLength(val);
+        if(length>50){
+              this.eventNameRuletip=true
+          }else{
+              this.eventNameRuletip=false
+          }
       },
       eventDesChanged(val){
         let self = this;
@@ -3201,6 +3211,19 @@ export default {
         console.log(content);
         self.eventDes = content;
         self.showEventDescInfo = false;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              this.eventDesRuletip=true
+          }else{
+              this.eventDesRuletip=false
+          }
+      },
+      notShowInputRuleTips(e){
+        if(e=='eventName'){
+            this.eventNameRuletip=false
+        }else if(e=='eventDes'){
+            this.eventDesRuletip=false
+        }
       },
       onPlayerWaiting(e){
         console.log('video is loading')
@@ -3931,6 +3954,13 @@ export default {
                 }
                 .lside-scrollbar{
                     height: 360px;
+                    .rules{
+                        margin-left: 20px;
+                        font-size: 10px;
+                        margin-top: 5px;
+                        color: #ff2400;
+                        display: block;
+                    }
                 }
                 .event-rside{
                     position: relative;

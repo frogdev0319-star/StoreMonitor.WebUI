@@ -17,6 +17,8 @@ import router from './router'
 import axios from 'axios'
 // import BootstrapVue from 'bootstrap-vue'
 // Vue.use(BootstrapVue)
+import Print from '@/plugins/print'
+Vue.use(Print)
 
 import { ProgressPlugin } from 'bootstrap-vue'
 Vue.use(ProgressPlugin)

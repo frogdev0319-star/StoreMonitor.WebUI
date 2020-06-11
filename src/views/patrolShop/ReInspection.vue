@@ -70,11 +70,13 @@
                     <hr class="dialog-hr"/>
                     <div class="dialog-event-content">
                         <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
-                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName"></el-input>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName" @blur="notShowInputRuleTips('eventName')"></el-input>
+                        <span class="rules" v-if="eventNameRuletip">{{generatePatrolLang('eventNameRuletip')}}</span>
                         <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
                         <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows: 7}"
-                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')" @blur="notShowInputRuleTips('eventDes')"></el-input>
+                        <span class="rules" v-if="eventDesRuletip">{{generatePatrolLang('comentRuletip')}}</span>
                     </div>
                 </div>
                 <div slot="footer">
@@ -82,7 +84,7 @@
                     <el-button id="confirmBtn" @click="confirmAddFeedBack1" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
                 </div>
             </el-dialog>
-            <el-dialog :title= "generatePatrolLang('feedbacks')"
+            <el-dialog :title="generatePatrolLang('feedbacks')"
             :visible.sync="showFeedDialog2" :close-on-click-modal="false" v-if="showFeedDialog2" :width="860*percentHeight+'px'" height=300px top=5%>
                 <div class="canvas-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
@@ -114,11 +116,13 @@
                     </div>
                     <div class="event-content">
                         <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
-                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName"></el-input>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName" @blur="notShowInputRuleTips('eventName')"></el-input>
+                        <span class="rules" style="margin-left:0;" v-if="eventNameRuletip">{{generatePatrolLang('eventNameRuletip')}}</span>
                         <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
                         <span class="event-title">{{generatePatrolLang('description')}}</span>
                         <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows: 7}"
-                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')" @blur="notShowInputRuleTips('eventDes')"></el-input>
+                        <span class="rules" style="margin-left:0;"  v-if="eventDesRuletip">{{generatePatrolLang('comentRuletip')}}</span>
                     </div>
                 </div>
                 <div slot="footer">
@@ -297,7 +301,8 @@
                                         </div>
                                     </div>
                                     <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
-                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled"></el-input>
+                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled" @blur="notShowInputRuleTips('item',item)"></el-input>
+                                    <span class="rules" v-if="item.Ruletip">{{generatePatrolLang('comentRuletip')}}</span>
                                 </div>
                             </div>
                             <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else-if="showFeedBackInfo">
@@ -681,7 +686,9 @@ export default {
             videoAuthority: false,
             isLoading: false,
             showEventNameInfo: false,
-            fromName: ''
+            fromName: '',
+            eventNameRuletip:false,
+            eventDesRuletip:false
         }
     },
     computed:{
@@ -2121,6 +2128,7 @@ export default {
                             itemObj.disabled=true;
                             itemObj.checked=false;   //是否选中状态
                             itemObj.isIgnore=false;  //是否被忽略
+                            itemObj.Ruletip=false;  //是否显示提示语
                             itemObj.sourceList=[];
                             tempItems.push(itemObj);
                         })
@@ -2997,6 +3005,12 @@ export default {
         let content = filterString.all(val,200);
         console.log(content);
         item.inspectInput = content;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              item.Ruletip=true
+          }else{
+              item.Ruletip=false
+          }
       },
       eventNameChanged(val){
         let self = this;
@@ -3004,12 +3018,33 @@ export default {
         console.log(content);
         self.eventName = content;
         self.showEventNameInfo = false;
+        let length = filterString.getContentLength(val);
+        if(length>50){
+              this.eventNameRuletip=true
+          }else{
+              this.eventNameRuletip=false
+          }
       },
       eventDesChanged(val){
         let self = this;
         let content = filterString.all(val,200);
         console.log(content);
         self.eventDes = content;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              this.eventDesRuletip=true
+          }else{
+              this.eventDesRuletip=false
+          }
+      },
+      notShowInputRuleTips(e,item){
+        if(e=='item'){
+            item.Ruletip=false
+        }else if(e=='eventName'){
+            this.eventNameRuletip=false
+        }else if(e=='eventDes'){
+            this.eventDesRuletip=false
+        }
       },
       onPlayerWaiting(e){
         console.log('video is loading')
@@ -3118,7 +3153,13 @@ export default {
         }
         .canvas-content{
             position: relative;
-
+            .rules{
+                margin-left: 20px;
+                font-size: 10px;
+                margin-top: 5px;
+                color: #ff2400;
+                display: block;
+            }
             .dialog-hr{
                 border: 0.5px solid ;
                 border-color: #dfe2e9;
@@ -3936,6 +3977,13 @@ export default {
                         @include point(padding-left,20);
                         padding-bottom: 0;
                         margin-top: 5px;
+                        .rules{
+                            margin-left: 20px;
+                            font-size: 10px;
+                            margin-top: 5px;
+                            color: #ff2400;
+                            display: block;
+                        }
                         &:last-child{
                             margin-bottom: 35px;
                         }

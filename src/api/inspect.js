@@ -177,3 +177,10 @@ export const submitInspectItem1=data=>{
         data
     })
 }
+export const getInspectReportDetail=params=>{
+    return request({
+        url:`${version}/inspect/report/detail`,
+        method:'post',
+        params
+    })
+}

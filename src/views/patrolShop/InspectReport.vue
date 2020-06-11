@@ -1,14 +1,22 @@
 <template>
-  <div class="report-container">
+  <div class="report-container" ref="printPDF">
     <img :src="report.iconSrc" alt="" class="report-img" :height="reportImgHeight"/>
     <div class="el-header">
       <img class="title-icon" :src="report.inspectSrc"/>
       <span class="report-title">{{report.storeName+report.tagName}}</span>
-      <div class="info-content">
+      <div class="info-content" :style="isexportPDF?'margin-right:40px;':''">
         <span class="info-label">{{generateReportLang('submitter')}}</span>
         <span class="info-value">{{report.submitterName}}</span>
         <span class="info-label">{{generateReportLang('generateTime')}}</span>
         <span class="info-value">{{report.dateStr}}</span>
+        <div style="display:inline-block;">
+          <div class="no-print">
+            <div class="exportbtn" @click="handleDown">
+              <i class="iconfont icon-pdf export"></i>
+              <span>{{generateReportLang('InspectionDetail')}}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="el-acticle">
@@ -66,6 +74,7 @@
                   <span class="item-des"></span>
                 </div>
               </el-scrollbar>
+              <span class="moreInfotip" v-if="item.itemCount>6&&isexportPDF">{{generateReportLang('more')}}</span>
             </div>
           </div>
           <div class="details" v-else>
@@ -81,16 +90,132 @@
           </div>
         </el-col>
       </el-row>
+      <el-row class="row-detail">
+        <el-col>
+          <div class="item-header" @click="isup?isup=false:isup=true">
+            <i class="iconfont icon-zhedie1 icontemp" v-if="isup" style="color: #eb1d63;"></i>
+            <i class="iconfont icon-zhankai1 icontemp" v-if="!isup" style="color:#7d8cad;"></i>
+            <span class="title-lable">{{$t('remotePatrol.detailInfo')}}</span>
+          </div>
+          <div class="item-content" v-if="isup">
+              <div style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;" v-for="(item,index) in groups" :key="index">
+                <div class="content-title">{{item.groupName}}</div>
+                <div class="content-detail" v-for="(_item,index) in item.items" :key="index">
+                  <div class="content-detail-title">
+                    <div class="detail-title">
+                      <p class="title1">{{index+1}}.{{_item.subject}}</p>
+                      <p class="title2">{{_item.description}}</p>
+                    </div>
+                    <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
+                    <div class="title-btn" v-if="_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
+                    <div class="title-btn" v-if="_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
+                    <div class="title-btn" v-if="_item.grade==2">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.good')}}</div>
+                  </div>
+                  <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
+                    <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
+                      <div class="cdm-voice" v-if="_item.showAudio">
+                        <div class="speech-info" @click="startSpeechItem(_item,index)">
+                            <i class="iconfont icon-yuyin icon-speech"></i>
+                        </div>
+                        <audio :ref="_item.audio.audioRef" @canplay="getCommentDuration(_item)">
+                            <source :src="_item.audio.audioSrc" type="audio/mpeg" />
+                        </audio>
+                        <span class="often-text">{{_item.audio.audioOftenText}}</span>
+                      </div>
+                      <div class="cdm-word" v-if="_item.comment!=null&&_item.comment!=''">
+                        <span>{{_item.comment}}</span>
+                      </div>
+                      <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
+                          <div v-for="(sourceitem,_index) in _item.sourceList" :key="_index" class="source-details" :height="imgHeight+'px'">
+                            <div v-if="sourceitem.mediaType==2" class="img-content">
+                                <img class="imgLittle imgInner" :title="imgTitle"
+                                :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
+                                @click="openOuter(sourceitem,$event)"/>
+                            </div>
+                            <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,_index)">
+                                <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
+                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-bottom:20px;">
+                <div class="content-title">{{$t('remotePatrol.feedbacks')}}</div>
+                <div class="content-detail" v-for="(item,index) in feedbacks" :key="index">
+                  <div class="content-detail-title" style="background-color:#fff;height:30px;">
+                    <div class="detail-title">
+                      <p class="title1">{{index+1}}.{{item.subject}}</p>
+                    </div>
+                  </div>
+                  <div class="content-detail-main" v-if="item.showAttachment||item.description!=null&&item.description!=''">
+                    <p class="cdm-title">{{$t('remotePatrol.description')}}：</p>
+                      <div class="cdm-voice" v-if="item.showAudio">
+                        <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
+                            <i class="iconfont icon-yuyin icon-speech"></i>
+                        </div>
+                        <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)">
+                            <source :src="item.audio.audioSrc" type="audio/mpeg" />
+                        </audio>
+                        <span class="often-text">{{item.audio.audioOftenText}}</span>
+                      </div>
+                      <div class="cdm-word" v-if="item.description!=null&&item.description!=''">
+                        <span>{{item.description}}</span>
+                      </div>
+                      <div class="cdm-pic" v-if="item.sourceList!=null&&item.sourceList.length!=0">
+                          <div v-for="(sourceitem,index) in item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
+                            <div v-if="sourceitem.mediaType==2" class="img-content">
+                                <img class="imgLittle imgInner" :title="imgTitle"
+                                :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
+                                @click="openOuter(sourceitem,$event)"/>
+                            </div>
+                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
+                                <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
+                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <el-dialog  :title="$t('eventView.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
+            v-if="dialogCommentVideo" width="850px" top=12% @close='stopCommentVideo' class='rate-video-dialog'>
+                <div class="video-dialog-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="video-content" >
+                        <video  height=83% width=90% id="previewVideo" prload  controls
+                            class="video-js vjs-fill">
+                        </video>
+                    </div>
+                </div>
+            </el-dialog>
+            <transition name="fade">
+                <el-dialog :title="$t('eventView.view')"
+                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width=850px top=12%>
+                <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                    <hr class="dialog-hr"/>
+                    <div class="dialog-source-content">
+                        <img v-if="showImg" :src="checkImgSrc"/>
+                    </div>
+                </div>
+                </el-dialog>
+            </transition>
+          </div>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
 <script>
   import ECharts from 'vue-echarts'
   import 'echarts/lib/chart/radar'
-  import {getInspectReportList, getInspectReportInfo} from '../../api/inspect'
+  import {getInspectReportList, getInspectReportInfo,getInspectReportDetail} from '../../api/inspect'
   import util from '@/common/util'
   import {generateReportLang} from '@/api/i18n'
   import filterString from "../../common/filterString";
+  import videojs from '../../../static/video.js'
+  import 'videojs-contrib-hls';
 
   export default {
     name: 'InspectReport',
@@ -100,7 +225,20 @@
     computed: {
       reportImgHeight() {
         return (this.varyWindowWidth / 1920) * 100;
-      }
+      },
+      imgHeight(){
+            let height=0;
+            if(this.varyWindowWidth>1800){
+                height= this.varyWindowWidth*0.039;
+            }
+            else if(this.varyWindowWidth>1400){
+                height= this.varyWindowWidth*0.035;
+            }
+            else{
+                height=75;
+            }
+            return height;
+        }
     },
     data() {
       return {
@@ -144,11 +282,35 @@
         failed: this.$t('reportView.failed'),
         lang: this.$i18n.locale,
         isInsiteInspect: false,
-        sidebarElm: null
+        sidebarElm: null,
+        isup:false,
+        isexportPDF:false,
+        groups:[],
+        feedbacks:[],
+        dialogCommentVideo:false,
+        showOuter:false,
+        showImg:false,
+        checkImgSrc:'',
+        previewplayer:'',
+        imgTitle:'',
+        startIcon:require('../../../static/img/pic_play_icon.png'),
+        videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
+        deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
       }
     },
     methods: {
       generateReportLang,
+      handleDown(){
+        let self = this
+        new Promise(function(resolve) {
+            self.isup=true
+            self.isexportPDF=true
+            resolve(true)
+        }).then(function() {
+            self.$print(self.$refs.printPDF);
+            self.isexportPDF=false
+        })
+      },
       getRouterData() {
         let self = this;
         let routeData = JSON.parse(sessionStorage.getItem('report_data'));
@@ -255,6 +417,178 @@
         }
         self.report = obj;
       },
+      async getReportDetail(){
+        let self = this
+        let params = {
+          reportId: self.report.reportId
+        };
+        getInspectReportDetail(params).then(res => {
+          console.log('报表详情',res);
+          let data = res.data
+          let temp=[];
+          let feedtemp=[]
+          data.groups.forEach((groupitem,groupindex)=>{
+            let obj={
+              items:[]
+            };
+            obj.groupId = groupitem.groupId
+            obj.groupName = groupitem.groupName
+            groupitem.items.forEach((item,index)=>{
+              let details = {}
+              details.subject = item.subject
+              details.comment = item.comment
+              details.description = item.description
+              details.grade = item.grade
+              if(item.attachment.length!=0){
+              let _temp=[];
+              let audioObj={};
+              details.showAttachment = true
+              item.attachment.forEach((_item,_index)=>{
+
+                  if(_item.mediaType==0){
+                      audioObj.audioSrc=_item.url;
+                      audioObj.audioRef='audioRef'+index;
+                      audioObj.isPlaying=false;
+                      audioObj.audioOftenText='';
+                      details.showAudio=true;
+                  }
+                  else{
+                      _temp.push(_item);
+                  }
+              })
+              details.audio=audioObj;
+              details.sourceList=_temp;
+              }else{
+                details.showAttachment = false
+              }
+              obj.items.push(details)
+            })
+            temp.push(obj);
+          })
+          self.groups=temp
+          console.log('嗯嗯嗯嗯', self.groups)
+          data.feedbacks.forEach((item,index)=>{
+            let obj={};
+              obj.subject = item.subject
+              obj.description = item.description
+              if(item.attachment.length!=0){
+              let _temp=[];
+              let audioObj={};
+              obj.showAttachment = true
+              item.attachment.forEach((_item,_index)=>{
+
+                  if(_item.mediaType==0){
+                      audioObj.audioSrc=_item.url;
+                      audioObj.audioRef='audioRef'+index;
+                      audioObj.isPlaying=false;
+                      audioObj.audioOftenText='';
+                      obj.showAudio=true;
+                  }
+                  else{
+                      _temp.push(_item);
+                  }
+              })
+              obj.audio=audioObj;
+              obj.sourceList=_temp;
+              }else{
+                obj.showAttachment = false
+              }
+            feedtemp.push(obj);
+          })
+          self.feedbacks = feedtemp
+          console.log('八八八八', self.groups)
+        })
+      },
+      stopCommentVideo(){
+            var video = document.getElementById("previewVideo");
+            this.previewplayer = videojs(video);
+            this.previewplayer.pause();
+        },
+      playCommentVideo(item,index){
+            let self=this;
+            self.dialogCommentVideo=true;
+            self.$nextTick(function(){
+                var video = document.getElementById("previewVideo");
+                this.previewplayer = videojs(video);
+                this.previewplayer.src({src:item.url});
+                this.previewplayer.play();
+            })
+
+        },
+      openOuter(item,$ev){
+            let self=this;
+            console.log(item);
+            console.log($ev.target.onerror);
+            if(item!=null){
+                self.showOuter=true;
+                self.checkImgSrc=item.url;
+                self.showImg=true;
+            }
+        },
+      getCommentDuration(item){
+            let self=this;
+            console.log(item)
+            if(item.showAudio){
+                let audio=self.$refs[item.audio.audioRef][0];
+                let du=audio.duration;
+                console.log(du)
+                if(isNaN(du)){
+                    item.showAudio=false;
+                }
+                else{
+                    let duration = Math.floor(du);
+                    if(duration === 0){
+                      du = 1;
+                    }
+                    item.audio.audioOftenText=parseInt(du)+'"';
+                    console.log(item.audio.audioOftenText);
+                }
+            }
+        },
+      startSpeechItem(item,index){
+            let self=this;
+            if(!item.audio.isPlaying){
+                self.$refs[item.audio.audioRef][0].play();
+                item.audio.isPlaying=true;
+            }
+            else{
+                self.$refs[item.audio.audioRef][0].pause();
+                item.audio.isPlaying=false;
+            }
+            self.groups.forEach((groupitem,groupindex)=>{
+              groupitem.items.forEach((_item,_index)=>{
+                if(_item.audio!=undefined){
+                    if(_index!=index){
+                      if(self.$refs[_item.audio.audioRef]!=undefined){
+                        self.$refs[_item.audio.audioRef][0].pause();
+                        _item.audio.isPlaying=false;
+                      }
+                    }
+                }
+              })
+            })
+        },
+        startSpeechFeedBacks(item,index){
+            let self=this;
+            if(!item.audio.isPlaying){
+                self.$refs[item.audio.audioRef][0].play();
+                item.audio.isPlaying=true;
+            }
+            else{
+                self.$refs[item.audio.audioRef][0].pause();
+                item.audio.isPlaying=false;
+            }
+              self.feedbacks.forEach((_item,_index)=>{
+                if(_item.audio!=undefined){
+                    if(_index!=index){
+                      if(self.$refs[_item.audio.audioRef]!=undefined){
+                        self.$refs[_item.audio.audioRef][0].pause();
+                        _item.audio.isPlaying=false;
+                      }
+                    }
+                }
+              })
+        },
       async getReportInfo() {
         let self = this;
         let reportId = self.report.reportId;
@@ -441,6 +775,7 @@
       self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
       self.getRouterData();
       self.getReportInfo();
+      self.getReportDetail()
       //self.getRadarOption();
     },
     beforeDestroy(){
@@ -457,7 +792,20 @@
 <style lang="scss" scoped>
   @import 'node_modules/bootstrap/scss/bootstrap';
   @import 'node_modules/bootstrap-vue/src/index.scss';
-
+  @function rem($val){
+    @return $val/16+rem;
+  }
+  @function checkRem($val){
+      @if($val==auto){@return auto;}
+      @else if($val==0){@return 0;}
+      @else{@return rem($val);}
+  }
+  @mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+  }
+  @media print {
+.content-detail{ page-break-inside:avoid;}
+}
   $red: #f31d65;
   $black: #182752;
   $border: #e3e9f4;
@@ -472,7 +820,8 @@
     height: 100%;
     color: $black;
     position: relative;
-    border: 1px solid $border;
+    // border: 1px solid $border;
+    border: 1px solid #fff;
     background-color: #fff;
     .report-img {
       position: absolute;
@@ -503,6 +852,26 @@
         }
         .info-value {
           color: $tab;
+        }
+        .exportbtn{
+          display: inline-block;
+          width:120px;
+          min-width: 85px;
+          height:36px;
+          line-height: 36px;
+          border-radius: 2px;
+          text-align: center;
+          margin-left:calc(20 / 1920 * 100vw);
+          margin-right: calc(30 / 1920 * 100vw);
+          background-color: $red;
+          color:#ffffff;
+          cursor: pointer;
+          span{
+            font-size:14px;
+          }
+          .export{
+            font-size:20px;
+          }
         }
       }
     }
@@ -632,6 +1001,7 @@
           .item-content {
             padding-top: calc(20 / 1920 * 100vw);
             height: 280px;
+            position: relative;
             .item-details {
               height: auto;
               font-size: calc(14 / 1920 * 100vw);
@@ -659,12 +1029,287 @@
                 width: 100%;
               }
             }
+            .moreInfotip{
+              position: absolute;
+              bottom:10px;
+              right:10px;
+              font-size: 12px;
+              color:$tab;
+            }
           }
           .item-img {
             padding-bottom: calc(20 / 1920 * 100vw);
           }
         }
       }
+      .row-detail{
+        margin-bottom: 50px !important;
+        .item-header{
+            position: relative;
+            background-color: $background;
+            height: 40px;
+            line-height: 40px;
+            border: 1px solid $border;
+            padding-left: calc(20 / 1920 * 100vw);
+            cursor: pointer;
+          .icontemp {
+              font-size: calc(14 / 1920 * 100vw);
+              margin-right: calc(15 / 1920 * 100vw);
+            }
+          .title-lable {
+            font-size: calc(14 / 1920 * 100vw);
+            font-weight: bold;
+          }
+        }
+        .item-content{
+          padding-top: calc(20 / 1920 * 100vw);
+          font-size: calc(14 / 1920 * 100vw);
+          padding-left: calc(30 / 1920 * 100vw);
+          padding-right: calc(30 / 1920 * 100vw);
+          color: #4b5262;
+          border: 1px solid $border;
+          border-top:0;
+          .content-title{
+            border-left:4px solid #eb1d63;
+            font-size: calc(14 / 1920 * 100vw);
+            color:#7d8cad;
+            padding-left:calc(20 / 1920 * 100vw);
+            font-weight: bold;
+          }
+          .content-detail{
+            margin-top: 10px;
+            .content-detail-title{
+              height:70px;
+              background-color:$background;
+              padding-left:calc(20 / 1920 * 100vw);
+              padding-right: calc(20 / 1920 * 100vw);
+              padding-top:10px;
+              padding-bottom: 10px;
+              display: flex;
+              .ignore-btn{
+                width:50px;
+                height:24px;
+                background-color: #434c5e;
+                font-size: 12px;
+                color:#ffffff;
+                font-weight: bold;
+                line-height: 25px;
+                text-align: center;
+                border-radius: 5px;
+                margin-right: calc(25 / 1920 * 100vw);
+              }
+              .title-btn{
+                width:100px;
+                height:25px;
+                background-color: #fcba3f;
+                font-size:12px;
+                color:#ffffff;
+                font-weight: bold;
+                line-height: 25px;
+                text-align: center;
+                border-radius: 20px;
+              }
+              .detail-title{
+                flex: 1;
+                .title1{
+                font-size: calc(14 / 1920 * 100vw);
+                color:#182752;
+                font-weight: bold;
+                margin:0 0 5px 0;
+                }
+                .title2{
+                  font-size: calc(12 / 1920 * 100vw);
+                  color:#7d8cad;
+                  margin: 15px 0 0 10px;
+                }
+              }
+            }
+            .content-detail-main{
+              padding-top: 10px;
+              padding-left:calc(20 / 1920 * 100vw);
+              padding-right: calc(20 / 1920 * 100vw);
+              .cdm-title{
+                font-size:calc(12 / 1920 * 100vw);
+                color:#94a4b4;
+                font-weight: bold;
+                margin: 0;
+              }
+              .cdm-voice{
+                margin-top: 10px;
+                .speech-info{
+                    @include point(width,80);
+                    @include point(height,26);
+                    background-color: #FFEDED;
+                    color: $red;
+                    border: 1px solid #FEC0C7;
+                    @include point(border-radius,15);
+                    display: inline-block;
+                    cursor: pointer;
+                    .icon-speech{
+                        @include point(font-size,18);
+                        @include point(line-height,26);
+                        @include point(margin-left,5);
+                    }
+                }
+                .often-text{
+                    @include point(margin-left,20);
+                }
+              }
+              .cdm-pic{
+                margin-top: 20px;
+                overflow: hidden;
+                .source-details{
+                    display: inline-block;
+                    .img-content{
+                      margin-right: calc(10/1920*100vw);
+                        position: relative;
+                        cursor: pointer;
+                        .start-icon{
+                            position: absolute;
+                            left: 35%;
+                            top: 30%;
+                        }
+                      .imgLittle{
+                        width: calc(130/1920*100vw);
+                      }
+                    }
+                  @media screen and (min-width: 1280px) and(max-width: 1366px){
+                    width: 90px;
+                    .img-content .imgLittle{
+                      width: 85px;
+                    }
+                  }
+                }
+              }
+              .cdm-word{
+                margin-top: 10px;
+                font-size: calc(14 / 1920 * 100vw);
+                color:#4b5262;
+              }
+            }
+          }
+        }
+      }
+      .video-dialog-content{
+            width:100%;
+            height:100%;
+            margin: auto;
+            .dialog-hr{
+                border: 0.5px solid ;
+                border-color: #dfe2e9;
+                margin-bottom:10px;
+                bottom: 5px;
+                margin-top: 0;
+            }
+            .video-content{
+                @include point(margin,20);
+                padding-top: 0;
+                position: relative;
+                #channelName{
+                    width: 100%;
+                    color: #fff;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    position: absolute;
+                    z-index: 10;
+                    text-align: left;
+                    span{
+                        margin-left: 30px;
+                    }
+                }
+                .icon-footer{
+                    width: 100%;
+                    position: absolute;
+                    bottom: 0px;
+                    color: #fff;
+                    overflow: hidden;
+                    user-select:none;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    z-index: 10;
+                    .iconlside{
+                        float: left;
+                        text-align: left;
+                        .iconplay{
+                            font-size: 18px;
+                            cursor: pointer;
+                            float: left;
+                            margin-left: 30px;
+                        }
+
+                    }
+                    .iconrside{
+                        max-width: 500px;
+                        float: right;
+                        position: relative;
+                        span{
+                            font-size: 13px;
+                            margin-right:6px;
+                            margin-left: 20px;
+                        }
+                        .speed-content{
+                            display: inline-block;
+                            span{
+                                position: relative;
+                                bottom:3px;
+                            }
+                        }
+                        .screen-content{
+                            display: inline;
+                            margin-left: 30px;
+                            position: absolute;
+                            right: 20px;
+                            .iconscreen{
+                                font-size: 18px;
+                                position: relative;
+                                cursor: pointer;
+                                margin-right: 20px;
+                                bottom: 3px;
+                            }
+                        }
+                    }
+                }
+            }
+            .channel-content{
+              margin: 20px 30px;
+              padding-top: 0;
+              position: relative;
+              .radio-group{
+                display: grid;
+                grid-template-columns: 240px 240px;
+                grid-template-rows: 30px;
+              }
+              .radio-class{
+                display: flex;
+                align-items: center;
+                /deep/ .el-radio__label{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .radio-img{
+                  height: 26px;
+                  width: 26px;
+                  margin-right: 10px;
+                }
+                .radio-span{
+                  display: inline-block;
+                  max-width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-size: 14px;
+                  color: #94a4b4;
+                }
+              }
+            }
+        }
+        #previewVideo{
+            @include point(min-width,450);
+            @include point(min-height,360);
+        }
     }
   }
 </style>

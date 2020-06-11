@@ -71,6 +71,31 @@
                         <el-button class="file-confirm-btn" @click="confirmImportFile" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
+                <el-dialog :title="generateInsSettingLang('importFailTitle')"
+                :visible.sync="showFailInfo" v-if="showFailInfo"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="28%"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                            <i class="el-icon-warning" style="font-size:40px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{generateInsSettingLang('FailTitle')}}</span>
+                            <ul class="ul_style">
+                                <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
+                                    <div class="list_style"></div>
+                                    {{item}}
+                                </li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showFailInfo = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="showFailInfo = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
             </el-col>
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
@@ -94,11 +119,13 @@ import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
+import DialogVue from '@/components/DialogVue.vue'
 
 export default {
     name:'RouteInspection',
     components:{
-        RouteDetail
+        RouteDetail,
+        DialogVue
     },
     data(){
         return{
@@ -126,6 +153,8 @@ export default {
             activeName:'',
             showImportContent:false,
             showConfirmImport:false,
+            showFailInfo:false,
+            FileInfo:[],
             checkValue:'',
             tabNameInput:'',
             hideUpload:false,
@@ -606,6 +635,7 @@ export default {
         async importfxx(obj) {
             let _this = this;
             let inputDOM = this.$refs.inputer;
+            _this.FileInfo=[]
             // 通过DOM取文件数据
             this.file = event.currentTarget.files[0];
             var rABS = false; //是否将文件读取为二进制字符串
@@ -635,10 +665,6 @@ export default {
                         });
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
-                    if(!outdata[0].hasOwnProperty('检查分类')){
-                        _this.notify(_this.$t('insSettingView.templateError'),'warning',3000);
-                        return false;
-                    }
                     let arr=outdata;
                     console.log(arr);
                     let indexArry=[];
@@ -677,38 +703,33 @@ export default {
                         }
                       }
                     })
-
-                    if(flaggroupLength){
-                        _this.$refs.loadFile.value = '';
-                        _this.notify(_this.$t('insSettingView.excelLongCategory'),'warning',3000);
-                        return false;
+                    if(!outdata[0].hasOwnProperty('检查分类')||flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
+                        _this.showFailInfo=true
+                        if(!outdata[0].hasOwnProperty('检查分类')){
+                            _this.FileInfo.push(_this.$t('insSettingView.templateError'))
+                        }
+                        if(flaggroupLength){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
+                        }
+                        if(flaggroupRex||flagItemRex){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
+                        }
+                        if(flagItemName){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelEmpty'))
+                        }
+                        if(flagItemLength){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelLongItem'))
+                        }
+                        if(flagDesLength){
+                            _this.$refs.loadFile.value = ''
+                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalDes'))
+                        }
+                        return false
                     }
-                    if(flaggroupRex){
-                        _this.$refs.loadFile.value = '';
-                        _this.notify(_this.$t('insSettingView.excelIllegalCategory'),'warning',3000);
-                        return false;
-                    }
-                    if(flagItemName){
-                        _this.$refs.loadFile.value = '';
-                        _this.notify(_this.$t('insSettingView.excelEmpty'),'warning',3000);
-                        return false;
-                    }
-                    if(flagItemLength){
-                        _this.$refs.loadFile.value = '';
-                        _this.notify(_this.$t('insSettingView.excelLongItem'),'warning',3000);
-                        return false;
-                    }
-                    if(flagItemRex){
-                        _this.$refs.loadFile.value = '';
-                        _this.notify(_this.$t('insSettingView.excelIllegalStr'),'warning',3000);
-                        return false;
-                    }
-                    if(flagDesLength){
-                      _this.$refs.loadFile.value = '';
-                      _this.notify(_this.$t('insSettingView.excelIllegalDes'),'warning',3000);
-                      return false;
-                    }
-
                     let dataArry=[];
                     for(var i=0;i<indexArry.length;i++){
                         if(i<indexArry.length){
@@ -844,6 +865,26 @@ export default {
             margin-left: 20px;
             &:last-child{
                 border-left: 1px solid #dcdfe6;
+            }
+        }
+        .ul_style{
+            background-color:#f7f8fb;
+            border:1px solid #dfe2e9;
+            border-radius:2px;
+            min-height:150px;
+            padding:20px 0 0 20px;
+            .li_style{
+                color:#7d8cad;
+                margin-bottom:10px;
+                list-style:none;
+                .list_style{
+                    width:10px;
+                    height:10px;
+                    border-radius:50%;
+                    background-color:#dfe2e9;
+                    display:inline-block;
+                    margin-right:10px;
+                }
             }
         }
     }

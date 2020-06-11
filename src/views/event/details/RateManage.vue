@@ -169,7 +169,8 @@
                 </div>
                 <span style="display:block;">{{generateEventLang('addDetails')}}</span>
                 <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
-                    maxlength="300" v-model="eventDes" :placeholder="generateEventLang('describe')"></el-input>
+                 v-model="eventDes" :placeholder="generateEventLang('describe')" @input="(val)=>ivsIdChange(val)" @blur="notShowInputRuleTips"></el-input>
+                 <span class="rules" v-if="ivsIdRuletip">{{generateEventLang('RateRuletip')}}</span>
             </div>
         </el-col>
         <el-col :span="8" class="rside">
@@ -236,6 +237,7 @@ import {getDeviceList} from '@/api/device'
 import {generateEventLang} from  '@/api/i18n'
 import EzvizVideo from '@/components/EzvizVideo.vue'
 import PermissionHelper from "../../../api/PermissionHelper";
+ import filterString from '@/common/filterString'
 
 export default {
     name:"RateManage",
@@ -299,7 +301,8 @@ export default {
             relatedChannels: [],
             channelRadio: '',
             timerPlayReal: null,
-            realTimeSpeed: 0
+            realTimeSpeed: 0,
+            ivsIdRuletip:false
         }
     },
     computed: {
@@ -367,6 +370,21 @@ export default {
     },
     methods:{
         generateEventLang,
+        ivsIdChange(val){
+        let self = this;
+        let comment = filterString.all(val,200);
+        console.log(comment);
+        self.eventDes = comment;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              self.ivsIdRuletip=true
+          }else{
+              self.ivsIdRuletip=false
+          }
+      },
+      notShowInputRuleTips(){
+          this.ivsIdRuletip=false
+      },
         onPlayerPlay(player){
             console.log(player);
         },
@@ -1464,6 +1482,12 @@ $h1:#292e36;
                 @include point(margin-right,20);
                 margin-top: 15px;
                 width: 80%;
+            }
+            .rules{
+                font-size: 10px;
+                color:#ff2400;
+                margin-top: 3px;
+                display: block;
             }
         }
         .eventInfo-content{

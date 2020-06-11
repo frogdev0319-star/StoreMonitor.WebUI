@@ -69,9 +69,10 @@
               </div>
               <el-col :span="24">
                 <el-form-item :label="$t('deviceView.comment')" prop="comment" class="comment-item">
-                  <el-input v-model="ezvizAccountInfo.comment" style="width: 100%;" type="textarea"  @input="commentChange" ></el-input>
+                  <el-input v-model="ezvizAccountInfo.comment" style="width: 100%;" type="textarea"  @input="commentChange" @blur="notShowInputRuleTips"></el-input>
                 </el-form-item>
                 <span class="text" style="float: right;color: #909399;">{{curLength}}/100</span>
+                <span class="rules" v-if="commentRuletip">{{$t('insSettingView.enterListNameRuletip')}}</span>
               </el-col>
             </el-form>
           </div>
@@ -285,7 +286,8 @@
             curLength: 0,
             totalMsg: '',
             noData: '',
-            accountList: []
+            accountList: [],
+            commentRuletip:false
           }
         },
         methods:{
@@ -559,6 +561,16 @@
             let commentLength = filterString.getContentLength(comment)
             self.curLength = commentLength;
             self.ezvizAccountInfo.comment = comment;
+            let length = filterString.getContentLength(val);
+            console.log(comment,length);
+            if(length>100){
+                  this.commentRuletip=true
+              }else{
+                  this.commentRuletip=false
+              }
+          },
+          notShowInputRuleTips(){
+          this.commentRuletip=false
           },
           notify(msg,type,time) {
             this.$message({
@@ -697,6 +709,12 @@
       bottom: 0;
     }
   }
+  .rules{
+        font-size: 10px;
+        line-height: 20px;
+        color: #ff2400;
+        display: block;
+    }
   .elradio{
     &:last-child{
       border-left: 1px solid #dcdfe6;
