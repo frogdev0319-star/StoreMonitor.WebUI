@@ -88,7 +88,7 @@ Print.prototype = {
       if(imgs.length==0){
         var img = document.createElement("img");
         img.src = imageURL;
-        img.setAttribute('style', 'max-width: 70%');
+        img.setAttribute('style', 'max-width: 100%;');
         img.className = 'isNeedRemove'
         canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
       }
@@ -112,6 +112,12 @@ Print.prototype = {
     doc.open();
     doc.write(content);
     doc.close();
+    let removes = document.querySelectorAll('.isNeedRemove')
+    if(removes.length>1){
+      for(var k=0;k<removeEventListener.length;k++){
+        removes[k].parentNode.removeChild(removes[k])
+      }
+    }
     var _this = this
     iframe.onload = function(){
       _this.toPrint(w);

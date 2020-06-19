@@ -141,7 +141,7 @@
                   </div>
                 </div>
               </div>
-              <div style="margin-bottom:20px;">
+              <div style="margin-bottom:20px;" v-if="showFeedBacks">
                 <div class="content-title">{{$t('remotePatrol.feedbacks')}}</div>
                 <div class="content-detail" v-for="(item,index) in feedbacks" :key="index">
                   <div class="content-detail-title" style="background-color:#fff;height:30px;">
@@ -180,7 +180,7 @@
                 </div>
               </div>
               <el-dialog  :title="$t('eventView.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
-            v-if="dialogCommentVideo" width="850px" top=12% @close='stopCommentVideo' class='rate-video-dialog'>
+            v-if="dialogCommentVideo" width="850px" top="12%" @close="stopCommentVideo" class='rate-video-dialog'>
                 <div class="video-dialog-content" style="overflow:hidden;">
                     <hr class="dialog-hr"/>
                     <div class="video-content" >
@@ -192,7 +192,7 @@
             </el-dialog>
             <transition name="fade">
                 <el-dialog :title="$t('eventView.view')"
-                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width=850px top=12%>
+                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width="850px" top="12%">
                 <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
                     <hr class="dialog-hr"/>
                     <div class="dialog-source-content">
@@ -287,6 +287,7 @@
         isexportPDF:false,
         groups:[],
         feedbacks:[],
+        showFeedBacks:false,
         dialogCommentVideo:false,
         showOuter:false,
         showImg:false,
@@ -423,7 +424,6 @@
           reportId: self.report.reportId
         };
         getInspectReportDetail(params).then(res => {
-          console.log('报表详情',res);
           let data = res.data
           let temp=[];
           let feedtemp=[]
@@ -466,8 +466,11 @@
             temp.push(obj);
           })
           self.groups=temp
-          console.log('嗯嗯嗯嗯', self.groups)
-          data.feedbacks.forEach((item,index)=>{
+          if(data.feedbacks.length==0){
+            this.showFeedBacks = false
+          }else{
+            this.showFeedBacks = true
+            data.feedbacks.forEach((item,index)=>{
             let obj={};
               obj.subject = item.subject
               obj.description = item.description
@@ -496,7 +499,7 @@
             feedtemp.push(obj);
           })
           self.feedbacks = feedtemp
-          console.log('八八八八', self.groups)
+          }
         })
       },
       stopCommentVideo(){
@@ -804,8 +807,12 @@
     #{$poi}:checkRem($val);
   }
   @media print {
-.content-detail{ page-break-inside:avoid;}
-}
+  .content-detail-title{ page-break-inside:avoid;}
+  .cdm-title{ page-break-inside:avoid;}
+  .cdm-voice{ page-break-inside:avoid;}
+  .cdm-word{ page-break-inside:avoid;}
+  .cdm-pic{ page-break-inside:avoid;}
+  }
   $red: #f31d65;
   $black: #182752;
   $border: #e3e9f4;
@@ -815,6 +822,12 @@
   $qualified: #6097F3;
   $noqualied: #FDBA40;
   $suggestBack: #F1F6FE;
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+  }
+  .fade-enter, .fade-leave-active {
+    opacity: 0
+  }
   .report-container {
     width: 100%;
     height: 100%;
@@ -1171,6 +1184,7 @@
                         }
                       .imgLittle{
                         width: calc(130/1920*100vw);
+                        min-width: 70px;
                       }
                     }
                   @media screen and (min-width: 1280px) and(max-width: 1366px){

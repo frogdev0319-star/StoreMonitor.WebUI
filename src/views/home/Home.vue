@@ -140,7 +140,7 @@
           </el-col>
           <el-col :sapn='24' class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.0.3 &copy; 2018-2019 StoreVue Ltd. All rights reserved.</p>
+              <p style="text-align:left;">v1.0.3 &copy; 2018-{{getFullYear}} StoreVue Ltd. All rights reserved.</p>
             </footer>
           </el-col>
 
@@ -184,6 +184,11 @@
       }
     },
     computed:{
+      getFullYear(){
+        let date = new Date
+        let y = date.getFullYear()
+        return y
+      },
       classObj(){
         return{
           'aside-collapse-width': this.collapsed,

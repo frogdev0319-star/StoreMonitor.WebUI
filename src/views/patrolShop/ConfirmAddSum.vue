@@ -345,6 +345,9 @@ export default {
                     };
                 }
                 self.$router.push({name:"submitEvent",params:{data:routeData}});
+            }).catch(err=>{
+                self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
+                return false;
             })
         },
         getRouteData(){
