@@ -254,7 +254,7 @@
                 <el-row class="inspect-content" v-if="inspectList.length!=0">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                            <div :style="{'height':varyWindowHeight*0.38-40+'px'}" style="background-color:#f4f5f9">
+                            <div style="background-color:#f4f5f9;height:316.06px;">
                                 <div v-for="(item,index) in inspectList" :key="index" class="inspect-details"
                                 @click="getItemByGroup(item,index)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                                     <span v-if="item.items!=undefined" :title="`${item.groupName}（${item.dealCount}/${item.items.length}）`">{{`${item.groupName}（${item.dealCount}/${item.items.length}）`}}</span>
@@ -265,7 +265,7 @@
                     </el-col>
                     <el-col :span="16" id="inspectContent">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
-                            <div :style="{'height':varyWindowHeight*0.32+'px'}" v-if="!showFeedBack">
+                            <div style="height:299.84px;" v-if="!showFeedBack">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
                                     <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'"
                                           :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
@@ -305,7 +305,7 @@
                                     <span class="rules" v-if="item.Ruletip">{{generatePatrolLang('comentRuletip')}}</span>
                                 </div>
                             </div>
-                            <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else-if="showFeedBackInfo">
+                            <div class="item-content" style="height:299.84px;" v-else-if="showFeedBackInfo">
                                 <div id="feedback-content">
                                     <span class="feedback-info">{{generatePatrolLang('methodI')}}</span>
                                     <span class="feedback-info">{{generatePatrolLang('methodII')}}</span>
@@ -313,7 +313,7 @@
                                 <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70"/>
                                 <img :src="plusSrc" alt="plusSrc"  class="plus-icon" @click="addFeedBack"/>
                             </div>
-                            <div class="item-content" :style="{'height':varyWindowHeight*0.32+'px'}" v-else>
+                            <div class="item-content" style="height:299.84px;" v-else>
                                 <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                                     <div class="feedbacks-content">
                                         <div class="feedbacks-details" v-for="(item,index) in eventList" :key="index">

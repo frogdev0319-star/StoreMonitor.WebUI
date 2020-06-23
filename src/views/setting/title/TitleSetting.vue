@@ -474,6 +474,8 @@
             self.roleNameList[2].children[1].disabled = true;
           }
           else if(roleId == 4){
+            self.roleNameList[1].children[0].disabled = false;
+            self.roleNameList[1].children[1].disabled = false;
             // inspect report
             self.roleNameList[1].children[2].checked = true;
             self.roleNameList[1].children[2].disabled = true;

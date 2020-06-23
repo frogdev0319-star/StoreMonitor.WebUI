@@ -84,14 +84,14 @@ Print.prototype = {
      //canvass echars图表转为图片
     for (var k4 = 0; k4 < canvass.length; k4++) {
       var imageURL = canvass[k4].toDataURL("image/png");
-      var imgs = canvass[k4].parentNode.getElementsByTagName("img")
-      if(imgs.length==0){
+      // var imgs = canvass[k4].parentNode.getElementsByTagName("img")
+      // if(imgs.length==0){
         var img = document.createElement("img");
         img.src = imageURL;
         img.setAttribute('style', 'max-width: 100%;');
         img.className = 'isNeedRemove'
         canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
-      }
+      // }
     }
     //做分页
     // var pages = document.querySelectorAll('.report-container');

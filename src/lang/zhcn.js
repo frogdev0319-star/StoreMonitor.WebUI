@@ -131,6 +131,7 @@ export default {
     emptyRegionList: '区域列表为空，请重新筛选数据',
     emptyStoreList: '门店列表为空，请重新筛选数据',
     patrolType: '巡检表类型',
+    patrolCate:'巡检项类别',
     items: '巡检项',
     remotePatrolTable: '远程巡检表',
     onsitePatrolTable: '现场巡检表',

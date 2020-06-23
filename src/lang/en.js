@@ -130,6 +130,7 @@ export default {
     emptyRegionList: 'Region list is empty, please refilter the data',
     emptyStoreList: 'Store list is empty, please refilter the data',
     patrolType: 'Inspection Category',
+    patrolCate:'Inspection Categories',
     items: 'Inspection Items',
     remotePatrolTable: 'Remote Patrol List',
     onsitePatrolTable: 'Onsite Patrol List',

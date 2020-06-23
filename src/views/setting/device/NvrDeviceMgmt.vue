@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-device" :style="{'height':varyWindowHeight-139+'px'}">
+  <el-row class="el-device" :style="{'min-height':varyWindowHeight-139+'px'}">
     <el-col :span="24" class="el-btns">
       <div style="display:inline-block;" v-if="activeName=='dash'">
         <el-button @click="connectServer"  :size="varWindowWidth>1680?'small':'mini'" class="btns" type="primary">
