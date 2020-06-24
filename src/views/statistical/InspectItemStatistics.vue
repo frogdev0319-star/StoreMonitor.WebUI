@@ -282,7 +282,7 @@
             itemsInfoData:[
               {
                 "prop": "inspectGroupName",
-                "label": this.$t("overview.patrolType"),
+                "label": this.$t("overview.patrolCate"),
                 "sortable": false,
                 "width": '280',
                 "maxWidth": '280'
