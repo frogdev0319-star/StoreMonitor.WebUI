@@ -2,7 +2,7 @@
     <div class="detail-container" style="height:auto;" :style="{'min-height':varyWindowWidth*0.70+'px'}">
         <el-row>
             <el-col :span="24" class="detail-title">
-                <span class="title-title " v-if="routeData.length!=0">{{tabNameLang}}&nbsp;{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
+                <span class="title-title " v-if="routeData.length!=0">{{tabNameLang}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
                   {{itemNum}} {{generateInsSettingLang('item')}}</span>
                 <div class="route-btns">
                      <el-button
@@ -76,11 +76,6 @@
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
                         <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
-                    <div class="table-right-post">
-                        <i class="iconfont icon-quxiaolianjie"></i>
-                        <span class="post-label" @click="bindPatrol">关联职务:</span>
-                        <span>管理员，店长，督导主管，督导</span>
-                    </div>
                      <div v-if="item.itemData.length!=0" class="table-class">
                         <el-table
                         :data="item.itemData"
@@ -104,7 +99,7 @@
                         </el-table>
                     </div>
                 </div>
-                <!-- <div class="data-empty" v-if="routeData.length==0">
+                <div class="data-empty" v-if="routeData.length==0">
                     <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
                     <p class="empty-title">
                       {{generateInsSettingLang('please')}}<a :href="downSrc" :download='fileName' class="downLoad-btn">{{ generateInsSettingLang('downloadInfo')}}</a>
@@ -113,7 +108,7 @@
                       {{ generateInsSettingLang('waveline')}}
                     </p>
                       <input id="uploadFile" type="file"  ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                </div> -->
+                </div>
                 <el-dialog :title="generateInsSettingLang('import')"
                 :visible.sync="showImportContent" v-if="showImportContent"
                 :append-to-body='true'
@@ -189,7 +184,6 @@ export default {
         routeData:Array,
         tabName:String,
         downSrc:String,
-        routeName:String
     },
     data(){
         return{
@@ -221,23 +215,20 @@ export default {
             curDeleteId:'',
             fileName: this.$t('insSettingView.patrolExample'),
             lang: this.$i18n.locale,
-            delItems:[],
-            delGroup:[]
         }
     },
     computed:{
     },
-    // watch:{
-    //     routeData:{
-    //         handler:function(val,oldval){
-    //             console.log('bval',val,oldval)
-    //             if(val!=oldval){
-    //                 this.getNum();
-    //             }
-    //         },
-    //         deep:true//对象内部的属性监听，也叫深度监听
-    //   },
-    // },
+    watch:{
+        routeData:{
+            handler:function(val,oldval){
+                if(val!=oldval){
+                    this.getNum();
+                }
+            },
+            deep:true//对象内部的属性监听，也叫深度监听
+      },
+    },
     mounted(){
         let self=this;
         self.getNum();
@@ -382,10 +373,10 @@ export default {
         deleteNapes(){
             let self=this;
             let arr=[];
-            let countGroup=[];
+            let countGroup=0;
             self.routeData.forEach(item=>{
                 if(item.checked){
-                    countGroup.push(item.id);
+                    countGroup++;
                 }
                 item.itemData.forEach(_item=>{
                     if(_item.checked){
@@ -393,9 +384,8 @@ export default {
                     }
                 });
             });
-            self.delGroup=countGroup
-            self.delItems=arr
-            if(arr.length==0&&countGroup.length==0){
+            console.log(arr);
+            if(arr.length==0&&countGroup==0){
                 self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
             }
@@ -405,32 +395,7 @@ export default {
             let self=this;
             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
-            self.delGroup.forEach(g_item=>{
-                self.routeData.forEach((r_item,r_index)=>{
-                    if(g_item==r_item.id){
-                        self.routeData.splice(r_index,1)
-                    }
-                })
-            })
-            self.delItems.forEach(_item=>{
-                self.routeData.forEach((r_item,r_index)=>{
-                    if(r_item.itemData.length!=0){
-                        r_item.itemData.forEach((d_item,d_index)=>{
-                                if(_item==d_item.id){
-                                    self.routeData[r_index].itemData.splice(d_index,1)
-                                    if(self.routeData[r_index].itemData.length==0){
-                                        self.routeData.splice(r_index,1)
-                                    }
-                                }
-                        })
-                    }
-                }) 
-            })
-            if(self.routeData.length==0){
-                self.$emit('delItem')
-            }
-            self.getNum()
-            // self.$emit('refreshList');
+            self.$emit('refreshList');
         },
         confirmDelete(){
             let self=this;
@@ -519,21 +484,7 @@ export default {
                 if(code!=undefined&&code=='Success'){
                     self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                     self.showSingleDeleteContent=false;
-                    // self.$emit('refreshList');
-                    self.routeData.forEach((r_item,r_index)=>{
-                        r_item.itemData.forEach((d_item,d_index)=>{
-                            if(self.curDeleteId==d_item.id){
-                                self.routeData[r_index].itemData.splice(d_index,1)
-                                if(self.routeData[r_index].itemData.length==0){
-                                    self.routeData.splice(r_index,1)
-                                }
-                            }
-                        })
-                    })
-                    if(self.routeData.length==0){
-                        self.$emit('delItem')
-                    }
-                    self.getNum();
+                    self.$emit('refreshList');
                 }
                 else{
                     self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
@@ -553,10 +504,7 @@ export default {
             self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang}});
             console.log(self.routeData);
         },
-        bindPatrol(){
-            let self=this;
-            self.$router.push({name:'bindStore',params:''});
-        },
+
         downLoadModel(){
             let self=this;
             let url='http://'+window.location.host+'/storemonitor/api/v1.0/inspect/template';
@@ -962,33 +910,11 @@ export default {
         }
         .table-header-title{
             float:left;
-            width:80%;
-            text-align: left;
             margin-bottom:calc(15/1920*100vw);
             margin-left: 27px;
             margin-right: 0;
             .all-checkBox{
                 margin-right: 0;
-            }
-        }
-        .table-right-post{
-            width:20%;
-            font-size: 12px;
-            color:#94a4b4;
-            text-align: left;
-            width:calc(250/1920*100vw);
-            margin-bottom:calc(15/1920*100vw);
-            margin-right: 0;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            cursor: pointer;
-            .iconfont{
-                font-size: 12px;
-                margin-right: 5px;
-            }
-            .post-label{
-                text-decoration: underline;
             }
         }
       .table-class{
