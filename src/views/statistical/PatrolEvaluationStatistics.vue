@@ -1,6 +1,6 @@
 <template>
-    <el-row class="statistics-container" ref="printPDF">
-      <el-col :span="24" class="statistics-header no-print">
+    <el-row class="statistics-container">
+      <el-col :span="24" class="statistics-header">
         <el-col :span="24" class="header-details">
           <span>{{generateReportLang('selectStores')}}</span>
           <el-select v-model="curCountry"  :placeholder="generateReportLang('country')" size="mini"
@@ -54,14 +54,6 @@
           </el-tooltip>
 
           <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
-          <div class="exprotBtn" style="float:right;height: calc(36/1920*100vw);">
-            <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="handleDown">
-              <div class="btn-area">
-                <i class="iconfont icon-pdf"></i>
-                <span class="spanClass">{{generateReportLang('InspectionDetail')}}</span>
-              </div>
-            </el-button>
-          </div>
         </el-col>
         <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -126,14 +118,12 @@
               {{$t('overview.regionalList')}}
             </span>
               <div class="exprotBtn">
-                <div class="no-print">
-                  <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-                    <div class="btn-area">
-                      <img :src="exportPng" class="icon-excel">
-                      <span class="spanClass">{{$t('eventView.exportReport')}}</span>
-                    </div>
-                  </el-button>
-                </div>
+                <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                  <div class="btn-area">
+                    <img :src="exportPng" class="icon-excel">
+                    <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                  </div>
+                </el-button>
               </div>
             </div>
           </el-col>
@@ -164,17 +154,15 @@
               </div>
             </el-table>
           </div>
-          <div class="no-print">
-            <div class="toolbar pagination clearfix">
-              <el-pagination background small
-                            :page-sizes="[10, 20, 50, 100]"
-                            @size-change="regionSizeChange"
-                            @current-change="regionCurrentChange"
-                            :current-page="pageRegion"
-                            layout="jumper,total, prev, pager, next,sizes"
-                            :page-size="sizeNumRegion" :total="totalRegion">
-              </el-pagination>
-            </div>
+          <div class="toolbar pagination clearfix">
+            <el-pagination background small
+                           :page-sizes="[10, 20, 50, 100]"
+                           @size-change="regionSizeChange"
+                           @current-change="regionCurrentChange"
+                           :current-page="pageRegion"
+                           layout="jumper,total, prev, pager, next,sizes"
+                           :page-size="sizeNumRegion" :total="totalRegion">
+            </el-pagination>
           </div>
         </el-col>
 
@@ -185,14 +173,12 @@
               {{$t('overview.storeList')}}
             </span>
               <div class="exprotBtn">
-                <div class="no-print">
-                  <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="exportStore2Excel" >
-                    <div class="btn-area">
-                      <img :src="exportPng" class="icon-excel">
-                      <span class="spanClass">{{$t('eventView.exportReport')}}</span>
-                    </div>
-                  </el-button>
-                </div>
+                <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="exportStore2Excel" >
+                  <div class="btn-area">
+                    <img :src="exportPng" class="icon-excel">
+                    <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                  </div>
+                </el-button>
               </div>
             </div>
           </el-col>
@@ -225,17 +211,16 @@
               </el-table>
             </div>
           </el-col>
-          <div class="no-print">
-            <div class="toolbar pagination clearfix">
-              <el-pagination background small
-                            :page-sizes="[10, 20, 50, 100]"
-                            @size-change="storeSizeChange"
-                            @current-change="storeCurrentChange"
-                            :current-page="pageStore"
-                            layout="jumper,total, prev, pager, next,sizes"
-                            :page-size="sizeNumStore" :total="totalStore">
-              </el-pagination>
-            </div>
+
+          <div class="toolbar pagination clearfix">
+            <el-pagination background small
+                           :page-sizes="[10, 20, 50, 100]"
+                           @size-change="storeSizeChange"
+                           @current-change="storeCurrentChange"
+                           :current-page="pageStore"
+                           layout="jumper,total, prev, pager, next,sizes"
+                           :page-size="sizeNumStore" :total="totalStore">
+            </el-pagination>
           </div>
         </el-col>
       </div>
@@ -497,16 +482,6 @@
     },
     methods:{
       generateReportLang,
-      handleDown(){
-        let self = this
-        new Promise(function(resolve) {
-          console.log('列表数据',self.totalRegion)
-          console.log('第二个列表',self.totalStore)
-            resolve(true)
-        }).then(function() {
-            self.$print(self.$refs.printPDF);
-        })
-      },
       regionSortChange(col){
         let self=this;
         let column = col.column;

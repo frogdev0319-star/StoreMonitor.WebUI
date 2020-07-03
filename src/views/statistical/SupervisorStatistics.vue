@@ -69,24 +69,24 @@
                 <el-table-column type="expand" :label="$t('overview.detail')" :width="lang!=='en'? 100: 120">
                   <template slot-scope="props">
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-                      <el-tab-pane label="巡店计划" name="patrolPlan" style="display: none">
-                        <el-table
-                          :data="planTableData"
-                          :highlight-current-row="true"
-                          align='left'
-                          stripe
-                          border
-                          style="width: 100%"
-                          size="mini"
-                          :header-cell-class-name="insideHeaderClass"
-                          :row-class-name="insideRowClass"
-                          :cell-class-name="insideCellClass"
-                        >
-                          <el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"
-                                           :prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">
-                          </el-table-column>
-                        </el-table>
-                      </el-tab-pane>
+                      <!--<el-tab-pane label="巡店计划" name="patrolPlan" style="display: none">-->
+                        <!--<el-table-->
+                          <!--:data="planTableData"-->
+                          <!--:highlight-current-row="true"-->
+                          <!--align='left'-->
+                          <!--stripe-->
+                          <!--border-->
+                          <!--style="width: 100%"-->
+                          <!--size="mini"-->
+                          <!--:header-cell-class-name="insideHeaderClass"-->
+                          <!--:row-class-name="insideRowClass"-->
+                          <!--:cell-class-name="insideCellClass"-->
+                        <!--&gt;-->
+                          <!--<el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"-->
+                                           <!--:prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">-->
+                          <!--</el-table-column>-->
+                        <!--</el-table>-->
+                      <!--</el-tab-pane>-->
                       <el-tab-pane :label="$t('overview.patrolExecution')" name="planImplementation">
                         <el-table
                           :data="implementTableData"
