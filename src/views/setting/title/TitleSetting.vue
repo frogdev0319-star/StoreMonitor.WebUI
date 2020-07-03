@@ -472,6 +472,9 @@
             //close event
             self.roleNameList[2].children[1].checked = true;
             self.roleNameList[2].children[1].disabled = true;
+            //
+            self.roleNameList[4].children[3].checked = true;
+            self.roleNameList[4].children[3].disabled = false;
           }
           else if(roleId == 4){
             self.roleNameList[1].children[0].disabled = false;
@@ -479,6 +482,9 @@
             // inspect report
             self.roleNameList[1].children[2].checked = true;
             self.roleNameList[1].children[2].disabled = true;
+            // 
+            self.roleNameList[1].children[3].checked = true;
+            self.roleNameList[1].children[3].disabled = false;
             // store monitor
             self.roleNameList[1].children[4].checked = true;
             self.roleNameList[1].children[4].disabled = true;

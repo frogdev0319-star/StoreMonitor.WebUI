@@ -4,7 +4,7 @@
             <span class="tab-name" v-if="!showEditTab">{{tabNameLang}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></span>
             <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="tabName"></el-input>
-            <div class="iconcontent" v-if="showEditTab">
+            <div class="iconcontent" v-if="showEditTab" style="margin-top:28px;">
                 <div class="iconlised" @click="confirmEditTab">
                     <i class="el-icon-check"></i>
                 </div>
@@ -28,39 +28,65 @@
                </div>
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="group-items group-title" :style="{'max-height':varyDivHeight+'px'}">
-                   <div v-for="(item,index) in groupList"
-                   :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)"
-                   :class="item.isClick?'noraml-color':'noraml-groupColor'">
+                   <div class="top-group-title">
+                       <div class="group-name-title">
+                           <span>{{$t('remotePatrol.category')}}</span>
+                       </div>
+                       <div class="group-dep-title">
+                           <span>{{generateInsSettingLang('relationDuty')}}</span>
+                       </div>
+                       <div style="flex:1;"></div>
+                   </div>
+                   <div v-for="(item,index) in groupList" :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
-                            <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
-                        <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
-                        <div v-if="item.showEdit" class="show-edit">
-                            <div class="nape-items-handle" v-if="!item.isEdit">
-                                <i class="iconfont icon-bianji"
-                                style="cursor:pointer;margin-right:10px;"
-                                 @click="editGroup(index,item)"></i>
-                                <i class="iconfont icon-shanchu" style="cursor:pointer;"
-                                  @click="deleteGroup(index, item)"></i>
+                        <div style="display:flex;">
+                            <div class="group-left">
+                                 <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
+                                 <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
                             </div>
-                        </div>
-                        <div class="iconcontent">
-                            <div class="iconlised" @click="confirmEditGroup(index,item)" v-if="item.isEdit">
-                                <i class="el-icon-check"></i>
+                            <div class="group-middle">
+                                <span v-if="!item.isEdit">这是关联职务这是关联职务这是关联职务这是关联职务这是关联职务</span>
+                                <region-multi-select v-if="item.isEdit" :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
+                                     :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)"></region-multi-select>
                             </div>
-                            <div class="iconrised" @click="cancelEditGroup(index,item)" v-if="item.isEdit">
-                                <i class="el-icon-close"></i>
+                            <div class="group-right">
+                                <div v-if="item.showEdit" class="show-edit">
+                                    <div class="nape-items-handle" v-if="!item.isEdit">
+                                        <i class="iconfont icon-bianji"
+                                        style="cursor:pointer;margin-right:30px;"
+                                        @click="editGroup(index,item)"></i>
+                                        <i class="iconfont icon-shanchu" style="cursor:pointer;"
+                                        @click="deleteGroup(index, item)"></i>
+                                    </div>
+                                </div>
+                                <div class="iconcontent" v-if="item.isEdit">
+                                    <div class="iconlised" @click="confirmEditGroup(index,item)">
+                                        <i class="el-icon-check"></i>
+                                    </div>
+                                    <div class="iconrised" @click="cancelEditGroup(index,item)">
+                                        <i class="el-icon-close"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="group-add" v-if="showAddGroup">
-                        <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"></el-input>
-                        <span class="rules" v-if="enterNameRuletip">{{generateInsSettingLang('enterNameRuletip')}}</span>
-                        <div class="iconcontent">
-                            <div class="iconlised" @click="confirmAddGroup">
-                                <i class="el-icon-check"></i>
-                            </div>
-                            <div class="iconrised" @click="cancelAddGroup">
-                                <i class="el-icon-close"></i>
+                        <div class="group-name-left">
+                            <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"></el-input>
+                            <span class="rules" v-if="enterNameRuletip">{{generateInsSettingLang('enterNameRuletip')}}</span>
+                        </div>
+                        <div class="group-name-middle">
+                            <region-multi-select :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
+                             :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)"></region-multi-select>
+                        </div>
+                        <div class="group-name-right">
+                            <div class="iconcontent">
+                                <div class="iconlised" @click="confirmAddGroup">
+                                    <i class="el-icon-check"></i>
+                                </div>
+                                <div class="iconrised" @click="cancelAddGroup">
+                                    <i class="el-icon-close"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -204,17 +230,22 @@
 import api from '@/api/index'
 import util from '@/common/util'
 import {validateInput} from '@/common/validate'
-import {inpectRESTful} from '@/api/index'
+import {inpectRESTful,titleRESTful} from '@/api/index'
 import PubSub from 'pubsub-js'
 import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
+import RegionMultiSelect from "@/components/RegionMultiSelect";
 
 export default {
     name:'AddRuteInspect',
+    components:{
+        RegionMultiSelect
+    },
     data(){
         return{
             groupTitle: this.$t('insSettingView.category'),
             tabName:'',
+            ModelPost:[],
             groupList:[],
             groupNameTemp:'',  //临时存放
             groupNameInput:'',
@@ -240,7 +271,10 @@ export default {
             varyWindowWidth:window.innerWidth,
             bindStoreList:[],
             lang: this.$i18n.locale,
-            tabNameLang: this.$route.params.tabNameLang
+            tabNameLang: this.$route.params.tabNameLang,
+            titleList: [],
+            tableData:[],
+            noData:''
         }
     },
     computed:{
@@ -258,9 +292,44 @@ export default {
     },
     methods:{
         generateInsSettingLang,
+        getTitleList(){
+          let self = this;
+          self.tableData = [];
+          self.getUserTitleList().then((res)=>{
+            console.log(res);
+            res.data.forEach(item=>{
+              let roleId = item.roleId;
+
+            })
+            self.tableData = res.data;
+            if(self.tableData.length == 0){
+              self.noData = self.$t('deviceView.noData')
+            }
+            let listArray = [];
+            self.tableData.forEach(item=>{
+              listArray.push({
+                  label:item.title,
+                  value:item.id,
+                  disabled:false
+              })
+            })
+            self.titleList = listArray;
+            console.log(self.titleList);
+          })
+            .catch(err=>{
+              console.log(err)
+            })
+        },
+        getUserTitleList(){
+          return new Promise((resolve, reject) => {
+            titleRESTful.getUserTitleList().then(res=>{
+              resolve(res)
+            })
+          })
+        },
         editTabName(){
             let self=this;
-            //self.showEditTab=true;
+            self.showEditTab=true;
         },
         confirmEditTab(){
             console.log('修改tab');
@@ -341,6 +410,10 @@ export default {
             self.groupList.forEach(item=>{
                 item.isEdit=false;
             })
+        },
+        changeSelect(val){
+            let self = this;
+            self.ModelPost = Array.from(val)[0]; // 选中的职务
         },
         confirmAddGroup(){
             let self=this;
@@ -846,6 +919,7 @@ export default {
     mounted(){
         let self=this;
         self.initData();
+        self.getTitleList()
     },
     beforeRouteLeave (to, from, next) {
         console.log(to.path);
@@ -1056,6 +1130,30 @@ export default {
             background-color: #FAFAFA;
             .group-items{
                 font-size: 14px;
+                .top-group-title{
+                    height: 60px;
+                    line-height: 60px;
+                    text-align: left;
+                    font-size: 14px;
+                    color: $tab;
+                    display: flex;
+                    .group-name-title{
+                        flex:1;
+                        margin-left:calc(30/1920*100vw);
+                        span{
+                            float: left;
+                            width:calc(140/1920*100vw);
+                            min-width: 74px;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+                    }
+                    .group-dep-title{
+                        flex:2;
+                        margin-left:calc(30/1920*100vw);
+                    }
+                }
                 .groupItem{
                     height: 60px;
                     line-height: 60px;
@@ -1071,23 +1169,117 @@ export default {
                         top: 15%;
                         background-color: $red;
                     }
-                    .group-input{
-                        max-width: 64%;
+                    .group-left{
+                        flex:1;
+                        width: calc(140/1920*100vw);
+                        .group-input{
+                            float: left;
+                            width: calc(140/1920*100vw);
+                            min-width: 74px;
+                            margin-left: calc(25/1920*100vw);
+                        }
+                        span{
+                            float: left;
+                            margin-left: calc(30/1920*100vw);
+                            width: calc(140/1920*100vw);
+                            min-width: 74px;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+                    }
+                    .group-middle{
+                        flex:2;
+                        margin-left:calc(55/1920*100vw);
+                        span{
+                            float: left;
+                            width:calc(150/1920*100vw);
+                            min-width: 85px;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+                    }
+                    .group-right{
+                        flex:1;
+                        position: relative;
+                        .iconcontent{
+                            display: flex;
+                            position: absolute;
+                            right:20px;
+                            top:0px;
+                            .iconlised{
+                                @include iconContent;
+                                background-color: $red;
+                                color: #fff;
+                                height: 22px;
+                                line-height: 22px;
+                            }
+                            .iconrised{
+                                background-color: #fff;
+                                @include iconContent;
+                                border-left:0;
+                                height: 22px;
+                                line-height: 22px;
+                            }
+                        }
+                        .show-edit{
+                            .nape-items-handle{
+                                .iconfont{
+                                font-size: calc(24/1920*100vw);
+                                color: #7d8cad;
+                                font-weight: 400;
+                                position: absolute;
+                                right:20px;
+                                top:0px;
+                                }
+                            }
+                        }
+                    }
+                    &:last-child{
+                        @include point(margin-bottom,20);
+                    }
+                }
+            }
+            .group-add{
+                margin-top: 5px;
+                overflow: hidden;
+                text-align: left;
+                height: 60px;
+                line-height: 60px;
+                margin-bottom: 25px;
+                position: relative;
+                display: flex;
+                .group-name-left{
+                    flex:1;
+                    width: calc(140/1920*100vw);
+                    .groupName-input{
+                        width: calc(140/1920*100vw);
+                        min-width: 74px;
                         float: left;
                         margin-left: calc(25/1920*100vw);
                     }
-                    span{
-                        float: left;
-                        margin-left: calc(30/1920*100vw);
-                        width: 70%;
-                        text-overflow: ellipsis;
-                        overflow: hidden;
-                        white-space: nowrap;
+                    .rules{
+                        font-size: 10px;
+                        color:#ff2400;
+                        font-weight: 400;
+                        line-height: 10px;
+                        position: absolute;
+                        top: 50px;
+                        left:calc(25/1920*100vw);
                     }
+                }
+                .group-name-middle{
+                    flex:2;
+                    margin-left:calc(55/1920*100vw);
+                }
+                .group-name-right{
+                    flex:1;
                     .iconcontent{
-                        margin-left: calc(30/1920*100vw);
-                        display: inline-block;
+                        display: flex;
                         margin-top: 15px;
+                        position: absolute;
+                        right:20px;
                         .iconlised{
                             @include iconContent;
                             background-color: $red;
@@ -1102,59 +1294,6 @@ export default {
                             height: 22px;
                             line-height: 22px;
                         }
-                    }
-                    &:last-child{
-                        @include point(margin-bottom,20);
-                    }
-                  .nape-items-handle{
-                    .iconfont{
-                      font-size: calc(24/1920*100vw);
-                      color: #7d8cad;
-                      font-weight: 400;
-                    }
-                  }
-                }
-            }
-            .group-add{
-                margin-top: 5px;
-                position: relative;
-                overflow: hidden;
-                height: 60px;
-                line-height: 60px;
-                margin-bottom: 25px;
-                position: relative;
-                .groupName-input{
-                    max-width: 64%;
-                    float: left;
-                    margin-left: calc(25/1920*100vw);
-                }
-                .rules{
-                    font-size: 10px;
-                    color:#ff2400;
-                    font-weight: 400;
-                    line-height: 10px;
-                    position: absolute;
-                    top: 50px;
-                    left:calc(25/1920*100vw);
-                }
-                .iconcontent{
-                    margin-left:calc(30/1920*100vw);
-                    display: inline-block;
-                    float: left;
-                    margin-top: 15px;
-                    .iconlised{
-                        @include iconContent;
-                        background-color: $red;
-                        color: #fff;
-                        height: 22px;
-                        line-height: 22px;
-                    }
-                    .iconrised{
-                        background-color: #fff;
-                        @include iconContent;
-                        border-left:0;
-                        height: 22px;
-                        line-height: 22px;
                     }
                 }
             }
@@ -1337,7 +1476,6 @@ export default {
         }
       }
     }
-
 </style>
 <style>
 .el-dialog__body{
@@ -1348,5 +1486,9 @@ export default {
 }
 .nape-input .el-textarea__inner{
     font-family: Roboto, Arial, 'Microsoft YaHei';
+}
+#el-menuscrollbar /deep/ .el-select--mini{
+    width:calc(150/1920*100vw);
+    min-width: 85px;
 }
 </style>

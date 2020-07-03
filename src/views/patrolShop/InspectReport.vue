@@ -27,19 +27,19 @@
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="8" class="radior-content">
+        <el-col :span="6" class="radior-content">
           <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
-        <el-col :span="16" class="report-table">
+        <el-col :span="18" class="report-table">
           <table class="table table-bordered">
             <thead>
             <tr>
-              <th scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
+              <th :style="isexportPDF?'font-size:10px;':'font-size:14px;'" scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-              <td class="icon-td">
+              <td class="icon-td" :style="isexportPDF?'font-size:8px;':'font-size:12px;'">
                 <div class="icon-content">
                   <div class="icon-blag"
                        :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">
@@ -128,13 +128,13 @@
                       <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
                           <div v-for="(sourceitem,_index) in _item.sourceList" :key="_index" class="source-details" :height="imgHeight+'px'">
                             <div v-if="sourceitem.mediaType==2" class="img-content">
-                                <img class="imgLittle imgInner" :title="imgTitle"
+                                <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
                                 :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
                                 @click="openOuter(sourceitem,$event)"/>
                             </div>
                             <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,_index)">
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
                           </div>
                       </div>
@@ -166,13 +166,13 @@
                       <div class="cdm-pic" v-if="item.sourceList!=null&&item.sourceList.length!=0">
                           <div v-for="(sourceitem,index) in item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
                             <div v-if="sourceitem.mediaType==2" class="img-content">
-                                <img class="imgLittle imgInner" :title="imgTitle"
+                                <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
                                 :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
                                 @click="openOuter(sourceitem,$event)"/>
                             </div>
                             <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
                           </div>
                       </div>
@@ -1183,7 +1183,6 @@
                             top: 30%;
                         }
                       .imgLittle{
-                        width: calc(130/1920*100vw);
                         min-width: 70px;
                       }
                     }
