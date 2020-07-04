@@ -88,7 +88,7 @@ Print.prototype = {
       if(imgs.length==0){
         var img = document.createElement("img");
         img.src = imageURL;
-        img.setAttribute('style', 'max-width: 70%;');
+        img.setAttribute('style', 'max-width: 60%;');
         img.className = 'isNeedRemove'
         canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
       }
