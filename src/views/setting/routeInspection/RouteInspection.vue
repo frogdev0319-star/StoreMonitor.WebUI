@@ -500,18 +500,26 @@ export default {
                 index=2;
             }
             let data=self.elTableData[index];
-            console.log(data);
-            console.log(data.label);
             let groupIdList=[];
             let itemIdList=[];
-            data.data.forEach(d_item=>{
-                d_item.routeData.forEach(item=>{
+            if(data.data.length!=0){
+                data.data.forEach(d_item=>{
+                    d_item.routeData.forEach(item=>{
+                        groupIdList.push(item.id);
+                        item.itemData.forEach(_item=>{
+                            itemIdList.push(_item.id);
+                        })
+                    })
+                })
+            }else{
+                let table=await self.getNapeList();
+                table.forEach(item=>{
                     groupIdList.push(item.id);
-                    item.itemData.forEach(_item=>{
+                    item.items.forEach(_item=>{
                         itemIdList.push(_item.id);
                     })
                 })
-            })
+            }
             if(itemIdList.length!=0){
                 let res1= await self.deleteItem(itemIdList);
             }
