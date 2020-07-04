@@ -3,8 +3,7 @@
         <el-col :span="24" class="el-route-header">
           <el-col :span="7" class="el-route-btns">
             <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
-            <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class"
-            :disabled="elTableData[Number(activeName)].routeData.length==0" type="primary">
+            <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class" :disabled="elTableData[Number(activeName)].data.length==0" type="primary">
               <div class="btn-area">
                 <i class="iconfont icon-quxiaolianjie"></i>
                 <span>{{generateInsSettingLang('bindList')}}</span>
@@ -52,7 +51,26 @@
                         </a>
                     </div>
                 </el-dialog>
-                <el-dialog :title="generateInsSettingLang('prompt')"
+                <el-dialog :title="generateInsSettingLang('import')"
+                :visible.sync="showNameImport" v-if="showNameImport"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="510px"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <div class="nameinput" style="padding:30px 40px;">
+                            <el-input v-model="ImportName" @input="watchName" :placeholder="$t('insSettingView.enterListName')" style="border-bottom:1px solid #ddd;"></el-input>
+                            <p v-if="showImportwarning" style="font-size:12px;color:red;margin:5px 0 0 0;">请输入巡检表名称</p>
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showNameImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmImportName" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
+                <!-- <el-dialog :title="generateInsSettingLang('prompt')"
                 :visible.sync="showConfirmImport" v-if="showConfirmImport"
                 :append-to-body='true'
                 :close-on-click-modal="false"
@@ -70,12 +88,12 @@
                         <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
                         <el-button class="file-confirm-btn" @click="confirmImportFile" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
-                </el-dialog>
+                </el-dialog> -->
                 <el-dialog :title="generateInsSettingLang('importFailTitle')"
                 :visible.sync="showFailInfo" v-if="showFailInfo"
                 :append-to-body='true'
                 :close-on-click-modal="false"
-                width="28%"
+                width="510px"
                 top="35vh"
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
@@ -96,13 +114,46 @@
                         <el-button class="file-confirm-btn" @click="showFailInfo = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
+                <el-dialog :title="generateInsSettingLang('confirmDelete')"
+                :visible.sync="showSingleDeleteContent" v-if="showSingleDeleteContent"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="28%"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;" >{{generateInsSettingLang('confirmDelData')}}</span>
+                        </p>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showSingleDeleteContent = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
             </el-col>
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :closable="index!=0&&index!=1?true:false" >
-                        <div v-if="item.routeData">
-                            <route-detail :ref="curIndex" :route-data="item.routeData" :down-src="downLoadSrc"
-                             :tab-name="item.label" @refreshList="getTagList"></route-detail>
+                        <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content">
+                            <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :label="`${_item.name}`" :name="_index.toString()">
+                                <div v-if="_item.routeData">
+                                    <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc"
+                                    :tab-name="_item.label" @refreshList="getTagList" @delItem="confirmDelete"></route-detail>
+                                </div>
+                            </el-tab-pane>
+                        </el-tabs>
+                        <div class="data-empty" v-else :style="{'min-height':varyWindowWidth*0.52+'px'}">
+                            <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
+                            <p class="empty-title">
+                            {{generateInsSettingLang('please')}}<a :href="downLoadSrc" :download='fileName' class="downLoad-btn">{{ generateInsSettingLang('downloadInfo')}}</a>
+                            {{generateInsSettingLang('toEdit')}}
+                            <span @click="showNameImport=true">{{generateInsSettingLang('thenImport')}}</span>
+                            {{ generateInsSettingLang('waveline')}}
+                            </p>
+                            <input id="uploadFile" type="file"  ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -130,7 +181,7 @@ export default {
     data(){
         return{
             //elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
-            elTableData:[],
+            elTableData:[{label:'远程巡检',data:[]},{label:'现场巡检',data:[]}],
             radioList:[
                 {
                     'value':'1',
@@ -145,14 +196,22 @@ export default {
                 //     'label':'新增巡检表'
                 // }
             ],
-          addPatrol: '新增巡检表',
+            varyWindowWidth:window.innerHeight,
+            addPatrol: '新增巡检表',
+            patrolActive:'0',
+            PatrolListOne:'0',
+            PatrolListTwo:'0',
+            showImportwarning:false,
             downLoadSrc:'',
             curIndex:'id0',
             showBtnContent:false,
+            showSingleDeleteContent:false,
             storeNum:0,
             activeName:'',
             showImportContent:false,
             showConfirmImport:false,
+            showNameImport:false,
+            ImportName:'',
             showFailInfo:false,
             FileInfo:[],
             checkValue:'',
@@ -178,6 +237,13 @@ export default {
                     iconClass:'iconfont icon-xiazai',
                     name:'download',
                     btnTitle: this.$t('insSettingView.download'),
+                    enabled:true,
+                },
+                {
+                    id:0,
+                    iconClass:'iconfont icon-shanchu',
+                    name:'delete',
+                    btnTitle: this.$t('scheduleView.delete'),
                     enabled:true,
                 }
             ],
@@ -232,6 +298,10 @@ export default {
     },
     methods:{
         generateInsSettingLang,
+        emptyImport(){
+            let self = this;
+            document.getElementById("uploadFile").click();
+        },
         getLang(index){
           console.log(index)
           if(index === 0){
@@ -344,35 +414,35 @@ export default {
                             temp.push(_obj);
                         }
                     })
-                    if(item=='远程巡检'){
-                        let obj={};
-                        obj.label=item;
-                        obj.routeData=temp;
+                    if(item=='远程巡检'&&self.activeName==0){
+                        let obj={label:item,name:self.ImportName,routeData:temp};
                         if(temp.length == 0){
                           self.getDownLoadURL();
                         }
-                        self.elTableData[0]=obj;
+                        if(self.ImportName!=''){
+                            self.elTableData[0].data.push(obj);
+                        }
                     }
-                    else if(item=='现场巡检'){
-                        let obj={};
-                        obj.label=item;
-                        obj.routeData=temp;
+                    else if(item=='现场巡检'&&self.activeName==1){
+                        let obj={label:item,name:self.ImportName,routeData:temp};
                         if(temp.length == 0){
                           self.getDownLoadURL();
                         }
-                        self.elTableData[1]=obj;
+                        if(self.ImportName!=''){
+                            self.elTableData[1].data.push(obj);
+                        }
                     }
                     else{
                         obj.label=item;
-                        obj.routeData=temp;
-                        tempAllData.push(obj);
+                        obj.data={name:'',routeData:temp};
+                        // tempAllData.push(obj);
                     }
                 })
                 self.elTableData=self.elTableData.concat(tempAllData);
             }
             else{
               self.getDownLoadURL();
-              self.elTableData=[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}];
+              self.elTableData=[{label:'远程巡检',data:[]},{label:'现场巡检',data:[]}];
             }
             self.getBindStoreList();
         },
@@ -493,6 +563,7 @@ export default {
                 let codeItem=resItem.errMsg;
                 if(codeItem!=null&&codeItem=='Success'){
                     self.notify(self.$t('insSettingView.importSuss'),'success',3000);
+                    self.showNameImport=false
                 }
                 else{
                     self.notify(self.$t('insSettingView.importFail'),'warning',3000);
@@ -511,14 +582,16 @@ export default {
         async bindStore(){
             let self=this;
             let arr=[];
-            if(self.elTableData[Number(self.activeName)].routeData.length==0){
+            if(self.elTableData[Number(self.activeName)].data.length==0){
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
-            self.elTableData[Number(self.activeName)].routeData.forEach(item=>{
-                item.itemData.forEach(_item=>{
-                    arr.push(_item.id);
-                });
+            self.elTableData[Number(self.activeName)].data.forEach(item=>{
+                item.routeData.forEach(r_item=>{
+                    r_item.itemData.forEach(_item=>{
+                        arr.push(_item.id);
+                    });
+                })
             });
             console.log(arr);
             if(arr.length==0){
@@ -551,32 +624,77 @@ export default {
           self.showConfirmImport=false;
           document.getElementById('loadFile').click()
       },
+      confirmImportName(){
+          let self = this;
+          if(self.ImportName!=''){
+              document.getElementById('loadFile').click()
+              self.showImportwarning=false
+          }else{
+              self.showImportwarning=true
+          }
+      },
+      watchName(val){
+          let self = this;
+          if(val!=''){
+              self.showImportwarning=false
+          }
+      },
         handleClick(tabObj){
-            console.log(tabObj);
+            // console.log(tabObj);
             let self=this;
             sessionStorage.setItem('TabIndex',tabObj.index);
             self.getBindStoreList();
             switch(tabObj.index){
                 case '0':
-                this.checkValue='远程巡检';break;
+                self.checkValue='远程巡检';break;
                 case '1':
-                this.checkValue='现场巡检';break;
+                self.checkValue='现场巡检';break;
                 default:
-                this.checkValue='新增巡检表';break;
+                self.checkValue='新增巡检表';break;
+            }
+            if(tabObj.index=='0'){
+                self.patrolActive=self.PatrolListOne
+            }else if(tabObj.index=='1'){
+                self.patrolActive=self.PatrolListTwo
             }
 
+        },
+        handleClickPatrol(val){
+            let self = this;
+            if(self.activeName=='0'){
+                self.PatrolListOne=val.index
+            }else if(self.activeName=='1'){
+                self.PatrolListTwo=val.index
+            }
+        },
+        delAllItem(){
+            this.showSingleDeleteContent=true
+        },
+        confirmDelete(){
+            let self=this;
+            self.showSingleDeleteContent=false
+            self.elTableData[Number(self.activeName)].data.splice(Number(self.patrolActive),1)
+            if(self.elTableData[Number(self.activeName)].data.length!=0){
+                self.patrolActive=(Number(self.patrolActive)-1).toString()
+            }
         },
          importItem(){
             let self=this;
             let ret= self.isLoginIn();
             console.log(ret);
-           if(self.elTableData[Number(self.activeName)].routeData.length!=0){
-             self.showConfirmImport=true;
-           }
-           else{
-             //self.showImportContent=true;
-             document.getElementById('loadFile').click();
-           }
+            let datalength = self.elTableData[Number(self.activeName)].data.length
+            if(datalength>10||datalength==10){
+                if(self.activeName=='0'){
+                    self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
+                    return false;
+                }else if(self.activeName=='1'){
+                    self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
+                    return false;
+                }
+            }else{
+                self.showNameImport=true
+            }
+
             // if(ret.data!=undefined&&ret.data.isLogin){
             //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){
             //         self.showConfirmImport=true;
@@ -777,6 +895,7 @@ export default {
                 case 0: self.importItem();break;
                 case 1: self.exportItem();break;
                 case 2: self.downItem();break;
+                case 3: self.delAllItem();break;
             }
         },
         export2Excel() {
@@ -786,49 +905,62 @@ export default {
                 const tHeader = ['检查分类','检查项目名称','项目分值', "检查项目详细说明（选填，不填为空）",]; // 导出的表头名
                 const filterVal = ['gourpname','napename','score','napedep',]; // 导出的表头字段名
                 console.log(that.activeName);
-                let curData=that.elTableData[Number(that.activeName)].routeData;
                 let excelData=[];
-                curData.forEach((item,index)=>{
-                    if(item.itemData.length==0){
-                        let obj={};
-                        obj.gourpname=item.groupName;
-                        obj.napename='';
-                        obj.score='';
-                        obj.napedep='';
-                        excelData.push(obj);
-                    }
-                    else{
-                        item.itemData.forEach((_item,_index)=>{
+                let name = '';
+                if(that.elTableData[Number(that.activeName)].data.length==0){
+                    let obj={};
+                    obj.gourpname='';
+                    obj.napename='';
+                    obj.score='';
+                    obj.napedep='';
+                    excelData.push(obj);
+                    
+                }else{
+                    let curData=that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)];
+                    name = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name;
+                    curData.routeData.forEach((item,index)=>{
+                        if(item.itemData.length!=0){
+                            item.itemData.forEach((_item,_index)=>{
+                                let obj={};
+                                if(_index==0){
+                                    obj.gourpname=item.groupName;
+                                }
+                                else{
+                                    obj.gourpname='';
+                                }
+                                obj.napename=_item.name;
+                                obj.score=_item.score;
+                                obj.napedep=_item.description=='---'?'':_item.description;
+                                excelData.push(obj);
+                            })
+                        }else{
                             let obj={};
-                            if(_index==0){
-                                obj.gourpname=item.groupName;
-                            }
-                            else{
-                                obj.gourpname='';
-                            }
-                            obj.napename=_item.name;
-                            obj.score=_item.score;
-                            obj.napedep=_item.description=='---'?'':_item.description;
+                            obj.gourpname=item.groupName;
+                            obj.napename='';
+                            obj.score='';
+                            obj.napedep='';
                             excelData.push(obj);
-                        })
-                    }
-                })
+                        }
+                    })
+                }
                 const list = excelData;
                 const data = that.formatJson(filterVal, list);
                 let fileName = '';
+                let label = '';
                 switch (Number(that.activeName)) {
                   case 0: {
-                    fileName = `[${that.$t('insSettingView.remotePatrol')}]`;
+                    label = `[${that.$t('insSettingView.remotePatrol')}]`;
                     break;
                   }
                   case 1:{
-                    fileName = `[${that.$t('insSettingView.onsitePatrol')}]`;
+                    label = `[${that.$t('insSettingView.onsitePatrol')}]`;
                     break;
                   }
                   default:{
-                    fileName = `[${that.elTableData[Number(that.activeName)].label}]`
+                    label = `[${that.elTableData[Number(that.activeName)].label}]`
                   }
                 }
+                fileName = label+' '+name;
                 export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
             })
         },
@@ -908,6 +1040,23 @@ export default {
             .el-route-tabs{
                 width: 98%;
                 margin-left: calc(15/1920*100vw);
+                .data-empty{
+                    margin: 0 auto;
+                    margin-top: 14%;
+                    position: relative;
+                    .empty-title{
+                        font-weight: bold;
+                        span{
+                            color: $mainColor;
+                            cursor: pointer;
+                        }
+                        .downLoad-btn{
+                            color:  $mainColor;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
+                    }
+                }
             }
             .el-route-btns{
                 position: absolute;
@@ -1054,6 +1203,9 @@ export default {
         }
     }
 
+    .nameinput /deep/ .el-input__inner{
+        border:0;
+    }
     #en-patrltabs-content /deep/ .el-tabs__nav-scroll {
       height: 40px;
     }
@@ -1095,6 +1247,36 @@ export default {
       right: 0px;
       top: 3px;
     }
+    #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
+    line-height: 30px;
+  }
+  #patrltabs-content /deep/ .el-tabs__item {
+    padding: 0 0;
+    margin: 0 12px;
+    font-size: 12px;
+    font-family: Roboto,"Microsoft YaHei";
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 30px;
+    line-height: 30px;
+  }
+  #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
+    height: 30px;
+  }
+  #patrltabs-content /deep/ .el-tabs__nav-wrap::after{
+    position: static;
+  }
+  #patrltabs-content /deep/ .is-active {
+    margin-bottom: 2px;
+    background: #f31d65 ;
+    color: #fff;
+    border-radius: 3px;
+  }
+
+  #patrltabs-content /deep/ .el-tabs__active-bar{
+    height: 0 !important;
+  }
 
 </style>
 
