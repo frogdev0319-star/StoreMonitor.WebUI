@@ -97,7 +97,7 @@
             <i class="iconfont icon-zhankai1 icontemp" v-if="!isup" style="color:#7d8cad;"></i>
             <span class="title-lable">{{$t('remotePatrol.detailInfo')}}</span>
           </div>
-          <div class="item-content" v-if="isup">
+          <div class="item-content" v-show="isup">
               <div style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;" v-for="(item,index) in groups" :key="index">
                 <div class="content-title">{{item.groupName}}</div>
                 <div class="content-detail" v-for="(_item,_index) in item.items" :key="_index">
