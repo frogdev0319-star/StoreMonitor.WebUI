@@ -53,12 +53,12 @@
             <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
           </el-tooltip>
 
-          <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
-          <div class="exprotBtn" style="float:right;height: calc(36/1920*100vw);">
-            <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="handleDown">
+          <div class="exprotBtn" style="float:right;">
+            <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
+            <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown">
               <div class="btn-area">
                 <i class="iconfont icon-pdf"></i>
-                <span class="spanClass">{{generateReportLang('InspectionDetail')}}</span>
+                <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{generateReportLang('InspectionDetail')}}</span>
               </div>
             </el-button>
           </div>
@@ -282,6 +282,7 @@
     },
     data(){
       return {
+        isexportPDF:false,
         curCountry:'',
         countryList:[],
         curProvince:[],
@@ -321,7 +322,7 @@
             'percent': '0%',
           },
           {
-            'type': this.$t("overview.pass"),
+            'type': this.$t("overview.echartGood"),
             'percent': '0%',
           },
           {
@@ -352,13 +353,13 @@
             "width": '160',
             "maxWidth": '160'
           },
-          {
-            "prop": "numOfExcellent",
-            "label": this.$t('overview.excellent'),
-            "sortable":'custom',
-            "width": '160',
-            "maxWidth": '160'
-          },
+          // {
+          //   "prop": "numOfExcellent",
+          //   "label": this.$t('overview.excellent'),
+          //   "sortable":'custom',
+          //   "width": '160',
+          //   "maxWidth": '160'
+          // },
           {
             "prop":"numOfQualified",
             "label": this.$t('overview.pass'),
@@ -414,13 +415,13 @@
             "width": '160',
             "maxWidth": '160'
           },
-          {
-            "prop": "numOfExcellent",
-            "label": this.$t('overview.excellent'),
-            "sortable":'custom',
-            "width": '160',
-            "maxWidth": '160'
-          },
+          // {
+          //   "prop": "numOfExcellent",
+          //   "label": this.$t('overview.excellent'),
+          //   "sortable":'custom',
+          //   "width": '160',
+          //   "maxWidth": '160'
+          // },
           {
             "prop":"numOfQualified",
             "label": this.$t('overview.pass'),
@@ -499,13 +500,15 @@
       generateReportLang,
       handleDown(){
         let self = this
-        new Promise(function(resolve) {
-          console.log('列表数据',self.totalRegion)
-          console.log('第二个列表',self.totalStore)
-            resolve(true)
-        }).then(function() {
+        // new Promise(function(resolve) {
+        //   console.log('列表数据',self.totalRegion)
+        //   console.log('第二个列表',self.totalStore)
+        //   self.isexportPDF=true
+        //     resolve(true)
+        // }).then(function() {
             self.$print(self.$refs.printPDF);
-        })
+        //     self.isexportPDF=false
+        // })
       },
       regionSortChange(col){
         let self=this;
@@ -1546,9 +1549,9 @@
         let totalDargerous = 0;
         let totalImproved = 0;
         let totalQualified = 0;
-        let totalExcellent = 0;
+        // let totalExcellent = 0;
         let totalReport = 0;
-        let jsonArray = self.resultLegend;
+        let jsonArray = self.resultLegend.slice(0,3);
         let seriesData = [];
         let params = {};
         params.beginTs = self.params.beginTs;
@@ -1574,21 +1577,21 @@
                 totalDargerous += item.numOfDangerous;
                 totalImproved += item.numOfImproved;
                 totalQualified += item.numOfQualified;
-                totalExcellent += item.numOfExcellent;
+                // totalExcellent += item.numOfExcellent;
                 totalReport += item.numOfReport;
               })
             }
             seriesData = [
               {value: totalDargerous, name: self.$t('overview.danger')},
               {value: totalImproved, name: self.$t('overview.improve')},
-              {value: totalQualified, name: self.$t('overview.pass')},
-              {value: totalExcellent, name: self.$t('overview.excellent')}
+              {value: totalQualified, name: self.$t('overview.echartGood')},
+              // {value: totalExcellent, name: self.$t('overview.excellent')}
             ];
-            let totalArray = [totalDargerous, totalImproved, totalQualified, totalExcellent];
+            let totalArray = [totalDargerous, totalImproved, totalQualified];
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
             jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-            jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
+            // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           }
           else {
             self.notify(self.$t('overview.queryFail'), 'warning', 3000);
@@ -1596,7 +1599,7 @@
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
             jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-            jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
+            // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           }
         }
         else {
@@ -1604,7 +1607,7 @@
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
           jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-          jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
+          // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
         }
         self.regionsOptions = {
           tooltip: {
@@ -1646,7 +1649,7 @@
                 normal: {
                   color: function (params) {
                     //自定义颜色
-                    var colorList = ['#f31d65', '#ffd035', '#72a1f3', '#57e78f'];
+                    var colorList = ['#f31d65', '#ffd035', '#72a1f3'];
                     return colorList[params.dataIndex]
                   }
                 }
@@ -1921,6 +1924,8 @@
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
   }
+  @media print{
+  }
   .statistics-container{
     /*margin-bottom: 20px;*/
     .statistics-header{
@@ -2040,16 +2045,17 @@
           padding: 0 0;
           font-size: calc(14/1920*100vw);
           margin-left: calc(20/1920*100vw);
-          float: right;
+          // float: right;
         }
         .en-search-btn{
           width: calc(130/1920*100vw);
+          min-width:115px;
           margin-left: calc(20/1920*100vw);
           height: calc(36/1920*100vw);
           padding: 0 0;
           font-size: calc(14/1920*100vw);
           margin-left: calc(20/1920*100vw);
-          float: right;
+          // float: right;
         }
         // .storename-str{
         //     width: 100%;
@@ -2081,7 +2087,7 @@
       }
       .exprotBtn{
         float: right;
-        display: inline-block;
+        // display: inline-block;
         padding-top: 25px;
       }
       .export-btn{

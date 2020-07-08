@@ -27,10 +27,15 @@
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="6" class="radior-content">
+        <el-col :span="8" class="radior-content">
           <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
-        <el-col :span="18" class="report-table">
+        <el-col :span="16" class="report-table">
+          <div class="header-score">
+              <span class="span-1">{{$t('remotePatrol.getscore')}}：</span>
+              <span class="span-2">{{scorecount}} <span>{{$t('remotePatrol.scorecount')}}</span></span>
+              <span class="span-3">({{$t('remotePatrol.scorerule')}})</span>
+          </div>
           <table class="table table-bordered">
             <thead>
             <tr>
@@ -47,7 +52,7 @@
                   </div>
                   <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div>
               </td>
-              <td><span>{{item.numOfExcellentItems}}</span></td>
+              <!-- <td><span>{{item.numOfExcellentItems}}</span></td> -->
               <td><span>{{item.numOfQualifiedItems}}</span></td>
               <td><span>{{item.numOfUnqualifiedItems}}</span></td>
             </tr>
@@ -109,7 +114,7 @@
                     <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
                     <div class="title-btn" v-if="_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
                     <div class="title-btn" v-if="_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
-                    <div class="title-btn" v-if="_item.grade==2">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.good')}}</div>
+                    <!-- <div class="title-btn" v-if="_item.grade==2">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.good')}}</div> -->
                   </div>
                   <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
                     <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
@@ -242,6 +247,7 @@
     },
     data() {
       return {
+        scorecount:0,
         reportId: 0,
         varyWindowWidth: window.innerWidth,
 
@@ -268,9 +274,9 @@
           {
             name: this.$t('reportView.items'),
           },
-          {
-            name: this.$t('reportView.goodItem')
-          },
+          // {
+          //   name: this.$t('reportView.goodItem')
+          // },
           {
             name: this.$t('reportView.passItem')
           },
@@ -424,9 +430,11 @@
           reportId: self.report.reportId
         };
         getInspectReportDetail(params).then(res => {
+          console.log(res)
           let data = res.data
           let temp=[];
           let feedtemp=[]
+          let gradetotal = []
           data.groups.forEach((groupitem,groupindex)=>{
             let obj={
               items:[]
@@ -439,6 +447,7 @@
               details.comment = item.comment
               details.description = item.description
               details.grade = item.grade
+              gradetotal.push(item.grade)
               if(item.attachment.length!=0){
               let _temp=[];
               let audioObj={};
@@ -465,6 +474,25 @@
             })
             temp.push(obj);
           })
+          let gradelength = gradetotal.length
+          let ignorelength = [] //-1
+          let faillength = [] //0
+          let passlength = [] //1
+          gradetotal.forEach((item,index)=>{
+            switch (item){
+              case -1:
+                ignorelength.push(item);
+                break;
+              case 0:
+                faillength.push(item);
+                break;
+              default:
+                passlength.push(item);
+                break;
+            }
+          })
+          let totalScoreItems = gradelength - ignorelength.length
+          self.scorecount = parseInt(passlength.length/totalScoreItems*100)
           self.groups=temp
           if(data.feedbacks.length==0){
             this.showFeedBacks = false
@@ -947,6 +975,22 @@
         .report-table {
           font-size: calc(14 / 1920 * 100vw);
           padding-left: calc(40/1920*100vw);
+          .header-score{
+            margin-bottom: 10px;
+            font-weight: bold;
+              .span-1{
+                  font-size: calc(14/1920*100vw);
+                  color: $black;
+              }
+              .span-2{
+                  color: $red;
+                  font-size: calc(20/1920*100vw);
+              }
+              .span-3{
+                  color: $tab;
+                  font-size: calc(12/1920*100vw);
+              }
+          }
           th {
             color: $tab;
             background-color: $background;

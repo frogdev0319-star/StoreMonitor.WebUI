@@ -1,6 +1,6 @@
 <template>
-  <div class="item-container">
-    <el-col :span="24" class="statistics-header">
+  <div class="item-container" ref="printPDF">
+    <el-col :span="24" class="statistics-header no-print">
       <el-col :span="24" class="header-details">
         <span>{{$t('reportView.selectStores')}}</span>
         <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
@@ -31,7 +31,7 @@
         <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                       style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
         <span>{{$t('overview.patrolType')}}</span>
-        <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini"
+        <!-- <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini"
                    class="el-province" @change="changeType">
           <el-option
             v-for="item in inspectTypeList"
@@ -39,7 +39,13 @@
             :label="item.label"
             :value="item.value">
           </el-option>
-        </el-select>
+        </el-select> -->
+        <el-cascader
+          v-model="value"
+          :options="options"
+          :props="{ expandTrigger: 'hover' }"
+          @change="handleChange">
+        </el-cascader>
 
       </el-col>
 
@@ -92,11 +98,18 @@
         <el-col :span="24" class="items-row">
           <el-col :span="24" class="items-title">
             <span class="title">{{$t('overview.itemChartReport')}}</span>
-            <div class="exprotBtn">
+            <div class="exprotBtn no-print">
               <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                 <div class="btn-area">
-                  <img :src="exportPng" class="icon-excel">
+                  <i class="iconfont icon-excel"></i>
+                  <!-- <img :src="exportPng" class="icon-excel"> -->
                   <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                </div>
+              </el-button>
+              <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown" style="margin-top:-15px;">
+                <div class="btn-area">
+                  <i class="iconfont icon-pdf"></i>
+                  <span class="spanClass">{{$t('reportView.InspectionDetail')}}</span>
                 </div>
               </el-button>
             </div>
@@ -168,15 +181,17 @@
                 </div>
               </el-table>
             </div>
-            <div class="toolbar pagination clearfix">
-              <el-pagination background small
-                             :page-sizes="[10, 20, 50, 100]"
-                             @size-change="sizeChange"
-                             @current-change="currentChange"
-                             :current-page="page"
-                             layout="jumper,total, prev, pager, next,sizes"
-                             :page-size="sizeNum" :total="total">
-              </el-pagination>
+            <div class="no-print">
+              <div class="toolbar pagination clearfix">
+                <el-pagination background small
+                              :page-sizes="[10, 20, 50, 100]"
+                              @size-change="sizeChange"
+                              @current-change="currentChange"
+                              :current-page="page"
+                              layout="jumper,total, prev, pager, next,sizes"
+                              :page-size="sizeNum" :total="total">
+                </el-pagination>
+              </div>
             </div>
           </div>
         </el-col>
@@ -222,6 +237,31 @@
         },
       data(){
           return {
+            value: [],
+        options: [{
+          value: 'zhinan',
+          label: '指南',
+          children: [{
+            value: 'shejiyuanze',
+            label: '远程巡检'
+          },
+          {
+            value: 'xianchang',
+            label: '现场巡检'
+          }]
+        },
+        {
+          value: 'ww',
+          label: '文档',
+          children: [{
+            value: 'qqq',
+            label: '地方'
+          },
+          {
+            value: 'ff',
+            label: '功能'
+          }]
+        }],
             curCountry:'',
             countryList:[],
             curProvince:[],
@@ -259,10 +299,10 @@
             itemsPerArray: [],
             itemsOptions:null,
             itemsLegend: [
-              {
-                'type': this.$t("overview.excellent"),
-                'percent': '0%',
-              },
+              // {
+              //   'type': this.$t("overview.excellent"),
+              //   'percent': '0%',
+              // },
               {
                 'type': this.$t("overview.pass"),
                 'percent': '0%',
@@ -301,13 +341,13 @@
                 "width": '130',
                 "maxWidth": '200'
               },
-              {
-                "prop": "numOfExcellent",
-                "label": `${this.$t("overview.excellent")}${this.$t("overview.timesUnit")}`,
-                "sortable":'custom',
-                "width": '130',
-                "maxWidth": '150'
-              },
+              // {
+              //   "prop": "numOfExcellent",
+              //   "label": `${this.$t("overview.excellent")}${this.$t("overview.timesUnit")}`,
+              //   "sortable":'custom',
+              //   "width": '130',
+              //   "maxWidth": '150'
+              // },
               {
                 "prop":"numOfQualified",
                 "label": `${this.$t("overview.pass")}${this.$t("overview.timesUnit")}`,
@@ -383,6 +423,17 @@
         }
       },
       methods:{
+        handleChange(){
+          
+        },
+        handleDown(){
+        let self = this
+        new Promise(function(resolve) {
+            resolve(true)
+          }).then(function() {
+              self.$print(self.$refs.printPDF);
+          })
+        },
         sortChange(col){
           console.log(col);
           let self=this;
@@ -930,7 +981,7 @@
                   normal: {
                     color: function (params) {
                       //自定义颜色
-                      var colorList = ['#57e78f', '#72a1f3', '#ffd035', '#cad1db'];
+                      var colorList = ['#72a1f3', '#ffd035', '#cad1db'];
                       return colorList[params.dataIndex]
                     }
                   }
@@ -945,7 +996,7 @@
               size: self.total
             }
             let inspectItems = await self.getInspectStatsItemInfo(params);
-            let excellentPer = 0;
+            // let excellentPer = 0;
             let qualifiedPer = 0;
             let unqualifiedPer = 0;
             let ignorePer = 0;
@@ -957,7 +1008,7 @@
               let totalIgnored = 0;
               let totalUnqualified = 0;
               let totalQualified = 0;
-              let totalExcellent = 0;
+              // let totalExcellent = 0;
               resultData = inspectItems.data;
               console.log(resultData)
               try {
@@ -966,12 +1017,12 @@
                   totalIgnored += item.numOfIgnored;
                   totalUnqualified += item.numOfUnqualified;
                   totalQualified += item.numOfQualified;
-                  totalExcellent += item.numOfExcellent;
+                  // totalExcellent += item.numOfExcellent;
                 })
                 console.log(resultData.content);
 
                 seriesData = [
-                  {value: totalExcellent, name: self.$t('overview.excellent')},
+                  // {value: totalExcellent, name: self.$t('overview.excellent')},
                   {value: totalQualified, name: self.$t('overview.pass')},
                   {value: totalUnqualified, name: self.$t('overview.failed')},
                   {value: totalIgnored, name: self.$t('overview.ignored')}
@@ -980,18 +1031,17 @@
               catch (e) {
                 seriesData = [];
               }
-              let totalArray = [totalExcellent, totalQualified, totalUnqualified, totalIgnored];
+              let totalArray = [totalQualified, totalUnqualified, totalIgnored];
               console.log(totalArray);
+              // jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
               jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
               jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
               jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-              jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
               self.itemsOptions.series[0].data = seriesData;
             }
             console.log(inspectItems);
 
             self.itemsPerArray = jsonArray;
-            console.log(self.itemsPerArray)
             self.getCatergyRadar(resultData.content);
           }
           else{
@@ -999,7 +1049,7 @@
             jsonArray[0].percent = 0;
             jsonArray[1].percent = 0;
             jsonArray[2].percent = 0;
-            jsonArray[3].percent = 0;
+            // jsonArray[3].percent = 0;
             self.itemsPerArray = jsonArray;
             self.hasNoData = true;
           }
@@ -1486,8 +1536,12 @@
                 .icon-excel{
                   margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
-                  height: calc(24/1920*100vw);
-                  width: calc(24/1920*100vw);
+                  // height: calc(24/1920*100vw);
+                  // width: calc(24/1920*100vw);
+                }
+                .icon-pdf{
+                  margin-right: calc(18/1920*100vw);
+                  font-size: calc(24/1920*100vw);
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
@@ -1518,8 +1572,13 @@
                 justify-content: center;
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-                  height: calc(24/1920*100vw);
-                  width: calc(24/1920*100vw);
+                  font-size: 24px;
+                  // height: calc(24/1920*100vw);
+                  // width: calc(24/1920*100vw);
+                }
+                .icon-pdf{
+                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  font-size: 24px;
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
@@ -1587,16 +1646,16 @@
                     color: $tab;
                     font-size: 12px;
                   }
+                  // .label-0 {
+                  //   background-color: $excellent;
+                  // }
                   .label-0 {
-                    background-color: $excellent;
-                  }
-                  .label-1 {
                     background-color: $pass;
                   }
-                  .label-2 {
+                  .label-1 {
                     background-color: $failed;
                   }
-                  .label-3 {
+                  .label-2 {
                     background-color: $ignored;
                   }
                 }
@@ -1796,6 +1855,14 @@
   }
 </style>
 <style>
+.el-cascader-menu {width: 200px; }
+.el-cascader-menu__wrap ul li{list-style: none;}
+.el-scrollbar__view{ padding: 0 15px;}
+.el-icon-arrow-right{float: right;}
+.in-active-path{color:#f31d65;font-weight: 600;}
+.el-cascader-node{font-size: 14px;margin: 10px 0;}
+.el-cascader-node:hover{color:#f31d65;font-weight: 600;cursor: pointer;}
+.el-cascader-menu__list .is-active{color:#f31d65;font-weight: 600;}
   .header-class{
     height: 40px;
     font-size: 12px;

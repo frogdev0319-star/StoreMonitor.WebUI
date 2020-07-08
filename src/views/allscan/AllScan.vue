@@ -309,7 +309,7 @@
             'desc': '优秀≤60%'
           },
         ],
-        resultList: [this.$t('overview.danger'), this.$t('overview.improve'), this.$t('overview.pass'), this.$t('overview.excellent')],
+        resultList: [this.$t('overview.danger'), this.$t('overview.improve'), this.$t('overview.pass')],
         itemsLegend: [
           {
             'type': this.$t("overview.excellent"),
@@ -432,7 +432,7 @@
         console.log(self.curGroupIndex)
         let option = {
           baseOption: {
-            color: ["#f31d65", "#ffd035", "#72a1f3", "#57e78f"],
+            color: ["#f31d65", "#ffd035", "#72a1f3"],
             timeline: {
               axisType: 'category',
               currentIndex: self.currentIndex,
@@ -563,7 +563,7 @@
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
+              // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
 
@@ -585,14 +585,14 @@
           let dangerJson = {};
           let improvedJson = {};
           let passJson = {};
-          let excellentJson = {};
+          // let excellentJson = {};
           resultData.forEach((item, index) => {
             let dateTime = item.ts;
             let region = item.regions;
             let dangerousList = [];
             let improvedList = [];
             let passList = [];
-            let excellentList = [];
+            // let excellentList = [];
             region.forEach(_item => {
               if (self.regionList.indexOf(_item.region) == -1) {
                 return;
@@ -609,13 +609,13 @@
               itemQualifiedJson.name = _item.region;
               itemQualifiedJson.value = _item.numOfQualified;
               passList.push(itemQualifiedJson);
-              let itemExcellentJson = {};
-              itemExcellentJson.name = _item.region;
-              itemExcellentJson.value = _item.numOfExcellent;
-              excellentList.push(itemExcellentJson);
+              // let itemExcellentJson = {};
+              // itemExcellentJson.name = _item.region;
+              // itemExcellentJson.value = _item.numOfExcellent;
+              // excellentList.push(itemExcellentJson);
             })
             let tempOption = {};
-            let seriesArray = new Array(4);
+            let seriesArray = new Array(3);
             let seriesDanJson = {};
             seriesDanJson.stack = 'test';
             seriesDanJson.data = dangerousList;
@@ -631,10 +631,10 @@
             seriesPassJson.data = passList;
             seriesArray[2] = seriesPassJson;
 
-            let seriesExcJson = {};
-            seriesExcJson.stack = 'test';
-            seriesExcJson.data = excellentList;
-            seriesArray[3] = seriesExcJson;
+            // let seriesExcJson = {};
+            // seriesExcJson.stack = 'test';
+            // seriesExcJson.data = excellentList;
+            // seriesArray[3] = seriesExcJson;
             tempOption.series = seriesArray;
             option.options.push(tempOption)
             self.regionChartEmpty = false;
@@ -644,7 +644,7 @@
           self.dataMap.dataDanger = {0: []};
           self.dataMap.dataImproved = {0: []};
           self.dataMap.dataQualified = {0: []}
-          self.dataMap.dataExcellent = {0: []};
+          // self.dataMap.dataExcellent = {0: []};
           self.regionChartEmpty = true;
           option.baseOption.timeline.autoPlay = false;
         }
@@ -663,7 +663,7 @@
         console.log(self.curGroupIndex)
         let option = {
           baseOption: {
-            color: ["#f31d65", "#ffd035", "#72a1f3", "#57e78f"],
+            color: ["#f31d65", "#ffd035", "#72a1f3"],
             timeline: {
               axisType: 'category',
               currentIndex: self.currentIndex,
@@ -794,7 +794,7 @@
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
+              // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
 
@@ -816,14 +816,14 @@
           let dangerJson = {};
           let improvedJson = {};
           let passJson = {};
-          let excellentJson = {};
+          // let excellentJson = {};
           resultData.forEach((item, index) => {
             let dateTime = item.ts;
             let region = item.regions;
             let dangerousList = [];
             let improvedList = [];
             let passList = [];
-            let excellentList = [];
+            // let excellentList = [];
             region.forEach(_item => {
               if (self.regionList.indexOf(_item.region) == -1) {
                 return;
@@ -840,13 +840,13 @@
               itemQualifiedJson.name = _item.region;
               itemQualifiedJson.value = _item.numOfQualified;
               passList.push(itemQualifiedJson);
-              let itemExcellentJson = {};
-              itemExcellentJson.name = _item.region;
-              itemExcellentJson.value = _item.numOfExcellent;
-              excellentList.push(itemExcellentJson);
+              // let itemExcellentJson = {};
+              // itemExcellentJson.name = _item.region;
+              // itemExcellentJson.value = _item.numOfExcellent;
+              // excellentList.push(itemExcellentJson);
             })
             let tempOption = {};
-            let seriesArray = new Array(4);
+            let seriesArray = new Array(3);
             let seriesDanJson = {};
             seriesDanJson.stack = 'test';
             seriesDanJson.data = dangerousList;
@@ -862,10 +862,10 @@
             seriesPassJson.data = passList;
             seriesArray[2] = seriesPassJson;
 
-            let seriesExcJson = {};
-            seriesExcJson.stack = 'test';
-            seriesExcJson.data = excellentList;
-            seriesArray[3] = seriesExcJson;
+            // let seriesExcJson = {};
+            // seriesExcJson.stack = 'test';
+            // seriesExcJson.data = excellentList;
+            // seriesArray[3] = seriesExcJson;
             tempOption.series = seriesArray;
             option.options.push(tempOption)
             self.regionChartEmpty = false;
@@ -875,7 +875,7 @@
           self.dataMap.dataDanger = {0: []};
           self.dataMap.dataImproved = {0: []};
           self.dataMap.dataQualified = {0: []}
-          self.dataMap.dataExcellent = {0: []};
+          // self.dataMap.dataExcellent = {0: []};
           self.regionChartEmpty = true;
         }
         self.storeOptions = option;
@@ -1454,18 +1454,19 @@
         let self = this;
         let inspectItems = await self.getInspectStatsItemInfo(self.params);
         console.log(inspectItems);
-        let excellentPer = 0;
+        // let excellentPer = 0;
         let qualifiedPer = 0;
         let unqualifiedPer = 0;
         let ignorePer = 0;
         let errCode = inspectItems.errCode;
-        let jsonArray = self.itemsLegend;
+        let jsonArray = self.itemsLegend.slice(1);
+        console.log('啊飒飒',jsonArray)
         let seriesData = [];
         if (errCode == 0) {
           let totalIgnored = 0;
           let totalUnqualified = 0;
           let totalQualified = 0;
-          let totalExcellent = 0;
+          // let totalExcellent = 0;
           let resultData = inspectItems.data;
           // sort by num Of Unqualified
 
@@ -1475,7 +1476,7 @@
               totalIgnored += item.numOfIgnored;
               totalUnqualified += item.numOfUnqualified;
               totalQualified += item.numOfQualified;
-              totalExcellent += item.numOfExcellent;
+              // totalExcellent += item.numOfExcellent;
             })
             resultData.sort((item1, item2) => {
               return item1.numOfUnqualified < item2.numOfUnqualified ? 1 : -1;
@@ -1491,7 +1492,7 @@
               item.percent = parseInt((percent * 100).toFixed(0));
             })
             seriesData = [
-              {value: totalExcellent, name: self.$t('overview.excellent')},
+              // {value: totalExcellent, name: self.$t('overview.excellent')},
               {value: totalQualified, name: self.$t('overview.pass')},
               {value: totalUnqualified, name: self.$t('overview.failed')},
               {value: totalIgnored, name: self.$t('overview.ignored')}
@@ -1504,7 +1505,7 @@
             self.itemsTopFive = [];
             seriesData = [];
           }
-          let totalArray = [totalExcellent, totalQualified, totalUnqualified, totalIgnored];
+          let totalArray = [totalQualified, totalUnqualified, totalIgnored];
           console.log(totalArray);
           // let totalItems = totalIgnored + totalUnqualified + totalQualified + totalExcellent;
           // if(totalItems != 0){
@@ -1513,10 +1514,10 @@
           //   qualifiedPer = self.toPercent(totalQualified/totalItems);
           //   excellentPer = self.toPercent(totalExcellent/totalItems);
           // }
+          // jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
           jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-          jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           self.itemsOptions = {
             tooltip: {
               trigger: 'item',
@@ -1554,7 +1555,7 @@
                   normal: {
                     color: function (params) {
                       //自定义颜色
-                      var colorList = ['#57e78f', '#72a1f3', '#ffd035', '#cad1db'];
+                      var colorList = ['#72a1f3', '#ffd035', '#cad1db'];
                       return colorList[params.dataIndex]
                     }
                   }
@@ -1565,7 +1566,6 @@
 
         }
         self.itemsPerArray = jsonArray;
-        console.log(self.itemsPerArray)
       },
       getInspectStatsItemInfo(params) {
         return new Promise((resolve, reject) => {
@@ -1620,7 +1620,7 @@
         self.regionResultList = result.data;
         let schema = [
           {name: 'inspectCycle', index: 0, text: self.$t('overview.cycle')},
-          {name: 'passRate', index: 1, text: self.$t('overview.passRate')},
+          {name: 'passRate', index: 1, text: self.$t('overview.goodRate')},
           {name: 'excellentRate', index: 2, text: self.$t('overview.excellentRate')},
           {name: 'dangerRate', index: 3, text: self.$t('overview.dangerRate')},
           {name: 'region', index: 5, text: self.$t('overview.region')},
@@ -1630,7 +1630,7 @@
             opacity: 0.8,
             shadowOffsetX: 0,
             shadowOffsetY: 0,
-            borderColor: '#57e78f',
+            borderColor: '#72a1f3',
           }
         };
         let itemDangerStyle = {
@@ -1698,7 +1698,7 @@
             fontFamily: self.fontFamily
           },
           color: [
-            'rgba(243,29,101,1)', 'rgba(243,29,101,0.5)', 'rgba(87,231,143, 1)', 'rgba(87,231,143,0.5)'
+            'rgba(243,29,101,1)', 'rgba(243,29,101,0.5)', 'rgba(114,161,243, 1)', 'rgba(114,161,243,0.5)'
           ],
           grid: {
             containLabel: true,
@@ -1721,31 +1721,32 @@
                 return;
               }
               let htmlRegion = `${schema[4].text}: ` //region
-              let execellentStr = `${schema[2].text}: ` //excellent rate
+              let passStr = `${schema[1].text}: ` //pass rate
+              // let execellentStr = `${schema[2].text}: ` //excellent rate
               let dangerousStr = `${schema[3].text}: ` //dangerous rate
               let allData = [...options.series[0].data, ...options.series[1].data, ...options.series[2].data, ...options.series[3].data]
               allData.forEach(item => {
                 if (value[0] === item[0] && value[1] === item[1]) {
                   htmlRegion += `${item[4]},`
-                  execellentStr += `${item[2]}%,`
-                  dangerousStr += `${item[3]}%,`
+                  passStr += `${item[3]}%,`
+                  // execellentStr += `${item[2]}%,`
+                  dangerousStr += `${item[0]}%,`
                 }
               });
               htmlRegion = htmlRegion.substr(0, htmlRegion.length -1)
-              execellentStr = execellentStr.substr(0, execellentStr.length -1)
+              // execellentStr = execellentStr.substr(0, execellentStr.length -1)
+              passStr = passStr.substr(0, passStr.length -1)
               dangerousStr = dangerousStr.substr(0, dangerousStr.length - 1)
               let htmlF = ''
               if(value[0] > 50){
                 htmlF = `${htmlRegion}<br>
-                          ${execellentStr}<br>
-                          ${schema[0].text}: ${value[1]}${self.$t("overview.day")}<br>
-                          ${schema[1].text}: ${value[0]}%<br>`
+                          ${passStr}<br>
+                          ${schema[0].text}: ${value[1]}${self.$t("overview.day")}<br>`
               }
               else{
                 htmlF = `${htmlRegion}<br>
                           ${dangerousStr}<br>
-                          ${schema[0].text}: ${value[1]}${self.$t("overview.day")}<br>
-                          ${schema[1].text}: ${value[0]}%<br>`
+                          ${schema[0].text}: ${value[1]}${self.$t("overview.day")}<br>`
               }
 
               return htmlF;
@@ -1896,7 +1897,6 @@
         let passRateLessArray = [];
         if (result.errCode == 0) {
           let resultData = result.data;
-          console.log(resultData)
           if (resultData.length > 0) {
             resultData.forEach(item => {
               let inspectNum = item.numOfReport;
@@ -1915,7 +1915,7 @@
                 tempArray.push(region)
                 console.log(tempArray);
                 if (qualifiedRate > 50) {
-                  excellentRate >= 60 ? passRateMoreArray.push(tempArray) : passRateLessArray.push(tempArray)
+                  qualifiedRate >= 60 ? passRateMoreArray.push(tempArray) : passRateLessArray.push(tempArray)
                 }
                 else {
                   floatRage >= 60 ? dangerRateMoreArray.push(tempArray) : dangerRateLessArray.push(tempArray)
@@ -1953,7 +1953,7 @@
         self.regionInspectListData = [];
         let option = {
           baseOption: {
-            color: ["#f31d65", "#ffd035", "#72a1f3", "#57e78f"],
+            color: ["#f31d65", "#ffd035", "#72a1f3"],
             timeline: {
               axisType: 'category',
               currentIndex: self.currentIndex,
@@ -2087,7 +2087,7 @@
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
+              // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
 
@@ -2129,14 +2129,14 @@
             let dangerJson = {};
             let improvedJson = {};
             let passJson = {};
-            let excellentJson = {};
+            // let excellentJson = {};
             resultData.forEach((item, index) => {
               let dateTime = item.ts;
               let region = item.regions;
               let dangerousList = [];
               let improvedList = [];
               let passList = [];
-              let excellentList = [];
+              // let excellentList = [];
               region.forEach(_item => {
                 let itemDangerJson = {};
                 itemDangerJson.name = _item.region;
@@ -2150,13 +2150,13 @@
                 itemQualifiedJson.name = _item.region;
                 itemQualifiedJson.value = _item.numOfQualified;
                 passList.push(itemQualifiedJson);
-                let itemExcellentJson = {};
-                itemExcellentJson.name = _item.region;
-                itemExcellentJson.value = _item.numOfExcellent;
-                excellentList.push(itemExcellentJson);
+                // let itemExcellentJson = {};
+                // itemExcellentJson.name = _item.region;
+                // itemExcellentJson.value = _item.numOfExcellent;
+                // excellentList.push(itemExcellentJson);
               })
               let tempOption = {};
-              let seriesArray = new Array(4);
+              let seriesArray = new Array(3);
               let seriesDanJson = {};
               seriesDanJson.stack = 'test';
               seriesDanJson.data = dangerousList;
@@ -2172,10 +2172,10 @@
               seriesPassJson.data = passList;
               seriesArray[2] = seriesPassJson;
 
-              let seriesExcJson = {};
-              seriesExcJson.stack = 'test';
-              seriesExcJson.data = excellentList;
-              seriesArray[3] = seriesExcJson;
+              // let seriesExcJson = {};
+              // seriesExcJson.stack = 'test';
+              // seriesExcJson.data = excellentList;
+              // seriesArray[3] = seriesExcJson;
               tempOption.series = seriesArray;
               option.options.push(tempOption)
               self.regionChartEmpty = false;
@@ -2185,7 +2185,7 @@
             self.dataMap.dataDanger = {0: []};
             self.dataMap.dataImproved = {0: []};
             self.dataMap.dataQualified = {0: []}
-            self.dataMap.dataExcellent = {0: []};
+            // self.dataMap.dataExcellent = {0: []};
             self.regionChartEmpty = true;
           }
         }
@@ -2193,7 +2193,7 @@
           self.dataMap.dataDanger = {0: []};
           self.dataMap.dataImproved = {0: []};
           self.dataMap.dataQualified = {0: []}
-          self.dataMap.dataExcellent = {0: []}
+          // self.dataMap.dataExcellent = {0: []}
           self.regionChartEmpty = true;
         }
         self.storeOptions = option;
@@ -2714,16 +2714,16 @@
                     color: $tab;
                     font-size: 12px;
                   }
+                  // .label-0 {
+                  //   background-color: $excellent;
+                  // }
                   .label-0 {
-                    background-color: $excellent;
-                  }
-                  .label-1 {
                     background-color: $pass;
                   }
-                  .label-2 {
+                  .label-1 {
                     background-color: $failed;
                   }
-                  .label-3 {
+                  .label-2 {
                     background-color: $ignored;
                   }
                 }

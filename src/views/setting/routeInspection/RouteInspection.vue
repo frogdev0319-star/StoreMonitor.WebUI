@@ -67,7 +67,7 @@
                     </div>
                     <div slot="footer" class="dialog-footer">
                         <el-button class="file-cancel-btn" @click="showNameImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmImportName" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmImportName" size="mini" type="primary">{{generateInsSettingLang('select')}}</el-button>
                     </div>
                 </el-dialog>
                 <!-- <el-dialog :title="generateInsSettingLang('prompt')"
@@ -693,6 +693,7 @@ export default {
                 }
             }else{
                 self.showNameImport=true
+                self.ImportName=''
             }
 
             // if(ret.data!=undefined&&ret.data.isLogin){

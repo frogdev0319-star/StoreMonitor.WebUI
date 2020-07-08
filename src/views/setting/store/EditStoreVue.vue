@@ -22,6 +22,9 @@
             </div>
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
+            <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
+                <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" ></el-tab-pane>
+            </el-tabs>
             <div class="el-table-title tabTitle">
                 <span class="name-title">{{generateStoreLang('patrolName')}}</span>
                 <span class="schedule-title">{{generateStoreLang('bindChanel')}}</span>
@@ -72,6 +75,8 @@ export default {
     },
     data(){
         return{
+            elTableData:[{label:'远程巡检一'},{label:'远程巡检二'},{label:'远程巡检三'},{label:'远程巡检四'},{label:'远程巡检五'}],
+            activeName:'',
             curTag:'远程巡检',
             storeTitle:'',
             store:{},
@@ -134,6 +139,9 @@ export default {
     },
     methods:{
         generateStoreLang,
+        handleClick(e){
+            console.log(e)
+        },
         getChannelByStore(storeId){
             let self=this;
             let params={storeId:storeId};
@@ -481,9 +489,30 @@ export default {
             margin-top: 25px;
             margin-bottom: 25px;
             background-color: #F6F7FB;
+            #patrltabs-content{
+                line-height: 60px;
+                height: 60px;
+            }
+            #patrltabs-content /deep/ .el-tabs__nav-wrap{
+                padding-left: 35px;
+            }
+            #patrltabs-content /deep/ .el-tabs__active-bar{
+                height: 4px;
+            }
+            #patrltabs-content /deep/ .el-tabs__item {
+                font-family: Roboto,"Microsoft YaHei";
+                font-weight: bold;
+                color: #94A4B4;
+                // width: 100px;
+                // overflow: hidden;
+                // text-overflow: ellipsis;
+            }
+            #patrltabs-content /deep/ .el-tabs__item.is-active{
+                color: #f31d65;
+            }
             .el-table-title{
-                line-height: 70px;
-                height: 70px;
+                line-height: 40px;
+                height: 40px;
                 text-align: left;
                 border-bottom: 1px solid #ddd;
                 margin:auto 10px;

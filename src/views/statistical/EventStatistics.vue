@@ -1,6 +1,6 @@
 <template>
-  <div class="el-overview-content">
-    <el-col :span="24" class="statistics-header">
+  <div class="el-overview-content" ref="printPDF">
+    <el-col :span="24" class="statistics-header no-print">
       <el-col :span="24" class="header-details">
         <span>{{$t('reportView.selectStores')}}</span>
         <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
@@ -58,8 +58,16 @@
           <div slot="content">{{$t('overview.dataRangeTips')}}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
         </el-tooltip>
-        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
+        <div class="exprotBtn" style="float:right;">
+            <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
                    type="primary" :disabled="curProvince.length == 0 ">{{$t('reportView.search')}}</el-button>
+            <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown">
+              <div class="btn-area">
+                <i class="iconfont icon-pdf" style="font-size: calc(14/1920*100vw)"></i>
+                <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{$t('reportView.InspectionDetail')}}</span>
+              </div>
+            </el-button>
+          </div>
       </el-col>
       <el-col :span="24" class="header-details1">
                 <span class="choice-store">
@@ -117,13 +125,15 @@
       <el-row class="second-row">
         <el-col :span="24" class="items-title">
           <span class="title">{{$t('overview.eventList')}}</span>
-          <div class="exprotBtn">
-            <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-              <div class="btn-area">
-                <img :src="exportPng" class="icon-excel">
-                <span class="spanClass">{{$t('eventView.exportReport')}}</span>
-              </div>
-            </el-button>
+          <div class="no-print">
+            <div class="exprotBtn">
+              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                <div class="btn-area">
+                  <img :src="exportPng" class="icon-excel">
+                  <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                </div>
+              </el-button>
+            </div>
           </div>
         </el-col>
         <el-col class="event-table" :span="24">
@@ -188,15 +198,17 @@
                 </div>
               </el-table>
             </div>
-            <div class="toolbar pagination clearfix">
-              <el-pagination background small
-                             :page-sizes="[10, 20, 50, 100]"
-                             @size-change="sizeChange"
-                             @current-change="currentChange"
-                             :current-page="page"
-                             layout="jumper,total, prev, pager, next,sizes"
-                             :page-size="sizeNum" :total="total">
-              </el-pagination>
+            <div class="no-print">
+              <div class="toolbar pagination clearfix">
+                <el-pagination background small
+                              :page-sizes="[10, 20, 50, 100]"
+                              @size-change="sizeChange"
+                              @current-change="currentChange"
+                              :current-page="page"
+                              layout="jumper,total, prev, pager, next,sizes"
+                              :page-size="sizeNum" :total="total">
+                </el-pagination>
+              </div>
             </div>
           </div>
         </el-col>
@@ -424,6 +436,14 @@
       }
     },
     methods:{
+      handleDown(){
+        let self = this
+        new Promise(function(resolve) {
+            resolve(true)
+        }).then(function() {
+            self.$print(self.$refs.printPDF);
+        })
+      },
       dateChange(val){
         let self=this;
         let start= typeof(val[0])==='object'?val[0].getTime():val[0];
@@ -1525,16 +1545,17 @@
           padding: 0 0;
           font-size: calc(14/1920*100vw);
           margin-left: calc(20/1920*100vw);
-          float: right;
+          // float: right;
         }
         .en-search-btn{
           width: calc(130/1920*100vw);
+          min-width:115px;
           margin-left: calc(20/1920*100vw);
           height: calc(36/1920*100vw);
           padding: 0 0;
           font-size: calc(14/1920*100vw);
           margin-left: calc(20/1920*100vw);
-          float: right;
+          // float: right;
         }
       }
       .header-details:nth-child(1){

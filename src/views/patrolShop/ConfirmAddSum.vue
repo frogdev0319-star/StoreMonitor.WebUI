@@ -7,7 +7,7 @@
             </div>
             <div class="submit-content">
                 <div class="submit-radio">
-                    <span class="el-radio-details" v-for="(item,index) in radioList" :key="index"
+                    <span class="el-radio-details" v-for="(item,index) in resultList" :key="index"
                           @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
@@ -30,11 +30,16 @@
             </el-row>
             <div class="table-content">
                 <div class="table-header">
-                    <span>
-                      <span v-if="lang=='en' "class="en-store-name">{{generatePatrolLang('storeName')}}: </span>
+                    <div class="header-store-name">
+                      <span v-if="lang=='en' " class="en-store-name">{{generatePatrolLang('storeName')}}: </span>
                       <span v-else class="store-name">{{generatePatrolLang('storeName')}}：</span>
                       {{store.storeName}}
-                    </span>
+                    </div>
+                    <div class="header-score">
+                        <span class="span-1">{{generatePatrolLang('getscore')}}：</span>
+                        <span class="span-2">{{scorecount}} <span>{{generatePatrolLang('scorecount')}}</span></span>
+                        <span class="span-3">({{generatePatrolLang('scorerule')}})</span>
+                    </div>
                 </div>
                 <table class="table table-bordered">
                     <thead>
@@ -46,7 +51,7 @@
                         <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
                             <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
                             <td class="icon-td"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua? pass : fail }}</div></td>
-                            <td><span>{{item.numOfExcellentItems}}</span></td>
+                            <!-- <td><span>{{item.numOfExcellentItems}}</span></td> -->
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
                             <td><span>{{item.numOfUnqualifiedItems}}</span></td>
                         </tr>
@@ -93,16 +98,17 @@ export default {
     name:'ConfirmAddSum',
     data(){
         return{
+            scorecount:'',
             radioList:[],
             resultList: [
-              {
-                'label': 3,
-                'name':this.$t('remotePatrol.good'),
-                'isActive':false
-              },
+            //   {
+            //     'label': 3,
+            //     'name':this.$t('remotePatrol.good'),
+            //     'isActive':false
+            //   },
               {
                 'label': 2,
-                'name':this.$t('remotePatrol.pass'),
+                'name':this.$t('overview.good'),
                 'isActive':false
               },
               {
@@ -123,9 +129,9 @@ export default {
                 {
                    name: this.$t('remotePatrol.groupPerfor')
                 },
-                {
-                    name: this.$t('remotePatrol.good')
-                },
+                // {
+                //     name: this.$t('remotePatrol.good')
+                // },
                 {
                    name: this.$t('remotePatrol.pass')
                 },
@@ -221,7 +227,7 @@ export default {
         clickSum(item,index){
             let self=this;
             item.isActive=true;
-            self.radioList.forEach((_item,_index)=>{
+            self.resultList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isActive=false;
                 }
@@ -234,7 +240,7 @@ export default {
             let eventList=self.eventList;
             let status=0;
             let flag=false;
-            self.radioList.forEach(item=>{
+            self.resultList.forEach(item=>{
                 if(item.isActive){
                     flag=true;
                 }
@@ -419,16 +425,16 @@ export default {
           console.log(totalQualified);
           console.log(totalUnqualified)
           console.log(totalItems)
+          console.log(self.resultList)
           let totalScoreItems = totalItems - totalIgnore
+          self.scorecount = parseInt(totalQualified/totalScoreItems*100)
             if(totalUnqualified > 0){
-              self.radioList = self.resultList.slice(2)
-              totalUnqualified/totalScoreItems >= 0.3 ? self.curSumIndex = 0: self.curSumIndex = 1;
-              self.curSumIndex == 0 ? self.radioList[1].isActive = true: self.radioList[0].isActive = true;
+              totalUnqualified/totalScoreItems >= 0.75 ? self.curSumIndex = 0: self.curSumIndex = 1;
+              self.curSumIndex == 0 ? self.resultList[1].isActive = true: self.resultList[2].isActive = true;
             }
             else{
-              self.radioList = self.resultList.slice(0,2)
-              totalExcellent/totalScoreItems >= 0.8 ? self.curSumIndex = 3: self.curSumIndex = 2;
-              self.curSumIndex == 3 ? self.radioList[0].isActive = true : self.radioList[1].isActive = true;
+              totalQualified/totalScoreItems >= 0.9 ? self.curSumIndex = 2: self.curSumIndex = 1;
+              self.curSumIndex == 2 ? self.resultList[0].isActive = true : self.resultList[1].isActive = true;
             }
             self.summary=summary;
             eventList.forEach((item,index)=>{
@@ -641,16 +647,33 @@ $h1:#292e36;
         }
         .table-content{
             .table-header{
-                text-align: left;
-                span{
+                padding-bottom: 20px;
+                font-weight: bold;
+                .header-store-name{
+                    float: left;
                     font-size: calc(16/1920*100vw);
-                    font-weight: bold;
                     color: $tab;
                     .store-name{
                         color: $black;
                     }
                     .en-store-name{
-                      margin-right: 20px;
+                        margin-right: 20px;
+                        color: $black;
+                    }
+                }
+                .header-score{
+                    float: right;
+                    .span-1{
+                        font-size: calc(16/1920*100vw);
+                        color: $black;
+                    }
+                    .span-2{
+                        color: $red;
+                        font-size: calc(20/1920*100vw);
+                    }
+                    .span-3{
+                        color: $tab;
+                        font-size: calc(12/1920*100vw);
                     }
                 }
             }
