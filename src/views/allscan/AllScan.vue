@@ -1728,9 +1728,9 @@
               allData.forEach(item => {
                 if (value[0] === item[0] && value[1] === item[1]) {
                   htmlRegion += `${item[4]},`
-                  passStr += `${item[3]}%,`
+                  passStr += `${item[2]}%,`
                   // execellentStr += `${item[2]}%,`
-                  dangerousStr += `${item[0]}%,`
+                  dangerousStr += `${item[3]}%,`
                 }
               });
               htmlRegion = htmlRegion.substr(0, htmlRegion.length -1)
