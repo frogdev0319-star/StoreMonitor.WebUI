@@ -9,7 +9,7 @@
                 <span>{{generateInsSettingLang('bindList')}}</span>
               </div>
             </el-button>
-            <input id="loadFile" type="file" ref="loadFile" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+            <input id="loadFileEx" type="file" ref="loadFileEx" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
 
             <el-button v-for="(item,index) in btnList"
                 :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
@@ -619,15 +619,15 @@ export default {
                }
             }
         },
-      confirmImportFile(){
-          let self = this;
-          self.showConfirmImport=false;
-          document.getElementById('loadFile').click()
-      },
+    //   confirmImportFile(){
+    //       let self = this;
+    //       self.showConfirmImport=false;
+    //       document.getElementById('loadFile').click()
+    //   },
       confirmImportName(){
           let self = this;
           if(self.ImportName!=''){
-              document.getElementById('loadFile').click()
+              document.getElementById('loadFileEx').click()
               self.showImportwarning=false
           }else{
               self.showImportwarning=true
@@ -839,22 +839,27 @@ export default {
                         }
                         if(flaggroupLength){
                             _this.$refs.loadFile.value = ''
+                            _this.$refs.loadFileEx.value = '';
                             _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
                         }
                         if(flaggroupRex||flagItemRex){
                             _this.$refs.loadFile.value = ''
+                            _this.$refs.loadFileEx.value = '';
                             _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
                         }
                         if(flagItemName){
                             _this.$refs.loadFile.value = ''
+                            _this.$refs.loadFileEx.value = '';
                             _this.FileInfo.push(_this.$t('insSettingView.excelEmpty'))
                         }
                         if(flagItemLength){
                             _this.$refs.loadFile.value = ''
+                            _this.$refs.loadFileEx.value = '';
                             _this.FileInfo.push(_this.$t('insSettingView.excelLongItem'))
                         }
                         if(flagDesLength){
                             _this.$refs.loadFile.value = ''
+                            _this.$refs.loadFileEx.value = '';
                             _this.FileInfo.push(_this.$t('insSettingView.excelIllegalDes'))
                         }
                         return false
@@ -870,6 +875,7 @@ export default {
                     }
                     _this.addAllData(dataArry);
                     _this.$refs.loadFile.value = '';
+                    _this.$refs.loadFileEx.value = '';
                 }
                 reader.readAsArrayBuffer(f);
             }

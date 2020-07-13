@@ -1,131 +1,131 @@
 <template>
-  <div class="el-overview-content" ref="printPDF">
-    <el-col :span="24" class="statistics-header no-print">
-      <el-col :span="24" class="header-details">
-        <span>{{$t('reportView.selectStores')}}</span>
-        <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
-                   class="el-province" @change="changeCountry">
-          <!--<el-option-->
-            <!--v-for="item in countryList"-->
-            <!--:key="item.value"-->
-            <!--:label="item.label"-->
-            <!--:value="item.value">-->
-          <!--</el-option>-->
-          <el-option-group
-            v-for="group in countryList"
-            :key="group.label"
-            :label="group.label">
-            <el-option
-              v-for="item in group.countryList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-option-group>
-        </el-select>
-        <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                             style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
-        <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                             style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
+  <div>
+    <div class="el-overview-content">
+      <el-col :span="24" class="statistics-header">
+        <el-col :span="24" class="header-details">
+          <span>{{$t('reportView.selectStores')}}</span>
+          <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
+                    class="el-province" @change="changeCountry">
+            <!--<el-option-->
+              <!--v-for="item in countryList"-->
+              <!--:key="item.value"-->
+              <!--:label="item.label"-->
+              <!--:value="item.value">-->
+            <!--</el-option>-->
+            <el-option-group
+              v-for="group in countryList"
+              :key="group.label"
+              :label="group.label">
+              <el-option
+                v-for="item in group.countryList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-option-group>
+          </el-select>
+          <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
+                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
+          <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
+                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
 
-        <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                      :disabled="curProvince.length==0 " style="display: inline" ref="multiSelect"></multi-select>
+          <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
+                        :disabled="curProvince.length==0 " style="display: inline" ref="multiSelect"></multi-select>
+        </el-col>
+
+        <el-col :span="24" class="header-details">
+          <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
+          <el-date-picker
+            ref="datePicker"
+            v-model="dateValue"
+            type="daterange"
+            range-separator="-"
+            size="mini"
+            :clearable=false
+            :editable=false
+            format="yyyy/MM/dd"
+            class="date-range"
+            :popper-class="poperClass"
+            :picker-options='dateOpt'
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="dateChange"
+            :default-time="['00:00:00', '23:59:59']"
+            unlink-panels
+          >
+          </el-date-picker>
+          <el-tooltip class="item" effect="dark"
+                      placement="right">
+            <div slot="content">{{$t('overview.dataRangeTips')}}</div>
+            <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
+          </el-tooltip>
+          <div class="exprotBtn" style="float:right;">
+              <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
+                    type="primary" :disabled="curProvince.length == 0 ">{{$t('reportView.search')}}</el-button>
+              <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()">
+                <div class="btn-area">
+                  <i class="iconfont icon-pdf" style="font-size: calc(14/1920*100vw)"></i>
+                  <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{$t('reportView.InspectionDetail')}}</span>
+                </div>
+              </el-button>
+            </div>
+        </el-col>
+        <el-col :span="24" class="header-details1">
+                  <span class="choice-store">
+                    <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
+                    {{$t('reportView.selected')}}
+                    <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
+                  </span>
+          <div class="store-selected" v-if="showStoreInfo">
+            <h1>{{$t('reportView.selected')}}</h1>
+            <ul class="store-list" v-show="storeStr.length > 0">
+              <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
+                - {{item}}
+              </li>
+            </ul>
+          </div>
+        </el-col>
       </el-col>
-
-      <el-col :span="24" class="header-details">
-        <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
-        <el-date-picker
-          ref="datePicker"
-          v-model="dateValue"
-          type="daterange"
-          range-separator="-"
-          size="mini"
-          :clearable=false
-          :editable=false
-          format="yyyy/MM/dd"
-          class="date-range"
-          :popper-class="poperClass"
-          :picker-options='dateOpt'
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          @change="dateChange"
-          :default-time="['00:00:00', '23:59:59']"
-          unlink-panels
-        >
-        </el-date-picker>
-        <el-tooltip class="item" effect="dark"
-                    placement="right">
-          <div slot="content">{{$t('overview.dataRangeTips')}}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
-        </el-tooltip>
-        <div class="exprotBtn" style="float:right;">
-            <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
-                   type="primary" :disabled="curProvince.length == 0 ">{{$t('reportView.search')}}</el-button>
-            <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown">
-              <div class="btn-area">
-                <i class="iconfont icon-pdf" style="font-size: calc(14/1920*100vw)"></i>
-                <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{$t('reportView.InspectionDetail')}}</span>
+      <el-col :span="24" class="el-overview">
+        <el-row class="first-row">
+          <el-col :span="24"  class="kpi-list">
+            <div class="title">{{$t('overview.eventGraph')}}</div>
+          </el-col>
+          <el-col :span="3"  class="kpi-list">
+            <div class="kpi-content">
+              <div class="event-list" v-for="(item,index) in eventKPIs" :key="index">
+                <div class="event-title">{{item.eventTitle}}</div>
+                <div class="event-num">{{item.eventNum}}</div>
               </div>
-            </el-button>
-          </div>
-      </el-col>
-      <el-col :span="24" class="header-details1">
-                <span class="choice-store">
-                  <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
-                  {{$t('reportView.selected')}}
-                  <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
-                </span>
-        <div class="store-selected" v-if="showStoreInfo">
-          <h1>{{$t('reportView.selected')}}</h1>
-          <ul class="store-list" v-show="storeStr.length > 0">
-            <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
-              - {{item}}
-            </li>
-          </ul>
-        </div>
-      </el-col>
-    </el-col>
-    <el-col :span="24" class="el-overview">
-      <el-row class="first-row">
-        <el-col :span="24"  class="kpi-list">
-          <div class="title">{{$t('overview.eventGraph')}}</div>
-        </el-col>
-        <el-col :span="3"  class="kpi-list">
-          <div class="kpi-content">
-            <div class="event-list" v-for="(item,index) in eventKPIs" :key="index">
-              <div class="event-title">{{item.eventTitle}}</div>
-              <div class="event-num">{{item.eventNum}}</div>
             </div>
-          </div>
-        </el-col>
-        <el-col :span="14" class="store-events">
-          <div class="region-result">
-            <div class="charts-content">
-              <v-chart  :options="storeEventsOptions"  class="result-content" :auto-resize='true' ref="storeEventRef"/>
+          </el-col>
+          <el-col :span="14" class="store-events">
+            <div class="region-result">
+              <div class="charts-content">
+                <v-chart  :options="storeEventsOptions"  class="result-content" :auto-resize='true' ref="storeEventRef"/>
+              </div>
             </div>
-          </div>
-        </el-col>
-        <el-col :span="7" class="source-list">
-          <div class="pct-content">
-            <div class="pct-panel">
-              <v-chart :auto-resize='true' :options="eventSourceOptions" class="chart-content" ref="eventSourceRef"></v-chart>
-            </div>
-            <div class="pct-nums">
-              <div class="content-labels" :class="lang=='en'? 'en-label': ''" v-for="(item, index) in sourcePerArray" :key="index">
-                <div class="excellent_nums">{{item.percent}}%</div>
-                <div class="excellent_labels">
-                  <span class="labels excellent-label" :class="`label-` + index"></span>
-                  <span class="label-desc">{{item.type}}</span>
+          </el-col>
+          <el-col :span="7" class="source-list">
+            <div class="pct-content">
+              <div class="pct-panel">
+                <v-chart :auto-resize='true' :options="eventSourceOptions" class="chart-content" ref="eventSourceRef"></v-chart>
+              </div>
+              <div class="pct-nums">
+                <div class="content-labels" :class="lang=='en'? 'en-label': ''" v-for="(item, index) in sourcePerArray" :key="index">
+                  <div class="excellent_nums">{{item.percent}}%</div>
+                  <div class="excellent_labels">
+                    <span class="labels excellent-label" :class="`label-` + index"></span>
+                    <span class="label-desc">{{item.type}}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
-      <el-row class="second-row">
-        <el-col :span="24" class="items-title">
-          <span class="title">{{$t('overview.eventList')}}</span>
-          <div class="no-print">
+          </el-col>
+        </el-row>
+        <el-row class="second-row">
+          <el-col :span="24" class="items-title">
+            <span class="title">{{$t('overview.eventList')}}</span>
             <div class="exprotBtn">
               <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                 <div class="btn-area">
@@ -134,86 +134,206 @@
                 </div>
               </el-button>
             </div>
-          </div>
-        </el-col>
-        <el-col class="event-table" :span="24">
-          <div class="table">
-            <div class="event-content">
-              <el-table
-                :data="eventTableData"
-                :highlight-current-row="true"
-                empty-text='无数据'
-                align='left'
-                stripe
-                @sort-change='sortChange'
-                :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
-                border
-                style="width: 100%"
-                :header-cell-class-name="headerClass"
-                size="mini"
-                :cell-class-name="cellClass"
-                :row-class-name="rowClass"
-              >
-                <el-table-column v-for="(_item,_index) in eventInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
-                </el-table-column>
-                <el-table-column
-                  :label="$t('overview.remotePatrol')"
-                  prop="remotePer"
-                  :min-width="lang!=='en'? 120 : 150"
-                  sortable="custom">
-                  <template slot-scope="scope">
-                    <div slot="reference" class="name-wrapper remote">
-                      <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer}}</el-tag>
+          </el-col>
+          <el-col class="event-table" :span="24">
+            <div class="table">
+              <div class="event-content">
+                <el-table
+                  :data="eventTableData"
+                  :highlight-current-row="true"
+                  empty-text='无数据'
+                  align='left'
+                  stripe
+                  @sort-change='sortChange'
+                  :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+                  border
+                  style="width: 100%"
+                  :header-cell-class-name="headerClass"
+                  size="mini"
+                  :cell-class-name="cellClass"
+                  :row-class-name="rowClass"
+                >
+                  <el-table-column v-for="(_item,_index) in eventInfoData" :key="_index"
+                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
+                  </el-table-column>
+                  <el-table-column
+                    :label="$t('overview.remotePatrol')"
+                    prop="remotePer"
+                    :min-width="lang!=='en'? 120 : 150"
+                    sortable="custom">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper remote">
+                        <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer}}</el-tag>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    :label="$t('overview.onsitePatrol')"
+                    prop="onsitePer"
+                    :min-width="lang!=='en'? 120 : 150"
+                    sortable="custom">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper onsite">
+                        <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer}}</el-tag>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    :label="$t('overview.storeMonitor')"
+                    prop="videoPer"
+                    :min-width="lang!=='en'? 120 : 150"
+                    sortable="custom">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper video">
+                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer}}</el-tag>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <div slot="empty">
+                    <div>
+                      <i class="iconfont icon-zhengque empty-data-icon"></i>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
                     </div>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  :label="$t('overview.onsitePatrol')"
-                  prop="onsitePer"
-                  :min-width="lang!=='en'? 120 : 150"
-                  sortable="custom">
-                  <template slot-scope="scope">
-                    <div slot="reference" class="name-wrapper onsite">
-                      <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer}}</el-tag>
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  :label="$t('overview.storeMonitor')"
-                  prop="videoPer"
-                  :min-width="lang!=='en'? 120 : 150"
-                  sortable="custom">
-                  <template slot-scope="scope">
-                    <div slot="reference" class="name-wrapper video">
-                      <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer}}</el-tag>
-                    </div>
-                  </template>
-                </el-table-column>
-                <div slot="empty">
-                  <div>
-                    <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
                   </div>
+                </el-table>
+              </div>
+                <div class="toolbar pagination clearfix">
+                  <el-pagination background small
+                                :page-sizes="[10, 20, 50, 100]"
+                                @size-change="sizeChange"
+                                @current-change="currentChange"
+                                :current-page="page"
+                                layout="jumper,total, prev, pager, next,sizes"
+                                :page-size="sizeNum" :total="total">
+                  </el-pagination>
                 </div>
-              </el-table>
             </div>
-            <div class="no-print">
-              <div class="toolbar pagination clearfix">
-                <el-pagination background small
-                              :page-sizes="[10, 20, 50, 100]"
-                              @size-change="sizeChange"
-                              @current-change="currentChange"
-                              :current-page="page"
-                              layout="jumper,total, prev, pager, next,sizes"
-                              :page-size="sizeNum" :total="total">
-                </el-pagination>
+          </el-col>
+        </el-row>
+      </el-col>
+      <el-dialog :title="$t('insSettingView.export')"
+      :visible.sync="ispdf" v-if="ispdf"
+      :append-to-body='true'
+      :close-on-click-modal="false"
+      class="LoadDialog"
+      width="510px"
+      top="35vh"
+      left="40vh">
+          <div style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;"/>
+              <p style="margin-top:40px;color:#000;">{{$t('insSettingView.isExportPDF')}}......</p>
+          </div>
+      </el-dialog>
+    </div>
+    <div class="el-overview-content" v-if="ispdf">
+      <el-col :span="24" class="el-overview" id="pdfDom" style="padding:40px 20px;">
+        <el-row class="first-row">
+          <el-col :span="24"  class="kpi-list">
+            <div class="title">{{$t('overview.eventGraph')}}</div>
+          </el-col>
+          <el-col :span="3"  class="kpi-list">
+            <div class="kpi-content">
+              <div class="event-list" v-for="(item,index) in eventKPIs" :key="index">
+                <div class="event-title">{{item.eventTitle}}</div>
+                <div class="event-num">{{item.eventNum}}</div>
               </div>
             </div>
-          </div>
-        </el-col>
-      </el-row>
-    </el-col>
+          </el-col>
+          <el-col :span="14" class="store-events">
+            <div class="region-result">
+              <div class="charts-content">
+                <v-chart  :options="storeEventsOptions"  class="result-content" :auto-resize='true' ref="storeEventRef"/>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="7" class="source-list">
+            <div class="pct-content">
+              <div class="pct-panel">
+                <v-chart :auto-resize='true' :options="eventSourceOptions" class="chart-content" ref="eventSourceRef"></v-chart>
+              </div>
+              <div class="pct-nums">
+                <div class="content-labels" :class="lang=='en'? 'en-label': ''" v-for="(item, index) in sourcePerArray" :key="index">
+                  <div class="excellent_nums">{{item.percent}}%</div>
+                  <div class="excellent_labels">
+                    <span class="labels excellent-label" :class="`label-` + index"></span>
+                    <span class="label-desc">{{item.type}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+        <el-row class="second-row" style="padding-bottom:20px;">
+          <el-col :span="24" class="items-title">
+            <span class="title">{{$t('overview.eventList')}}</span>
+          </el-col>
+          <el-col class="event-table" :span="24">
+            <div class="table">
+              <div class="event-content">
+                <el-table
+                  :data="eventPDFData"
+                  :highlight-current-row="true"
+                  empty-text='无数据'
+                  align='left'
+                  stripe
+                  @sort-change='sortChange'
+                  :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+                  border
+                  style="width: 100%"
+                  :header-cell-class-name="headerClass"
+                  size="mini"
+                  :cell-class-name="cellClass"
+                  :row-class-name="rowClass"
+                >
+                  <el-table-column v-for="(_item,_index) in eventInfoData" :key="_index"
+                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.pdfwidth">
+                  </el-table-column>
+                  <el-table-column
+                    :label="$t('overview.remotePatrol')"
+                    prop="remotePer"
+                    :min-width="lang!=='en'? '8% ': '9%'"
+                    sortable="custom">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper remote">
+                        <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer}}</el-tag>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    :label="$t('overview.onsitePatrol')"
+                    prop="onsitePer"
+                    :min-width="lang!=='en'? '8%' : '9%'"
+                    sortable="custom">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper onsite">
+                        <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer}}</el-tag>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    :label="$t('overview.storeMonitor')"
+                    prop="videoPer"
+                    :min-width="lang!=='en'? '8%' : '9%'"
+                    sortable="custom">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper video">
+                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer}}</el-tag>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <div slot="empty">
+                    <div>
+                      <i class="iconfont icon-zhengque empty-data-icon"></i>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                    </div>
+                  </div>
+                </el-table>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </el-col>
+    </div>
   </div>
 </template>
 
@@ -252,6 +372,8 @@
     },
     data(){
       return{
+        ispdf:false,
+        htmlTitle:'事件处理统计pdf',
         curCountry:'',
         countryList:[],
         curProvince:[],
@@ -339,48 +461,55 @@
         echartBackground: 'rgba(30,34,52,0.75)',
         exportPng: require('../../../static/img/icon_excel.png'),
         eventTableData: [],
+        eventPDFData:[],
         eventInfoData: [
           {
             "prop": "storeName",
             "label": this.$t('overview.storeName'),
             "sortable": false,
             "width": '290',
-            "maxWidth": '290'
+            "maxWidth": '290',
+            "pdfwidth":'20%'
           },
           {
             "prop":"regionName",
             "label": this.$t('overview.area'),
             "sortable": false,
             "width": '165',
-            "maxWidth": '165'
+            "maxWidth": '165',
+            "pdfwidth":'11%'
           },
           {
             "prop":"numOfTotal",
             "label": this.$t('overview.sumEvents'),
             "sortable":'custom',
             "width": '165',
-            "maxWidth": '165'
+            "maxWidth": '165',
+            "pdfwidth":'11%'
           },
           {
             "prop": "numOfUnprocessed",
             "label": this.$t('overview.numUnprocessEvents'),
             "sortable":'custom',
             "width": '165',
-            "maxWidth": '165'
+            "maxWidth": '165',
+            "pdfwidth":'11%'
           },
           {
             "prop":"numOfInprocess",
             "label": this.$t('overview.numProcessEvents'),
             "sortable":'custom',
             "width": '165',
-            "maxWidth": '165'
+            "maxWidth": '165',
+            "pdfwidth":'11%'
           },
           {
             "prop":"numOfProcessed",
             "label": this.$t('overview.numClosedEvents'),
             "sortable":'custom',
             "width": '165',
-            "maxWidth": '165'
+            "maxWidth": '165',
+            "pdfwidth":'11%'
           },
           // {
           //   "prop":"numOfRemote",
@@ -438,11 +567,20 @@
     methods:{
       handleDown(){
         let self = this
-        new Promise(function(resolve) {
-            resolve(true)
-        }).then(function() {
-            self.$print(self.$refs.printPDF);
-        })
+        self.ispdf=true
+        self.eventPDFData = self.allEventData;
+        setTimeout(()=>{
+          self.getPdf()
+          if(sessionStorage.getItem('startPDF')=='start'){
+            sessionStorage.removeItem('startPDF','start');
+            if(sessionStorage.getItem('endPDF')=='end'){
+              sessionStorage.removeItem('endPDF','end');
+              setTimeout(()=>{
+                self.ispdf=false
+              },1000)
+            }
+          }
+        },1000)
       },
       dateChange(val){
         let self=this;
@@ -1426,6 +1564,12 @@
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
   }
+  .LoadDialog /deep/ .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0 20px 30px;
+  }
   .el-overview-content {
     width: 100%;
     position: relative;
@@ -1740,6 +1884,7 @@
         height: auto;
         margin-top: 30px;
         background-color: #fff;
+        border: 1px solid $border;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         .items-title{
           height: 70px;

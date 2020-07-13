@@ -108,7 +108,7 @@ export default {
             //   },
               {
                 'label': 2,
-                'name':this.$t('overview.good'),
+                'name':this.$t('overview.echartGood'),
                 'isActive':false
               },
               {

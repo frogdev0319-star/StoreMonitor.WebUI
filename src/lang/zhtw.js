@@ -438,6 +438,8 @@ export default {
     group: '大類',
     item: '個巡檢項目',
     relationDuty:'关联职务tw',
+    isExportPDF:'正在导出PDF',
+    Inspector:'请选择巡检人',
     inspectName: '巡檢名稱',
     inspectionDescp: '巡檢項要求描述',
     score: '項目分值',

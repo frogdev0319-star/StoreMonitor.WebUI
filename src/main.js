@@ -31,6 +31,8 @@ import jquery from 'jquery';
 import moment from 'moment';
 import elCascaderMulti from 'el-cascader-multi';
 Vue.use(elCascaderMulti)
+import htmlToPdf from '@/plugins/htmlToPdf'
+Vue.use(htmlToPdf)
 Vue.prototype.$moment = moment;//赋值使用
 Vue.config.productionTip = false
 

@@ -1,5 +1,6 @@
 <template>
-    <el-row class="statistics-container" ref="printPDF">
+  <div>
+    <el-row class="statistics-container">
       <el-col :span="24" class="statistics-header no-print">
         <el-col :span="24" class="header-details">
           <span>{{generateReportLang('selectStores')}}</span>
@@ -55,7 +56,7 @@
 
           <div class="exprotBtn" style="float:right;">
             <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0 ">{{generateReportLang('search')}}</el-button>
-            <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown">
+            <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()">
               <div class="btn-area">
                 <i class="iconfont icon-pdf"></i>
                 <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{generateReportLang('InspectionDetail')}}</span>
@@ -139,6 +140,7 @@
           </el-col>
           <div class="el-table-panel">
             <el-table
+              ref="eltable"
               :data="regionTableData"
               :highlight-current-row="true"
               empty-text='无数据'
@@ -164,7 +166,6 @@
               </div>
             </el-table>
           </div>
-          <div class="no-print">
             <div class="toolbar pagination clearfix">
               <el-pagination background small
                             :page-sizes="[10, 20, 50, 100]"
@@ -175,7 +176,6 @@
                             :page-size="sizeNumRegion" :total="totalRegion">
               </el-pagination>
             </div>
-          </div>
         </el-col>
 
         <el-col :sapn="24" class="store-list">
@@ -225,7 +225,6 @@
               </el-table>
             </div>
           </el-col>
-          <div class="no-print">
             <div class="toolbar pagination clearfix">
               <el-pagination background small
                             :page-sizes="[10, 20, 50, 100]"
@@ -236,10 +235,150 @@
                             :page-size="sizeNumStore" :total="totalStore">
               </el-pagination>
             </div>
+        </el-col>
+        <el-dialog :title="$t('insSettingView.export')"
+        :visible.sync="ispdf" v-if="ispdf"
+        :append-to-body='true'
+        :close-on-click-modal="false"
+        class="LoadDialog"
+        width="510px"
+        top="35vh"
+        left="40vh">
+            <div style="overflow:hidden;width:100%;">
+              <hr style="border: 0.5px solid #dfe2e9;"/>
+                <p style="margin-top:40px;color:#000;">{{$t('insSettingView.isExportPDF')}}......</p>
+            </div>
+        </el-dialog>
+      </div>
+    </el-row>
+
+
+
+    <el-row class="statistics-container" id="pdfDom" v-if="ispdf" style="padding:40px 20px;">
+      
+      <div class="statistics-content">
+        <el-col :span="24" class="region-chart">
+          <el-col :span="24" class="region-header">
+            <div class="region-titles">
+              <span class="title">
+              {{$t('overview.regionalAssessment')}}
+            </span>
+            </div>
+          </el-col>
+          <el-col :span="9" class="evalution-pct">
+            <div class="pct-content">
+              <div class="pct-panel">
+                <v-chart :auto-resize='true' :options="regionsOptions" class="chart-content" ref="itemsPie"></v-chart>
+              </div>
+              <div class="pct-nums">
+                <div class="content-labels" :class="lang=='en'? 'en-labels': ''" v-for="(item, index) in regionsPerArray"
+                     :key="index">
+                  <div class="excellent_nums">{{item.percent}}%</div>
+                  <div class="excellent_labels">
+                    <span class="labels excellent-label" :class="`label-` + index"></span>
+                    <span class="label-desc">{{item.type}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="15" class="charts-content">
+            <div class="title">
+              <limit-select :selected="curRegion" :options="regionsList" @changeInput="handleRegionsChange" style="display: inline" ref="multiRegionsSelect"
+                            :limit="2" :inputSize="'mini'"></limit-select>
+            </div>
+            <div class="region-result">
+              <div class="region-content">
+                <div class="region-result-panel">
+                  <v-chart :options="regionsChartsOptions" class="result-content" :auto-resize='true' ref="storeChart" ></v-chart>
+                </div>
+              </div>
+            </div>
+          </el-col>
+        </el-col>
+        <el-col :sapn="24" class="region-list" style="padding-bottom:20px;">
+          <el-col :span="24" class="region-header">
+            <div class="region-titles">
+            <span class="title">
+              {{$t('overview.regionalList')}}
+            </span>
+              
+            </div>
+          </el-col>
+          <div class="el-table-panel">
+            <el-table
+              ref="eltable"
+              :data="regionPDFData"
+              :highlight-current-row="true"
+              empty-text='无数据'
+              align='left'
+              stripe
+              @sort-change='regionSortChange'
+              :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+              border
+              style="width: 100%"
+              :header-cell-class-name="headerClass"
+              size="mini"
+              :cell-class-name="cellClass"
+              :row-class-name="rowClass"
+            >
+              <el-table-column v-for="(_item,_index) in regionInfoData" :key="_index"
+                               :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
+              </el-table-column>
+              <div slot="empty">
+                <div>
+                  <i class="iconfont icon-zhengque empty-data-icon"></i>
+                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                </div>
+              </div>
+            </el-table>
           </div>
+          
+        </el-col>
+
+        <el-col :sapn="24" class="store-list" style="padding-bottom:20px;">
+          <el-col :span="24" class="region-header">
+            <div class="region-titles">
+            <span class="title">
+              {{$t('overview.storeList')}}
+            </span>
+              
+            </div>
+          </el-col>
+          <el-col :span="24">
+            <div class="el-table-panel">
+              <el-table
+                :data="storePDFData"
+                :highlight-current-row="true"
+                empty-text='无数据'
+                align='left'
+                stripe
+                @sort-change='storeSortChange'
+                :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+                border
+                style="width: 100%"
+                :header-cell-class-name="headerClass"
+                size="mini"
+                :cell-class-name="cellClass"
+                :row-class-name="rowClass"
+              >
+                <el-table-column v-for="(_item,_index) in storeInfoData" :key="_index"
+                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
+                </el-table-column>
+                <div slot="empty">
+                  <div>
+                    <i class="iconfont icon-zhengque empty-data-icon"></i>
+                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                  </div>
+                </div>
+              </el-table>
+            </div>
+          </el-col>
+          
         </el-col>
       </div>
     </el-row>
+  </div>
 </template>
 <script>
   import {generateReportLang} from '@/api/i18n'
@@ -282,6 +421,7 @@
     },
     data(){
       return {
+        htmlTitle:'巡店考评统计pdf',
         isexportPDF:false,
         curCountry:'',
         countryList:[],
@@ -336,6 +476,8 @@
             "prop": "region",
             "label": this.$t('overview.regionName'),
             "sortable": false,
+            "pdfwidth": '22%',
+            "pdfmaxWidth": '22%',
             "width": '284',
             "maxWidth": '284'
           },
@@ -343,6 +485,8 @@
             "prop":"cycleOfInspect",
             "label": this.$t('overview.advPatrolCycle'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '14%',
             "width": '160',
             "maxWidth": '180'
           },
@@ -350,6 +494,8 @@
             "prop":"numOfReport",
             "label": this.$t('overview.numOfEvaluations'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -364,6 +510,8 @@
             "prop":"numOfQualified",
             "label": this.$t('overview.pass'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -371,6 +519,8 @@
             "prop":"numOfImproved",
             "label": this.$t('overview.improve'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -378,6 +528,8 @@
             "prop":"numOfDangerous",
             "label": this.$t('overview.danger'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -385,11 +537,14 @@
             "prop":"qualifiedRatePer",
             "label": this.$t('overview.passRate'),
             "sortable":'custom',
-            "width": '219',
+            "pdfwidth": '16%',
+            "pdfmaxWidth": '14%',
+            "width": '217',
             "maxWidth": '180'
           }
         ],
         regionTableData: [],
+        regionPDFData:[],
         totalRegion:0,
         pageRegion:1,
         sizeNumRegion:10,
@@ -398,6 +553,8 @@
             "prop": "region",
             "label": this.$t('overview.storeName'),
             "sortable":false,
+            "pdfwidth": '22%',
+            "pdfmaxWidth": '22%',
             "width": '284',
             "maxWidth": '284'
           },
@@ -405,6 +562,8 @@
             "prop":"cycleOfInspect",
             "label": this.$t('overview.advPatrolCycle'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '14%',
             "width": '160',
             "maxWidth": '180'
           },
@@ -412,6 +571,8 @@
             "prop":"numOfReport",
             "label": this.$t('overview.numOfEvaluations'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -426,6 +587,8 @@
             "prop":"numOfQualified",
             "label": this.$t('overview.pass'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -433,6 +596,8 @@
             "prop":"numOfImproved",
             "label": this.$t('overview.improve'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -440,6 +605,8 @@
             "prop":"numOfDangerous",
             "label": this.$t('overview.danger'),
             "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
             "width": '160',
             "maxWidth": '160'
           },
@@ -447,11 +614,14 @@
             "prop":"qualifiedRatePer",
             "label": this.$t('overview.passRate'),
             "sortable":'custom',
+            "pdfwidth": '16%',
+            "pdfmaxWidth": '14%',
             "width": '219',
             "maxWidth": '180'
           }
         ],
         storeTableData: [],
+        storePDFData:[],
         totalStore:0,
         pageStore:1,
         sizeNumStore:10,
@@ -473,7 +643,8 @@
         storeFilter: {"page": 0 , "size": 10},
         storeOrder: {"direction":"asc", "property": 'qualifiedRate'},
         sidebarElm: null,
-        fontFamily: 'Roboto, Microsoft YaHei'
+        fontFamily: 'Roboto, Microsoft YaHei',
+        ispdf:false
       }
     },
     computed:{
@@ -500,15 +671,76 @@
       generateReportLang,
       handleDown(){
         let self = this
-        // new Promise(function(resolve) {
-        //   console.log('列表数据',self.totalRegion)
-        //   console.log('第二个列表',self.totalStore)
-        //   self.isexportPDF=true
-        //     resolve(true)
-        // }).then(function() {
-            self.$print(self.$refs.printPDF);
-        //     self.isexportPDF=false
-        // })
+        self.ispdf=true
+        require.ensure([], async() => {
+          let LoadRegionTable = 0
+          let LoadStoreTable = 0
+          // 区域表
+          let size= self.totalRegion;
+          let params = {};
+          params.beginTs = self.params.beginTs;
+          params.endTs = self.params.endTs;
+          params.filter = {"page": 0, "size": size};
+          params.order = self.regionOrder;
+          let region = 1;
+          if(self.curCity.length > 0){
+            region = 2;
+          }
+          else{
+            region = 1;
+          }
+          params.regionMode = region;
+          params.storeIds = self.params.storeIds;
+          let regionResult = await self.getInspectStatsOverviewWithRegion(params);
+          if (regionResult.errCode == 0) {
+            let result = regionResult.data;
+            if (result) {
+              result.content.forEach(item=>{
+                item.qualifiedRatePer = item.qualifiedRate + '%'
+              })
+              self.regionPDFData= result.content;
+              LoadRegionTable = 1
+            }
+          }
+          // 门店表
+          let storesize= self.totalStore;
+          let storeparams = {};
+          storeparams.beginTs = self.params.beginTs;
+          storeparams.endTs = self.params.endTs;
+          storeparams.regionMode = 3;
+          storeparams.storeIds = self.params.storeIds;
+          storeparams.filter = {
+            "page": 0,
+            "size": storesize
+          };
+          storeparams.order = self.storeOrder;
+
+          let storeResult = await self.getInspectStatsOverviewWithRegion(storeparams);
+          if (storeResult.errCode == 0) {
+            let result = storeResult.data;
+            if (result) {
+              result.content.forEach(item=>{
+                item.qualifiedRatePer = item.qualifiedRate + '%'
+              })
+              self.storePDFData = result.content
+              LoadStoreTable = 1
+            }
+          }
+          if(LoadRegionTable == 1&&LoadStoreTable == 1){
+            setTimeout(()=>{
+              self.getPdf()
+              if(sessionStorage.getItem('startPDF')=='start'){
+                sessionStorage.removeItem('startPDF','start');
+                if(sessionStorage.getItem('endPDF')=='end'){
+                  sessionStorage.removeItem('endPDF','end');
+                  setTimeout(()=>{
+                    self.ispdf=false
+                  },1000)
+                }
+              }
+            },1000)
+          }
+        })
       },
       regionSortChange(col){
         let self=this;
@@ -1924,7 +2156,13 @@
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
   }
-  @media print{
+ @media print {
+  }
+  .LoadDialog /deep/ .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0 20px 30px;
   }
   .statistics-container{
     /*margin-bottom: 20px;*/
@@ -2264,6 +2502,8 @@
     }
     .store-list{
       margin-top: 30px;
+      border: 1px solid $border;
+      background-color: #fff;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       .region-header{
         border-bottom: 1px solid $border;
@@ -2290,6 +2530,15 @@
   }
 </style>
 <style>
+.el-table__body-wrapper::-webkit-scrollbar{
+    height: 8px;
+}
+.el-table__body-wrapper::-webkit-scrollbar-thumb{
+    border-radius: 2px;
+}
+.el-table__body-wrapper::-webkit-scrollbar-track{
+    border-radius: 2px;
+}
   .header-class{
     height: 40px;
     font-size: 12px;

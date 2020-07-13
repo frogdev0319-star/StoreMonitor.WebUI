@@ -1,136 +1,251 @@
 <template>
-  <div class="item-container">
-    <el-col :span="24" class="statistics-header">
-      <el-col :span="24" class="header-details">
-        <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
-        <el-date-picker
-          ref="datePicker"
-          v-model="dateValue"
-          type="daterange"
-          range-separator="-"
-          size="mini"
-          :clearable=false
-          :editable=false
-          format="yyyy/MM/dd"
-          class="date-range"
-          :popper-class="poperClass"
-          :picker-options='dateOpt'
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          @change="dateChange"
-          :default-time="['00:00:00', '23:59:59']"
-          unlink-panels
-        >
-        </el-date-picker>
-        <el-tooltip class="item" effect="dark"
-                    placement="right">
-          <div slot="content">{{$t('overview.dataRangeTips')}}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
-        </el-tooltip>
+  <div>
+    <div class="item-container"  :style="ispdf?'min-height:100vh;':''">
+      <el-col :span="24" class="statistics-header">
+        <div class="header-details">
+          <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
+          <el-date-picker
+            ref="datePicker"
+            v-model="dateValue"
+            type="daterange"
+            range-separator="-"
+            size="mini"
+            :clearable=false
+            :editable=false
+            format="yyyy/MM/dd"
+            class="date-range"
+            :popper-class="poperClass"
+            :picker-options='dateOpt'
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="dateChange"
+            :default-time="['00:00:00', '23:59:59']"
+            unlink-panels
+          >
+          </el-date-picker>
+          <el-tooltip class="item" effect="dark"
+                      placement="right">
+            <div slot="content">{{$t('overview.dataRangeTips')}}</div>
+            <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
+          </el-tooltip>
+        </div>
+        <div class="header-mul-select">
+          <span class="mul-label">巡检人</span>
+          <region-multi-select :options="titleList" :placeholder="$t('insSettingView.Inspector')" :disabled="false"
+            :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)" :all="$t('reportView.all')"></region-multi-select>
+        </div>
       </el-col>
-    </el-col>
-    <el-col :span="24" class="items-content">
-      <el-col :span="24" class="contents-container">
-        <el-col :span="24" class="items-title">
-          <span class="title">{{$t('overview.patrolList')}}</span>
-          <div class="exprotBtn">
-            <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-              <div class="btn-area">
-                <img :src="exportPng" class="icon-excel">
-                <span class="spanClass">{{$t('eventView.exportReport')}}</span>
-              </div>
-            </el-button>
-          </div>
-        </el-col>
-        <el-col :span="24" class="items-table">
-          <div class="table">
-            <div class="el-table-panel">
-              <el-table
-                :data="supervisorTableData"
-                :highlight-current-row="true"
-                empty-text='无数据'
-                align='left'
-                stripe
-                @sort-change='sortChange'
-                :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
-                border
-                style="width: 100%"
-                :header-cell-class-name="headerClass"
-                size="mini"
-                :cell-class-name="cellClass"
-                :row-key='getRowKeys'
-                :expand-row-keys="expands"
-                @expand-change="expandSelect"
-                :row-class-name="rowClass"
-              >
-                <el-table-column v-for="(_item,_index) in supervisorInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
-                </el-table-column>
-                <el-table-column type="expand" :label="$t('overview.detail')" :width="lang!=='en'? 100: 120">
-                  <template slot-scope="props">
-                    <el-tabs v-model="activeName" @tab-click="handleClick">
-                      <el-tab-pane label="巡店计划" name="patrolPlan" style="display: none">
-                        <el-table
-                          :data="planTableData"
-                          :highlight-current-row="true"
-                          align='left'
-                          stripe
-                          border
-                          style="width: 100%"
-                          size="mini"
-                          :header-cell-class-name="insideHeaderClass"
-                          :row-class-name="insideRowClass"
-                          :cell-class-name="insideCellClass"
-                        >
-                          <el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"
-                                           :prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">
-                          </el-table-column>
-                        </el-table>
-                      </el-tab-pane>
-                      <el-tab-pane :label="$t('overview.patrolExecution')" name="planImplementation">
-                        <el-table
-                          :data="implementTableData"
-                          :highlight-current-row="true"
-                          align='left'
-                          stripe
-                          border
-                          style="width: 100%"
-                          size="mini"
-                          :header-cell-class-name="insideHeaderClass"
-                          :row-class-name="insideRowClass"
-                          :cell-class-name="insideCellClass"
-                        >
-                          <el-table-column v-for="(_item,_index) in implementTableInfo" :key="_index"
-                                           :prop="_item.prop" :label="_item.label" :min-width="_item.width">
-                          </el-table-column>
-                        </el-table>
-                      </el-tab-pane>
-                    </el-tabs>
-                  </template>
-                </el-table-column>
-
-                <div slot="empty">
-                  <div>
-                    <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
-                  </div>
+      <el-col :span="24" class="items-content">
+        <el-col :span="24" class="contents-container">
+          <el-col :span="24" class="items-title">
+            <span class="title">{{$t('overview.patrolList')}}</span>
+            <div class="exprotBtn">
+              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                <div class="btn-area">
+                  <i class="iconfont icon-excel"></i>
+                  <!-- <img :src="exportPng" class="icon-excel"> -->
+                  <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                 </div>
-              </el-table>
+              </el-button>
+              <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="margin-top:-15px;">
+                <div class="btn-area">
+                  <i class="iconfont icon-pdf"></i>
+                  <span class="spanClass">{{$t('reportView.InspectionDetail')}}</span>
+                </div>
+              </el-button>
             </div>
-            <div class="toolbar pagination clearfix">
-              <el-pagination background small
-                             :page-sizes="[10, 20, 50, 100]"
-                             @size-change="sizeChange"
-                             @current-change="currentChange"
-                             :current-page="page"
-                             layout="jumper,total, prev, pager, next,sizes"
-                             :page-size="sizeNum" :total="total">
-              </el-pagination>
+          </el-col>
+          <el-col :span="24" class="items-table">
+            <div class="table">
+              <div class="el-table-panel">
+                <el-table
+                  :data="supervisorTableData"
+                  :highlight-current-row="true"
+                  empty-text='无数据'
+                  align='left'
+                  stripe
+                  @sort-change='sortChange'
+                  :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
+                  border
+                  style="width: 100%"
+                  :header-cell-class-name="headerClass"
+                  size="mini"
+                  :cell-class-name="cellClass"
+                  :row-key='getRowKeys'
+                  :expand-row-keys="expands"
+                  @expand-change="expandSelect"
+                  :row-class-name="rowClass"
+                >
+                  <el-table-column v-for="(_item,_index) in supervisorInfoData" :key="_index"
+                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
+                  </el-table-column>
+                  <el-table-column type="expand" :label="$t('overview.detail')" :width="lang!=='en'? 100: 120">
+                    <template slot-scope="props">
+                      <el-tabs v-model="activeName" @tab-click="handleClick">
+                        <el-tab-pane label="巡店计划" name="patrolPlan" style="display: none">
+                          <el-table
+                            :data="planTableData"
+                            :highlight-current-row="true"
+                            align='left'
+                            stripe
+                            border
+                            style="width: 100%"
+                            size="mini"
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                          >
+                            <el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"
+                                            :prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">
+                            </el-table-column>
+                          </el-table>
+                        </el-tab-pane>
+                        <el-tab-pane :label="$t('overview.patrolExecution')" name="planImplementation">
+                          <el-table
+                            :data="implementTableData"
+                            :highlight-current-row="true"
+                            align='left'
+                            stripe
+                            border
+                            style="width: 100%"
+                            size="mini"
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                          >
+                            <el-table-column v-for="(_item,_index) in implementTableInfo" :key="_index"
+                                            :prop="_item.prop" :label="_item.label" :min-width="_item.width">
+                            </el-table-column>
+                          </el-table>
+                        </el-tab-pane>
+                      </el-tabs>
+                    </template>
+                  </el-table-column>
+
+                  <div slot="empty">
+                    <div>
+                      <i class="iconfont icon-zhengque empty-data-icon"></i>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                    </div>
+                  </div>
+                </el-table>
+              </div>
+              <div class="toolbar pagination clearfix">
+                <el-pagination background small
+                              :page-sizes="[10, 20, 50, 100]"
+                              @size-change="sizeChange"
+                              @current-change="currentChange"
+                              :current-page="page"
+                              layout="jumper,total, prev, pager, next,sizes"
+                              :page-size="sizeNum" :total="total">
+                </el-pagination>
+              </div>
             </div>
-          </div>
+          </el-col>
         </el-col>
       </el-col>
-    </el-col>
+      <el-dialog :title="$t('insSettingView.export')"
+      :visible.sync="ispdf" v-if="ispdf"
+      :append-to-body='true'
+      :close-on-click-modal="false"
+      class="LoadDialog"
+      width="510px"
+      top="35vh"
+      left="40vh">
+          <div style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;"/>
+              <p style="margin-top:40px;color:#000;">{{$t('insSettingView.isExportPDF')}}......</p>
+          </div>
+      </el-dialog>
+    </div>
+    <div class="item-container" v-if="ispdf">
+      <el-col :span="24" class="items-content"  id="pdfDom"  style="padding:40px 20px;">
+        <el-col :span="24" class="contents-container">
+          <el-col :span="24" class="items-title">
+            <span class="title">{{$t('overview.patrolList')}}</span>
+          </el-col>
+          <el-col :span="24" class="items-table" style="padding-bottom:20px;">
+            <div class="table">
+              <div class="el-table-panel">
+                <el-table
+                  :data="elPDFtableData"
+                  :highlight-current-row="true"
+                  empty-text='无数据'
+                  align='left'
+                  stripe
+                  @sort-change='sortChange'
+                  :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
+                  border
+                  style="width: 100%"
+                  :header-cell-class-name="headerClass"
+                  size="mini"
+                  :cell-class-name="cellClass"
+                  :row-key='getRowKeys'
+                  :expand-row-keys="expands"
+                  @expand-change="expandSelect"
+                  :row-class-name="rowClass"
+                >
+                  <el-table-column v-for="(_item,_index) in supervisorInfoData" :key="_index"
+                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
+                  </el-table-column>
+                  <el-table-column type="expand" :label="$t('overview.detail')" width="100px">
+                    <template slot-scope="props">
+                      <el-tabs v-model="activePDFFirst" @tab-click="handleClick">
+                        <el-tab-pane label="巡店计划" name="First">
+                          <el-table
+                            :data="planTableData"
+                            :highlight-current-row="true"
+                            align='left'
+                            stripe
+                            border
+                            style="width: 100%"
+                            size="mini"
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                          >
+                            <el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"
+                                            :prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">
+                            </el-table-column>
+                          </el-table>
+                        </el-tab-pane>
+                        </el-tabs>
+                        <el-tabs v-model="activePDFSecond" @tab-click="handleClick">
+                        <el-tab-pane :label="$t('overview.patrolExecution')" name="Second">
+                          <el-table
+                            :data="implementTableData"
+                            :highlight-current-row="true"
+                            align='left'
+                            stripe
+                            border
+                            style="width: 100%"
+                            size="mini"
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                          >
+                            <el-table-column v-for="(_item,_index) in implementTableInfo" :key="_index"
+                                            :prop="_item.prop" :label="_item.label" :min-width="_item.width">
+                            </el-table-column>
+                          </el-table>
+                        </el-tab-pane>
+                      </el-tabs>
+                    </template>
+                  </el-table-column>
+
+                  <div slot="empty">
+                    <div>
+                      <i class="iconfont icon-zhengque empty-data-icon"></i>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                    </div>
+                  </div>
+                </el-table>
+              </div>
+            </div>
+          </el-col>
+        </el-col>
+      </el-col>
+    </div>
   </div>
 </template>
 
@@ -139,6 +254,7 @@
   import {getStoreList} from '@/api/store'
   import util from '../../common/util.js'
   import {Message} from 'element-ui'
+  import RegionMultiSelect from "@/components/RegionMultiSelect";
 
   import {
     getInspectStatsOverPersonV2,
@@ -146,8 +262,13 @@
   } from '@/api/inspectOverview'
   export default {
     name: "SupervisorStatistics",
+    components:{
+        RegionMultiSelect
+    },
     data(){
       return {
+        activePDFFirst:'First',
+        activePDFSecond:'Second',
         dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date).endOf('d').toDate()],
         dateOpt: {
           disabledDate: (time) => {
@@ -155,16 +276,32 @@
           }
         },
         timeMode: 1,
+        ispdf:false,
         params: {},
         poperClass: 'date-picker-poper',
         exportPng: require('../../../static/img/icon_excel.png'),
         lang: this.$i18n.locale,
         supervisorTableData:[],
+        titleList:[
+          {
+           label:'门店督导',
+           value:1,
+           disabled:false
+           },
+           {
+           label:'门店负责人',
+           value:2,
+           disabled:false
+           }
+        ],
+        ModelPost:[],
         supervisorInfoData:[
           {
             "prop": "supervisorName",
             "label": this.$t('overview.supervisorName'),
             "sortable":false,
+            "pdfwidth": '15%',
+            "pdfmaxWidth": '17%',
             "width": 232,
             "maxWidth": 232,
           },
@@ -172,6 +309,8 @@
             "prop":"numOfStores",
             "label": this.$t('overview.storeNum'),
             "sortable":'custom',
+            "pdfwidth": '15%',
+            "pdfmaxWidth": '17%',
             "width": 227,
             "maxWidth": 227,
           },
@@ -179,6 +318,8 @@
             "prop":"numOfTasked",
             "label": this.$t('overview.scheduleNum'),
             "sortable":'custom',
+            "pdfwidth": '15%',
+            "pdfmaxWidth": '16%',
             "width": 227,
             "maxWidth": 210,
           },
@@ -186,6 +327,8 @@
             "prop": "numOfCompleted",
             "label": this.$t('overview.inscheduleNum'),
             "sortable":'custom',
+            "pdfwidth": '15%',
+            "pdfmaxWidth": '16%',
             "width": 227,
             "maxWidth": 220,
           },
@@ -193,6 +336,8 @@
             "prop":"numOfUnscheduled",
             "label": this.$t('overview.unscheduleNum'),
             "sortable":'custom',
+            "pdfwidth": '15%',
+            "pdfmaxWidth": '16%',
             "width": 227,
             "maxWidth": 220,
           },
@@ -200,6 +345,8 @@
             "prop":"completionRateStr",
             "label": this.$t('overview.completeRate'),
             "sortable":'custom',
+            "pdfwidth": '15%',
+            "pdfmaxWidth": '16%',
             "width": 227,
             "maxWidth": 220,
           }
@@ -272,7 +419,8 @@
         rowClass: 'row-class',
         insideCellClass: 'inside-cell-class',
         insideHeaderClass: 'inside-header-class',
-        insideRowClass: 'inside-row-class'
+        insideRowClass: 'inside-row-class',
+        elPDFtableData:[]
       }
     },
     computed:{
@@ -304,6 +452,42 @@
       }
     },
     methods:{
+      handleDown(){
+        let self = this;
+        self.ispdf=true
+        require.ensure([], async() => {
+            self.params.filter={
+            "page": 0,
+            "size": self.total
+          };
+          let regionResult = await self.getInspectStatsPersonInfo(self.params);
+          if (regionResult.errCode == 0) {
+            let result = regionResult.data;
+            if (result) {
+              result.content.forEach(item=>{
+                item.completionRateStr = item.completionRate + '%'
+              })
+              self.elPDFtableData = result.content;
+            }
+          }
+          setTimeout(()=>{
+            self.getPdf()
+            if(sessionStorage.getItem('startPDF')=='start'){
+              sessionStorage.removeItem('startPDF','start');
+              if(sessionStorage.getItem('endPDF')=='end'){
+                sessionStorage.removeItem('endPDF','end');
+                setTimeout(()=>{
+                  self.ispdf=false
+                },1000)
+              }
+            }
+          },1000)
+        })
+      },
+      changeSelect(val){
+            let self = this;
+            self.ModelPost = Array.from(val)[0]; // 选中的职务
+        },
       getRowKeys(row){
         return row.supervisorId
       },
@@ -699,10 +883,25 @@
       padding-top: 30px;
       padding-bottom: 30px;
       color: $black;
+      text-align: left;
+      .header-mul-select /deep/ .el-input__inner{
+        height: calc(35 / 1920 * 100vw);
+        min-height: 28px;
+      }
+      .header-mul-select{
+        display: inline-block;
+        .mul-label{
+          font-size: calc(16/1920*100vw);
+          margin-right: calc(20/1920*100vw);
+          margin-left: calc(20/1920*100vw);
+          color: $black;
+        }
+      }
       .header-details{
         text-align: left;
         padding-left: calc(40/1920*100vw);
         position: relative;
+        display: inline-block;
         .search-content{
           display: inline-block;
         }
@@ -812,6 +1011,8 @@
               border-width: 0;
               border-radius: 4px;
               top: calc(24/1920*100vw);
+              min-height: 28px;
+              min-width: 120px;
               .btn-area{
                 padding: 0 calc(6/1920*100vw);
                 height: calc(36/1920*100vw);
@@ -819,10 +1020,14 @@
                 align-items: center;
                 justify-content: center;
                 .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
-                  height: calc(24/1920*100vw);
-                  width: calc(24/1920*100vw);
+                  // height: calc(24/1920*100vw);
+                  // width: calc(24/1920*100vw);
+                }
+                .icon-pdf{
+                  margin-right: calc(18/1920*100vw);
+                  font-size: calc(24/1920*100vw);
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);
@@ -888,6 +1093,12 @@
   }
 </style>
 <style>
+  .LoadDialog .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog .el-dialog__body{
+    padding:0 20px 30px 20px;
+  }
   .header-class, .inside-header-class{
     height: 40px;
     font-size: 12px;

@@ -1,187 +1,183 @@
 <template>
-  <div class="item-container" ref="printPDF">
-    <el-col :span="24" class="statistics-header no-print">
-      <el-col :span="24" class="header-details">
-        <span>{{$t('reportView.selectStores')}}</span>
-        <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
-                   class="el-province" @change="changeCountry">
-          <!--<el-option-->
-            <!--v-for="item in countryList"-->
-            <!--:key="item.value"-->
-            <!--:label="item.label"-->
-            <!--:value="item.value">-->
-          <!--</el-option>-->
-          <el-option-group
-            v-for="group in countryList"
-            :key="group.label"
-            :label="group.label">
-            <el-option
-              v-for="item in group.countryList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-option-group>
-        </el-select>
-        <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                             style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
-        <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                             style="display: inline" ref="citySelect" :disabled="curProvince.length==0 ":all="$t('overview.allZoneII')"></region-multi-select>
+  <div>
+    <div class="item-container">
+      <el-col :span="24" class="statistics-header">
+        <el-col :span="24" class="header-details">
+          <span>{{$t('reportView.selectStores')}}</span>
+          <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry">
+            <!--<el-option-->
+              <!--v-for="item in countryList"-->
+              <!--:key="item.value"-->
+              <!--:label="item.label"-->
+              <!--:value="item.value">-->
+            <!--</el-option>-->
+            <el-option-group
+              v-for="group in countryList"
+              :key="group.label"
+              :label="group.label">
+              <el-option
+                v-for="item in group.countryList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-option-group>
+          </el-select>
+          <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
+                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
+          <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
+                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 ":all="$t('overview.allZoneII')"></region-multi-select>
 
-        <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                      style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
-        <span>{{$t('overview.patrolType')}}</span>
-        <!-- <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini"
-                   class="el-province" @change="changeType">
-          <el-option
-            v-for="item in inspectTypeList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select> -->
-        <el-cascader
-          v-model="value"
-          :options="options"
-          :props="{ expandTrigger: 'hover' }"
-          @change="handleChange">
-        </el-cascader>
-
+          <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
+                        style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
+          <span>{{$t('overview.patrolType')}}</span>
+          <!-- <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini" class="el-province" @change="changeType">
+                  <el-option
+                    v-for="item in inspectTypeList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select> -->
+          <el-cascader
+            v-model="value"
+            :options="options"
+            :props="{ expandTrigger: 'hover' }"
+            @change="handleChange">
+          </el-cascader>
+        </el-col>
+        <el-col :span="24" class="header-details">
+          <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
+          <el-date-picker
+            ref="datePicker"
+            v-model="dateValue"
+            type="daterange"
+            range-separator="-"
+            size="mini"
+            :clearable=false
+            :editable=false
+            format="yyyy/MM/dd"
+            class="date-range"
+            :popper-class="poperClass"
+            :picker-options='dateOpt'
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="dateChange"
+            :default-time="['00:00:00', '23:59:59']"
+            unlink-panels
+          >
+          </el-date-picker>
+          <el-tooltip class="item" effect="dark"
+                      placement="right">
+            <div slot="content">{{$t('overview.dataRangeTips')}}</div>
+            <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
+          </el-tooltip>
+          <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0">{{$t('reportView.search')}}</el-button>
+        </el-col>
+        <el-col :span="24" class="header-details1">
+                  <span class="choice-store">
+                    <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
+                    {{$t('reportView.selected')}}
+                    <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
+                  </span>
+          <div class="store-selected" v-if="showStoreInfo">
+            <h1>{{$t('reportView.selected')}}</h1>
+            <ul class="store-list" v-show="storeStr.length > 0">
+              <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
+                - {{item}}
+              </li>
+            </ul>
+          </div>
+        </el-col>
       </el-col>
-
-      <el-col :span="24" class="header-details">
-        <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
-        <el-date-picker
-          ref="datePicker"
-          v-model="dateValue"
-          type="daterange"
-          range-separator="-"
-          size="mini"
-          :clearable=false
-          :editable=false
-          format="yyyy/MM/dd"
-          class="date-range"
-          :popper-class="poperClass"
-          :picker-options='dateOpt'
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          @change="dateChange"
-          :default-time="['00:00:00', '23:59:59']"
-          unlink-panels
-        >
-        </el-date-picker>
-        <el-tooltip class="item" effect="dark"
-                    placement="right">
-          <div slot="content">{{$t('overview.dataRangeTips')}}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
-        </el-tooltip>
-        <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="curProvince.length == 0">{{$t('reportView.search')}}</el-button>
-      </el-col>
-      <el-col :span="24" class="header-details1">
-                <span class="choice-store">
-                  <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
-                  {{$t('reportView.selected')}}
-                  <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
-                </span>
-        <div class="store-selected" v-if="showStoreInfo">
-          <h1>{{$t('reportView.selected')}}</h1>
-          <ul class="store-list" v-show="storeStr.length > 0">
-            <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
-              - {{item}}
-            </li>
-          </ul>
-        </div>
-      </el-col>
-    </el-col>
-    <el-col :span="24" class="items-content">
-      <el-col :span="24" class="contents-container">
-        <el-col :span="24" class="items-row">
-          <el-col :span="24" class="items-title">
-            <span class="title">{{$t('overview.itemChartReport')}}</span>
-            <div class="exprotBtn no-print">
-              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-                <div class="btn-area">
-                  <i class="iconfont icon-excel"></i>
-                  <!-- <img :src="exportPng" class="icon-excel"> -->
-                  <span class="spanClass">{{$t('eventView.exportReport')}}</span>
-                </div>
-              </el-button>
-              <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown" style="margin-top:-15px;">
-                <div class="btn-area">
-                  <i class="iconfont icon-pdf"></i>
-                  <span class="spanClass">{{$t('reportView.InspectionDetail')}}</span>
-                </div>
-              </el-button>
-            </div>
-          </el-col>
-          <el-col :span="12" class="evalution-pct">
-            <div class="title">{{$t('overview.proportionOfInspectionItems')}}</div>
-            <div class="pct-content">
-              <div>
-                <div class="pct-panel">
-                  <v-chart :auto-resize='true' :options="itemsOptions" class="chart-content" ref="itemsPie"></v-chart>
-                </div>
-                <div class="pct-nums">
-                  <div class="content-labels" :class="lang=='en'? 'en-labels': ''" v-for="(item, index) in itemsPerArray"
-                       :key="index">
-                    <div class="excellent_nums">{{item.percent}}%</div>
-                    <div class="excellent_labels">
-                      <span class="labels excellent-label" :class="`label-` + index"></span>
-                      <span class="label-desc">{{item.type}}</span>
+      <el-col :span="24" class="items-content">
+        <el-col :span="24" class="contents-container">
+          <el-col :span="24" class="items-row">
+            <el-col :span="24" class="items-title">
+              <span class="title">{{$t('overview.itemChartReport')}}</span>
+              <div class="exprotBtn">
+                <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                  <div class="btn-area">
+                    <i class="iconfont icon-excel"></i>
+                    <!-- <img :src="exportPng" class="icon-excel"> -->
+                    <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                  </div>
+                </el-button>
+                <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="margin-top:-15px;">
+                  <div class="btn-area">
+                    <i class="iconfont icon-pdf"></i>
+                    <span class="spanClass">{{$t('reportView.InspectionDetail')}}</span>
+                  </div>
+                </el-button>
+              </div>
+            </el-col>
+            <el-col :span="12" class="evalution-pct">
+              <div class="title">{{$t('overview.proportionOfInspectionItems')}}</div>
+              <div class="pct-content">
+                <div>
+                  <div class="pct-panel">
+                    <v-chart :auto-resize='true' :options="itemsOptions" class="chart-content" ref="itemsPie"></v-chart>
+                  </div>
+                  <div class="pct-nums">
+                    <div class="content-labels" :class="lang=='en'? 'en-labels': ''" v-for="(item, index) in itemsPerArray"
+                        :key="index">
+                      <div class="excellent_nums">{{item.percent}}%</div>
+                      <div class="excellent_labels">
+                        <span class="labels excellent-label" :class="`label-` + index"></span>
+                        <span class="label-desc">{{item.type}}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+              <!-- <div v-else class="data-empty">
+                      {{$t('overview.noData')}}
+                    </div> -->
               </div>
-<!--              <div v-else class="data-empty">-->
-<!--                {{$t('overview.noData')}}-->
-<!--              </div>-->
-            </div>
 
-          </el-col>
-          <el-col :span="12" class="evalution-pct">
-            <div class="radar-title">{{curType== 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite')}}</div>
-            <div class="inspect-catergy">
-              <div class="rader-panel">
-                <div v-if="!hasNoData">
-                  <v-chart :options="itemsRadarOption" class="radar-content" :auto-resize='true' ref="itemsRadar"/>
-                </div>
-                <div v-else class="data-empty">
-                  {{$t('overview.noData')}}
-                </div>
-              </div>
-            </div>
-          </el-col>
-        </el-col>
-        <el-col :span="24" class="items-table">
-          <div class="table">
-            <div class="el-table-panel">
-              <el-table
-                :data="itemsTableData"
-                :highlight-current-row="true"
-                empty-text='无数据'
-                align='left'
-                stripe
-                @sort-change='sortChange'
-                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                border
-                style="width: 100%"
-                :header-cell-class-name="headerClass"
-                size="mini"
-                :cell-class-name="cellClass"
-                :row-class-name="rowClass"
-              >
-                <el-table-column v-for="(_item,_index) in itemsInfoData" :key="_index"
-                                 :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
-                </el-table-column>
-                <div slot="empty">
-                  <div>
-                    <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+            </el-col>
+            <el-col :span="12" class="evalution-pct">
+              <div class="radar-title">{{curType== 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite')}}</div>
+              <div class="inspect-catergy">
+                <div class="rader-panel">
+                  <div v-if="!hasNoData">
+                    <v-chart :options="itemsRadarOption" class="radar-content" :auto-resize='true' ref="itemsRadar"/>
+                  </div>
+                  <div v-else class="data-empty">
+                    {{$t('overview.noData')}}
                   </div>
                 </div>
-              </el-table>
-            </div>
-            <div class="no-print">
+              </div>
+            </el-col>
+          </el-col>
+          <el-col :span="24" class="items-table">
+            <div class="table">
+              <div class="el-table-panel">
+                <el-table
+                  :data="itemsTableData"
+                  :highlight-current-row="true"
+                  empty-text='无数据'
+                  align='left'
+                  stripe
+                  @sort-change='sortChange'
+                  :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+                  border
+                  style="width: 100%"
+                  :header-cell-class-name="headerClass"
+                  size="mini"
+                  :cell-class-name="cellClass"
+                  :row-class-name="rowClass"
+                >
+                  <el-table-column v-for="(_item,_index) in itemsInfoData" :key="_index"
+                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
+                  </el-table-column>
+                  <div slot="empty">
+                    <div>
+                      <i class="iconfont icon-zhengque empty-data-icon"></i>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                    </div>
+                  </div>
+                </el-table>
+              </div>
               <div class="toolbar pagination clearfix">
                 <el-pagination background small
                               :page-sizes="[10, 20, 50, 100]"
@@ -193,10 +189,98 @@
                 </el-pagination>
               </div>
             </div>
-          </div>
+          </el-col>
         </el-col>
       </el-col>
-    </el-col>
+      <el-dialog :title="$t('insSettingView.export')"
+        :visible.sync="ispdf" v-if="ispdf"
+        :append-to-body='true'
+        :close-on-click-modal="false"
+        class="LoadDialog"
+        width="510px"
+        top="35vh"
+        left="40vh">
+            <div style="overflow:hidden;width:100%;">
+              <hr style="border: 0.5px solid #dfe2e9;"/>
+                <p style="margin-top:40px;color:#000;">{{$t('insSettingView.isExportPDF')}}......</p>
+            </div>
+        </el-dialog>
+    </div>
+    <div class="item-container" v-if="ispdf">
+      <el-col :span="24" class="items-content"  id="pdfDom"  style="padding:40px 20px;">
+        <el-col :span="24" class="contents-container" style="padding-bottom:20px;">
+          <el-col :span="24" class="items-row">
+            <el-col :span="24" class="items-title">
+              <span class="title">{{$t('overview.itemChartReport')}}</span>
+            </el-col>
+            <el-col :span="12" class="evalution-pct">
+              <div class="title">{{$t('overview.proportionOfInspectionItems')}}</div>
+              <div class="pct-content">
+                <div>
+                  <div class="pct-panel">
+                    <v-chart :auto-resize='true' :options="itemsOptions" class="chart-content" ref="itemsPie"></v-chart>
+                  </div>
+                  <div class="pct-nums">
+                    <div class="content-labels" :class="lang=='en'? 'en-labels': ''" v-for="(item, index) in itemsPerArray"
+                        :key="index">
+                      <div class="excellent_nums">{{item.percent}}%</div>
+                      <div class="excellent_labels">
+                        <span class="labels excellent-label" :class="`label-` + index"></span>
+                        <span class="label-desc">{{item.type}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </el-col>
+            <el-col :span="12" class="evalution-pct">
+              <div class="radar-title">{{curType== 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite')}}</div>
+              <div class="inspect-catergy">
+                <div class="rader-panel">
+                  <div v-if="!hasNoData">
+                    <v-chart :options="itemsRadarOption" class="radar-content" :auto-resize='true' ref="itemsRadar"/>
+                  </div>
+                  <div v-else class="data-empty">
+                    {{$t('overview.noData')}}
+                  </div>
+                </div>
+              </div>
+            </el-col>
+          </el-col>
+          <el-col :span="24" class="items-table">
+            <div class="table">
+              <div class="el-table-panel">
+                <el-table
+                  :data="PDFData"
+                  :highlight-current-row="true"
+                  empty-text='无数据'
+                  align='left'
+                  stripe
+                  @sort-change='sortChange'
+                  :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+                  border
+                  style="width: 100%"
+                  :header-cell-class-name="headerClass"
+                  size="mini"
+                  :cell-class-name="cellClass"
+                  :row-class-name="rowClass"
+                >
+                  <el-table-column v-for="(_item,_index) in itemsInfoData" :key="_index"
+                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
+                  </el-table-column>
+                  <div slot="empty">
+                    <div>
+                      <i class="iconfont icon-zhengque empty-data-icon"></i>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                    </div>
+                  </div>
+                </el-table>
+              </div>
+            </div>
+          </el-col>
+        </el-col>
+      </el-col>
+    </div>
   </div>
 </template>
 
@@ -319,18 +403,25 @@
             itemsRadarOption: null,
             echartBackground: 'rgba(30,34,52,0.75)',
             itemsTableData:[],
+            PDFData:[],
+            htmlTitle:'巡检项统计pdf',
+            ispdf:false,
             itemsInfoData:[
               {
                 "prop": "inspectGroupName",
                 "label": this.$t("overview.patrolCate"),
                 "sortable": false,
+                "pdfwidth": '21%',
+                "pdfmaxWidth": '19%',
                 "width": '280',
-                "maxWidth": '280'
+                "maxWidth": '280',
               },
               {
                 "prop":"inspectItemName",
                 "label": this.$t("overview.items"),
                 "sortable":'custom',
+                "pdfwidth": '29%',
+                "pdfmaxWidth": '26%',
                 "width": '380',
                 "maxWidth": '380'
               },
@@ -338,6 +429,8 @@
                 "prop":"numOfTotal",
                 "label": this.$t("overview.numOfEvaluations"),
                 "sortable":'custom',
+                "pdfwidth": '10%',
+                "pdfmaxWidth": '14%',
                 "width": '130',
                 "maxWidth": '200'
               },
@@ -352,6 +445,8 @@
                 "prop":"numOfQualified",
                 "label": `${this.$t("overview.pass")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
+                "pdfwidth": '10%',
+                "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
               },
@@ -359,6 +454,8 @@
                 "prop":"numOfUnqualified",
                 "label": `${this.$t("overview.failed")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
+                "pdfwidth": '10%',
+                "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
               },
@@ -366,6 +463,8 @@
                 "prop":"numOfIgnored",
                 "label": `${this.$t("overview.ignored")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
+                "pdfwidth": '10%',
+                "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
               },
@@ -373,6 +472,8 @@
                 "prop":"qualifiedRateStr",
                 "label": this.$t("overview.passRate"),
                 "sortable":'custom',
+                "pdfwidth": '10%',
+                "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
               }
@@ -427,11 +528,39 @@
           
         },
         handleDown(){
-        let self = this
-        new Promise(function(resolve) {
-            resolve(true)
-          }).then(function() {
-              self.$print(self.$refs.printPDF);
+          let self = this
+          self.ispdf=true
+          require.ensure([], async() => {
+            let LoadTable = 0
+            self.params.filter={
+              "page": 0,
+              "size": self.total
+            };
+            let regionResult = await self.getInspectStatsItemInfo(self.params);
+            if (regionResult.errCode == 0) {
+              let result = regionResult.data;
+              if (result) {
+                result.content.forEach(item=>{
+                  item.qualifiedRateStr = item.qualifiedRate + '%'
+                })
+                self.PDFData = result.content;
+                LoadTable = 1
+              }
+            }
+            if(LoadTable == 1){
+              setTimeout(()=>{
+                self.getPdf()
+                if(sessionStorage.getItem('startPDF')=='start'){
+                  sessionStorage.removeItem('startPDF','start');
+                  if(sessionStorage.getItem('endPDF')=='end'){
+                    sessionStorage.removeItem('endPDF','end');
+                    setTimeout(()=>{
+                      self.ispdf=false
+                    },1000)
+                  }
+                }
+              },1000)
+            }
           })
         },
         sortChange(col){
@@ -1336,6 +1465,12 @@
   *{
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
+  }
+  .LoadDialog /deep/ .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0 20px 30px;
   }
   .item-container{
     padding-bottom: 20px;

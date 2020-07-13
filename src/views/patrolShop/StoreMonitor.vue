@@ -308,14 +308,6 @@
                     </el-scrollbar>
                 </el-tab-pane>
             </el-tabs>
-            <div class="patrol-select">
-               <div class="patrol-content">
-                    <p class="patrol-title">请选择，西安一店关联巡检表</p>
-                    <el-select v-model="patrolstore" placeholder="请选择" class="patrol-elselect">
-                        <el-option v-for="item in PatrolList" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                    </el-select>
-               </div>
-            </div>
             <hr class="rside-hr"/>
             <div class="channel-content">
                 <span>{{generateStoreMonitorLang('zoneList')}}</span>
@@ -4164,25 +4156,6 @@ export default {
                         font-weight: bold;
                         color: $black;
                         @include point(margin-left,20);
-                    }
-                }
-            }
-            .patrol-select{
-                height:140px;
-                width:92%;
-                text-align: left;
-                margin:0 auto;
-                border-top:0.5px solid #e3e9f4;
-                .patrol-content{
-                    padding: 0 30px;
-                    .patrol-title{
-                        font-size:14px;
-                        color:#182752;
-                        font-weight: bold;
-                        margin:30px 0 20px 0;
-                        .patrol-elselect{
-                            width:234px;
-                        }
                     }
                 }
             }

@@ -1460,7 +1460,6 @@
         let ignorePer = 0;
         let errCode = inspectItems.errCode;
         let jsonArray = self.itemsLegend.slice(1);
-        console.log('啊飒飒',jsonArray)
         let seriesData = [];
         if (errCode == 0) {
           let totalIgnored = 0;
