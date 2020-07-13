@@ -444,7 +444,7 @@ export default {
                 feedBackTemp.push(objFeedBack);
             })
             tempList[0]={
-                itemTitleName: self.$t('remotePatrol.ignored'),
+                itemTitleName: self.$t('remotePatrol.ignoreds'),
                 iconSrc:'icon-hulve',
                 itemCount:ignoreTemp.length,
                 itemList:ignoreTemp

@@ -26,25 +26,25 @@
           <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
                               style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
           <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 ":all="$t('overview.allZoneII')"></region-multi-select>
+                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
           <span>{{$t('overview.patrolType')}}</span>
-          <!-- <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini" class="el-province" @change="changeType">
+          <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini" class="el-province" @change="changeType">
                   <el-option
                     v-for="item in inspectTypeList"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
                   </el-option>
-                </el-select> -->
-          <el-cascader
+                </el-select>
+          <!-- <el-cascader
             v-model="value"
             :options="options"
             :props="{ expandTrigger: 'hover' }"
             @change="handleChange">
-          </el-cascader>
+          </el-cascader> -->
         </el-col>
         <el-col :span="24" class="header-details">
           <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
@@ -484,7 +484,7 @@
             direction: 'asc',
             property: 'qualifiedRate',
             hasNoData: false,
-            exportItmesHeader: ['巡检表类别','巡检项', '评估次数', '优良（次）', '合格（次）', '不合格（次）', '忽略（次）', '合格率'],
+            exportItmesHeader: ['巡检表类别','巡检项', '评估次数', '合格（次）', '不合格（次）', '忽略（次）', '合格率'],
             headerClass: 'header-class',
             cellClass: 'cell-class',
             echartAxiasColor: '#e3e9f4',
@@ -530,38 +530,36 @@
         handleDown(){
           let self = this
           self.ispdf=true
-          require.ensure([], async() => {
-            let LoadTable = 0
-            self.params.filter={
-              "page": 0,
-              "size": self.total
-            };
-            let regionResult = await self.getInspectStatsItemInfo(self.params);
-            if (regionResult.errCode == 0) {
-              let result = regionResult.data;
-              if (result) {
-                result.content.forEach(item=>{
-                  item.qualifiedRateStr = item.qualifiedRate + '%'
-                })
-                self.PDFData = result.content;
-                LoadTable = 1
+          if(self.total>0){
+            require.ensure([], async() => {
+              self.params.filter={
+                "page": 0,
+                "size": self.total
+              };
+              let regionResult = await self.getInspectStatsItemInfo(self.params);
+              if (regionResult.errCode == 0) {
+                let result = regionResult.data;
+                if (result) {
+                  result.content.forEach(item=>{
+                    item.qualifiedRateStr = item.qualifiedRate + '%'
+                  })
+                  self.PDFData = result.content;
+                }
+              }
+            })
+          }
+          setTimeout(()=>{
+            self.getPdf()
+            if(sessionStorage.getItem('startPDF')=='start'){
+              sessionStorage.removeItem('startPDF','start');
+              if(sessionStorage.getItem('endPDF')=='end'){
+                sessionStorage.removeItem('endPDF','end');
+                setTimeout(()=>{
+                  self.ispdf=false
+                },1000)
               }
             }
-            if(LoadTable == 1){
-              setTimeout(()=>{
-                self.getPdf()
-                if(sessionStorage.getItem('startPDF')=='start'){
-                  sessionStorage.removeItem('startPDF','start');
-                  if(sessionStorage.getItem('endPDF')=='end'){
-                    sessionStorage.removeItem('endPDF','end');
-                    setTimeout(()=>{
-                      self.ispdf=false
-                    },1000)
-                  }
-                }
-              },1000)
-            }
-          })
+          },1000)
         },
         sortChange(col){
           console.log(col);
@@ -1385,7 +1383,7 @@
           require.ensure([], async() => {
             const { export_json_to_excel } = require('@/excel/Export2Excel');
             const tHeader = that.exportItmesHeader; // 导出的表头名
-            const filterVal = ['inspectGroupName','inspectItemName','numOfTotal','numOfExcellent','numOfQualified','numOfUnqualified','numOfIgnored','qualifiedRatePer']; // 导出的表头字段名
+            const filterVal = ['inspectGroupName','inspectItemName','numOfTotal','numOfQualified','numOfUnqualified','numOfIgnored','qualifiedRatePer']; // 导出的表头字段名
             let self=this;
             self.params.filter={
               "page": 0,
@@ -1465,12 +1463,6 @@
   *{
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
-  }
-  .LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0 20px 30px;
   }
   .item-container{
     padding-bottom: 20px;
@@ -1575,9 +1567,9 @@
           }
         }
         @media screen and(min-width: 1366px){
-          .en-span-class{
+          // .en-span-class{
             //margin-right: 75px;
-          }
+          // }
         }
         .el-province{
           width: calc(160/1920*100vw);
@@ -1990,14 +1982,20 @@
   }
 </style>
 <style>
-.el-cascader-menu {width: 200px; }
+/* .el-cascader-menu {width: 200px; }
 .el-cascader-menu__wrap ul li{list-style: none;}
 .el-scrollbar__view{ padding: 0 15px;}
 .el-icon-arrow-right{float: right;}
 .in-active-path{color:#f31d65;font-weight: 600;}
 .el-cascader-node{font-size: 14px;margin: 10px 0;}
 .el-cascader-node:hover{color:#f31d65;font-weight: 600;cursor: pointer;}
-.el-cascader-menu__list .is-active{color:#f31d65;font-weight: 600;}
+.el-cascader-menu__list .is-active{color:#f31d65;font-weight: 600;} */
+  .LoadDialog /deep/ .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0 20px 30px;
+  }
   .header-class{
     height: 40px;
     font-size: 12px;

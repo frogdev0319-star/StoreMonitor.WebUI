@@ -180,8 +180,8 @@
                   :header-cell-class-name="headerClass"
                   size="mini"
                   :cell-class-name="cellClass"
+                  default-expand-all
                   :row-key='getRowKeys'
-                  :expand-row-keys="expands"
                   @expand-change="expandSelect"
                   :row-class-name="rowClass"
                 >
@@ -420,7 +420,8 @@
         insideCellClass: 'inside-cell-class',
         insideHeaderClass: 'inside-header-class',
         insideRowClass: 'inside-row-class',
-        elPDFtableData:[]
+        elPDFtableData:[],
+        htmlTitle:'巡店效率统计pdf'
       }
     },
     computed:{
@@ -455,34 +456,36 @@
       handleDown(){
         let self = this;
         self.ispdf=true
-        require.ensure([], async() => {
-            self.params.filter={
-            "page": 0,
-            "size": self.total
-          };
-          let regionResult = await self.getInspectStatsPersonInfo(self.params);
-          if (regionResult.errCode == 0) {
-            let result = regionResult.data;
-            if (result) {
-              result.content.forEach(item=>{
-                item.completionRateStr = item.completionRate + '%'
-              })
-              self.elPDFtableData = result.content;
-            }
-          }
-          setTimeout(()=>{
-            self.getPdf()
-            if(sessionStorage.getItem('startPDF')=='start'){
-              sessionStorage.removeItem('startPDF','start');
-              if(sessionStorage.getItem('endPDF')=='end'){
-                sessionStorage.removeItem('endPDF','end');
-                setTimeout(()=>{
-                  self.ispdf=false
-                },1000)
+        if(self.total>0){
+          require.ensure([], async() => {
+              self.params.filter={
+              "page": 0,
+              "size": self.total
+            };
+            let regionResult = await self.getInspectStatsPersonInfo(self.params);
+            if (regionResult.errCode == 0) {
+              let result = regionResult.data;
+              if (result) {
+                result.content.forEach(item=>{
+                  item.completionRateStr = item.completionRate + '%'
+                })
+                self.elPDFtableData = result.content;
               }
             }
-          },1000)
-        })
+          })
+        }
+        setTimeout(()=>{
+          self.getPdf()
+          if(sessionStorage.getItem('startPDF')=='start'){
+            sessionStorage.removeItem('startPDF','start');
+            if(sessionStorage.getItem('endPDF')=='end'){
+              sessionStorage.removeItem('endPDF','end');
+              setTimeout(()=>{
+                self.ispdf=false
+              },1000)
+            }
+          }
+        },1000)
       },
       changeSelect(val){
             let self = this;
@@ -1093,11 +1096,11 @@
   }
 </style>
 <style>
-  .LoadDialog .el-dialog__header{
+  .LoadDialog /deep/ .el-dialog__header{
     padding-bottom:0;
   }
-  .LoadDialog .el-dialog__body{
-    padding:0 20px 30px 20px;
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0px 20px 30px 20px;
   }
   .header-class, .inside-header-class{
     height: 40px;

@@ -48,13 +48,13 @@
                        :key="index" :label="`${item.name}`">
             <el-col :span="24" class="header-details">
               <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-              <div class="NameInput">
+              <div class="NameInput" style="margin-right:calc(25/1920*100vw);">
                 <el-input v-model="item.name"  :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
                         class="el-type" @input="(val)=>scheduluNameChange(val,item)" @blur="notShowInputRuleTips(item)"></el-input>
                 <span class="rules" v-if="item.Ruletip">{{generateScheduleLang('scheduleNameRuletip')}}</span>
               </div>
-            </el-col>
-            <el-col :span="24" class="header-details">
+            <!-- </el-col> -->
+            <!-- <el-col :span="24" class="header-details"> -->
               <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
               <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
                          class="el-type" v-if="activePatrol=='0'">
@@ -132,10 +132,10 @@
               </el-tooltip>
               <el-checkbox v-model="item.ifNotifyOneDay">{{generateScheduleLang('notifyOneDayBefore')}}</el-checkbox>
             </el-col>
-            <el-col :span="24" class="header-details">
+            <el-col :span="24" class="header-details header-person">
               <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('dueDays')}}</span>
               <el-select v-model="item.dueDays"  placeholder="选择执行时效" size="mini"
-                         class="el-type" >
+                         class="el-type" style="margin-right:calc(25/1920*100vw);">
                 <el-option
                   v-for="item in dueDaysList"
                   :key="item.value"
@@ -143,6 +143,10 @@
                   :value="item.value">
                 </el-option>
               </el-select>
+              <span :id="lang=='en'? 'en-span': 'span'" style="padding-right:14px;">{{generateScheduleLang('InspectPerson')}}</span>
+              <el-checkbox-group v-model="Inspector" @change="ChangeInspector">
+                <el-checkbox v-for="item in InspectorList" :label="item" :key="item">{{item}}</el-checkbox>
+              </el-checkbox-group>
             </el-col>
             <el-col :span="24" class="el-header-hr"></el-col>
             <el-col :span="24" class="el-bind-header">
@@ -203,7 +207,7 @@
               <div class="el-bind-footer">
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
-                    <span>{{generateScheduleLang('saveAndApply')}}</span>
+                    <span>{{generateScheduleLang('saveAndUse')}}</span>
                   </el-button>
                 </div>
               </div>
@@ -273,6 +277,8 @@
         tempStoreList :[],
         showAddTime: false,
         scheduleList: ['点检排程一'],
+        InspectorList:['门店督导','门店负责人'],
+        Inspector:[],
         paneList:[],
         lang: this.$i18n.locale ,
         bigMonthList:[
@@ -664,6 +670,9 @@
 
     methods: {
       generateScheduleLang,
+      ChangeInspector(){
+
+      },
       noWeekDialog(val){
         let self=this;
         self.selectWeekObj.dialogCosed=false;
@@ -879,6 +888,7 @@
         };
         self.paneList.push(addInfo);
         let pane = self.paneList;
+        self.$emit('paneList', pane.length)
         self.activeName = (pane.length -1).toString() ;
         self.selectTab = self.scheduleName;
         self.scheduleId = 0;
@@ -2186,35 +2196,32 @@
       }
     }
   }
-  #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
-    line-height: 30px;
-  }
-  #patrltabs-content /deep/ .el-tabs__item {
-    padding: 0 0;
-    margin: 0 12px;
-    font-size: 12px;
-    font-family: Roboto,"Microsoft YaHei";
-    width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    height: 30px;
-    line-height: 30px;
-  }
-  #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
-    height: 30px;
-  }
-  #patrltabs-content /deep/ .el-tabs__nav-wrap::after{
-    position: static;
-  }
+  // #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
+  //   line-height: 30px;
+  // }
+  // #patrltabs-content /deep/ .el-tabs__item {
+  //   padding: 0 0;
+  //   margin: 0 12px;
+  //   font-size: 12px;
+  //   font-family: Roboto,"Microsoft YaHei";
+  //   width: 100px;
+  //   overflow: hidden;
+  //   text-overflow: ellipsis;
+  //   height: 30px;
+  //   line-height: 30px;
+  // }
+  // #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
+  //   height: 30px;
+  // }
+  // #patrltabs-content /deep/ .el-tabs__nav-wrap::after{
+  //   position: static;
+  // }
   #patrltabs-content /deep/ .is-active {
-    margin-bottom: 2px;
-    background: #f31d65 ;
-    color: #fff;
-    border-radius: 3px;
+    color: #f31d65;
+    font-weight: 600;
   }
-
-  #patrltabs-content /deep/ .el-tabs__active-bar{
-    height: 0 !important;
+  #patrltabs-content /deep/ .el-tabs__active-bar{  
+      height: 4px;
   }
   /deep/ .el-input--mini .el-input__inner{
     height: 30px;
@@ -2247,6 +2254,12 @@
 
   /deep/ .el-checkbox__label{
     font-size: calc(14/1920*100vw);
+  }
+  .header-person /deep/ .el-checkbox-group{
+    display: inline-block;
+  }
+  .header-person /deep/ .el-checkbox{
+    margin-right:45px;
   }
 </style>
 <style>

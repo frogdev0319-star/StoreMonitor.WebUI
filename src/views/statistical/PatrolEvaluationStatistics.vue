@@ -626,8 +626,8 @@
         pageStore:1,
         sizeNumStore:10,
         curRegionArray: [],
-        exportDataHeader:['门店名称','平均巡店周期','评估次数','优秀','合格','待改善', '立即督导','合格率'], //需要导出数据的表头
-        exportRegionHeader:['区域名称','平均巡店周期','评估次数','优秀','合格','待改善', '立即督导','合格率'], //需要导出数据的表头
+        exportDataHeader:['门店名称','平均巡店周期','评估次数','合格','待改善', '立即督导','合格率'], //需要导出数据的表头
+        exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格','待改善', '立即督导','合格率'], //需要导出数据的表头
         regionParams: {},
         chartParams:{},
         chartArrayData: [],
@@ -673,74 +673,72 @@
         let self = this
         self.ispdf=true
         require.ensure([], async() => {
-          let LoadRegionTable = 0
-          let LoadStoreTable = 0
           // 区域表
-          let size= self.totalRegion;
-          let params = {};
-          params.beginTs = self.params.beginTs;
-          params.endTs = self.params.endTs;
-          params.filter = {"page": 0, "size": size};
-          params.order = self.regionOrder;
-          let region = 1;
-          if(self.curCity.length > 0){
-            region = 2;
-          }
-          else{
-            region = 1;
-          }
-          params.regionMode = region;
-          params.storeIds = self.params.storeIds;
-          let regionResult = await self.getInspectStatsOverviewWithRegion(params);
-          if (regionResult.errCode == 0) {
-            let result = regionResult.data;
-            if (result) {
-              result.content.forEach(item=>{
-                item.qualifiedRatePer = item.qualifiedRate + '%'
-              })
-              self.regionPDFData= result.content;
-              LoadRegionTable = 1
+          if(self.totalRegion>0){
+            let size= self.totalRegion;
+            let params = {};
+            params.beginTs = self.params.beginTs;
+            params.endTs = self.params.endTs;
+            params.filter = {"page": 0, "size": size};
+            params.order = self.regionOrder;
+            let region = 1;
+            if(self.curCity.length > 0){
+              region = 2;
+            }
+            else{
+              region = 1;
+            }
+            params.regionMode = region;
+            params.storeIds = self.params.storeIds;
+            let regionResult = await self.getInspectStatsOverviewWithRegion(params);
+            if (regionResult.errCode == 0) {
+              let result = regionResult.data;
+              if (result) {
+                result.content.forEach(item=>{
+                  item.qualifiedRatePer = item.qualifiedRate + '%'
+                })
+                self.regionPDFData= result.content;
+              }
             }
           }
           // 门店表
-          let storesize= self.totalStore;
-          let storeparams = {};
-          storeparams.beginTs = self.params.beginTs;
-          storeparams.endTs = self.params.endTs;
-          storeparams.regionMode = 3;
-          storeparams.storeIds = self.params.storeIds;
-          storeparams.filter = {
-            "page": 0,
-            "size": storesize
-          };
-          storeparams.order = self.storeOrder;
+          if(self.totalStore>0){
+            let storesize= self.totalStore;
+            let storeparams = {};
+            storeparams.beginTs = self.params.beginTs;
+            storeparams.endTs = self.params.endTs;
+            storeparams.regionMode = 3;
+            storeparams.storeIds = self.params.storeIds;
+            storeparams.filter = {
+              "page": 0,
+              "size": storesize
+            };
+            storeparams.order = self.storeOrder;
 
-          let storeResult = await self.getInspectStatsOverviewWithRegion(storeparams);
-          if (storeResult.errCode == 0) {
-            let result = storeResult.data;
-            if (result) {
-              result.content.forEach(item=>{
-                item.qualifiedRatePer = item.qualifiedRate + '%'
-              })
-              self.storePDFData = result.content
-              LoadStoreTable = 1
+            let storeResult = await self.getInspectStatsOverviewWithRegion(storeparams);
+            if (storeResult.errCode == 0) {
+              let result = storeResult.data;
+              if (result) {
+                result.content.forEach(item=>{
+                  item.qualifiedRatePer = item.qualifiedRate + '%'
+                })
+                self.storePDFData = result.content
+              }
             }
           }
-          if(LoadRegionTable == 1&&LoadStoreTable == 1){
-            setTimeout(()=>{
-              self.getPdf()
-              if(sessionStorage.getItem('startPDF')=='start'){
-                sessionStorage.removeItem('startPDF','start');
-                if(sessionStorage.getItem('endPDF')=='end'){
-                  sessionStorage.removeItem('endPDF','end');
-                  setTimeout(()=>{
-                    self.ispdf=false
-                  },1000)
-                }
-              }
-            },1000)
-          }
         })
+        setTimeout(()=>{
+          self.getPdf()
+          if(sessionStorage.getItem('startPDF')=='start'){
+            sessionStorage.removeItem('startPDF','start');
+            if(sessionStorage.getItem('endPDF')=='end'){
+              sessionStorage.removeItem('endPDF','end');
+              setTimeout(()=>{
+                self.ispdf=false
+              },1000)
+            }
+          }
+        },1000)
       },
       regionSortChange(col){
         let self=this;
@@ -1319,7 +1317,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportRegionHeader; // 导出的表头名
-          const filterVal = ['region','cycleOfInspect','numOfReport','numOfExcellent','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer']; // 导出的表头字段名
+          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer']; // 导出的表头字段名
           let self=this;
           let size= self.totalRegion;
           let params = {};
@@ -1365,7 +1363,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportDataHeader; // 导出的表头名
-          const filterVal = ['region','cycleOfInspect','numOfReport','numOfExcellent','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer']; // 导出的表头字段名
+          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer']; // 导出的表头字段名
           let self=this;
           let size= self.totalStore;
           let params = {};
@@ -2156,14 +2154,6 @@
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
   }
- @media print {
-  }
-  .LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0 20px 30px;
-  }
   .statistics-container{
     /*margin-bottom: 20px;*/
     .statistics-header{
@@ -2530,6 +2520,12 @@
   }
 </style>
 <style>
+.LoadDialog /deep/ .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0px 20px 30px 20px;
+  }
 .el-table__body-wrapper::-webkit-scrollbar{
     height: 8px;
 }

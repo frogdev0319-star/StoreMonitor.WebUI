@@ -568,7 +568,9 @@
       handleDown(){
         let self = this
         self.ispdf=true
-        self.eventPDFData = self.allEventData;
+        if(self.total > 0){
+          self.eventPDFData = self.allEventData;
+        }
         setTimeout(()=>{
           self.getPdf()
           if(sessionStorage.getItem('startPDF')=='start'){
@@ -1564,12 +1566,6 @@
     box-sizing: border-box;
     font-family: Roboto, Arial, 'Microsoft YaHei';
   }
-  .LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0 20px 30px;
-  }
   .el-overview-content {
     width: 100%;
     position: relative;
@@ -1996,6 +1992,12 @@
 </style>
 <style>
   @import '../../assets/css/pagination.css';
+  .LoadDialog /deep/ .el-dialog__header{
+    padding-bottom:0;
+  }
+  .LoadDialog /deep/ .el-dialog__body{
+    padding:0px 20px 30px 20px;
+  }
   .date-picker-poper .el-button--text{
     visibility: hidden !important;
   }

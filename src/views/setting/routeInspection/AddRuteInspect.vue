@@ -1,7 +1,7 @@
 <template>
     <el-row class="el-addrute">
         <el-col :span="24" class="el-rute-title">
-            <span class="tab-name" v-if="!showEditTab">{{tabNameLang}}<i class="iconfont icon-bianji icon-tabname"
+            <span class="tab-name" v-if="!showEditTab">{{routeName}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></span>
             <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="tabName"></el-input>
             <div class="iconcontent" v-if="showEditTab" style="margin-top:28px;">
@@ -77,7 +77,7 @@
                         </div>
                         <div class="group-name-middle">
                             <region-multi-select :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
-                             :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)"></region-multi-select>
+                             :inputSize="`mini`" :selected="ModelAddPost" @changeInput="changeAddSelect(arguments)"></region-multi-select>
                         </div>
                         <div class="group-name-right">
                             <div class="iconcontent">
@@ -246,6 +246,7 @@ export default {
             groupTitle: this.$t('insSettingView.category'),
             tabName:'',
             ModelPost:[],
+            ModelAddPost:[],
             groupList:[],
             groupNameTemp:'',  //临时存放
             groupNameInput:'',
@@ -272,6 +273,7 @@ export default {
             bindStoreList:[],
             lang: this.$i18n.locale,
             tabNameLang: this.$route.params.tabNameLang,
+            routeName:this.$route.params.routeName,
             titleList: [],
             tableData:[],
             noData:''
@@ -414,6 +416,10 @@ export default {
         changeSelect(val){
             let self = this;
             self.ModelPost = Array.from(val)[0]; // 选中的职务
+        },
+        changeAddSelect(val){
+            let self = this;
+            self.ModelAddPost = Array.from(val)[0]; // 选中的职务
         },
         confirmAddGroup(){
             let self=this;
@@ -1476,6 +1482,10 @@ export default {
         }
       }
     }
+    #el-menuscrollbar /deep/ .el-select--mini{
+        width:calc(150/1920*100vw);
+        min-width: 85px;
+    }
 </style>
 <style>
 .el-dialog__body{
@@ -1486,9 +1496,5 @@ export default {
 }
 .nape-input .el-textarea__inner{
     font-family: Roboto, Arial, 'Microsoft YaHei';
-}
-#el-menuscrollbar /deep/ .el-select--mini{
-    width:calc(150/1920*100vw);
-    min-width: 85px;
 }
 </style>

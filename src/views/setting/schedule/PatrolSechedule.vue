@@ -1,31 +1,42 @@
 <template>
   <el-row class="schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
     <div class="el-schedule-header">
-      <el-col :span="7" class="el-schedule-btns">
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
+      <el-col :span="24" class="el-schedule-btns">
+        <div class="left-title">
+          <span class="title">{{generateScheduleLang('scheduleTitle')}}</span>
+          <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
+            <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
+          </el-select>
+          <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolList">
+            <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
+          </el-select>
+        </div>
+        <div class="right-title">
+          <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
                    @click="addScheduleButton">
-          <div class="btn-area">
-            <i class="iconfont el-icon-plus"></i>
-            <span>{{generateScheduleLang('addSchedule')}}</span>
-          </div>
-        </el-button>
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
-                   @click="deleteScheduleButton"
-                   :disabled="Number(activeName) == 0? true: false"
-        >
-          <div class="btn-area">
-            <i class="iconfont icon-shanchu"></i>
-            <span>{{generateScheduleLang('delete')}}</span>
-          </div>
-        </el-button>
+            <div class="btn-area">
+              <i class="iconfont el-icon-plus"></i>
+              <span>{{generateScheduleLang('addSchedule')}}</span>
+            </div>
+          </el-button>
+          <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
+                    @click="deleteScheduleButton"
+                    :disabled="Number(activeName) == 0? true: false"
+          >
+            <div class="btn-area">
+              <i class="iconfont icon-shanchu"></i>
+              <span>{{generateScheduleLang('delete')}}</span>
+            </div>
+          </el-button>
+        </div>
       </el-col>
-      <el-col :span="18" class="el-schedule-tabs">
-        <el-tabs v-model="activePatrol" @tab-click="changePatrol" id="patrol-content">
-          <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index" >
-          </el-tab-pane>
-          <remote-detail ref="remoteHandle" v-on:sendActiveName = "changeActiveName" :active-patrol = 'activePatrol'></remote-detail>
+      <el-col :span="24" class="el-schedule-tabs">
+        <!-- <el-tabs v-model="activePatrol" @tab-click="changePatrol" id="patrol-content"> -->
+          <!-- <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index" > -->
+          <!-- </el-tab-pane> -->
+          <remote-detail ref="remoteHandle" v-on:sendActiveName = "changeActiveName" @paneList="getpaneList" :active-patrol = 'activePatrol'></remote-detail>
           <!--<onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>-->
-        </el-tabs>
+        <!-- </el-tabs> -->
       </el-col>
     </div>
   </el-row>
@@ -56,17 +67,47 @@
         lang: this.$i18n.locale,
         activeName: '0',
         activePatrol: '0',
+        isActive:'',
+        isActivePatrol:'',
+        paneLength:0
       }
     },
     methods: {
       generateScheduleLang,
       addScheduleButton() {
         let self = this;
-        self.$refs.remoteHandle.addSchedule();
+        if(self.paneLength==10||self.paneLength>10){
+          if(self.isActive==0){
+            self.notify(self.$t('insSettingView.SchdRemoteLength'),'warning',3000);
+            return false;
+          }else{
+            self.notify(self.$t('insSettingView.SchdOnsiteLength'),'warning',3000);
+            return false;
+          }          
+        }else{
+          self.$refs.remoteHandle.addSchedule();
+        }
+      },
+      changePatrolType(val){
+
+      },
+      changePatrolList(val){
+        
+      },
+      notify(msg,type,time) {
+          this.$message({
+              message: msg,
+              type: type,
+              duration:time
+          });
       },
       changeActiveName(val) {
         console.log(val + 'from sun')
         this.activeName = val;
+      },
+      getpaneList(val){
+        console.log('排程个数',val)
+        this.paneLength = val
       },
       deleteScheduleButton() {
         let self = this;
@@ -129,7 +170,7 @@
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
   }
-
+  
   .el-add-btn{
     color: #fff;
     position: relative;
@@ -220,14 +261,28 @@
       .el-schedule-tabs {
         width: 98%;
         @include point(margin-left, 10);
+        margin-top: 30px;
       }
       .el-schedule-btns {
         position: absolute;
         @include point(right, 30);
-        z-index: 10;
-        width: auto;
+        width: 98%;
+        padding-left: 22px;
         @include point(top, 20);
         display: flex;
+        .left-title{
+          flex:1;
+          text-align: left;
+          .title{
+            font-size: 16px;
+            color:#182752;
+            font-weight: 600;
+          }
+          .el-select{
+            margin-left:calc(30/1920*100vw);
+            width:200px;
+          }
+        }
       }
     }
     #patrol-content /deep/ .el-tabs__nav-scroll{
@@ -267,7 +322,13 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(162, 162, 163);
   }
-
+  .el-schedule-btns /deep/ .el-input__inner{
+    color:#7d8cad;
+    background-color: #f4f5f9;
+    font-size: 14px;
+    text-align: left;
+    height:35px;
+  }
 </style>
 <style>
   #el-menuscrollbar .el-scrollbar__wrap {

@@ -668,7 +668,13 @@ export default {
             }
         },
         delAllItem(){
-            this.showSingleDeleteContent=true
+            let datalength = this.elTableData[Number(this.activeName)].data.length
+            if(datalength==0){
+                this.notify(this.$t('insSettingView.deletePatrolList'),'warning',3000);
+                return false;
+            }else{
+                this.showSingleDeleteContent=true
+            }
         },
         confirmDelete(){
             let self=this;

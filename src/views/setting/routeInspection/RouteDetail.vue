@@ -2,7 +2,7 @@
     <div class="detail-container" style="height:auto;" :style="{'min-height':varyWindowWidth*0.70+'px'}">
         <el-row>
             <el-col :span="24" class="detail-title">
-                <span class="title-title " v-if="routeData.length!=0">{{tabNameLang}}&nbsp;{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
+                <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
                   {{itemNum}} {{generateInsSettingLang('item')}}</span>
                 <div class="route-btns">
                      <el-button
@@ -76,9 +76,9 @@
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
                         <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
-                    <div class="table-right-post">
+                    <div class="table-right-post" @click="bindPatrol(index,item)">
                         <i class="iconfont icon-quxiaolianjie"></i>
-                        <span class="post-label" @click="bindPatrol">关联职务:</span>
+                        <span class="post-label">关联职务:</span>
                         <span>管理员，店长，督导主管，督导</span>
                     </div>
                      <div v-if="item.itemData.length!=0" class="table-class">
@@ -550,12 +550,12 @@ export default {
             let self=this;
             sessionStorage.setItem('NapeItem',JSON.stringify(self.routeData));
             sessionStorage.setItem('GroupName',self.tabName);
-            self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang}});
+            self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}});
             console.log(self.routeData);
         },
-        bindPatrol(){
+        bindPatrol(index,item){
             let self=this;
-            self.$router.push({name:'bindStore',params:''});
+            self.$router.push({name:'itemSetting',params:{}}); //点击超链接进入巡检项设置页面，对应index的巡检项应显示编辑状态
         },
         downLoadModel(){
             let self=this;

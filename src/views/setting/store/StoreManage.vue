@@ -89,12 +89,12 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column prop="schedue"
+            <!-- <el-table-column prop="schedue"
                 :label="generateStoreLang('bindSchedule')"
                 min-width="100"
                 align="left">
 
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column
                 prop="option"
                 :label="generateStoreLang('operation')"

@@ -15,11 +15,11 @@
               <span style="min-width:100px;display:inline-block;">
                 <el-input v-model="supervisorName" disabled size="mini" class='input'></el-input></span>
             </div>
-            <div class="store-handle">
+            <!-- <div class="store-handle">
               <el-col :span="24" class="header-details1">
                 <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{generateStoreLang('bindSchedule')}}<span class="storename-str" style="margin-left:20px;">{{schedule}}</span></span>
               </el-col>
-            </div>
+            </div> -->
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
             <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
@@ -503,12 +503,14 @@ export default {
                 font-family: Roboto,"Microsoft YaHei";
                 font-weight: bold;
                 color: #94A4B4;
+                font-size: 14px;
                 // width: 100px;
                 // overflow: hidden;
                 // text-overflow: ellipsis;
             }
             #patrltabs-content /deep/ .el-tabs__item.is-active{
                 color: #f31d65;
+                font-weight: bold;
             }
             .el-table-title{
                 line-height: 40px;
