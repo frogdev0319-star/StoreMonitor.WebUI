@@ -184,3 +184,24 @@ export const getInspectReportDetail=params=>{
         params
     })
 }
+export const BindInspectGroup=data=>{
+    return request({
+        url:`${version}/inspect/group/bind`,
+        method:'post',
+        data
+    })
+}
+export const UnbindInspectGroupAndTitle=data=>{
+    return request({
+        url:`${version}/inspect/group/unbind`,
+        method:'post',
+        data
+    })
+}
+export const GetInspectTagList=params=>{
+    return request({
+        url:`${version}/inspect/tag/list`,
+        method:'get',
+        params
+    })
+}

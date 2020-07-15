@@ -690,13 +690,8 @@ export default {
             console.log(ret);
             let datalength = self.elTableData[Number(self.activeName)].data.length
             if(datalength>10||datalength==10){
-                if(self.activeName=='0'){
-                    self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
-                    return false;
-                }else if(self.activeName=='1'){
-                    self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
-                    return false;
-                }
+                self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
+                return false;
             }else{
                 self.showNameImport=true
                 self.ImportName=''

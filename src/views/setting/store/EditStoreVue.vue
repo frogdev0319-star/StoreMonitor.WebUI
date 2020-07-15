@@ -22,40 +22,39 @@
             </div> -->
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
-            <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
-                <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" ></el-tab-pane>
-            </el-tabs>
-            <div class="el-table-title tabTitle">
-                <span class="name-title">{{generateStoreLang('patrolName')}}</span>
-                <span class="schedule-title">{{generateStoreLang('bindChanel')}}</span>
-            </div>
-            <!-- <div v-if="scheduleData.length!=0"> -->
-                <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index" >
-                    <span class="grouptitle">
-                        {{item.napeName}}（{{item.napeNum}}）
-                    </span>
-                    <div class="schedule-data">
-                        <div v-for="(_item,_index) in item.itemData" :key="_index" :class="!_item.isClick?'noraml-color':'active-color'"
-                        class="schedule-detials" style="overflow:hidden;" @click="clickItem(_item,_index)">
-                            <span class="nape-title">
-                                {{`${_index+1}. ${_item.subject}`}}
-                            </span>
-<!--                            <el-select v-model="_item.channelvalue" size="mini"  @focus="clickItem(_item,_index)" multiple  collapse-tags>-->
-<!--                                <el-option-->
-<!--                                v-for="item in alleList"-->
-<!--                                :key="item.name"-->
-<!--                                :label="item.name"-->
-<!--                                :value="item.name">-->
-<!--                                </el-option>-->
-<!--                            </el-select>-->
-                          <limit-select :selected="_item.channelvalue" :options="alleList" :inputSize="`mini`"
-                                        @changeInput="changeDeviceId($event, _item)"  @changeIfSelect="changeSelect($event, _item,_index)" class="nape-value"></limit-select>
+            <p class="tab-title">{{$t('insSettingView.editStore')}}</p>
+            <div class="tab-main">
+                <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
+                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" ></el-tab-pane>
+                </el-tabs>
+                <div class="el-table-title tabTitle">
+                    <span class="name-title">{{generateStoreLang('patrolName')}}</span>
+                    <span class="schedule-title">{{generateStoreLang('bindChanel')}}</span>
+                </div>
+                    <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index" >
+                        <span class="grouptitle">
+                            {{item.napeName}}（{{item.napeNum}}）
+                        </span>
+                        <div class="schedule-data">
+                            <div v-for="(_item,_index) in item.itemData" :key="_index" :class="!_item.isClick?'noraml-color':'active-color'"
+                            class="schedule-detials" style="overflow:hidden;" @click="clickItem(_item,_index)">
+                                <span class="nape-title">
+                                    {{`${_index+1}. ${_item.subject}`}}
+                                </span>
+                            <!-- <el-select v-model="_item.channelvalue" size="mini"  @focus="clickItem(_item,_index)" multiple  collapse-tags>
+                                <el-option
+                                v-for="item in alleList"
+                                :key="item.name"
+                                :label="item.name"
+                                :value="item.name">
+                                </el-option>
+                            </el-select> -->
+                            <limit-select :selected="_item.channelvalue" :options="alleList" :inputSize="`mini`"
+                                            @changeInput="changeDeviceId($event, _item)"  @changeIfSelect="changeSelect($event, _item,_index)" class="nape-value"></limit-select>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <!-- </div> -->
-            <!-- <div class="empty-text" v-else>
-            </div> -->
+            </div>
         </el-col>
     </el-row>
 </template>
@@ -75,7 +74,7 @@ export default {
     },
     data(){
         return{
-            elTableData:[{label:'远程巡检一'},{label:'远程巡检二'},{label:'远程巡检三'},{label:'远程巡检四'},{label:'远程巡检五'}],
+            elTableData:[{label:'远程巡检一'},{label:'远程巡检二'},{label:'test'},{label:'远程巡检四'},{label:'远程巡检五'}],
             activeName:'',
             curTag:'远程巡检',
             storeTitle:'',
@@ -413,12 +412,9 @@ export default {
         cursor: pointer;
     }
     .el-storeEdit-content{
-      border: 1px solid $border;
-      background-color: #fff;
-        padding-left: calc(40/1920*100vw);
-        padding-top: 25px;
-        padding-right: calc(15/1920*100vw);
         .storeEdit-header{
+            background-color: #fff;
+            padding:30px calc(50/1920*100vw) 30px calc(80/1920*100vw);
             .store-title{
                 overflow: hidden;
                 text-align: left;
@@ -486,9 +482,21 @@ export default {
             }
         }
         .storeEdit-content{
-            margin-top: 25px;
-            margin-bottom: 25px;
-            background-color: #F6F7FB;
+            margin: 30px;
+            background-color: #fff;
+            padding:30px;
+            width:96%;
+            .tab-main{
+                background-color: #f6f7fb;
+                border: 1px solid $border;
+            }
+            .tab-title{
+                text-align: left;
+                font-size: calc(14/1920*100vw);
+                color:#182752;
+                font-weight: bold;
+                margin: 0 0 10px 0;
+            }
             #patrltabs-content{
                 line-height: 60px;
                 height: 60px;
@@ -497,20 +505,19 @@ export default {
                 padding-left: 35px;
             }
             #patrltabs-content /deep/ .el-tabs__active-bar{
-                height: 4px;
+                height: 5px;
             }
             #patrltabs-content /deep/ .el-tabs__item {
-                font-family: Roboto,"Microsoft YaHei";
                 font-weight: bold;
                 color: #94A4B4;
-                font-size: 14px;
-                // width: 100px;
+                font-size: calc(14/1920*100vw);
+                min-width: 150px;
                 // overflow: hidden;
                 // text-overflow: ellipsis;
             }
             #patrltabs-content /deep/ .el-tabs__item.is-active{
                 color: #f31d65;
-                font-weight: bold;
+                font-size: calc(16/1920*100vw);
             }
             .el-table-title{
                 line-height: 40px;
@@ -519,7 +526,7 @@ export default {
                 border-bottom: 1px solid #ddd;
                 margin:auto 10px;
                 color: #94A4B4;
-                font-size: 14px;
+                font-size: calc(12/1920*100vw);
                 font-weight: bold;
                 .name-title{
                     width: 40%;

@@ -39,12 +39,12 @@
           <table class="table table-bordered">
             <thead>
             <tr>
-              <th :style="isexportPDF?'font-size:10px;':'font-size:14px;'" scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
+              <th class="thPrintfont" scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-              <td class="icon-td" :style="isexportPDF?'font-size:8px;':'font-size:12px;'">
+              <td class="icon-td tdPrintfont">
                 <div class="icon-content">
                   <div class="icon-blag"
                        :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">
@@ -53,8 +53,8 @@
                   <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div>
               </td>
               <!-- <td><span>{{item.numOfExcellentItems}}</span></td> -->
-              <td><span>{{item.numOfQualifiedItems}}</span></td>
-              <td><span>{{item.numOfUnqualifiedItems}}</span></td>
+              <td class="tdPrintfont"><span>{{item.numOfQualifiedItems}}</span></td>
+              <td class="tdPrintfont"><span>{{item.numOfUnqualifiedItems}}</span></td>
             </tr>
             </tbody>
           </table>
@@ -726,8 +726,8 @@
                 formatter: (params) => {
                   console.log(params);
                   let str = '';
-                  if (params.length > 5) {
-                    str = params.substr(0, 5) + '...';
+                  if (params.length > 10) {
+                    str = params.substr(0, 10) + '...';
                   }
                   else {
                     str = params;
@@ -861,6 +861,8 @@
   .cdm-voice{ page-break-inside:avoid;}
   .cdm-word{ page-break-inside:avoid;}
   .cdm-pic{ page-break-inside:avoid;}
+  .thPrintfont{font-size: 10px;}
+  .tdPrintfont{font-size: 8px;}
   }
   $red: #f31d65;
   $black: #182752;

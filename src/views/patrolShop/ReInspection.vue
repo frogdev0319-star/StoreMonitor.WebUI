@@ -392,9 +392,10 @@
             </el-tabs>
             <div class="patrol-select">
                <div class="patrol-content">
-                    <p class="patrol-title">请选择，西安一店关联巡检表</p>
-                    <el-select v-model="patrolstore" placeholder="请选择" class="patrol-elselect">
-                        <el-option v-for="item in PatrolList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    <p class="patrol-title" v-if="lang!= 'en'">{{$t('storeView.selectPlaceholder')}}，<span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span>{{$t('storeView.bindInspectList')}}</p>
+                    <p class="patrol-title" v-if="lang== 'en'">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span></p>
+                    <el-select v-model="patrolstore" :placeholder="$t('storeView.selectPlaceholder')" class="patrol-elselect" @change="changePatrolList">
+                        <el-option v-for="item in PatrolList" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                </div>
             </div>
@@ -593,6 +594,7 @@ export default {
             curTabItem:null,
             curStoreIndex:0,
             curStoreItem:null, //当前点击的门店对象
+            patrolStoreName:null,
 
             inspectItemList:[],
             allInspectItemList:[], //当前全部没有忽略的巡检项
@@ -1692,8 +1694,10 @@ export default {
                         let storeObj={
                             storeId:curStoreId
                         };
+                        self.patrolStoreName = storeData[0].name
+                        self.PatrolList=storeData[0].authorizedInspect //门店对应巡检表
                         self.saveStoreObj(storeObj);
-                        self.getInspectByStore(self.tabList[0].storeList[0].storeId);
+                        // self.changePatrolList(self.tabList[0].storeList[0].storeId);
                         self.getChannelByStore(self.tabList[0].storeList[0]);
                     }
                     else{
@@ -2101,62 +2105,10 @@ export default {
         },
         getInspectByStore(storeId){
             let self=this;
-            self.inspectItemList=[];
-            let params={
-                storeId:self.store.storeId,
-                mode:0
-            }
-          checkOutInspectItemV3(params).then(res=>{
-                if(res.errCode==0){
-                    let data=res.data.groups;
-                    let temp=[];
-                    data.forEach((item,index)=>{
-                        let obj={};
-                        obj.groupId=item.groupId;
-                        obj.mode=item.mode;
-                        obj.groupName=item.groupName;
-                        obj.dealCount=0;
-                        if(index==0){
-                            obj.isClick=true;
-                        }
-                        else{
-                            obj.isClick=false;
-                        }
-                        let tempItems=[];
-                        item.items.forEach((_item,_index)=>{
-                            let itemObj={};
-                            itemObj.id=_item.id;
-                            itemObj.groupId=item.groupId;
-                            itemObj.subject=_item.subject;
-                            itemObj.description=_item.description;
-                            itemObj.itemScore='--';
-                            itemObj.itemScoreTitle='--';
-                            //itemObj.deviceId=_item.deviceId;
-                            itemObj.deviceId=_item.deviceIds;
-                            itemObj.inspectInput='';
-                            itemObj.inputCount=0;
-                            itemObj.disabled=true;
-                            itemObj.checked=false;   //是否选中状态
-                            itemObj.isIgnore=false;  //是否被忽略
-                            itemObj.Ruletip=false;  //是否显示提示语
-                            itemObj.sourceList=[];
-                            tempItems.push(itemObj);
-                        })
-                        obj.items=tempItems;
-                        temp.push(obj);
-                    })
-                    self.inspectList=temp;
-                    let feedobj={
-                        groupId:'feedBack',
-                        groupName: self.$t('remotePatrol.feedbacks'), //问题反馈
-                        isClick:false,
-                    }
-                    if(self.inspectList.length!=0){
-                        self.inspectList.push(feedobj);
-                        self.getItemByGroup(self.inspectList[0],0);
-                    }
-                }
-            })
+            // self.inspectItemList=[];
+        //   checkOutInspectItemV3(params).then(res=>{
+        //         
+        //     })
         },
         leaveDialog(){
           let self=this;
@@ -2680,6 +2632,8 @@ export default {
         //切换门店
         changeStore(item,index,_item,_index){
             let self=this;
+            self.patrolStoreName = _item.name
+            self.PatrolList=_item.authorizedInspect // 现在 门店对应的巡检表
             _item.isActive=true;
             self.showStoreUp=true;
             if(!self.isEzviz){
@@ -2714,7 +2668,7 @@ export default {
             }
             self.store=obj;
             let curStoreId='';
-            self.getInspectByStore(self.store.storeId);
+            // self.getInspectByStore(self.store.storeId); //以前 获取门店对应的巡检表
             let tabIndex=Number(self.activeIndex);
             if(tabIndex!=2){
                 item.storeList.forEach((itemS,indexS)=>{
@@ -2854,6 +2808,72 @@ export default {
             let self=this;
             self.noStoreUser.dialogCosed=false;
             self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+        },
+        changePatrolList(val){
+            let self = this;
+            let tagName=''
+            self.PatrolList.forEach(item=>{
+                if(item.id==val){
+                    tagName=item.name
+                }
+            })
+            let params={
+                storeId:self.store.storeId,
+                authorizedOnly:1,
+                tagName:tagName
+            }
+            self.inspectItemList=[];
+            checkOutInspectItemV3(params).then(res=>{
+                if(res.errCode==0){
+                    let data=res.data.groups;
+                    let temp=[];
+                    data.forEach((item,index)=>{
+                        let obj={};
+                        obj.groupId=item.groupId;
+                        obj.mode=item.mode;
+                        obj.groupName=item.groupName;
+                        obj.dealCount=0;
+                        if(index==0){
+                            obj.isClick=true;
+                        }
+                        else{
+                            obj.isClick=false;
+                        }
+                        let tempItems=[];
+                        item.items.forEach((_item,_index)=>{
+                            let itemObj={};
+                            itemObj.id=_item.id;
+                            itemObj.groupId=item.groupId;
+                            itemObj.subject=_item.subject;
+                            itemObj.description=_item.description;
+                            itemObj.itemScore='--';
+                            itemObj.itemScoreTitle='--';
+                            //itemObj.deviceId=_item.deviceId;
+                            itemObj.deviceId=_item.deviceIds;
+                            itemObj.inspectInput='';
+                            itemObj.inputCount=0;
+                            itemObj.disabled=true;
+                            itemObj.checked=false;   //是否选中状态
+                            itemObj.isIgnore=false;  //是否被忽略
+                            itemObj.Ruletip=false;  //是否显示提示语
+                            itemObj.sourceList=[];
+                            tempItems.push(itemObj);
+                        })
+                        obj.items=tempItems;
+                        temp.push(obj);
+                    })
+                    self.inspectList=temp;
+                    let feedobj={
+                        groupId:'feedBack',
+                        groupName: self.$t('remotePatrol.feedbacks'), //问题反馈
+                        isClick:false,
+                    }
+                    if(self.inspectList.length!=0){
+                        self.inspectList.push(feedobj);
+                        self.getItemByGroup(self.inspectList[0],0);
+                    }
+                }
+            })
         },
         clickStore(item,index,_item,_index){
             let self=this;

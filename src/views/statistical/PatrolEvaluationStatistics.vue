@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row class="statistics-container">
-      <el-col :span="24" class="statistics-header no-print">
+      <el-col :span="24" class="statistics-header">
         <el-col :span="24" class="header-details">
           <span>{{generateReportLang('selectStores')}}</span>
           <el-select v-model="curCountry"  :placeholder="generateReportLang('country')" size="mini"
@@ -127,14 +127,12 @@
               {{$t('overview.regionalList')}}
             </span>
               <div class="exprotBtn">
-                <div class="no-print">
                   <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                     <div class="btn-area">
                       <img :src="exportPng" class="icon-excel">
                       <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                     </div>
                   </el-button>
-                </div>
               </div>
             </div>
           </el-col>
@@ -185,14 +183,12 @@
               {{$t('overview.storeList')}}
             </span>
               <div class="exprotBtn">
-                <div class="no-print">
                   <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="exportStore2Excel" >
                     <div class="btn-area">
                       <img :src="exportPng" class="icon-excel">
                       <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                     </div>
                   </el-button>
-                </div>
               </div>
             </div>
           </el-col>

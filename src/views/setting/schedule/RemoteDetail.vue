@@ -207,7 +207,7 @@
               <div class="el-bind-footer">
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
-                    <span>{{generateScheduleLang('saveAndUse')}}</span>
+                    <span>{{generateScheduleLang('saveAndApply')}}</span>
                   </el-button>
                 </div>
               </div>

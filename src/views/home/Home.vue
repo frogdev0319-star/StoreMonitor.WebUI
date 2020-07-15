@@ -242,6 +242,7 @@
           case '/patrolItem':
           case '/supervisorStat':
           case '/eventStat':
+          case '/storedetail':
           {
             flag= true;
             break

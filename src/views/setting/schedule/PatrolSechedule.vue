@@ -77,13 +77,8 @@
       addScheduleButton() {
         let self = this;
         if(self.paneLength==10||self.paneLength>10){
-          if(self.isActive==0){
             self.notify(self.$t('insSettingView.SchdRemoteLength'),'warning',3000);
-            return false;
-          }else{
-            self.notify(self.$t('insSettingView.SchdOnsiteLength'),'warning',3000);
-            return false;
-          }          
+            return false;         
         }else{
           self.$refs.remoteHandle.addSchedule();
         }

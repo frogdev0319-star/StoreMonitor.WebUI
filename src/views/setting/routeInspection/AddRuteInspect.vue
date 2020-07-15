@@ -3,7 +3,7 @@
         <el-col :span="24" class="el-rute-title">
             <span class="tab-name" v-if="!showEditTab">{{routeName}}<i class="iconfont icon-bianji icon-tabname"
              @click="editTabName"></i></span>
-            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="tabName"></el-input>
+            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="editRouteName"></el-input>
             <div class="iconcontent" v-if="showEditTab" style="margin-top:28px;">
                 <div class="iconlised" @click="confirmEditTab">
                     <i class="el-icon-check"></i>
@@ -274,6 +274,7 @@ export default {
             lang: this.$i18n.locale,
             tabNameLang: this.$route.params.tabNameLang,
             routeName:this.$route.params.routeName,
+            editRouteName:'',
             titleList: [],
             tableData:[],
             noData:''
@@ -332,6 +333,7 @@ export default {
         editTabName(){
             let self=this;
             self.showEditTab=true;
+            self.editRouteName = self.routeName
         },
         confirmEditTab(){
             console.log('修改tab');
@@ -364,7 +366,7 @@ export default {
             let self=this;
         },
 
-        confirmEditGroup(index,item){
+        async confirmEditGroup(index,item){
             let self=this;
             let temp=[];
             if(item.groupName==null||item.groupName.length==0){
@@ -384,6 +386,19 @@ export default {
             let params={
                 "groups":temp
             };
+            // let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
+            // resUpdateGroup = await self.updateGroup(params)
+            // resUnbindGroup = await self.unbindGroup(paramsUnbind)
+            // if(resUnbindGroup == null || resUnbindGroup.errMsg=='Success'){
+            //     resBindGroup=await self.bindGroup(paramsBind);
+            // }
+            // if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
+            //     self.notify(self.$t('deviceView.editSuss'),'success',3000);
+            //     item.isEdit=false;
+            // }else{
+            //     self.notify(self.$t('deviceView.editFail'),'warning',3000);
+            //     return false;
+            // }
             inpectRESTful.updateInspectGroup(params).then(res=>{
                 console.log(res);
                 let codeMsg=res.errMsg;
@@ -396,6 +411,30 @@ export default {
                     return false;
                 }
             })
+        },
+        updateGroup(params){
+          return new Promise((resolve,reject)=>{
+            inpectRESTful.updateInspectGroup(params).then(res=>{
+              console.log(res);
+              resolve(res);
+            })
+          })
+        },
+        unbindGroup(params){
+          return new Promise((resolve,reject)=>{
+            inpectRESTful.UnbindInspectGroupAndTitle(params).then(res=>{
+              console.log(res);
+              resolve(res);
+            })
+          })
+        },
+        bindGroup(params){
+          return new Promise((resolve,reject)=>{
+            inpectRESTful.BindInspectGroup(params).then(res=>{
+              console.log(res);
+              resolve(res);
+            })
+          })
         },
         cancelEditGroup(index,item){
             let self=this;
@@ -786,6 +825,13 @@ export default {
                 })
             })
         },
+        getPersonData(){
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectTagList().then(res=>{
+                    resolve(data);
+                })
+            })
+        },
         getBindStoreList(){
             let self=this;
             let tagName=self.tabName;
@@ -802,6 +848,7 @@ export default {
             let self=this;
             let curTag=self.tabName;
             let allData=await self.getAllData();
+            // let personData=await self.getPersonData()
             let data=util.getRouteByTag(curTag,allData);
             console.log(data);
             let temp=[];
