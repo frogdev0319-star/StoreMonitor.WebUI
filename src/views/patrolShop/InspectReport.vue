@@ -27,19 +27,19 @@
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="8" class="radior-content">
+        <el-col :span="6" class="radior-content">
           <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
-        <el-col :span="16" class="report-table">
+        <el-col :span="18" class="report-table">
           <table class="table table-bordered">
             <thead>
             <tr>
-              <th scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
+              <th :style="isexportPDF?'font-size:10px;':'font-size:14px;'" scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-              <td class="icon-td">
+              <td class="icon-td" :style="isexportPDF?'font-size:8px;':'font-size:12px;'">
                 <div class="icon-content">
                   <div class="icon-blag"
                        :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">
@@ -97,13 +97,13 @@
             <i class="iconfont icon-zhankai1 icontemp" v-if="!isup" style="color:#7d8cad;"></i>
             <span class="title-lable">{{$t('remotePatrol.detailInfo')}}</span>
           </div>
-          <div class="item-content" v-if="isup">
+          <div class="item-content" v-show="isup">
               <div style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;" v-for="(item,index) in groups" :key="index">
                 <div class="content-title">{{item.groupName}}</div>
-                <div class="content-detail" v-for="(_item,index) in item.items" :key="index">
+                <div class="content-detail" v-for="(_item,_index) in item.items" :key="_index">
                   <div class="content-detail-title">
                     <div class="detail-title">
-                      <p class="title1">{{index+1}}.{{_item.subject}}</p>
+                      <p class="title1">{{_index+1}}.{{_item.subject}}</p>
                       <p class="title2">{{_item.description}}</p>
                     </div>
                     <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
@@ -114,10 +114,10 @@
                   <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
                     <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
                       <div class="cdm-voice" v-if="_item.showAudio">
-                        <div class="speech-info" @click="startSpeechItem(_item,index)">
+                        <div class="speech-info" @click="startSpeechItem(_item,_index)">
                             <i class="iconfont icon-yuyin icon-speech"></i>
                         </div>
-                        <audio :ref="_item.audio.audioRef" @canplay="getCommentDuration(_item)">
+                        <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
                             <source :src="_item.audio.audioSrc" type="audio/mpeg" />
                         </audio>
                         <span class="often-text">{{_item.audio.audioOftenText}}</span>
@@ -126,15 +126,15 @@
                         <span>{{_item.comment}}</span>
                       </div>
                       <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
-                          <div v-for="(sourceitem,_index) in _item.sourceList" :key="_index" class="source-details" :height="imgHeight+'px'">
+                          <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex" class="source-details" :height="imgHeight+'px'">
                             <div v-if="sourceitem.mediaType==2" class="img-content">
-                                <img class="imgLittle imgInner" :title="imgTitle"
+                                <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
                                 :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
                                 @click="openOuter(sourceitem,$event)"/>
                             </div>
-                            <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,_index)">
+                            <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
                           </div>
                       </div>
@@ -155,7 +155,7 @@
                         <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
                             <i class="iconfont icon-yuyin icon-speech"></i>
                         </div>
-                        <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)">
+                        <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
                             <source :src="item.audio.audioSrc" type="audio/mpeg" />
                         </audio>
                         <span class="often-text">{{item.audio.audioOftenText}}</span>
@@ -166,13 +166,13 @@
                       <div class="cdm-pic" v-if="item.sourceList!=null&&item.sourceList.length!=0">
                           <div v-for="(sourceitem,index) in item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
                             <div v-if="sourceitem.mediaType==2" class="img-content">
-                                <img class="imgLittle imgInner" :title="imgTitle"
+                                <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
                                 :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
                                 @click="openOuter(sourceitem,$event)"/>
                             </div>
                             <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
                           </div>
                       </div>
@@ -447,7 +447,7 @@
 
                   if(_item.mediaType==0){
                       audioObj.audioSrc=_item.url;
-                      audioObj.audioRef='audioRef'+index;
+                      audioObj.audioRef='audioRef'+groupindex+index+_index;
                       audioObj.isPlaying=false;
                       audioObj.audioOftenText='';
                       details.showAudio=true;
@@ -528,7 +528,27 @@
                 self.showImg=true;
             }
         },
-      getCommentDuration(item){
+      getGroupsDuration(item){
+            let self=this;
+            console.log(item)
+            if(item.showAudio){
+                let audio=self.$refs[item.audio.audioRef][0];
+                let du=audio.duration;
+                console.log(du)
+                if(isNaN(du)){
+                    item.showAudio=false;
+                }
+                else{
+                    let duration = Math.floor(du);
+                    if(duration === 0){
+                      du = 1;
+                    }
+                    item.audio.audioOftenText=parseInt(du)+'"';
+                    console.log(item.audio.audioOftenText);
+                }
+            }
+        },
+        getFeedBacksDuration(item){
             let self=this;
             console.log(item)
             if(item.showAudio){
@@ -1183,7 +1203,6 @@
                             top: 30%;
                         }
                       .imgLittle{
-                        width: calc(130/1920*100vw);
                         min-width: 70px;
                       }
                     }

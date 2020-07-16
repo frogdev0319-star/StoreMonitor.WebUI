@@ -422,6 +422,10 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
+    tHeaderA:'巡检类别（必填，30字符）',
+    tHeaderB:'巡检项名称（必填，100字符）',
+    tHeaderC:'项目分值（1~100分）',
+    tHeaderD:'巡检项目详细说明（选填，300字符）',
     bindWith: '已绑定',
     bindStore: '家门店',
     bindList: '巡检表绑定',

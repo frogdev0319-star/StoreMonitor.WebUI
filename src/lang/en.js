@@ -420,6 +420,10 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
+    tHeaderA:'Inspection Category(Required, 30 characters)',
+    tHeaderB:'Inspection Items(Required, 100 characters)',
+    tHeaderC:'Score(1~100points)',
+    tHeaderD:'Inspection Item Description(Required,100 characters)',
     bindWith: 'Binded with ',
     bindStore: 'stores',
     bindList: 'Bound List',

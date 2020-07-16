@@ -88,7 +88,7 @@ Print.prototype = {
       // if(imgs.length==0){
         var img = document.createElement("img");
         img.src = imageURL;
-        img.setAttribute('style', 'max-width: 100%;');
+        img.setAttribute('style', 'width: calc(450/1920*100vw);');
         img.className = 'isNeedRemove'
         canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
       // }

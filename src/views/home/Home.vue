@@ -140,7 +140,7 @@
           </el-col>
           <el-col :sapn='24' class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.0.3 &copy; 2018-{{getFullYear}} StoreVue Ltd. All rights reserved.</p>
+              <p style="text-align:left;">v1.0.4 &copy; 2018-{{getFullYear}} StoreVue Ltd. All rights reserved.</p>
             </footer>
           </el-col>
 
