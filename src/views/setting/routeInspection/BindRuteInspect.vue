@@ -601,8 +601,7 @@ export default {
         },
         getBindStoreList(){
             let self=this;
-            let tagName=self.tabName;
-            let params={tagName:tagName};
+            let params={inspectId:self.$route.params.inspectId};
             return new Promise((resolve,reject)=>{
                 getInspectBindList(params).then(res=>{
                     console.log(res.errMsg);

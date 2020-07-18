@@ -47,7 +47,7 @@
             stripe
             :height="tableHieght"
             @sort-change='sortChange'
-            @row-click='rowClickItem'
+            @row-click='toEventDetail'
             style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;"
             :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
             :cell-style="cellStyle"
@@ -462,6 +462,7 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.supervisorId = item.supervisorId; //督导编号
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
+                    obj.authorizedInspect=item.authorizedInspect
                     obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
                     obj.schedue='--',
                     obj.device=item.device;
@@ -528,13 +529,13 @@ import {generateStoreLang} from '@/api/i18n'
             },
             toEventDetail(row){
                 let self=this;
-                sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
-                self.$router.push({name:'storeDetail',params:row});
-            },
-            rowClickItem(row,column,event){
-                let self=this;
-                sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
-                self.$router.push({name:'storeDetail',params:row});
+                if(row.authorizedInspect[0].id!=undefined){
+                    sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
+                    self.$router.push({name:'storeDetail',params:row});
+                }else{
+                    self.notify(self.$t('insSettingView.storeNoInspect'),'warning',3000);
+                    return false;
+                }
             },
             getStoreData(params){
                 let self=this;

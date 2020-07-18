@@ -8,7 +8,7 @@
             <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
           </el-select>
           <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolList">
-            <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
+            <el-option v-for="item in InspectList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>
         <div class="right-title">
@@ -34,7 +34,7 @@
         <!-- <el-tabs v-model="activePatrol" @tab-click="changePatrol" id="patrol-content"> -->
           <!-- <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index" > -->
           <!-- </el-tab-pane> -->
-          <remote-detail ref="remoteHandle" v-on:sendActiveName = "changeActiveName" @paneList="getpaneList" :active-patrol = 'activePatrol'></remote-detail>
+          <remote-detail ref="remoteHandle" v-on:sendActiveName = "changeActiveName" @paneList="getpaneList" :active-patrol = 'activePatrol' :inspectId="isActivePatrol"></remote-detail>
           <!--<onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>-->
         <!-- </el-tabs> -->
       </el-col>
@@ -47,6 +47,7 @@
   import {generateScheduleLang} from '@/api/i18n'
   import {getScheduleBindList, addNewSchedule, getScheduleListService, bindScheduleAndStore, unbindScheduleAndStore, updateSchedule,deleteScheduleService} from '@/api/schedule'
   import {getStoreList} from '@/api/store'
+  import {inpectRESTful} from '@/api/index'
   import RemoteDetail from '@/views/setting/schedule/RemoteDetail'
   import OnsiteDetail from '@/views/setting/schedule/OnsiteDetail'
   import {mapGetters} from 'vuex'
@@ -61,6 +62,7 @@
       return {
         varyWindowHeight: window.innerHeight,
         varyWindowWidth: window.innerWidth,
+        InspectList:[],
         patrolList: [{flag: 0, tag: this.$t('scheduleView.remotePatrol')}, {flag: 1, tag: this.$t('scheduleView.onsitePatrol')}],
         paneList: [],
         timeArray: ['08:00'], //选中的执行时间
@@ -74,6 +76,39 @@
     },
     methods: {
       generateScheduleLang,
+      changePatrolType(val){//获取巡检表
+            let self=this;
+            self.isActivePatrol=''
+            let params={
+                mode:val
+            }
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectTagList(params).then(res=>{
+                    let data=res.data;
+                    let InspectList=[]
+                    data.forEach(item=>{
+                      if(item.appliedTo.length!=0){
+                        item.appliedTo.forEach(app_item=>{
+                          if(app_item.roleId==3||app_item.roleId==4){
+                            let obj={}
+                            obj.id=item.id
+                            obj.name=item.name
+                            InspectList.push(obj)
+                          }
+                        })
+                      }
+                    })
+                    self.InspectList=InspectList
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                })
+
+            })
+        },
+      changePatrolList(val){
+
+      },
       addScheduleButton() {
         let self = this;
         if(self.paneLength==10||self.paneLength>10){
@@ -82,12 +117,6 @@
         }else{
           self.$refs.remoteHandle.addSchedule();
         }
-      },
-      changePatrolType(val){
-
-      },
-      changePatrolList(val){
-        
       },
       notify(msg,type,time) {
           this.$message({

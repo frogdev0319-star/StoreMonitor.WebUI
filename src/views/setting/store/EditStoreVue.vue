@@ -25,7 +25,7 @@
             <p class="tab-title">{{$t('insSettingView.editStore')}}</p>
             <div class="tab-main">
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
-                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="item.label" ></el-tab-pane>
+                    <el-tab-pane v-for="(item,index) in store.authorizedInspect" :key="index" :label="item.name" ></el-tab-pane>
                 </el-tabs>
                 <div class="el-table-title tabTitle">
                     <span class="name-title">{{generateStoreLang('patrolName')}}</span>
@@ -63,8 +63,8 @@
 import api from '@/api/index'
 import {getUserInfo} from '@/api/login'
 import {getDeviceList} from '@/api/device'
-import {checkOutInspectItem,bindInspectItem, checkOutInspectItemV3, bindInspectItemV2, unbindInspectItemV2} from '@/api/inspect'
-import {updateStoreInfo} from '@/api/store'
+import {checkOutInspectItem,bindInspectItem, checkOutInspectItemV3, bindInspectItemV2, unbindInspectItemV2,GetInspectTagList} from '@/api/inspect'
+import {updateStoreInfo,getStoreList} from '@/api/store'
 import {generateStoreLang} from '@/api/i18n'
 import LimitSelect from "../../../components/LimitSelect";
 export default {
@@ -74,8 +74,7 @@ export default {
     },
     data(){
         return{
-            elTableData:[{label:'远程巡检一'},{label:'远程巡检二'},{label:'test'},{label:'远程巡检四'},{label:'远程巡检五'}],
-            activeName:'',
+            activeName:'0',
             curTag:'远程巡检',
             storeTitle:'',
             store:{},
@@ -139,7 +138,9 @@ export default {
     methods:{
         generateStoreLang,
         handleClick(e){
-            console.log(e)
+            console.log(e.index)
+            let self=this
+            self.getNapeByStore(self.store.storeId)
         },
         getChannelByStore(storeId){
             let self=this;
@@ -181,11 +182,13 @@ export default {
       changeSelect(val, item, index){
           this.clickItem(item, index)
       },
-        getNapeByStore(storeId){
+      getNapeByStore(storeId){
             let self=this;
             let params={
                 storeId:storeId,
-                mode:0
+                mode:0,
+                authorizedOnly:0,
+                tagName:self.store.authorizedInspect[self.activeName].name
             }
           checkOutInspectItemV3(params).then(res=>{
                 console.log(res);

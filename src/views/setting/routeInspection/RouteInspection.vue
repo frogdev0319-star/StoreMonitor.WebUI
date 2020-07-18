@@ -142,7 +142,7 @@
                             <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :label="`${_item.name}`" :name="_index.toString()">
                                 <div v-if="_item.routeData">
                                     <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc"
-                                    :tab-name="_item.name" @refreshList="getTagList" @delItem="confirmDelete"></route-detail>
+                                    :tab-name="_item.name" @refreshList="getTagList"></route-detail>
                                 </div>
                             </el-tab-pane>
                         </el-tabs>
@@ -404,7 +404,8 @@ export default {
             let TagData=await self.getTagAll();
             if(TagData.length!=0){
                 let params={
-                    inspectId:TagData[Number(self.patrolActive)].id
+                    // inspectId:TagData[Number(self.patrolActive)].id
+                    inspectId:49
                 }
                 let NapeData=await self.getNapeList(params)
                 let tempAllData=[];
@@ -670,7 +671,7 @@ export default {
             }
             sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
-            self.$router.push({name:'bindStore',params:self.activeName});
+            self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
         },
 
         changeValue(obj){
@@ -698,7 +699,6 @@ export default {
           if(self.ImportName!=''){
               self.showImportwarning=false
               //限制巡检表名称不可重复
-              debugger
               let TagData=await self.getTagAll();
               let namerepeat=0
               TagData.forEach(item=>{
@@ -763,11 +763,58 @@ export default {
         },
         confirmDelete(){
             let self=this;
-            self.showSingleDeleteContent=false
-            // self.elTableData[Number(self.activeName)].data.splice(Number(self.patrolActive),1)
-            // if(self.elTableData[Number(self.activeName)].data.length!=0){
-            //     self.patrolActive=(Number(self.patrolActive)-1).toString()
-            // }
+            let arrGroup=[];
+            let arrItem=[];
+            self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData.forEach(item=>{
+                arrGroup.push(item.id);
+                item.itemData.forEach(_item=>{
+                    arrItem.push(_item.id);
+                });
+            });
+            let params={
+                "itemIds":arrItem
+            };
+            let paramsGroup={
+                "groupIds":arrGroup
+            }
+            if(arrItem.length!=0){
+                inpectRESTful.deleteInspectItem(params).then(res=>{
+                    let code=res.errMsg;
+                    if(code!=undefined&&code=='Success'){
+                        if(arrGroup.length!=0){
+                            inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                                if(resGroup.errMsg=='Success'){
+                                    self.afterDeleteList();
+                                }
+                            })
+                        }
+                        else{
+                            self.afterDeleteList();
+                        }
+                    }
+                    else{
+                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
+                        return false;
+                    }
+                })
+            }
+            else{
+                inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                    if(resGroup.errMsg=='Success'){
+                        self.afterDeleteList();
+                    }
+                    else{
+                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
+                        return false;
+                    }
+                })
+            }
+        },
+        afterDeleteList(){
+            let self=this;
+            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+            self.showSingleDeleteContent=false;
+            self.getTagList()
         },
          importItem(){
             let self=this;
@@ -812,11 +859,9 @@ export default {
         },
         getBindStoreList(){
             let self=this;
-            let tagName=self.elTableData[Number(self.activeName)].label;
-            console.log(tagName)
-            let params={tagName:tagName};
+            let inspectId =self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
+            let params={inspectId :inspectId };
             inpectRESTful.getInspectBindList(params).then(res=>{
-                console.log(res.data.errMsg);
                 if(res.errMsg!=undefined&&res.errMsg=='Success'){
                     let data=res.data;
                     self.storeNum=data.length;

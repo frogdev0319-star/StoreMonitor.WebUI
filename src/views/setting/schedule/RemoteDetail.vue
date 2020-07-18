@@ -265,6 +265,9 @@
       activePatrol:{
         type: String,
         default: '0'
+      },
+      inspectId:{
+        type: String
       }
     },
     data(){
@@ -845,7 +848,7 @@
         params.schedule = tempSchedule;
         console.log(params.schedule);
         params.extra={
-          inspectId:parseInt(self.activeName),
+          inspectId:parseInt(self.Inspector),
           assignedTo:self.Inspector
         }
 
@@ -1439,6 +1442,7 @@
         let params = {};
         params.category = parseInt(self.activePatrol);
         let data = await self.getScheduleFromDB(params)
+        console.log('特特热恩',data)
         if(data.length!=0){
           data.forEach(item=>{
             let name = item.name; //排程名称
@@ -1699,7 +1703,11 @@
           })
         }
         params.schedule = tempSchedule;
-        console.log(params.schedule);
+        params.extra={
+          inspectId:parseInt(self.inspectId),
+          assignedTo:self.Inspector
+        }
+        console.log(params);
         return new Promise((resolve, reject) => {
           updateSchedule(params).then(res => {
             console.log(res);

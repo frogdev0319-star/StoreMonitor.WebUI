@@ -357,8 +357,15 @@
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
                             </span> -->
-                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''"
+                            <!-- <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''"
                             :style="!_item.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}" @click="clickStore(item,index,_item,_index)">
+                                <el-tooltip class="item" effect="dark" :content="_item.name"
+                                    placement="bottom">
+                                    <span>{{_item.name}}</span>
+                                </el-tooltip>
+                            </div> -->
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''"
+                             @click="clickStore(item,index,_item,_index)">
                                 <el-tooltip class="item" effect="dark" :content="_item.name"
                                     placement="bottom">
                                     <span>{{_item.name}}</span>
@@ -377,7 +384,14 @@
                             <span class="icon-info" v-if="item.storeList.length!=0" style="margin-bottom:15px">* {{generatePatrolLang('cannotSwitch')}}</span>
                             <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
                                 <span class="citys">{{_item.cityName}}</span>
-                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
+                                <!-- <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
+                                :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
+                                    <el-tooltip class="item" effect="dark" :content="itemDs.name"
+                                    placement="bottom">
+                                    <span>{{itemDs.name}}</span>
+                                    </el-tooltip>
+                                </div> -->
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name"
                                 :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
                                     <!-- <span v-if="itemDs.hasInspect">{{itemDs.name}}</span> -->
                                     <el-tooltip class="item" effect="dark" :content="itemDs.name"

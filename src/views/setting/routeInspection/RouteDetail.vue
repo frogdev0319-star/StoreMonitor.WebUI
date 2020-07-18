@@ -531,7 +531,7 @@ export default {
                         })
                     })
                     if(self.routeData.length==0){
-                        self.$emit('delItem')
+                        // self.$emit('delItem')
                     }
                     self.getNum();
                 }

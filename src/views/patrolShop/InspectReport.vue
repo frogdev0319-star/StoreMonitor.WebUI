@@ -33,7 +33,7 @@
         <el-col :span="16" class="report-table">
           <div class="header-score">
               <span class="span-1">{{$t('remotePatrol.getscore')}}：</span>
-              <span class="span-2">{{scorecount}} <span>{{$t('remotePatrol.scorecount')}}</span></span>
+              <span class="span-2">{{totalScore}} <span>{{$t('remotePatrol.scorecount')}}</span></span>
               <span class="span-3">({{$t('remotePatrol.scorerule')}})</span>
           </div>
           <table class="table table-bordered">
@@ -247,7 +247,6 @@
     },
     data() {
       return {
-        scorecount:0,
         reportId: 0,
         varyWindowWidth: window.innerWidth,
 
@@ -268,6 +267,7 @@
         report: null,
         suggest: '',
         summary: [],
+        totalScore:'',
         tempList: [],
         options: null,
         theaderList: [
@@ -434,7 +434,7 @@
           let data = res.data
           let temp=[];
           let feedtemp=[]
-          let gradetotal = []
+          // let gradetotal = []
           data.groups.forEach((groupitem,groupindex)=>{
             let obj={
               items:[]
@@ -447,7 +447,7 @@
               details.comment = item.comment
               details.description = item.description
               details.grade = item.grade
-              gradetotal.push(item.grade)
+              // gradetotal.push(item.grade)
               if(item.attachment.length!=0){
               let _temp=[];
               let audioObj={};
@@ -474,25 +474,6 @@
             })
             temp.push(obj);
           })
-          let gradelength = gradetotal.length
-          let ignorelength = [] //-1
-          let faillength = [] //0
-          let passlength = [] //1
-          gradetotal.forEach((item,index)=>{
-            switch (item){
-              case -1:
-                ignorelength.push(item);
-                break;
-              case 0:
-                faillength.push(item);
-                break;
-              default:
-                passlength.push(item);
-                break;
-            }
-          })
-          let totalScoreItems = gradelength - ignorelength.length
-          self.scorecount = parseInt(passlength.length/totalScoreItems*100)
           self.groups=temp
           if(data.feedbacks.length==0){
             this.showFeedBacks = false
@@ -653,6 +634,7 @@
           let data = res.data[0].info;
           self.suggest = data.comment;
           let summary = data.summary;
+          self.totalScore=data.totalScore
           let summaryTemp = [];
           summary.forEach(item => {
             let obj = {};

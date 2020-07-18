@@ -523,7 +523,7 @@ export default {
             let self = this;
             self.ModelAddPost = Array.from(val)[0]; // 选中的职务
         },
-        confirmAddGroup(){
+        async confirmAddGroup(){
             let self=this;
             let temp=[];
             if(self.groupNameInput.trim().length==0){
@@ -555,6 +555,7 @@ export default {
             };
             inpectRESTful.addInspectGroup(params).then(res=>{
                 let codeMsg=res.errMsg;
+                console.log('嗡嗡嗡',res)
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     let obj={
                         id:res.data[0],
@@ -566,6 +567,22 @@ export default {
                         itemData:[]
                     };
                     self.groupList.push(obj);
+                    // 绑定职务参数
+                    if(self.ModelAddPost.length!=0){
+                        let titleIds=[]
+                        if(self.ModelAddPost[0]=='-1'){
+                            titleIds=self.ModelAddPost.slice(1)
+                        }else{
+                            titleIds=self.ModelAddPost
+                        }
+                        let paramsBind={
+                            groupItems:[{
+                                groupId:res.data[0],
+                                titleIds:titleIds
+                            }]
+                        }
+                        self.bindGroup(paramsBind);
+                    }
                     self.groupNameInput='';
                     self.showAddGroup=false;
                     self.refreshData(self.groupList.length-1);

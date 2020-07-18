@@ -432,6 +432,7 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
+    storeNoInspect:'此门店尚未绑定巡检表',
     storesupervisor:'门店督导',
     storesuperManage:'门店负责人',
     bindWith: '已绑定',
