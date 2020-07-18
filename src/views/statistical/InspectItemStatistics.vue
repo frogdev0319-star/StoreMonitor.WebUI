@@ -404,7 +404,7 @@
             echartBackground: 'rgba(30,34,52,0.75)',
             itemsTableData:[],
             PDFData:[],
-            htmlTitle:'巡检项统计pdf',
+            htmlTitle:this.$t("overview.htmltopdfB"),
             ispdf:false,
             itemsInfoData:[
               {
@@ -1663,8 +1663,6 @@
                 .icon-excel{
                   margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
-                  // height: calc(24/1920*100vw);
-                  // width: calc(24/1920*100vw);
                 }
                 .icon-pdf{
                   margin-right: calc(18/1920*100vw);
@@ -1700,8 +1698,6 @@
                 .icon-excel{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
                   font-size: 24px;
-                  // height: calc(24/1920*100vw);
-                  // width: calc(24/1920*100vw);
                 }
                 .icon-pdf{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;

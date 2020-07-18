@@ -30,7 +30,7 @@
           </el-tooltip>
         </div>
         <div class="header-mul-select">
-          <span class="mul-label">巡检人</span>
+          <span class="mul-label">{{$t('scheduleView.InspectPerson')}}</span>
           <region-multi-select :options="titleList" :placeholder="$t('insSettingView.Inspector')" :disabled="false"
             :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)" :all="$t('reportView.all')"></region-multi-select>
         </div>
@@ -421,7 +421,7 @@
         insideHeaderClass: 'inside-header-class',
         insideRowClass: 'inside-row-class',
         elPDFtableData:[],
-        htmlTitle:'巡店效率统计pdf'
+        htmlTitle:this.$t("overview.htmltopdfC")
       }
     },
     computed:{
@@ -1025,8 +1025,6 @@
                 .icon-excel{
                   margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
-                  // height: calc(24/1920*100vw);
-                  // width: calc(24/1920*100vw);
                 }
                 .icon-pdf{
                   margin-right: calc(18/1920*100vw);
@@ -1060,10 +1058,11 @@
                 justify-content: center;
                 .icon-excel{
                   margin-right: calc(18/1920*100vw);
-                  height: calc(24/1920*100vw);
-                  width: calc(24/1920*100vw);
-                  min-height: 18px;
-                  min-width: 18px;
+                  font-size: calc(24/1920*100vw);
+                }
+                .icon-pdf{
+                  margin-right: calc(18/1920*100vw);
+                  font-size: calc(24/1920*100vw);
                 }
                 .spanClass{
                   font-size: calc(14/1920*100vw);

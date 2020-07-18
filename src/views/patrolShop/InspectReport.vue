@@ -435,7 +435,6 @@
           let temp=[];
           let feedtemp=[]
           let gradetotal = []
-          debugger
           data.groups.forEach((groupitem,groupindex)=>{
             let obj={
               items:[]

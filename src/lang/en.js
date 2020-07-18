@@ -56,6 +56,10 @@ export default {
     loginAbnormal: 'The login information is abnormal, please sign in again!'
   },
   overview:{
+    'htmltopdfA':'Patrol Evaluation Statistics PDF',
+    'htmltopdfB':'Inspection Items Statistics PDF',
+    'htmltopdfC':'Inspection Work Statistics PDF',
+    'htmltopdfD':'Event Processing Statistics PDF',
     'date': 'Date',
     'dataRangeTips': '* Date ranges: 7 ~ 365 days',
     'totalStore': 'Total Stores:',
@@ -426,6 +430,8 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
+    storesupervisor:'Supervisor',
+    storesuperManage:'Store Manager',
     bindWith: 'Binded with ',
     bindStore: 'stores',
     bindList: 'Bound List',

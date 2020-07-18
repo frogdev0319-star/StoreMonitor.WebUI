@@ -417,7 +417,7 @@
     },
     data(){
       return {
-        htmlTitle:'巡店考评统计pdf',
+        htmlTitle:this.$t("overview.htmltopdfA"),
         isexportPDF:false,
         curCountry:'',
         countryList:[],

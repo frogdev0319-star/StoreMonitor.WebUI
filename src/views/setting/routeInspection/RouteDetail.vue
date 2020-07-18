@@ -76,10 +76,10 @@
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
                         <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
-                    <div class="table-right-post" @click="bindPatrol(index,item)">
-                        <i class="iconfont icon-quxiaolianjie"></i>
-                        <span class="post-label">关联职务:</span>
-                        <span>管理员，店长，督导主管，督导</span>
+                    <div class="table-right-post" @click="setItem">
+                        <i class="iconfont icon-quxiaolianjie" :style="item.ModelPost==null?'color:#f31b65;':''"></i>
+                        <span class="post-label" :style="item.ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
+                        <span>{{item.ModelPost}}</span>
                     </div>
                      <div v-if="item.itemData.length!=0" class="table-class">
                         <el-table
@@ -227,17 +227,17 @@ export default {
     },
     computed:{
     },
-    // watch:{
-    //     routeData:{
-    //         handler:function(val,oldval){
-    //             console.log('bval',val,oldval)
-    //             if(val!=oldval){
-    //                 this.getNum();
-    //             }
-    //         },
-    //         deep:true//对象内部的属性监听，也叫深度监听
-    //   },
-    // },
+    watch:{
+        routeData:{
+            handler:function(val,oldval){
+                console.log('bval',val,oldval)
+                if(val!=oldval){
+                    this.getNum();
+                }
+            },
+            deep:true//对象内部的属性监听，也叫深度监听
+      },
+    },
     mounted(){
         let self=this;
         self.getNum();
@@ -393,8 +393,8 @@ export default {
                     }
                 });
             });
-            self.delGroup=countGroup
-            self.delItems=arr
+            // self.delGroup=countGroup
+            // self.delItems=arr
             if(arr.length==0&&countGroup.length==0){
                 self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
@@ -405,32 +405,32 @@ export default {
             let self=this;
             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
-            self.delGroup.forEach(g_item=>{
-                self.routeData.forEach((r_item,r_index)=>{
-                    if(g_item==r_item.id){
-                        self.routeData.splice(r_index,1)
-                    }
-                })
-            })
-            self.delItems.forEach(_item=>{
-                self.routeData.forEach((r_item,r_index)=>{
-                    if(r_item.itemData.length!=0){
-                        r_item.itemData.forEach((d_item,d_index)=>{
-                                if(_item==d_item.id){
-                                    self.routeData[r_index].itemData.splice(d_index,1)
-                                    if(self.routeData[r_index].itemData.length==0){
-                                        self.routeData.splice(r_index,1)
-                                    }
-                                }
-                        })
-                    }
-                }) 
-            })
-            if(self.routeData.length==0){
-                self.$emit('delItem')
-            }
-            self.getNum()
-            // self.$emit('refreshList');
+            // self.delGroup.forEach(g_item=>{
+            //     self.routeData.forEach((r_item,r_index)=>{
+            //         if(g_item==r_item.id){
+            //             self.routeData.splice(r_index,1)
+            //         }
+            //     })
+            // })
+            // self.delItems.forEach(_item=>{
+            //     self.routeData.forEach((r_item,r_index)=>{
+            //         if(r_item.itemData.length!=0){
+            //             r_item.itemData.forEach((d_item,d_index)=>{
+            //                     if(_item==d_item.id){
+            //                         self.routeData[r_index].itemData.splice(d_index,1)
+            //                         if(self.routeData[r_index].itemData.length==0){
+            //                             self.routeData.splice(r_index,1)
+            //                         }
+            //                     }
+            //             })
+            //         }
+            //     }) 
+            // })
+            // if(self.routeData.length==0){
+            //     self.$emit('delItem')
+            // }
+            // self.getNum()
+            self.$emit('refreshList');
         },
         confirmDelete(){
             let self=this;
@@ -553,10 +553,10 @@ export default {
             self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}});
             console.log(self.routeData);
         },
-        bindPatrol(index,item){
-            let self=this;
-            self.$router.push({name:'itemSetting',params:{}}); //点击超链接进入巡检项设置页面，对应index的巡检项应显示编辑状态
-        },
+        // bindPatrol(index,item){
+        //     let self=this;
+        //     self.$router.push({name:'itemSetting',params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}}); 
+        // },
         downLoadModel(){
             let self=this;
             let url='http://'+window.location.host+'/storemonitor/api/v1.0/inspect/template';

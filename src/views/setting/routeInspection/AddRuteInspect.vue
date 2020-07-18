@@ -45,9 +45,9 @@
                                  <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
                             </div>
                             <div class="group-middle">
-                                <span v-if="!item.isEdit">这是关联职务这是关联职务这是关联职务这是关联职务这是关联职务</span>
+                                <span v-if="!item.isEdit">{{item.textModel}}</span>
                                 <region-multi-select v-if="item.isEdit" :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
-                                     :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)"></region-multi-select>
+                                     :inputSize="`mini`" :selected="item.ModelPost" :all="$t('reportView.all')" @changeInput="changeSelect(arguments)"></region-multi-select>
                             </div>
                             <div class="group-right">
                                 <div v-if="item.showEdit" class="show-edit">
@@ -274,6 +274,7 @@ export default {
             lang: this.$i18n.locale,
             tabNameLang: this.$route.params.tabNameLang,
             routeName:this.$route.params.routeName,
+            routeData:this.$route.params.routeData,
             editRouteName:'',
             titleList: [],
             tableData:[],
@@ -336,7 +337,21 @@ export default {
             self.editRouteName = self.routeName
         },
         confirmEditTab(){
-            console.log('修改tab');
+            let self=this;
+            let params={
+                inspectId:self.routeData[0].inspectId,
+                name:self.editRouteName
+            }
+            inpectRESTful.UpdateInspectGroupTag(params).then(res=>{
+                if(res.errCode==0){
+                    self.showEditTab=false
+                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                    return false;
+                }else{
+                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                    return false;
+                }
+            })
         },
         cancelEditTab(){
             let self=this;
@@ -365,7 +380,30 @@ export default {
         clickItem(index,item){
             let self=this;
         },
+        getTagAll(params){//获取巡检表
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectTagList(params).then(res=>{
+                    let data=res.data;
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                })
 
+            })
+        },
+        getInspectGroupBindAll(params){//获取巡检类别关联职务
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectGroupBindList(params).then(res=>{
+                    let data=res.data;
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                })
+
+            })
+        },
         async confirmEditGroup(index,item){
             let self=this;
             let temp=[];
@@ -386,31 +424,56 @@ export default {
             let params={
                 "groups":temp
             };
-            // let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
-            // resUpdateGroup = await self.updateGroup(params)
-            // resUnbindGroup = await self.unbindGroup(paramsUnbind)
-            // if(resUnbindGroup == null || resUnbindGroup.errMsg=='Success'){
-            //     resBindGroup=await self.bindGroup(paramsBind);
-            // }
-            // if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
-            //     self.notify(self.$t('deviceView.editSuss'),'success',3000);
-            //     item.isEdit=false;
-            // }else{
-            //     self.notify(self.$t('deviceView.editFail'),'warning',3000);
-            //     return false;
-            // }
-            inpectRESTful.updateInspectGroup(params).then(res=>{
-                console.log(res);
-                let codeMsg=res.errMsg;
-                if(codeMsg!=undefined&&codeMsg=='Success'){
-                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
-                    item.isEdit=false;
+            let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
+            let paramsBind={}
+            let paramsUnbind={}
+            // 绑定职务参数
+            let titleIds=[]
+            if(self.ModelPost[0]=='-1'){
+                titleIds=self.ModelPost.slice(1)
+            }else{
+                titleIds=self.ModelPost
+            }
+            paramsBind={
+                groupItems:[{
+                    groupId:item.id,
+                    titleIds:titleIds
+                }]
+            }         
+            let postparams={
+                groupIds:[item.id]
+            }
+            let postBind = await self.getInspectGroupBindAll(postparams)
+            console.log(postBind)
+            if(postBind[0].userTitles.length!=0){
+                let userTitles=[]
+                postBind[0].userTitles.forEach(user_item=>{
+                    userTitles.push(user_item.titleId)
+                })
+                // 解绑职务参数
+                paramsUnbind={
+                    groupItems:[{
+                        groupId:item.id,
+                        titleIds:userTitles
+                    }]
                 }
-                else{
-                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
-                    return false;
+                resUnbindGroup = await self.unbindGroup(paramsUnbind)
+                resUpdateGroup = await self.updateGroup(params)
+                if(resUnbindGroup.errMsg=='Success'){
+                    resBindGroup=await self.bindGroup(paramsBind);
                 }
-            })
+            }else{
+                resUpdateGroup = await self.updateGroup(params)
+                resBindGroup=await self.bindGroup(paramsBind);
+            }
+            if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
+                self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                item.isEdit=false;
+                self.refreshData(self.groupIndex);
+            }else{
+                self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                return false;
+            }
         },
         updateGroup(params){
           return new Promise((resolve,reject)=>{
@@ -813,8 +876,12 @@ export default {
         },
 
         getAllData(){
+            let self=this;
             return new Promise((resolve,reject)=>{
-                inpectRESTful.getInspectItemList().then(res=>{
+                let params={
+                    inspectId:self.routeData[0].inspectId
+                }
+                inpectRESTful.getInspectItemList(params).then(res=>{
                     console.log(res);
                     let code=res.errMsg;
                     let data=res.data;
@@ -852,6 +919,7 @@ export default {
             let data=util.getRouteByTag(curTag,allData);
             console.log(data);
             let temp=[];
+            let groupIds=[];
             data.forEach(item=>{
                 let obj={};
                 obj.id=item.id;
@@ -862,6 +930,35 @@ export default {
                 obj.isEdit=false;
                 obj.itemData=item.items;
                 temp.push(obj);
+                groupIds.push(item.id)
+            })
+            let postparams={
+                groupIds:groupIds
+            }
+            let postBind = await self.getInspectGroupBindAll(postparams)
+            let titleList=await self.getUserTitleList()
+            temp.forEach((t_item,t_index)=>{
+                let usertemp=[]
+                let usertext=[]
+                postBind.forEach(p_item=>{
+                    if(t_item.id==p_item.groupId){
+                       if(p_item.userTitles.length!=0){
+                           p_item.userTitles.forEach(u_item=>{
+                               if(titleList.data.length==p_item.userTitles.length){
+                                    t_item['textModel']=self.$t('reportView.all')
+                               }else{
+                                    usertext.push(u_item.titleName)
+                                    t_item['textModel']=usertext.toString()
+                               }
+                               usertemp.push(u_item.titleId)
+                               t_item['ModelPost']=usertemp
+                           })
+                       }else{
+                          t_item['ModelPost']=[]
+                          t_item['textModel']=''
+                       }
+                    }
+                })
             })
             self.groupList=temp;
             self.groupList[index].isClick=true;
@@ -1246,8 +1343,8 @@ export default {
                         margin-left:calc(55/1920*100vw);
                         span{
                             float: left;
-                            width:calc(150/1920*100vw);
-                            min-width: 85px;
+                            width:calc(180/1920*100vw);
+                            min-width: 120px;
                             text-overflow: ellipsis;
                             overflow: hidden;
                             white-space: nowrap;
@@ -1530,8 +1627,8 @@ export default {
       }
     }
     #el-menuscrollbar /deep/ .el-select--mini{
-        width:calc(150/1920*100vw);
-        min-width: 85px;
+        width:calc(180/1920*100vw);
+        min-width: 120px;
     }
 </style>
 <style>

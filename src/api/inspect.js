@@ -205,3 +205,17 @@ export const GetInspectTagList=params=>{
         params
     })
 }
+export const GetInspectGroupBindList=data=>{
+    return request({
+        url:`${version}/inspect/group/bind/list`,
+        method:'post',
+        data
+    })
+}
+export const UpdateInspectGroupTag=params=>{
+    return request({
+        url:`${version}/inspect/tag/update`,
+        method:'post',
+        params
+    })
+}

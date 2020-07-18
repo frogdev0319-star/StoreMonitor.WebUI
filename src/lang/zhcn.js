@@ -57,6 +57,10 @@ export default {
     loginAbnormal: '登录信息异常，请重新登录！'
   },
   overview:{
+    htmltopdfA:'巡店考评统计PDF',
+    htmltopdfB:'巡检项统计PDF',
+    htmltopdfC:'巡店效率统计PDF',
+    htmltopdfD:'事件处理统计PDF',
     date: '时间自定',
     dataRangeTips: '* 时间范围：最短一周，最长一年',
     totalStore: '门店总数',
@@ -428,6 +432,8 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
+    storesupervisor:'门店督导',
+    storesuperManage:'门店负责人',
     bindWith: '已绑定',
     bindStore: '家门店',
     bindList: '巡检表绑定',

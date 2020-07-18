@@ -63,6 +63,7 @@
                         <div class="nameinput" style="padding:30px 40px;">
                             <el-input v-model="ImportName" @input="watchName" :placeholder="$t('insSettingView.enterListName')" style="border-bottom:1px solid #ddd;"></el-input>
                             <p v-if="showImportwarning" style="font-size:12px;color:red;margin:5px 0 0 0;">请输入巡检表名称</p>
+                            <p v-if="showRepeatNameWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">此巡检表名称已存在</p>
                         </div>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -136,12 +137,12 @@
             </el-col>
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
-                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :closable="index!=0&&index!=1?true:false" >
+                    <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :name="index.toString()" :closable="index!=0&&index!=1?true:false" >
                         <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content">
                             <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :label="`${_item.name}`" :name="_index.toString()">
                                 <div v-if="_item.routeData">
                                     <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc"
-                                    :tab-name="_item.label" @refreshList="getTagList" @delItem="confirmDelete"></route-detail>
+                                    :tab-name="_item.name" @refreshList="getTagList" @delItem="confirmDelete"></route-detail>
                                 </div>
                             </el-tab-pane>
                         </el-tabs>
@@ -164,7 +165,7 @@
 <script>
 import RouteDetail from '@/views/setting/routeInspection/RouteDetail'
 import api from '@/api/index'
-import {inpectRESTful} from '@/api/index'
+import {inpectRESTful,titleRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
@@ -202,6 +203,7 @@ export default {
             PatrolListOne:'0',
             PatrolListTwo:'0',
             showImportwarning:false,
+            showRepeatNameWarning:false,
             downLoadSrc:'',
             curIndex:'id0',
             showBtnContent:false,
@@ -282,18 +284,18 @@ export default {
     },
     created(){
       let self=this;
-      self.getTagList();
+    //   self.getTagList();
       let tabIndex=sessionStorage.getItem('TabIndex');
       self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-      self.initData();
+    //   self.initData();
       //self.getDownLoadURL();
     },
     mounted(){
-        // let self=this;
-        // self.getTagList();
+        let self=this;
+        self.getTagList();
         // let tabIndex=sessionStorage.getItem('TabIndex');
         // self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-        // self.initData();
+        self.initData();
         // self.getDownLoadURL();
     },
     methods:{
@@ -352,10 +354,25 @@ export default {
                 //window.open(self.downLoadSrc,'_self');
             })
         },
-        getNapeList(){
+        getTagAll(){//获取巡检表
+            let self=this;
+            let params={
+                mode:parseInt(self.activeName)
+            }
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectTagList(params).then(res=>{
+                    let data=res.data;
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                })
+
+            })
+        },
+        getNapeList(params){//获取巡检表内容
             let self=this;
             return new Promise((resolve,reject)=>{
-                inpectRESTful.getInspectItemList().then(res=>{
+                inpectRESTful.getInspectItemList(params).then(res=>{
                     let code=res.errMsg;
                     let data=res.data;
                     if(code!=null&&code=='Success'){
@@ -366,28 +383,35 @@ export default {
                     resolve(data);
                 }).catch(err => {
                     console.log(err.message);
-                    //self.loading.close();
+                })
+
+            })
+        },
+        getInspectGroupBindAll(params){//获取巡检类别关联职务
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectGroupBindList(params).then(res=>{
+                    let data=res.data;
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
                 })
 
             })
         },
         async getTagList(){
             let self=this;
-            let data=await self.getNapeList();
-            if(data.length!=0){
-                data.forEach(item=>{
-                    let tag=item.tag;
-                    if(self.tagList.indexOf(tag)==-1){
-                        self.tagList.push(tag);
-                    }
-                })
+            let TagData=await self.getTagAll();
+            if(TagData.length!=0){
+                let params={
+                    inspectId:TagData[Number(self.patrolActive)].id
+                }
+                let NapeData=await self.getNapeList(params)
                 let tempAllData=[];
-                self.tagList.forEach(item=>{
-                    let tag=item;
                     let obj={};
                     let temp=[];
-                    self.allData.forEach((_item,_index)=>{
-                        if(tag==_item.tag){
+                    let groupids=[]
+                    NapeData.forEach((_item,_index)=>{
                             let _obj={};
                             _obj.id=_item.id;
                             _obj.groupName=_item.name;
@@ -400,44 +424,79 @@ export default {
                                 objChild.checked=false;
                                 objChild.name=itemChild.subject;
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
-                                //objChild.score=itemChild.itemScore+'分';
                                 if(self.lang == 'en'){
-                                  objChild.score=itemChild.itemScore ;
+                                objChild.score=itemChild.itemScore ;
                                 }
                                 else{
-                                  objChild.score=itemChild.itemScore + " " + self.$t('insSettingView.scores');
+                                objChild.score=itemChild.itemScore + " " + self.$t('insSettingView.scores');
                                 }
 
                                 tempChild.push(objChild);
                             })
                             _obj.itemData=tempChild;
+                            _obj.inspectId=TagData[Number(self.patrolActive)].id; //巡检表
+                            _obj.mode=TagData[Number(self.patrolActive)].mode; //巡检类别
+                            groupids.push(_item.id)
                             temp.push(_obj);
-                        }
                     })
-                    if(item=='远程巡检'&&self.activeName==0){
-                        let obj={label:item,name:self.ImportName,routeData:temp};
-                        if(temp.length == 0){
-                          self.getDownLoadURL();
-                        }
-                        if(self.ImportName!=''){
-                            self.elTableData[0].data.push(obj);
-                        }
+                    let postparams={
+                        groupIds:groupids
                     }
-                    else if(item=='现场巡检'&&self.activeName==1){
-                        let obj={label:item,name:self.ImportName,routeData:temp};
+                    let titletemp=await self.getInspectGroupBindAll(postparams)
+                    let titleList=await self.getUserTitleList()
+                    temp.forEach(te_item=>{
+                        let usertext=[]
+                        titletemp.forEach(ti_item=>{
+                            if(te_item.id==ti_item.groupId){
+                                if(ti_item.userTitles.length!=0){
+                                    if(ti_item.userTitles.length==titleList.data.length){
+                                        te_item['ModelPost']=self.$t('reportView.all')
+                                    }else{
+                                        ti_item.userTitles.forEach(u_item=>{
+                                            usertext.push(u_item.titleName)
+                                            te_item['ModelPost']=usertext.toString()//关联职务
+                                        })
+                                    }
+                                }else{
+                                    te_item['ModelPost']=null
+                                }
+                            }
+                        })
+                    })
+                    let tagTemp=[]
+                    TagData.forEach((tag_item,tag_index)=>{
+                        let tagObj={};
+                        let label=''
+                        if(tag_item.mode==0){
+                            label='远程巡检'
+                        }else if(tag_item.mode==1){
+                            label='现场巡检'
+                        }
+                        tagObj.label=label
+                        tagObj.name=tag_item.name
+                        tagObj.routeData=temp
+                        tagTemp.push(tagObj)
+                    })
+                    if(self.activeName==0){
+                        // let tagTemp={label:item,name:self.ImportName,routeData:temp};
                         if(temp.length == 0){
                           self.getDownLoadURL();
                         }
-                        if(self.ImportName!=''){
-                            self.elTableData[1].data.push(obj);
+                        self.elTableData[0].data=tagTemp;
+                    }
+                    else if(self.activeName==1){
+                        // let obj={label:item,name:self.ImportName,routeData:temp};
+                        if(temp.length == 0){
+                          self.getDownLoadURL();
                         }
+                        self.elTableData[1].data=tagTemp;
                     }
                     else{
                         obj.label=item;
                         obj.data={name:'',routeData:temp};
                         // tempAllData.push(obj);
                     }
-                })
+                // })
                 self.elTableData=self.elTableData.concat(tempAllData);
             }
             else{
@@ -445,6 +504,13 @@ export default {
               self.elTableData=[{label:'远程巡检',data:[]},{label:'现场巡检',data:[]}];
             }
             self.getBindStoreList();
+        },
+        getUserTitleList(){
+          return new Promise((resolve, reject) => {
+            titleRESTful.getUserTitleList().then(res=>{
+              resolve(res)
+            })
+          })
         },
         deleteItem(itemIdList){
             let params={
@@ -499,39 +565,42 @@ export default {
             else{
                 index=2;
             }
-            let data=self.elTableData[index];
-            let groupIdList=[];
-            let itemIdList=[];
-            if(data.data.length!=0){
-                data.data.forEach(d_item=>{
-                    d_item.routeData.forEach(item=>{
-                        groupIdList.push(item.id);
-                        item.itemData.forEach(_item=>{
-                            itemIdList.push(_item.id);
-                        })
-                    })
-                })
-            }else{
-                let table=await self.getNapeList();
-                table.forEach(item=>{
-                    groupIdList.push(item.id);
-                    item.items.forEach(_item=>{
-                        itemIdList.push(_item.id);
-                    })
-                })
-            }
-            if(itemIdList.length!=0){
-                let res1= await self.deleteItem(itemIdList);
-            }
-            if(groupIdList.length!=0){
-                let res2= await self.deleteGroup(groupIdList);
-            }
+            // let data=self.elTableData[index];
+            // let groupIdList=[];
+            // let itemIdList=[];
+            // if(data.data.length!=0){
+            //     data.data.forEach(d_item=>{
+            //         d_item.routeData.forEach(item=>{
+            //             groupIdList.push(item.id);
+            //             item.itemData.forEach(_item=>{
+            //                 itemIdList.push(_item.id);
+            //             })
+            //         })
+            //     })
+            // }else{
+            //     let params={
+            //         inspectId:parseInt(self.patrolActive)
+            //     }
+            //     let table=await self.getNapeList(params);
+            //     table.forEach(item=>{
+            //         groupIdList.push(item.id);
+            //         item.items.forEach(_item=>{
+            //             itemIdList.push(_item.id);
+            //         })
+            //     })
+            // }
+            // if(itemIdList.length!=0){
+            //     let res1= await self.deleteItem(itemIdList);
+            // }
+            // if(groupIdList.length!=0){
+            //     let res2= await self.deleteGroup(groupIdList);
+            // }
             let tempGroups=[];
             dataArry.forEach((item,index)=>{
                 let obj={};
                 obj.name=item[0]['检查分类'];
                 obj.mode=mode;
-                obj.tag=self.checkValue;
+                obj.tag=self.ImportName;
                 tempGroups.push(obj);
             })
             let paramsGroup={
@@ -624,11 +693,25 @@ export default {
     //       self.showConfirmImport=false;
     //       document.getElementById('loadFile').click()
     //   },
-      confirmImportName(){
+      async confirmImportName(){
           let self = this;
           if(self.ImportName!=''){
-              document.getElementById('loadFileEx').click()
               self.showImportwarning=false
+              //限制巡检表名称不可重复
+              debugger
+              let TagData=await self.getTagAll();
+              let namerepeat=0
+              TagData.forEach(item=>{
+                  if(item.name==self.ImportName){
+                      namerepeat=1
+                  }
+              })
+              if(namerepeat==1){
+                    self.showRepeatNameWarning=true
+                }else{
+                    self.showRepeatNameWarning=false
+                    document.getElementById('loadFileEx').click()
+                }
           }else{
               self.showImportwarning=true
           }
@@ -657,6 +740,7 @@ export default {
             }else if(tabObj.index=='1'){
                 self.patrolActive=self.PatrolListTwo
             }
+            self.getTagList();
 
         },
         handleClickPatrol(val){
@@ -666,6 +750,7 @@ export default {
             }else if(self.activeName=='1'){
                 self.PatrolListTwo=val.index
             }
+            self.getTagList();
         },
         delAllItem(){
             let datalength = this.elTableData[Number(this.activeName)].data.length
@@ -679,10 +764,10 @@ export default {
         confirmDelete(){
             let self=this;
             self.showSingleDeleteContent=false
-            self.elTableData[Number(self.activeName)].data.splice(Number(self.patrolActive),1)
-            if(self.elTableData[Number(self.activeName)].data.length!=0){
-                self.patrolActive=(Number(self.patrolActive)-1).toString()
-            }
+            // self.elTableData[Number(self.activeName)].data.splice(Number(self.patrolActive),1)
+            // if(self.elTableData[Number(self.activeName)].data.length!=0){
+            //     self.patrolActive=(Number(self.patrolActive)-1).toString()
+            // }
         },
          importItem(){
             let self=this;

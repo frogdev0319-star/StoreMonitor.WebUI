@@ -144,8 +144,8 @@
                 </el-option>
               </el-select>
               <span :id="lang=='en'? 'en-span': 'span'" style="padding-right:14px;">{{generateScheduleLang('InspectPerson')}}</span>
-              <el-checkbox-group v-model="Inspector" @change="ChangeInspector">
-                <el-checkbox v-for="item in InspectorList" :label="item" :key="item">{{item}}</el-checkbox>
+              <el-checkbox-group v-model="Inspector">
+                <el-checkbox v-for="item in InspectorList" :label="item.id" :key="item.id">{{item.label}}</el-checkbox>
               </el-checkbox-group>
             </el-col>
             <el-col :span="24" class="el-header-hr"></el-col>
@@ -277,7 +277,7 @@
         tempStoreList :[],
         showAddTime: false,
         scheduleList: ['点检排程一'],
-        InspectorList:['门店督导','门店负责人'],
+        InspectorList:[{id:3,label:this.$t('insSettingView.storesupervisor')},{id:4,label:this.$t('insSettingView.storesuperManage')}],
         Inspector:[],
         paneList:[],
         lang: this.$i18n.locale ,
@@ -670,9 +670,6 @@
 
     methods: {
       generateScheduleLang,
-      ChangeInspector(){
-
-      },
       noWeekDialog(val){
         let self=this;
         self.selectWeekObj.dialogCosed=false;
@@ -847,6 +844,10 @@
         }
         params.schedule = tempSchedule;
         console.log(params.schedule);
+        params.extra={
+          inspectId:parseInt(self.activeName),
+          assignedTo:self.Inspector
+        }
 
         return new Promise((resolve, reject) => {
           addNewSchedule(params).then(res => {

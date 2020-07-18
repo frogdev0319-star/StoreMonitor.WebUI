@@ -373,7 +373,7 @@
     data(){
       return{
         ispdf:false,
-        htmlTitle:'事件处理统计pdf',
+        htmlTitle:this.$t("overview.htmltopdfD"),
         curCountry:'',
         countryList:[],
         curProvince:[],
