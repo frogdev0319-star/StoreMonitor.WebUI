@@ -31,12 +31,12 @@
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
           <span>{{$t('overview.patrolType')}}</span>
-          <el-select v-model="curType"  placeholder="请选择巡检表类型" size="mini" class="el-province" @change="changeType">
+          <el-select v-model="inspectList"  :placeholder="$t('insSettingView.selectPost')" size="mini" class="el-province" @change="changeType">
                   <el-option
                     v-for="item in inspectTypeList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
                   </el-option>
                 </el-select>
           <!-- <el-cascader
@@ -308,6 +308,7 @@
   import {getStoreList} from '@/api/store'
   import util from '../../common/util.js'
   import {Message} from 'element-ui'
+  import {inpectRESTful} from '@/api/index'
 
   import {
     getInspectStatsItemOverviewV2
@@ -321,31 +322,6 @@
         },
       data(){
           return {
-            value: [],
-        options: [{
-          value: 'zhinan',
-          label: '指南',
-          children: [{
-            value: 'shejiyuanze',
-            label: '远程巡检'
-          },
-          {
-            value: 'xianchang',
-            label: '现场巡检'
-          }]
-        },
-        {
-          value: 'ww',
-          label: '文档',
-          children: [{
-            value: 'qqq',
-            label: '地方'
-          },
-          {
-            value: 'ff',
-            label: '功能'
-          }]
-        }],
             curCountry:'',
             countryList:[],
             curProvince:[],
@@ -365,16 +341,18 @@
             },
             timeMode: 1,
             curType: 0,
-            inspectTypeList: [
-              {
-                value: 0,
-                label: this.$t('overview.remotePatrolTable'),
-              },
-              {
-                value: 1,
-                label: this.$t('overview.onsitePatrolTable'),
-              }
-            ],
+            inspectTypeList:[],
+            inspectList:'',
+            // inspectTypeList: [
+            //   {
+            //     value: 0,
+            //     label: this.$t('overview.remotePatrolTable'),
+            //   },
+            //   {
+            //     value: 1,
+            //     label: this.$t('overview.onsitePatrolTable'),
+            //   }
+            // ],
             showStoreInfo: false,
             params: {},
             poperClass: 'date-picker-poper',
@@ -524,6 +502,23 @@
         }
       },
       methods:{
+
+        getTagAll(){//获取巡检表
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectTagList().then(res=>{
+                    let data=res.data;
+                    self.inspectTypeList=res.data
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                })
+
+            })
+        },
+        getRole(){
+
+        },
         handleChange(){
           
         },
@@ -945,6 +940,7 @@
           self.params.filter={page:self.page - 1,size:self.sizeNum};
           self.params.order = {direction: self.direction, property: self.property}
           self.params.mode = self.curType;
+          self.params.inspectId = self.inspectList
           await self.getInspectItemsTable();
           await self.getInspectCharts();
         },
@@ -1122,6 +1118,7 @@
               page: 0,
               size: self.total
             }
+            params.inspectId = self.params.inspectId
             let inspectItems = await self.getInspectStatsItemInfo(params);
             // let excellentPer = 0;
             let qualifiedPer = 0;
@@ -1429,6 +1426,7 @@
         self.params.beginTs = start;
         self.params.endTs = end;
         self.initDaysRange();
+        self.getTagAll()
         await self.getRegionInfo();
         await self.initData();
       },
@@ -1990,7 +1988,7 @@
     padding-bottom:0;
   }
   .LoadDialog /deep/ .el-dialog__body{
-    padding:0 20px 30px;
+    padding:0px 20px 30px 20px !important;
   }
   .header-class{
     height: 40px;

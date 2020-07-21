@@ -1996,7 +1996,7 @@
     padding-bottom:0;
   }
   .LoadDialog /deep/ .el-dialog__body{
-    padding:0px 20px 30px 20px;
+    padding:0px 20px 30px 20px !important;
   }
   .date-picker-poper .el-button--text{
     visibility: hidden !important;

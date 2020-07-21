@@ -56,6 +56,17 @@ export default {
     loginAbnormal: 'The login information is abnormal, please sign in again!'
   },
   overview:{
+    'eachmonth':' each month',//新增
+    'everydays':' every week',
+    'act':'Executed on ',//新增
+    // 'daysww':'号',//新增
+    // 'everymon':'每月',
+    // 'weeks':'every week',
+    'patrolPlan':'Patrol Plan',
+    'patrolStore':'Stores',
+    'planDes':'Plan Destcription',
+    'planFre':'Frequency',
+    'patrolLists':'Patrol List',
     'htmltopdfA':'Patrol Evaluation Statistics PDF',
     'htmltopdfB':'Inspection Items Statistics PDF',
     'htmltopdfC':'Inspection Work Statistics PDF',
@@ -64,6 +75,10 @@ export default {
     'dataRangeTips': '* Date ranges: 7 ~ 365 days',
     'totalStore': 'Total Stores:',
     'totalUnit': '',
+    'superTaskmode0':'day',
+    'superTaskmode1':'Weekly',
+    'superTaskmode2':'Monthly',
+    'superTaskmode3':'User Defined',
     'kpiIndex': 'KPIs',
     'totalPatrol': 'Number of Patrol',
     'advPatrolCycle': 'Average Patrol Cycle',
@@ -146,7 +161,7 @@ export default {
     proportionOfOnsite: 'Percentage of Onsite Inspection Categories Evaluated',
     emptyItemList: 'The inspection item list is empty, please re-filter the data',
     timesUnit: '(Times)',
-    patrolList: 'Inspection List',
+    patrolList: 'Inspection KPI',
     supervisorName: 'Supervisor',
     storeNum: 'Number of Managing Stores',
     scheduleNum: 'Planned Patrol',
@@ -214,6 +229,7 @@ export default {
     ignoreds: 'N/A',
     noItems: 'No Inspection Items',
     notCombined: 'Not binding with inspection items yet!',
+    confirmChangeBind:'The current inspection list has not been submitted. Confirm to switch the  other inspection list?',
     confirmSwitch: 'Not finish yet, confirm switching?',
     confirmIgnore: 'Confirm ignore items?',
     notBindCamera: 'Items hasn\'t bind with devices!',
@@ -430,7 +446,8 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
-    storeNoInspect:'此门店尚未绑定巡检表',
+    storeNoInspect:'No bound inspection list with the store',
+    confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
     storesupervisor:'Supervisor',
     storesuperManage:'Store Manager',
     bindWith: 'Binded with ',
@@ -459,6 +476,7 @@ export default {
     importFail: 'Failed to import!',
     importFailTitle:'Failed to import',
     editStore:'Please select the inspection item to bind channels',
+    editStoretips:'Reminder: Click the submit button to save the current inspection list',
     RemoteLength:'The number of inspection tables exceeds the limit, please delete and then import',
     SchdRemoteLength:'The number of schedules exceeds the limit, please delete and then create',
     deletePatrolList:'There is currently no inspection list to delete',
@@ -487,6 +505,8 @@ export default {
     deleteGroup: 'Confirm delete inspection category and items?',
     deleteSuss: 'Successfully deleted!',
     deleteFail: 'Failed to delete',
+    deleteInspectSuss: 'Successfully deleted！',
+    deleteInspectFail: 'Failed to delete！',
     selectProviceInfo: 'Select by province',
     bindStores: 'Bind stores',
     total: 'stores in total with',
@@ -675,6 +695,8 @@ export default {
   },
   //Schedule Management page language
   scheduleView:{
+    noscheduleInspect:'Please select the inspection list associated with the schedule',
+    emptyAssignedTo:'Please select inspector',
     schedule: 'Schedule',
     scheduleName: 'Schedule Name',
     scheduleNameRuletip:'Enter up to 30 characters',

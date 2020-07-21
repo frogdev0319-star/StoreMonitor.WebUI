@@ -447,7 +447,7 @@ import {generateStoreLang} from '@/api/i18n'
                 self.storeData.content.forEach(item=>{
                   console.log(item)
                     let obj={};
-                    if(item.appliedInspect.indexOf('远程巡检')==-1){
+                    if(item.appliedInspect==''){
                         obj.showTag=false;
                     }
                     else{
@@ -463,7 +463,16 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
                     obj.authorizedInspect=item.authorizedInspect
-                    obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
+                    if(item.authorizedInspect.length!=0){
+                        let au_inspect=[]
+                        item.authorizedInspect.forEach(au_item=>{
+                            au_inspect.push(au_item.name)
+                        })
+                        obj.napeTable=au_inspect.join('，')
+                    }else{
+                        obj.napeTable='--'
+                    }
+                    // obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
                     obj.schedue='--',
                     obj.device=item.device;
                     temp.push(obj);

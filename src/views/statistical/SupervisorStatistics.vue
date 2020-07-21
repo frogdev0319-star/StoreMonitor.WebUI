@@ -31,8 +31,16 @@
         </div>
         <div class="header-mul-select">
           <span class="mul-label">{{$t('scheduleView.InspectPerson')}}</span>
-          <region-multi-select :options="titleList" :placeholder="$t('insSettingView.Inspector')" :disabled="false"
-            :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)" :all="$t('reportView.all')"></region-multi-select>
+          <el-select v-model="ModelPost"  placeholder="请选择" size="mini" class="el-province" @change="searchData">
+            <el-option
+              v-for="item in titleList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <!-- <region-multi-select :options="titleList" :placeholder="$t('insSettingView.Inspector')" :disabled="false"
+            :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)" :all="$t('reportView.all')"></region-multi-select> -->
         </div>
       </el-col>
       <el-col :span="24" class="items-content">
@@ -82,7 +90,7 @@
                   <el-table-column type="expand" :label="$t('overview.detail')" :width="lang!=='en'? 100: 120">
                     <template slot-scope="props">
                       <el-tabs v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane label="巡店计划" name="patrolPlan" style="display: none">
+                        <el-tab-pane :label="$t('overview.patrolPlan')" name="patrolPlan">
                           <el-table
                             :data="planTableData"
                             :highlight-current-row="true"
@@ -191,7 +199,7 @@
                   <el-table-column type="expand" :label="$t('overview.detail')" width="100px">
                     <template slot-scope="props">
                       <el-tabs v-model="activePDFFirst" @tab-click="handleClick">
-                        <el-tab-pane label="巡店计划" name="First">
+                        <el-tab-pane :label="$t('overview.patrolPlan')" name="First">
                           <el-table
                             :data="planTableData"
                             :highlight-current-row="true"
@@ -255,6 +263,8 @@
   import util from '../../common/util.js'
   import {Message} from 'element-ui'
   import RegionMultiSelect from "@/components/RegionMultiSelect";
+  import {GetScheduleTaskList} from "@/api/schedule"
+  import moment from "moment"
 
   import {
     getInspectStatsOverPersonV2,
@@ -284,21 +294,19 @@
         supervisorTableData:[],
         titleList:[
           {
-           label:'门店督导',
-           value:1,
-           disabled:false
+           label:this.$t('insSettingView.storesupervisor'),
+           value:3
            },
            {
-           label:'门店负责人',
-           value:2,
-           disabled:false
+           label:this.$t('insSettingView.storesuperManage'),
+           value:4
            }
         ],
-        ModelPost:[],
+        ModelPost:3,
         supervisorInfoData:[
           {
             "prop": "supervisorName",
-            "label": this.$t('overview.supervisorName'),
+            "label": this.$t('scheduleView.InspectPerson'),
             "sortable":false,
             "pdfwidth": '15%',
             "pdfmaxWidth": '17%',
@@ -360,30 +368,45 @@
         exportItmesHeader: ['督导名称','管辖门店数量', '计划巡店次数', '按计划巡店次数', '计划外巡店次数', '巡店计划完成率'],
         headerClass: 'header-class',
         cellClass: 'cell-class',
-        activeName: 'planImplementation',
+        activeName: 'patrolPlan',
         planTableData: [],
+        week:['Mon.','Tues.', 'Wed.','Thur.','Fri.','Sat.','Sun.'],
+        monthly:['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sept.','Oct.','Nov.','Dec.'],
+        month:['st','nd','rd','th'],
         planTableInfo: [
           {
-            "prop": "supervisorName",
-            "label": '巡店方式',
+            "prop": "scheduleName",
+            "label": this.$t('scheduleView.scheduleName'),
             "width": '13%',
             "className": 'col1'
           },
           {
-            "prop":"numOfStores",
-            "label": '巡检门店',
+            "prop": "category",
+            "label": this.$t('overview.patrolMethod'),
+            "width": '13%',
+            "className": 'col1'
+          },
+          {
+            "prop": "inspectTagName",
+            "label": this.$t('overview.patrolLists'),
+            "width": '13%',
+            "className": 'col1'
+          },
+          {
+            "prop":"appliedStores",
+            "label": this.$t('overview.patrolStore'),
             "width": '27%',
             "className": 'col2'
           },
           {
-            "prop":"计划描述",
-            "label": '计划描述',
+            "prop":"schedule",
+            "label": this.$t('overview.planDes'),
             "width": '35%',
             "className": 'col3'
           },
           {
-            "prop": "numOfCompleted",
-            "label": '频率',
+            "prop": "mode",
+            "label": this.$t('overview.planFre'),
             "width": '25%',
             "className": 'col4'
           }
@@ -453,7 +476,15 @@
       }
     },
     methods:{
-      handleDown(){
+      getInspectorPlan(params){
+        return new Promise((resolve, reject) => {
+          GetScheduleTaskList(params).then(res => {
+            let data = res;
+            resolve(data);
+          })
+        })
+      },
+      async handleDown(){
         let self = this;
         self.ispdf=true
         if(self.total>0){
@@ -466,8 +497,14 @@
             if (regionResult.errCode == 0) {
               let result = regionResult.data;
               if (result) {
+                // let planTableData=[]
+                // let implementTableData = []
                 result.content.forEach(item=>{
                   item.completionRateStr = item.completionRate + '%'
+                  // self.getPlanDetail(item.supervisorId)
+                  // self.getScheduleTaskImplementation(item.supervisorId);
+                  // planTableData.push(self.planTableData);
+                  // implementTableData.push(self.implementTableData)
                 })
                 self.elPDFtableData = result.content;
               }
@@ -487,10 +524,6 @@
           }
         },1000)
       },
-      changeSelect(val){
-            let self = this;
-            self.ModelPost = Array.from(val)[0]; // 选中的职务
-        },
       getRowKeys(row){
         return row.supervisorId
       },
@@ -500,7 +533,7 @@
           self.expands = []
           if (row) {
             self.expands.push(row.supervisorId);
-            //self.getPlanDetail()
+            self.getPlanDetail()
             self.getScheduleTaskImplementation();
           }
         }
@@ -691,6 +724,7 @@
         let self = this;
         self.params.filter={page:self.page - 1,size:self.sizeNum};
         self.params.order = {direction: self.direction, property: self.property}
+        self.params.roleId = parseInt(self.ModelPost)
         await self.getInspectPersonTable();
       },
 
@@ -733,7 +767,8 @@
       async initData(){
         let self = this;
         self.params.filter={page:self.page - 1,size:self.sizeNum};
-        self.params.order = {direction: self.direction, property: self.property}
+        self.params.order = {direction: self.direction, property: self.property};
+        self.params.roleId = parseInt(self.ModelPost)
         await self.getInspectPersonTable();
       },
       export2Excel(){
@@ -783,20 +818,125 @@
       handleClick(tab, event) {
         console.log(tab, event);
       },
-      getPlanDetail(){
+      async getPlanDetail(e){
         let self = this;
-        let params = self.expands[0];
+        let params = {}
+        let supervisorId=''
+        if(e!=undefined){
+          supervisorId=e
+        }else{
+          supervisorId=self.expands[0]
+        }
+        params.supervisorId = supervisorId;
+        params.category = [0,1]
         console.log(params)
-        self.planTableData= [{
+        let result = await self.getInspectorPlan(params)
+        let storeparams={
+          "filter":{
+            "page":0,
+            "size":1000
+          }
+        };
+        let retData=await self.getStoreData(storeparams);
+        let storeList=retData.data.content;
+        let errCode = result.errCode;
+        if (errCode == 0) {
+          let resultData = result.data;
+          console.log(resultData)
+          resultData.forEach(item=>{
+            item.category = item.category== 0 ? self.$t('overview.remotePatrol'): self.$t('overview.onsitePatrol');
+            let scheduleStr = '';
+            let store=''
+            storeList.forEach(store_item=>{
+              item.appliedStores.forEach(app_item=>{
+                 if(store_item.storeId==app_item){
+                    store += store_item.name+ ','
+                  }
+              })
+            })
+            item.appliedStores = store
+            switch(item.mode){
+              // case 0:
+              //   item.mode=self.$t('overview.superTaskmode0');
+              //   item.schedule.forEach((_item,_index)=>{
+              //     scheduleStr += _item.day + ','
+              //   })
+              //   item.schedule='每天执行'
+              //   break;
+              case 1:
+                item.mode=self.$t('overview.superTaskmode1');
+                item.schedule.forEach((_item,_index)=>{
+                  let isuu= _index==item.schedule.length-1?'':',';
+                  if(self.lang!='en'){
+                    if(_item.day==7){
+                      _item.day=self.$t('overview.superTaskmode0')
+                    }
+                    scheduleStr += self.$t('overview.weeks')+_item.day + isuu
+                  }else{
+                    scheduleStr += self.week[_item.day-1] + isuu
+                  }
 
-        }]
+                })
+                if(self.lang!='en'){
+                  item.schedule=self.$t('overview.everydays') + scheduleStr + self.$t('overview.act')
+                }else{
+                  item.schedule=self.$t('overview.act') + scheduleStr + self.$t('overview.everydays')
+                }
+                break;
+              case 2:
+                item.mode=self.$t('overview.superTaskmode2');
+                item.schedule.forEach((_item,_index)=>{
+                  let isuu= _index==item.schedule.length-1?'':',';
+                  if(self.lang!='en'){
+                    scheduleStr += _item.day + self.$t('overview.daysww')+isuu
+                  }else{
+                    let idx = _item.day>3?3:_item.day-1;
+                      scheduleStr += _item.day+self.month[idx] + isuu
+                  }
+                })
+                if(self.lang!='en'){
+                  item.schedule=self.$t('overview.eachmonth') + scheduleStr + self.$t('overview.act')
+                }else{
+                  item.schedule=self.$t('overview.act') + scheduleStr + self.$t('overview.eachmonth')
+                }
+                break;
+              default:
+                item.mode=self.$t('overview.superTaskmode3');
+                item.schedule.forEach((_item,_index)=>{
+                  let days = moment('20200101').add(_item.day,'days')
+                  let isuu= _index==item.schedule.length-1?'':',';
+                  if(self.lang!='en'){
+                    scheduleStr += days.format('M') +self.$t('overview.superTaskmode2')+days.format('D')+self.$t('overview.superTaskmode0')+ isuu
+                  }else{
+                    // scheduleStr += self.monthly[_item.day-1]+_item.day+ isuu
+                    scheduleStr += days.format('LL')+' '
+                  }
+                })
+                if(self.lang!='en'){
+                  item.schedule = scheduleStr + self.$t('overview.act')
+                }else{
+                  item.schedule = self.$t('overview.act')+scheduleStr
+                }
+                break;
+            }
+          })
+          self.planTableData=resultData
+        }else{
+          self.planTableData=[]
+        }
       },
-      async getScheduleTaskImplementation(){
+      async getScheduleTaskImplementation(e){
         let self = this;
         let params = {};
+        let supervisorId=''
+        if(e!=undefined){
+          supervisorId=e
+        }else{
+          supervisorId=self.expands[0]
+        }
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        params.supervisorId = self.expands[0];
+        params.supervisorId = supervisorId;
         params.filter =  {
            "page": 0,
            "size": 3
@@ -1099,7 +1239,7 @@
     padding-bottom:0;
   }
   .LoadDialog /deep/ .el-dialog__body{
-    padding:0px 20px 30px 20px;
+    padding:0px 20px 30px 20px !important;
   }
   .header-class, .inside-header-class{
     height: 40px;

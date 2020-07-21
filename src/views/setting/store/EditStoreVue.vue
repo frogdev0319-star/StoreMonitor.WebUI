@@ -22,9 +22,9 @@
             </div> -->
         </el-col>
         <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
-            <p class="tab-title">{{$t('insSettingView.editStore')}}</p>
+            <p class="tab-title"><span class="tab-title-1">{{$t('insSettingView.editStore')}}</span><span class="tab-title-2">{{$t('insSettingView.editStoretips')}}</span></p>
             <div class="tab-main">
-                <el-tabs v-model="activeName" @tab-click="handleClick" id="patrltabs-content">
+                <el-tabs v-model="activeName" :before-leave="beforeleave" @tab-click="handleClick" id="patrltabs-content">
                     <el-tab-pane v-for="(item,index) in store.authorizedInspect" :key="index" :label="item.name" ></el-tab-pane>
                 </el-tabs>
                 <div class="el-table-title tabTitle">
@@ -56,6 +56,8 @@
                     </div>
             </div>
         </el-col>
+        <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
+        <dialog-vue :dialog-title='changeSubmitObj.title' :show-info='changeSubmitObj.showInfo' :is-warning='changeSubmitObj.isWarning' :dialog-closed='changeSubmitObj.dialogCosed' @confirmed='submitData' @canceled='cancelSubmitDialog'></dialog-vue>
     </el-row>
 </template>
 
@@ -66,14 +68,28 @@ import {getDeviceList} from '@/api/device'
 import {checkOutInspectItem,bindInspectItem, checkOutInspectItemV3, bindInspectItemV2, unbindInspectItemV2,GetInspectTagList} from '@/api/inspect'
 import {updateStoreInfo,getStoreList} from '@/api/store'
 import {generateStoreLang} from '@/api/i18n'
+import DialogVue from '@/components/DialogVue.vue'
 import LimitSelect from "../../../components/LimitSelect";
 export default {
     name:'EditStoreVue',
     components:{
-      LimitSelect
+      LimitSelect,
+      DialogVue
     },
     data(){
         return{
+            changeStoreObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmChangeBind'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            changeSubmitObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('insSettingView.confirmSubmitThis'),
+                isWarning:true,
+                dialogCosed:false
+            },
             activeName:'0',
             curTag:'远程巡检',
             storeTitle:'',
@@ -137,10 +153,43 @@ export default {
     },
     methods:{
         generateStoreLang,
+        changeStoreDialog(){
+            let self=this
+            self.changeStoreObj.dialogCosed=false
+            self.getNapeByStore(self.store.storeId)
+        },
+        canceldChangeStore(){
+            let self=this
+            self.changeStoreObj.dialogCosed=false
+        },
+        beforeleave(e,w){
+            let self = this
+            let isshowdialog=false
+            self.scheduleData.forEach(item=>{
+                item.itemData.forEach(_item=>{
+                    if(_item.oldChannelvalue.toString()!=_item.channelvalue.toString()){
+                        isshowdialog=true
+                    }
+                })
+            })
+            !isshowdialog?self.getNapeByStore(self.store.storeId,Number(e)):null
+                return isshowdialog ? new Promise((resolve,reject)=>{
+                    self.$confirm(self.$t('remotePatrol.confirmChangeBind'), self.$t('remotePatrol.confirm'), {
+                        confirmButtonText: self.$t('remotePatrol.confirm'),
+                        cancelButtonText: self.$t('remotePatrol.cancel'),
+                        type: 'warning'
+                        }).then(() => {
+                            self.getNapeByStore(self.store.storeId,Number(e))
+                            resolve();
+                        }).catch((err) => {
+                            reject(err);
+                        })
+                }) : true;
+        },
         handleClick(e){
             console.log(e.index)
             let self=this
-            self.getNapeByStore(self.store.storeId)
+            // self.getNapeByStore(self.store.storeId)
         },
         getChannelByStore(storeId){
             let self=this;
@@ -177,18 +226,25 @@ export default {
             })
         },
       changeDeviceId(val, item){
+        let self = this
         item.channelvalue = val;
       },
       changeSelect(val, item, index){
           this.clickItem(item, index)
       },
-      getNapeByStore(storeId){
+      getNapeByStore(storeId,idx){
             let self=this;
+            let index = 0
+            if(idx!=undefined){
+                index=idx
+            }else{
+                index=self.activeName
+            }
             let params={
                 storeId:storeId,
                 mode:0,
                 authorizedOnly:0,
-                tagName:self.store.authorizedInspect[self.activeName].name
+                tagName:self.store.authorizedInspect[index].name
             }
           checkOutInspectItemV3(params).then(res=>{
                 console.log(res);
@@ -258,6 +314,14 @@ export default {
               //self.curPerson=self.userId;
                 self.curPerson = self.supervisorId;
             })
+        },
+        // confirmSubmit(){
+        //     let self=this;
+        //     self.changeSubmitObj.dialogCosed=true
+        // },
+        cancelSubmitDialog(){
+            let self=this;
+            self.changeSubmitObj.dialogCosed=false
         },
         async submitData(){
             let self=this;
@@ -347,6 +411,8 @@ export default {
               //((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success')) ||
               if((resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
+                    self.changeSubmitObj.dialogCosed=false
+                    self.getNapeByStore(self.store.storeId)
                 }
                 else{
                     self.notify(this.$t('storeView.failSubmit'),'warning',3000);
@@ -487,7 +553,7 @@ export default {
         .storeEdit-content{
             margin: 30px;
             background-color: #fff;
-            padding:30px;
+            padding:0 30px 30px 30px;
             width:96%;
             .tab-main{
                 background-color: #f6f7fb;
@@ -495,10 +561,17 @@ export default {
             }
             .tab-title{
                 text-align: left;
-                font-size: calc(14/1920*100vw);
-                color:#182752;
-                font-weight: bold;
-                margin: 0 0 10px 0;
+                margin:30px 0 10px 0;
+                .tab-title-1{
+                    font-size: calc(14/1920*100vw);
+                    color:#182752;
+                    font-weight: bold;
+                }
+                .tab-title-2{
+                    font-size: calc(12/1920*100vw);
+                    color:#ffb540;
+                    margin-left: calc(15/1920*100vw);
+                }
             }
             #patrltabs-content{
                 line-height: 60px;
@@ -583,6 +656,9 @@ export default {
     }
 </style>
 <style>
+.el-dialog__body{
+    padding: 0px !important;
+}
 .el-schedule .el-input__inner{
     background: #f0f5f8 !important;
     border-radius: 0px !important;

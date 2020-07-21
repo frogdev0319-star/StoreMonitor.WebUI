@@ -103,20 +103,32 @@
         </el-col>
       </el-row>
       <el-row class="task-row">
-        <div class="titles">
-          <span class="title">{{$t('overview.patrolRanking')}}</span>
-          <span class="arrows" @click="changWorkerRanking">
-            <span class="order-span" v-if="isWorstWork">{{$t('overview.descendingOrder')}}</span>
-            <span class="order-span" v-else>{{$t('overview.ascendingOrder')}}</span>
-            <img :src="descending" v-if="isWorstWork" class="img-class">
-              <img :src="ascending" v-else class="img-class">
-          </span>
-          <!--<span class="arrows">-->
-          <!--<i @click="showBestWorks" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstWork }"></i>-->
-          <!--<i @click="showWorstWorks" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstWork }"></i>-->
-          <!--</span>-->
-          <!--<span class="five-title" v-if="isWorstWork">{{$t('overview.worstPatrol')}}</span>-->
-          <!--<span class="five-title" v-else>{{$t('overview.bestPatrol')}}</span>-->
+        <div class="top">
+          <div class="titles">
+            <span class="title">{{$t('overview.patrolRanking')}}</span>
+            <span class="arrows" @click="changWorkerRanking">
+              <span class="order-span" v-if="isWorstWork">{{$t('overview.descendingOrder')}}</span>
+              <span class="order-span" v-else>{{$t('overview.ascendingOrder')}}</span>
+              <img :src="descending" v-if="isWorstWork" class="img-class">
+                <img :src="ascending" v-else class="img-class">
+            </span>
+            <!--<span class="arrows">-->
+            <!--<i @click="showBestWorks" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstWork }"></i>-->
+            <!--<i @click="showWorstWorks" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstWork }"></i>-->
+            <!--</span>-->
+            <!--<span class="five-title" v-if="isWorstWork">{{$t('overview.worstPatrol')}}</span>-->
+            <!--<span class="five-title" v-else>{{$t('overview.bestPatrol')}}</span>-->
+          </div>
+          <div class="right-select">
+            <el-select v-model="ModelPost" size="mini" class="el-province" @change="initData">
+              <el-option
+                v-for="item in titleList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
         </div>
         <div class="task-dashboard">
           <div class="task-board" v-if="taskList.length > 0" :class="taskList.length < 5 ? 'space-task': ''">
@@ -260,6 +272,7 @@
   import {getCookie} from '@/common/auth';
   import {isLoginIn} from '@/api/login'
   import {mapGetters} from 'vuex'
+  import {getInspectStatsOverPersonV2} from '@/api/inspectOverview'
 
   export default {
     name: "ExceptEvent",
@@ -274,6 +287,17 @@
             return time.getTime() > this.$moment(new Date).endOf('d').toDate();
           }
         },
+        titleList:[
+          {
+           label:this.$t('insSettingView.storesupervisor'),
+           value:3
+           },
+           {
+           label:this.$t('insSettingView.storesuperManage'),
+           value:4
+           }
+        ],
+        ModelPost:3,
         toolTipClass: 'page-login-toolTipClass',
         tooltipClass: 'tooltip-class',
         taskList: [],
@@ -1091,6 +1115,7 @@
         console.log(self.timeMode);
         self.params.beginTs = start;
         self.params.endTs = end;
+        self.params.roleId = self.ModelPost
         self.initData();
       },
       initData() {
@@ -1586,6 +1611,7 @@
         params = JSON.parse(JSON.stringify(self.params));
         params.lowestFirst = self.isWorstWork;
         params.numOfPerson = 5;
+        params.roleId = self.ModelPost
         let result = await self.getInspectStatsOverPerson(params);
         console.log(result)
         let tempTaskList = [];
@@ -2557,10 +2583,18 @@
         border: 1px solid $border;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         background-color: #fff;
-        .titles {
+        .top{
           height: 70px;
           text-align: left;
           border-bottom: 1px solid $border;
+        }
+        .right-select{
+          float:right;
+          width:150px;
+          margin: 20px calc(30 / 1920 * 100vw) 0 0;
+        }
+        .titles {
+          float:left;
           .title {
             height: 100%;
             padding-top: 30px;

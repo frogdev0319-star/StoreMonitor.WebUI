@@ -3,7 +3,8 @@
     <div class="el-schedule-header">
       <el-col :span="24" class="el-schedule-btns">
         <div class="left-title">
-          <span class="title">{{generateScheduleLang('scheduleTitle')}}</span>
+          <span class="title" v-if="lang!='en'">{{generateScheduleLang('scheduleTitle')}}</span>
+          <span class="title" v-else>{{generateScheduleLang('noscheduleInspect')}}</span>
           <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
             <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
           </el-select>
@@ -74,6 +75,10 @@
         paneLength:0
       }
     },
+    mounted(){
+      let self=this
+      self.changePatrolType(0)
+    },
     methods: {
       generateScheduleLang,
       changePatrolType(val){//获取巡检表
@@ -88,17 +93,28 @@
                     let InspectList=[]
                     data.forEach(item=>{
                       if(item.appliedTo.length!=0){
+                        let isrole=[]
                         item.appliedTo.forEach(app_item=>{
                           if(app_item.roleId==3||app_item.roleId==4){
-                            let obj={}
-                            obj.id=item.id
-                            obj.name=item.name
-                            InspectList.push(obj)
+                            isrole.push(app_item)
                           }
                         })
+                        if(isrole.length!=0){
+                          let obj={}
+                          obj.id=item.id
+                          obj.name=item.name
+                          InspectList.push(obj)
+                        }
                       }
                     })
                     self.InspectList=InspectList
+                    if(self.InspectList.length!=0){
+                      self.isActivePatrol=self.InspectList[0].id
+                      self.isActive=0
+                      self.changePatrolList(self.isActivePatrol)
+                    }else{
+                      self.changePatrolList('noInspect')
+                    }
                     resolve(data);
                 }).catch(err => {
                     console.log(err.message);
@@ -107,7 +123,8 @@
             })
         },
       changePatrolList(val){
-
+        let self=this
+        self.$refs.remoteHandle.getScheduleList(val);
       },
       addScheduleButton() {
         let self = this;
@@ -115,7 +132,7 @@
             self.notify(self.$t('insSettingView.SchdRemoteLength'),'warning',3000);
             return false;         
         }else{
-          self.$refs.remoteHandle.addSchedule();
+          self.$refs.remoteHandle.addSchedule(self.isActivePatrol);
         }
       },
       notify(msg,type,time) {
@@ -130,7 +147,6 @@
         this.activeName = val;
       },
       getpaneList(val){
-        console.log('排程个数',val)
         this.paneLength = val
       },
       deleteScheduleButton() {
@@ -157,7 +173,7 @@
           self.$refs.remoteHandle.isFirstLoad = true;
           self.$refs.remoteHandle.activeName = "0";
           self.activeName = '0';
-          self.$refs.remoteHandle.getScheduleList();
+          self.$refs.remoteHandle.getScheduleList(self.isActivePatrol);
         }
       }
     },

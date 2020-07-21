@@ -57,6 +57,16 @@ export default {
     loginAbnormal: '登錄信息異常，請重新登錄！'
   },
   overview:{
+    'everydays':'每',//新增
+    'act':'執行',//新增
+    'daysww':'號',//新增
+    'eachmonth':'每月',
+    'weeks':'週',
+    'patrolPlan':'巡店計劃',
+    'patrolStore':'巡檢門店',
+    'planDes':'計劃描述',
+    'planFre':'頻率',
+    'patrolLists':'巡檢表',
     'htmltopdfA':'巡店考評統計PDF',
     'htmltopdfB':'巡檢項統計PDF',
     'htmltopdfC':'巡店效率統計PDF',
@@ -65,6 +75,10 @@ export default {
     'dataRangeTips': '* 時間範圍：最短壹周，最長壹年',
     'totalStore': '門店總數',
     'totalUnit': '家',
+    'superTaskmode0':'日',
+    'superTaskmode1':'周',
+    'superTaskmode2':'月',
+    'superTaskmode3':'自定義',
     'kpiIndex': 'KPI指標',
     'totalPatrol': '巡店總數',
     'advPatrolCycle': '平均巡店周期',
@@ -147,7 +161,7 @@ export default {
     proportionOfOnsite: '現場巡檢類別占比圖',
     emptyItemList:'巡檢項列表為空，請重新篩選數據',
     timesUnit: '（次）',
-    patrolList: '督導巡檢KPI列表',
+    patrolList: '巡店KPI列表',
     supervisorName: '督導名稱',
     storeNum: '管轄門店數量',
     scheduleNum: '計劃巡店次數',
@@ -215,6 +229,7 @@ export default {
     ignoreds: '不适用项',
     noItems: '暫無巡檢項！',
     notCombined: '該門店暫未綁定巡檢項！',
+    confirmChangeBind:'巡檢表尚未提交，是否確認切換巡檢表？',
     confirmSwitch: '本次巡店尚未完成，確認是否切換當前門店？',
     confirmIgnore: '確認是否忽略當前巡檢項？',
     notBindCamera: '當前門店的巡檢項未綁定設備！',
@@ -433,7 +448,8 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-    storeNoInspect:'此门店尚未绑定巡检表',
+    storeNoInspect:'此門店尚未綁定巡檢表',
+    confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'門店督導',
     storesuperManage:'門店負責人',
     bindWith: '已綁定',
@@ -462,6 +478,7 @@ export default {
     importFail: '範本導入失敗！',
     importFailTitle:'導入失敗',
     editStore:'遠程巡檢項通道綁定',
+    editStoretips:'溫馨提示：點擊提交按鈕，保存當前巡檢表',
     RemoteLength:'巡檢表數量超限，請刪除後再導入',
     SchdRemoteLength:'排程數量超限，請刪除後再創建',
     deletePatrolList:'當前沒有可刪除的巡檢表',
@@ -490,6 +507,8 @@ export default {
     deleteGroup: '確認刪除當前巡檢類別及其巡檢項？',
     deleteSuss: '巡檢項刪除成功！',
     deleteFail: '巡檢項刪除失敗！',
+    deleteInspectSuss: '巡檢表刪除成功！',
+    deleteInspectFail: '巡檢表刪除失敗！',
     selectProviceInfo: '按省份選擇',
     selectStore:'請選擇',
     bindStores: '绑定门店',
@@ -678,6 +697,8 @@ export default {
   },
   //Schedule Management page language
   scheduleView:{
+    noscheduleInspect:'請選擇排程關聯的巡檢表',
+    emptyAssignedTo:'請選擇巡檢人',
     schedule: '排程',
     scheduleName: '排程名稱',
     scheduleNameRuletip:'最多可輸入30個字符',

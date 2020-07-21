@@ -57,3 +57,11 @@ export const deleteScheduleService=data=>{
     data
   })
 }
+
+export const GetScheduleTaskList=data=>{
+  return request({
+    url:`${version}/schedule/task/list`,
+    method:'post',
+    data
+  })
+}

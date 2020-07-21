@@ -144,7 +144,7 @@
                 </el-option>
               </el-select>
               <span :id="lang=='en'? 'en-span': 'span'" style="padding-right:14px;">{{generateScheduleLang('InspectPerson')}}</span>
-              <el-checkbox-group v-model="Inspector">
+              <el-checkbox-group v-model="item.assignedTo">
                 <el-checkbox v-for="item in InspectorList" :label="item.id" :key="item.id">{{item.label}}</el-checkbox>
               </el-checkbox-group>
             </el-col>
@@ -267,7 +267,7 @@
         default: '0'
       },
       inspectId:{
-        type: String
+        type: Number
       }
     },
     data(){
@@ -281,7 +281,7 @@
         showAddTime: false,
         scheduleList: ['点检排程一'],
         InspectorList:[{id:3,label:this.$t('insSettingView.storesupervisor')},{id:4,label:this.$t('insSettingView.storesuperManage')}],
-        Inspector:[],
+        // Inspector:[],
         paneList:[],
         lang: this.$i18n.locale ,
         bigMonthList:[
@@ -539,6 +539,7 @@
         weekDays:[],
         showAddDialog:false,
         showDeleteDialog:false,
+        isActivePatrol:'',
         scheduleName: '',
         storeCount: 0,
         serachVale: '',
@@ -718,6 +719,7 @@
         }
         let name = self.paneList[tabIndex].name;
         let schedule = self.paneList[tabIndex].schedule;
+        let assignedTo = self.paneList[tabIndex].assignedTo
         console.log(schedule)
         if(name == ''){
           self.notify(self.$t('scheduleView.emptyName'), 'warning',3000);
@@ -729,7 +731,10 @@
           return false;
         }
         console.log(dayArray)
-
+        if(assignedTo.length == 0){
+          self.notify(self.$t('scheduleView.emptyAssignedTo'), 'warning',3000);
+          return false;
+        }
         if(mode==1 || mode == 2){
           //weekly or monthly mode
           if(dayArray.length == 0 ){
@@ -759,7 +764,12 @@
             return false;
           }
         }
-        self.showBindDialog = true;
+        if(self.isActivePatrol=='noInspect'){
+          self.notify(self.$t('scheduleView.noscheduleInspect'), 'warning',3000);
+          return false;
+        }else{
+          self.showBindDialog = true;
+        }
       },
       handleClick(val) {
         let self = this;
@@ -784,8 +794,8 @@
       },
 
       addScheduleService() {
-        let params = {};
         let self = this;
+        let params = {};
         let tabIndex = Number(self.activeName);
         params.name = self.paneList[tabIndex].name;
         params.comment = parseInt(self.activePatrol) == 0 ? '远程巡检计划': '现场巡检计划';
@@ -848,10 +858,9 @@
         params.schedule = tempSchedule;
         console.log(params.schedule);
         params.extra={
-          inspectId:parseInt(self.Inspector),
-          assignedTo:self.Inspector
+          inspectId:self.isActivePatrol,
+          assignedTo:self.paneList[tabIndex].assignedTo
         }
-
         return new Promise((resolve, reject) => {
           addNewSchedule(params).then(res => {
             console.log(res);
@@ -864,8 +873,9 @@
         })
       },
 
-      async addSchedule() {
+      async addSchedule(val) {
         let self = this;
+        self.isActivePatrol=val
         self.scheduleName = self.$t('scheduleView.newSchedule');
         self.showAddDialog = false;
         let selfMonth = self.selfMonthList.slice(0);
@@ -878,6 +888,7 @@
           enable: 0,
           to: -1,
           dueDays: 1,
+          assignedTo:[],
           schedule: [{
             month: '',
             day: [],
@@ -1030,7 +1041,7 @@
             //   _obj.disabled = false;
             //   _tempCount++;
             // }
-            if(mode === 3){
+            // if(mode === 3){
               if (bindStoreId.indexOf(_item.storeId) == -1) {
                 _obj.checked = false;
                 _obj.disabled = false;
@@ -1040,29 +1051,29 @@
                 _obj.disabled = false;
                 _tempCount++;
               }
-            }
-            else{
-              if (bindStoreId.indexOf(_item.storeId) != -1) {
-                _obj.checked = true;
-                _obj.disabled = false;
-                _tempCount++;
-              }
-              else {
-                // 周月模式下，剩下的商店id 要看有没有绑定周月模式，若绑定，则不可用，
-                if(self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
-                  _obj.checked = false;
-                  _obj.disabled = false;
-                }
-                else{
-                  _obj.checked = false;
-                  _obj.disabled = true;
-                  _tempDisCount++;
-                }
-                // _obj.checked = true;
-                // _obj.disable = false;
-                // _tempCount++;
-              }
-            }
+            // }
+            // else{
+            //   if (bindStoreId.indexOf(_item.storeId) != -1) {
+            //     _obj.checked = true;
+            //     _obj.disabled = false;
+            //     _tempCount++;
+            //   }
+            //   else {
+            //     // 周月模式下，剩下的商店id 要看有没有绑定周月模式，若绑定，则不可用，
+            //     if(self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
+            //       _obj.checked = false;
+            //       _obj.disabled = false;
+            //     }
+            //     else{
+            //       _obj.checked = false;
+            //       _obj.disabled = true;
+            //       _tempDisCount++;
+            //     }
+            //     // _obj.checked = true;
+            //     // _obj.disable = false;
+            //     // _tempCount++;
+            //   }
+            // }
             _obj.storeId = _item.storeId;
             _obj.name = _item.storeName;
             _obj.city = item.city;
@@ -1319,7 +1330,6 @@
             size: 1000
           }
         }
-
         let resData = await self.getStoreData(params);
         let data = resData.content;
         console.log(data)
@@ -1435,157 +1445,175 @@
           })
         })
       },
-      async getScheduleList(){
+      async getScheduleList(val){
         let self = this;
+        self.isActivePatrol=val;
+        self.activeName='0';
         self.paneList = [];
         self.scheduleList = [];
-        let params = {};
-        params.category = parseInt(self.activePatrol);
-        let data = await self.getScheduleFromDB(params)
-        console.log('特特热恩',data)
-        if(data.length!=0){
-          data.forEach(item=>{
-            let name = item.name; //排程名称
-            if(self.scheduleList.indexOf(name)==-1){
-              self.scheduleList.push(name);
-            }
-          })
-          let tempAllData=[];
-          data.forEach(_item => {
-            console.log(_item);
-            let tempScheduleData = {};
-            tempScheduleData.name = _item.name;
-            tempScheduleData.mode = _item.mode;
-            tempScheduleData.modeDisabled = true;
-            tempScheduleData.schId = _item.id; //排程id
-            tempScheduleData.enable = _item.enable;
-            tempScheduleData.notifyTime = (_item.notifyTime == -1)? '' : self.secondsToHour(_item.notifyTime);
-            tempScheduleData.from = self.$moment(_item.from).format('YYYY'); //从from获取年
-            let aheadNotification = _item.aheadNotification; //是否提前一天通知
-
-            if(aheadNotification == 86400){
-              tempScheduleData.ifNotifyOneDay = true;
-            }
-            else{
-              tempScheduleData.ifNotifyOneDay = false;
-            }
-            tempScheduleData.dueDays = _item.dueDays;
-            tempScheduleData.execOnce = (_item.to == -1) ? false: true;
-            let tempSchedules = _item.schedule;
-            console.log(tempSchedules)
-            let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly, 3 自定义
-            let dayArray = []; //存放1，2两种类型选中的时间
-            let timeArray = []; //存放3种类型的执行时间
-            tempSchedules.forEach(sche=>{
-              console.log(sche)
-              let day = sche.day;
-              dayArray.push(day)
-              console.log(dayArray);
-
-              let period = sche.period;
-              period.forEach(periods=>{
-                let from = periods.from;
-                let hours = self.secondsToHour(from);
-                if(timeArray.indexOf(hours) == -1){
-                  timeArray.push(self.secondsToHour(from));
-                }
-                else{
-
+        if(val=='noInspect'){
+            self.getTemp()
+        }else{
+            let params = {};
+            params.category = parseInt(self.activePatrol);
+            let data = await self.getScheduleFromDB(params)
+            if(data.length!=0){
+              let paneArr=[]
+              data.forEach(item=>{
+                // let name = item.name; //排程名称
+                // if(self.scheduleList.indexOf(name)==-1){
+                if(item.extra.inspectId==val){
+                  paneArr.push(item);
                 }
               })
-            })
-            if(mode == 3){
-              let tempArray = [];
-              let scheduleSelf = []; //存放自定义的月份和时间
-              dayArray.forEach(item=>{
-                let monthDay = self.$moment([tempScheduleData.from]).dayOfYear(item).format('M-D');
-                tempArray.push(monthDay);
-              })
-              //将数组按照月份分组，日组成数组
-              console.log(tempArray)
-              scheduleSelf = self.formatMonthDay(tempArray);
-              console.log(scheduleSelf)
-              let selectMonth = [];
-              scheduleSelf.forEach(item=>{
-                let month = parseInt(item.month);
-                selectMonth.push(item.month);
-                console.log(item.day.map(Number));;
-                let year = self.$moment().format('YYYY');
-                let days = self.$moment([year, month-1]).daysInMonth();
-                console.log(days)
-                item.monthList = self.bigMonthList.slice(0, days);
-                item.showMonthContent = false; //时间选择面板默认不显示
-                item.showSelfDefineMonth = false;
-                let selfMonth = self.selfMonthList.slice(0);
-                selfMonth.forEach(item=>{item.disabled = false});
-                item.selfMonthList = selfMonth;
-                item.day = item.day.map(Number)
-              })
-              selectMonth.forEach(item=>{
-                scheduleSelf.forEach(_item=>{
-                  if(item  != _item.month){
-                    _item.selfMonthList.forEach(month=>{
-                      if(month.value == item){
-                        month.disabled = true;
+              let tempAllData=[];
+              if(paneArr.length!=0){
+                  paneArr.forEach(_item => {
+                  console.log(_item);
+                  let tempScheduleData = {};
+                  tempScheduleData.name = _item.name;
+                  tempScheduleData.mode = _item.mode;
+                  tempScheduleData.modeDisabled = true;
+                  tempScheduleData.schId = _item.id; //排程id
+                  tempScheduleData.enable = _item.enable;
+                  tempScheduleData.notifyTime = (_item.notifyTime == -1)? '' : self.secondsToHour(_item.notifyTime);
+                  tempScheduleData.from = self.$moment(_item.from).format('YYYY'); //从from获取年
+                  tempScheduleData.assignedTo = _item.extra.assignedTo
+                  let aheadNotification = _item.aheadNotification; //是否提前一天通知
+
+                  if(aheadNotification == 86400){
+                    tempScheduleData.ifNotifyOneDay = true;
+                  }
+                  else{
+                    tempScheduleData.ifNotifyOneDay = false;
+                  }
+                  tempScheduleData.dueDays = _item.dueDays;
+                  tempScheduleData.execOnce = (_item.to == -1) ? false: true;
+                  let tempSchedules = _item.schedule;
+                  console.log(tempSchedules)
+                  let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly, 3 自定义
+                  let dayArray = []; //存放1，2两种类型选中的时间
+                  let timeArray = []; //存放3种类型的执行时间
+                  tempSchedules.forEach(sche=>{
+                    console.log(sche)
+                    let day = sche.day;
+                    dayArray.push(day)
+                    console.log(dayArray);
+
+                    let period = sche.period;
+                    period.forEach(periods=>{
+                      let from = periods.from;
+                      let hours = self.secondsToHour(from);
+                      if(timeArray.indexOf(hours) == -1){
+                        timeArray.push(self.secondsToHour(from));
+                      }
+                      else{
+
                       }
                     })
+                  })
+                  if(mode == 3){
+                    let tempArray = [];
+                    let scheduleSelf = []; //存放自定义的月份和时间
+                    dayArray.forEach(item=>{
+                      let monthDay = self.$moment([tempScheduleData.from]).dayOfYear(item).format('M-D');
+                      tempArray.push(monthDay);
+                    })
+                    //将数组按照月份分组，日组成数组
+                    console.log(tempArray)
+                    scheduleSelf = self.formatMonthDay(tempArray);
+                    console.log(scheduleSelf)
+                    let selectMonth = [];
+                    scheduleSelf.forEach(item=>{
+                      let month = parseInt(item.month);
+                      selectMonth.push(item.month);
+                      console.log(item.day.map(Number));;
+                      let year = self.$moment().format('YYYY');
+                      let days = self.$moment([year, month-1]).daysInMonth();
+                      console.log(days)
+                      item.monthList = self.bigMonthList.slice(0, days);
+                      item.showMonthContent = false; //时间选择面板默认不显示
+                      item.showSelfDefineMonth = false;
+                      let selfMonth = self.selfMonthList.slice(0);
+                      selfMonth.forEach(item=>{item.disabled = false});
+                      item.selfMonthList = selfMonth;
+                      item.day = item.day.map(Number)
+                    })
+                    selectMonth.forEach(item=>{
+                      scheduleSelf.forEach(_item=>{
+                        if(item  != _item.month){
+                          _item.selfMonthList.forEach(month=>{
+                            if(month.value == item){
+                              month.disabled = true;
+                            }
+                          })
+                        }
+                      })
+                    })
+                    tempScheduleData.schedule = scheduleSelf;
                   }
+                  else{
+                    tempScheduleData.schedule = [{}];
+                    tempScheduleData.schedule[0].day = dayArray;
+                  }
+                  console.log(timeArray);
+                  console.log(dayArray);
+                  tempScheduleData.timeArray = timeArray;
+                  tempScheduleData.dayArray = dayArray;
+                  self.paneList.push(tempScheduleData);
                 })
-              })
-              tempScheduleData.schedule = scheduleSelf;
+                
+              }else{
+                self.getTemp()
+              }
+              if(self.isFirstLoad == true){
+                self.isFirstLoad = false;
+                self.selectTab = this.paneList[Number(self.activeName)].name;
+                self.scheduleId = self.paneList[0].schId;
+                console.log(self.dayArray)
+              }
+              self.scheduleId = self.paneList[0].schId;
+              console.log(self.paneList);
+              self.getHasBoundStroeIds();
             }
-            else{
-              tempScheduleData.schedule = [{}];
-              tempScheduleData.schedule[0].day = dayArray;
+            else if(data.length == 0){
+              self.getTemp()
             }
-            console.log(timeArray);
-            console.log(dayArray);
-            tempScheduleData.timeArray = timeArray;
-            tempScheduleData.dayArray = dayArray;
-            self.paneList.push(tempScheduleData);
-          })
-          if(self.isFirstLoad == true){
-            self.isFirstLoad = false;
-            self.selectTab = this.paneList[Number(self.activeName)].name;
-            self.scheduleId = self.paneList[0].schId;
-            console.log(self.dayArray)
-            self.searchStore();
-          }
-          console.log(self.paneList);
-          self.getHasBoundStroeIds();
         }
-        else if(data.length == 0){
-          self.scheduleName = self.$t('scheduleView.newSchedule');
-          let selfMonth = self.selfMonthList.slice(0);
-          selfMonth.forEach(item=>{item.disabled = false});
-          let addInfo = {
-            name: self.scheduleName,
-            mode: self.activePatrol=='0' ? 1: 2,
-            schId: 0,
-            enable: 0,
-            to: -1,
-            dueDays: 1,
-            schedule: [{
-              month: '',
-              day: [],
-              selfMonthList: selfMonth,
-              monthList: self.bigMonthList
-            }],
-            notifyTime: '',
-            execOnce: false,
-            ifNotifyOneDay: false,
-            modeDisabled: false,
-            Ruletip:false
-          };
-          self.paneList.push(addInfo);
-          self.scheduleName = "远程巡检排程一";
-          self.selectTab = "远程巡检排程一";
-          self.scheduleId = 0;
-          self.isDisabled = false;
-          self.isAdd = true;
-          self.hasBoundStoreIds = [];
-          self.searchStore();
-        }
+        self.searchStore();
+      },
+      getTemp(){
+        let self=this
+            self.scheduleName = self.$t('scheduleView.newSchedule');
+            let selfMonth = self.selfMonthList.slice(0);
+            selfMonth.forEach(item=>{item.disabled = false});
+            let addInfo = {
+              name: self.scheduleName,
+              mode: self.activePatrol=='0' ? 1: 2,
+              schId: 0,
+              enable: 0,
+              to: -1,
+              dueDays: 1,
+              assignedTo:[],
+              schedule: [{
+                month: '',
+                day: [],
+                selfMonthList: selfMonth,
+                monthList: self.bigMonthList
+              }],
+              notifyTime: '',
+              execOnce: false,
+              ifNotifyOneDay: false,
+              modeDisabled: false,
+              Ruletip:false
+            };
+            self.paneList.push(addInfo);
+            self.scheduleName = "远程巡检排程一";
+            self.selectTab = "远程巡检排程一";
+            self.scheduleId = 0;
+            self.isDisabled = false;
+            self.isAdd = true;
+            self.hasBoundStoreIds = [];
       },
       getHasBoundStroeIds(){
         let self = this;
@@ -1704,8 +1732,8 @@
         }
         params.schedule = tempSchedule;
         params.extra={
-          inspectId:parseInt(self.inspectId),
-          assignedTo:self.Inspector
+          inspectId:self.inspectId,
+          assignedTo:self.paneList[tabIndex].assignedTo
         }
         console.log(params);
         return new Promise((resolve, reject) => {
@@ -1858,7 +1886,7 @@
 
     mounted(){
       let self = this;
-      self.getScheduleList();
+      // self.getScheduleList();
     }
 
   }
@@ -2272,6 +2300,9 @@
   }
 </style>
 <style>
+.el-dialog__body{
+    padding: 0px !important;
+}
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
   }

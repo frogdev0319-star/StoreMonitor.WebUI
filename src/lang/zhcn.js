@@ -57,6 +57,16 @@ export default {
     loginAbnormal: '登录信息异常，请重新登录！'
   },
   overview:{
+    everydays:'每',//新增
+    act:'执行',//新增
+    daysww:'号',//新增
+    eachmonth:'每月',
+    weeks:'周',
+    patrolPlan:'巡店计划',
+    patrolStore:'巡检门店',
+    planDes:'计划描述',
+    planFre:'频率',
+    patrolLists:'巡检表',
     htmltopdfA:'巡店考评统计PDF',
     htmltopdfB:'巡检项统计PDF',
     htmltopdfC:'巡店效率统计PDF',
@@ -65,6 +75,10 @@ export default {
     dataRangeTips: '* 时间范围：最短一周，最长一年',
     totalStore: '门店总数',
     totalUnit: '家',
+    superTaskmode0:'日',
+    superTaskmode1:'周',
+    superTaskmode2:'月',
+    superTaskmode3:'自定义',
     kpiIndex: 'KPI指标',
     totalPatrol: '巡店总数',
     advPatrolCycle: '平均巡店周期',
@@ -147,7 +161,7 @@ export default {
     proportionOfOnsite: '现场巡检类别占比图',
     emptyItemList:'巡检项列表为空，请重新筛选数据',
     timesUnit: '（次）',
-    patrolList: '督导巡店KPI列表',
+    patrolList: '巡店KPI列表',
     supervisorName: '督导名称',
     storeNum: '管辖门店数量',
     scheduleNum: '计划巡店次数',
@@ -215,6 +229,7 @@ export default {
     ignoreds: '不适用项',
     noItems: '暂无巡检项',
     notCombined: '该门店暂未绑定巡检项！',
+    confirmChangeBind:'巡检表尚未提交，是否确认切换巡检表？',
     confirmSwitch: '本次巡店尚未完成，确认是否切换当前门店？',
     confirmIgnore: '确认是否忽略当前巡检项？',
     notBindCamera: '当前门店的巡检项未绑定设备！',
@@ -433,6 +448,7 @@ export default {
   // Inspection Management page language
   insSettingView:{
     storeNoInspect:'此门店尚未绑定巡检表',
+    confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'门店督导',
     storesuperManage:'门店负责人',
     bindWith: '已绑定',
@@ -461,6 +477,7 @@ export default {
     importFail: '模板导入失败！',
     importFailTitle:'导入失败',
     editStore:'远程巡检项通道绑定',
+    editStoretips:'温馨提示：点击提交按钮，保存当前巡检表',
     RemoteLength:'巡检表数量超限，请删除后再导入',
     SchdRemoteLength:'排程数量超限，请删除后再创建',
     deletePatrolList:'当前没有可删除的巡检表',
@@ -489,6 +506,8 @@ export default {
     deleteGroup: '确认删除当前巡检类别及其巡检项？',
     deleteSuss: '巡检项删除成功！',
     deleteFail: '巡检项删除失败！',
+    deleteInspectSuss: '巡检表删除成功！',
+    deleteInspectFail: '巡检表删除失败！',
     selectProviceInfo: '按省份选择',
     selectStore:'请选择',
     bindStores: '绑定门店',
@@ -682,6 +701,8 @@ export default {
   },
   //Schedule Management page language
   scheduleView:{
+    noscheduleInspect:'请选择排程关联的巡检表',
+    emptyAssignedTo:'请选择巡检人',
     schedule: '排程',
     scheduleName: '排程名称',
     scheduleNameRuletip:'最多可输入30个字符',

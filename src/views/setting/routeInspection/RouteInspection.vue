@@ -399,13 +399,15 @@ export default {
 
             })
         },
-        async getTagList(){
+        async getTagList(val){
             let self=this;
             let TagData=await self.getTagAll();
             if(TagData.length!=0){
+                if(val=='del'){
+                    self.patrolActive=(TagData.length-1).toString()
+                }
                 let params={
-                    // inspectId:TagData[Number(self.patrolActive)].id
-                    inspectId:49
+                    inspectId:TagData[Number(self.patrolActive)].id
                 }
                 let NapeData=await self.getNapeList(params)
                 let tempAllData=[];
@@ -499,6 +501,7 @@ export default {
                     }
                 // })
                 self.elTableData=self.elTableData.concat(tempAllData);
+                console.log('不不不',self.elTableData)
             }
             else{
               self.getDownLoadURL();
@@ -726,7 +729,7 @@ export default {
             // console.log(tabObj);
             let self=this;
             sessionStorage.setItem('TabIndex',tabObj.index);
-            self.getBindStoreList();
+            // self.getBindStoreList();
             switch(tabObj.index){
                 case '0':
                 self.checkValue='远程巡检';break;
@@ -793,7 +796,7 @@ export default {
                         }
                     }
                     else{
-                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
+                        self.notify(self.$t('insSettingView.deleteInspectFail') ,'warning',3000);
                         return false;
                     }
                 })
@@ -804,7 +807,7 @@ export default {
                         self.afterDeleteList();
                     }
                     else{
-                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
+                        self.notify(self.$t('insSettingView.deleteInspectFail') ,'warning',3000);
                         return false;
                     }
                 })
@@ -812,9 +815,9 @@ export default {
         },
         afterDeleteList(){
             let self=this;
-            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+            self.notify(self.$t('insSettingView.deleteInspectSuss'),'success',3000);
             self.showSingleDeleteContent=false;
-            self.getTagList()
+            self.getTagList('del')
         },
          importItem(){
             let self=this;
