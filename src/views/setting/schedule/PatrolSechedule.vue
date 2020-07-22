@@ -103,6 +103,7 @@
                           let obj={}
                           obj.id=item.id
                           obj.name=item.name
+                          obj.roleId=item.appliedTo
                           InspectList.push(obj)
                         }
                       }

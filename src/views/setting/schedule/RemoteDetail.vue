@@ -143,9 +143,9 @@
                   :value="item.value">
                 </el-option>
               </el-select>
-              <span :id="lang=='en'? 'en-span': 'span'" style="padding-right:14px;">{{generateScheduleLang('InspectPerson')}}</span>
+              <span :id="lang=='en'? 'en-span': 'span'" :style="lang=='en'?'':'padding-right:14px;'">{{generateScheduleLang('InspectPerson')}}</span>
               <el-checkbox-group v-model="item.assignedTo">
-                <el-checkbox v-for="item in InspectorList" :label="item.id" :key="item.id">{{item.label}}</el-checkbox>
+                <el-checkbox v-for="list_item in InspectorList" :disabled="list_item.disabled" :label="list_item.id" :key="list_item.id">{{list_item.label}}</el-checkbox>
               </el-checkbox-group>
             </el-col>
             <el-col :span="24" class="el-header-hr"></el-col>
@@ -245,6 +245,7 @@
 
 <script>
   import {generateScheduleLang} from '@/api/i18n'
+  import {inpectRESTful} from '@/api/index'
   import {getScheduleBindList, addNewSchedule, getScheduleListService, bindScheduleAndStore, unbindScheduleAndStore, updateSchedule,deleteScheduleService} from '@/api/schedule'
   import {getStoreList} from '@/api/store'
   import DialogVue from '@/components/DialogVue.vue'
@@ -280,7 +281,7 @@
         tempStoreList :[],
         showAddTime: false,
         scheduleList: ['点检排程一'],
-        InspectorList:[{id:3,label:this.$t('insSettingView.storesupervisor')},{id:4,label:this.$t('insSettingView.storesuperManage')}],
+        InspectorList:[{id:3,label:this.$t('insSettingView.storesupervisor'),disabled:false},{id:4,label:this.$t('insSettingView.storesuperManage'),disabled:false}],
         // Inspector:[],
         paneList:[],
         lang: this.$i18n.locale ,
@@ -1445,12 +1446,36 @@
           })
         })
       },
+      getTagAll(){//获取巡检表
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                inpectRESTful.GetInspectTagList().then(res=>{
+                    let data=res.data;
+                    resolve(data);
+                }).catch(err => {
+                    console.log(err.message);
+                })
+
+            })
+        },
       async getScheduleList(val){
         let self = this;
         self.isActivePatrol=val;
         self.activeName='0';
         self.paneList = [];
         self.scheduleList = [];
+        let tag = await self.getTagAll()
+        // tag.forEach(item=>{
+        //     if(val==item.id){
+        //       self.InspectorList.forEach(_item=>{
+        //       item.appliedTo.forEach(ass_item=>{
+        //         if(ass_item!=_item.id){
+        //             _item.disabled=true
+        //           }
+        //         })
+        //       })
+        //     }
+        // })
         if(val=='noInspect'){
             self.getTemp()
         }else{

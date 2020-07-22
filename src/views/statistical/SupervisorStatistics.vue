@@ -48,13 +48,13 @@
           <el-col :span="24" class="items-title">
             <span class="title">{{$t('overview.patrolList')}}</span>
             <div class="exprotBtn">
-              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+              <!-- <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                 <div class="btn-area">
                   <i class="iconfont icon-excel"></i>
-                  <!-- <img :src="exportPng" class="icon-excel"> -->
+                  <img :src="exportPng" class="icon-excel">
                   <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                 </div>
-              </el-button>
+              </el-button> -->
               <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="margin-top:-15px;">
                 <div class="btn-area">
                   <i class="iconfont icon-pdf"></i>
@@ -197,11 +197,11 @@
                                   :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
                   </el-table-column>
                   <el-table-column type="expand" :label="$t('overview.detail')" width="100px">
-                    <template slot-scope="props">
+                    <template slot-scope="scope">
                       <el-tabs v-model="activePDFFirst" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="First">
                           <el-table
-                            :data="planTableData"
+                            :data="scope.row.planTableData"
                             :highlight-current-row="true"
                             align='left'
                             stripe
@@ -221,7 +221,7 @@
                         <el-tabs v-model="activePDFSecond" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolExecution')" name="Second">
                           <el-table
-                            :data="implementTableData"
+                            :data="scope.row.implementTableData"
                             :highlight-current-row="true"
                             align='left'
                             stripe
@@ -370,6 +370,7 @@
         cellClass: 'cell-class',
         activeName: 'patrolPlan',
         planTableData: [],
+        planPDFData:[],
         week:['Mon.','Tues.', 'Wed.','Thur.','Fri.','Sat.','Sun.'],
         monthly:['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sept.','Oct.','Nov.','Dec.'],
         month:['st','nd','rd','th'],
@@ -412,6 +413,7 @@
           }
           ],
         implementTableData: [],
+        implementPDFData:[],
         implementTableInfo: [
           {
             "prop": "fromDateStr",
@@ -487,42 +489,59 @@
       async handleDown(){
         let self = this;
         self.ispdf=true
-        if(self.total>0){
-          require.ensure([], async() => {
+        require.ensure([], async() => {
+          if(self.total>0){
+            require.ensure([], async() => {
               self.params.filter={
-              "page": 0,
-              "size": self.total
-            };
-            let regionResult = await self.getInspectStatsPersonInfo(self.params);
-            if (regionResult.errCode == 0) {
-              let result = regionResult.data;
-              if (result) {
-                // let planTableData=[]
-                // let implementTableData = []
-                result.content.forEach(item=>{
-                  item.completionRateStr = item.completionRate + '%'
-                  // self.getPlanDetail(item.supervisorId)
-                  // self.getScheduleTaskImplementation(item.supervisorId);
-                  // planTableData.push(self.planTableData);
-                  // implementTableData.push(self.implementTableData)
-                })
-                self.elPDFtableData = result.content;
+                "page": 0,
+                "size": self.total
+              };
+              let regionResult = await self.getInspectStatsPersonInfo(self.params);
+              if (regionResult.errCode == 0) {
+                let result = regionResult.data;
+                if (result) {
+                      let dataLabel = new Array(result.content.length).fill(false);
+                      result.content.forEach(async (item,index)=>{
+                        item.completionRateStr = item.completionRate + '%'
+                        await self.getPlanDetail(item.supervisorId)
+                        item.planTableData=self.planTableData;   
+                        await self.getScheduleTaskImplementation(item.supervisorId);
+                        item.implementTableData=self.implementTableData;
+                        dataLabel[index] = true;
+
+                        if(dataLabel.findIndex(p=>p ==false) == -1){
+                            self.elPDFtableData = result.content;
+                              setTimeout(()=>{
+                                self.getPdf()
+                                if(sessionStorage.getItem('startPDF')=='start'){
+                                  sessionStorage.removeItem('startPDF','start');
+                                  if(sessionStorage.getItem('endPDF')=='end'){
+                                    sessionStorage.removeItem('endPDF','end');
+                                    setTimeout(()=>{
+                                      self.ispdf=false
+                                    },1000)
+                                  }
+                                }
+                              },1000)
+                        }
+                      })
+                }
+              }
+            })
+          }else{
+            self.getPdf()
+            if(sessionStorage.getItem('startPDF')=='start'){
+              sessionStorage.removeItem('startPDF','start');
+              if(sessionStorage.getItem('endPDF')=='end'){
+                sessionStorage.removeItem('endPDF','end');
+                setTimeout(()=>{
+                  self.ispdf=false
+                },1000)
               }
             }
-          })
-        }
-        setTimeout(()=>{
-          self.getPdf()
-          if(sessionStorage.getItem('startPDF')=='start'){
-            sessionStorage.removeItem('startPDF','start');
-            if(sessionStorage.getItem('endPDF')=='end'){
-              sessionStorage.removeItem('endPDF','end');
-              setTimeout(()=>{
-                self.ispdf=false
-              },1000)
-            }
           }
-        },1000)
+        })
+      
       },
       getRowKeys(row){
         return row.supervisorId

@@ -96,13 +96,13 @@
             <el-col :span="24" class="items-title">
               <span class="title">{{$t('overview.itemChartReport')}}</span>
               <div class="exprotBtn">
-                <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                <!-- <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                   <div class="btn-area">
                     <i class="iconfont icon-excel"></i>
-                    <!-- <img :src="exportPng" class="icon-excel"> -->
+                    <img :src="exportPng" class="icon-excel">
                     <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                   </div>
-                </el-button>
+                </el-button> -->
                 <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="margin-top:-15px;">
                   <div class="btn-area">
                     <i class="iconfont icon-pdf"></i>

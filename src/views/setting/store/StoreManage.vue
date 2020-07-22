@@ -445,9 +445,8 @@ import {generateStoreLang} from '@/api/i18n'
                 self.storeData=data.data;
                 let temp=[];
                 self.storeData.content.forEach(item=>{
-                  console.log(item)
                     let obj={};
-                    if(item.appliedInspect==''){
+                    if(item.authorizedInspect.length==0){
                         obj.showTag=false;
                     }
                     else{
@@ -465,9 +464,16 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.authorizedInspect=item.authorizedInspect
                     if(item.authorizedInspect.length!=0){
                         let au_inspect=[]
+                        let mode=[]
                         item.authorizedInspect.forEach(au_item=>{
-                            au_inspect.push(au_item.name)
+                            mode.push(au_item.mode)
                         })
+                        if(mode.indexOf(0)!=-1){
+                            au_inspect.push(self.$t('overview.remotePatrol'))
+                        }
+                        if(mode.indexOf(1)!=-1){
+                            au_inspect.push(self.$t('overview.onsitePatrol'))
+                        }
                         obj.napeTable=au_inspect.join('，')
                     }else{
                         obj.napeTable='--'
@@ -538,7 +544,7 @@ import {generateStoreLang} from '@/api/i18n'
             },
             toEventDetail(row){
                 let self=this;
-                if(row.authorizedInspect[0].id!=undefined){
+                if(row.authorizedInspect.length!=0){
                     sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
                     self.$router.push({name:'storeDetail',params:row});
                 }else{

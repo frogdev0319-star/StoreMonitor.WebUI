@@ -523,6 +523,8 @@
               self.roleNameList[1].children[0].disabled = false;
               self.roleNameList[1].children[1].checked = false;
               self.roleNameList[1].children[1].disabled = false;
+              self.roleNameList[1].children[7].checked = false;
+              self.roleNameList[1].children[7].disabled = false;
             }
           }
           else{

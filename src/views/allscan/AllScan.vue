@@ -1203,10 +1203,10 @@
         let self = this;
         let result = self.regionResultList.concat([]);
         // if there is one region, no show best area
-        if (result.length == 1 && !self.isWorstArea) {
-          self.regionTopFive = [];
-          return;
-        }
+        // if (result.length == 1 && !self.isWorstArea) {
+        //   self.regionTopFive = [];
+        //   return;
+        // }
         let firstColor = '';
         let secondColor = '';
         let firstName = '';
@@ -1645,7 +1645,7 @@
         self.regionResultList = result.data;
         let schema = [
           {name: 'inspectCycle', index: 0, text: self.$t('overview.cycle')},
-          {name: 'passRate', index: 1, text: self.$t('overview.goodRate')},
+          {name: 'passRate', index: 1, text: self.$t('overview.passRate')},
           {name: 'excellentRate', index: 2, text: self.$t('overview.excellentRate')},
           {name: 'dangerRate', index: 3, text: self.$t('overview.dangerRate')},
           {name: 'region', index: 5, text: self.$t('overview.region')},
@@ -1753,7 +1753,7 @@
               allData.forEach(item => {
                 if (value[0] === item[0] && value[1] === item[1]) {
                   htmlRegion += `${item[4]},`
-                  passStr += `${item[2]}%,`
+                  passStr += `${item[0]}%,`
                   // execellentStr += `${item[2]}%,`
                   dangerousStr += `${item[3]}%,`
                 }
