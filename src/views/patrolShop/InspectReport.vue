@@ -27,7 +27,7 @@
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="8" class="radior-content">
+        <el-col :span="6" class="radior-content">
           <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
         <el-col :span="16" class="report-table">

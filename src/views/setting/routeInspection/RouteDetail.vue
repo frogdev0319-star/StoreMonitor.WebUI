@@ -616,45 +616,45 @@ export default {
             let flagItemName=false,flagItemRex=false,flagItemLength=false;
             let flagDescName = false, flagDesLength=false;
             arr.forEach((item,index)=>{
-              if(item['检查分类']!=undefined&&item['检查分类'].length!=0){
+              if(item['巡檢類別（必填，30字符）']!=undefined&&item['巡檢類別（必填，30字符）'].length!=0){
                 indexArry.push(index);
-                typeName.push(item['检查分类']);
+                typeName.push(item['巡檢類別（必填，30字符）']);
                 // if(item['检查分类'].toString().trim().length>10){
                 //   flaggroupLength=true;
                 // }
-                if(filterString.getContentLength(item['检查分类'].toString().trim()) > 30){
+                if(filterString.getContentLength(item['巡檢類別（必填，30字符）'].toString().trim()) > 30){
                    flaggroupLength=true;
                 }
-                if(validateInput(item['检查分类'])){
+                if(validateInput(item['巡檢類別（必填，30字符）'])){
                   flaggroupRex=true;
                 }
               }
-              if(item['检查项目名称']==undefined||item['检查项目名称'].length==0){
+              if(item['巡檢項名稱（必填，100字符）']==undefined||item['巡檢項名稱（必填，100字符）'].length==0){
                 flagItemName=true;
               }
               else{
                 // if(item['检查项目名称'].toString().trim().length>25){
                 //   flagItemLength=true;
                 // }
-                if(filterString.getContentLength(item['检查项目名称'].toString().trim()) > 100){
+                if(filterString.getContentLength(item['巡檢項名稱（必填，100字符）'].toString().trim()) > 100){
                     flagItemLength=true;
                 }
-                if(validateInput(item['检查项目名称'])){
+                if(validateInput(item['巡檢項名稱（必填，100字符）'])){
                   flagItemRex=true;
                 }
               }
-              if(item['检查项目详细说明（选填，不填为空）']==undefined){
+              if(item['巡檢項目詳細說明（選填，300字符）']==undefined){
                         flagDescName=true;
                 }
                 else{
-                if(filterString.getContentLength(item['检查项目详细说明（选填，不填为空）'].toString().trim()) > 300){
+                if(filterString.getContentLength(item['巡檢項目詳細說明（選填，300字符）'].toString().trim()) > 300){
                     flagDesLength=true;
                 }
                 }
             })
-            if(!outdata[0].hasOwnProperty('检查分类')||flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
+            if(!outdata[0].hasOwnProperty('巡檢類別（必填，30字符）')||flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
                         _this.showFailInfo=true
-                        if(!outdata[0].hasOwnProperty('检查分类')){
+                        if(!outdata[0].hasOwnProperty('巡檢類別（必填，30字符）')){
                             _this.FileInfo.push(_this.$t('insSettingView.templateError'))
                         }
                         if(flaggroupLength){
@@ -691,7 +691,7 @@ export default {
             let tempGroups=[];
             dataArry.forEach((item,index)=>{
               let obj={};
-              obj.name=item[0]['检查分类'];
+              obj.name=item[0]['巡檢類別（必填，30字符）'];
               //obj.mode=0;
               if(_this.tabName=='远程巡检'){
                 obj.mode=0;
@@ -716,8 +716,8 @@ export default {
                   let temp=[];
                   item.forEach((_item,_index)=>{
                     let _obj={};
-                    _obj.subject=_item['检查项目名称'];
-                    _obj.description=_item["检查项目详细说明（选填，不填为空）"];
+                    _obj.subject=_item['巡檢項名稱（必填，100字符）'];
+                    _obj.description=_item["巡檢項目詳細說明（選填，300字符）"];
                     _obj.itemScore=10;
                     temp.push(_obj);
                   })
