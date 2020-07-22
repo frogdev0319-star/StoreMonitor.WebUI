@@ -105,8 +105,8 @@ export default {
     'avgPatrlCycle' : '各區域巡店周期&合格率',
     'dangerousMore' : '立即督導≥60%',
     'DangerousLess': '立即督導＜60%',
-    'excellentMore' : '良好≥60%',
-    'excellentLess': '良好＜60%',
+    'excellentMore' : '合格≥60%',
+    'excellentLess': '合格＜60%',
     'noData': '暫無數據',
     'day' : '天',
     'cycle' : '周期',
@@ -195,6 +195,8 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
+    Patroltips1:'請輸入巡檢錶名稱',
+    Patroltips2:'此巡檢錶名稱已存在',
     stared: '已關注',
     clickToStar: '點擊關注',
     confirmSum: '確認總結',

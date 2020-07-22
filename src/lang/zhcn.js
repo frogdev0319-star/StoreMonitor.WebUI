@@ -195,6 +195,8 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
+    Patroltips1:'请输入巡检表名称',//新增
+    Patroltips2:'此巡检表名称已存在',//新增
     stared: '已关注',
     clickToStar: '点击关注',
     submit: '提交',
@@ -447,17 +449,14 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-<<<<<<< HEAD
     storeNoInspect:'此门店尚未绑定巡检表',
     confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'门店督导',
     storesuperManage:'门店负责人',
-=======
     tHeaderA:'巡检类别（必填，30字符）',
     tHeaderB:'巡检项名称（必填，100字符）',
     tHeaderC:'项目分值（1~100分）',
     tHeaderD:'巡检项目详细说明（选填，300字符）',
->>>>>>> dev-2020716
     bindWith: '已绑定',
     bindStore: '家门店',
     bindList: '巡检表绑定',

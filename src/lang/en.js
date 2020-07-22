@@ -105,8 +105,8 @@ export default {
     'avgPatrlCycle' : 'Average Patrol cycle and Qualified Rate at each region',
     'dangerousMore' : 'Dangerous Ratio≥60%',
     'DangerousLess': 'Dangerous Ratio＜60%',
-    'excellentMore' : 'Good Ratio≥60%',
-    'excellentLess': 'Good Ratio＜60%',
+    'excellentMore' : 'Qualified Ratio≥60%',
+    'excellentLess': 'Qualified Ratio＜60%',
     'noData': 'No Data',
     'day' : 'Day',
     'cycle' : 'Cycle',
@@ -195,6 +195,8 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
+    Patroltips1:'Please enter the inspection list name',
+    Patroltips2:'The inspection list name already exists',
     stared: 'Star',
     clickToStar: 'Click to star',
     submit: 'Submit',

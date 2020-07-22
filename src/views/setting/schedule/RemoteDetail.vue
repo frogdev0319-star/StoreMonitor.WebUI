@@ -1464,18 +1464,29 @@
         self.activeName='0';
         self.paneList = [];
         self.scheduleList = [];
+        self.InspectorList[0].disabled=false
+        self.InspectorList[1].disabled=false
         let tag = await self.getTagAll()
-        // tag.forEach(item=>{
-        //     if(val==item.id){
-        //       self.InspectorList.forEach(_item=>{
-        //       item.appliedTo.forEach(ass_item=>{
-        //         if(ass_item!=_item.id){
-        //             _item.disabled=true
-        //           }
-        //         })
-        //       })
-        //     }
-        // })
+        let role = []
+        tag.forEach(item=>{
+            if(val==item.id){
+               item.appliedTo.forEach(ass_item=>{
+                 if(ass_item.roleId==3||ass_item.roleId==4){
+                   role.push(ass_item.roleId)
+                 }
+               })
+            }
+        })
+        if(role.indexOf(3)!=-1&&role.indexOf(4)==-1){
+          self.InspectorList[1].disabled=true
+        }
+        else if(role.indexOf(3)==-1&&role.indexOf(4)!=-1){
+          self.InspectorList[0].disabled=true
+        }
+        else if(role.indexOf(3)!=-1&&role.indexOf(4)!=-1){
+          self.InspectorList[0].disabled=false
+          self.InspectorList[1].disabled=false
+        }
         if(val=='noInspect'){
             self.getTemp()
         }else{

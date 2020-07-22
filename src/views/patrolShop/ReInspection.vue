@@ -1698,7 +1698,12 @@ export default {
                             storeId:curStoreId
                         };
                         self.patrolStoreName = storeData[0].name
-                        self.PatrolList=storeData[0].authorizedInspect //门店对应巡检表
+                        storeData[0].authorizedInspect.forEach(au_item=>{
+                            if(au_item.mode==0){
+                               self.PatrolList.push(au_item) //门店对应巡检表
+                            }
+                        })
+                        // self.PatrolList=storeData[0].authorizedInspect 
                         self.saveStoreObj(storeObj);
                         // self.changePatrolList(self.tabList[0].storeList[0].storeId);
                         self.getChannelByStore(self.tabList[0].storeList[0]);
@@ -2641,7 +2646,12 @@ export default {
             self.inspectItemList=''
             self.inspectList=''
             self.patrolStoreName = _item.name
-            self.PatrolList=_item.authorizedInspect // 门店对应的巡检表
+            _item.authorizedInspect.forEach(au_item=>{
+                if(au_item.mode==0){
+                    self.PatrolList.push(au_item) //门店对应巡检表
+                }
+            })
+            // self.PatrolList=_item.authorizedInspect // 门店对应的巡检表
             _item.isActive=true;
             self.showStoreUp=true;
             if(!self.isEzviz){

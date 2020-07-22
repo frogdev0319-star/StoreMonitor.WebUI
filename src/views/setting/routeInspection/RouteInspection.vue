@@ -60,10 +60,10 @@
                 left="40vh">
                     <div class="dialog-content" style="overflow:hidden;width:100%;">
                         <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <div class="nameinput" style="padding:30px 40px;">
+                        <div class="nameinput" style="padding:30px 40px 10px 40px;height:60px;">
                             <el-input v-model="ImportName" @input="watchName" :placeholder="$t('insSettingView.enterListName')" style="border-bottom:1px solid #ddd;"></el-input>
-                            <p v-if="showImportwarning" style="font-size:12px;color:red;margin:5px 0 0 0;">请输入巡检表名称</p>
-                            <p v-if="showRepeatNameWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">此巡检表名称已存在</p>
+                            <p v-if="showImportwarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{$t('remotePatrol.Patroltips1')}}</p>
+                            <p v-if="showRepeatNameWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{$t('remotePatrol.Patroltips2')}}</p>
                         </div>
                     </div>
                     <div slot="footer" class="dialog-footer">
@@ -717,6 +717,7 @@ export default {
                 }
           }else{
               self.showImportwarning=true
+              self.showRepeatNameWarning=false
           }
       },
       watchName(val){

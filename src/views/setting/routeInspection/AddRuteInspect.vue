@@ -345,10 +345,11 @@ export default {
             inpectRESTful.UpdateInspectGroupTag(params).then(res=>{
                 if(res.errCode==0){
                     self.showEditTab=false
+                    self.routeName=self.editRouteName
                     self.notify(self.$t('deviceView.editSuss'),'success',3000);
                     return false;
                 }else{
-                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                    self.notify(self.$t('remotePatrol.Patroltips2'),'warning',3000);
                     return false;
                 }
             })
@@ -428,6 +429,7 @@ export default {
             let paramsBind={}
             let paramsUnbind={}
             // 绑定职务参数
+            debugger
             let titleIds=[]
             if(self.ModelPost[0]=='-1'){
                 titleIds=self.ModelPost.slice(1)
@@ -459,12 +461,21 @@ export default {
                 }
                 resUnbindGroup = await self.unbindGroup(paramsUnbind)
                 resUpdateGroup = await self.updateGroup(params)
-                if(resUnbindGroup.errMsg=='Success'){
+                if(resUnbindGroup.errMsg=='Success'&&titleIds.length!=0){
                     resBindGroup=await self.bindGroup(paramsBind);
+                }else if(resUnbindGroup.errMsg=='Success'&&titleIds.length==0){
+                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                    item.isEdit=false;
+                    self.refreshData(self.groupIndex);
+                    return false;
                 }
-            }else{
+            }
+            if(titleIds.length!=0){
                 resUpdateGroup = await self.updateGroup(params)
                 resBindGroup=await self.bindGroup(paramsBind);
+            }else if(titleIds.length==0){
+                self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                return false;
             }
             if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
                 self.notify(self.$t('deviceView.editSuss'),'success',3000);
@@ -555,7 +566,6 @@ export default {
             };
             inpectRESTful.addInspectGroup(params).then(res=>{
                 let codeMsg=res.errMsg;
-                console.log('嗡嗡嗡',res)
                 if(codeMsg!=undefined&&codeMsg=='Success'){
                     let obj={
                         id:res.data[0],
