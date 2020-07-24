@@ -3,7 +3,8 @@
     <img :src="report.iconSrc" alt="" class="report-img" :height="reportImgHeight"/>
     <div class="el-header">
       <img class="title-icon" :src="report.inspectSrc"/>
-      <span class="report-title">{{report.storeName+report.tagName}}</span>
+      <span class="report-title">{{report.storeName+' '+report.tagName+' ('+report.inspectType+')'}}</span>
+      <!-- <span class="report-title">这里是四十个汉字这里是四十个汉字这里是四十个汉字这里是四十个汉字这里是四十个汉字 (远程巡检)</span> -->
       <div class="info-content" :style="isexportPDF?'margin-right:40px;':''">
         <span class="info-label">{{generateReportLang('submitter')}}</span>
         <span class="info-value">{{report.submitterName}}</span>
@@ -27,7 +28,7 @@
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="6" class="radior-content">
+        <el-col :span="8" class="radior-content">
           <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
         <el-col :span="16" class="report-table">
@@ -331,10 +332,12 @@
         switch (routeData.mode) {
           case 0:
             obj.inspectSrc = self.inspectSrc;
+            obj.inspectType = self.$t('overview.remotePatrol')
             break;
           case 1:
             obj.inspectSrc = self.insiteInspectSrc;
             self.isInsiteInspect = true;
+            obj.inspectType = self.$t('overview.onsitePatrol')
             break;
           default:
             obj.inspectSrc = self.videoSrc;

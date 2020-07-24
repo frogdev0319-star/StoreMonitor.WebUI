@@ -153,6 +153,7 @@
             </el-dialog>
 
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
+            <dialog-vue :dialog-title='changeInspectObj.title' :show-info='changeInspectObj.showInfo' :is-warning='changeInspectObj.isWarning' :dialog-closed='changeInspectObj.dialogCosed' @confirmed='changeInspectDialog' @canceled='canceldChangeInspect'></dialog-vue>
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
@@ -617,6 +618,12 @@ export default {
                 isWarning:true,
                 dialogCosed:false
             },
+            changeInspectObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmSwitchInspect'),
+                isWarning:true,
+                dialogCosed:false
+            },
             ignoreInspectObj:{
                 title: this.$t('remotePatrol.confirm'),
                 showInfo: this.$t('remotePatrol.confirmIgnore'),
@@ -699,7 +706,8 @@ export default {
             showEventNameInfo: false,
             fromName: '',
             eventNameRuletip:false,
-            eventDesRuletip:false
+            eventDesRuletip:false,
+            oldVal:''
         }
     },
     computed:{
@@ -1624,6 +1632,9 @@ export default {
                     if(data.errCode==0){
                         let storeData=data.data;
                         self.tabList[0].storeList=getStoreTemp(storeData);
+                    }
+                    if(data.errCode==500){
+                        self.tabList[0].storeList=[];
                     }
                     break;
                 case 1:
@@ -2646,6 +2657,7 @@ export default {
             self.inspectItemList=''
             self.inspectList=''
             self.patrolStoreName = _item.name
+            self.PatrolList=[]
             _item.authorizedInspect.forEach(au_item=>{
                 if(au_item.mode==0){
                     self.PatrolList.push(au_item) //门店对应巡检表
@@ -2723,6 +2735,16 @@ export default {
             else{
                 self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
             }
+        },
+        changeInspectDialog(){
+            let self = this;
+            self.changeInspectObj.dialogCosed=false;
+            self.changeInspect(self.patrolstore)
+        },
+        canceldChangeInspect(){
+            let self = this;
+            self.changeInspectObj.dialogCosed=false;
+            self.patrolstore = self.oldVal
         },
         canceldChangeStore(){
             let self=this;
@@ -2829,70 +2851,91 @@ export default {
         },
         changePatrolList(val){
             let self = this;
-            let tagName=''
-            self.PatrolList.forEach(item=>{
-                if(item.id==val){
-                    tagName=item.name
-                }
-            })
-            let params={
-                storeId:self.store.storeId,
-                mode:0,
-                authorizedOnly:1,
-                tagName:tagName
+            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
             }
-            self.inspectItemList=[];
-            checkOutInspectItemV3(params).then(res=>{
-                if(res.errCode==0){
-                    let data=res.data.groups;
-                    let temp=[];
-                    data.forEach((item,index)=>{
-                        let obj={};
-                        obj.groupId=item.groupId;
-                        obj.mode=item.mode;
-                        obj.groupName=item.groupName;
-                        obj.dealCount=0;
-                        if(index==0){
-                            obj.isClick=true;
-                        }
-                        else{
-                            obj.isClick=false;
-                        }
-                        let tempItems=[];
-                        item.items.forEach((_item,_index)=>{
-                            let itemObj={};
-                            itemObj.id=_item.id;
-                            itemObj.groupId=item.groupId;
-                            itemObj.subject=_item.subject;
-                            itemObj.description=_item.description;
-                            itemObj.itemScore='--';
-                            itemObj.itemScoreTitle='--';
-                            //itemObj.deviceId=_item.deviceId;
-                            itemObj.deviceId=_item.deviceIds;
-                            itemObj.inspectInput='';
-                            itemObj.inputCount=0;
-                            itemObj.disabled=true;
-                            itemObj.checked=false;   //是否选中状态
-                            itemObj.isIgnore=false;  //是否被忽略
-                            itemObj.Ruletip=false;  //是否显示提示语
-                            itemObj.sourceList=[];
-                            tempItems.push(itemObj);
-                        })
-                        obj.items=tempItems;
-                        temp.push(obj);
-                    })
-                    self.inspectList=temp;
-                    let feedobj={
-                        groupId:'feedBack',
-                        groupName: self.$t('remotePatrol.feedbacks'), //问题反馈
-                        isClick:false,
+            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
+                self.changeInspectObj.dialogCosed=true;
+            }else{
+                self.oldVal = val
+                self.changeInspect(val)
+            }
+        },
+        changeInspect(val){
+            let self = this;
+            let tagName=''
+            if(!self.isEzviz){
+              self.editCount=0;
+            }
+            else{
+              if(!self.showGuide){
+                self.$refs.ezvizVideo.editCount = 0
+              }
+            }
+                self.PatrolList.forEach(item=>{
+                    if(item.id==val){
+                        tagName=item.name
                     }
-                    if(self.inspectList.length!=0){
-                        self.inspectList.push(feedobj);
-                        self.getItemByGroup(self.inspectList[0],0);
-                    }
+                })
+                let params={
+                    storeId:self.store.storeId,
+                    mode:0,
+                    authorizedOnly:1,
+                    tagName:tagName
                 }
-            })
+                self.inspectItemList=[];
+                checkOutInspectItemV3(params).then(res=>{
+                    if(res.errCode==0){
+                        let data=res.data.groups;
+                        let temp=[];
+                        data.forEach((item,index)=>{
+                            let obj={};
+                            obj.groupId=item.groupId;
+                            obj.mode=item.mode;
+                            obj.groupName=item.groupName;
+                            obj.dealCount=0;
+                            if(index==0){
+                                obj.isClick=true;
+                            }
+                            else{
+                                obj.isClick=false;
+                            }
+                            let tempItems=[];
+                            item.items.forEach((_item,_index)=>{
+                                let itemObj={};
+                                itemObj.id=_item.id;
+                                itemObj.groupId=item.groupId;
+                                itemObj.subject=_item.subject;
+                                itemObj.description=_item.description;
+                                itemObj.itemScore='--';
+                                itemObj.itemScoreTitle='--';
+                                //itemObj.deviceId=_item.deviceId;
+                                itemObj.deviceId=_item.deviceIds;
+                                itemObj.inspectInput='';
+                                itemObj.inputCount=0;
+                                itemObj.disabled=true;
+                                itemObj.checked=false;   //是否选中状态
+                                itemObj.isIgnore=false;  //是否被忽略
+                                itemObj.Ruletip=false;  //是否显示提示语
+                                itemObj.sourceList=[];
+                                tempItems.push(itemObj);
+                            })
+                            obj.items=tempItems;
+                            temp.push(obj);
+                        })
+                        self.inspectList=temp;
+                        let feedobj={
+                            groupId:'feedBack',
+                            groupName: self.$t('remotePatrol.feedbacks'), //问题反馈
+                            isClick:false,
+                        }
+                        if(self.inspectList.length!=0){
+                            self.inspectList.push(feedobj);
+                            self.getItemByGroup(self.inspectList[0],0);
+                        }
+                    }
+                })
         },
         clickStore(item,index,_item,_index){
             let self=this;

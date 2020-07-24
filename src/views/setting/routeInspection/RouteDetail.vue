@@ -2,8 +2,18 @@
     <div class="detail-container" style="height:auto;" :style="{'min-height':varyWindowWidth*0.70+'px'}">
         <el-row>
             <el-col :span="24" class="detail-title">
-                <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
-                  {{itemNum}} {{generateInsSettingLang('item')}}</span>
+                <div class="table-right-post" @click="setItem">
+                    <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
+                        {{itemNum}} {{generateInsSettingLang('item')}}</span>
+                    <i class="iconfont icon-quxiaolianjie" :style="ModelPost==null?'color:#f31b65;':''"></i>
+                    <span class="post-label"  :style="ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
+                    <span>{{ModelPost}}</span>
+                </div>
+                  <!-- <div class="table-right-post" @click="setItem">
+                        <i class="iconfont icon-quxiaolianjie" :style="item.ModelPost==null?'color:#f31b65;':''"></i>
+                        <span class="post-label" :style="item.ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
+                        <span>{{item.ModelPost}}</span>
+                    </div> -->
                 <div class="route-btns">
                      <el-button
                         :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
@@ -76,11 +86,11 @@
                         <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
                         <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
                     </div>
-                    <div class="table-right-post" @click="setItem">
+                    <!-- <div class="table-right-post" @click="setItem">
                         <i class="iconfont icon-quxiaolianjie" :style="item.ModelPost==null?'color:#f31b65;':''"></i>
                         <span class="post-label" :style="item.ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
                         <span>{{item.ModelPost}}</span>
-                    </div>
+                    </div> -->
                      <div v-if="item.itemData.length!=0" class="table-class">
                         <el-table
                         :data="item.itemData"
@@ -222,7 +232,8 @@ export default {
             fileName: this.$t('insSettingView.patrolExample'),
             lang: this.$i18n.locale,
             delItems:[],
-            delGroup:[]
+            delGroup:[],
+            ModelPost:null
         }
     },
     computed:{
@@ -270,6 +281,7 @@ export default {
                 allcount+=item.itemData.length;
             })
             self.itemNum=allcount;
+            self.ModelPost = self.routeData[0].ModelPost
         },
         changeAllData(val){
             console.log(val);
@@ -817,15 +829,29 @@ export default {
     }
     .detail-title{
         overflow: hidden;
-        .title-title{
-            display: block;
-            margin-left: 0px;
-            margin-top: 15px;
-            margin-bottom: 20px;
+        .table-right-post{
+            font-size: 12px;
+            color:#94a4b4;
+            text-align: left;
             float: left;
-            font-size: calc(18/1920*100vw);
-            font-weight: bold;
-            color: #424151;
+            line-height: 36px;
+            cursor: pointer;
+            .title-title{
+                margin-left: 0px;
+                margin-top: 15px;
+                margin-bottom: 20px;
+                font-size: calc(18/1920*100vw);
+                font-weight: bold;
+                color: #424151;
+            }
+            .iconfont{
+                font-size: 12px;
+                margin-right: 5px;
+                margin-left: calc(15/1920*100vw);
+            }
+            .post-label{
+                text-decoration: underline;
+            }
         }
         .route-btns{
             float: right;
@@ -969,26 +995,6 @@ export default {
             margin-right: 0;
             .all-checkBox{
                 margin-right: 0;
-            }
-        }
-        .table-right-post{
-            width:20%;
-            font-size: 12px;
-            color:#94a4b4;
-            text-align: left;
-            width:calc(250/1920*100vw);
-            margin-bottom:calc(15/1920*100vw);
-            margin-right: 0;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            cursor: pointer;
-            .iconfont{
-                font-size: 12px;
-                margin-right: 5px;
-            }
-            .post-label{
-                text-decoration: underline;
             }
         }
       .table-class{

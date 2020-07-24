@@ -446,12 +446,6 @@ import {generateStoreLang} from '@/api/i18n'
                 let temp=[];
                 self.storeData.content.forEach(item=>{
                     let obj={};
-                    if(item.authorizedInspect.length==0){
-                        obj.showTag=false;
-                    }
-                    else{
-                        obj.showTag=true;
-                    }
                     obj.bindDevice=false;
                     obj.storeId=item.storeId;
                     obj.name=item.name;
@@ -461,11 +455,11 @@ import {generateStoreLang} from '@/api/i18n'
                     obj.supervisorId = item.supervisorId; //督导编号
                     obj.phone=item.phoneNumber;
                     obj.favorite=item.favorite;
-                    obj.authorizedInspect=item.authorizedInspect
-                    if(item.authorizedInspect.length!=0){
+                    obj.appliedInspect=item.appliedInspect
+                    if(item.appliedInspect.length!=0){
                         let au_inspect=[]
                         let mode=[]
-                        item.authorizedInspect.forEach(au_item=>{
+                        item.appliedInspect.forEach(au_item=>{
                             mode.push(au_item.mode)
                         })
                         if(mode.indexOf(0)!=-1){
@@ -477,6 +471,12 @@ import {generateStoreLang} from '@/api/i18n'
                         obj.napeTable=au_inspect.join('，')
                     }else{
                         obj.napeTable='--'
+                    }
+                    if(obj.napeTable.indexOf(self.$t('overview.remotePatrol'))==-1){
+                        obj.showTag=false;
+                    }
+                    else{
+                        obj.showTag=true;
                     }
                     // obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
                     obj.schedue='--',
@@ -544,7 +544,7 @@ import {generateStoreLang} from '@/api/i18n'
             },
             toEventDetail(row){
                 let self=this;
-                if(row.authorizedInspect.length!=0){
+                if(row.napeTable.indexOf(self.$t('overview.remotePatrol'))!=-1){
                     sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
                     self.$router.push({name:'storeDetail',params:row});
                 }else{

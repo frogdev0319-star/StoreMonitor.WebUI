@@ -70,7 +70,7 @@
         lang: this.$i18n.locale,
         activeName: '0',
         activePatrol: '0',
-        isActive:'',
+        isActive:0,
         isActivePatrol:'',
         paneLength:0
       }
@@ -111,7 +111,7 @@
                     self.InspectList=InspectList
                     if(self.InspectList.length!=0){
                       self.isActivePatrol=self.InspectList[0].id
-                      self.isActive=0
+                      // self.isActive=0
                       self.changePatrolList(self.isActivePatrol)
                     }else{
                       self.changePatrolList('noInspect')

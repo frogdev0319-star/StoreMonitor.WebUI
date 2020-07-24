@@ -867,9 +867,10 @@
             let scheduleStr = '';
             let store=''
             storeList.forEach(store_item=>{
-              item.appliedStores.forEach(app_item=>{
+              item.appliedStores.forEach((app_item,app_index)=>{
                  if(store_item.storeId==app_item){
-                    store += store_item.name+ ','
+                    let isuu= app_index==item.appliedStores.length-1?'':',';
+                    store += store_item.name+ isuu
                   }
               })
             })

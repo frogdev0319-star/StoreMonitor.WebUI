@@ -25,7 +25,7 @@
             <p class="tab-title"><span class="tab-title-1">{{$t('insSettingView.editStore')}}</span><span class="tab-title-2">{{$t('insSettingView.editStoretips')}}</span></p>
             <div class="tab-main">
                 <el-tabs v-model="activeName" :before-leave="beforeleave" @tab-click="handleClick" id="patrltabs-content">
-                    <el-tab-pane v-for="(item,index) in authorizedInspect" :key="index" :label="item.name" ></el-tab-pane>
+                    <el-tab-pane v-for="(item,index) in appliedInspect" :key="index" :label="item.name" ></el-tab-pane>
                 </el-tabs>
                 <div class="el-table-title tabTitle">
                     <span class="name-title">{{generateStoreLang('patrolName')}}</span>
@@ -119,7 +119,7 @@ export default {
             varyWindowHeight:window.innerHeight,
             varyWindowWidth:window.innerWidth,
             userName: '',
-            authorizedInspect:[]
+            appliedInspect:[]
         }
     },
     computed:{
@@ -148,9 +148,9 @@ export default {
         console.log(self.store.napeTable)
         self.curTag=self.store.napeTable;
         self.phone=self.store.phone;
-        self.store.authorizedInspect.forEach(item=>{
+        self.store.appliedInspect.forEach(item=>{
             if(item.mode==0){
-                self.authorizedInspect.push(item)
+                self.appliedInspect.push(item)
             }
         })
         await self.getChannelByStore(storeId);
@@ -250,7 +250,7 @@ export default {
                 storeId:storeId,
                 mode:0,
                 authorizedOnly:0,
-                tagName:self.authorizedInspect[index].name
+                tagName:self.appliedInspect[index].name
             }
           checkOutInspectItemV3(params).then(res=>{
                 console.log(res);

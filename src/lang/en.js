@@ -233,6 +233,7 @@ export default {
     notCombined: 'Not binding with inspection items yet!',
     confirmChangeBind:'The current inspection list has not been submitted. Confirm to switch the  other inspection list?',
     confirmSwitch: 'Not finish yet, confirm switching?',
+    confirmSwitchInspect:'Not finish yet, confirm switching?',
     confirmIgnore: 'Confirm ignore items?',
     notBindCamera: 'Items hasn\'t bind with devices!',
     incompleteInfo: 'Incomplete items, please check!',
@@ -448,8 +449,9 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
-    storeNoInspect:'No bound inspection list with the store',
-    confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
+    selecttitle:'请选择关联职务',//自定义需确认
+    storeNoInspect:'No bound Remote Patrol List with the store',
+    // confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
     storesupervisor:'Supervisor',
     storesuperManage:'Store Manager',
     tHeaderA:'Inspection Category(Required, 30 characters)',
@@ -483,7 +485,8 @@ export default {
     importFailTitle:'Failed to import',
     editStore:'Please select the inspection item to bind channels',
     editStoretips:'Reminder: Click the submit button to save the current inspection list',
-    RemoteLength:'The number of inspection tables exceeds the limit, please delete and then import',
+    RemoteLength:'The number of Remote Patrol List exceeds the limit, please delete and then import',
+    OnsiteLength:'The number of Onsite Patrol List exceeds the limit, please delete and then import',
     SchdRemoteLength:'The number of schedules exceeds the limit, please delete and then create',
     deletePatrolList:'There is currently no inspection list to delete',
     selectPost:'Please select',
@@ -502,6 +505,7 @@ export default {
     confirmSelecDel: 'Confirm delete selected items?',
     confirmCurDel: 'Confirm delete current items?',
     confirmDelData:'Confirm to delete the inspection list?',
+    confirmToBindData:'部分巡检组尚未与职务关联，是否继续？',//自定义需确认
     please: 'Please ',
     downloadInfo: 'download template',
     toEdit: 'to edit and ',

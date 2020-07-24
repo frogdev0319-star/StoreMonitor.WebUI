@@ -134,6 +134,25 @@
                         <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
+                <el-dialog :title="$t('remotePatrol.prompt')"
+                :visible.sync="showNoPostDialog" v-if="showNoPostDialog"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="28%"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;" >{{generateInsSettingLang('confirmToBindData')}}</span>
+                        </p>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showNoPostDialog = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="confirmToBind" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
             </el-col>
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
@@ -197,6 +216,7 @@ export default {
                 //     'label':'新增巡检表'
                 // }
             ],
+            showNoPostDialog:false,
             varyWindowWidth:window.innerHeight,
             addPatrol: '新增巡检表',
             patrolActive:'0',
@@ -447,6 +467,11 @@ export default {
                     }
                     let titletemp=await self.getInspectGroupBindAll(postparams)
                     let titleList=await self.getUserTitleList()
+                    // let usertext=[]
+                    // titletemp[0].userTitles.forEach(u_item=>{
+                    //     usertext.push(u_item.titleName)
+                    // })
+                    // temp.push({ModelPost:usertext.toString()})//关联职务
                     temp.forEach(te_item=>{
                         let usertext=[]
                         titletemp.forEach(ti_item=>{
@@ -501,7 +526,6 @@ export default {
                     }
                 // })
                 self.elTableData=self.elTableData.concat(tempAllData);
-                console.log('不不不',self.elTableData)
             }
             else{
               self.getDownLoadURL();
@@ -652,7 +676,19 @@ export default {
             this.showBtnContent=!this.showBtnContent;
         },
 
-        async bindStore(){
+        bindStore(){
+            let self=this;
+            let routeData=self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData
+            let PostArr=[]
+            routeData.forEach(item=>{
+                PostArr.push(item.ModelPost)
+            })
+            self.showNoPostDialog = PostArr.indexOf(null)!=-1 ? true : false
+            if(!self.showNoPostDialog){
+                self.confirmToBind()
+            }
+        },
+        confirmToBind(){
             let self=this;
             let arr=[];
             if(self.elTableData[Number(self.activeName)].data.length==0){
@@ -675,8 +711,8 @@ export default {
             sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
             self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
-        },
 
+        },
         changeValue(obj){
             let self=this;
             self.tabNameInput='';
@@ -824,15 +860,17 @@ export default {
             let self=this;
             let ret= self.isLoginIn();
             console.log(ret);
-            let datalength = self.elTableData[Number(self.activeName)].data.length
-            if(datalength>10||datalength==10){
-                self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
-                return false;
+            let Datalength = self.elTableData[Number(self.activeName)].data.length
+            if(Number(self.activeName)==0&&Datalength==10){
+                    self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
+                    return false;
+            }else if(Number(self.activeName)==1&&Datalength==10){
+                    self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
+                    return false;
             }else{
-                self.showNameImport=true
-                self.ImportName=''
+                    self.showNameImport=true
+                    self.ImportName=''
             }
-
             // if(ret.data!=undefined&&ret.data.isLogin){
             //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){
             //         self.showConfirmImport=true;
@@ -863,14 +901,18 @@ export default {
         },
         getBindStoreList(){
             let self=this;
-            let inspectId =self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
-            let params={inspectId :inspectId };
-            inpectRESTful.getInspectBindList(params).then(res=>{
-                if(res.errMsg!=undefined&&res.errMsg=='Success'){
-                    let data=res.data;
-                    self.storeNum=data.length;
-                }
-            })
+            if(self.elTableData[Number(self.activeName)].data.length!=0){
+                let inspectId =self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
+                let params={inspectId :inspectId };
+                inpectRESTful.getInspectBindList(params).then(res=>{
+                    if(res.errMsg!=undefined&&res.errMsg=='Success'){
+                        let data=res.data;
+                        self.storeNum=data.length;
+                    }
+                })
+            }else{
+                self.storeNum=0
+            }
         },
         isLoginIn(){
             let self=this;

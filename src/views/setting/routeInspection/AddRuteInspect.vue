@@ -13,6 +13,18 @@
                 </div>
             </div>
         </el-col>
+        <el-col :span="24" class="el-rute-post">
+            <div class="post-left">
+                <span><i class="iconfont icon-quxiaolianjie"></i>{{$t('insSettingView.selecttitle')}}</span>
+                <region-multi-select :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
+                    :inputSize="`mini`" :selected="ModelPost" :all="$t('reportView.all')" @changeInput="changeSelect(arguments)"></region-multi-select>
+            </div>
+            <div class="post-right">
+                <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="submitBindTitle" type="primary" class="btn-class">
+                    {{$t('remotePatrol.submit')}}
+                </el-button>
+            </div>
+        </el-col>
        <el-col :span="lang=='en'&& varyWindowWidth < 1366? 9: 7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
@@ -32,28 +44,28 @@
                        <div class="group-name-title">
                            <span>{{$t('remotePatrol.category')}}</span>
                        </div>
-                       <div class="group-dep-title">
+                       <!-- <div class="group-dep-title">
                            <span>{{generateInsSettingLang('relationDuty')}}</span>
                        </div>
-                       <div style="flex:1;"></div>
+                       <div style="flex:1;"></div> -->
                    </div>
                    <div v-for="(item,index) in groupList" :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
-                        <div style="display:flex;">
+                        <div>
                             <div class="group-left">
                                  <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
                                  <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
                             </div>
-                            <div class="group-middle">
+                            <!-- <div class="group-middle">
                                 <span v-if="!item.isEdit">{{item.textModel}}</span>
                                 <region-multi-select v-if="item.isEdit" :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
                                      :inputSize="`mini`" :selected="item.ModelPost" :all="$t('reportView.all')" @changeInput="changeSelect(arguments)"></region-multi-select>
-                            </div>
+                            </div> -->
                             <div class="group-right">
                                 <div v-if="item.showEdit" class="show-edit">
                                     <div class="nape-items-handle" v-if="!item.isEdit">
                                         <i class="iconfont icon-bianji"
-                                        style="cursor:pointer;margin-right:30px;"
+                                        style="cursor:pointer;"
                                         @click="editGroup(index,item)"></i>
                                         <i class="iconfont icon-shanchu" style="cursor:pointer;"
                                         @click="deleteGroup(index, item)"></i>
@@ -75,10 +87,10 @@
                             <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"></el-input>
                             <span class="rules" v-if="enterNameRuletip">{{generateInsSettingLang('enterNameRuletip')}}</span>
                         </div>
-                        <div class="group-name-middle">
+                        <!-- <div class="group-name-middle">
                             <region-multi-select :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
                              :inputSize="`mini`" :selected="ModelAddPost" @changeInput="changeAddSelect(arguments)"></region-multi-select>
-                        </div>
+                        </div> -->
                         <div class="group-name-right">
                             <div class="iconcontent">
                                 <div class="iconlised" @click="confirmAddGroup">
@@ -278,7 +290,8 @@ export default {
             editRouteName:'',
             titleList: [],
             tableData:[],
-            noData:''
+            noData:'',
+            groupIds:[]
         }
     },
     computed:{
@@ -405,6 +418,85 @@ export default {
 
             })
         },
+        async submitBindTitle(){
+            let self = this
+            let resBindGroup=null,resUnbindGroup=null;
+            let paramsBind={}
+            let paramsUnbind={}
+            let titleIds=[]
+            if(self.ModelPost[0]=='-1'){
+                titleIds=self.ModelPost.slice(1)
+            }else{
+                titleIds=self.ModelPost
+            }      
+            let postparams={
+                groupIds:self.groupIds
+            }
+            let postBind = await self.getInspectGroupBindAll(postparams)
+            console.log(postBind)
+            let groupItems = []
+            postBind.forEach(b_item=>{
+                let obj = {
+                    groupId:'',
+                    titleIds:[]
+                }
+                obj.groupId=b_item.groupId
+                b_item.userTitles.forEach(user_item=>{
+                    obj.titleIds.push(user_item.titleId)
+                })
+                groupItems.push(obj)
+            })
+            let groupBindItems = []
+            let bindtitleIds = []
+            if(self.ModelPost[0]=='-1'){
+                bindtitleIds=self.ModelPost.slice(1)
+            }else{
+                bindtitleIds=self.ModelPost
+            }
+            self.groupList.forEach(g_item=>{
+                let obj = {
+                    groupId:'',
+                    titleIds:[]
+                }
+                obj.groupId=g_item.id
+                obj.titleIds=bindtitleIds
+                groupBindItems.push(obj)
+            })
+            // 解绑职务参数
+            paramsUnbind={
+                groupItems:groupItems
+            }
+            // 绑定职务参数
+            paramsBind={
+                groupItems:groupBindItems
+            }
+            if(postBind[0].userTitles.length!=0){
+                resUnbindGroup = await self.unbindGroup(paramsUnbind)
+                if(resUnbindGroup.errMsg=='Success'&&bindtitleIds.length!=0){
+                    resBindGroup=await self.bindGroup(paramsBind);
+                }else if(resUnbindGroup.errMsg=='Success'&&titleIds.length==0){
+                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                    item.isEdit=false;
+                    self.refreshData(self.groupIndex);
+                    return false;
+                }
+            }else{
+                if(bindtitleIds.length!=0){
+                    resBindGroup=await self.bindGroup(paramsBind);
+                }else if(bindtitleIds.length==0){
+                    self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                    return false;
+                }
+            }
+            if(resBindGroup.errMsg=='Success'){
+                self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                item.isEdit=false;
+                self.refreshData(self.groupIndex);
+            }else{
+                self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                return false;
+            }
+        },
         async confirmEditGroup(index,item){
             let self=this;
             let temp=[];
@@ -425,66 +517,65 @@ export default {
             let params={
                 "groups":temp
             };
-            let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
-            let paramsBind={}
-            let paramsUnbind={}
-            // 绑定职务参数
-            debugger
-            let titleIds=[]
-            if(self.ModelPost[0]=='-1'){
-                titleIds=self.ModelPost.slice(1)
-            }else{
-                titleIds=self.ModelPost
-            }
-            paramsBind={
-                groupItems:[{
-                    groupId:item.id,
-                    titleIds:titleIds
-                }]
-            }         
-            let postparams={
-                groupIds:[item.id]
-            }
-            let postBind = await self.getInspectGroupBindAll(postparams)
-            console.log(postBind)
-            if(postBind[0].userTitles.length!=0){
-                let userTitles=[]
-                postBind[0].userTitles.forEach(user_item=>{
-                    userTitles.push(user_item.titleId)
-                })
-                // 解绑职务参数
-                paramsUnbind={
-                    groupItems:[{
-                        groupId:item.id,
-                        titleIds:userTitles
-                    }]
-                }
-                resUnbindGroup = await self.unbindGroup(paramsUnbind)
-                resUpdateGroup = await self.updateGroup(params)
-                if(resUnbindGroup.errMsg=='Success'&&titleIds.length!=0){
-                    resBindGroup=await self.bindGroup(paramsBind);
-                }else if(resUnbindGroup.errMsg=='Success'&&titleIds.length==0){
-                    self.notify(self.$t('deviceView.editSuss'),'success',3000);
-                    item.isEdit=false;
-                    self.refreshData(self.groupIndex);
-                    return false;
-                }
-            }
-            if(titleIds.length!=0){
-                resUpdateGroup = await self.updateGroup(params)
-                resBindGroup=await self.bindGroup(paramsBind);
-            }else if(titleIds.length==0){
-                self.notify(self.$t('deviceView.editFail'),'warning',3000);
-                return false;
-            }
-            if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
-                self.notify(self.$t('deviceView.editSuss'),'success',3000);
-                item.isEdit=false;
-                self.refreshData(self.groupIndex);
-            }else{
-                self.notify(self.$t('deviceView.editFail'),'warning',3000);
-                return false;
-            }
+            // let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
+            // let paramsBind={}
+            // let paramsUnbind={}
+            // // 绑定职务参数
+            // let titleIds=[]
+            // if(self.ModelPost[0]=='-1'){
+            //     titleIds=self.ModelPost.slice(1)
+            // }else{
+            //     titleIds=self.ModelPost
+            // }
+            // paramsBind={
+            //     groupItems:[{
+            //         groupId:item.id,
+            //         titleIds:titleIds
+            //     }]
+            // }         
+            // let postparams={
+            //     groupIds:[item.id]
+            // }
+            // let postBind = await self.getInspectGroupBindAll(postparams)
+            // console.log(postBind)
+            // if(postBind[0].userTitles.length!=0){
+            //     let userTitles=[]
+            //     postBind[0].userTitles.forEach(user_item=>{
+            //         userTitles.push(user_item.titleId)
+            //     })
+            //     // 解绑职务参数
+            //     paramsUnbind={
+            //         groupItems:[{
+            //             groupId:item.id,
+            //             titleIds:userTitles
+            //         }]
+            //     }
+                // resUnbindGroup = await self.unbindGroup(paramsUnbind)
+                // resUpdateGroup = await self.updateGroup(params)
+                // if(resUnbindGroup.errMsg=='Success'&&titleIds.length!=0){
+                //     resBindGroup=await self.bindGroup(paramsBind);
+                // }else if(resUnbindGroup.errMsg=='Success'&&titleIds.length==0){
+                //     self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                //     item.isEdit=false;
+                //     self.refreshData(self.groupIndex);
+                //     return false;
+                // }
+            // }
+            // if(titleIds.length!=0){
+            //     resUpdateGroup = await self.updateGroup(params)
+            //     resBindGroup=await self.bindGroup(paramsBind);
+            // }else if(titleIds.length==0){
+            //     self.notify(self.$t('deviceView.editFail'),'warning',3000);
+            //     return false;
+            // }
+            // if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
+            //     self.notify(self.$t('deviceView.editSuss'),'success',3000);
+            //     item.isEdit=false;
+            //     self.refreshData(self.groupIndex);
+            // }else{
+            //     self.notify(self.$t('deviceView.editFail'),'warning',3000);
+            //     return false;
+            // }
         },
         updateGroup(params){
           return new Promise((resolve,reject)=>{
@@ -578,7 +669,14 @@ export default {
                     };
                     self.groupList.push(obj);
                     // 绑定职务参数
-                    if(self.ModelAddPost.length!=0){
+                    // if(self.ModelAddPost.length!=0){
+                    let titleIds = []
+                    if(self.ModelPost[0]=='-1'){
+                        titleIds=self.ModelPost.slice(1)
+                    }else{
+                        titleIds=self.ModelPost
+                    }
+                    if(titleIds.length!=0){
                         let titleIds=[]
                         if(self.ModelAddPost[0]=='-1'){
                             titleIds=self.ModelAddPost.slice(1)
@@ -946,7 +1044,7 @@ export default {
             let data=util.getRouteByTag(curTag,allData);
             console.log(data);
             let temp=[];
-            let groupIds=[];
+            // let groupIds=[];
             data.forEach(item=>{
                 let obj={};
                 obj.id=item.id;
@@ -957,10 +1055,10 @@ export default {
                 obj.isEdit=false;
                 obj.itemData=item.items;
                 temp.push(obj);
-                groupIds.push(item.id)
+                self.groupIds.push(item.id)
             })
             let postparams={
-                groupIds:groupIds
+                groupIds:self.groupIds
             }
             let postBind = await self.getInspectGroupBindAll(postparams)
             let titleList=await self.getUserTitleList()
@@ -987,6 +1085,7 @@ export default {
                     }
                 })
             })
+            self.ModelPost = temp[0].ModelPost
             self.groupList=temp;
             self.groupList[index].isClick=true;
             self.curGroup=self.groupList[index];
@@ -1181,6 +1280,28 @@ export default {
             cursor: pointer;
 
         }
+        .el-rute-post{
+            height:68px;
+            line-height: 68px;
+            padding:0 calc(20/1920*100vw);
+            border-bottom: 1px solid $border;
+            .post-left{
+                float:left;
+                .iconfont{
+                    font-size: calc(16/1920*100vw);
+                    margin-right: 10px;
+                }
+                span{
+                    font-size: calc(16/1920*100vw);
+                    color:#424151;
+                    font-weight: bold;
+                    margin-right: calc(20/1920*100vw);
+                }
+            }
+            .post-right{
+                float:right;
+            }
+        }
         .el-rute-title{
             width: 100%;
             @include point(height,60);
@@ -1251,7 +1372,7 @@ export default {
             overflow: hidden;
             border-bottom: 1px solid $border;
             .level2{
-              margin-left: calc(15/1920*100vw);
+            //   margin-left: calc(15/1920*100vw);
               .iconfont{
                 font-size: 16px;
               }
@@ -1313,21 +1434,21 @@ export default {
                     text-align: left;
                     font-size: 14px;
                     color: $tab;
-                    display: flex;
+                    // display: flex;
                     .group-name-title{
-                        flex:1;
-                        margin-left:calc(30/1920*100vw);
+                        // flex:1;
+                        margin-left:calc(50/1920*100vw);
                         span{
                             float: left;
-                            width:calc(140/1920*100vw);
-                            min-width: 74px;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                            white-space: nowrap;
+                            // width:calc(140/1920*100vw);
+                            // min-width: 74px;
+                            // text-overflow: ellipsis;
+                            // overflow: hidden;
+                            // white-space: nowrap;
                         }
                     }
                     .group-dep-title{
-                        flex:2;
+                        // flex:2;
                         margin-left:calc(30/1920*100vw);
                     }
                 }
@@ -1347,44 +1468,49 @@ export default {
                         background-color: $red;
                     }
                     .group-left{
-                        flex:1;
-                        width: calc(140/1920*100vw);
+                        // flex:1;
+                        // width: calc(140/1920*100vw);
                         .group-input{
                             float: left;
-                            width: calc(140/1920*100vw);
-                            min-width: 74px;
-                            margin-left: calc(25/1920*100vw);
+                            max-width: 64%;
+                            // width: calc(140/1920*100vw);
+                            // min-width: 74px;
+                            margin-left: calc(45/1920*100vw);
                         }
                         span{
                             float: left;
-                            margin-left: calc(30/1920*100vw);
-                            width: calc(140/1920*100vw);
-                            min-width: 74px;
+                            width: 70%;
+                            margin-left: calc(50/1920*100vw);
+                            // width: calc(140/1920*100vw);
+                            // min-width: 74px;
                             text-overflow: ellipsis;
                             overflow: hidden;
                             white-space: nowrap;
                         }
                     }
-                    .group-middle{
-                        flex:2;
-                        margin-left:calc(55/1920*100vw);
-                        span{
-                            float: left;
-                            width:calc(180/1920*100vw);
-                            min-width: 120px;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                            white-space: nowrap;
-                        }
-                    }
+                    // .group-middle{
+                    //     flex:2;
+                    //     margin-left:calc(55/1920*100vw);
+                    //     span{
+                    //         float: left;
+                    //         width:calc(180/1920*100vw);
+                    //         min-width: 120px;
+                    //         text-overflow: ellipsis;
+                    //         overflow: hidden;
+                    //         white-space: nowrap;
+                    //     }
+                    // }
                     .group-right{
-                        flex:1;
+                        // flex:1;
                         position: relative;
                         .iconcontent{
-                            display: flex;
-                            position: absolute;
-                            right:20px;
-                            top:0px;
+                            margin-left: calc(30/1920*100vw);
+                            display: inline-block;
+                            margin-top: 15px;
+                            // display: flex;
+                            // position: absolute;
+                            // right:20px;
+                            // top:0px;
                             .iconlised{
                                 @include iconContent;
                                 background-color: $red;
@@ -1406,9 +1532,9 @@ export default {
                                 font-size: calc(24/1920*100vw);
                                 color: #7d8cad;
                                 font-weight: 400;
-                                position: absolute;
-                                right:20px;
-                                top:0px;
+                                // position: absolute;
+                                // right:20px;
+                                // top:0px;
                                 }
                             }
                         }
@@ -1426,15 +1552,16 @@ export default {
                 line-height: 60px;
                 margin-bottom: 25px;
                 position: relative;
-                display: flex;
+                // display: flex;
                 .group-name-left{
-                    flex:1;
-                    width: calc(140/1920*100vw);
+                    // flex:1;
+                    // width: calc(140/1920*100vw);
                     .groupName-input{
-                        width: calc(140/1920*100vw);
-                        min-width: 74px;
+                        // width: calc(140/1920*100vw);
+                        // min-width: 74px;
+                         max-width: 64%;
                         float: left;
-                        margin-left: calc(25/1920*100vw);
+                        margin-left: calc(45/1920*100vw);
                     }
                     .rules{
                         font-size: 10px;
@@ -1446,17 +1573,21 @@ export default {
                         left:calc(25/1920*100vw);
                     }
                 }
-                .group-name-middle{
-                    flex:2;
-                    margin-left:calc(55/1920*100vw);
-                }
+                // .group-name-middle{
+                //     flex:2;
+                //     margin-left:calc(55/1920*100vw);
+                // }
                 .group-name-right{
-                    flex:1;
+                    // flex:1;
                     .iconcontent{
-                        display: flex;
+                        // display: flex;
+                        // margin-top: 15px;
+                        // position: absolute;
+                        // right:20px;
+                        margin-left:calc(30/1920*100vw);
+                        // display: inline-block;
+                        float: left;
                         margin-top: 15px;
-                        position: absolute;
-                        right:20px;
                         .iconlised{
                             @include iconContent;
                             background-color: $red;
@@ -1659,6 +1790,11 @@ export default {
     }
 </style>
 <style>
+.el-rute-post .el-select.el-select--mini{
+    width:190px !important;
+    height:45px !important;
+    color:#424151 !important;
+}
 .el-dialog__body{
     padding: 0px !important;
 }

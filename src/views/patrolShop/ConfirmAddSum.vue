@@ -427,13 +427,14 @@ export default {
           console.log(totalItems)
           console.log(self.resultList)
           let totalScoreItems = totalItems - totalIgnore
-          self.scorecount = parseInt(totalQualified/totalScoreItems*100)
-            if(totalUnqualified > 0){
-              totalUnqualified/totalScoreItems >= 0.75 ? self.curSumIndex = 0: self.curSumIndex = 1;
+          self.scorecount = Math.round(totalQualified/totalScoreItems*100)
+
+            if(self.scorecount < 90){
+              self.scorecount >= 75 ? self.curSumIndex = 0: self.curSumIndex = 1;
               self.curSumIndex == 0 ? self.resultList[1].isActive = true: self.resultList[2].isActive = true;
             }
             else{
-              totalQualified/totalScoreItems >= 0.9 ? self.curSumIndex = 2: self.curSumIndex = 1;
+              self.scorecount >= 90 ? self.curSumIndex = 2: self.curSumIndex = 1;
               self.curSumIndex == 2 ? self.resultList[0].isActive = true : self.resultList[1].isActive = true;
             }
             self.summary=summary;

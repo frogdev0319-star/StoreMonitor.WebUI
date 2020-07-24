@@ -233,6 +233,7 @@ export default {
     notCombined: '该门店暂未绑定巡检项！',
     confirmChangeBind:'巡检表尚未提交，是否确认切换巡检表？',
     confirmSwitch: '本次巡店尚未完成，确认是否切换当前门店？',
+    confirmSwitchInspect: '本次巡店尚未完成，确认是否切换当前巡检表？',
     confirmIgnore: '确认是否忽略当前巡检项？',
     notBindCamera: '当前门店的巡检项未绑定设备！',
     incompleteInfo: '当前尚有未完成巡检项，请完成后进行提交！',
@@ -449,7 +450,8 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-    storeNoInspect:'此门店尚未绑定巡检表',
+    selecttitle:'请选择关联职务',
+    storeNoInspect:'此门店尚未绑定远程巡检表',
     confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'门店督导',
     storesuperManage:'门店负责人',
@@ -484,7 +486,8 @@ export default {
     importFailTitle:'导入失败',
     editStore:'远程巡检项通道绑定',
     editStoretips:'温馨提示：点击提交按钮，保存当前巡检表',
-    RemoteLength:'巡检表数量超限，请删除后再导入',
+    RemoteLength:'远程巡检表数量超限，请删除后再导入',
+    OnsiteLength:'现场巡检表数量超限，请删除后再导入',
     SchdRemoteLength:'排程数量超限，请删除后再创建',
     deletePatrolList:'当前没有可删除的巡检表',
     selectPost:'请选择',
@@ -503,6 +506,7 @@ export default {
     confirmSelecDel: '确认删除当前勾选的巡检项？',
     confirmCurDel: '确认删除当前巡检项？',
     confirmDelData:'确认删除当前巡检表?',
+    confirmToBindData:'部分巡检组尚未与职务关联，是否继续？',
     please: '请先',
     downloadInfo: '下载巡检表模板',
     toEdit: '进行编辑，再点击',
