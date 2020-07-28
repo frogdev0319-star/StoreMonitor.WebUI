@@ -154,10 +154,10 @@
                       <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:22px"></i>
                       <span style="margin-left:12px;">{{generateStoreMonitorLang('record')}}</span>
                     </div>
-                    <div class="icon-drap-content">
+                    <!-- <div class="icon-drap-content">
                       <i class="iconfont icon-zhedie iconzhedie" @click="spreadContent" v-if="!showSpread"></i>
                       <i class="iconfont icon-close iconzhedie" @click="closeContent" v-else></i>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
                 <div class="errorVideo-model" v-else>
@@ -261,7 +261,7 @@
                 </div>
             </div>
         </el-col>
-        <el-col :span="8" class="rside" v-if="!showSpread">
+        <el-col :span="8" class="rside">
             <div class="el-header-title">
                 <span>{{generateStoreMonitorLang('selectStores')}}</span>
             </div>
@@ -1736,14 +1736,14 @@ export default {
                 })
             }
         },
-        spreadContent(){
-            let self=this;
-            self.showSpread=true;
-        },
-        closeContent(){
-            let self=this;
-            self.showSpread=false;
-        },
+        // spreadContent(){
+        //     let self=this;
+        //     self.showSpread=true;
+        // },
+        // closeContent(){
+        //     let self=this;
+        //     self.showSpread=false;
+        // },
         cutPicture(...val){
             let self=this;
             self.showCancelContent=false;

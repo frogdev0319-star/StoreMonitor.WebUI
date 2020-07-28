@@ -49,7 +49,7 @@
                                 :value="item.name">
                                 </el-option>
                             </el-select> -->
-                            <limit-select :selected="_item.channelvalue" :options="alleList" :inputSize="`mini`"
+                            <limit-select :selected="_item.channelvalue" :options="alleList" :inputSize="`mini`" :selectLimit="5"
                                             @changeInput="changeDeviceId($event, _item)"  @changeIfSelect="changeSelect($event, _item,_index)" class="nape-value"></limit-select>
                             </div>
                         </div>
@@ -562,6 +562,7 @@ export default {
             padding:0 30px 30px 30px;
             width:96%;
             .tab-main{
+                min-height:80vh;
                 background-color: #f6f7fb;
                 border: 1px solid $border;
             }

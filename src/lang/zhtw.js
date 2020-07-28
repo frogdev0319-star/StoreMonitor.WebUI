@@ -451,7 +451,7 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-    selecttitle:'请选择关联职务',
+    selecttitle:'請選擇關聯職務',
     storeNoInspect:'此門店尚未綁定遠程巡檢表',
     confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'門店督導',
@@ -485,6 +485,7 @@ export default {
     importSuss: '範本導入成功！',
     importFail: '範本導入失敗！',
     importFailTitle:'導入失敗',
+    exportFailTitle:'匯出失敗',
     editStore:'遠程巡檢項通道綁定',
     editStoretips:'溫馨提示：點擊提交按鈕，保存當前巡檢表',
     RemoteLength:'遠程巡檢表數量超限，請刪除後再導入',
@@ -507,7 +508,7 @@ export default {
     confirmSelecDel: '確認刪除當前勾選的巡檢項？',
     confirmCurDel: '確認刪除當前巡檢項？',
     confirmDelData:'確認刪除當前巡檢表?',
-    confirmToBindData:'部分巡检组尚未与职务关联，是否继续？',
+    confirmToBindData:'巡檢表尚未與職務關聯',
     please: '請先',
     downloadInfo: '下載巡檢表範本',
     toEdit: '進行編輯，再點擊',
@@ -648,6 +649,8 @@ export default {
     addNewAccount: '新增螢石賬號',
     updateAccount: '編輯螢石賬號',
     deleteAccount: '刪除螢石賬號',
+    storeViuAccount:'StoreVue賬號',
+    userAccount:'客戶螢石賬號',
     selectAccountType: '請選擇賬號類型',
     enterAccount: '請輸入賬號',
     comment: '備註',

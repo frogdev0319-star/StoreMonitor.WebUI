@@ -229,6 +229,7 @@ export default {
             showBtnContent:false,
             showSingleDeleteContent:false,
             storeNum:0,
+            // BindStoreList:[],
             activeName:'',
             showImportContent:false,
             showConfirmImport:false,
@@ -626,7 +627,7 @@ export default {
             let tempGroups=[];
             dataArry.forEach((item,index)=>{
                 let obj={};
-                obj.name=item[0]['巡檢類別（必填，30字符）'];
+                obj.name=item[0].a;
                 obj.mode=mode;
                 obj.tag=self.ImportName;
                 tempGroups.push(obj);
@@ -644,8 +645,8 @@ export default {
                     let temp=[];
                     item.forEach((_item,_index)=>{
                         let _obj={};
-                        _obj.subject=_item['巡檢項名稱（必填，100字符）'];
-                        _obj.description=_item["巡檢項目詳細說明（選填，300字符）"];
+                        _obj.subject=_item.b;
+                        _obj.description=_item.d;
                         _obj.itemScore=10;
                         temp.push(_obj);
                     })
@@ -679,11 +680,7 @@ export default {
         bindStore(){
             let self=this;
             let routeData=self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData
-            let PostArr=[]
-            routeData.forEach(item=>{
-                PostArr.push(item.ModelPost)
-            })
-            self.showNoPostDialog = PostArr.indexOf(null)!=-1 ? true : false
+            self.showNoPostDialog = routeData[0].ModelPost==null ? true : false
             if(!self.showNoPostDialog){
                 self.confirmToBind()
             }
@@ -969,6 +966,10 @@ export default {
                         wb = XLSX.read(binary, {
                             type: 'binary'
                         });
+                        delete wb.Sheets[wb.SheetNames[0]].A1
+                        delete wb.Sheets[wb.SheetNames[0]].B1
+                        delete wb.Sheets[wb.SheetNames[0]].C1
+                        delete wb.Sheets[wb.SheetNames[0]].D1
                     }
                     outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
                     let arr=outdata;
@@ -978,42 +979,52 @@ export default {
                     let flaggroupLength=false,flaggroupRex=false;
                     let flagItemName=false,flagItemRex=false,flagItemLength=false;
                     let flagDescName = false, flagDesLength=false;
+
+                    let tempData = []
                     arr.forEach((item,index)=>{
-                        if(item['巡檢類別（必填，30字符）']!=undefined&&item["巡檢類別（必填，30字符）"].length!=0){
+                        let obj={}
+                        obj.a = item.__EMPTY
+                        obj.b = item.__EMPTY_1
+                        obj.c = item.__EMPTY_2
+                        obj.d = item.__EMPTY_3
+                        tempData.push(obj)
+                    })
+                    console.log(tempData)
+
+                    tempData.forEach((item,index)=>{
+                        if(item.a!=undefined&&item.a.length!=0){
                             indexArry.push(index);
-                            typeName.push(item['巡檢類別（必填，30字符）']);
-                            if(filterString.getContentLength(item['巡檢類別（必填，30字符）'].toString().trim()) > 30){
+                            typeName.push(item.a);
+                            if(filterString.getContentLength(item.a.toString().trim()) > 30){
                                 flaggroupLength=true;
                             }
-                            if(validateInput(item['巡檢類別（必填，30字符）'])){
+                            if(validateInput(item.a)){
                                 flaggroupRex=true;
                             }
                         }
-                        if(item['巡檢項名稱（必填，100字符）']==undefined||item['巡檢項名稱（必填，100字符）'].length==0){
+                        if(item.b==undefined||item.b.length==0){
                             flagItemName=true;
                         }
                         else{
-                            if(filterString.getContentLength(item['巡檢項名稱（必填，100字符）'].toString().trim()) > 100){
+                            if(filterString.getContentLength(item.b.toString().trim()) > 100){
                                 flagItemLength=true;
                             }
-                            if(validateInput(item['巡檢項名稱（必填，100字符）'])){
+                            if(validateInput(item.b)){
                                 flagItemRex=true;
                             }
                         }
-                      if(item['巡檢項目詳細說明（選填，300字符）']==undefined){
+                      if(item.d==undefined){
                         flagDescName=true;
                       }
                       else{
-                        if(filterString.getContentLength(item['巡檢項目詳細說明（選填，300字符）'].toString().trim()) > 300){
+                        if(filterString.getContentLength(item.d.toString().trim()) > 300){
                           flagDesLength=true;
                         }
                       }
                     })
-                    if(!outdata[0].hasOwnProperty('巡檢類別（必填，30字符）')||flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
+
+                    if(flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
                         _this.showFailInfo=true
-                        if(!outdata[0].hasOwnProperty('巡檢類別（必填，30字符）')){
-                            _this.FileInfo.push(_this.$t('insSettingView.templateError'))
-                        }
                         if(flaggroupLength){
                             _this.$refs.loadFile.value = ''
                             _this.$refs.loadFileEx.value = '';
@@ -1044,10 +1055,10 @@ export default {
                     let dataArry=[];
                     for(var i=0;i<indexArry.length;i++){
                         if(i<indexArry.length){
-                            dataArry[i]=outdata.slice(indexArry[i],indexArry[i+1]);
+                            dataArry[i]=tempData.slice(indexArry[i],indexArry[i+1]);
                         }
                         else{
-                            dataArry[i]=outdata.slice(indexArry[length-1],indexArry.length);
+                            dataArry[i]=tempData.slice(indexArry[length-1],indexArry.length);
                         }
                     }
                     _this.addAllData(dataArry);

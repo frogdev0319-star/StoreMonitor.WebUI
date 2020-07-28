@@ -275,6 +275,7 @@
       return {
         varyWindowHeight:window.innerHeight,
         varyWindowWidth:window.innerWidth,
+        isActive:'',
         allData:false,
         allDisabled: false,
         storeList:[],
@@ -800,7 +801,7 @@
         let tabIndex = Number(self.activeName);
         params.name = self.paneList[tabIndex].name;
         params.comment = parseInt(self.activePatrol) == 0 ? '远程巡检计划': '现场巡检计划';
-        params.category = parseInt(self.activePatrol);
+        params.category = parseInt(self.isActive);
         params.mode = self.paneList[tabIndex].mode;
         params.enable = Number(self.paneList[tabIndex].enable);
         let execOnce = self.paneList[tabIndex].execOnce;
@@ -1458,9 +1459,10 @@
 
             })
         },
-      async getScheduleList(val){
+      async getScheduleList(val,e){
         let self = this;
         self.isActivePatrol=val;
+        self.isActive = e
         self.activeName='0';
         self.paneList = [];
         self.scheduleList = [];
@@ -1491,7 +1493,7 @@
             self.getTemp()
         }else{
             let params = {};
-            params.category = parseInt(self.activePatrol);
+            params.category = parseInt(e);
             let data = await self.getScheduleFromDB(params)
             if(data.length!=0){
               let paneArr=[]
@@ -1709,7 +1711,7 @@
         params.id = self.paneList[tabIndex].schId;
         params.name = self.paneList[tabIndex].name;
         params.comment = parseInt(self.activePatrol) == 0 ? '远程巡检计划': '现场巡检计划';
-        params.category = parseInt(self.activePatrol);
+        params.category = parseInt(self.isActive);
         params.enable = Number(self.paneList[tabIndex].enable);
         params.mode = self.paneList[tabIndex].mode;
         let execOnce = self.paneList[tabIndex].execOnce;

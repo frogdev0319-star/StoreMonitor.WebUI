@@ -449,7 +449,7 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
-    selecttitle:'请选择关联职务',//自定义需确认
+    selecttitle:'Please select the related jobs',
     storeNoInspect:'No bound Remote Patrol List with the store',
     // confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
     storesupervisor:'Supervisor',
@@ -483,6 +483,7 @@ export default {
     importSuss: 'Successfully imported!',
     importFail: 'Failed to import!',
     importFailTitle:'Failed to import',
+    exportFailTitle:'Failed to export',
     editStore:'Please select the inspection item to bind channels',
     editStoretips:'Reminder: Click the submit button to save the current inspection list',
     RemoteLength:'The number of Remote Patrol List exceeds the limit, please delete and then import',
@@ -505,7 +506,7 @@ export default {
     confirmSelecDel: 'Confirm delete selected items?',
     confirmCurDel: 'Confirm delete current items?',
     confirmDelData:'Confirm to delete the inspection list?',
-    confirmToBindData:'部分巡检组尚未与职务关联，是否继续？',//自定义需确认
+    confirmToBindData:'The inspection list is not associated with the system role.',
     please: 'Please ',
     downloadInfo: 'download template',
     toEdit: 'to edit and ',
@@ -643,7 +644,7 @@ export default {
     addNewAccount: 'Add Ezviz account',
     updateAccount: 'Edit Ezviz account',
     deleteAccount: 'Delete Ezviz Account',
-    storeViuAccount: 'StoreViu Account',
+    storeViuAccount: 'StoreVue Account',
     userAccount: 'User Ezviz Account',
     selectAccountType: 'Please select account type',
     enterAccount: 'Please enter account (cell-phone number)',

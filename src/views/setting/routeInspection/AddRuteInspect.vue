@@ -517,6 +517,16 @@ export default {
             let params={
                 "groups":temp
             };
+            let resUpdateGroup=null
+            resUpdateGroup = await self.updateGroup(params)
+            if(resUpdateGroup.errMsg=='Success'){
+                self.notify(self.$t('deviceView.editSuss'),'success',3000);
+                item.isEdit=false;
+                self.refreshData(self.groupIndex);
+            }else{
+                self.notify(self.$t('deviceView.editFail'),'warning',3000);
+                return false;
+            }
             // let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
             // let paramsBind={}
             // let paramsUnbind={}
@@ -669,7 +679,6 @@ export default {
                     };
                     self.groupList.push(obj);
                     // 绑定职务参数
-                    // if(self.ModelAddPost.length!=0){
                     let titleIds = []
                     if(self.ModelPost[0]=='-1'){
                         titleIds=self.ModelPost.slice(1)
@@ -677,12 +686,6 @@ export default {
                         titleIds=self.ModelPost
                     }
                     if(titleIds.length!=0){
-                        let titleIds=[]
-                        if(self.ModelAddPost[0]=='-1'){
-                            titleIds=self.ModelAddPost.slice(1)
-                        }else{
-                            titleIds=self.ModelAddPost
-                        }
                         let paramsBind={
                             groupItems:[{
                                 groupId:res.data[0],
@@ -945,7 +948,6 @@ export default {
                     self.showAddNape=false;
                     self.refreshData(self.groupIndex);
                     self.groupList[self.groupIndex].groupNum++;
-
                     let data=res.data;
                     let storeList=self.bindStoreList;
                     let tempParams=[];
@@ -1026,8 +1028,8 @@ export default {
         },
         getBindStoreList(){
             let self=this;
-            let tagName=self.tabName;
-            let params={tagName:tagName};
+            let inspectId=self.routeData[0].inspectId;
+            let params={inspectId :inspectId };
             inpectRESTful.getInspectBindList(params).then(res=>{
                 console.log(res.errMsg);
                 if(res.errMsg!=undefined&&res.errMsg=='Success'){
@@ -1044,7 +1046,7 @@ export default {
             let data=util.getRouteByTag(curTag,allData);
             console.log(data);
             let temp=[];
-            // let groupIds=[];
+            let groupIds=[];
             data.forEach(item=>{
                 let obj={};
                 obj.id=item.id;
@@ -1055,8 +1057,9 @@ export default {
                 obj.isEdit=false;
                 obj.itemData=item.items;
                 temp.push(obj);
-                self.groupIds.push(item.id)
+                groupIds.push(item.id)
             })
+            self.groupIds = groupIds
             let postparams={
                 groupIds:self.groupIds
             }
@@ -1502,7 +1505,8 @@ export default {
                     // }
                     .group-right{
                         // flex:1;
-                        position: relative;
+                        // position: relative;
+                        display: inline-block;
                         .iconcontent{
                             margin-left: calc(30/1920*100vw);
                             display: inline-block;

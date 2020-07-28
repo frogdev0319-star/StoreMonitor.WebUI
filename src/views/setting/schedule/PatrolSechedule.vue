@@ -8,7 +8,7 @@
           <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
             <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
           </el-select>
-          <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolList">
+          <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolList(isActivePatrol,isActive)">
             <el-option v-for="item in InspectList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>
@@ -112,9 +112,9 @@
                     if(self.InspectList.length!=0){
                       self.isActivePatrol=self.InspectList[0].id
                       // self.isActive=0
-                      self.changePatrolList(self.isActivePatrol)
+                      self.changePatrolList(self.isActivePatrol,self.isActive)
                     }else{
-                      self.changePatrolList('noInspect')
+                      self.changePatrolList('noInspect',self.isActive)
                     }
                     resolve(data);
                 }).catch(err => {
@@ -123,9 +123,9 @@
 
             })
         },
-      changePatrolList(val){
+      changePatrolList(val1,val2){
         let self=this
-        self.$refs.remoteHandle.getScheduleList(val);
+        self.$refs.remoteHandle.getScheduleList(val1,val2);
       },
       addScheduleButton() {
         let self = this;
@@ -174,7 +174,9 @@
           self.$refs.remoteHandle.isFirstLoad = true;
           self.$refs.remoteHandle.activeName = "0";
           self.activeName = '0';
-          self.$refs.remoteHandle.getScheduleList(self.isActivePatrol);
+          self.isActive=0
+          self.changePatrolType(0)
+          // self.$refs.remoteHandle.getScheduleList(self.isActivePatrol,self.isActive);
         }
       }
     },

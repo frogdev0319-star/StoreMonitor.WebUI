@@ -526,6 +526,10 @@
                         }
                       })
                 }
+              }else{
+                self.ispdf=false
+                self.notify(self.$t('insSettingView.exportFailTitle'),'warning',3000);
+                return false;
               }
             })
           }else{

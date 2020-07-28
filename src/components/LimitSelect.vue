@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler" class="el-province"
-               :size="inputSize" @focus="clickSelect" :placeholder="placeholder">
+               :size="inputSize" @focus="clickSelect" :placeholder="placeholder" :multiple-limit="selectLimit">
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.value' :disabled="item.disabled"></el-option>
     </el-select>
     <el-input placeholder="" readonly  :size="inputSize"
@@ -31,6 +31,10 @@
       },
       placeholder:{
         type: String,
+      },
+      selectLimit:{
+        type: Number,
+        default: 0
       }
     },
     watch: {
@@ -110,7 +114,6 @@
 
       },
       changeSelect (val) {
-        console.log(val)
         let self = this
         self.changed = true;
         if(this.limit > 0){

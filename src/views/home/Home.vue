@@ -44,7 +44,7 @@
         <aside :class="classObj" class="aside-menu">
           <div class="brand-panel" v-if="!collapsed">
             <span class="brand-label">{{generateRoute('brand')}}</span>
-            <el-select v-model="accountId" :placeholder="generateRoute('select')"   popper-class='brandSelect' class="brand-list" @change='changeAccount' :disabled="brandDisabled" ref="fieldSelect">
+            <el-select v-model="accountId" placeholder=""   popper-class='brandSelect' class="brand-list" @change='changeAccount' :disabled="brandDisabled" ref="fieldSelect">
               <el-option
                 class="options"
                 v-for="(item,index) in brandList" :key="index"
@@ -140,7 +140,7 @@
           </el-col>
           <el-col :sapn='24' class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.0.4 &copy; 2018-{{getFullYear}} StoreVue Ltd. All rights reserved.</p>
+              <p style="text-align:left;">v1.1.0 &copy; 2018-{{getFullYear}} StoreVue Ltd. All rights reserved.</p>
             </footer>
           </el-col>
 
@@ -452,7 +452,7 @@
           let data=res.data;
           if(res.errCode==0){
             self.brandList=data;
-            console.log(self.brandList)
+            self.getUserName();
             //self.curBrand=self.accountId;
           }
         })
@@ -528,7 +528,7 @@
       self.isMobile = self.$_isMobile();
     },
     mounted(){
-      this.getUserName();
+      // this.getUserName();
       this.getAccountList();
       this.updateTitle();
       console.log(this.$router.options.routes)

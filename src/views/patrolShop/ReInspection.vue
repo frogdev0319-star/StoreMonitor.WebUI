@@ -394,7 +394,7 @@
                <div class="patrol-content">
                     <p class="patrol-title" v-if="lang!= 'en'">{{$t('storeView.selectPlaceholder')}}，<span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span>{{$t('storeView.bindInspectList')}}</p>
                     <p class="patrol-title" v-if="lang== 'en'">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span></p>
-                    <el-select v-model="patrolstore" :placeholder="$t('storeView.selectPlaceholder')" class="patrol-elselect" @change="changePatrolList">
+                    <el-select v-model="patrolstore" :placeholder="$t('storeView.selectPlaceholder')" class="patrol-elselect" @focus="visibleFocus" @change="changeInspect">
                         <el-option v-for="item in PatrolList" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                </div>
@@ -1716,7 +1716,6 @@ export default {
                         })
                         // self.PatrolList=storeData[0].authorizedInspect 
                         self.saveStoreObj(storeObj);
-                        // self.changePatrolList(self.tabList[0].storeList[0].storeId);
                         self.getChannelByStore(self.tabList[0].storeList[0]);
                     }
                     else{
@@ -2739,12 +2738,11 @@ export default {
         changeInspectDialog(){
             let self = this;
             self.changeInspectObj.dialogCosed=false;
-            self.changeInspect(self.patrolstore)
+            self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
         },
         canceldChangeInspect(){
             let self = this;
             self.changeInspectObj.dialogCosed=false;
-            self.patrolstore = self.oldVal
         },
         canceldChangeStore(){
             let self=this;
@@ -2849,7 +2847,7 @@ export default {
             self.noStoreUser.dialogCosed=false;
             self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
         },
-        changePatrolList(val){
+        visibleFocus(val){
             let self = this;
             if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
@@ -2857,9 +2855,6 @@ export default {
             }
             if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
                 self.changeInspectObj.dialogCosed=true;
-            }else{
-                self.oldVal = val
-                self.changeInspect(val)
             }
         },
         changeInspect(val){

@@ -930,8 +930,8 @@ export default {
       let self=this;
       if(!self.$route.meta.isBack || self.isFirstLoad){
         self.initData();
-        self.getRegionInfo();
-        self.getInitReportList();
+        // self.getRegionInfo();
+        // self.getInitReportList();
       }
       else{
         //

@@ -417,32 +417,8 @@ export default {
             let self=this;
             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
-            // self.delGroup.forEach(g_item=>{
-            //     self.routeData.forEach((r_item,r_index)=>{
-            //         if(g_item==r_item.id){
-            //             self.routeData.splice(r_index,1)
-            //         }
-            //     })
-            // })
-            // self.delItems.forEach(_item=>{
-            //     self.routeData.forEach((r_item,r_index)=>{
-            //         if(r_item.itemData.length!=0){
-            //             r_item.itemData.forEach((d_item,d_index)=>{
-            //                     if(_item==d_item.id){
-            //                         self.routeData[r_index].itemData.splice(d_index,1)
-            //                         if(self.routeData[r_index].itemData.length==0){
-            //                             self.routeData.splice(r_index,1)
-            //                         }
-            //                     }
-            //             })
-            //         }
-            //     }) 
-            // })
-            // if(self.routeData.length==0){
-            //     self.$emit('delItem')
-            // }
-            // self.getNum()
-            self.$emit('refreshList');
+            let val = 'del'
+            self.$emit('refreshList',val)
         },
         confirmDelete(){
             let self=this;
@@ -619,6 +595,10 @@ export default {
               wb = XLSX.read(binary, {
                 type: 'binary'
               });
+              delete wb.Sheets[wb.SheetNames[0]].A1
+              delete wb.Sheets[wb.SheetNames[0]].B1
+              delete wb.Sheets[wb.SheetNames[0]].C1
+              delete wb.Sheets[wb.SheetNames[0]].D1
             }
             outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
             let arr=outdata;
@@ -628,69 +608,76 @@ export default {
             let flagItemName=false,flagItemRex=false,flagItemLength=false;
             let flagDescName = false, flagDesLength=false;
             arr.forEach((item,index)=>{
-              if(item['巡檢類別（必填，30字符）']!=undefined&&item['巡檢類別（必填，30字符）'].length!=0){
-                indexArry.push(index);
-                typeName.push(item['巡檢類別（必填，30字符）']);
-                // if(item['检查分类'].toString().trim().length>10){
-                //   flaggroupLength=true;
-                // }
-                if(filterString.getContentLength(item['巡檢類別（必填，30字符）'].toString().trim()) > 30){
-                   flaggroupLength=true;
+                let obj={}
+                obj.a = item.__EMPTY
+                obj.b = item.__EMPTY_1
+                obj.c = item.__EMPTY_2
+                obj.d = item.__EMPTY_3
+                tempData.push(obj)
+            })
+            console.log(tempData)
+
+            tempData.forEach((item,index)=>{
+                if(item.a!=undefined&&item.a.length!=0){
+                    indexArry.push(index);
+                    typeName.push(item.a);
+                    if(filterString.getContentLength(item.a.toString().trim()) > 30){
+                        flaggroupLength=true;
+                    }
+                    if(validateInput(item.a)){
+                        flaggroupRex=true;
+                    }
                 }
-                if(validateInput(item['巡檢類別（必填，30字符）'])){
-                  flaggroupRex=true;
-                }
-              }
-              if(item['巡檢項名稱（必填，100字符）']==undefined||item['巡檢項名稱（必填，100字符）'].length==0){
-                flagItemName=true;
-              }
-              else{
-                // if(item['检查项目名称'].toString().trim().length>25){
-                //   flagItemLength=true;
-                // }
-                if(filterString.getContentLength(item['巡檢項名稱（必填，100字符）'].toString().trim()) > 100){
-                    flagItemLength=true;
-                }
-                if(validateInput(item['巡檢項名稱（必填，100字符）'])){
-                  flagItemRex=true;
-                }
-              }
-              if(item['巡檢項目詳細說明（選填，300字符）']==undefined){
-                        flagDescName=true;
+                if(item.b==undefined||item.b.length==0){
+                    flagItemName=true;
                 }
                 else{
-                if(filterString.getContentLength(item['巡檢項目詳細說明（選填，300字符）'].toString().trim()) > 300){
+                    if(filterString.getContentLength(item.b.toString().trim()) > 100){
+                        flagItemLength=true;
+                    }
+                    if(validateInput(item.b)){
+                        flagItemRex=true;
+                    }
+                }
+                if(item.d==undefined){
+                flagDescName=true;
+                }
+                else{
+                if(filterString.getContentLength(item.d.toString().trim()) > 300){
                     flagDesLength=true;
                 }
                 }
             })
-            if(!outdata[0].hasOwnProperty('巡檢類別（必填，30字符）')||flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
-                        _this.showFailInfo=true
-                        if(!outdata[0].hasOwnProperty('巡檢類別（必填，30字符）')){
-                            _this.FileInfo.push(_this.$t('insSettingView.templateError'))
-                        }
-                        if(flaggroupLength){
-                            _this.$refs.loadFile.value = ''
-                            _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
-                        }
-                        if(flaggroupRex||flagItemRex){
-                            _this.$refs.loadFile.value = ''
-                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
-                        }
-                        if(flagItemName){
-                            _this.$refs.loadFile.value = ''
-                            _this.FileInfo.push(_this.$t('insSettingView.excelEmpty'))
-                        }
-                        if(flagItemLength){
-                            _this.$refs.loadFile.value = ''
-                            _this.FileInfo.push(_this.$t('insSettingView.excelLongItem'))
-                        }
-                        if(flagDesLength){
-                            _this.$refs.loadFile.value = ''
-                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalDes'))
-                        }
-                        return false
-                    }
+
+            if(flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
+                _this.showFailInfo=true
+                if(flaggroupLength){
+                    _this.$refs.loadFile.value = ''
+                    _this.$refs.loadFileEx.value = '';
+                    _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
+                }
+                if(flaggroupRex||flagItemRex){
+                    _this.$refs.loadFile.value = ''
+                    _this.$refs.loadFileEx.value = '';
+                    _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
+                }
+                if(flagItemName){
+                    _this.$refs.loadFile.value = ''
+                    _this.$refs.loadFileEx.value = '';
+                    _this.FileInfo.push(_this.$t('insSettingView.excelEmpty'))
+                }
+                if(flagItemLength){
+                    _this.$refs.loadFile.value = ''
+                    _this.$refs.loadFileEx.value = '';
+                    _this.FileInfo.push(_this.$t('insSettingView.excelLongItem'))
+                }
+                if(flagDesLength){
+                    _this.$refs.loadFile.value = ''
+                    _this.$refs.loadFileEx.value = '';
+                    _this.FileInfo.push(_this.$t('insSettingView.excelIllegalDes'))
+                }
+                return false
+            }
             let dataArry=[];
             for(var i=0;i<indexArry.length;i++){
               if(i<indexArry.length){
@@ -703,7 +690,7 @@ export default {
             let tempGroups=[];
             dataArry.forEach((item,index)=>{
               let obj={};
-              obj.name=item[0]['巡檢類別（必填，30字符）'];
+              obj.name=item[0].a;
               //obj.mode=0;
               if(_this.tabName=='远程巡检'){
                 obj.mode=0;
@@ -728,8 +715,8 @@ export default {
                   let temp=[];
                   item.forEach((_item,_index)=>{
                     let _obj={};
-                    _obj.subject=_item['巡檢項名稱（必填，100字符）'];
-                    _obj.description=_item["巡檢項目詳細說明（選填，300字符）"];
+                    _obj.subject=_item.b;
+                    _obj.description=_item.d;
                     _obj.itemScore=10;
                     temp.push(_obj);
                   })
