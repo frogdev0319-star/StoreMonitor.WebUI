@@ -236,7 +236,7 @@ export default {
     confirmSwitchInspect:'Not finish yet, confirm switching?',
     confirmIgnore: 'Confirm ignore items?',
     notBindCamera: 'Items hasn\'t bind with devices!',
-    incompleteInfo: 'Incomplete items, please check!',
+    incompleteInfo: 'Some inspection items have not yet been evaluated. Do you want to continue to submit?',
     notSolver: 'Solver hasn\'t been assigned yet, continue?',
     emptyTitle: 'Title may not empty!',
     recording: 'Recording',

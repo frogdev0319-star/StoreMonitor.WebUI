@@ -53,8 +53,39 @@
                         class="el-type" @input="(val)=>scheduluNameChange(val,item)" @blur="notShowInputRuleTips(item)"></el-input>
                 <span class="rules" v-if="item.Ruletip">{{generateScheduleLang('scheduleNameRuletip')}}</span>
               </div>
-            <!-- </el-col> -->
-            <!-- <el-col :span="24" class="header-details"> -->
+              <div v-if="varyWindowWidth>1440" style="display:inline-block;">
+                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
+                <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
+                          class="el-type" v-if="activePatrol=='0'">
+                  <el-option
+                    v-for="itemType in typeList"
+                    :key="itemType.value"
+                    :label="itemType.label"
+                    :value="itemType.value">
+                  </el-option>
+                </el-select>
+                <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
+                          class="el-type" v-else>
+                  <el-option
+                    v-for="itemType in typeList.slice(1)"
+                    :key="itemType.value"
+                    :label="itemType.label"
+                    :value="itemType.value">
+                  </el-option>
+                </el-select>
+                <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">{{generateScheduleLang('execOnce')}}</el-checkbox>
+                <div class="day-detail" v-if="item.mode == 1">
+                  <region-multi-select :options="weekList" :selected="item.schedule[0].day" :placeholder="generateScheduleLang('select')" :disabled="false"
+                                      :inputSize="`mini`"  @changeInput="changeSelectWeek(arguments,item)" :all="$t('scheduleView.everyDay')"></region-multi-select>
+                </div>
+                <div class="day-detail" v-if="item.mode == 2">
+                  <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('execDays')}}</span>
+                  <region-multi-select :options="bigMonthList.slice(0, 28)" :selected="item.schedule[0].day" :placeholder="generateScheduleLang('select')" :disabled="false"
+                                      :inputSize="`mini`"  @changeInput="changeSelectMonth(arguments,item)" :all="$t('scheduleView.everyDay')"></region-multi-select>
+                </div>
+              </div>
+            </el-col>
+            <el-col :span="24" class="header-details" v-if="varyWindowWidth<=1440">
               <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
               <el-select v-model="item.mode"  placeholder="选择类型" size="mini" :disabled="item.modeDisabled" @change="searchStore"
                          class="el-type" v-if="activePatrol=='0'">

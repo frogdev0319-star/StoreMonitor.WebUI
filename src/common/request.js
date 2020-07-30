@@ -168,16 +168,16 @@ service.interceptors.response.use(
                 })
             }
         }
-        else if(err.request){
-            if(err.request.readyState==4&&err.request.status==0){
-                console.log(err.request);
-                message({
-                    message: i18n.t('route.networkError'),
-                    type:'error',
-                    duration:5*1000
-                })
-            }
-        }
+        // else if(err.request){
+        //     if(err.request.readyState==4&&err.request.status==0){
+        //         console.log(err.request);
+        //         message({
+        //             message: i18n.t('route.networkError'),
+        //             type:'error',
+        //             duration:5*1000
+        //         })
+        //     }
+        // }
 
         return Promise.reject(err);
     }

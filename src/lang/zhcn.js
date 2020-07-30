@@ -236,7 +236,7 @@ export default {
     confirmSwitchInspect: '本次巡店尚未完成，确认是否切换当前巡检表？',
     confirmIgnore: '确认是否忽略当前巡检项？',
     notBindCamera: '当前门店的巡检项未绑定设备！',
-    incompleteInfo: '当前尚有未完成巡检项，请完成后进行提交！',
+    incompleteInfo: '当前尚有未完成的巡检项，是否继续提交？',
     notSolver: '当前门店未绑定负责人，是否继续？',
     emptyTitle: '问题反馈名称不能为空！',
     recording: '正在录制',

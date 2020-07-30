@@ -320,10 +320,17 @@
             font-size: 16px;
             color:#182752;
             font-weight: 600;
+            @media screen and (max-width: 1366px){
+              width: 310px !important;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              float:left;
+            }
           }
           .el-select{
             margin-left:calc(30/1920*100vw);
-            width:200px;
+            width:calc(200/1920*100vw);
           }
         }
       }

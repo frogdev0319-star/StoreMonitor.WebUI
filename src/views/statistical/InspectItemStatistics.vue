@@ -30,8 +30,8 @@
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect" :disabled="curProvince.length==0"></multi-select>
-          <span>{{$t('overview.patrolType')}}</span>
-          <el-select v-model="inspectList"  :placeholder="$t('insSettingView.selectPost')" size="mini" class="el-province" @change="changeType">
+          <span>{{$t('overview.patrolLists')}}</span>
+          <el-select v-model="inspectList"  :placeholder="$t('insSettingView.selectPost')" size="mini" class="el-province">
                   <el-option
                     v-for="item in inspectTypeList"
                     :key="item.id"
@@ -941,11 +941,9 @@
           self.params.order = {direction: self.direction, property: self.property}
           self.params.mode = self.curType;
           self.params.inspectId = self.inspectList
+          // await self.getInspectCharts();
           await self.getInspectItemsTable();
-          await self.getInspectCharts();
-        },
-        changeType(){
-
+          
         },
         selectAllProAndCity(val){
           let self = this;
@@ -1049,6 +1047,7 @@
               self.itemsTableData = resultData.content;
               self.total = resultData.totalElements;
               console.log(resultData.content);
+              await self.getInspectCharts();
             }
             catch (e) {
               seriesData = [];

@@ -236,7 +236,7 @@ export default {
     confirmSwitchInspect:'本次巡店尚未完成，確認是否切換當前巡檢表？',
     confirmIgnore: '確認是否忽略當前巡檢項？',
     notBindCamera: '當前門店的巡檢項未綁定設備！',
-    incompleteInfo: ' 當前尚有未完成巡檢項，請完成後進行提交！',
+    incompleteInfo: ' 當前尚有未完成的巡檢項，是否繼續提交？',
     notSolver: '當前門店未綁定負責人，是否繼續？',
     emptyTitle: '問題回饋名稱不能為空！',
     recording: '正在錄製',

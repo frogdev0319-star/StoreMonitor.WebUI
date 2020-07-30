@@ -919,19 +919,19 @@ export default {
         });
       }
     },
-    async mounted(){
-        console.log(this.sortTypeList);
-        let self=this;
-        //self.getDeafultTime();
-        await self.getRegionInfo();
-        self.getInitReportList();
-    },
+    // async mounted(){
+    //     console.log(this.sortTypeList);
+    //     let self=this;
+    //     //self.getDeafultTime();
+    //     await self.getRegionInfo();
+    //     self.getInitReportList();
+    // },
     activated(){
       let self=this;
       if(!self.$route.meta.isBack || self.isFirstLoad){
         self.initData();
-        // self.getRegionInfo();
-        // self.getInitReportList();
+        self.getRegionInfo();
+        self.getInitReportList();
       }
       else{
         //

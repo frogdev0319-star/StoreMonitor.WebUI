@@ -639,7 +639,7 @@ export default {
             noAllInspectObj:{
                 title: this.$t('remotePatrol.prompt'),
                 showInfo: this.$t('remotePatrol.incompleteInfo'),
-                isWarning:false,
+                isWarning:true,
                 dialogCosed:false
             },
             noStoreUser:{
@@ -2142,6 +2142,35 @@ export default {
         noAllInspectDialog(){
             let self=this;
             self.noAllInspectObj.dialogCosed=false;
+            let count=0;
+            let ignoreCount = 0;
+            debugger
+            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
+            let inspectList=self.inspectList.slice(0,indexFeed);
+            inspectList.forEach(item=>{
+                item.dealCount = item.items.length
+                count=count+item.items.length;
+                item.items.forEach((_item,_index)=>{
+                  if(_item.isIgnore==false&&_item.itemScore=='--'||_item.isIgnore==true&&_item.itemScore!='--'||_item.isIgnore==true&&_item.itemScore=='--'){
+                      _item.isIgnore=true
+                      _item.inspectInput = ''
+                      _item.sourceList = []
+                  }
+                  _item.isIgnore ? ignoreCount++ : ''
+                })
+            })
+            if(ignoreCount == count){
+              self.allIgnoreObj.dialogCosed=true;
+              return false;
+            }
+            let obj={
+                inspect:inspectList,
+                event:self.eventList,
+                store:self.store,
+                channel:self.channel
+            }
+            sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
+            self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         canceldNoAllInspect(){
             let self=this;
