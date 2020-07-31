@@ -195,7 +195,6 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    Patroltips1:'Please enter the inspection list name',
     Patroltips2:'The inspection list name already exists',
     stared: 'Star',
     clickToStar: 'Click to star',
@@ -475,6 +474,7 @@ export default {
     score: 'Score',
     selectImprtLoc: 'Select a location for import files.',
     enterListName: 'Enter List Name',
+    enterItemName: 'Enter Item Name',
     enterListNameRuletip:'Enter up to 100 characters',
     select: 'Select File',
     clearInfo: 'This would clear current inspection items, continue?',

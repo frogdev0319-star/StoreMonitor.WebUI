@@ -57,9 +57,9 @@ export default {
     loginAbnormal: '登录信息异常，请重新登录！'
   },
   overview:{
-    everydays:'每',//新增
-    act:'执行',//新增
-    daysww:'号',//新增
+    everydays:'每',
+    act:'执行',
+    daysww:'号',
     eachmonth:'每月',
     weeks:'周',
     patrolPlan:'巡店计划',
@@ -195,8 +195,7 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    Patroltips1:'请输入巡检表名称',//新增
-    Patroltips2:'此巡检表名称已存在',//新增
+    Patroltips2:'此巡检表名称已存在',
     stared: '已关注',
     clickToStar: '点击关注',
     submit: '提交',
@@ -476,6 +475,7 @@ export default {
     score: '项目分值',
     selectImprtLoc: '请选择导入文件的位置',
     enterListName: '请输入巡检表名称',
+    enterItemName: '请输入巡检项名称',
     enterListNameRuletip:'最多可输入100个字符',
     select: '选择文件',
     clearInfo: '此操作将会清空当前页面已有巡检项，是否继续？',

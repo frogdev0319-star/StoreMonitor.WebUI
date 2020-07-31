@@ -55,6 +55,7 @@
                 :visible.sync="showNameImport" v-if="showNameImport"
                 :append-to-body='true'
                 :close-on-click-modal="false"
+                @close="cancelImportName"
                 width="510px"
                 top="35vh"
                 left="40vh">
@@ -62,12 +63,11 @@
                         <hr style="border: 0.5px solid #dfe2e9;"/>
                         <div class="nameinput" style="padding:30px 40px 10px 40px;height:60px;">
                             <el-input v-model="ImportName" @input="watchName" :placeholder="$t('insSettingView.enterListName')" style="border-bottom:1px solid #ddd;"></el-input>
-                            <p v-if="showImportwarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{$t('remotePatrol.Patroltips1')}}</p>
-                            <p v-if="showRepeatNameWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{$t('remotePatrol.Patroltips2')}}</p>
+                            <p v-if="isShowWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{warningContent}}</p>
                         </div>
                     </div>
                     <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showNameImport = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-cancel-btn" @click="cancelImportName" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
                         <el-button class="file-confirm-btn" @click="confirmImportName" size="mini" type="primary">{{generateInsSettingLang('select')}}</el-button>
                     </div>
                 </el-dialog>
@@ -222,8 +222,8 @@ export default {
             patrolActive:'0',
             PatrolListOne:'0',
             PatrolListTwo:'0',
-            showImportwarning:false,
-            showRepeatNameWarning:false,
+            warningContent:'',
+            isShowWarning:false,
             downLoadSrc:'',
             curIndex:'id0',
             showBtnContent:false,
@@ -303,21 +303,17 @@ export default {
             }
         });
     },
-    created(){
-      let self=this;
-    //   self.getTagList();
-      let tabIndex=sessionStorage.getItem('TabIndex');
-      self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-    //   self.initData();
-      //self.getDownLoadURL();
-    },
     mounted(){
         let self=this;
+        let tabIndex=sessionStorage.getItem('TabIndex');
+        self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+        if(self.activeName=='0'){
+            self.patrolActive = sessionStorage.getItem('TabPatrolIndex0')
+        }else if(self.activeName=='1'){
+            self.patrolActive = sessionStorage.getItem('TabPatrolIndex1')
+        }
         self.getTagList();
-        // let tabIndex=sessionStorage.getItem('TabIndex');
-        // self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
         self.initData();
-        // self.getDownLoadURL();
     },
     methods:{
         generateInsSettingLang,
@@ -425,7 +421,9 @@ export default {
             let TagData=await self.getTagAll();
             if(TagData.length!=0){
                 if(val=='del'){
-                    self.patrolActive=(TagData.length-1).toString()
+                    if(Number(self.patrolActive)==TagData.length){
+                        self.patrolActive=(TagData.length-1).toString()
+                    }
                 }
                 let params={
                     inspectId:TagData[Number(self.patrolActive)].id
@@ -705,7 +703,7 @@ export default {
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
-            sessionStorage.setItem('TabName',self.activeName);
+            // sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
             self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
 
@@ -730,11 +728,15 @@ export default {
     //       self.showConfirmImport=false;
     //       document.getElementById('loadFile').click()
     //   },
+    cancelImportName(){
+        let self = this;
+        self.isShowWarning = false
+        self.showNameImport = false
+    },
       async confirmImportName(){
           let self = this;
           if(self.ImportName!=''){
-              self.showImportwarning=false
-              //限制巡检表名称不可重复
+              //限制巡检表名称不可重复、不可为空、不可超过30字符
               let TagData=await self.getTagAll();
               let namerepeat=0
               TagData.forEach(item=>{
@@ -743,26 +745,35 @@ export default {
                   }
               })
               if(namerepeat==1){
-                    self.showRepeatNameWarning=true
+                    self.isShowWarning = true
+                    self.warningContent = self.$t('remotePatrol.Patroltips2')
                 }else{
-                    self.showRepeatNameWarning=false
+                    self.isShowWarning = false
                     document.getElementById('loadFileEx').click()
                 }
           }else{
-              self.showImportwarning=true
-              self.showRepeatNameWarning=false
+              self.isShowWarning = true
+              self.warningContent = self.$t('insSettingView.enterListName')
           }
       },
       watchName(val){
-          let self = this;
-          if(val!=''){
-              self.showImportwarning=false
-          }
+            let self = this;
+            let content = filterString.all(val,30);
+            let length = filterString.getContentLength(val);
+            console.log(content);
+            self.ImportName = content;
+            if(length>30){
+                self.isShowWarning = true
+                self.warningContent = self.$t('insSettingView.enterNameRuletip')
+            }else{
+                self.isShowWarning = false
+            }
       },
         handleClick(tabObj){
             // console.log(tabObj);
             let self=this;
             sessionStorage.setItem('TabIndex',tabObj.index);
+            sessionStorage.setItem('TabName',self.activeName);
             // self.getBindStoreList();
             switch(tabObj.index){
                 case '0':
@@ -773,9 +784,9 @@ export default {
                 self.checkValue='新增巡检表';break;
             }
             if(tabObj.index=='0'){
-                self.patrolActive=self.PatrolListOne
+                self.patrolActive = sessionStorage.getItem('TabPatrolIndex0')
             }else if(tabObj.index=='1'){
-                self.patrolActive=self.PatrolListTwo
+                self.patrolActive = sessionStorage.getItem('TabPatrolIndex1')
             }
             self.getTagList();
 
@@ -783,9 +794,9 @@ export default {
         handleClickPatrol(val){
             let self = this;
             if(self.activeName=='0'){
-                self.PatrolListOne=val.index
+                sessionStorage.setItem('TabPatrolIndex0',val.index);
             }else if(self.activeName=='1'){
-                self.PatrolListTwo=val.index
+                sessionStorage.setItem('TabPatrolIndex1',val.index);
             }
             self.getTagList();
         },

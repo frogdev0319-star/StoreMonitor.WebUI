@@ -1,9 +1,8 @@
 <template>
     <el-row class="el-addrute">
         <el-col :span="24" class="el-rute-title">
-            <span class="tab-name" v-if="!showEditTab">{{routeName}}<i class="iconfont icon-bianji icon-tabname"
-             @click="editTabName"></i></span>
-            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="editRouteName"></el-input>
+            <span class="tab-name" v-if="!showEditTab">{{routeName}}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"></i></span>
+            <el-input :size="varyWindowWidth>1600?'small':'mini'" v-if="showEditTab" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')" v-model="editRouteName" @input="RouteNameLength"></el-input>
             <div class="iconcontent" v-if="showEditTab" style="margin-top:28px;">
                 <div class="iconlised" @click="confirmEditTab">
                     <i class="el-icon-check"></i>
@@ -12,6 +11,7 @@
                     <i class="el-icon-close"></i>
                 </div>
             </div>
+            <span v-if="showLengthNameWarning" class="warningtips">{{$t('insSettingView.enterNameRuletip')}}</span>
         </el-col>
         <el-col :span="24" class="el-rute-post">
             <div class="post-left">
@@ -147,7 +147,7 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
-                            <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
+                            <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
                        </div>
                        <div class="nape-dep-data">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
@@ -211,7 +211,7 @@
                        <div class="nape-name-data">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
                             <div class="inputcontent">
-                                <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterListName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
+                                <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
                                 <span class="rules" v-if="enterListNameRuletip">{{generateInsSettingLang('enterListNameRuletip')}}</span>
                             </div>
                        </div>
@@ -284,9 +284,10 @@ export default {
             varyWindowWidth:window.innerWidth,
             bindStoreList:[],
             lang: this.$i18n.locale,
-            tabNameLang: this.$route.params.tabNameLang,
+            // tabNameLang: this.$route.params.tabNameLang,
             routeName:this.$route.params.routeName,
             routeData:this.$route.params.routeData,
+            showLengthNameWarning:false,
             editRouteName:'',
             titleList: [],
             tableData:[],
@@ -349,8 +350,24 @@ export default {
             self.showEditTab=true;
             self.editRouteName = self.routeName
         },
+        RouteNameLength(val){
+            let self = this;
+            let content = filterString.all(val,30);
+            let length = filterString.getContentLength(val);
+            console.log(content);
+            self.editRouteName = content;
+            if(length>30){
+                self.showLengthNameWarning=true
+            }else{
+                self.showLengthNameWarning=false
+            }
+        },
         confirmEditTab(){
             let self=this;
+            if(self.editRouteName==''){
+                self.notify(self.$t('insSettingView.enterListName'),'warning',3000);
+                return false;
+            }
             let params={
                 inspectId:self.routeData[0].inspectId,
                 name:self.editRouteName
@@ -359,6 +376,7 @@ export default {
                 if(res.errCode==0){
                     self.showEditTab=false
                     self.routeName=self.editRouteName
+                    self.showLengthNameWarning =false
                     self.notify(self.$t('deviceView.editSuss'),'success',3000);
                     return false;
                 }else{
@@ -527,65 +545,6 @@ export default {
                 self.notify(self.$t('deviceView.editFail'),'warning',3000);
                 return false;
             }
-            // let resUpdateGroup=null,resBindGroup=null,resUnbindGroup=null;
-            // let paramsBind={}
-            // let paramsUnbind={}
-            // // 绑定职务参数
-            // let titleIds=[]
-            // if(self.ModelPost[0]=='-1'){
-            //     titleIds=self.ModelPost.slice(1)
-            // }else{
-            //     titleIds=self.ModelPost
-            // }
-            // paramsBind={
-            //     groupItems:[{
-            //         groupId:item.id,
-            //         titleIds:titleIds
-            //     }]
-            // }         
-            // let postparams={
-            //     groupIds:[item.id]
-            // }
-            // let postBind = await self.getInspectGroupBindAll(postparams)
-            // console.log(postBind)
-            // if(postBind[0].userTitles.length!=0){
-            //     let userTitles=[]
-            //     postBind[0].userTitles.forEach(user_item=>{
-            //         userTitles.push(user_item.titleId)
-            //     })
-            //     // 解绑职务参数
-            //     paramsUnbind={
-            //         groupItems:[{
-            //             groupId:item.id,
-            //             titleIds:userTitles
-            //         }]
-            //     }
-                // resUnbindGroup = await self.unbindGroup(paramsUnbind)
-                // resUpdateGroup = await self.updateGroup(params)
-                // if(resUnbindGroup.errMsg=='Success'&&titleIds.length!=0){
-                //     resBindGroup=await self.bindGroup(paramsBind);
-                // }else if(resUnbindGroup.errMsg=='Success'&&titleIds.length==0){
-                //     self.notify(self.$t('deviceView.editSuss'),'success',3000);
-                //     item.isEdit=false;
-                //     self.refreshData(self.groupIndex);
-                //     return false;
-                // }
-            // }
-            // if(titleIds.length!=0){
-            //     resUpdateGroup = await self.updateGroup(params)
-            //     resBindGroup=await self.bindGroup(paramsBind);
-            // }else if(titleIds.length==0){
-            //     self.notify(self.$t('deviceView.editFail'),'warning',3000);
-            //     return false;
-            // }
-            // if(resUpdateGroup.errMsg=='Success'&&resBindGroup.errMsg=='Success'){
-            //     self.notify(self.$t('deviceView.editSuss'),'success',3000);
-            //     item.isEdit=false;
-            //     self.refreshData(self.groupIndex);
-            // }else{
-            //     self.notify(self.$t('deviceView.editFail'),'warning',3000);
-            //     return false;
-            // }
         },
         updateGroup(params){
           return new Promise((resolve,reject)=>{
@@ -647,15 +606,16 @@ export default {
                 return false;
             }
             let mode=0;
-            if(self.tabName=='远程巡检'){
+            let tabIndex=sessionStorage.getItem('TabIndex');
+            if(tabIndex=='0'){
                 mode=0;
             }
-            else if(self.tabName=='现场巡检'){
+            else if(tabIndex=='1'){
                 mode=1;
             }
-            else{
-                mode=0;
-            }
+            // else{
+            //     mode=0;
+            // }
             let obj={
                 name:self.groupNameInput,
                 mode:mode,
@@ -1314,6 +1274,7 @@ export default {
             padding-left: calc(20/1920*100vw);
             border-bottom: 1px solid $border;
             text-align: left;
+            position: relative;
             .tab-name{
                 text-align: left ;
                 margin-left:calc(15/1920*100vw);
@@ -1328,6 +1289,14 @@ export default {
                 @include point(width,180);
                 float: left;
                 @include point(margin-left,5);
+            }
+            .warningtips{
+                font-size:12px;
+                color:red;
+                margin:5px 0 0 0;
+                position: absolute;
+                top:22px;
+                left:calc(30/1920*100vw);
             }
         }
         .rute-btn{

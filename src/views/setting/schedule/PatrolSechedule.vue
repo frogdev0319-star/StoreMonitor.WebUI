@@ -4,7 +4,10 @@
       <el-col :span="24" class="el-schedule-btns">
         <div class="left-title">
           <span class="title" v-if="lang!='en'">{{generateScheduleLang('scheduleTitle')}}</span>
-          <span class="title" v-else>{{generateScheduleLang('noscheduleInspect')}}</span>
+          <span class="title" v-if="lang=='en'&&varyWindowWidth>1366">{{generateScheduleLang('noscheduleInspect')}}</span>
+          <el-tooltip class="item" effect="dark" v-if="varyWindowWidth<=1366" :content="generateScheduleLang('noscheduleInspect')" placement="top">
+              <span class="title" v-if="lang=='en'">{{generateScheduleLang('noscheduleInspect')}}</span>
+          </el-tooltip>
           <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
             <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
           </el-select>

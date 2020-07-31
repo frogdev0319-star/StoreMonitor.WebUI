@@ -195,7 +195,6 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    Patroltips1:'請輸入巡檢錶名稱',
     Patroltips2:'此巡檢錶名稱已存在',
     stared: '已關注',
     clickToStar: '點擊關注',
@@ -477,6 +476,7 @@ export default {
     score: '項目分值',
     selectImprtLoc: '請選擇導入檔案的位置',
     enterListName: '請輸入巡檢表名稱',
+    enterItemName:'請輸入巡檢項名稱',
     enterListNameRuletip:'最多可輸入100個字符',
     select: '選擇檔案',
     clearInfo: '此操作將會清空當前頁面已有巡檢項，是否繼續？',

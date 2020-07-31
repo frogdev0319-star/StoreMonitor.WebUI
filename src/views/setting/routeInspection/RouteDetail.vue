@@ -252,28 +252,28 @@ export default {
     mounted(){
         let self=this;
         self.getNum();
-        self.initLang();
+        // self.initLang();
 
     },
     methods:{
         generateInsSettingLang,
-        initLang(){
-          let self = this;
-          if(self.tabName=='远程巡检'){
-             self.tabNameLang = self.$t('insSettingView.remotePatrol')
-          }
-          else if(self.tabName=='现场巡检'){
-             self.tabNameLang = self.$t('insSettingView.onsitePatrol')
-          }
-        },
+        // initLang(){
+        //   let self = this;
+        //   if(self.tabName=='远程巡检'){
+        //      self.tabNameLang = self.$t('insSettingView.remotePatrol')
+        //   }
+        //   else if(self.tabName=='现场巡检'){
+        //      self.tabNameLang = self.$t('insSettingView.onsitePatrol')
+        //   }
+        // },
         getNum(){
             let self=this;
-            if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
-                self.checkValue=self.tabName;
-            }
-            else{
-                self.checkValue='新增巡检表';
-            }
+            // if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
+            //     self.checkValue=self.tabName;
+            // }
+            // else{
+            //     self.checkValue='新增巡检表';
+            // }
             self.typeNum=self.routeData.length;
             //获取当前巡检项总数
             let allcount=0;
