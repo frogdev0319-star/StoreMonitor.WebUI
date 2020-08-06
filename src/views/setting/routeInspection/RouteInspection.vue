@@ -289,7 +289,9 @@ export default {
             console.log(val);
             let self=this;
             if(val!=0){
-                self.getTagList();
+                sessionStorage.removeItem('TabPatrolIndex0')
+                sessionStorage.removeItem('TabPatrolIndex1')
+                self.getTagList('accountChanged');
             }
         }
     },
@@ -424,6 +426,9 @@ export default {
                     if(Number(self.patrolActive)==TagData.length){
                         self.patrolActive=(TagData.length-1).toString()
                     }
+                }
+                if(val=='accountChanged'){
+                    self.patrolActive = '0'
                 }
                 let params={
                     inspectId:TagData[Number(self.patrolActive)].id
@@ -760,7 +765,7 @@ export default {
             let self = this;
             let content = filterString.all(val,30);
             let length = filterString.getContentLength(val);
-            console.log(content);
+            self.ImportName =val.replace(/[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig, "")
             self.ImportName = content;
             if(length>30){
                 self.isShowWarning = true
@@ -784,9 +789,19 @@ export default {
                 self.checkValue='新增巡检表';break;
             }
             if(tabObj.index=='0'){
-                self.patrolActive = sessionStorage.getItem('TabPatrolIndex0')
+                let idx0 = sessionStorage.getItem('TabPatrolIndex0')
+                if(idx0){
+                    self.patrolActive = idx0
+                }else{
+                    self.patrolActive = '0'
+                }
             }else if(tabObj.index=='1'){
-                self.patrolActive = sessionStorage.getItem('TabPatrolIndex1')
+                let idx1 = sessionStorage.getItem('TabPatrolIndex1')
+                if(idx1){
+                    self.patrolActive = idx1
+                }else{
+                    self.patrolActive = '0'
+                }
             }
             self.getTagList();
 

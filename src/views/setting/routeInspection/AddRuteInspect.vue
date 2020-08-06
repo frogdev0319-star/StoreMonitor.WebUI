@@ -494,7 +494,6 @@ export default {
                     resBindGroup=await self.bindGroup(paramsBind);
                 }else if(resUnbindGroup.errMsg=='Success'&&titleIds.length==0){
                     self.notify(self.$t('deviceView.editSuss'),'success',3000);
-                    item.isEdit=false;
                     self.refreshData(self.groupIndex);
                     return false;
                 }
@@ -508,7 +507,6 @@ export default {
             }
             if(resBindGroup.errMsg=='Success'){
                 self.notify(self.$t('deviceView.editSuss'),'success',3000);
-                item.isEdit=false;
                 self.refreshData(self.groupIndex);
             }else{
                 self.notify(self.$t('deviceView.editFail'),'warning',3000);

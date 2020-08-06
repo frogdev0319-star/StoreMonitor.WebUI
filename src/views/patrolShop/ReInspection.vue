@@ -733,11 +733,6 @@ export default {
             let self=this;
             if(val!=0){
                 self.changeBrand();
-                window.setTimeout(function(){
-                  self.$route.meta.keepAlive = true;
-                  console.log(self.$route.meta.keepAlive);
-                },
-                300)
             }
         },
         realTimeSpeed(val,oldVal){
@@ -750,22 +745,8 @@ export default {
             }
         },
     },
-    beforeRouteEnter(to, from, next){
-      console.log(to.meta.keepAlive)
-      if(from.name !== 'submitEvent'){
-        //to.meta.keepAlive = true
-      }
-      //to.meta.keepAlive = true
-      next(vm=>{
-    //     vm.fromName = from.name;
-    //     if(from.name == 'submitEvent' && !to.meta.keepAlive){
-    //       vm.$destroy()
-    //     }
-      })
-     },
     beforeRouteLeave(to, from, next){
         let self=this;
-        console.log(from.meta.keepAlive)
         let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
         if(canLeave && to.name !='confirmSum'){
           self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
@@ -778,11 +759,12 @@ export default {
           }).then(() => {
             console.log('confirm')
             if(to.name !='confirmSum' ){
-              from.meta.keepAlive=false;
+            //   from.meta.keepAlive=false;
               self.previewplayer && self.previewplayer.dispose()
+              self.$store.dispatch('setPatrolHistory',null);
             }
             else{
-              from.meta.keepAlive = true;
+            //   from.meta.keepAlive = true;
             }
             if(self.playState){
               self.stopRealTime();
@@ -801,10 +783,11 @@ export default {
         }
         else{
           if(to.name !='confirmSum'){
-            from.meta.keepAlive=false;
+            // from.meta.keepAlive=false;
+            self.$store.dispatch('setPatrolHistory',null);
           }
           else{
-            from.meta.keepAlive=true;
+            // from.meta.keepAlive=true;
           }
           if(self.playState){
             self.stopRealTime();
@@ -844,14 +827,43 @@ export default {
     },
     async mounted(){
         let self=this;
+        let PatrolHistory = self.$store.getters.PatrolHistory;
+        if(PatrolHistory!=null&&self.$route.params.from==undefined){
+            self.activeIndex = PatrolHistory.activeIndex
+            self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList
+            self.PatrolList = PatrolHistory.PatrolList
+            self.patrolstore = PatrolHistory.patrolstore
+            self.inspectList = PatrolHistory.inspect,
+            self.inspectList.push({groupId: "feedBack",groupName: "Feedback",isClick: false})
+            self.inspectItemList = PatrolHistory.inspectItemList,
+            self.store = PatrolHistory.store
+            if(PatrolHistory.eventList.length>0){
+                self.eventList = PatrolHistory.eventList
+                self.showFeedBackInfo = false
+            }
+            self.showGuide = false
+            self.showStoreUp = true
+        }else if(self.$route.params.from=='submitEvent'){
+            self.activeIndex = '0'
+            self.PatrolList = []
+            self.patrolstore = ''
+            self.inspectList = []
+            self.inspectItemList = []
+            self.store = ''
+            self.eventList = []
+            self.showFeedBackInfo = true
+            self.showGuide = true
+            self.showStoreUp = false
+            self.getFaStoreData();
+        }
+        else{
+            self.getFaStoreData();
+        }
         document.onmouseup=self.mouseUpAction;
         self.isREC=false;
         self.getUpLoadBucketInfo();
         self.getOssInfo();
-        //self.getInitStoreData();
-        self.getFaStoreData();
         self.getDeviceList();
-        //self.getVideoAuthority();
       if(!self.isEzviz){
           self.looper();
         }
@@ -919,8 +931,17 @@ export default {
                 window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal = null
             }
-            self.activeIndex='0';
+
+            self.activeIndex = '0'
+            self.PatrolList = []
+            self.patrolstore = ''
+            self.inspectList = []
+            self.inspectItemList = []
+            self.store = ''
+            self.showStoreUp = false
             self.showGuide=true;
+            self.eventList = []
+            self.showFeedBackInfo = true
             self.accountId=localStorage.getItem('oss_bucket');
             self.showChannelBtns = [];
             //self.getInitStoreData();
@@ -1694,7 +1715,6 @@ export default {
                     self.inspectList=[];
                 }
                 else{
-                    // if(self.appliedInspectList.indexOf(storeData[0].storeId)!=-1){
                     if(storeData[0].authorizedInspect.length!=0){
                         let obj={};
                         obj.storeId=storeData[0].storeId;
@@ -1714,7 +1734,6 @@ export default {
                                self.PatrolList.push(au_item) //门店对应巡检表
                             }
                         })
-                        // self.PatrolList=storeData[0].authorizedInspect 
                         self.saveStoreObj(storeObj);
                         self.getChannelByStore(self.tabList[0].storeList[0]);
                     }
@@ -2144,7 +2163,6 @@ export default {
             self.noAllInspectObj.dialogCosed=false;
             let count=0;
             let ignoreCount = 0;
-            debugger
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
             let inspectList=self.inspectList.slice(0,indexFeed);
             inspectList.forEach(item=>{
@@ -2169,7 +2187,18 @@ export default {
                 store:self.store,
                 channel:self.channel
             }
+            let historyObj = {
+                storeList:self.tabList[Number(self.activeIndex)].storeList,
+                patrolstore:self.patrolstore,
+                PatrolList:self.PatrolList,
+                activeIndex:self.activeIndex,
+                store:self.store,
+                inspect:inspectList,
+                inspectItemList:self.inspectItemList,
+                eventList:self.eventList
+            }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
+            self.$store.dispatch('setPatrolHistory',historyObj );
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         canceldNoAllInspect(){
@@ -2225,7 +2254,18 @@ export default {
                 store:self.store,
                 channel:self.channel
             }
+            let historyObj = {
+                storeList:self.tabList[Number(self.activeIndex)].storeList,
+                patrolstore:self.patrolstore,
+                PatrolList:self.PatrolList,
+                activeIndex:self.activeIndex,
+                store:self.store,
+                inspect:inspectList,
+                inspectItemList:self.inspectItemList,
+                eventList:self.eventList
+            }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
+            self.$store.dispatch('setPatrolHistory',historyObj );
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         async submit(){

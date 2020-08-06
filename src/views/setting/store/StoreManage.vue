@@ -602,7 +602,6 @@ import {generateStoreLang} from '@/api/i18n'
             // }
         },
         beforeRouteEnter(to, from, next){
-            console.log(to);
             next(vm=>{
                 console.log(vm);
                 PubSub.publish('change-color',{showTag:false});

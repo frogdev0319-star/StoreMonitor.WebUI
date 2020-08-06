@@ -165,7 +165,7 @@
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                self.$router.push({name:'remotePatrol'});
+                self.$router.push({name:'remotePatrol',params:{from:'submitEvent'}});
             }
         },
         reTry(){

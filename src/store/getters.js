@@ -12,5 +12,6 @@ const getters= {
   isEzviz:state=> state.user.isEzviz,
   authorities:state=>state.user.authorities,
   permission_routes: state => state.user.routes,
+  PatrolHistory: state => state.user.PatrolHistory,
 }
 export default getters

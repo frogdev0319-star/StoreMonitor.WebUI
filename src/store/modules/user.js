@@ -26,7 +26,8 @@ const user={
         isEzviz: getCookie('isEzviz') ? JSON.parse(getCookie('isEzviz')): false ,
         authorities: [],
         routes: [],
-        addRoutes: []
+        addRoutes: [],
+        PatrolHistory:null
     },
 
     mutations:{
@@ -75,9 +76,16 @@ const user={
         SET_ROUTES: (state, routes) => {
           state.addRoutes = routes
           state.routes = constantRoutes.concat(routes)
+        },
+        SET_PatrolHistory:(state,PatrolHistory)=>{
+          state.PatrolHistory = PatrolHistory
         }
     },
     actions:{
+      //远程巡检缓存数据
+      setPatrolHistory({commit},PatrolHistory){
+        commit('SET_PatrolHistory',PatrolHistory)
+      },
         GetDash({commit}){
             return new Promise((resolve,reject)=>{
                 getDashServerInfo().then(res=>{
@@ -238,7 +246,7 @@ const user={
                 component:resolve=>require(['@/views/patrolShop/ReInspection'],resolve),
                 meta:{
                 requireAuth: true,
-                  keepAlive:true,
+                  // keepAlive:true,
               },
                 isReadOnly:false,
               },
@@ -248,7 +256,7 @@ const user={
                 component:resolve=>require(['@/views/patrolShop/ConfirmAddSum'],resolve),
                 hidden:true,
                 meta:{
-                keepAlive:true
+                // keepAlive:true
               },
                 children:[
                   {
