@@ -707,7 +707,8 @@ export default {
             fromName: '',
             eventNameRuletip:false,
             eventDesRuletip:false,
-            oldVal:''
+            oldVal:'',
+            historyObj:null
         }
     },
     computed:{
@@ -765,6 +766,7 @@ export default {
             }
             else{
             //   from.meta.keepAlive = true;
+            self.$store.dispatch('setPatrolHistory',self.historyObj );
             }
             if(self.playState){
               self.stopRealTime();
@@ -788,6 +790,7 @@ export default {
           }
           else{
             // from.meta.keepAlive=true;
+            self.$store.dispatch('setPatrolHistory',self.historyObj);
           }
           if(self.playState){
             self.stopRealTime();
@@ -828,19 +831,26 @@ export default {
     async mounted(){
         let self=this;
         let PatrolHistory = self.$store.getters.PatrolHistory;
-        if(PatrolHistory!=null&&self.$route.params.from==undefined){
+        if(PatrolHistory!=null&&self.$route.params.from!='submitEvent'){
             self.activeIndex = PatrolHistory.activeIndex
             self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList
             self.PatrolList = PatrolHistory.PatrolList
             self.patrolstore = PatrolHistory.patrolstore
-            self.inspectList = PatrolHistory.inspect,
-            self.inspectList.push({groupId: "feedBack",groupName: "Feedback",isClick: false})
-            self.inspectItemList = PatrolHistory.inspectItemList,
-            self.store = PatrolHistory.store
-            if(PatrolHistory.eventList.length>0){
-                self.eventList = PatrolHistory.eventList
-                self.showFeedBackInfo = false
+            self.inspectList = PatrolHistory.inspect
+            let isClick = self.inspectList[self.inspectList.length-1].isClick
+            if(isClick){
+                if(PatrolHistory.eventList.length>0){
+                    self.eventList = PatrolHistory.eventList
+                    self.showFeedBackInfo = false
+                    self.showFeedBack = true
+                }else{
+                    self.showFeedBackInfo = true
+                    self.showFeedBack = true
+                }
+            }else{
+                self.inspectItemList = PatrolHistory.inspectItemList
             }
+            self.store = PatrolHistory.store
             self.showGuide = false
             self.showStoreUp = true
         }else if(self.$route.params.from=='submitEvent'){
@@ -2163,6 +2173,7 @@ export default {
             self.noAllInspectObj.dialogCosed=false;
             let count=0;
             let ignoreCount = 0;
+            let feedBack = self.inspectList.slice(self.inspectList.length-1)[0]
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
             let inspectList=self.inspectList.slice(0,indexFeed);
             inspectList.forEach(item=>{
@@ -2187,18 +2198,17 @@ export default {
                 store:self.store,
                 channel:self.channel
             }
-            let historyObj = {
+            self.historyObj = {
                 storeList:self.tabList[Number(self.activeIndex)].storeList,
                 patrolstore:self.patrolstore,
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                inspect:inspectList,
+                inspect:inspectList.concat(feedBack),
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList
             }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
-            self.$store.dispatch('setPatrolHistory',historyObj );
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         canceldNoAllInspect(){
@@ -2227,6 +2237,7 @@ export default {
             let count=0;
             let dealCount=0;
             let ignoreCount = 0;
+            let feedBack = self.inspectList.slice(self.inspectList.length-1)[0]
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
             let inspectList=self.inspectList.slice(0,indexFeed);
 
@@ -2254,18 +2265,17 @@ export default {
                 store:self.store,
                 channel:self.channel
             }
-            let historyObj = {
+            self.historyObj = {
                 storeList:self.tabList[Number(self.activeIndex)].storeList,
                 patrolstore:self.patrolstore,
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                inspect:inspectList,
+                inspect:inspectList.concat(feedBack),
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList
             }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
-            self.$store.dispatch('setPatrolHistory',historyObj );
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         async submit(){

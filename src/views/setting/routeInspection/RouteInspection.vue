@@ -305,15 +305,39 @@ export default {
             }
         });
     },
+    beforeRouteLeave(to, from, next) {
+        let self=this;
+        if(to.name=='itemSetting'||to.name=='bindStore'){
+            let historyObj = {
+                activeName:self.activeName,
+                patrolActive:self.patrolActive
+            }
+            self.$store.dispatch('setInspectHistory',historyObj);
+            next();
+        }
+        else{
+            self.$store.dispatch('setInspectHistory',null);
+            sessionStorage.removeItem('TabPatrolIndex0')
+            sessionStorage.removeItem('TabPatrolIndex1')
+            next();
+        }
+    },
     mounted(){
         let self=this;
-        let tabIndex=sessionStorage.getItem('TabIndex');
-        self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-        if(self.activeName=='0'){
-            self.patrolActive = sessionStorage.getItem('TabPatrolIndex0')
-        }else if(self.activeName=='1'){
-            self.patrolActive = sessionStorage.getItem('TabPatrolIndex1')
+        let InspectHistory = self.$store.getters.InspectHistory;
+        if(InspectHistory!=null){
+            self.activeName = InspectHistory.activeName
+            self.patrolActive = InspectHistory.patrolActive
         }
+        // let tabIndex=sessionStorage.getItem('TabIndex');
+        // self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
+        // if(self.activeName=='0'){
+        //     let idx0 = sessionStorage.getItem('TabPatrolIndex0')
+        //     self.patrolActive = idx0!=undefined ? idx0 : '0'
+        // }else if(self.activeName=='1'){
+        //     let idx1 = sessionStorage.getItem('TabPatrolIndex1')
+        //     self.patrolActive = idx1!=undefined ? idx1 : '0'
+        // }
         self.getTagList();
         self.initData();
     },
@@ -777,8 +801,8 @@ export default {
         handleClick(tabObj){
             // console.log(tabObj);
             let self=this;
-            sessionStorage.setItem('TabIndex',tabObj.index);
-            sessionStorage.setItem('TabName',self.activeName);
+            // sessionStorage.setItem('TabIndex',tabObj.index);
+            // sessionStorage.setItem('TabName',self.activeName);
             // self.getBindStoreList();
             switch(tabObj.index){
                 case '0':
@@ -790,15 +814,23 @@ export default {
             }
             if(tabObj.index=='0'){
                 let idx0 = sessionStorage.getItem('TabPatrolIndex0')
-                if(idx0){
-                    self.patrolActive = idx0
+                if(idx0!=null){
+                    if(Number(idx0)==self.elTableData[Number(self.activeName)].data.length){
+                        self.patrolActive = (Number(idx0)-1).toString()
+                    }else{
+                        self.patrolActive = idx0
+                    }
                 }else{
                     self.patrolActive = '0'
                 }
             }else if(tabObj.index=='1'){
                 let idx1 = sessionStorage.getItem('TabPatrolIndex1')
-                if(idx1){
-                    self.patrolActive = idx1
+                if(idx1!=null){
+                    if(Number(idx1)==self.elTableData[Number(self.activeName)].data.length){
+                        self.patrolActive = (Number(idx1)-1).toString()
+                    }else{
+                        self.patrolActive = idx1
+                    }
                 }else{
                     self.patrolActive = '0'
                 }

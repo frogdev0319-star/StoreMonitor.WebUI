@@ -711,6 +711,7 @@ export default {
             self.params.endTs=end;
             self.params.clause={"status":0,"assignee":self.userId};
             self.params.order={"direction": "desc","property": "ts"};
+            self.params.filter = {size:self.sizeNum};
             self.getEventList(self.params);
         },
         getEventCount(start,end,status,...value){

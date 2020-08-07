@@ -27,7 +27,8 @@ const user={
         authorities: [],
         routes: [],
         addRoutes: [],
-        PatrolHistory:null
+        PatrolHistory:null,
+        InspectHistory:null
     },
 
     mutations:{
@@ -79,12 +80,19 @@ const user={
         },
         SET_PatrolHistory:(state,PatrolHistory)=>{
           state.PatrolHistory = PatrolHistory
+        },
+        SET_InspectHistory:(state,InspectHistory)=>{
+          state.InspectHistory = InspectHistory
         }
     },
     actions:{
       //远程巡检缓存数据
       setPatrolHistory({commit},PatrolHistory){
         commit('SET_PatrolHistory',PatrolHistory)
+      },
+      //当前选中巡检表缓存数据
+      setInspectHistory({commit},InspectHistory){
+        commit('SET_InspectHistory',InspectHistory)
       },
         GetDash({commit}){
             return new Promise((resolve,reject)=>{

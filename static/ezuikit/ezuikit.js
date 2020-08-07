@@ -1003,7 +1003,7 @@
         _this.jSPlugin = new JSPlugin({
           szId: playParams.id,
           iType: 1,
-          iWidth: playParams.width || 600,
+          iWidth: playParams.width || 560,
           iHeight: playParams.height || 400,
           iMaxSplit: Math.ceil(Math.sqrt(playParams.url.split(",").length)),
           iCurrentSplit: playParams.splitBasis || Math.ceil(Math.sqrt(playParams.url.split(",").length)),
@@ -1011,7 +1011,7 @@
         });
         // 注册全屏事件
         window.onresize = function () {
-          _this.jSPlugin.JS_Resize(playParams.width || 600, playParams.height || 400);
+          _this.jSPlugin.JS_Resize(playParams.width || 560, playParams.height || 400);
         }
         _this.log("初始化解码器----完成");
         resolve('200 OK')
@@ -1213,7 +1213,7 @@
   };
   EZUIPlayer.prototype.resizeWindow = function(width, height){
     if (!!this.jSPlugin) {
-      this.jSPlugin.JS_Resize(width || 600, height || 400);
+      this.jSPlugin.JS_Resize(width || 560, height || 400);
       this.log("重置");
     }
     else {

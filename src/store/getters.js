@@ -13,5 +13,6 @@ const getters= {
   authorities:state=>state.user.authorities,
   permission_routes: state => state.user.routes,
   PatrolHistory: state => state.user.PatrolHistory,
+  InspectHistory:state=> state.user.InspectHistory
 }
 export default getters
