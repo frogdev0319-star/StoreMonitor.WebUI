@@ -25,6 +25,15 @@
             <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
             <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
           </div>
+          <div class="icon-width">
+            <span style="margin-right:10px;font-size:12px;">{{$t('storeMonitor.ezuikitwidth')}}</span>
+            <el-dropdown trigger="click" size="mini" split-button style="height:30px;">
+              <span style="width:80px;">{{proportion}}</span>
+              <el-dropdown-menu slot="dropdown" style="width:80px;">
+                <el-dropdown-item v-for="(item,index) in proportionList" :key="index" @click.native="checkPro(item)">{{item.label}}</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
           <div class="iconrside">
             <div class="speed-content" v-if="playBackState">
               <span>{{$t('storeMonitor.back')}}</span>
@@ -295,6 +304,11 @@
     },
     data(){
       return{
+        proportion:'4:3',
+        proportionList:[
+          {label:'4:3'},
+          {label:'16:9'},
+        ],
         clearIconSrc:require('../../static/img/清除.png'),
         removeIconSrc:require('../../static/img/撤销.png'),
         penBtnSrc:require('../../static/img/pen_btn.png'),
@@ -518,6 +532,11 @@
     },
     methods: {
       generatePatrolLang,
+      checkPro(item){
+        let self = this;
+        self.proportion = item.label
+        self.initVideo();
+      },
       async changeHistoryTime(newValue){
         console.log("curTime")
         let self = this;
@@ -682,9 +701,21 @@
         else{
           self.isLoading = true;
           let o = self.$refs.myPlayer || self.$refs.errorModel;
-          let width = o.offsetWidth;
+          // let width = o.offsetWidth;
           let height = o.offsetHeight;
-          self.initPlayerWidth = width;
+          let width = 0
+          switch(self.proportion){
+            case '4:3':
+              width=560;
+              break;
+            case '16:9':
+              width=746;
+              break;
+            default:
+              width=560;
+                break;
+          }
+          self.initPlayerWidth = o.offsetWidth;
           self.initPlayerHeight = height;
           console.log(width);
           console.log(height)
@@ -703,7 +734,7 @@
             accessToken: self.accessToken,
             //decoderPath: '../../static/ezuikit/',
             decoderPath: './static/ezuikit/',
-            // width: width,
+            width: width,
             height: height,
             handleError: self.handleError,
             handleSuccess: self.handleSuccess,
@@ -2088,6 +2119,11 @@
         }
       }
     }
+    .icon-width{
+      display: inline-block;
+      position: absolute;
+      right: 80px;
+    }
     .screen-content{
       display: inline;
       margin-left: 30px;
@@ -2410,6 +2446,13 @@
   }
 </style>
 <style>
+#videoContent .icon-width .el-button--mini{
+  background-color: rgba(233, 232, 232, 0.7);
+  padding-top:4px;
+  padding-bottom: 4px;
+  border:0px;
+  color:#fff;
+}
   .select-popClass .el-select-dropdown__item{
     font-size:12px;
     height: 24px;

@@ -329,15 +329,6 @@ export default {
             self.activeName = InspectHistory.activeName
             self.patrolActive = InspectHistory.patrolActive
         }
-        // let tabIndex=sessionStorage.getItem('TabIndex');
-        // self.activeName=tabIndex!=undefined?tabIndex:self.activeName;
-        // if(self.activeName=='0'){
-        //     let idx0 = sessionStorage.getItem('TabPatrolIndex0')
-        //     self.patrolActive = idx0!=undefined ? idx0 : '0'
-        // }else if(self.activeName=='1'){
-        //     let idx1 = sessionStorage.getItem('TabPatrolIndex1')
-        //     self.patrolActive = idx1!=undefined ? idx1 : '0'
-        // }
         self.getTagList();
         self.initData();
     },
@@ -814,7 +805,7 @@ export default {
             }
             if(tabObj.index=='0'){
                 let idx0 = sessionStorage.getItem('TabPatrolIndex0')
-                if(idx0!=null){
+                if(idx0!=null&&idx0!='0'){
                     if(Number(idx0)==self.elTableData[Number(self.activeName)].data.length){
                         self.patrolActive = (Number(idx0)-1).toString()
                     }else{
@@ -825,7 +816,7 @@ export default {
                 }
             }else if(tabObj.index=='1'){
                 let idx1 = sessionStorage.getItem('TabPatrolIndex1')
-                if(idx1!=null){
+                if(idx1!=null&&idx1!='0'){
                     if(Number(idx1)==self.elTableData[Number(self.activeName)].data.length){
                         self.patrolActive = (Number(idx1)-1).toString()
                     }else{

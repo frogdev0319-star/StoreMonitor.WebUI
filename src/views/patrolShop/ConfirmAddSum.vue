@@ -159,6 +159,14 @@ export default {
             adviceInfoRuletip:false
         }
     },
+    beforeRouteLeave(to, from, next){
+        next(vm=>{
+            let self = this
+            if(to.name !='remotePatrol' ){
+                self.$store.dispatch('setPatrolHistory',null);
+            }
+        })
+    },
     methods:{
         generatePatrolLang,
         getFileUrl(fileName){

@@ -62,7 +62,6 @@ async function setURL(){
     sessionStorage.setItem('LoginURL',url);
   }
 }
-
 setURL();
 
 Vue.use(ElementUI);

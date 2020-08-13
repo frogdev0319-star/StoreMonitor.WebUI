@@ -394,9 +394,17 @@
                <div class="patrol-content">
                     <p class="patrol-title" v-if="lang!= 'en'">{{$t('storeView.selectPlaceholder')}}，<span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span>{{$t('storeView.bindInspectList')}}</p>
                     <p class="patrol-title" v-if="lang== 'en'">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span></p>
-                    <el-select v-model="patrolstore" :placeholder="$t('storeView.selectPlaceholder')" class="patrol-elselect" @focus="visibleFocus" @change="changeInspect">
-                        <el-option v-for="item in PatrolList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                    </el-select>
+                    <el-dropdown trigger="click" placement="bottom" @command="changeInspect" class="patrol-dropdown">
+                        <span class="el-dropdown-link">
+                            <p class="link-span" v-if="patrolstore!=''">{{patrolstore}}</p>
+                            <p class="link-span" v-else>{{$t('storeView.selectPlaceholder')}}</p>
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
+                            <el-dropdown-item  v-for="item in PatrolList" :key="item.id" :command="item.id">{{item.name}}</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+
                </div>
             </div>
             <div class="channelbar-content">
@@ -708,7 +716,8 @@ export default {
             eventNameRuletip:false,
             eventDesRuletip:false,
             oldVal:'',
-            historyObj:null
+            historyObj:null,
+            beforepatrolstore:''
         }
     },
     computed:{
@@ -2817,6 +2826,7 @@ export default {
         changeInspectDialog(){
             let self = this;
             self.changeInspectObj.dialogCosed=false;
+            self.changeInspectList(self.beforepatrolstore)
             self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
         },
         canceldChangeInspect(){
@@ -2926,7 +2936,7 @@ export default {
             self.noStoreUser.dialogCosed=false;
             self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
         },
-        visibleFocus(val){
+        changeInspect(val){
             let self = this;
             if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
@@ -2934,11 +2944,13 @@ export default {
             }
             if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
                 self.changeInspectObj.dialogCosed=true;
+                self.beforepatrolstore=val
+            }else{
+                self.changeInspectList(val)
             }
         },
-        changeInspect(val){
-            let self = this;
-            let tagName=''
+        changeInspectList(val){
+            let self = this
             if(!self.isEzviz){
               self.editCount=0;
             }
@@ -2949,14 +2961,14 @@ export default {
             }
                 self.PatrolList.forEach(item=>{
                     if(item.id==val){
-                        tagName=item.name
+                        self.patrolstore=item.name
                     }
                 })
                 let params={
                     storeId:self.store.storeId,
                     mode:0,
                     authorizedOnly:1,
-                    tagName:tagName
+                    tagName:self.patrolstore
                 }
                 self.inspectItemList=[];
                 checkOutInspectItemV3(params).then(res=>{
@@ -4422,12 +4434,26 @@ export default {
                     }
                 }
             }
+            .patrol-select /deep/ .el-icon--right{
+                float:right;
+            }
             .patrol-select{
                 height:160px;
                 width:92%;
                 text-align: left;
                 margin:0 auto;
                 border-top:0.5px solid #e3e9f4;
+                .patrol-dropdown{
+                    padding:5px 12px;
+                    border:1px solid #ddd;
+                    border-radius: 4px;
+                    .link-span{
+                        width:calc(220/1920*100vw);
+                        min-width:100px;
+                        margin:0;
+                        display: inline-block;
+                    }
+                }
                 .patrol-content{
                     padding: 0 30px;
                     .patrol-title{
@@ -4435,9 +4461,6 @@ export default {
                         color:#182752;
                         font-weight: bold;
                         margin:30px 0 20px 0;
-                        .patrol-elselect{
-                            width:234px;
-                        }
                     }
                 }
             }

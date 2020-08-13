@@ -82,11 +82,11 @@
               <div class="region-name">{{item.region}}</div>
               <div class="item-titles">
                 <el-tooltip placement="bottom" :key="index" :popper-class="elTooltipClass">
-                  <div slot="content">{{item.region}}<br/>{{item.firstName}}: {{item.firstNum}}<br/>{{item.secondName}}:
+                  <div slot="content">{{item.region}}<br/><span v-if="isWorstArea">{{item.firstName}}: {{item.firstNum}}<br/></span>{{item.secondName}}:
                     {{item.secondNum}}
                   </div>
                   <div class="process-list">
-                    <el-progress :percentage="item.firstPercent" :stroke-width="10" :color="item.firstColor"
+                    <el-progress :percentage="item.firstPercent" :stroke-width="10" :color="item.firstColor" v-if="isWorstArea"
                                  :show-text="false"
                                  :class="item.firstNum > 0 ? 'item-process': 'region-process'"></el-progress>
                     <el-progress :percentage="item.secondPercent" :stroke-width="10" :color="item.secondColor"
@@ -333,7 +333,7 @@
             'desc': '优秀≤60%'
           },
         ],
-        resultList: [this.$t('overview.danger'), this.$t('overview.improve'), this.$t('overview.pass')],
+        resultList: [this.$t('overview.danger'), this.$t('overview.improve'), this.$t('overview.echartGood')],
         itemsLegend: [
           {
             'type': this.$t("overview.excellent"),
@@ -586,7 +586,7 @@
             series: [
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10'},
               // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
@@ -817,7 +817,7 @@
             series: [
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10'},
               // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
@@ -1230,7 +1230,7 @@
           firstColor = '#57e78f';
           secondColor = '#72a1f3';
           firstName = self.$t("overview.excellent");
-          secondName = self.$t("overview.pass");
+          secondName = self.$t("overview.echartGood");
           try {
             result.sort(self.compareExcellent);
             maxValue = self.findMaxExcellent(result);
@@ -2111,7 +2111,7 @@
             series: [
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
               {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10'},
               // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },

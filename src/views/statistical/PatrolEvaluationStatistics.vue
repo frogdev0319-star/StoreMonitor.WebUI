@@ -504,7 +504,7 @@
           // },
           {
             "prop":"numOfQualified",
-            "label": this.$t('overview.pass'),
+            "label": this.$t('overview.echartGood'),
             "sortable":'custom',
             "pdfwidth": '12%',
             "pdfmaxWidth": '12%',
@@ -581,7 +581,7 @@
           // },
           {
             "prop":"numOfQualified",
-            "label": this.$t('overview.pass'),
+            "label": this.$t('overview.echartGood'),
             "sortable":'custom',
             "pdfwidth": '12%',
             "pdfmaxWidth": '12%',

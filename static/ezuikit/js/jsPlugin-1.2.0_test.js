@@ -86,7 +86,7 @@ function (t, e) {
                             e = o + (f + u >= Math.pow(u, 2) ? i : 0);
                             var c = a + (f % u === u - 1 ? n : 0),
                                 d = s + (f + u >= Math.pow(u, 2) ? i : 0);
-                            l += '<div style="background-color: ' + p[M].oStyle.background + ";width:100%;height: " + d + 'px;"><canvas id="canvas' + f + '" class="play-window" style="border:1px solid ' + p[M].oStyle.border + ';" wid="' + f + '" width="560px" height="' + e + 'px;"></canvas><canvas id="canvas_draw' + f + '"  class="draw-window" style="position:absolute; top:0; left:0;" wid="' + f + '"width="560px" height="' + d + 'px;"></canvas></div>'
+                            l += '<div style="background-color: ' + p[M].oStyle.background + "; position: relative; width:100%; height: " + d + 'px;"><canvas id="canvas' + f + '" class="play-window" style="border:1px solid ' + p[M].oStyle.border + ';" wid="' + f + '" width="' + p[M].iWidth + '" height="' + e + '"></canvas><canvas id="canvas_draw' + f + '"  class="draw-window" style="position:absolute; top:0; left:0;" wid="' + f + '" width=' + p[M].iWidth + " height=" + d + "></canvas></div>"
 
                             // l += '<div style="float:left; background-color: ' + p[M].oStyle.background + "; position: relative; width: " + c + "px; height: " + d + 'px;"><canvas id="canvas' + f + '" class="play-window" style="border:1px solid ' + p[M].oStyle.border + ';" wid="' + f + '" width="' + t + '" height="' + e + '"></canvas><canvas id="canvas_draw' + f + '"  class="draw-window" style="position:absolute; top:0; left:0;" wid="' + f + '" width=' + c + " height=" + d + "></canvas></div>"
                         }

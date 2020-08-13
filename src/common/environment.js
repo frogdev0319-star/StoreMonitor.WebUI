@@ -43,7 +43,7 @@ let _Environments = {
   }
 }
 
-let environJSON = _Environments.Preview;
+let environJSON = _Environments.Debug_XA;
 let isGlobalWebsite = false;
 
 let Environment;
