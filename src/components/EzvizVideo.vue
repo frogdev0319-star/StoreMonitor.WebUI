@@ -25,34 +25,48 @@
             <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
             <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
           </div>
-          <div class="icon-width">
-            <span style="margin-right:10px;font-size:12px;">{{$t('storeMonitor.ezuikitwidth')}}</span>
-            <el-dropdown trigger="click" size="mini" split-button style="height:30px;">
-              <span style="width:80px;">{{proportion}}</span>
-              <el-dropdown-menu slot="dropdown" style="width:80px;">
-                <el-dropdown-item v-for="(item,index) in proportionList" :key="index" @click.native="checkPro(item)">{{item.label}}</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </div>
-          <div class="iconrside">
-            <div class="speed-content" v-if="playBackState">
-              <span>{{$t('storeMonitor.back')}}</span>
-              <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
-                <el-option
-                  v-for="(item) in backList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                  @click.native="adjustProcess(item.value, item.label)"
-                >
-                </el-option>
-              </el-select>
+          <div class="footer-right">
+            <div class="iconrside" v-if="playBackState">
+              <div class="speed-content">
+                <span>{{$t('storeMonitor.back')}}</span>
+                <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
+                  <el-option
+                    v-for="(item) in backList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                    @click.native="adjustProcess(item.value, item.label)"
+                  >
+                  </el-option>
+                </el-select>
+              </div>
             </div>
-          </div>
-          <div class="screen-content">
-            <i class="iconfont iconscreen"
-               :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
-            <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+            <div class="iconrside">
+              <div class="speed-content">
+                  <span>{{$t('storeMonitor.ezuikitwidth')}}</span>
+                  <el-select class="el-test" size="mini" :value="proportion" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
+                      <el-option
+                        v-for="(item,index) in proportionList" 
+                        :key="index"
+                        :label="item.label"
+                        :value="item.label"
+                        @click.native="checkPro(item.label)"
+                      >
+                      </el-option>
+                    </el-select>
+                  <!-- <el-dropdown trigger="click" size="mini" split-button style="height:30px;">
+                    <span style="width:80px;">{{proportion}}</span>
+                    <el-dropdown-menu slot="dropdown" style="width:80px;">
+                      <el-dropdown-item v-for="(item,index) in proportionList" :key="index" @click.native="checkPro(item)">{{item.label}}</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown> -->
+              </div>
+            </div>
+            <div class="screen-content">
+              <i class="iconfont iconscreen"
+                :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
+              <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+            </div>
           </div>
         </div>
         <div class="progress-content" v-if="playBackState">
@@ -88,25 +102,42 @@
               <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
               <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
             </div>
-            <div class="iconrside">
-              <div class="speed-content" v-if="playBackState">
-                <span>{{$t('storeMonitor.back')}}</span>
-                <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder='' :popper-append-to-body="false">
-                  <el-option
-                    v-for="(item) in backList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                    @click.native="adjustProcess(item.value, item.label)"
-                  >
-                  </el-option>
-                </el-select>
+            <div class="footer-right">
+              <div class="iconrside" v-if="playBackState">
+                <div class="speed-content">
+                  <span>{{$t('storeMonitor.back')}}</span>
+                  <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder='' :popper-append-to-body="false">
+                    <el-option
+                      v-for="(item) in backList"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                      @click.native="adjustProcess(item.value, item.label)"
+                    >
+                    </el-option>
+                  </el-select>
+                </div>
               </div>
-            </div>
-            <div class="screen-content">
-              <i class="iconfont iconscreen"
-                 :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
-              <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+              <div class="iconrside">
+                  <div class="speed-content">
+                    <span>{{$t('storeMonitor.ezuikitwidth')}}</span>
+                    <el-select class="el-test" size="mini" :value="proportion" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
+                        <el-option
+                          v-for="(item,index) in proportionList" 
+                          :key="index"
+                          :label="item.label"
+                          :value="item.label"
+                          @click.native="checkPro(item.label)"
+                        >
+                        </el-option>
+                    </el-select>
+                  </div>
+              </div>
+              <div class="screen-content">
+                <i class="iconfont iconscreen"
+                  :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
+                <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+              </div>
             </div>
           </div>
           <div class="progress-content" v-if="playBackState">
@@ -534,8 +565,12 @@
       generatePatrolLang,
       checkPro(item){
         let self = this;
-        self.proportion = item.label
-        self.initVideo();
+        self.proportion = item
+        if(self.fullWindow){
+          self.resetVideoSize()
+        }else{
+          self.initVideo();
+        }
       },
       async changeHistoryTime(newValue){
         console.log("curTime")
@@ -954,7 +989,7 @@
         else if(ele.msRequestFullscreen) {
           ele.msRequestFullscreen();
         }
-        self.resetVideoSize();
+        self.resetVideoSize('fullin');
       },
       //退出全屏
       exitFullscreen() {
@@ -994,6 +1029,18 @@
           self.fullDecoder.stop();
           self.fullDecoder = null;
           self.isLoading = true;
+          let width = 0
+          switch(self.proportion){
+            case '4:3':
+              width=560;
+              break;
+            case '16:9':
+              width=746;
+              break;
+            default:
+              width=560;
+                break;
+          }
           console.log(self.initPlayerWidth);
           console.log(self.initPlayerHeight)
           self.getVideoUrl()
@@ -1005,7 +1052,7 @@
             accessToken: self.accessToken,
             //decoderPath: '../../static/ezuikit/',
             decoderPath: './static/ezuikit/',
-            // width: self.initPlayerWidth,
+            width: width,
             height: self.initPlayerHeight,
             handleError: self.handleError,
             handleSuccess: self.handleExitFullScreenSuccess,
@@ -1015,18 +1062,32 @@
           // do nothing
         }
       },
-      resetVideoSize(){
+      resetVideoSize(e){
         let self = this;
         if(self.channelInfo==null){
           return;
         }
         else if(self.playState){
-          self.decoder.closeSound();
-          self.decoder.stop();
-          self.decorder = null;
+          if(e=='fullin'){
+            self.decoder.closeSound();
+            self.decoder.stop();
+            self.decorder = null;
+          }
           self.isLoading = true;
-          let  width = screen.width;
+          // let  width = screen.width;
           let height = screen.height;
+          let width = 0
+          switch(self.proportion){
+            case '4:3':
+              width = height*4/3;
+              break;
+            case '16:9':
+              width=height*16/9;
+              break;
+            default:
+              width=height*4/3;
+                break;
+          }
           let playerEle = self.$refs.myPlayer;
           playerEle.style.width = screen.width + 'px'; //动态设置HTML元素高度
           playerEle.style.height = screen.height + 'px';
@@ -2088,25 +2149,27 @@
           float: left;
         }
       }
-      @media screen and(min-width:1366px){
-        .iconrside{
-          width: 40%;
-        }
-      }
-      @media screen and(min-width:1366px){
-        .iconrside{
-          width: 40%;
-        }
+      // @media screen and(min-width:1366px){
+      //   .iconrside{
+      //     width: 40%;
+      //   }
+      // }
+      // @media screen and(min-width:1366px){
+      //   .iconrside{
+      //     width: 40%;
+      //   }
+      // }
+      .footer-right{
+        float:right;
       }
       .iconrside{
-        max-width: 500px;
-        float: right;
-        position: relative;
-        right: 75px;
+        // max-width: 230px;
+        display: inline-block;
+        margin-right: 20px;
         span{
           font-size: 13px;
           margin-right:6px;
-          margin-left: 20px;
+          // margin-left: 20px;
         }
         .speed-content{
           height: 46px;
@@ -2114,25 +2177,17 @@
           position: relative;
           display: inline-block;
           .el-test{
-            width: 40%;
+            width: 85px;
           }
         }
       }
     }
-    .icon-width{
-      display: inline-block;
-      position: absolute;
-      right: 80px;
-    }
     .screen-content{
-      display: inline;
-      margin-left: 30px;
-      position: absolute;
-      right: 20px;
+      display: inline-block;
       .iconscreen{
         margin-right: 20px;
         font-size: 18px;
-        position: relative;
+        // position: relative;
         cursor: pointer;
       }
     }
@@ -2446,13 +2501,6 @@
   }
 </style>
 <style>
-#videoContent .icon-width .el-button--mini{
-  background-color: rgba(233, 232, 232, 0.7);
-  padding-top:4px;
-  padding-bottom: 4px;
-  border:0px;
-  color:#fff;
-}
   .select-popClass .el-select-dropdown__item{
     font-size:12px;
     height: 24px;
@@ -2482,6 +2530,7 @@
   }
   .el-select-dropdown.el-popper.select-popClass{
     border:0px;
+    margin-top:-5px;
   }
   .select-popClass.el-popper[x-placement^=bottom] .popper__arrow{
     border-bottom-color:#34374A !important;

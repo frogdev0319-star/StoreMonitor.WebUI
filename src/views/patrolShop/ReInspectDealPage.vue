@@ -110,14 +110,6 @@
     beforeRouteLeave(to, from, next) {
         let self=this;
         clearInterval(self.timeid);
-        if(to.name=='remotePatrol'){
-            if(this.isSuccess==true){
-                to.meta.keepAlive = false;
-            }
-            else{
-                to.meta.keepAlive=true;
-            }
-        }
         next();
     },
     mounted(){
@@ -165,7 +157,7 @@
             self.curSecond--;
             if(self.curSecond==0){
                 clearInterval(self.timeid);
-                self.$router.push({name:'remotePatrol',params:{from:'submitEvent'}});
+                self.$router.push({name:'remotePatrol'});
             }
         },
         reTry(){

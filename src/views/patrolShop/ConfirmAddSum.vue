@@ -160,12 +160,13 @@ export default {
         }
     },
     beforeRouteLeave(to, from, next){
-        next(vm=>{
-            let self = this
-            if(to.name !='remotePatrol' ){
-                self.$store.dispatch('setPatrolHistory',null);
-            }
-        })
+        let self = this
+        if(to.name !='remotePatrol' ){
+            self.$store.dispatch('setPatrolHistory',null);
+            next();
+        }else{
+            next();
+        }
     },
     methods:{
         generatePatrolLang,

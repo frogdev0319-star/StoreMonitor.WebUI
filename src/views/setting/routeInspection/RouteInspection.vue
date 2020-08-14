@@ -14,7 +14,7 @@
             <el-button v-for="(item,index) in btnList"
                 :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
                   <div class="btn-area">
-                    <i :class="item.iconClass" style="font-size:24px;"></i>
+                    <i :class="item.iconClass" :style="item.style"></i>
                     <span>{{item.btnTitle}}</span>
                   </div>
             </el-button>
@@ -244,6 +244,7 @@ export default {
                 {
                     id:0,
                     iconClass:'iconfont icon-daoru',
+                    style:'font-size:24px;',
                     name:'import',
                     btnTitle: this.$t('insSettingView.import'),
                     enabled:true,
@@ -251,6 +252,7 @@ export default {
                 {
                     id:0,
                     iconClass:'iconfont icon-daochu',
+                    style:'font-size:24px;',
                     name:'export',
                     btnTitle: this.$t('insSettingView.export'),
                     enabled:true,
@@ -258,6 +260,7 @@ export default {
                 {
                     id:0,
                     iconClass:'iconfont icon-xiazai',
+                    style:'font-size:24px;',
                     name:'download',
                     btnTitle: this.$t('insSettingView.download'),
                     enabled:true,
@@ -265,6 +268,7 @@ export default {
                 {
                     id:0,
                     iconClass:'iconfont icon-shanchu',
+                    style:'font-size:17px;',
                     name:'delete',
                     btnTitle: this.$t('scheduleView.delete'),
                     enabled:true,

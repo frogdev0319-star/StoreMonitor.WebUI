@@ -839,8 +839,9 @@ export default {
     },
     async mounted(){
         let self=this;
+        debugger
         let PatrolHistory = self.$store.getters.PatrolHistory;
-        if(PatrolHistory!=null&&self.$route.params.from!='submitEvent'){
+        if(PatrolHistory!=null){
             self.activeIndex = PatrolHistory.activeIndex
             self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList
             self.PatrolList = PatrolHistory.PatrolList
@@ -862,22 +863,8 @@ export default {
             self.store = PatrolHistory.store
             self.showGuide = false
             self.showStoreUp = true
-        }else if(self.$route.params.from=='submitEvent'){
-            self.activeIndex = '0'
-            self.PatrolList = []
-            self.patrolstore = ''
-            self.inspectList = []
-            self.inspectItemList = []
-            self.store = ''
-            self.eventList = []
-            self.showFeedBackInfo = true
-            self.showGuide = true
-            self.showStoreUp = false
-            self.getFaStoreData();
         }
-        else{
-            self.getFaStoreData();
-        }
+        self.getFaStoreData();
         document.onmouseup=self.mouseUpAction;
         self.isREC=false;
         self.getUpLoadBucketInfo();
@@ -1636,6 +1623,7 @@ export default {
         },
         async getStoreList(){
             let self=this;
+            debugger
             console.log(self.activeIndex);
             console.log(self.store);
             let getStoreTemp=data=>{
@@ -1825,6 +1813,7 @@ export default {
         handleClick(tab){
             console.log(tab);
             let self=this;
+            debugger
             self.getStoreList();
         },
         addStoreUp(){
@@ -4000,7 +3989,7 @@ export default {
                     background-color: $background;
                     border-bottom:1px solid $border;
                     position: relative;
-                    z-index: 100;
+                    // z-index: 100;
                 }
                 @media screen and (min-width: 1600px){
                     .inspect-header{
@@ -4601,7 +4590,18 @@ export default {
 @import '../../assets/css/videoBar.css';
 @import '../../assets/css/tabsItem.css';
 @import '../../assets/css/pagination.css';
-
+.el-test .el-input__inner{
+    height: 24px;
+    line-height: 24px;
+    border-radius: 0px;
+    background-color: #34374A;
+    color: #fff;
+    padding:0 10px;
+    border: 0px;
+}
+.el-test .el-input__icon{
+    line-height: 24px;
+}
     .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }
