@@ -839,7 +839,6 @@ export default {
     },
     async mounted(){
         let self=this;
-        debugger
         let PatrolHistory = self.$store.getters.PatrolHistory;
         if(PatrolHistory!=null){
             self.activeIndex = PatrolHistory.activeIndex
@@ -1623,7 +1622,6 @@ export default {
         },
         async getStoreList(){
             let self=this;
-            debugger
             console.log(self.activeIndex);
             console.log(self.store);
             let getStoreTemp=data=>{
@@ -1813,7 +1811,6 @@ export default {
         handleClick(tab){
             console.log(tab);
             let self=this;
-            debugger
             self.getStoreList();
         },
         addStoreUp(){

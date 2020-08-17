@@ -527,6 +527,7 @@ export default {
     total: '表共有',
     bind: '已綁定',
     relateAllStores: '綁定至所有門店',
+    loadingbindstore:'載入中',
     confirmBound: '確認綁定',
     editSuss: '門店綁定修改成功，巡檢表綁定',
     storesBound: '家門店！',

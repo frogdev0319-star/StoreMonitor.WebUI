@@ -524,6 +524,7 @@ export default {
     total: 'stores in total with',
     bind: 'bound',
     relateAllStores: 'Bound to all stores',
+    loadingbindstore:'loading',
     confirmBound: 'Confirm Bound',
     editSuss: 'Successfully edited with ',
     storesBound: 'stores bound.',

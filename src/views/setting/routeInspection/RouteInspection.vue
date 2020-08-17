@@ -446,6 +446,9 @@ export default {
                         self.patrolActive=(TagData.length-1).toString()
                     }
                 }
+                if(val=='add'){
+                    self.patrolActive=(TagData.length-1).toString()
+                }
                 if(val=='accountChanged'){
                     self.patrolActive = '0'
                 }
@@ -693,7 +696,7 @@ export default {
                 self.notify(self.$t('insSettingView.importFail'),'warning',3000);
             }
             self.showImportContent=false;
-            self.getTagList();
+            self.getTagList('add');
         },
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
@@ -727,7 +730,7 @@ export default {
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
-            // sessionStorage.setItem('TabName',self.activeName);
+            sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
             self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
 

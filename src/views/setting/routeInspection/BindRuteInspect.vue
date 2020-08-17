@@ -52,6 +52,10 @@
             {{generateInsSettingLang('bindStore')}},{{generateInsSettingLang('bindWith')}}{{storeCount}}{{generateInsSettingLang('bindStore')}}</p>
         </div>
         <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.56+'px'}">
+            <div class="bind-empty" :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0">
+                <img :src="loadingGif"/>
+                <span class="empty-text">{{generateInsSettingLang('loadingbindstore')}}</span>
+            </div>
             <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                 <div class="el-all-checkbox" v-if="storeList.length!=0">
                     <el-checkbox  v-model="allData" @change="choiceAll"></el-checkbox>
@@ -117,7 +121,8 @@ export default {
             serachVale:'',
             curCitys: this.$t('storeView.cityPlaceholder'),
             showPopoVer:true,
-            lang: this.$i18n.locale
+            lang: this.$i18n.locale,
+            loadingGif: require('../../../../static/img/loading.gif')
         }
     },
     methods:{
@@ -305,8 +310,26 @@ export default {
                 }
             }
             let resData=await self.getStoreData(params);
-            let data=resData.content;
-            self.getStoreByCity(data);
+            self.storeData=resData.content;
+            self.getStoreByCity(self.storeData);
+
+            self.totalCount=resData.totalElements;
+            let p_temp=[];
+            if(self.storeData!=undefined&&self.storeData.length!=0){
+                self.storeData.forEach(item=>{
+                    let province=item.province;
+                    if(p_temp.map(x=>x.label).indexOf(province)==-1){
+                        let obj={
+                            value:province,
+                            label:province,
+                            citys:[],
+                        }
+                        p_temp.push(obj);
+                    }
+                })
+            }
+            p_temp.length > 0 ? p_temp.unshift({value:'', label:self.$t('storeView.provincePlaceholder'),}) : p_temp;
+            self.provinceList=p_temp;
 
             let count=0;
             self.storeList.forEach(item=>{
@@ -635,7 +658,7 @@ export default {
             }
             self.tabName= name;
             self.tabNameLang = nameLang; //转化为多语言的表名
-            self.getProvinceList();
+            // self.getProvinceList();
             self.searchStore();
 
         },
@@ -802,6 +825,13 @@ $h1:#292e36;
         background-color: #F6F7FB;
         border:0.5px solid #e3e9f4;
         color: $black;
+        .bind-empty{
+            text-align: center;
+            .empty-text{
+                font-size: calc(14/1920*100vw);
+                color:#7d8cad;
+            }
+        }
         .el-all-checkbox{
             margin: 20px auto 20px 15px;
             margin-left: calc(25/1920*100vw);
