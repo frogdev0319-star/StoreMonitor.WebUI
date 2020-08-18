@@ -606,6 +606,7 @@ export default {
         },
         async addAllData(dataArry){
             let self=this;
+            debugger
             let index=0;
             let mode=0;
             if(self.activeName=='0'){
@@ -619,84 +620,54 @@ export default {
             else{
                 index=2;
             }
-            // let data=self.elTableData[index];
-            // let groupIdList=[];
-            // let itemIdList=[];
-            // if(data.data.length!=0){
-            //     data.data.forEach(d_item=>{
-            //         d_item.routeData.forEach(item=>{
-            //             groupIdList.push(item.id);
-            //             item.itemData.forEach(_item=>{
-            //                 itemIdList.push(_item.id);
-            //             })
+            // let tempGroups=[];
+            // dataArry.forEach((item,index)=>{
+            //     let obj={};
+            //     obj.name=item[0].a;
+            //     obj.mode=mode;
+            //     obj.tag=self.ImportName;
+            //     tempGroups.push(obj);
+            // })
+            // let paramsGroup={
+            //     "groups": tempGroups
+            // };
+            // let resGroup=await self.addGroup(paramsGroup);
+            // let codeGroup=resGroup.errMsg;
+            // let dataGroup=resGroup.data;
+            // if(codeGroup!=null&&codeGroup=='Success'){
+            //     let tempItems=[];
+            //     dataArry.forEach((item,index)=>{
+            //         let obj={};
+            //         let temp=[];
+            //         item.forEach((_item,_index)=>{
+            //             let _obj={};
+            //             _obj.subject=_item.b;
+            //             _obj.description=_item.d;
+            //             _obj.itemScore=10;
+            //             temp.push(_obj);
             //         })
+            //         obj.groupId=dataGroup[index];
+            //         obj.items=temp;
+            //         tempItems.push(obj);
             //     })
-            // }else{
-            //     let params={
-            //         inspectId:parseInt(self.patrolActive)
+            //     let paramsItem={
+            //         "request": tempItems
+            //     };
+            //     let resItem=await self.addItem(paramsItem);
+            //     let codeItem=resItem.errMsg;
+            //     if(codeItem!=null&&codeItem=='Success'){
+            //         self.notify(self.$t('insSettingView.importSuss'),'success',3000);
+            //         self.showNameImport=false
             //     }
-            //     let table=await self.getNapeList(params);
-            //     table.forEach(item=>{
-            //         groupIdList.push(item.id);
-            //         item.items.forEach(_item=>{
-            //             itemIdList.push(_item.id);
-            //         })
-            //     })
+            //     else{
+            //         self.notify(self.$t('insSettingView.importFail'),'warning',3000);
+            //     }
             // }
-            // if(itemIdList.length!=0){
-            //     let res1= await self.deleteItem(itemIdList);
+            // else{
+            //     self.notify(self.$t('insSettingView.importFail'),'warning',3000);
             // }
-            // if(groupIdList.length!=0){
-            //     let res2= await self.deleteGroup(groupIdList);
-            // }
-            let tempGroups=[];
-            dataArry.forEach((item,index)=>{
-                let obj={};
-                obj.name=item[0].a;
-                obj.mode=mode;
-                obj.tag=self.ImportName;
-                tempGroups.push(obj);
-            })
-            let paramsGroup={
-                "groups": tempGroups
-            };
-            let resGroup=await self.addGroup(paramsGroup);
-            let codeGroup=resGroup.errMsg;
-            let dataGroup=resGroup.data;
-            if(codeGroup!=null&&codeGroup=='Success'){
-                let tempItems=[];
-                dataArry.forEach((item,index)=>{
-                    let obj={};
-                    let temp=[];
-                    item.forEach((_item,_index)=>{
-                        let _obj={};
-                        _obj.subject=_item.b;
-                        _obj.description=_item.d;
-                        _obj.itemScore=10;
-                        temp.push(_obj);
-                    })
-                    obj.groupId=dataGroup[index];
-                    obj.items=temp;
-                    tempItems.push(obj);
-                })
-                let paramsItem={
-                    "request": tempItems
-                };
-                let resItem=await self.addItem(paramsItem);
-                let codeItem=resItem.errMsg;
-                if(codeItem!=null&&codeItem=='Success'){
-                    self.notify(self.$t('insSettingView.importSuss'),'success',3000);
-                    self.showNameImport=false
-                }
-                else{
-                    self.notify(self.$t('insSettingView.importFail'),'warning',3000);
-                }
-            }
-            else{
-                self.notify(self.$t('insSettingView.importFail'),'warning',3000);
-            }
-            self.showImportContent=false;
-            self.getTagList('add');
+            // self.showImportContent=false;
+            // self.getTagList('add');
         },
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
@@ -1005,7 +976,7 @@ export default {
                 var rABS = false; //是否将文件读取为二进制字符串
                 var pt = this;
                 var wb; //读取完成的数据
-                var outdata;
+                var outdata = {};
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     var bytes = new Uint8Array(reader.result);
@@ -1022,100 +993,180 @@ export default {
                         wb = XLSX.read(binary, {
                             type: 'binary'
                         });
-                        delete wb.Sheets[wb.SheetNames[0]].A1
-                        delete wb.Sheets[wb.SheetNames[0]].B1
-                        delete wb.Sheets[wb.SheetNames[0]].C1
-                        delete wb.Sheets[wb.SheetNames[0]].D1
                     }
-                    outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);//outdata就是你想要的东西
-                    let arr=outdata;
-                    console.log(arr);
-                    let indexArry=[];
-                    let typeName=[];
-                    let flaggroupLength=false,flaggroupRex=false;
-                    let flagItemName=false,flagItemRex=false,flagItemLength=false;
-                    let flagDescName = false, flagDesLength=false;
+                    // 动态解析表头
+                    var sheet1,sheet2,sheet3
+                    let PassFail = wb.Sheets['Pass&Fail']
+                    let Score = wb.Sheets['Score']
+                    let Others = wb.Sheets['Others']
+                    let temp_sheet1 = [],temp_sheet2 = [],temp_sheet3 = []
+                    if(PassFail!=undefined){
+                        delete PassFail.A1;delete PassFail.B1;delete PassFail.C1;delete PassFail.D1
+                        sheet1 = XLSX.utils.sheet_to_json(wb.Sheets['Pass&Fail']);
+                        sheet1.forEach((_item,_index)=>{
+                            let obj={}
+                            obj.a = _item.__EMPTY
+                            obj.b = _item.__EMPTY_1
+                            obj.c = _item.__EMPTY_2
+                            obj.d = _item.__EMPTY_3
+                            temp_sheet1.push(obj)
+                        })
+                        outdata.PassFail=temp_sheet1
+                    }
+                    if(Score!=undefined){
+                        delete Score.A1;delete Score.B1;delete Score.C1;delete Score.D1;delete Score.E1
+                        sheet2 = XLSX.utils.sheet_to_json(wb.Sheets['Score']);
+                        sheet2.forEach((_item,_index)=>{
+                            let obj={}
+                            obj.a = _item.__EMPTY
+                            obj.b = _item.__EMPTY_1
+                            obj.c = _item.__EMPTY_2
+                            obj.d = _item.__EMPTY_3
+                            obj.e = _item.__EMPTY_4
+                            temp_sheet2.push(obj)
+                        })
+                        outdata.Score=temp_sheet2
+                    }
+                    if(Others!=undefined){
+                        delete Others.A1;delete Others.B1;delete Others.C1;delete Others.D1
+                        sheet3 = XLSX.utils.sheet_to_json(wb.Sheets['Others']);
+                        sheet3.forEach((_item,_index)=>{
+                            let obj={}
+                            obj.a = _item.__EMPTY
+                            obj.b = _item.__EMPTY_1
+                            obj.c = _item.__EMPTY_2
+                            obj.d = _item.__EMPTY_3
+                            temp_sheet3.push(obj)
+                        })
+                        outdata.Others=temp_sheet3
+                    }
 
-                    let tempData = []
-                    arr.forEach((item,index)=>{
-                        let obj={}
-                        obj.a = item.__EMPTY
-                        obj.b = item.__EMPTY_1
-                        obj.c = item.__EMPTY_2
-                        obj.d = item.__EMPTY_3
-                        tempData.push(obj)
-                    })
-                    console.log(tempData)
-
-                    tempData.forEach((item,index)=>{
-                        if(item.a!=undefined&&item.a.length!=0){
-                            indexArry.push(index);
-                            typeName.push(item.a);
-                            if(filterString.getContentLength(item.a.toString().trim()) > 30){
-                                flaggroupLength=true;
+                    let indexArryPassFail=[],indexArryScore=[],indexArryOthers=[]
+                    let flaggroupLengthPassFail=false,flaggroupLengthScore=false,flaggroupLengthOthers=false
+                    let flaggroupRexPassFail=false,flaggroupRexScore=false,flaggroupRexOthers=false
+                    let flagItemNamePassFail=false,flagItemNameScore=false,flagItemNameOthers=false
+                    let flagItemRexPassFail=false,flagItemRexScore=false,flagItemRexOthers=false
+                    let flagItemLengthPassFail=false,flagItemLengthScore=false,flagItemLengthOthers=false
+                    let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
+                    let flagDesLengthPassFail=false,flagDesLengthScore=false,flagDesLengthOthers=false;
+                    //sheet整合好的巡检表:outdata
+                    if(outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others!=undefined){
+                        _this.notify(_this.$t('insSettingView.OnlyOthers'),'warning',3000);
+                        return false;
+                    }
+                    let arr = Object.entries(outdata)
+                    for(let i=0;i<arr.length;i++){
+                        arr[i][1].forEach((item,index)=>{
+                            if(arr[i][0]=='PassFail'){
+                                    if(item.a!=undefined&&item.a.length!=0){
+                                        indexArryPassFail.push(index);
+                                        if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthPassFail=true;}
+                                        if(validateInput(item.a)){flaggroupRexPassFail=true;}
+                                    }
+                                    if(item.b==undefined||item.b.length==0){flagItemNamePassFail=true;}
+                                    else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthPassFail=true;}
+                                        if(validateInput(item.b)){flagItemRexPassFail=true;}
+                                    }
+                                    if(item.d==undefined){ flagDescNamePassFail=true;}
+                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 300){flagDesLengthPassFail=true;}}
+                            }else if(arr[i][0]=='Score'){
+                                    if(item.a!=undefined&&item.a.length!=0){
+                                        indexArryScore.push(index);
+                                        if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthScore=true;}
+                                        if(validateInput(item.a)){flaggroupRexScore=true;}
+                                    }
+                                    if(item.b==undefined||item.b.length==0){flagItemNameScore=true;}
+                                    else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthScore=true;}
+                                        if(validateInput(item.b)){flagItemRexScore=true;}
+                                    }
+                                    if(item.e==undefined){ flagDescNameScore=true;}
+                                    else{if(filterString.getContentLength(item.e.toString().trim()) > 300){flagDesLengthScore=true;}}
+                            }else if(arr[i][0]=='Others'){
+                                    if(item.a!=undefined&&item.a.length!=0){
+                                        indexArryOthers.push(index);
+                                        if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthOthers=true;}
+                                        if(validateInput(item.a)){flaggroupRexOthers=true;}
+                                    }
+                                    if(item.b==undefined||item.b.length==0){flagItemNameOthers=true;}
+                                    else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthOthers=true;}
+                                        if(validateInput(item.b)){flagItemRexOthers=true;}
+                                    }
+                                    if(item.d==undefined){ flagDescNameOthers=true;}
+                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 300){flagDesLengthOthers=true;}}
                             }
-                            if(validateInput(item.a)){
-                                flaggroupRex=true;
-                            }
-                        }
-                        if(item.b==undefined||item.b.length==0){
-                            flagItemName=true;
-                        }
-                        else{
-                            if(filterString.getContentLength(item.b.toString().trim()) > 100){
-                                flagItemLength=true;
-                            }
-                            if(validateInput(item.b)){
-                                flagItemRex=true;
-                            }
-                        }
-                      if(item.d==undefined){
-                        flagDescName=true;
-                      }
-                      else{
-                        if(filterString.getContentLength(item.d.toString().trim()) > 300){
-                          flagDesLength=true;
-                        }
-                      }
-                    })
-
-                    if(flaggroupLength||flaggroupRex||flagItemName||flagItemLength||flagItemRex||flagDesLength){
+                        })
+                    }
+                    let showWarningIfo = flaggroupLengthPassFail||flaggroupRexPassFail||flagItemNamePassFail||flagItemLengthPassFail||flagItemRexPassFail||flagDesLengthPassFail||
+                                         flaggroupLengthScore||flaggroupRexScore||flagItemNameScore||flagItemLengthScore||flagItemRexScore||flagDesLengthScore||
+                                         flaggroupLengthOthers||flaggroupRexOthers||flagItemNameOthers||flagItemLengthOthers||flagItemRexOthers||flagDesLengthOthers
+                    if(showWarningIfo){
                         _this.showFailInfo=true
-                        if(flaggroupLength){
-                            _this.$refs.loadFile.value = ''
-                            _this.$refs.loadFileEx.value = '';
-                            _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
+                        _this.$refs.loadFile.value = ''
+                        _this.$refs.loadFileEx.value = '';
+                        if(flaggroupLengthPassFail||flaggroupLengthScore||flaggroupLengthOthers){
+                            let flagArr = []
+                            if(flaggroupLengthPassFail){flagArr.push('PassFail')}
+                            if(flaggroupLengthScore){flagArr.push('Score')}
+                            if(flaggroupLengthOthers){flagArr.push('Others')}
+                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelLongCategory')
+                            _this.FileInfo.push(flag)
                         }
-                        if(flaggroupRex||flagItemRex){
-                            _this.$refs.loadFile.value = ''
-                            _this.$refs.loadFileEx.value = '';
-                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
+                        if(flaggroupRexPassFail||flagItemRexPassFail||flaggroupRexScore||flagItemRexScore||flaggroupRexOthers||flagItemRexOthers){
+                            let flagArr = []
+                            if(flaggroupRexPassFail||flagItemRexPassFail){flagArr.push('PassFail')}
+                            if(flaggroupRexScore||flagItemRexScore){flagArr.push('Score')}
+                            if(flaggroupRexOthers||flagItemRexOthers){flagArr.push('Others')}
+                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalCategory')
+                            _this.FileInfo.push(flag)
                         }
-                        if(flagItemName){
-                            _this.$refs.loadFile.value = ''
-                            _this.$refs.loadFileEx.value = '';
-                            _this.FileInfo.push(_this.$t('insSettingView.excelEmpty'))
+                        if(flagItemNamePassFail||flagItemNameScore||flagItemNameOthers){
+                            let flagArr = []
+                            if(flagItemNamePassFail){flagArr.push('PassFail')}
+                            if(flagItemNameScore){flagArr.push('Score')}
+                            if(flagItemNameOthers){flagArr.push('Others')}
+                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelEmpty')
+                            _this.FileInfo.push(flag)
                         }
-                        if(flagItemLength){
-                            _this.$refs.loadFile.value = ''
-                            _this.$refs.loadFileEx.value = '';
-                            _this.FileInfo.push(_this.$t('insSettingView.excelLongItem'))
+                        if(flagItemLengthPassFail||flagItemLengthScore||flagItemLengthOthers){
+                            let flagArr = []
+                            if(flagItemLengthPassFail){flagArr.push('PassFail')}
+                            if(flagItemLengthScore){flagArr.push('Score')}
+                            if(flagItemLengthOthers){flagArr.push('Others')}
+                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelLongItem')
+                            _this.FileInfo.push(flag)
                         }
-                        if(flagDesLength){
-                            _this.$refs.loadFile.value = ''
-                            _this.$refs.loadFileEx.value = '';
-                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalDes'))
+                        if(flagDesLengthPassFail||flagDesLengthScore||flagDesLengthOthers){
+                            let flagArr = []
+                            if(flagDesLengthPassFail){flagArr.push('PassFail')}
+                            if(flagDesLengthScore){flagArr.push('Score')}
+                            if(flagDesLengthOthers){flagArr.push('Others')}
+                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalDes')
+                            _this.FileInfo.push(flag)
                         }
                         return false
                     }
-                    let dataArry=[];
-                    for(var i=0;i<indexArry.length;i++){
-                        if(i<indexArry.length){
-                            dataArry[i]=tempData.slice(indexArry[i],indexArry[i+1]);
+                    let arrsheet1=[];
+                    if(indexArryPassFail.length!=0){
+                        for(var i=0;i<indexArryPassFail.length;i++){
+                            arrsheet1[i]=outdata.PassFail.slice(indexArryPassFail[i],indexArryPassFail[i+1]);
                         }
-                        else{
-                            dataArry[i]=tempData.slice(indexArry[length-1],indexArry.length);
+                    }
+                    let arrsheet2=[];
+                    if(indexArryScore.length!=0){
+                        for(var i=0;i<indexArryScore.length;i++){
+                            arrsheet2[i]=outdata.Score.slice(indexArryScore[i],indexArryScore[i+1]);
                         }
+                    }
+                    let arrsheet3=[];
+                    if(indexArryOthers.length!=0){
+                        for(var i=0;i<indexArryOthers.length;i++){
+                            arrsheet3[i]=outdata.Others.slice(indexArryOthers[i],indexArryOthers[i+1]);
+                        }
+                    }
+                    let dataArry = {
+                        PassFail:arrsheet1,
+                        Score:arrsheet2,
+                        Others:arrsheet3
                     }
                     _this.addAllData(dataArry);
                     _this.$refs.loadFile.value = '';

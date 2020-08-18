@@ -451,6 +451,7 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
+    OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8 新增
     selecttitle:'請選擇關聯職務',
     storeNoInspect:'此門店尚未綁定遠程巡檢表',
     confirmSubmitThis:'是否确认绑定当前巡检表',

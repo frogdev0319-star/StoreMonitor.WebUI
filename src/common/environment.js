@@ -3,8 +3,8 @@ let version = 'v1.0';
 
 let _Environments = {
   Debug_XA: {
-    CHINA_WEBSITE: 'http://172.21.81.43:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.43:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://172.21.81.37:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.21.81.37:8081/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version

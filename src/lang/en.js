@@ -56,10 +56,10 @@ export default {
     loginAbnormal: 'The login information is abnormal, please sign in again!'
   },
   overview:{
-    'eachmonth':' each month',//新增
+    'eachmonth':' each month',
     'everydays':' every week',
-    'act':'Executed on ',//新增
-    // 'daysww':'号',//新增
+    'act':'Executed on ',
+    // 'daysww':'号',
     // 'everymon':'每月',
     // 'weeks':'every week',
     'patrolPlan':'Patrol Plan',
@@ -449,6 +449,7 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
+    OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8 新增
     selecttitle:'Please select the related jobs',
     storeNoInspect:'No bound Remote Patrol List with the store',
     // confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',

@@ -1,5 +1,5 @@
 <template>
-    <div class="detail-container" style="height:auto;" :style="{'min-height':varyWindowWidth*0.70+'px'}">
+    <div class="detail-container" :style="{'max-height':varyWindowWidth+'px'}">
         <el-row>
             <el-col :span="24" class="detail-title">
                 <div class="table-right-post" @click="setItem">
@@ -9,11 +9,6 @@
                     <span class="post-label"  :style="ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
                     <span>{{ModelPost}}</span>
                 </div>
-                  <!-- <div class="table-right-post" @click="setItem">
-                        <i class="iconfont icon-quxiaolianjie" :style="item.ModelPost==null?'color:#f31b65;':''"></i>
-                        <span class="post-label" :style="item.ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
-                        <span>{{item.ModelPost}}</span>
-                    </div> -->
                 <div class="route-btns">
                      <el-button
                         :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
@@ -73,47 +68,51 @@
 
             </el-col>
             <el-col :span="24">
-                <div v-for="(item,index) in routeData" :key="index" class="data-content" v-if="routeData.length!=0">
-                    <div class="header-content tabTitle" v-if="index==0">
-                        <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
-                        <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
-                        <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
-                        <span class="score-title">{{generateInsSettingLang('score')}}</span>
-                        <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
+                <el-scrollbar id="el-menuscrollbar">
+                    <div class="data-box">
+                        <p class="item_title">合格率评估项</p>
+                        <p class="item_title">巡检评估项</p>
+                        <p class="item_title">附加项</p>
                     </div>
+                    <div v-if="routeData.length!=0" :style="{'max-height':varyWindowWidth*0.55+'px'}">
+                        <div v-for="(item,index) in routeData" :key="index" class="data-content">
+                            <div class="header-content tabTitle" v-if="index==0">
+                                <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
+                                <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
+                                <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
+                                <span class="score-title">{{generateInsSettingLang('score')}}</span>
+                                <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
+                            </div>
 
-                    <div class="table-header-title">
-                        <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
-                        <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
+                            <div class="table-header-title">
+                                <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
+                                <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
+                            </div>
+                            <div v-if="item.itemData.length!=0" class="table-class">
+                                <el-table
+                                :data="item.itemData"
+                                size="medium"
+                                :ref="item.refId"
+                                :show-header="false">
+                                    <el-table-column prop="checked" width="70px" align="center">
+                                        <template slot-scope="scope">
+                                            <span class="showNewContent" v-if="scope.row.isNew">new</span>
+                                            <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"></el-checkbox>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="name" :label="generateInsSettingLang('inspectName')" width="300px"></el-table-column>
+                                    <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='40%'></el-table-column>
+                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" min-width="8%"></el-table-column>
+                                    <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="10%">
+                                        <template slot-scope="scope">
+                                                <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
+                                            </template>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                        </div>
                     </div>
-                    <!-- <div class="table-right-post" @click="setItem">
-                        <i class="iconfont icon-quxiaolianjie" :style="item.ModelPost==null?'color:#f31b65;':''"></i>
-                        <span class="post-label" :style="item.ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
-                        <span>{{item.ModelPost}}</span>
-                    </div> -->
-                     <div v-if="item.itemData.length!=0" class="table-class">
-                        <el-table
-                        :data="item.itemData"
-                        size="medium"
-                        :ref="item.refId"
-                        :show-header="false">
-                            <el-table-column prop="checked" width="70px" align="center">
-                                <template slot-scope="scope">
-                                    <span class="showNewContent" v-if="scope.row.isNew">new</span>
-                                    <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"></el-checkbox>
-                                </template>
-                            </el-table-column>
-                            <el-table-column prop="name" :label="generateInsSettingLang('inspectName')" width="300px"></el-table-column>
-                            <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='40%'></el-table-column>
-                            <el-table-column prop="score" :label="generateInsSettingLang('score')" min-width="8%"></el-table-column>
-                            <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="10%">
-                                <template slot-scope="scope">
-                                        <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
-                                    </template>
-                            </el-table-column>
-                        </el-table>
-                    </div>
-                </div>
+                </el-scrollbar>
                 <!-- <div class="data-empty" v-if="routeData.length==0">
                     <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
                     <p class="empty-title">
@@ -929,6 +928,25 @@ export default {
           }
         }
     }
+    #el-menuscrollbar{
+        height:100%;
+        border:1px solid #e3e9f4;
+        margin:10px 0 10px 0;
+    }
+    .data-box{
+        background-color: #e9eff8;
+        height:36px;
+        line-height: 36px;
+        // position: fixed;
+        .item_title{
+            margin:0;
+            color:#404153;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+        }
+    }
     .data-content{
         margin: 20px calc(20/1920*100vw);
         margin-left: 0px;
@@ -1049,6 +1067,9 @@ export default {
     }
 </style>
 <style>
+#el-menuscrollbar .el-scrollbar__wrap {
+  overflow-x: hidden;
+}
 .current-row > td {
   background: #FEE7E4 !important;
 }
