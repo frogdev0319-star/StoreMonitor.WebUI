@@ -862,8 +862,9 @@ export default {
             self.store = PatrolHistory.store
             self.showGuide = false
             self.showStoreUp = true
+        }else{
+            self.getFaStoreData();
         }
-        self.getFaStoreData();
         document.onmouseup=self.mouseUpAction;
         self.isREC=false;
         self.getUpLoadBucketInfo();
@@ -1808,9 +1809,11 @@ export default {
                 }
             }
         },
-        handleClick(tab){
+        async handleClick(tab){
             console.log(tab);
             let self=this;
+            let allStoreData=await self.getAllStoreList();
+            self.getInitStoreData(allStoreData);
             self.getStoreList();
         },
         addStoreUp(){
@@ -2170,7 +2173,7 @@ export default {
             let ignoreCount = 0;
             let feedBack = self.inspectList.slice(self.inspectList.length-1)[0]
             let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
-            let inspectList=self.inspectList.slice(0,indexFeed);
+            let inspectList=JSON.parse(JSON.stringify(self.inspectList.slice(0,indexFeed)));
             inspectList.forEach(item=>{
                 item.dealCount = item.items.length
                 count=count+item.items.length;
@@ -2199,7 +2202,7 @@ export default {
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                inspect:inspectList.concat(feedBack),
+                inspect:self.inspectList,
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList
             }
@@ -2266,7 +2269,7 @@ export default {
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                inspect:inspectList.concat(feedBack),
+                inspect:self.inspectList,
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList
             }

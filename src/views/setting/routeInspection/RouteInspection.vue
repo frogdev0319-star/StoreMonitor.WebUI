@@ -446,9 +446,6 @@ export default {
                         self.patrolActive=(TagData.length-1).toString()
                     }
                 }
-                if(val=='add'){
-                    self.patrolActive=(TagData.length-1).toString()
-                }
                 if(val=='accountChanged'){
                     self.patrolActive = '0'
                 }
@@ -552,6 +549,10 @@ export default {
                     }
                 // })
                 self.elTableData=self.elTableData.concat(tempAllData);
+                if(val=='add'){
+                    self.patrolActive=(TagData.length-1).toString()
+                    self.notify(self.$t('insSettingView.importSuss'),'success',3000);
+                }
             }
             else{
               self.getDownLoadURL();
@@ -619,36 +620,6 @@ export default {
             else{
                 index=2;
             }
-            // let data=self.elTableData[index];
-            // let groupIdList=[];
-            // let itemIdList=[];
-            // if(data.data.length!=0){
-            //     data.data.forEach(d_item=>{
-            //         d_item.routeData.forEach(item=>{
-            //             groupIdList.push(item.id);
-            //             item.itemData.forEach(_item=>{
-            //                 itemIdList.push(_item.id);
-            //             })
-            //         })
-            //     })
-            // }else{
-            //     let params={
-            //         inspectId:parseInt(self.patrolActive)
-            //     }
-            //     let table=await self.getNapeList(params);
-            //     table.forEach(item=>{
-            //         groupIdList.push(item.id);
-            //         item.items.forEach(_item=>{
-            //             itemIdList.push(_item.id);
-            //         })
-            //     })
-            // }
-            // if(itemIdList.length!=0){
-            //     let res1= await self.deleteItem(itemIdList);
-            // }
-            // if(groupIdList.length!=0){
-            //     let res2= await self.deleteGroup(groupIdList);
-            // }
             let tempGroups=[];
             dataArry.forEach((item,index)=>{
                 let obj={};
@@ -685,8 +656,7 @@ export default {
                 let resItem=await self.addItem(paramsItem);
                 let codeItem=resItem.errMsg;
                 if(codeItem!=null&&codeItem=='Success'){
-                    self.notify(self.$t('insSettingView.importSuss'),'success',3000);
-                    self.showNameImport=false
+                    self.getTagList('add');
                 }
                 else{
                     self.notify(self.$t('insSettingView.importFail'),'warning',3000);
@@ -695,8 +665,7 @@ export default {
             else{
                 self.notify(self.$t('insSettingView.importFail'),'warning',3000);
             }
-            self.showImportContent=false;
-            self.getTagList('add');
+            // self.showImportContent=false;
         },
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
@@ -777,6 +746,7 @@ export default {
                 }else{
                     self.isShowWarning = false
                     document.getElementById('loadFileEx').click()
+                    self.showNameImport=false
                 }
           }else{
               self.isShowWarning = true
