@@ -1,13 +1,13 @@
 <template>
-    <div class="detail-container" :style="{'max-height':varyWindowWidth+'px'}">
+    <div class="detail-container">
         <el-row>
             <el-col :span="24" class="detail-title">
                 <div class="table-right-post" @click="setItem">
-                    <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
-                        {{itemNum}} {{generateInsSettingLang('item')}}</span>
-                    <i class="iconfont icon-quxiaolianjie" :style="ModelPost==null?'color:#f31b65;':''"></i>
-                    <span class="post-label"  :style="ModelPost==null?'color:#f31b65;':''">{{$t('insSettingView.relationDuty')}}:</span>
-                    <span>{{ModelPost}}</span>
+                    <!-- <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
+                        {{itemNum}} {{generateInsSettingLang('item')}}</span> -->
+                    <i class="iconfont icon-quxiaolianjie"></i>
+                    <span class="post-label">{{$t('insSettingView.relationDuty')}}:</span>
+                    <span class="post-concent">{{ModelPost}}</span>
                 </div>
                 <div class="route-btns">
                      <el-button
@@ -68,19 +68,21 @@
 
             </el-col>
             <el-col :span="24">
-                <el-scrollbar id="el-menuscrollbar">
-                    <div class="data-box">
-                        <p class="item_title">合格率评估项</p>
-                        <p class="item_title">巡检评估项</p>
-                        <p class="item_title">附加项</p>
+                <div class="data-box">
+                    <div class="sheet_title" v-for="item in sheetName" :key="item.id" @click="changeSheet(item.id)">
+                        <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{item.label}}</p>
                     </div>
-                    <div v-if="routeData.length!=0" :style="{'max-height':varyWindowWidth*0.55+'px'}">
+                </div>
+                <el-scrollbar id="el-menuscrollbar">
+                    <div v-if="routeData.length!=0" :style="{'max-height':varyWindowWidth*0.58+'px'}">
                         <div v-for="(item,index) in routeData" :key="index" class="data-content">
                             <div class="header-content tabTitle" v-if="index==0">
                                 <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
                                 <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
                                 <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
-                                <span class="score-title">{{generateInsSettingLang('score')}}</span>
+                                <span class="score-title" :style="sheetName[1].isClick?'width: calc((100% - 405px) * 2.5/29);':''" v-if="sheetName[0].isClick||sheetName[1].isClick">{{generateInsSettingLang('sheetscore0')}}</span>
+                                <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="sheetName[1].isClick">{{generateInsSettingLang('sheetscore1')}}</span>
+                                <span class="score-title" v-if="sheetName[2].isClick">{{generateInsSettingLang('sheetscore2')}}</span>
                                 <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
                             </div>
 
@@ -101,9 +103,10 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="name" :label="generateInsSettingLang('inspectName')" width="300px"></el-table-column>
-                                    <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='40%'></el-table-column>
-                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" min-width="8%"></el-table-column>
-                                    <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="10%">
+                                    <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='24%'></el-table-column>
+                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" align="center" :min-width="sheetName[1].isClick?'4%':'15%'"></el-table-column>
+                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" align="center" min-width="11%" v-if="sheetName[1].isClick"></el-table-column>
+                                    <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="6%">
                                         <template slot-scope="scope">
                                                 <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
                                             </template>
@@ -226,6 +229,11 @@ export default {
             tabNameLang: '',
             tabNameInput:'',
             varyWindowWidth:window.innerHeight,
+            sheetName:[
+                {id:0,isClick:true,label:this.$t('insSettingView.sheetpassfail')},
+                {id:1,isClick:false,label:this.$t('insSettingView.sheetscore')},
+                {id:2,isClick:false,label:this.$t('insSettingView.sheetother')}
+            ],
             allchecked:false,
             curDeleteId:'',
             fileName: this.$t('insSettingView.patrolExample'),
@@ -290,6 +298,16 @@ export default {
                 item.itemData.forEach(_item=>{
                     _item.checked=val;
                 })
+            })
+        },
+        changeSheet(e){
+            let self = this
+            self.sheetName.forEach(item=>{
+                if(item.id==e){
+                    item.isClick = true
+                }else{
+                    item.isClick = false
+                }
             })
         },
         change(item){
@@ -816,11 +834,12 @@ export default {
     .detail-title{
         overflow: hidden;
         .table-right-post{
-            font-size: 12px;
+            font-size: 14px;
             color:#94a4b4;
             text-align: left;
             float: left;
             line-height: 36px;
+            font-weight: bold;
             cursor: pointer;
             .title-title{
                 margin-left: 0px;
@@ -831,12 +850,16 @@ export default {
                 color: #424151;
             }
             .iconfont{
-                font-size: 12px;
-                margin-right: 5px;
-                margin-left: calc(15/1920*100vw);
+                font-size: 14px;
+                margin-right: 38px;
+                margin-left: calc(27/1920*100vw);
             }
             .post-label{
+                color:#f31b65;
                 text-decoration: underline;
+            }
+            .post-concent{
+                color:#404153;
             }
         }
         .route-btns{
@@ -931,20 +954,33 @@ export default {
     #el-menuscrollbar{
         height:100%;
         border:1px solid #e3e9f4;
-        margin:10px 0 10px 0;
+        border-top: 0px;
+        margin-bottom:10px;
+        position: relative;
     }
     .data-box{
         background-color: #e9eff8;
         height:36px;
-        line-height: 36px;
-        // position: fixed;
+        border:1px solid #e3e9f4;
+        border-bottom: 0px;
+        margin-top:10px;
+        padding-left:60px;
         .item_title{
-            margin:0;
             color:#404153;
+            margin: 0;
             font-size: 14px;
             font-weight: bold;
-            display: inline-block;
             text-align: center;
+            width:120px;
+            height:34px;
+            line-height: 34px;
+            border-radius:4px 4px 0 0;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+        .sheet_title{
+            float: left;
+            margin-top: 2px;
         }
     }
     .data-content{
@@ -953,15 +989,17 @@ export default {
         overflow: hidden;
         .header-content{
             width: 100%;
-            margin-top:0px;
-            margin-bottom: 15px;
+            margin:0px;
             float: left;
             overflow: hidden;
             text-align: left;
-            padding-left: 27px;
-            padding-bottom:15px;
+            padding: 15px 0 15px 27px;
             border-bottom:1px solid #e3e9f4;
             font-size: calc(14/1920*100vw);
+            position: absolute;
+            top:0;
+            background-color: #fff;
+            z-index: 100;
             .allcheckBox{
                 float: left;
                 margin-right: 0;
@@ -975,16 +1013,18 @@ export default {
             .description-title{
                 float: left;
                 width: 50%;
-                width: calc((100% - 405px) * 20/29);
+                width: calc((100% - 405px) * 15.3/29);
             }
             .score-title{
                 float: left;
-                width: calc((100% - 405px) * 4/29);
+                width: calc((100% - 405px) * 9/29);
                 padding: 0 10px;
+                text-align: center;
             }
             .handle-title{
                 float: left;
-                width: calc((100% - 405px) * 5/29);
+                width: calc((100% - 405px) * 3/29);
+                padding-left:calc(20/1920*100vw);
             }
             .en-handle-title{
               float: left;

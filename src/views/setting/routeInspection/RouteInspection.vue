@@ -446,9 +446,6 @@ export default {
                         self.patrolActive=(TagData.length-1).toString()
                     }
                 }
-                if(val=='add'){
-                    self.patrolActive=(TagData.length-1).toString()
-                }
                 if(val=='accountChanged'){
                     self.patrolActive = '0'
                 }
@@ -552,6 +549,10 @@ export default {
                     }
                 // })
                 self.elTableData=self.elTableData.concat(tempAllData);
+                if(val=='add'){
+                    self.patrolActive=(TagData.length-1).toString()
+                    self.notify(self.$t('insSettingView.importSuss'),'success',3000);
+                }
             }
             else{
               self.getDownLoadURL();
@@ -606,7 +607,6 @@ export default {
         },
         async addAllData(dataArry){
             let self=this;
-            debugger
             let index=0;
             let mode=0;
             if(self.activeName=='0'){
@@ -620,6 +620,70 @@ export default {
             else{
                 index=2;
             }
+            debugger
+            let arr = Object.entries(dataArry)
+            let tempGroups=[];
+            let tempItems=[];
+            let sheetName = ''
+            for(let i=0;i<arr.length;i++){
+                if(arr[i][0]=='PassFail'){
+                    sheetName = 'PassFail'
+                }
+                else if(arr[i][0]=='Score'){
+                    sheetName = 'Score'
+                }
+                else if(arr[i][0]=='Others'){
+                    sheetName = 'Others'
+                }
+                arr[i][1].forEach((item,index)=>{
+                    let obj={};
+                        obj.name=item[0].a;
+                        obj.mode=mode;
+                        obj.tag=self.ImportName;
+                        obj.sheetName=sheetName
+                        tempGroups.push(obj);
+                    let objItem={};
+                    let temp=[];
+                    item.forEach((_item,_index)=>{
+                        let _obj={};
+                        let score=0,minScore=0,description=''
+                        if(arr[i][0]=='PassFail'){
+                            score = 10
+                            minScore = null
+                            description = _item.c
+                        }
+                        else if(arr[i][0]=='Score'){
+                            score = _item.c
+                            minScore = _item.d
+                            description = _item.e
+                        }
+                        else if(arr[i][0]=='Others'){
+                            score = _item.c
+                            minScore = null
+                            description = _item.d
+                        }
+                        _obj.subject=_item.b;
+                        _obj.description=description;
+                        _obj.itemScore=score;
+                        _obj.minScore=minScore
+                        temp.push(_obj);
+                    })
+                    objItem.groupId=1;
+                    objItem.items=temp;
+                    tempItems.push(objItem);
+                })
+            }
+            debugger
+            //巡检类别
+            let paramsGroup={
+                "groups": tempGroups
+            };
+            //巡检项
+            let paramsItem={
+                "request": tempItems
+            };
+                
+
             // let tempGroups=[];
             // dataArry.forEach((item,index)=>{
             //     let obj={};
@@ -656,8 +720,7 @@ export default {
             //     let resItem=await self.addItem(paramsItem);
             //     let codeItem=resItem.errMsg;
             //     if(codeItem!=null&&codeItem=='Success'){
-            //         self.notify(self.$t('insSettingView.importSuss'),'success',3000);
-            //         self.showNameImport=false
+            //         self.getTagList('add');
             //     }
             //     else{
             //         self.notify(self.$t('insSettingView.importFail'),'warning',3000);
@@ -667,7 +730,6 @@ export default {
             //     self.notify(self.$t('insSettingView.importFail'),'warning',3000);
             // }
             // self.showImportContent=false;
-            // self.getTagList('add');
         },
         handleItem(){
             this.showBtnContent=!this.showBtnContent;
@@ -748,6 +810,7 @@ export default {
                 }else{
                     self.isShowWarning = false
                     document.getElementById('loadFileEx').click()
+                    self.showNameImport=false
                 }
           }else{
               self.isShowWarning = true
@@ -1008,7 +1071,7 @@ export default {
                             obj.a = _item.__EMPTY
                             obj.b = _item.__EMPTY_1
                             obj.c = _item.__EMPTY_2
-                            obj.d = _item.__EMPTY_3
+                            // obj.d = _item.__EMPTY_3
                             temp_sheet1.push(obj)
                         })
                         outdata.PassFail=temp_sheet1
@@ -1049,11 +1112,16 @@ export default {
                     let flagItemLengthPassFail=false,flagItemLengthScore=false,flagItemLengthOthers=false
                     let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
                     let flagDesLengthPassFail=false,flagDesLengthScore=false,flagDesLengthOthers=false;
+                    let flagFullScoreType=false,flagMinScoreType=false,flagOtherScoreType=false
+                    let flagTempError=false
                     //sheet整合好的巡检表:outdata
-                    if(outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others!=undefined){
+                    if((outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others!=undefined)||(outdata.PassFail!=undefined&&outdata.Score==undefined&&outdata.Others!=undefined)){
+                        _this.$refs.loadFile.value = ''
+                        _this.$refs.loadFileEx.value = '';
                         _this.notify(_this.$t('insSettingView.OnlyOthers'),'warning',3000);
                         return false;
                     }
+                    outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others==undefined ? flagTempError=true : flagTempError=false
                     let arr = Object.entries(outdata)
                     for(let i=0;i<arr.length;i++){
                         arr[i][1].forEach((item,index)=>{
@@ -1067,8 +1135,8 @@ export default {
                                     else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthPassFail=true;}
                                         if(validateInput(item.b)){flagItemRexPassFail=true;}
                                     }
-                                    if(item.d==undefined){ flagDescNamePassFail=true;}
-                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 300){flagDesLengthPassFail=true;}}
+                                    if(item.c==undefined){ flagDescNamePassFail=true;}
+                                    else{if(filterString.getContentLength(item.c.toString().trim()) > 300){flagDesLengthPassFail=true;}}
                             }else if(arr[i][0]=='Score'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryScore.push(index);
@@ -1078,6 +1146,12 @@ export default {
                                     if(item.b==undefined||item.b.length==0){flagItemNameScore=true;}
                                     else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthScore=true;}
                                         if(validateInput(item.b)){flagItemRexScore=true;}
+                                    }
+                                    if(item.c==undefined||item.c.length==0||!Number.isInteger(item.c)||parseInt(item.c)<1||parseInt(item.c)>10){//项目满分值必填，字符类型为1~10整数
+                                        flagFullScoreType=true
+                                    }
+                                    if(item.d==undefined||item.d.length==0||!Number.isInteger(item.d)||parseInt(item.d)<1||parseInt(item.d)>parseInt(item.c)){//最低分值必填，字符类型为1~item.c整数
+                                        flagMinScoreType=true
                                     }
                                     if(item.e==undefined){ flagDescNameScore=true;}
                                     else{if(filterString.getContentLength(item.e.toString().trim()) > 300){flagDesLengthScore=true;}}
@@ -1091,6 +1165,9 @@ export default {
                                     else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthOthers=true;}
                                         if(validateInput(item.b)){flagItemRexOthers=true;}
                                     }
+                                    if(item.c==undefined||item.c.length==0||!Number.isInteger(Math.abs(item.c))||parseInt(item.c)<-100||parseInt(item.c)>100){//项目分值必填，字符类型为-100~+100整数
+                                        flagOtherScoreType=true
+                                    }
                                     if(item.d==undefined){ flagDescNameOthers=true;}
                                     else{if(filterString.getContentLength(item.d.toString().trim()) > 300){flagDesLengthOthers=true;}}
                             }
@@ -1098,11 +1175,15 @@ export default {
                     }
                     let showWarningIfo = flaggroupLengthPassFail||flaggroupRexPassFail||flagItemNamePassFail||flagItemLengthPassFail||flagItemRexPassFail||flagDesLengthPassFail||
                                          flaggroupLengthScore||flaggroupRexScore||flagItemNameScore||flagItemLengthScore||flagItemRexScore||flagDesLengthScore||
-                                         flaggroupLengthOthers||flaggroupRexOthers||flagItemNameOthers||flagItemLengthOthers||flagItemRexOthers||flagDesLengthOthers
+                                         flaggroupLengthOthers||flaggroupRexOthers||flagItemNameOthers||flagItemLengthOthers||flagItemRexOthers||flagDesLengthOthers||
+                                         flagFullScoreType||flagMinScoreType||flagOtherScoreType||flagTempError
                     if(showWarningIfo){
                         _this.showFailInfo=true
                         _this.$refs.loadFile.value = ''
                         _this.$refs.loadFileEx.value = '';
+                        if(flagTempError){
+                            _this.FileInfo.push(_this.$t('insSettingView.templateError'))
+                        }
                         if(flaggroupLengthPassFail||flaggroupLengthScore||flaggroupLengthOthers){
                             let flagArr = []
                             if(flaggroupLengthPassFail){flagArr.push('PassFail')}
@@ -1121,11 +1202,17 @@ export default {
                         }
                         if(flagItemNamePassFail||flagItemNameScore||flagItemNameOthers){
                             let flagArr = []
-                            if(flagItemNamePassFail){flagArr.push('PassFail')}
-                            if(flagItemNameScore){flagArr.push('Score')}
-                            if(flagItemNameOthers){flagArr.push('Others')}
-                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelEmpty')
-                            _this.FileInfo.push(flag)
+                            if(flagItemNameScore){
+                                let flag = 'Score' + ' ' +  _this.$t('insSettingView.excelEmpty')
+                                _this.FileInfo.push(flag)
+                            }
+                            if(flagItemNamePassFail||flagItemNameOthers){
+                                if(flagItemNamePassFail){flagArr.push('PassFail')}
+                                if(flagItemNameOthers){flagArr.push('Others')}
+                                let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.passfailexcelEmpty')
+                                _this.FileInfo.push(flag)
+                            }
+                            
                         }
                         if(flagItemLengthPassFail||flagItemLengthScore||flagItemLengthOthers){
                             let flagArr = []
@@ -1143,12 +1230,26 @@ export default {
                             let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalDes')
                             _this.FileInfo.push(flag)
                         }
+                        if(flagFullScoreType){
+                            _this.FileInfo.push('Score' + ' ' +_this.$t('insSettingView.excelFullScoreType'))
+                        }
+                        if(flagMinScoreType){
+                            _this.FileInfo.push('Score' + ' ' +_this.$t('insSettingView.excelMinScoreType'))
+                        }
+                        if(flagOtherScoreType){
+                            _this.FileInfo.push('Others' + ' ' +_this.$t('insSettingView.excelOtherScoreType'))
+                        }
                         return false
                     }
                     let arrsheet1=[];
                     if(indexArryPassFail.length!=0){
                         for(var i=0;i<indexArryPassFail.length;i++){
                             arrsheet1[i]=outdata.PassFail.slice(indexArryPassFail[i],indexArryPassFail[i+1]);
+                        }
+                    }else{
+                        if(outdata.PassFail.length!=0){
+                            arrsheet1 = outdata.PassFail
+                            arrsheet1[0].a = '评级项目'
                         }
                     }
                     let arrsheet2=[];
@@ -1161,6 +1262,11 @@ export default {
                     if(indexArryOthers.length!=0){
                         for(var i=0;i<indexArryOthers.length;i++){
                             arrsheet3[i]=outdata.Others.slice(indexArryOthers[i],indexArryOthers[i+1]);
+                        }
+                    }else{
+                        if(outdata.Others.length!=0){
+                            arrsheet3 = outdata.Others
+                            arrsheet3[0].a = '附加评分项目'
                         }
                     }
                     let dataArry = {

@@ -473,6 +473,12 @@ export default {
     Inspector:'Please select inspector',
     inspectName: 'Name',
     inspectionDescp: 'Descriptions',
+    sheetscore0: '项目满分值',//Sprint8 新增
+    sheetscore1: '低于*分，须由门店负责人处理',//Sprint8 新增
+    sheetscore2: '项目分值(必填，-100分~100分)',//Sprint8 新增
+    sheetpassfail:'合格率评估项',//Sprint8 新增
+    sheetscore:'巡检评估项',//Sprint8 新增
+    sheetother:'附加项',//Sprint8 新增
     score: 'Score',
     selectImprtLoc: 'Select a location for import files.',
     enterListName: 'Enter List Name',
@@ -500,6 +506,10 @@ export default {
     excelLongCategory: 'The length of group supports up to 30 characters!',
     excelIllegalCategory: 'llegal characters outside "@#￥%^&*"!',
     excelEmpty: 'The group name and item name can\'t empty!',
+    passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
+    excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
+    excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
+    excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
     excelLongItem: 'The length of item is 100 characters at most!',
     excelIllegalDes: 'The length of item description is 300 characters at most!',
     deleteItem: 'Delete Item',

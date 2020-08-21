@@ -474,7 +474,12 @@ export default {
     Inspector:'请选择巡检人',
     inspectName: '巡检名称',
     inspectionDescp: '巡检项要求描述',
-    score: '项目分值',
+    sheetscore0: '项目满分值',//Sprint8 新增
+    sheetscore1: '低于*分，须由门店负责人处理',//Sprint8 新增
+    sheetscore2: '项目分值(必填，-100分~100分)',//Sprint8 新增
+    sheetpassfail:'合格率评估项',//Sprint8 新增
+    sheetscore:'巡检评估项',//Sprint8 新增
+    sheetother:'附加项',//Sprint8 新增
     selectImprtLoc: '请选择导入文件的位置',
     enterListName: '请输入巡检表名称',
     enterItemName: '请输入巡检项名称',
@@ -501,6 +506,10 @@ export default {
     excelLongCategory: '巡检类别长度不可超过30个字符！',
     excelIllegalCategory: '存在“@#￥%^&*”外的非法字符！',
     excelEmpty: '巡检类别与巡检项不能为空！',
+    passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
+    excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
+    excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
+    excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
     excelLongItem: '巡检项长度不可超过100个字符！',
     excelIllegalDes: '巡检项目详细说明不可超过300个字符！',
     deleteItem: '删除巡检项',

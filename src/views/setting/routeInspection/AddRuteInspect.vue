@@ -25,7 +25,7 @@
                 </el-button>
             </div>
         </el-col>
-       <el-col :span="lang=='en'&& varyWindowWidth < 1366? 9: 7" class="el-rute-group">
+       <el-col :span="7" class="el-rute-group">
            <div class="group-content">
                <div class="title-content">
                  <span class="level2"><i class="iconfont icon-wenjian icontitle"></i><span class="level2-name">{{groupTitle}}</span></span>
@@ -42,12 +42,12 @@
                <div class="group-items group-title" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="top-group-title">
                        <div class="group-name-title">
-                           <span>{{$t('remotePatrol.category')}}</span>
+                           <el-tabs v-model="activeSheetName" id="group-content" @tab-click="handleSheetClick">
+                                <el-tab-pane :label="$t('insSettingView.sheetpassfail')" name="0"></el-tab-pane>
+                                <el-tab-pane :label="$t('insSettingView.sheetscore')" name="1"></el-tab-pane>
+                                <el-tab-pane :label="$t('insSettingView.sheetother')" name="2"></el-tab-pane>
+                            </el-tabs>
                        </div>
-                       <!-- <div class="group-dep-title">
-                           <span>{{generateInsSettingLang('relationDuty')}}</span>
-                       </div>
-                       <div style="flex:1;"></div> -->
                    </div>
                    <div v-for="(item,index) in groupList" :key="index" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)" :class="item.isClick?'noraml-color':'noraml-groupColor'">
                         <div class="proper-flag" v-if="item.isClick"></div>
@@ -56,11 +56,6 @@
                                  <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{item.groupName}}（{{item.groupNum}}）</span>
                                  <el-input  size="mini" v-model="item.groupName" class="group-input" v-if="item.isEdit" @input="(val)=>groupNameChange(val,item)"></el-input>
                             </div>
-                            <!-- <div class="group-middle">
-                                <span v-if="!item.isEdit">{{item.textModel}}</span>
-                                <region-multi-select v-if="item.isEdit" :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
-                                     :inputSize="`mini`" :selected="item.ModelPost" :all="$t('reportView.all')" @changeInput="changeSelect(arguments)"></region-multi-select>
-                            </div> -->
                             <div class="group-right">
                                 <div v-if="item.showEdit" class="show-edit">
                                     <div class="nape-items-handle" v-if="!item.isEdit">
@@ -87,10 +82,6 @@
                             <el-input  size="mini" class="groupName-input" :placeholder="generateInsSettingLang('enterName')" v-model="groupNameInput" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"></el-input>
                             <span class="rules" v-if="enterNameRuletip">{{generateInsSettingLang('enterNameRuletip')}}</span>
                         </div>
-                        <!-- <div class="group-name-middle">
-                            <region-multi-select :options="titleList" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
-                             :inputSize="`mini`" :selected="ModelAddPost" @changeInput="changeAddSelect(arguments)"></region-multi-select>
-                        </div> -->
                         <div class="group-name-right">
                             <div class="iconcontent">
                                 <div class="iconlised" @click="confirmAddGroup">
@@ -107,7 +98,7 @@
 
            </div>
        </el-col>
-       <el-col :span="lang=='en'&& varyWindowWidth < 1366? 15: 17" class="el-rute-nape">
+       <el-col :span="17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
                     <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
@@ -131,40 +122,65 @@
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="nape-items-title" v-if="napeList.length!=0">
-                       <div class="nape-name-title">
+                       <div class="nape-name-title" :style="showScore1?'flex:2;':(showScore2?'flex:3;':'flex:2;')">
                            <span>{{generateInsSettingLang('inspectName')}}</span>
                        </div>
-                       <div class="nape-dep-title">
-                           <span>{{generateInsSettingLang('inspectionDescp')}}</span>
+                       <div class="nape-dep-title" :style="showScore1?'flex:3;':(showScore2?'flex:4;':'flex:3;')">
+                           <span :style="showScore1?'left:5%;':(showScore2?'left:2%;':'')">{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
-                       <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'">
+                       <div class="nape-score0-title" v-if="showScore1" style="flex:1;">
+                           <span style="position:relative;;left:8%;">{{generateInsSettingLang('sheetscore0')}}</span>
+                       </div>
+                       <div class="nape-score0-title" v-if="showScore1" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
+                           <span>{{generateInsSettingLang('sheetscore1')}}</span>
+                       </div>
+                       <div class="nape-score1-title" v-if="showScore2" style="flex:2;">
+                           <span>{{generateInsSettingLang('sheetscore2')}}</span>
+                       </div>
+                       <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
                            <span>{{generateInsSettingLang('operation')}}</span>
                        </div>
                    </div>
                    <div class="nape-items-data"
                    v-for="(item,index) in napeList"
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
-                       <div class="nape-name-data">
+                       <div class="nape-name-data" :style="showScore1?'flex:2;':(showScore2?'flex:3;':'flex:2;')">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
                             <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
                        </div>
-                       <div class="nape-dep-data">
+                       <div class="nape-dep-data" :style="showScore1?'flex:2.7;':(showScore2?'flex:4;':'flex:3;margin-right:40px;')">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
                            <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
-                            <div class="iconcontent" v-if="item.isClick">
-                                <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
-                                    <i class="el-icon-check"></i>
-                                </div>
-                                <div class="iconrised" @click="cancelEditNape(index,item)">
-                                    <i class="el-icon-close"></i>
-                                </div>
-                            </div>
                        </div>
-                       <div class="nape-items-handle">
+                       <div class="nape-scores-handle" v-if="showScore1" style="flex:1;">
+                           <span style="margin-left:40px;" v-if="!item.isClick">10分</span>
+                           <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="FullScore" @change="selectFullScore">
+                                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+                            </el-select>
+                       </div>
+                       <div class="nape-scores-handle" v-if="showScore1" style="flex:1;">
+                           <span style="margin-left:40px;" v-if="!item.isClick">5分</span>
+                           <el-select size="mini" class="critical-input" v-if="item.isClick" v-model="critical">
+                                <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
+                            </el-select>
+                       </div>
+                       <div class="nape-scores-handle" v-if="showScore2" style="flex:2;">
+                           <span style="margin-left:73px;" v-if="!item.isClick">+20分</span>
+                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick"></el-input>
+                       </div>
+                       <div class="nape-items-handle" v-if="!item.isClick" style="flex:1;">
                            <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"  @click="handleEdit(index,item)"></i>
                            <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(index, item)"></i>
                        </div>
+                       <div class="iconcontent" v-if="item.isClick" style="flex:1;">
+                            <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
+                                <i class="el-icon-check"></i>
+                            </div>
+                            <div class="iconrised" @click="cancelEditNape(index,item)">
+                                <i class="el-icon-close"></i>
+                            </div>
+                        </div>
                    </div>
                     <el-dialog :title="generateInsSettingLang('confirmDelete')"
                     :visible.sync="showDeleteItem" v-if="showDeleteItem"
@@ -260,6 +276,7 @@ export default {
             ModelPost:[],
             ModelAddPost:[],
             groupList:[],
+            activeSheetName:'',
             groupNameTemp:'',  //临时存放
             groupNameInput:'',
             napeTitle:'',
@@ -292,7 +309,12 @@ export default {
             titleList: [],
             tableData:[],
             noData:'',
-            groupIds:[]
+            groupIds:[],
+            showScore1:false,
+            showScore2:false,
+            ScoreList:[],
+            FullScore:'',
+            critical:''
         }
     },
     computed:{
@@ -388,6 +410,11 @@ export default {
         cancelEditTab(){
             let self=this;
             self.showEditTab=false;
+        },
+        handleSheetClick(val){
+            let self = this
+            self.showScore1 = val.index=='1' ? true : false
+            self.showScore2 = val.index=='2' ? true : false
         },
         clickGroupItem(index,item){
             let self=this;
@@ -1109,6 +1136,11 @@ export default {
               this.enterNameRuletip=false
           }
         },
+        selectFullScore(val){
+            let self = this
+            let arr=[1,2,3,4,5,6,7,8,9,10]
+            self.ScoreList = arr.slice(0,val)
+        },
         napeNameChange(val, item){
           let self = this;
           let comment = filterString.all(val,100);
@@ -1189,7 +1221,7 @@ export default {
         #{$poi}:checkRem($val);
     }
     .nape-input{
-        @include point(width,180);
+        // @include point(width,180);
         float: left;
         @include point(margin-left,10);
     }
@@ -1401,25 +1433,27 @@ export default {
                 .top-group-title{
                     height: 60px;
                     line-height: 60px;
-                    text-align: left;
+                    text-align: center;
                     font-size: 14px;
                     color: $tab;
-                    // display: flex;
                     .group-name-title{
-                        // flex:1;
-                        margin-left:calc(50/1920*100vw);
-                        span{
-                            float: left;
-                            // width:calc(140/1920*100vw);
-                            // min-width: 74px;
-                            // text-overflow: ellipsis;
-                            // overflow: hidden;
-                            // white-space: nowrap;
+                        #group-content /deep/ .el-tabs__nav-wrap{
+                            margin-left: 6px;
                         }
-                    }
-                    .group-dep-title{
-                        // flex:2;
-                        margin-left:calc(30/1920*100vw);
+                        #group-content /deep/ .el-tabs__active-bar{
+                            height: 4px;
+                        }
+                        #group-content /deep/ .el-tabs__item {
+                            font-weight: bold;
+                            color: #94A4B4;
+                            font-size: calc(14/1920*100vw);
+                            width: calc(131/1920*100vw);
+                            min-width:92px;
+                            padding:0;
+                        }
+                        #group-content /deep/ .el-tabs__item.is-active{
+                            color: #f31d65;
+                        }
                     }
                 }
                 .groupItem{
@@ -1438,50 +1472,26 @@ export default {
                         background-color: $red;
                     }
                     .group-left{
-                        // flex:1;
-                        // width: calc(140/1920*100vw);
                         .group-input{
                             float: left;
                             max-width: 64%;
-                            // width: calc(140/1920*100vw);
-                            // min-width: 74px;
                             margin-left: calc(45/1920*100vw);
                         }
                         span{
                             float: left;
                             width: 70%;
                             margin-left: calc(50/1920*100vw);
-                            // width: calc(140/1920*100vw);
-                            // min-width: 74px;
                             text-overflow: ellipsis;
                             overflow: hidden;
                             white-space: nowrap;
                         }
                     }
-                    // .group-middle{
-                    //     flex:2;
-                    //     margin-left:calc(55/1920*100vw);
-                    //     span{
-                    //         float: left;
-                    //         width:calc(180/1920*100vw);
-                    //         min-width: 120px;
-                    //         text-overflow: ellipsis;
-                    //         overflow: hidden;
-                    //         white-space: nowrap;
-                    //     }
-                    // }
                     .group-right{
-                        // flex:1;
-                        // position: relative;
                         display: inline-block;
                         .iconcontent{
                             margin-left: calc(30/1920*100vw);
                             display: inline-block;
                             margin-top: 15px;
-                            // display: flex;
-                            // position: absolute;
-                            // right:20px;
-                            // top:0px;
                             .iconlised{
                                 @include iconContent;
                                 background-color: $red;
@@ -1503,9 +1513,6 @@ export default {
                                 font-size: calc(24/1920*100vw);
                                 color: #7d8cad;
                                 font-weight: 400;
-                                // position: absolute;
-                                // right:20px;
-                                // top:0px;
                                 }
                             }
                         }
@@ -1523,13 +1530,8 @@ export default {
                 line-height: 60px;
                 margin-bottom: 25px;
                 position: relative;
-                // display: flex;
                 .group-name-left{
-                    // flex:1;
-                    // width: calc(140/1920*100vw);
                     .groupName-input{
-                        // width: calc(140/1920*100vw);
-                        // min-width: 74px;
                          max-width: 64%;
                         float: left;
                         margin-left: calc(45/1920*100vw);
@@ -1544,19 +1546,9 @@ export default {
                         left:calc(25/1920*100vw);
                     }
                 }
-                // .group-name-middle{
-                //     flex:2;
-                //     margin-left:calc(55/1920*100vw);
-                // }
                 .group-name-right{
-                    // flex:1;
                     .iconcontent{
-                        // display: flex;
-                        // margin-top: 15px;
-                        // position: absolute;
-                        // right:20px;
                         margin-left:calc(30/1920*100vw);
-                        // display: inline-block;
                         float: left;
                         margin-top: 15px;
                         .iconlised{
@@ -1581,39 +1573,43 @@ export default {
             height: auto;
             min-height: 90%;
             .nape-name-title{
-                width: 36%;
-                display: inline-block;
-                span{
-                    position: relative;
-                    left: 20%;
-                }
-
-            }
-            .nape-dep-title{
-                width: 50%;
                 display: inline-block;
                 span{
                     position: relative;
                     left: 10%;
                 }
-              @media screen and (max-width: 1280px){
-                  width: 49%;
-              }
+
             }
-            .nape-handle-title{
-                width: 10%;
+            .nape-dep-title{
                 display: inline-block;
                 span{
                     position: relative;
-                    left: 20%;
+                    left: 0%;
+                }
+            }
+            .nape-score0-title{
+                display: inline-block;
+            }
+            .nape-score1-title{
+                display: inline-block;
+                min-width: 117px;
+                @media screen and (max-width: 1515px){
+                    line-height:20px;
+                    padding-top:10px;
+                }
+            }
+            .nape-handle-title{
+                display: inline-block;
+                span{
+                    position: relative;
+                    left: 0%;
                 }
             }
             .en-nape-handle-title{
-                width: 10%;
                 display: inline-block;
                 span{
                   position: relative;
-                  left: 10%;
+                  left: 0%;
                 }
             }
             .nape-items-title{
@@ -1622,6 +1618,9 @@ export default {
                 text-align: left;
                 font-size: 14px;
                 color: $tab;
+                display: flex;
+                width: 96%;
+                float: right;
             }
             .nape-items-data{
                 overflow: hidden;
@@ -1633,19 +1632,13 @@ export default {
                 font-size: 14px;
                 color: #424151;
                 height:auto;
+                display: flex;
                 //@include point(min-height,50);
                 min-height: 60px;
                 &:last-child{
                     @include point(margin-bottom,15);
                 }
-                .nape-input{
-                    @include point(width,220);
-                    float: left;
-                    @include point(margin-left,10);
-                    @include point(margin-bottom,3);
-                }
                 .nape-name-data{
-                    width: 36%;
                     position: relative;
                     float: left;
                     @include point(line-height,20);
@@ -1653,6 +1646,13 @@ export default {
                     .item-checkbox{
                         float: left;
                         margin-right: 0px;
+                    }
+                    .nape-input{
+                        width:calc(220/1920*100vw);
+                        min-width:136px;
+                        float: left;
+                        @include point(margin-left,10);
+                        @include point(margin-bottom,3);
                     }
                     span{
                         float: left;
@@ -1672,7 +1672,6 @@ export default {
                     }
                 }
                 .nape-dep-data{
-                    width: 50%;
                     height: 100%;
                     position: relative;
                     float: left;
@@ -1681,8 +1680,14 @@ export default {
                     @include point(margin-top,15);
                     span{
                         float: left;
-                        @include point(margin-left,25);
                         text-align: left;
+                    }
+                    .nape-input{
+                        width:calc(250/1920*100vw);
+                        min-width:215px;
+                        float: left;
+                        @include point(margin-left,10);
+                        @include point(margin-bottom,3);
                     }
                     .inputcontent{
                         float: left;
@@ -1695,8 +1700,31 @@ export default {
                         }
                     }
                 }
+                .nape-scores-handle{
+                    height: 100%;
+                    position: relative;
+                    float: left;
+                    overflow: hidden;
+                    @include point(line-height,20);
+                    @include point(margin-top,15);
+                    span{
+                        float: left;
+                        text-align: left;
+                    }
+                    .FullScore-input /deep/ .el-input{
+                        width:68px;
+                        margin: 0 auto;
+                    }
+                    .critical-input /deep/ .el-input{
+                        width:68px;
+                        margin: 0 auto;
+                    }
+                    .Itemscores-input{
+                        width:68px;
+                        margin: 0 auto;
+                    }
+                }
                 .nape-items-handle{
-                    width: 10%;
                     display: inline-block;
                     @include point(line-height,20);
                     @include point(margin-top,15);
@@ -1709,7 +1737,7 @@ export default {
                 .iconcontent{
                     @include point(margin-left,25);
                     display: inline-block;
-                    margin-top: 0;
+                    @include point(margin-top,15);
                     .iconlised{
                         @include iconContent;
                         background-color: $red;
@@ -1754,10 +1782,6 @@ export default {
           justify-content: center;
         }
       }
-    }
-    #el-menuscrollbar /deep/ .el-select--mini{
-        width:calc(180/1920*100vw);
-        min-width: 120px;
     }
 </style>
 <style>
