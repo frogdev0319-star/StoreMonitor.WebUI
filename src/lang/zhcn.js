@@ -368,6 +368,7 @@ export default {
   reportView:{
     selectStores: '门店选择',
     country: '国家/地区',
+    selectStoreTag:'标签快选',//Sprint8 新增
     regionI: '区域一',
     regionII: '区域二',
     stores: '门店',

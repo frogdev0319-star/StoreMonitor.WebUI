@@ -831,6 +831,9 @@ export default {
             }
         }
     }
+    #el-menuscrollbar /deep/ .el-scrollbar__view{
+        margin-top:65px;
+    }
     .detail-title{
         overflow: hidden;
         .table-right-post{

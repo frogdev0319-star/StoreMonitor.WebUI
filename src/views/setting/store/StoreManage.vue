@@ -1,44 +1,40 @@
 <template>
     <div class="el-event-content" :style="{'height':windowHeight-142+'px'}">
-       <div class="seacrh-content">
-            <span class="select-title">{{generateStoreLang('provinceTitle')}}</span>
-            <el-select v-model="curProvince"  :placeholder="generateStoreLang('provincePlaceholder')" size="mini"
-             class="el-province" @change="changePro" @clear="clearCitys">
+       <el-col :span="24" class="seacrh-content">
+            <span class="select-title">{{$t('reportView.selectStores')}}</span>
+            <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
+             class="el-province" @change="changeCountry">
                     <el-option
-                    v-for="item in provinceList"
+                    v-for="item in CountryList"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
                     </el-option>
             </el-select>
-            <el-popover
-                placement="bottom-start"
-                width="600"
-                visible-arrow='false'
-                :disabled='showPopoVer'
-                v-model="showCityContent"
-                trigger="click">
-                    <div class="city-panel" @mouseleave="showCityContent=false">
-                        <p :style="isChecked?{}:{'color':'#FB4C5D'}"><el-checkbox v-model="allCityChecked" @change="choiceAllCity"
-                            style="margin-right:10px;"></el-checkbox>{{generateStoreLang('all')}}</p>
-                        <div class="city-details" v-for="(item,index) in cityList" :key="index">
-                            <el-checkbox v-model="item.checked" @change="changeCityItem(item)" class="elcheckBox"></el-checkbox>
-                            <span>{{item.cityName}}</span>
-                        </div>
-                    </div>
-                <div slot="reference" @click="choiceCity" class="city-input"><span>{{curCitys}}</span><i :class="showDrap?'el-icon-arrow-up':'el-icon-arrow-down'" class='icon-input'></i></div>
-            </el-popover>
+            <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
+             class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
+                    <el-option
+                    v-for="item in StoreTagList"
+                    :key="item.tagId"
+                    :label="item.tagName"
+                    :value="item.tagId">
+                    </el-option>
+            </el-select>
+            <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" class="el-province" @changeInput="handleProChange"
+                                style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+            <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" class="el-province" @changeInput="handleCityChange"
+                                style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
 
-            <el-button :size="varyWindowWidth>1680?'small':'mini'"  :class="lang=='en'? 'en-el-search-btn': 'el-search-btn'" @click="searchStore" type="primary">{{generateStoreLang('searchButton')}}</el-button>
-            <el-input
-                size="small"
-                class="el-search-input"
-                clearable
-                v-model="serachVale" @keyup.enter.native="searchEventList" @clear="searchEventList">
-                <i slot="prefix" class="iconfont icon-sousuo iconsou"></i>
-            </el-input>
-       </div>
-        <div class="el-table-content">
+            <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" class="el-province" @changeInput="handleStoreChange"
+                                style="display: inline" ref="multiSelect"></multi-select>
+
+            <div class="store-handle">
+              <el-col :span="24" class="header-details1">
+                <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
+              </el-col>
+            </div>
+       </el-col>
+        <el-col :span="24" class="el-table-content">
             <el-table
             :data="tableData"
             :highlight-current-row="true"
@@ -63,55 +59,55 @@
                               v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> <span>{{generateStoreLang('unbinded')}}</span></span>
                     </template>
                 </el-table-column>
-            <el-table-column v-for="(item,index) in tableInfoData" :key="index"
-                :prop="item.prop" :label="item.label" :sortable="item.sortable" :min-width="item.width">
-            </el-table-column>
-            <el-table-column
-                prop="napeTable"
-                :label="generateStoreLang('bindInspectList')"
-                min-width="160"
-                align="left">
-                <template slot-scope="scope">
-                    <el-popover
-                    v-if="scope.row.napeTable.length!=0&&(scope.row.napeTable!='--'&&scope.row.napwTable!='现场巡检')"
-                        placement="top-start"
-                        width="200"
-                        trigger="hover">
-                        <span v-for="(_item,_index) in scope.row.napeTable.split('，')"
-                        :key="_index">
-                            {{_item}}
+                <el-table-column v-for="(item,index) in tableInfoData" :key="index"
+                    :prop="item.prop" :label="item.label" :sortable="item.sortable" :min-width="item.width">
+                </el-table-column>
+                <el-table-column
+                    prop="napeTable"
+                    :label="generateStoreLang('bindInspectList')"
+                    min-width="160"
+                    align="left">
+                    <template slot-scope="scope">
+                        <el-popover
+                        v-if="scope.row.napeTable.length!=0&&(scope.row.napeTable!='--'&&scope.row.napwTable!='现场巡检')"
+                            placement="top-start"
+                            width="200"
+                            trigger="hover">
+                            <span v-for="(_item,_index) in scope.row.napeTable.split('，')"
+                            :key="_index">
+                                {{_item}}
+                            </span>
+                            <!-- :style="_item=='远程巡检'?{'color':'red','font-weight':'bold'}:{}" -->
+                            <span class="napeTable-prp" slot="reference">{{scope.row.napeTable}}</span>
+                        </el-popover>
+                        <span v-else>
+                            {{scope.row.napeTable}}
                         </span>
-                        <!-- :style="_item=='远程巡检'?{'color':'red','font-weight':'bold'}:{}" -->
-                        <span class="napeTable-prp" slot="reference">{{scope.row.napeTable}}</span>
-                    </el-popover>
-                    <span v-else>
-                        {{scope.row.napeTable}}
-                    </span>
-                </template>
-            </el-table-column>
-            <!-- <el-table-column prop="schedue"
-                :label="generateStoreLang('bindSchedule')"
-                min-width="100"
-                align="left">
+                    </template>
+                </el-table-column>
+                <!-- <el-table-column prop="schedue"
+                    :label="generateStoreLang('bindSchedule')"
+                    min-width="100"
+                    align="left">
 
-            </el-table-column> -->
-            <el-table-column
-                prop="option"
-                :label="generateStoreLang('operation')"
-                align="left"
-                min-width="100"
-            >
-                <template slot-scope="scope">
-                    <i class="iconfont icon-gengduo" style="cursor: pointer; vertical-align: middle" @click="toEventDetail(scope.row)"></i>
-                </template>
-            </el-table-column>
-            <div slot="empty">
-                <div>
-                    <i class="iconfont icon-zhengque empty-data-icon"></i>
-                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{noData}}</span>
+                </el-table-column> -->
+                <el-table-column
+                    prop="option"
+                    :label="generateStoreLang('operation')"
+                    align="left"
+                    min-width="100"
+                >
+                    <template slot-scope="scope">
+                        <i class="iconfont icon-gengduo" style="cursor: pointer; vertical-align: middle" @click="toEventDetail(scope.row)"></i>
+                    </template>
+                </el-table-column>
+                <div slot="empty">
+                    <div>
+                        <i class="iconfont icon-zhengque empty-data-icon"></i>
+                        <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{noData}}</span>
+                    </div>
                 </div>
-            </div>
-        </el-table>
+            </el-table>
             <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">
               <el-pagination background small
                 :page-sizes="[10, 20, 50, 100]"
@@ -123,7 +119,7 @@
               style="float:right;margin-top:15px;">
               </el-pagination>
             </div>
-        </div>
+        </el-col>
     </div>
 </template>
 
@@ -131,13 +127,19 @@
 import api from '@/api/index'
 import {mapGetters} from 'vuex'
 import {getInspectBindCount} from '@/api/inspect'
-import {getStoreList} from '@/api/store'
+import {getStoreList,getBriefStoreList,GetTagList} from '@/api/store'
 import {isLoginIn} from '@/api/login'
 import PubSub from 'pubsub-js'
 import {generateStoreLang} from '@/api/i18n'
+import MultiSelect from '@/components/MultiSelect'
+import RegionMultiSelect from '@/components/RegionMultiSelect'
 
     export default {
         name: "StoreManage",
+        components: {
+            MultiSelect,
+            RegionMultiSelect
+        },
         data(){
             return{
                 tableInfoData:[
@@ -174,7 +176,14 @@ import {generateStoreLang} from '@/api/i18n'
                 tableData:[],
                 provinceList:[],
                 cityList:[],
-                curProvince:'',
+                storeDataList:[],
+                CountryList:[],
+                StoreTagList:[],
+                curCountry:'',
+                curProvince:[],
+                curCity:[],
+                curStore:[],
+                curStoreTag:'',
                 showDrap:false,
                 showCityContent:false,
                 multeCityList:[],
@@ -191,7 +200,8 @@ import {generateStoreLang} from '@/api/i18n'
                 curCitys:'城市',
                 showPopoVer:true,
                 lang: this.$i18n.locale,
-                noData: ''
+                noData: '',
+                storeStr:''
             }
         },
         watch:{
@@ -199,7 +209,7 @@ import {generateStoreLang} from '@/api/i18n'
                 console.log(val);
                 let self=this;
                 if(val!=0){
-                    self.getProvinceList();
+                    // self.getProvinceList();
                     self.getInitData();
                 }
             }
@@ -233,27 +243,181 @@ import {generateStoreLang} from '@/api/i18n'
             return obj;
           },
             generateStoreLang,
+            changeStoreTag(val){
+                let self=this
+                let temp=[]
+                self.tempStoreData.forEach(item=>{
+                    item.tagIds.forEach(_item=>{
+                        if(_item==val){
+                            let obj={
+                                storeId:item.storeId,
+                                label:item.name,
+                                value:item.name,
+                                userId:item.userId,
+                                userName:item.userName
+                            };
+                            temp.push(obj);
+                        }
+                    })
+                })
+                self.storeDataList=temp
+                let str = '',storeArr=[],arr=[]
+                self.storeDataList.forEach(item=>{
+                    storeArr.push(item.storeId)
+                    arr.push(item.value)
+                })
+                self.curStore=storeArr
+                arr.forEach(item=>{
+                    str+=item+'，'
+                })
+                str=str.substr(0,str.length-1)
+                self.storeStr=str;
+                self.searchStore()
+            },
+            changeCountry(val){
+                let self=this;
+                let temp=[]
+                self.clearProviceInfo()
+                self.clearCityInfo();
+                self.clearStoreInfo();
+                self.selectAllProAndCity(val);
+            },
             changePro(val){
                 let self=this;
-                if(val == ''){
-                  self.cityList=[];
-                  self.showCityContent=false;
-                  self.curCitys=this.$t('storeView.cityPlaceholder');
-                  self.multeCityList.length=0;
+                self.curCity= [];
+                self.clearCityInfo();
+                self.clearStoreInfo();
+                let storeList=self.tempStoreData;
+                let temp=[];
+                let tempStore=[];
+                if(val.length!=0){
+                    val.forEach(_item=>{
+                        storeList.forEach(item=>{
+                            if(item.province==_item){
+                            if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                                let obj={
+                                label:item.city,
+                                value:item.city
+                                }
+                                temp.push(obj);
+                            }
+                            let obj={
+                                storeId:item.storeId,
+                                label:item.name,
+                                value:item.name,
+                                userId:item.userId,
+                                userName:item.userName
+                            };
+                            tempStore.push(obj);
+                            }
+                        })
+                    })
                 }
-                else{
-                  self.getCityByProvince(val);
-                  self.curCitys=this.$t('storeView.cityPlaceholder');
-                  self.multeCityList.length=0;
-                  self.allCityChecked=false;
-                }
+                self.cityList=temp;
+                self.storeDataList=tempStore;
+                let cityArr=[],storeArr=[],arr=[]
+                self.cityList.forEach(item=>{
+                   cityArr.push(item.value)
+                })
+                self.storeDataList.forEach(item=>{
+                   storeArr.push(item.storeId)
+                   arr.push(item.value)
+                })
+                self.curCity=cityArr
+                self.curStore=storeArr
+                let str = ''
+                arr.forEach(item=>{
+                    str+=item+'，'
+                })
+                str=str.substr(0,str.length-1)
+                self.storeStr=str;
+                self.searchStore()
             },
-            clearCitys(){
+            changeCity(val){
                 let self=this;
-                self.cityList=[];
-                self.showCityContent=false;
-                self.curCitys=this.$t('storeView.cityPlaceholder');
-                self.multeCityList.length=0;
+                self.clearStoreInfo();
+                let storeList=self.tempStoreData;
+                let temp=[];
+                if(val.length != 0){
+                    val.forEach(_item=>{
+                    storeList.forEach(item=>{
+                        if(item.city==_item){
+                            if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                                let obj={
+                                storeId:item.storeId,
+                                label:item.name,
+                                value:item.name,
+                                userId:item.userId
+                                }
+                                temp.push(obj);
+                            }
+                        }
+                    })
+                    })
+                }
+                self.storeDataList=temp;
+                let str = '',storeArr=[],arr=[]
+                self.storeDataList.forEach(item=>{
+                    storeArr.push(item.storeId)
+                    arr.push(item.value)
+                })
+                self.curStore=storeArr
+                arr.forEach(item=>{
+                    str+=item+'，'
+                })
+                str=str.substr(0,str.length-1)
+                self.storeStr=str;
+                self.searchStore()
+            },
+            handleStoreChange (arr) {
+                let self=this;
+                self.curStore = arr
+                self.changeStore(arr)
+            },
+            handleProChange(arr){
+                let self=this;
+                console.log(arr)
+                self.curProvince = arr
+                self.changePro(arr)
+            },
+            handleCityChange(arr){
+                let self=this;
+                console.log(arr)
+                self.curCity = arr
+                self.changeCity(arr)
+            },
+            clearStoreInfo(){
+                let self=this;
+                self.curStore=[];
+                self.storeStr='';
+                self.$refs.multiSelect.selectedArray = [];
+                self.$refs.multiSelect.input=''
+            },
+            clearProviceInfo(){
+                let self=this;
+                self.curProvince=[];
+                self.$refs.proviceSelect.selectedArray = [];
+                self.$refs.proviceSelect.input=''
+            },
+            clearCityInfo(){
+                let self=this;
+                self.curCity=[];
+                self.$refs.citySelect.selectedArray = [];
+                self.$refs.citySelect.input=''
+            },
+            changeStore(val){
+                let self=this;
+                let str='';
+                self.tempStoreData.forEach((item,index)=>{
+                    val.forEach(_item=>{
+                    if(item.storeId==_item){
+                        str+=item.name+'，'
+                    }
+                    })
+                })
+                str=str.substr(0,str.length-1)
+                self.storeStr=str;
+                self.searchStore()
             },
             choiceCity(){
                 let self=this;
@@ -267,97 +431,40 @@ import {generateStoreLang} from '@/api/i18n'
                     self.showDrap=!self.showDrap;
                 }
             },
-            choiceAllCity(val){
-                let self=this;
-                let str='';
-                let temp=[];
-                if(!val){
-                    //self.curCitys='城市'
-                    self.curCitys=this.$t('storeView.cityPlaceholder');
-                    self.multeCityList=[];
-                    self.cityList.forEach(item=>{
-                        item.checked=val;
-                        if(val){
-                            str=str+item.cityName+';';
-                            temp.push(item.cityName);
-                        }
-                    })
-                }
-                else{
-                    self.cityList.forEach(item=>{
-                        item.checked=val;
-                        if(val){
-                            str=str+item.cityName+';';
-                            temp.push(item.cityName);
-                        }
-                    })
-                    self.isChecked=val;
-                    self.curCitys='';
-                    self.curCitys=str.substring(0,str.length-1);
-                    self.multeCityList=temp;
-                }
-            },
-            changeCityItem(item){
-                console.log(item);
-                let self=this;
-                let str='';
-                //let flag=false;
-                let temp=[];
-                self.cityList.forEach(_item=>{
-                    if(_item.checked){
-                        str=str+_item.cityName+';';
-                        temp.push(_item.cityName);
-
-                    }
-                })
-                if(temp.length!=0){
-                    self.isChecked=true;
-                }
-                else{
-                    self.isChecked=false;
-                }
-                self.curCitys='';
-                self.curCitys=str.substring(0,str.length-1);
-                if(temp.length==self.cityList.length){
-                    self.allCityChecked=true;
-                }
-                else{
-                    self.allCityChecked=false;
-                }
-                if(temp.length==0){
-                    //self.curCitys='城市';
-                    self.curCitys=this.$t('storeView.cityPlaceholder');
-                }
-                self.multeCityList=temp;
-            },
             searchStore(){
                 let self=this;
                 self.params.like={};
                 let temp=[];
                 self.page=1;
-                self.cityList.forEach(item=>{
-                    if(item.checked){
-                        temp.push(item.cityName);
+                let storeList = self.storeStr.split('，')
+                if(storeList.length!=0){
+                    self.params.clause={
+                        name:storeList
                     }
-                })
-                if(self.curProvince!= null && self.curProvince.length!=0){
-                    if(temp.length!=0){
-                        self.params.clause={
-                            city:temp,
-                            province:self.curProvince
-                        };
-                    }
-                    else{
-                        self.params.clause={
-                            province:self.curProvince
-                        }
-                    }
-                }
-                else{
+                }else{
                     self.params.clause={};
                 }
-
-
+                // self.cityList.forEach(item=>{
+                //     if(item.checked){
+                //         temp.push(item.cityName);
+                //     }
+                // })
+                // if(self.curProvince!= null && self.curProvince.length!=0){
+                //     if(temp.length!=0){
+                //         self.params.clause={
+                //             city:temp,
+                //             province:self.curProvince
+                //         };
+                //     }
+                //     else{
+                //         self.params.clause={
+                //             province:self.curProvince
+                //         }
+                //     }
+                // }
+                // else{
+                //     self.params.clause={};
+                // }
                 self.getStoreList(self.params);
             },
             sizeChange(val){
@@ -375,55 +482,108 @@ import {generateStoreLang} from '@/api/i18n'
                     document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop=0;
                 }
             },
-            getCityByProvince(province){
+            // getCityByProvince(province){
+            //     let self=this;
+            //     let temp=[];
+            //     self.tempStoreData.forEach(item=>{
+            //         if(item.province==province){
+            //             let obj={};
+            //             obj.cityName=item.city;
+            //             obj.checked=false;
+            //             if(temp.map(x=>x.cityName).indexOf(obj.cityName)==-1){
+            //                 temp.push(obj);
+            //             }
+            //         }
+            //     })
+            //     self.cityList=temp;
+            // },
+            async getCountryStore(){
                 let self=this;
-                let temp=[];
-                self.tempStoreData.forEach(item=>{
-                    if(item.province==province){
-                        let obj={};
-                        obj.cityName=item.city;
-                        obj.checked=false;
-                        if(temp.map(x=>x.cityName).indexOf(obj.cityName)==-1){
-                            temp.push(obj);
+                let data=await self.getBriefStoreData();
+                let temp=[]
+                if(data.errCode==0&&data.errMsg=='Success'){
+                    self.tempStoreData=data.data;
+                    if(self.tempStoreData.length!=0){
+                        self.tempStoreData.forEach(item=>{
+                            let country=item.country;
+                            if(temp.map(x=>x.label).indexOf(country)==-1){
+                                let obj={
+                                    value:country,
+                                    label:country
+                                }
+                                temp.push(obj);
+                            }
+                        })
+                    }
+                    temp.length>0 ? temp.unshift({value:'', label:self.$t('reportView.country')}) : temp;
+                    self.CountryList=temp;
+                    self.curCountry=self.CountryList[1].label
+                    self.selectAllProAndCity(self.curCountry);
+                }
+            },
+            selectAllProAndCity(val){
+                let self = this;
+                let storeList = self.tempStoreData;
+                let temp = [];
+                let tempStore = [];
+                storeList.forEach(item=>{
+                    if(item.country==val){
+                    if(temp.map(x=>x.value).indexOf(item.province)==-1){
+                        let obj={
+                        label:item.province,
+                        value:item.province
                         }
+                        temp.push(obj);
+                    }
+                    let obj={
+                        storeId:item.storeId,
+                        label:item.name,
+                        value:item.name,
+                        userId:item.userId,
+                        userName:item.userName
+                    };
+                    tempStore.push(obj);
                     }
                 })
-                self.cityList=temp;
-            },
-            async getProvinceList(){
-                let self=this;
-                let params={
-                    "filter":{
-                        "page":0,
-                        "size":1000
-                    }
-                };
-                let data=await self.getStoreData(params);
-                if(data.response!=undefined&&data.response.status==500){
-                    return false;
-                }
-                self.tempStoreData=data.data.content;
-                let temp=[];
-                if(self.tempStoreData!=undefined&&self.tempStoreData.length!=0){
-                    self.tempStoreData.forEach(item=>{
-                        let province=item.province;
-                        if(temp.map(x=>x.label).indexOf(province)==-1){
-                            let obj={
-                                value:province,
-                                label:province,
-                                citys:[],
-                            }
-                            temp.push(obj);
+                self.provinceList = temp;
+                let cityTemp = [];
+                self.provinceList.forEach(_item=>{
+                    storeList.forEach(item=>{
+                    if(item.province==_item.value){
+                        if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
+                        let obj={
+                            label:item.city,
+                            value:item.city
                         }
+                        cityTemp.push(obj);
+                        }
+                    }
                     })
-                }
-                temp.length>0 ? temp.unshift({value:'', label:self.$t('storeView.provincePlaceholder'),}) : temp;
-                self.provinceList=temp;
+                })
+                self.cityList = cityTemp;
+                let provinceArr = [];
+                self.provinceList.forEach(item=>{
+                    provinceArr.push(item.value)
+                })
+                self.curProvince = provinceArr;
+
+                let cityArr = [];
+                self.cityList.forEach(item=>{
+                    cityArr.push(item.value)
+                })
+                self.curCity = cityArr;
+                self.storeDataList = tempStore;
+                let storeArr = [];
+                self.storeDataList.forEach(item=>{
+                    storeArr.push(item.storeId)
+                })
+                self.curStore = storeArr;
+                self.changeStore(self.curStore)
             },
             clearPage(){
                 let self=this;
                 self.params={};
-                self.curProvince='';
+                self.curProvince=[];
                 //self.curCitys='城市';
                 self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.serachVale='';
@@ -513,7 +673,7 @@ import {generateStoreLang} from '@/api/i18n'
             searchEventList(){
                 let self=this;
                 self.params.clause={};
-                self.curProvince='';
+                self.curProvince=[];
                 //self.curCitys='城市';
                 self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.page=1;
@@ -566,18 +726,46 @@ import {generateStoreLang} from '@/api/i18n'
                     })
                 })
             },
-            isLoginIn(){
+            getBriefStoreData(){
                 let self=this;
                 return new Promise((resolve,reject)=>{
-                    isLoginIn().then(res=>{
-                        self.getProvinceList();
-                        self.getInitData();
+                    getBriefStoreList().then(res=>{
+                        let errMsg=res.errMsg;
+                        if(errMsg!=undefined&&errMsg=='Success'){
+                            let data=res.data;
+                            resolve(res);
+                        }
+                    }).catch(res => {
                         resolve(res);
                     })
-                }).catch(err=>{
-                    console.log(err);
                 })
             },
+            getTagListData(){
+                let self=this;
+                return new Promise((resolve,reject)=>{
+                    GetTagList().then(res=>{
+                        let errMsg=res.errMsg;
+                        if(errMsg!=undefined&&errMsg=='Success'){
+                            self.StoreTagList=res.data;
+                            resolve(res);
+                        }
+                    }).catch(res => {
+                        resolve(res);
+                    })
+                })
+            },
+            // isLoginIn(){
+            //     let self=this;
+            //     return new Promise((resolve,reject)=>{
+            //         isLoginIn().then(res=>{
+            //             self.getProvinceList();
+            //             self.getInitData();
+            //             resolve(res);
+            //         })
+            //     }).catch(err=>{
+            //         console.log(err);
+            //     })
+            // },
             notify(msg,type,time) {
                 this.$message({
                     message: msg,
@@ -594,8 +782,13 @@ import {generateStoreLang} from '@/api/i18n'
                 this.tableHeight=770+'px';
                 this.sizeNum=20;
             }
-            self.getProvinceList();
-            self.getInitData();
+            self.getCountryStore() //查询门店列表
+            self.getTagListData() //查询门店标签
+
+            // self.getProvinceList();
+
+            // self.getInitData();
+
             //await this.isLoginIn();
             // if(!this.timeid){
             //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
@@ -630,7 +823,8 @@ import {generateStoreLang} from '@/api/i18n'
     #{$poi}:checkRem($val);
 }
  $red:#f31d65;
-  $border:#e3e9f4;
+ $border:#e3e9f4;
+ $tab:#7d8cad;
 .city-panel{
     @include point(height,auto);
     padding: 0px 15px 30px 15px;
@@ -652,30 +846,44 @@ import {generateStoreLang} from '@/api/i18n'
     }
 }
 .el-event-content{
-    width: 100%;
-    position: relative;
-    border: 1px solid $border;
-    background-color: #fff;
     .elcheckBox {
         margin-right: 10px !important;
     }
     .seacrh-content{
-        padding-left: calc(40/1920*100vw);
-        height: 80px;
-        line-height: 80px;
-        position: relative;
+        padding: 30px calc(40/1920*100vw);
         text-align: left;
         border-bottom: 0.5px solid #e3e9f4;
-        display: flex;
         align-items: center;
+        background-color: #fff;
+        .store-handle{
+            margin-top:30px;
+            .header-details1{
+                text-align: left;
+                height: auto;
+                line-height: calc(30/1920*100vw);
+                span{
+                    font-size: calc(14/1920*100vw);
+                    margin-right: calc(20/1920*100vw);
+                }
+                .choice-store{
+                    color: $tab;
+                    i{
+                        margin-right: calc(15/1920*100vw);
+                    }
+                    .icon-tishi1{
+                        font-size: calc(16/1920*100vw);
+                    }
+                }
+            }
+        }
         .select-title{
             color: #424151;
             font-size: calc(14/1920*100vw);
         }
         .el-province{
             width: calc(160/1920*100vw);
-            margin-right: calc(25/1920*100vw);
             margin-left: calc(20/1920*100vw);
+            margin-right: 0;
             @media screen and (max-width: 1024px){
               margin-right: 10px;
               margin-left: 10px;
@@ -743,9 +951,12 @@ import {generateStoreLang} from '@/api/i18n'
         }
     }
     .el-table-content{
-        width: 97.46%;
         float: left;
         background-color: #fff;
+        margin: 30px;
+        padding:0 30px 30px 0px;
+        width:96%;
+        border: 1px solid $border;
         .napeTable-prp{
             width: 70%;
             text-overflow: ellipsis;

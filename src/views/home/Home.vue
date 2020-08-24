@@ -243,6 +243,7 @@
           case '/supervisorStat':
           case '/eventStat':
           case '/storedetail':
+          case '/storemanage':
           {
             flag= true;
             break

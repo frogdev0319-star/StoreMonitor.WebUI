@@ -10,6 +10,22 @@ export const getStoreList=data=>{
     })
 }
 
+export const getBriefStoreList=data=>{
+    return request({
+        url:`${version}/store/brief/list`,
+        method:'get',
+        data
+    })
+}
+
+export const GetTagList=data=>{
+    return request({
+        url:`${version}/tag/list`,
+        method:'get',
+        data
+    })
+}
+
 export const updateStoreInfo=data=>{
     return request({
         url:`${version}/store/update`,

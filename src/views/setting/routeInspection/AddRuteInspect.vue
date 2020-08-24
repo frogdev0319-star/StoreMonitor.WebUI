@@ -1225,6 +1225,9 @@ export default {
         float: left;
         @include point(margin-left,10);
     }
+    #el-menuscrollbar /deep/ .el-scrollbar__thumb{
+        width:0 !important;
+    }
     .el-addrute{
         width: 100%;
         height: 100%;
