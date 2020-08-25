@@ -244,6 +244,7 @@
           case '/eventStat':
           case '/storedetail':
           case '/storemanage':
+          case '/bindroute':
           {
             flag= true;
             break

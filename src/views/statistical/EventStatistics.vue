@@ -24,13 +24,22 @@
               </el-option>
             </el-option-group>
           </el-select>
+          <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
+             class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
+                    <el-option
+                    v-for="item in StoreTagList"
+                    :key="item.tagId"
+                    :label="item.tagName"
+                    :value="item.tagId">
+                    </el-option>
+            </el-select>
           <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0" :all="$t('overview.allZoneI')"></region-multi-select>
+                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=0" :all="$t('overview.allZoneI')"></region-multi-select>
           <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0 " :all="$t('overview.allZoneII')"></region-multi-select>
+                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=0" :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                        :disabled="curProvince.length==0 " style="display: inline" ref="multiSelect"></multi-select>
+                        style="display: inline" ref="multiSelect"></multi-select>
         </el-col>
 
         <el-col :span="24" class="header-details">
@@ -61,7 +70,7 @@
           </el-tooltip>
           <div class="exprotBtn" style="float:right;">
               <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
-                    type="primary" :disabled="curProvince.length == 0 ">{{$t('reportView.search')}}</el-button>
+                    type="primary" :disabled="storeDataList.length==0">{{$t('reportView.search')}}</el-button>
               <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()">
                 <div class="btn-area">
                   <i class="iconfont icon-pdf" style="font-size: calc(14/1920*100vw)"></i>
@@ -358,7 +367,7 @@
   import MultiSelect from '@/components/MultiSelect'
   import RegionMultiSelect from '@/components/RegionMultiSelect'
   import {mapGetters} from 'vuex'
-  import {getStoreList} from '@/api/store'
+  import {getStoreList,getBriefStoreList,GetTagList} from '@/api/store'
   import util from '../../common/util.js'
   import {Message} from 'element-ui'
   import {getEventStatsOverStoreV2, getEventStatsOverStore} from '@/api/eventOverview'
@@ -375,6 +384,8 @@
         ispdf:false,
         htmlTitle:this.$t("overview.htmltopdfD"),
         curCountry:'',
+        curStoreTag:'',
+        StoreTagList:[],
         countryList:[],
         curProvince:[],
         provinceList:[],
@@ -559,7 +570,7 @@
           self.params.beginTs = start;
           self.params.endTs = end;
           self.initDaysRange();
-          await self.getRegionInfo();
+          await self.getCountryStore();
           self.initData();
         }
       }
@@ -876,6 +887,32 @@
         self.curCountry = countryList[0].label;
         self.selectAllProAndCity(self.curCountry);
       },
+      async getCountryStore(){
+          let self=this;
+          let data=await self.getBriefStoreData();
+          let temp=[]
+          if(data.errCode==0&&data.errMsg=='Success'){
+              self.storeList=data.data;
+              if(self.storeList.length!=0){
+                  self.storeList.forEach(item=>{
+                      let country=item.country;
+                      if(temp.map(x=>x.label).indexOf(country)==-1){
+                          let obj={
+                              value:country,
+                              label:country
+                          }
+                          temp.push(obj);
+                      }
+                  })
+              }
+              let countryList=temp;
+              self.countryList[0] = {}
+              self.countryList[0].label= self.$t('reportView.country');
+              self.countryList[0].countryList = countryList
+              self.curCountry = countryList[0].label;
+              self.selectAllProAndCity(self.curCountry);
+          }
+      },
       getStoreData(params){
         let self=this;
         return new Promise((resolve,reject)=>{
@@ -973,10 +1010,59 @@
         }
         self.storeDataList=tempStore;
       },
+      getBriefStoreData(){
+          let self=this;
+          return new Promise((resolve,reject)=>{
+              getBriefStoreList().then(res=>{
+                  let errMsg=res.errMsg;
+                  if(errMsg!=undefined&&errMsg=='Success'){
+                      let data=res.data;
+                      resolve(res);
+                  }
+              }).catch(res => {
+                  resolve(res);
+              })
+          })
+      },
+      getTagListData(){
+          let self=this;
+          return new Promise((resolve,reject)=>{
+              GetTagList().then(res=>{
+                  let errMsg=res.errMsg;
+                  if(errMsg!=undefined&&errMsg=='Success'){
+                      self.StoreTagList=res.data;
+                      resolve(res);
+                  }
+              }).catch(res => {
+                  resolve(res);
+              })
+          })
+      },
+      changeStoreTag(val){
+        let self=this
+        let temp=[]
+        self.clearStoreInfo();
+        self.storeList.forEach(item=>{
+            item.tagIds.forEach(_item=>{
+                if(_item==val&&self.curCountry==item.country){
+                    let obj={
+                        storeId:item.storeId,
+                        label:item.name,
+                        value:item.name,
+                        userId:item.userId,
+                        userName:item.userName
+                    };
+                    temp.push(obj);
+                }
+            })
+        })
+        self.storeDataList=temp
+      },
       changeCountry(val){
         let self=this;
         self.curProvince= [];
         self.curCity=[];
+        self.curStoreTag=''
         let storeList=self.storeList;
         let tempStore=[];
         let temp=[];
@@ -1515,12 +1601,14 @@
       self.params.endTs = end;
       self.params.timeMode = self.timeMode;
       self.initDaysRange();
-      await self.getRegionInfo();
+      // await self.getRegionInfo();
       self.initData();
 
     },
     mounted(){
       let self=this;
+      self.getCountryStore()
+      self.getTagListData()
       window.addEventListener("resize", self.adjustChart, false);
       self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
       self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)

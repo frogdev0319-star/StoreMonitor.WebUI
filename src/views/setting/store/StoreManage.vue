@@ -3,13 +3,18 @@
        <el-col :span="24" class="seacrh-content">
             <span class="select-title">{{$t('reportView.selectStores')}}</span>
             <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
-             class="el-province" @change="changeCountry">
-                    <el-option
-                    v-for="item in CountryList"
+                     class="el-province" @change="changeCountry">
+                <el-option-group
+                v-for="group in CountryList"
+                :key="group.label"
+                :label="group.label">
+                <el-option
+                    v-for="item in group.countryList"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
-                    </el-option>
+                </el-option>
+                </el-option-group>
             </el-select>
             <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
              class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
@@ -246,15 +251,16 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
             changeStoreTag(val){
                 let self=this
                 let temp=[]
+                self.clearStoreInfo();
                 self.tempStoreData.forEach(item=>{
                     item.tagIds.forEach(_item=>{
-                        if(_item==val){
+                        if(_item==val&&self.curCountry==item.country){
                             let obj={
                                 storeId:item.storeId,
                                 label:item.name,
                                 value:item.name,
                                 userId:item.userId,
-                                userName:item.userName
+                                tagIds:item.tagIds
                             };
                             temp.push(obj);
                         }
@@ -277,6 +283,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
             changeCountry(val){
                 let self=this;
                 let temp=[]
+                self.curStoreTag=''
                 self.clearProviceInfo()
                 self.clearCityInfo();
                 self.clearStoreInfo();
@@ -290,7 +297,20 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 let storeList=self.tempStoreData;
                 let temp=[];
                 let tempStore=[];
-                if(val.length!=0){
+                if(val==''){
+                    storeList.forEach(item=>{
+                        if(item.country==self.curCountry){
+                                let obj={
+                                    storeId:item.storeId,
+                                    label:item.name,
+                                    value:item.name,
+                                    userId:item.userId,
+                                    tagIds:item.tagIds
+                                };
+                                tempStore.push(obj);
+                        }
+                    })
+                }else{
                     val.forEach(_item=>{
                         storeList.forEach(item=>{
                             if(item.province==_item){
@@ -306,24 +326,29 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                                 label:item.name,
                                 value:item.name,
                                 userId:item.userId,
-                                userName:item.userName
+                                tagIds:item.tagIds
                             };
                             tempStore.push(obj);
                             }
                         })
                     })
+                    self.cityList=temp;
+                    let cityArr=[]
+                    if(self.cityList.length!=0){
+                    self.cityList.forEach(item=>{
+                        cityArr.push(item.value)
+                    })
+                    self.curCity=cityArr
                 }
-                self.cityList=temp;
+                }
                 self.storeDataList=tempStore;
-                let cityArr=[],storeArr=[],arr=[]
-                self.cityList.forEach(item=>{
-                   cityArr.push(item.value)
-                })
+                let storeArr=[],arr=[]
+                
                 self.storeDataList.forEach(item=>{
                    storeArr.push(item.storeId)
                    arr.push(item.value)
                 })
-                self.curCity=cityArr
+                
                 self.curStore=storeArr
                 let str = ''
                 arr.forEach(item=>{
@@ -347,7 +372,8 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                                 storeId:item.storeId,
                                 label:item.name,
                                 value:item.name,
-                                userId:item.userId
+                                userId:item.userId,
+                                tagIds:item.tagIds
                                 }
                                 temp.push(obj);
                             }
@@ -515,9 +541,13 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                             }
                         })
                     }
-                    temp.length>0 ? temp.unshift({value:'', label:self.$t('reportView.country')}) : temp;
-                    self.CountryList=temp;
-                    self.curCountry=self.CountryList[1].label
+                    // temp.length>0 ? temp.unshift({value:'', label:self.$t('reportView.country')}) : temp;
+                    let countryList=temp;
+                    self.CountryList[0] = {}
+                    self.CountryList[0].label= self.$t('reportView.country');
+                    self.CountryList[0].countryList = countryList
+                    self.curCountry = countryList[0].label;
+                    // self.curCountry=self.CountryList[1].label
                     self.selectAllProAndCity(self.curCountry);
                 }
             },
@@ -540,7 +570,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                         label:item.name,
                         value:item.name,
                         userId:item.userId,
-                        userName:item.userName
+                        tagIds:item.tagIds
                     };
                     tempStore.push(obj);
                     }
@@ -882,6 +912,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
         }
         .el-province{
             width: calc(160/1920*100vw);
+            min-width: 85px;
             margin-left: calc(20/1920*100vw);
             margin-right: 0;
             @media screen and (max-width: 1024px){
@@ -953,7 +984,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
     .el-table-content{
         float: left;
         background-color: #fff;
-        margin: 30px;
+        margin: calc(30/1920*100vw);
         padding:0 30px 30px 0px;
         width:96%;
         border: 1px solid $border;
