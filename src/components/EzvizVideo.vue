@@ -567,8 +567,22 @@
         let self = this;
         self.proportion = item
         if(self.fullWindow){
+          if(self.playState){
+            if(self.ifOpenSound){
+              self.fullDecoder.closeSound();
+            }
+            self.fullDecoder.stop();
+            self.fullDecoder = null;
+          }
           self.resetVideoSize()
         }else{
+          if(self.playState){
+              if(self.ifOpenSound){
+                self.decoder.closeSound();
+              }
+              self.decoder.stop();
+              self.decoder = null;
+            }
           self.initVideo();
         }
       },
