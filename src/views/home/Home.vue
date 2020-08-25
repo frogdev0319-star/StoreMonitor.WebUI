@@ -22,10 +22,10 @@
         </div>
         <div class="headUrl-content">
           <div class="system-name">{{$t('route.mgt')}}</div>
-          <div class="bell-content">
+          <!-- <div class="bell-content">
             <i class="el-icon-bell"></i>
             <el-badge is-dot class="item"></el-badge>
-          </div>
+          </div> -->
           <el-dropdown class="el-user-drop" >
                         <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right"
                                                                                       style="margin-left:6px;cursor:pointer;"></i></span>
