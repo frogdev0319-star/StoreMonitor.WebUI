@@ -833,7 +833,7 @@ export default {
         handleClick(tabObj){
             // console.log(tabObj);
             let self=this;
-            // sessionStorage.setItem('TabIndex',tabObj.index);
+            sessionStorage.setItem('TabIndex',tabObj.index);
             // sessionStorage.setItem('TabName',self.activeName);
             // self.getBindStoreList();
             switch(tabObj.index){
