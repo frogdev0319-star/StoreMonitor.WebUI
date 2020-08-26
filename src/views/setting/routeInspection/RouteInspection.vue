@@ -607,128 +607,87 @@ export default {
         },
         async addAllData(dataArry){
             let self=this;
-            let index=0;
-            let mode=0;
-            if(self.activeName=='0'){
-                index=0;
-                mode=0;  //远程巡检 mode 0
-            }
-            else if(self.activeName=='1'){
-                index=1;
-                mode=1;  //现场巡检  mode 1
-            }
-            else{
-                index=2;
-            }
-            debugger
+            let mode= self.activeName=='0' ? mode=0 : mode=1  //远程巡检 mode 0,现场巡检  mode 1
             let arr = Object.entries(dataArry)
             let tempGroups=[];
             let tempItems=[];
-            let sheetName = ''
+            let type = null
             for(let i=0;i<arr.length;i++){
                 if(arr[i][0]=='PassFail'){
-                    sheetName = 'PassFail'
+                    type=0
                 }
                 else if(arr[i][0]=='Score'){
-                    sheetName = 'Score'
+                    type=1
                 }
                 else if(arr[i][0]=='Others'){
-                    sheetName = 'Others'
+                    type=2
                 }
                 arr[i][1].forEach((item,index)=>{
                     let obj={};
                         obj.name=item[0].a;
                         obj.mode=mode;
                         obj.tag=self.ImportName;
-                        obj.sheetName=sheetName
+                        obj.type=type
                         tempGroups.push(obj);
-                    let objItem={};
-                    let temp=[];
-                    item.forEach((_item,_index)=>{
-                        let _obj={};
-                        let score=0,minScore=0,description=''
-                        if(arr[i][0]=='PassFail'){
-                            score = 10
-                            minScore = null
-                            description = _item.c
-                        }
-                        else if(arr[i][0]=='Score'){
-                            score = _item.c
-                            minScore = _item.d
-                            description = _item.e
-                        }
-                        else if(arr[i][0]=='Others'){
-                            score = _item.c
-                            minScore = null
-                            description = _item.d
-                        }
-                        _obj.subject=_item.b;
-                        _obj.description=description;
-                        _obj.itemScore=score;
-                        _obj.minScore=minScore
-                        temp.push(_obj);
-                    })
-                    objItem.groupId=1;
-                    objItem.items=temp;
-                    tempItems.push(objItem);
                 })
             }
-            debugger
-            //巡检类别
             let paramsGroup={
-                "groups": tempGroups
+                "groups": tempGroups //巡检类别
             };
-            //巡检项
-            let paramsItem={
-                "request": tempItems
-            };
-                
-
-            // let tempGroups=[];
-            // dataArry.forEach((item,index)=>{
-            //     let obj={};
-            //     obj.name=item[0].a;
-            //     obj.mode=mode;
-            //     obj.tag=self.ImportName;
-            //     tempGroups.push(obj);
-            // })
-            // let paramsGroup={
-            //     "groups": tempGroups
-            // };
-            // let resGroup=await self.addGroup(paramsGroup);
-            // let codeGroup=resGroup.errMsg;
-            // let dataGroup=resGroup.data;
-            // if(codeGroup!=null&&codeGroup=='Success'){
-            //     let tempItems=[];
-            //     dataArry.forEach((item,index)=>{
-            //         let obj={};
-            //         let temp=[];
-            //         item.forEach((_item,_index)=>{
-            //             let _obj={};
-            //             _obj.subject=_item.b;
-            //             _obj.description=_item.d;
-            //             _obj.itemScore=10;
-            //             temp.push(_obj);
-            //         })
-            //         obj.groupId=dataGroup[index];
-            //         obj.items=temp;
-            //         tempItems.push(obj);
-            //     })
-            //     let paramsItem={
-            //         "request": tempItems
-            //     };
-            //     let resItem=await self.addItem(paramsItem);
-            //     let codeItem=resItem.errMsg;
-            //     if(codeItem!=null&&codeItem=='Success'){
-            //         self.getTagList('add');
-            //     }
-            //     else{
-            //         self.notify(self.$t('insSettingView.importFail'),'warning',3000);
-            //     }
-            // }
-            // else{
-            //     self.notify(self.$t('insSettingView.importFail'),'warning',3000);
-            // }
+            let resGroup=await self.addGroup(paramsGroup);
+            let codeGroup=resGroup.errMsg;
+            let dataGroup=resGroup.data;
+            let groupindex=0
+            if(codeGroup!=null&&codeGroup=='Success'){
+                for(let i=0;i<arr.length;i++){
+                    arr[i][1].forEach((item,index)=>{
+                        let objItem={};
+                        let temp=[];
+                        item.forEach((_item,_index)=>{
+                            let _obj={};
+                            let itemScore=0,qualifiedScore=0,description=''
+                            if(arr[i][0]=='PassFail'){
+                                itemScore = 10
+                                qualifiedScore = null
+                                description = _item.c
+                            }
+                            else if(arr[i][0]=='Score'){
+                                itemScore = _item.c
+                                qualifiedScore = _item.d
+                                description = _item.e
+                            }
+                            else if(arr[i][0]=='Others'){
+                                itemScore = _item.c
+                                qualifiedScore = null
+                                description = _item.d
+                            }
+                            _obj.subject=_item.b;
+                            _obj.description=description;
+                            _obj.itemScore=itemScore;
+                            _obj.qualifiedScore=qualifiedScore
+                            temp.push(_obj);
+                        })
+                        objItem.groupId=dataGroup[groupindex];
+                        objItem.items=temp;
+                        tempItems.push(objItem);
+                        groupindex=groupindex+1
+                    })
+                }
+                let paramsItem={
+                    "request": tempItems //巡检项
+                };
+                let resItem=await self.addItem(paramsItem);
+                let codeItem=resItem.errMsg;
+                if(codeItem!=null&&codeItem=='Success'){
+                    self.getTagList('add');
+                }
+                else{
+                    self.notify(self.$t('insSettingView.importFail'),'warning',3000);
+                }
+            }
+            else{
+                self.notify(self.$t('insSettingView.importFail'),'warning',3000);
+            }
             // self.showImportContent=false;
         },
         handleItem(){
@@ -1352,26 +1311,76 @@ export default {
                         }
                     })
                 }
-                const list = excelData;
-                const data = that.formatJson(filterVal, list);
-                let fileName = '';
-                let label = '';
-                switch (Number(that.activeName)) {
-                  case 0: {
-                    label = `[${that.$t('insSettingView.remotePatrol')}]`;
-                    break;
-                  }
-                  case 1:{
-                    label = `[${that.$t('insSettingView.onsitePatrol')}]`;
-                    break;
-                  }
-                  default:{
-                    label = `[${that.elTableData[Number(that.activeName)].label}]`
-                  }
-                }
-                fileName = label+' '+name;
-                export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
+                // let sheet0data = [ {} ]
+                let sheet1data = [ { department: "行政部", count: 2 }, { department: "前端部", count: 2 } ];
+                let sheet2data = [ { name: "张三", do: "整理文件" }, { name: "李四", do: "打印" } ];
+                let sheet3data = [ { name: "张大人", do: "vue" }, { name: "李大人", do: "react" } ];
+                // var sheet0 = XLSX.utils.json_to_sheet(sheet0data);
+                var sheet1 = XLSX.utils.json_to_sheet(sheet1data);
+                var sheet2 = XLSX.utils.json_to_sheet(sheet2data);
+                var sheet3 = XLSX.utils.json_to_sheet(sheet3data);
+        
+                /* create a new blank workbook */
+                var wb = XLSX.utils.book_new();
+                // XLSX.utils.book_append_sheet(wb, sheet0, "注意事项");
+                XLSX.utils.book_append_sheet(wb, sheet1, "部门统计");
+                XLSX.utils.book_append_sheet(wb, sheet2, "行政部");
+                XLSX.utils.book_append_sheet(wb, sheet3, "前端部");
+                debugger
+                const workbookBlob = that.workbook2blob(wb);
+                that.openDownloadDialog(workbookBlob, `部门统计.xlsx`);
+                // const list = excelData;
+                // const data = that.formatJson(filterVal, list);
+                // let fileName = '';
+                // let label = '';
+                // switch (Number(that.activeName)) {
+                //   case 0: {
+                //     label = `[${that.$t('insSettingView.remotePatrol')}]`;
+                //     break;
+                //   }
+                //   case 1:{
+                //     label = `[${that.$t('insSettingView.onsitePatrol')}]`;
+                //     break;
+                //   }
+                //   default:{
+                //     label = `[${that.elTableData[Number(that.activeName)].label}]`
+                //   }
+                // }
+                // fileName = label+' '+name;
+                // export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
             })
+        },
+        // 将workbook装化成blob对象
+        workbook2blob(workbook) {
+          let self=this
+          var wopts = {bookType: "xlsx",bookSST: false,type: "binary"};
+          var wbout = XLSX.write(workbook, wopts);
+          var blob = new Blob([self.s2ab(wbout)], {
+            type: "application/octet-stream"
+          });
+          return blob;
+        },
+        s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
+            return buf;
+        },
+        openDownloadDialog(blob, fileName) {
+            if (typeof blob == "object" && blob instanceof Blob) {
+                blob = URL.createObjectURL(blob);
+            }
+            var aLink = document.createElement("a");
+            aLink.href = blob;
+            aLink.download = fileName || "";
+            var event;
+            if (window.MouseEvent) event = new MouseEvent("click");
+                // 移动端
+            else {
+                event = document.createEvent("MouseEvents");
+                event.initMouseEvent( "click", true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
+            }
+            aLink.dispatchEvent(event);
         },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => v[j]))

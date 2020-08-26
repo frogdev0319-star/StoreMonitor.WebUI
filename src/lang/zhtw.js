@@ -195,6 +195,9 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
+    TableTotal:'项目总分值',//Sprint8 新增
+    TableIgnore:'不适用数量',//Sprint8 新增
+    TableGet:'得分',//Sprint8 新增
     Patroltips2:'此巡檢錶名稱已存在',
     stared: '已關注',
     clickToStar: '點擊關注',
@@ -413,6 +416,7 @@ export default {
 
   // event Management page language
   eventView:{
+    enclosure:'附件',//Sprint8 新增
     status: '處理狀態',
     all : '全部',
     pending: '未處理',

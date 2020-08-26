@@ -98,7 +98,7 @@
                             </el-table-column>
                             <el-table-column
                                 prop="option"
-                                :label= "generateEventLang('operation')"
+                                :label="generateEventLang('operation')"
                                 min-width="80"
                                 align="left">
                                 <template slot-scope="scope">
@@ -192,6 +192,18 @@ export default {
                 {
                     "prop": "storeName",
                     "label": this.$t('eventView.stores'),
+                    "sortable":'custom',
+                    "width":160
+                },
+                {
+                    "prop": "patrolLists",
+                    "label": this.$t('overview.patrolLists'),
+                    "sortable":'custom',
+                    "width":160
+                },
+                {
+                    "prop": "enclosure",
+                    "label": this.$t('eventView.enclosure'),
                     "sortable":'custom',
                     "width":160
                 },

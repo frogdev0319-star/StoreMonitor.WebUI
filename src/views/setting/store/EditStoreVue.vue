@@ -27,6 +27,11 @@
                 <el-tabs v-model="activeName" :before-leave="beforeleave" @tab-click="handleClick" id="patrltabs-content">
                     <el-tab-pane v-for="(item,index) in appliedInspect" :key="index" :label="item.name" ></el-tab-pane>
                 </el-tabs>
+                <div class="data-box">
+                    <div class="sheet_title" v-for="item in sheetName" :key="item.id" @click="changeSheet(item.id)">
+                        <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{item.label}}</p>
+                    </div>
+                </div>
                 <div class="el-table-title tabTitle">
                     <span class="name-title">{{generateStoreLang('patrolName')}}</span>
                     <span class="schedule-title">{{generateStoreLang('bindChanel')}}</span>
@@ -90,6 +95,11 @@ export default {
                 isWarning:true,
                 dialogCosed:false
             },
+            sheetName:[
+                {id:0,isClick:true,label:this.$t('insSettingView.sheetpassfail')},
+                {id:1,isClick:false,label:this.$t('insSettingView.sheetscore')},
+                {id:2,isClick:false,label:this.$t('insSettingView.sheetother')}
+            ],
             activeName:'0',
             curTag:'远程巡检',
             storeTitle:'',
@@ -196,6 +206,16 @@ export default {
             console.log(e.index)
             let self=this
             // self.getNapeByStore(self.store.storeId)
+        },
+        changeSheet(e){
+            let self = this
+            self.sheetName.forEach(item=>{
+                if(item.id==e){
+                    item.isClick = true
+                }else{
+                    item.isClick = false
+                }
+            })
         },
         getChannelByStore(storeId){
             let self=this;
@@ -565,6 +585,31 @@ export default {
                 min-height:80vh;
                 background-color: #f6f7fb;
                 border: 1px solid $border;
+            }
+            .data-box{
+                background-color: #e9eff8;
+                height:36px;
+                border:1px solid #e3e9f4;
+                border-bottom: 0px;
+                margin-top:10px;
+                padding-left:60px;
+                .item_title{
+                    color:#404153;
+                    margin: 0;
+                    font-size: 14px;
+                    font-weight: bold;
+                    text-align: center;
+                    width:120px;
+                    height:34px;
+                    line-height: 34px;
+                    border-radius:4px 4px 0 0;
+                    margin-right: 20px;
+                    cursor: pointer;
+                }
+                .sheet_title{
+                    float: left;
+                    margin-top: 2px;
+                }
             }
             .tab-title{
                 text-align: left;

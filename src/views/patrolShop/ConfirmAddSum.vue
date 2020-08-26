@@ -44,20 +44,170 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
+                            <th scope="col" v-for="(item ,index) in theaderPassFail" :key="index" :style="item.width">{{item.name}}</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td rowspan="4"><span class="sheet_title">{{$t('insSettingView.sheetpassfail')}}</span></td>
+                        </tr>
                         <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
                             <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
-                            <td class="icon-td"><div class="icon-blag" :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">{{item.isQua? pass : fail }}</div></td>
-                            <!-- <td><span>{{item.numOfExcellentItems}}</span></td> -->
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
                             <td><span>{{item.numOfUnqualifiedItems}}</span></td>
                         </tr>
                     </tbody>
                 </table>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col" v-for="(item ,index) in theaderScore" :key="index" :style="item.width">{{item.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="4"><span class="sheet_title">{{$t('insSettingView.sheetscore')}}</span></td>
+                        </tr>
+                        <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td><span>{{item.numOfQualifiedItems}}</span></td>
+                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
+                            <td><span>8</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col" v-for="(item ,index) in theaderOther" :key="index" :style="item.width">{{item.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="4"><span class="sheet_title">{{$t('insSettingView.sheetother')}}</span></td>
+                        </tr>
+                        <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td><span>{{item.numOfQualifiedItems}}</span></td>
+                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
+                            <td><span>8</span></td>
+                            <td><span>8</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            <!-- <el-row class="row-detail">
+                <el-col>
+                <div class="item-header">
+                    <i class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"></i>
+                    <span class="title-lable">{{$t('remotePatrol.detailInfo')}}</span>
+                </div>
+                <div class="item-content">
+                    <div style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;" v-for="(item,index) in groups" :key="index">
+                        <div class="content-title">{{item.groupName}}</div>
+                        <div class="content-detail" v-for="(_item,_index) in item.items" :key="_index">
+                        <div class="content-detail-title">
+                            <div class="detail-title">
+                            <p class="title1">{{_index+1}}.{{_item.subject}}</p>
+                            <p class="title2">{{_item.description}}</p>
+                            </div>
+                            <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
+                            <div class="title-btn" v-if="_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
+                            <div class="title-btn" v-if="_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
+                        </div>
+                        <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
+                            <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
+                            <div class="cdm-voice" v-if="_item.showAudio">
+                                <div class="speech-info" @click="startSpeechItem(_item,_index)">
+                                    <i class="iconfont icon-yuyin icon-speech"></i>
+                                </div>
+                                <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
+                                    <source :src="_item.audio.audioSrc" type="audio/mpeg" />
+                                </audio>
+                                <span class="often-text">{{_item.audio.audioOftenText}}</span>
+                            </div>
+                            <div class="cdm-word" v-if="_item.comment!=null&&_item.comment!=''">
+                                <span>{{_item.comment}}</span>
+                            </div>
+                            <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
+                                <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex" class="source-details" :height="imgHeight+'px'">
+                                    <div v-if="sourceitem.mediaType==2" class="img-content">
+                                        <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
+                                        :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
+                                        @click="openOuter(sourceitem,$event)"/>
+                                    </div>
+                                    <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                                        <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
+                                        <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;" v-if="showFeedBacks">
+                        <div class="content-title">{{$t('remotePatrol.feedbacks')}}</div>
+                        <div class="content-detail" v-for="(item,index) in feedbacks" :key="index">
+                        <div class="content-detail-title" style="background-color:#fff;height:30px;">
+                            <div class="detail-title">
+                            <p class="title1">{{index+1}}.{{item.subject}}</p>
+                            </div>
+                        </div>
+                        <div class="content-detail-main" v-if="item.showAttachment||item.description!=null&&item.description!=''">
+                            <p class="cdm-title">{{$t('remotePatrol.description')}}：</p>
+                            <div class="cdm-voice" v-if="item.showAudio">
+                                <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
+                                    <i class="iconfont icon-yuyin icon-speech"></i>
+                                </div>
+                                <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
+                                    <source :src="item.audio.audioSrc" type="audio/mpeg" />
+                                </audio>
+                                <span class="often-text">{{item.audio.audioOftenText}}</span>
+                            </div>
+                            <div class="cdm-word" v-if="item.description!=null&&item.description!=''">
+                                <span>{{item.description}}</span>
+                            </div>
+                            <div class="cdm-pic" v-if="item.sourceList!=null&&item.sourceList.length!=0">
+                                <div v-for="(sourceitem,index) in item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
+                                    <div v-if="sourceitem.mediaType==2" class="img-content">
+                                        <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
+                                        :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
+                                        @click="openOuter(sourceitem,$event)"/>
+                                    </div>
+                                    <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
+                                        <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
+                                        <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <el-dialog  :title="$t('eventView.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
+                    v-if="dialogCommentVideo" width="850px" top="12%" @close="stopCommentVideo" class='rate-video-dialog'>
+                        <div class="video-dialog-content" style="overflow:hidden;">
+                            <hr class="dialog-hr"/>
+                            <div class="video-content" >
+                                <video  height=83% width=90% id="previewVideo" prload  controls
+                                    class="video-js vjs-fill">
+                                </video>
+                            </div>
+                        </div>
+                    </el-dialog>
+                    <transition name="fade">
+                        <el-dialog :title="$t('eventView.view')"
+                        :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width="850px" top="12%">
+                        <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                            <hr class="dialog-hr"/>
+                            <div class="dialog-source-content">
+                                <img v-if="showImg" :src="checkImgSrc"/>
+                            </div>
+                        </div>
+                        </el-dialog>
+                    </transition>
+                </div>
+                </el-col>
+            </el-row> -->
             <el-row class="row-footer">
                 <el-col :span="12" v-for="(item,index) in tempList" :key="index" class="details-content">
                     <div class="details">
@@ -74,7 +224,6 @@
                                 <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
                                     <div class="item-blag"></div>
                                     <span class="item-name">{{index!=2?_item.name:_item.subject}}</span>
-                                    <!--<span class="item-des">{{_item.description}}</span>-->
                                     <span class="item-des"></span>
                                 </div>
                             </el-scrollbar>
@@ -122,22 +271,26 @@ export default {
                 'isActive':false
               },
             ],
-            theaderList:[
-                {
-                    name: this.$t('remotePatrol.item'),
-                },
-                {
-                   name: this.$t('remotePatrol.groupPerfor')
-                },
-                // {
-                //     name: this.$t('remotePatrol.good')
-                // },
-                {
-                   name: this.$t('remotePatrol.pass')
-                },
-                {
-                   name: this.$t('remotePatrol.failed')
-                }
+            theaderPassFail:[
+                {name: '',width:'width:11%;'},
+                {name: this.$t('remotePatrol.item'),width:'width:22.2%;'},
+                {name: this.$t('remotePatrol.pass'),width:'width:35%;'},
+                {name: this.$t('remotePatrol.failed'),width:'width:35%;'}
+            ],
+            theaderScore:[
+                {name: '',width:'width:10%;'},
+                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.TableTotal'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.TableGet'),width:'width:20%;'}
+            ],
+            theaderOther:[
+                {name: '',width:'width:10%;'},
+                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.pass'),width:'width:15%;'},
+                {name: this.$t('remotePatrol.failed'),width:'width:15%;'},
+                {name: this.$t('remotePatrol.TableIgnore'),width:'width:15%;'},
+                {name: this.$t('remotePatrol.TableGet'),width:'width:15%;'}
             ],
             suggest:'',
             store:{},
@@ -696,7 +849,7 @@ $h1:#292e36;
                     background-color: $background;
                     border-bottom-width: 1px;
                     padding: 0.5rem;
-                    width: 20%;
+                    // width: 10%;
                     padding-left: 1rem;
                 }
                 td{
@@ -706,6 +859,9 @@ $h1:#292e36;
                     padding-left: 1.2rem;
                     text-align: left;
                     font-weight: bold;
+                }
+                .sheet_title{
+                    line-height: 88px;
                 }
                 .count-blag{
                     padding: 2px 12px;
@@ -727,6 +883,154 @@ $h1:#292e36;
                     font-size: calc(12/1920*100vw);
                     font-weight: normal;
                 }
+            }
+        }
+        .row-detail{
+            margin-bottom: 50px !important;
+            .item-header{
+                position: relative;
+                background-color: $background;
+                height: 40px;
+                line-height: 40px;
+                border: 1px solid $border;
+                padding-left: calc(20 / 1920 * 100vw);
+                cursor: pointer;
+            .icontemp {
+                font-size: calc(14 / 1920 * 100vw);
+                margin-right: calc(15 / 1920 * 100vw);
+                }
+            .title-lable {
+                font-size: calc(14 / 1920 * 100vw);
+                font-weight: bold;
+            }
+            }
+            .item-content{
+            padding-top: calc(20 / 1920 * 100vw);
+            font-size: calc(14 / 1920 * 100vw);
+            padding-left: calc(30 / 1920 * 100vw);
+            padding-right: calc(30 / 1920 * 100vw);
+            color: #4b5262;
+            border: 1px solid $border;
+            border-top:0;
+            .content-title{
+                border-left:4px solid #eb1d63;
+                font-size: calc(14 / 1920 * 100vw);
+                color:#7d8cad;
+                padding-left:calc(20 / 1920 * 100vw);
+                font-weight: bold;
+            }
+            .content-detail{
+                margin-top: 10px;
+                .content-detail-title{
+                height:70px;
+                background-color:$background;
+                padding-left:calc(20 / 1920 * 100vw);
+                padding-right: calc(20 / 1920 * 100vw);
+                padding-top:10px;
+                padding-bottom: 10px;
+                display: flex;
+                .ignore-btn{
+                    width:50px;
+                    height:24px;
+                    background-color: #434c5e;
+                    font-size: 12px;
+                    color:#ffffff;
+                    font-weight: bold;
+                    line-height: 25px;
+                    text-align: center;
+                    border-radius: 5px;
+                    margin-right: calc(25 / 1920 * 100vw);
+                }
+                .title-btn{
+                    width:100px;
+                    height:25px;
+                    background-color: #fcba3f;
+                    font-size:12px;
+                    color:#ffffff;
+                    font-weight: bold;
+                    line-height: 25px;
+                    text-align: center;
+                    border-radius: 20px;
+                }
+                .detail-title{
+                    flex: 1;
+                    .title1{
+                    font-size: calc(14 / 1920 * 100vw);
+                    color:#182752;
+                    font-weight: bold;
+                    margin:0 0 5px 0;
+                    }
+                    .title2{
+                    font-size: calc(12 / 1920 * 100vw);
+                    color:#7d8cad;
+                    margin: 15px 0 0 10px;
+                    }
+                }
+                }
+                .content-detail-main{
+                padding-top: 10px;
+                padding-left:calc(20 / 1920 * 100vw);
+                padding-right: calc(20 / 1920 * 100vw);
+                .cdm-title{
+                    font-size:calc(12 / 1920 * 100vw);
+                    color:#94a4b4;
+                    font-weight: bold;
+                    margin: 0;
+                }
+                .cdm-voice{
+                    margin-top: 10px;
+                    .speech-info{
+                        @include point(width,80);
+                        @include point(height,26);
+                        background-color: #FFEDED;
+                        color: $red;
+                        border: 1px solid #FEC0C7;
+                        @include point(border-radius,15);
+                        display: inline-block;
+                        cursor: pointer;
+                        .icon-speech{
+                            @include point(font-size,18);
+                            @include point(line-height,26);
+                            @include point(margin-left,5);
+                        }
+                    }
+                    .often-text{
+                        @include point(margin-left,20);
+                    }
+                }
+                .cdm-pic{
+                    margin-top: 20px;
+                    overflow: hidden;
+                    .source-details{
+                        display: inline-block;
+                        .img-content{
+                        margin-right: calc(10/1920*100vw);
+                            position: relative;
+                            cursor: pointer;
+                            .start-icon{
+                                position: absolute;
+                                left: 35%;
+                                top: 30%;
+                            }
+                        .imgLittle{
+                            min-width: 70px;
+                        }
+                        }
+                    @media screen and (min-width: 1280px) and(max-width: 1366px){
+                        width: 90px;
+                        .img-content .imgLittle{
+                        width: 85px;
+                        }
+                    }
+                    }
+                }
+                .cdm-word{
+                    margin-top: 10px;
+                    font-size: calc(14 / 1920 * 100vw);
+                    color:#4b5262;
+                }
+                }
+            }
             }
         }
         .row-footer{

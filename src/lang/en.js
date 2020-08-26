@@ -195,6 +195,9 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
+    TableTotal:'项目总分值',//Sprint8 新增
+    TableIgnore:'不适用数量',//Sprint8 新增
+    TableGet:'得分',//Sprint8 新增
     Patroltips2:'The inspection list name already exists',
     stared: 'Star',
     clickToStar: 'Click to star',
@@ -412,6 +415,7 @@ export default {
 
   // event Management page language
   eventView:{
+    enclosure:'附件',//Sprint8 新增
     status: 'Status',
     all : 'All',
     pending: 'Pending',

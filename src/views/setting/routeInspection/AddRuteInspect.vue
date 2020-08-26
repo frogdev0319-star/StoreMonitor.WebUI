@@ -122,19 +122,19 @@
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="nape-items-title" v-if="napeList.length!=0">
-                       <div class="nape-name-title" :style="showScore1?'flex:2;':(showScore2?'flex:3;':'flex:2;')">
+                       <div class="nape-name-title" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
                            <span>{{generateInsSettingLang('inspectName')}}</span>
                        </div>
-                       <div class="nape-dep-title" :style="showScore1?'flex:3;':(showScore2?'flex:4;':'flex:3;')">
-                           <span :style="showScore1?'left:5%;':(showScore2?'left:2%;':'')">{{generateInsSettingLang('inspectionDescp')}}</span>
+                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:3;':(activeSheetName=='2'?'flex:4;':'flex:3;')">
+                           <span :style="activeSheetName=='1'?'left:5%;':(activeSheetName=='2'?'left:2%;':'')">{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
-                       <div class="nape-score0-title" v-if="showScore1" style="flex:1;">
+                       <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;">
                            <span style="position:relative;;left:8%;">{{generateInsSettingLang('sheetscore0')}}</span>
                        </div>
-                       <div class="nape-score0-title" v-if="showScore1" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
+                       <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
                            <span>{{generateInsSettingLang('sheetscore1')}}</span>
                        </div>
-                       <div class="nape-score1-title" v-if="showScore2" style="flex:2;">
+                       <div class="nape-score1-title" v-if="activeSheetName=='2'" style="flex:2;">
                            <span>{{generateInsSettingLang('sheetscore2')}}</span>
                        </div>
                        <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
@@ -144,28 +144,28 @@
                    <div class="nape-items-data"
                    v-for="(item,index) in napeList"
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
-                       <div class="nape-name-data" :style="showScore1?'flex:2;':(showScore2?'flex:3;':'flex:2;')">
+                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
                             <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
                        </div>
-                       <div class="nape-dep-data" :style="showScore1?'flex:2.7;':(showScore2?'flex:4;':'flex:3;margin-right:40px;')">
+                       <div class="nape-dep-data" :style="activeSheetName=='1'?'flex:2.7;':(activeSheetName=='2'?'flex:4;':'flex:3;margin-right:40px;')">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
                            <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
                        </div>
-                       <div class="nape-scores-handle" v-if="showScore1" style="flex:1;">
+                       <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
                            <span style="margin-left:40px;" v-if="!item.isClick">10分</span>
                            <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="FullScore" @change="selectFullScore">
                                 <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
-                       <div class="nape-scores-handle" v-if="showScore1" style="flex:1;">
+                       <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
                            <span style="margin-left:40px;" v-if="!item.isClick">5分</span>
                            <el-select size="mini" class="critical-input" v-if="item.isClick" v-model="critical">
                                 <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
-                       <div class="nape-scores-handle" v-if="showScore2" style="flex:2;">
+                       <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
                            <span style="margin-left:73px;" v-if="!item.isClick">+20分</span>
                            <el-input size="mini" class="Itemscores-input" v-if="item.isClick"></el-input>
                        </div>
@@ -224,28 +224,36 @@
                         </div>
                     </el-dialog>
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
-                       <div class="nape-name-data">
+                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
-                            <div class="inputcontent">
-                                <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
-                                <span class="rules" v-if="enterListNameRuletip">{{generateInsSettingLang('enterListNameRuletip')}}</span>
-                            </div>
+                            <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
+                            <span class="rules" v-if="enterListNameRuletip">{{generateInsSettingLang('enterListNameRuletip')}}</span>
                        </div>
-                       <div class="nape-dep-data">
-                            <div class="inputcontent">
-                                <el-input type="textarea" resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})" @blur="notShowInputRuleTips('description')"></el-input>
-                                <div style="clear:both;"></div>
-                                <span class="rules" v-if="descriptionRuletip">{{generateInsSettingLang('descriptionRuletip')}}</span>
-                            </div>
-                            <div class="iconcontent">
-                                <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
-                                    <i class="el-icon-check"></i>
-                                </div>
-                                <div class="iconrised" @click="cancelAddNape">
-                                    <i class="el-icon-close"></i>
-                                </div>
-                            </div>
+                       <div class="nape-dep-data" :style="activeSheetName=='1'?'flex:2.7;':(activeSheetName=='2'?'flex:4;':'flex:3;margin-right:40px;')">
+                           <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})" @blur="notShowInputRuleTips('description')"></el-input>
+                           <span class="rules" v-if="descriptionRuletip">{{generateInsSettingLang('descriptionRuletip')}}</span>
                        </div>
+                       <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
+                           <el-select size="mini" class="FullScore-input" v-model="newScore" @change="selectFullScore">
+                                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+                            </el-select>
+                       </div>
+                       <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
+                           <el-select size="mini" class="critical-input" v-model="newCritical">
+                                <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
+                            </el-select>
+                       </div>
+                       <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
+                           <el-input size="mini" class="Itemscores-input" v-model="newAddScore"></el-input>
+                       </div>
+                       <div class="iconcontent" style="flex:1;">
+                            <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
+                                <i class="el-icon-check"></i>
+                            </div>
+                            <div class="iconrised" @click="cancelAddNape">
+                                <i class="el-icon-close"></i>
+                            </div>
+                        </div>
                    </div>
                </div>
                </el-scrollbar>
@@ -271,6 +279,9 @@ export default {
     },
     data(){
         return{
+            newScore:0,
+            newCritical:0,
+            newAddScore:0,
             groupTitle: this.$t('insSettingView.category'),
             tabName:'',
             ModelPost:[],
@@ -310,8 +321,6 @@ export default {
             tableData:[],
             noData:'',
             groupIds:[],
-            showScore1:false,
-            showScore2:false,
             ScoreList:[],
             FullScore:'',
             critical:''
@@ -413,8 +422,6 @@ export default {
         },
         handleSheetClick(val){
             let self = this
-            self.showScore1 = val.index=='1' ? true : false
-            self.showScore2 = val.index=='2' ? true : false
         },
         clickGroupItem(index,item){
             let self=this;
@@ -632,19 +639,12 @@ export default {
             }
             let mode=0;
             let tabIndex=sessionStorage.getItem('TabIndex');
-            if(tabIndex=='0'){
-                mode=0;
-            }
-            else if(tabIndex=='1'){
-                mode=1;
-            }
-            // else{
-            //     mode=0;
-            // }
+            mode= tabIndex=='0' ? 0 : (tabIndex=='1' ? 1 : 0)
             let obj={
                 name:self.groupNameInput,
                 mode:mode,
-                tag:self.tabName
+                tag:self.tabName,
+                type:Number(self.activeSheetName)
             }
             temp.push(obj);
             let params={
@@ -860,13 +860,26 @@ export default {
                 self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
+            let itemScore=0,qualifiedScore=0
+            if(self.activeSheetName=='0'){
+                itemScore=10
+                qualifiedScore=null
+            }else if(self.activeSheetName=='1'){
+                itemScore=self.newScore
+                qualifiedScore=self.newCritical
+            }else if(self.activeSheetName=='2'){
+                itemScore=self.newAddScore
+                qualifiedScore=null
+            }
             let obj={
                 id:item.id,
                 subject:item.napeName,
                 description:item.napeDep,
-                itemScore:10
+                itemScore:itemScore,
+                qualifiedScore:qualifiedScore
             }
             temp.push(obj);
+            debugger
             let params={
                 "items":temp
             };
@@ -901,13 +914,24 @@ export default {
                 self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
                 return false;
             }
+            let itemScore=0,qualifiedScore=0
+            if(self.activeSheetName=='0'){
+                itemScore=10
+                qualifiedScore=null
+            }else if(self.activeSheetName=='1'){
+                itemScore=self.newScore
+                qualifiedScore=self.newCritical
+            }else if(self.activeSheetName=='2'){
+                itemScore=self.newAddScore
+                qualifiedScore=null
+            }
             let objItem={
                 subject:self.newNapeName.trim(),
                 description:self.newNapeDep.trim(),
-                itemScore:10,
+                itemScore:itemScore,
+                qualifiedScore:qualifiedScore
             };
             temp.push(objItem);
-
             let obj={
                 groupId:self.curGroup.id,
                 items:temp
