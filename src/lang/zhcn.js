@@ -463,8 +463,9 @@ export default {
     storesuperManage:'门店负责人',
     tHeaderA:'巡检类别（必填，30字符）',
     tHeaderB:'巡检项名称（必填，100字符）',
-    tHeaderC:'项目分值（1~100分）',
+    tHeaderC:'项目满分值（1~100分）',
     tHeaderD:'巡检项目详细说明（选填，300字符）',
+    tHeaderF:'低于*分，需由门店负责人处理（必填，1~10分）',//Sprint8 新增
     bindWith: '已绑定',
     bindStore: '家门店',
     bindList: '巡检表绑定',

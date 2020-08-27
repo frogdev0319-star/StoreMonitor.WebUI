@@ -464,6 +464,7 @@ export default {
     tHeaderB:'Inspection Items(Required, 100 characters)',
     tHeaderC:'Score(1~100points)',
     tHeaderD:'Inspection Item Description(Required,100 characters)',
+    tHeaderF:'低于*分，需由门店负责人处理（必填，1~10分）',//Sprint8 新增
     bindWith: 'Binded with ',
     bindStore: 'stores',
     bindList: 'Bound List',

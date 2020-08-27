@@ -160,8 +160,8 @@
                         <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content">
                             <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :label="`${_item.name}`" :name="_index.toString()">
                                 <div v-if="_item.routeData">
-                                    <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc"
-                                    :tab-name="_item.name" @refreshList="getTagList"></route-detail>
+                                    <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName"
+                                    :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"></route-detail>
                                 </div>
                             </el-tab-pane>
                         </el-tabs>
@@ -437,6 +437,10 @@ export default {
 
             })
         },
+        changerouteData(val){
+            let self=this;
+            self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData=val
+        },
         async getTagList(val){
             let self=this;
             let TagData=await self.getTagAll();
@@ -462,6 +466,7 @@ export default {
                             _obj.id=_item.id;
                             _obj.groupName=_item.name;
                             _obj.itemCount=_item.items.length;
+                            _obj.type=_item.type
                             _obj.checked=false;
                             let tempChild=[];
                             _item.items.forEach(itemChild=>{
@@ -472,9 +477,11 @@ export default {
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
                                 if(self.lang == 'en'){
                                 objChild.score=itemChild.itemScore ;
+                                objChild.qualifiedScore=itemChild.qualifiedScore ;
                                 }
                                 else{
                                 objChild.score=itemChild.itemScore + " " + self.$t('insSettingView.scores');
+                                objChild.qualifiedScore=itemChild.qualifiedScore + " " + self.$t('insSettingView.scores');
                                 }
 
                                 tempChild.push(objChild);
@@ -490,11 +497,6 @@ export default {
                     }
                     let titletemp=await self.getInspectGroupBindAll(postparams)
                     let titleList=await self.getUserTitleList()
-                    // let usertext=[]
-                    // titletemp[0].userTitles.forEach(u_item=>{
-                    //     usertext.push(u_item.titleName)
-                    // })
-                    // temp.push({ModelPost:usertext.toString()})//关联职务
                     temp.forEach(te_item=>{
                         let usertext=[]
                         titletemp.forEach(ti_item=>{
@@ -514,6 +516,26 @@ export default {
                             }
                         })
                     })
+                    let te_temp=[]
+                    let sheetName=[]
+                    for(let i=0;i<3;i++){
+                        let Typeindex=temp.filter(x=>x.type==i);
+                        let obj={}
+                        if(Typeindex.length!=0){
+                            te_temp.push(Typeindex)
+                            if(Typeindex[0].type==0){
+                                obj={'id':0,'isClick':false,'label':this.$t('insSettingView.sheetpassfail')}
+                            }
+                            if(Typeindex[0].type==1){
+                                obj={'id':1,'isClick':false,'label':this.$t('insSettingView.sheetscore')}
+                            }
+                            if(Typeindex[0].type==2){
+                                obj={'id':2,'isClick':false,'label':this.$t('insSettingView.sheetother')}
+                            }
+                            sheetName.push(obj)
+                        }
+                    }
+                    sheetName[0].isClick=true
                     let tagTemp=[]
                     TagData.forEach((tag_item,tag_index)=>{
                         let tagObj={};
@@ -525,18 +547,18 @@ export default {
                         }
                         tagObj.label=label
                         tagObj.name=tag_item.name
-                        tagObj.routeData=temp
+                        tagObj.routeData=te_temp[0]
+                        tagObj.allRoutedata=te_temp
+                        tagObj.sheetName=sheetName
                         tagTemp.push(tagObj)
                     })
                     if(self.activeName==0){
-                        // let tagTemp={label:item,name:self.ImportName,routeData:temp};
                         if(temp.length == 0){
                           self.getDownLoadURL();
                         }
                         self.elTableData[0].data=tagTemp;
                     }
                     else if(self.activeName==1){
-                        // let obj={label:item,name:self.ImportName,routeData:temp};
                         if(temp.length == 0){
                           self.getDownLoadURL();
                         }
@@ -544,7 +566,7 @@ export default {
                     }
                     else{
                         obj.label=item;
-                        obj.data={name:'',routeData:temp};
+                        obj.data={name:'',routeData:te_temp[0]};
                         // tempAllData.push(obj);
                     }
                 // })
@@ -622,14 +644,16 @@ export default {
                 else if(arr[i][0]=='Others'){
                     type=2
                 }
-                arr[i][1].forEach((item,index)=>{
-                    let obj={};
-                        obj.name=item[0].a;
-                        obj.mode=mode;
-                        obj.tag=self.ImportName;
-                        obj.type=type
-                        tempGroups.push(obj);
-                })
+                if(arr[i][1].length!=0){
+                    arr[i][1].forEach((item,index)=>{
+                        let obj={};
+                            obj.name=item[0].a;
+                            obj.mode=mode;
+                            obj.tag=self.ImportName;
+                            obj.type=type
+                            tempGroups.push(obj);
+                    })
+                }
             }
             let paramsGroup={
                 "groups": tempGroups //巡检类别
@@ -640,38 +664,40 @@ export default {
             let groupindex=0
             if(codeGroup!=null&&codeGroup=='Success'){
                 for(let i=0;i<arr.length;i++){
-                    arr[i][1].forEach((item,index)=>{
-                        let objItem={};
-                        let temp=[];
-                        item.forEach((_item,_index)=>{
-                            let _obj={};
-                            let itemScore=0,qualifiedScore=0,description=''
-                            if(arr[i][0]=='PassFail'){
-                                itemScore = 10
-                                qualifiedScore = null
-                                description = _item.c
-                            }
-                            else if(arr[i][0]=='Score'){
-                                itemScore = _item.c
-                                qualifiedScore = _item.d
-                                description = _item.e
-                            }
-                            else if(arr[i][0]=='Others'){
-                                itemScore = _item.c
-                                qualifiedScore = null
-                                description = _item.d
-                            }
-                            _obj.subject=_item.b;
-                            _obj.description=description;
-                            _obj.itemScore=itemScore;
-                            _obj.qualifiedScore=qualifiedScore
-                            temp.push(_obj);
+                    if(arr[i][1].length!=0){
+                        arr[i][1].forEach((item,index)=>{
+                            let objItem={};
+                            let temp=[];
+                            item.forEach((_item,_index)=>{
+                                let _obj={};
+                                let itemScore=0,qualifiedScore=0,description=''
+                                if(arr[i][0]=='PassFail'){
+                                    itemScore = 10
+                                    qualifiedScore = null
+                                    description = _item.c
+                                }
+                                else if(arr[i][0]=='Score'){
+                                    itemScore = _item.c
+                                    qualifiedScore = _item.d
+                                    description = _item.e
+                                }
+                                else if(arr[i][0]=='Others'){
+                                    itemScore = _item.c
+                                    qualifiedScore = null
+                                    description = _item.d
+                                }
+                                _obj.subject=_item.b;
+                                _obj.description=description;
+                                _obj.itemScore=itemScore;
+                                _obj.qualifiedScore=qualifiedScore
+                                temp.push(_obj);
+                            })
+                            objItem.groupId=dataGroup[groupindex];
+                            objItem.items=temp;
+                            tempItems.push(objItem);
+                            groupindex=groupindex+1
                         })
-                        objItem.groupId=dataGroup[groupindex];
-                        objItem.items=temp;
-                        tempItems.push(objItem);
-                        groupindex=groupindex+1
-                    })
+                    }
                 }
                 let paramsItem={
                     "request": tempItems //巡检项
@@ -1201,31 +1227,37 @@ export default {
                         return false
                     }
                     let arrsheet1=[];
-                    if(indexArryPassFail.length!=0){
-                        for(var i=0;i<indexArryPassFail.length;i++){
-                            arrsheet1[i]=outdata.PassFail.slice(indexArryPassFail[i],indexArryPassFail[i+1]);
-                        }
-                    }else{
-                        if(outdata.PassFail.length!=0){
-                            arrsheet1 = outdata.PassFail
-                            arrsheet1[0].a = '评级项目'
+                    if(outdata.PassFail!=undefined){
+                        if(indexArryPassFail.length!=0){
+                            for(var i=0;i<indexArryPassFail.length;i++){
+                                arrsheet1[i]=outdata.PassFail.slice(indexArryPassFail[i],indexArryPassFail[i+1]);
+                            }
+                        }else{
+                            if(outdata.PassFail.length!=0){
+                                arrsheet1 = outdata.PassFail
+                                arrsheet1[0].a = '评级项目'
+                            }
                         }
                     }
                     let arrsheet2=[];
-                    if(indexArryScore.length!=0){
-                        for(var i=0;i<indexArryScore.length;i++){
-                            arrsheet2[i]=outdata.Score.slice(indexArryScore[i],indexArryScore[i+1]);
+                    if(outdata.Score!=undefined){
+                        if(indexArryScore.length!=0){
+                            for(var i=0;i<indexArryScore.length;i++){
+                                arrsheet2[i]=outdata.Score.slice(indexArryScore[i],indexArryScore[i+1]);
+                            }
                         }
                     }
                     let arrsheet3=[];
-                    if(indexArryOthers.length!=0){
-                        for(var i=0;i<indexArryOthers.length;i++){
-                            arrsheet3[i]=outdata.Others.slice(indexArryOthers[i],indexArryOthers[i+1]);
-                        }
-                    }else{
-                        if(outdata.Others.length!=0){
-                            arrsheet3 = outdata.Others
-                            arrsheet3[0].a = '附加评分项目'
+                    if(outdata.Others!=undefined){
+                        if(indexArryOthers.length!=0){
+                            for(var i=0;i<indexArryOthers.length;i++){
+                                arrsheet3[i]=outdata.Others.slice(indexArryOthers[i],indexArryOthers[i+1]);
+                            }
+                        }else{
+                            if(outdata.Others.length!=0){
+                                arrsheet3 = outdata.Others
+                                arrsheet3[0].a = '附加评分项目'
+                            }
                         }
                     }
                     let dataArry = {
@@ -1269,85 +1301,128 @@ export default {
             var that = this;
             require.ensure([], () => {
                 const { export_json_to_excel } = require('@/excel/Export2Excel');
-                const tHeader = [that.$t('insSettingView.tHeaderA'),that.$t('insSettingView.tHeaderB'),that.$t('insSettingView.tHeaderC'),that.$t('insSettingView.tHeaderD')]
-                // const tHeaderzhcn = ['检查分类','检查项目名称','项目分值', "检查项目详细说明（选填，不填为空）",]; // 导出的表头名
-                const filterVal = ['gourpname','napename','score','napedep',]; // 导出的表头字段名
-                console.log(that.activeName);
+                const tHeader = [that.$t('insSettingView.tHeaderA'),that.$t('insSettingView.tHeaderB'),that.$t('insSettingView.tHeaderC'),that.$t('insSettingView.tHeaderD'),that.$t('insSettingView.tHeaderF')]
                 let excelData=[];
                 let name = '';
+                var wb = XLSX.utils.book_new();
                 if(that.elTableData[Number(that.activeName)].data.length==0){
-                    let obj={};
-                    obj.gourpname='';
-                    obj.napename='';
-                    obj.score='';
-                    obj.napedep='';
-                    excelData.push(obj);
+                    // let obj={};
+                    // obj.gourpname='';
+                    // obj.napename='';
+                    // obj.score='';
+                    // obj.napedep='';
+                    // excelData.push(obj);
+                    //巡检表为空时导出处理
                     
                 }else{
-                    let curData=that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)];
-                    name = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name;
-                    curData.routeData.forEach((item,index)=>{
-                        if(item.itemData.length!=0){
-                            item.itemData.forEach((_item,_index)=>{
+                    let sheet1data=[],sheet2data=[],sheet3data=[]
+                    let curData=that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
+                    let passfail=curData.filter(x=>x[0].type==0)[0];
+                    let score=curData.filter(x=>x[0].type==1)[0];
+                    let other=curData.filter(x=>x[0].type==2)[0];
+                    name=that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name
+                    if(passfail!=undefined){
+                        passfail.forEach(item=>{
+                            if(item.itemData.length!=0){
+                                item.itemData.forEach((_item,_index)=>{
+                                    let obj={};
+                                    if(_index==0){
+                                        obj[tHeader[0]]=item.groupName;
+                                    }
+                                    else{
+                                        obj[tHeader[0]]='';
+                                    }
+                                    obj[tHeader[1]]=_item.name;
+                                    obj[tHeader[3]]=_item.description=='---'?'':_item.description;
+                                    sheet1data.push(obj);
+                                })
+                            }else{
                                 let obj={};
-                                if(_index==0){
-                                    obj.gourpname=item.groupName;
-                                }
-                                else{
-                                    obj.gourpname='';
-                                }
-                                obj.napename=_item.name;
-                                obj.score=_item.score;
-                                obj.napedep=_item.description=='---'?'':_item.description;
-                                excelData.push(obj);
-                            })
-                        }else{
-                            let obj={};
-                            obj.gourpname=item.groupName;
-                            obj.napename='';
-                            obj.score='';
-                            obj.napedep='';
-                            excelData.push(obj);
-                        }
-                    })
+                                obj[tHeader[0]]=item.groupName;
+                                obj[tHeader[1]]='';
+                                obj[tHeader[3]]='';
+                                sheet1data.push(obj);
+                            }
+                        })
+                        var sheet1 = XLSX.utils.json_to_sheet(sheet1data);
+                        XLSX.utils.book_append_sheet(wb, sheet1, "Pass&Fail");
+                    }
+                    if(score!=undefined){
+                        score.forEach(item=>{
+                            if(item.itemData.length!=0){
+                                item.itemData.forEach((_item,_index)=>{
+                                    let obj={};
+                                    if(_index==0){
+                                        obj[tHeader[0]]=item.groupName;
+                                    }
+                                    else{
+                                        obj[tHeader[0]]='';
+                                    }
+                                    obj[tHeader[1]]=_item.name;
+                                    obj[tHeader[2]]=_item.score;
+                                    obj[tHeader[4]]=_item.qualifiedScore
+                                    obj[tHeader[3]]=_item.description=='---'?'':_item.description;
+                                    sheet2data.push(obj);
+                                })
+                            }else{
+                                let obj={};
+                                obj[tHeader[0]]=item.groupName;
+                                obj[tHeader[1]]='';
+                                obj[tHeader[2]]='';
+                                obj[tHeader[4]]=_item.qualifiedScore
+                                obj[tHeader[3]]='';
+                                sheet2data.push(obj);
+                            }
+                        })
+                        var sheet2 = XLSX.utils.json_to_sheet(sheet2data);
+                        XLSX.utils.book_append_sheet(wb, sheet2, "Score");
+                    }
+                    if(other!=undefined){
+                        other.forEach(item=>{
+                            if(item.itemData.length!=0){
+                                item.itemData.forEach((_item,_index)=>{
+                                    let obj={};
+                                    if(_index==0){
+                                        obj[tHeader[0]]=item.groupName;
+                                    }
+                                    else{
+                                        obj[tHeader[0]]='';
+                                    }
+                                    obj[tHeader[1]]=_item.name;
+                                    obj[tHeader[2]]=_item.score;
+                                    obj[tHeader[3]]=_item.description=='---'?'':_item.description;
+                                    sheet3data.push(obj);
+                                })
+                            }else{
+                                let obj={};
+                                obj[tHeader[0]]=item.groupName;
+                                obj[tHeader[1]]='';
+                                obj[tHeader[2]]='';
+                                obj[tHeader[3]]='';
+                                sheet3data.push(obj);
+                            }
+                        })
+                        var sheet3 = XLSX.utils.json_to_sheet(sheet3data);
+                        XLSX.utils.book_append_sheet(wb, sheet3, "Others");
+                    }
                 }
-                // let sheet0data = [ {} ]
-                let sheet1data = [ { department: "行政部", count: 2 }, { department: "前端部", count: 2 } ];
-                let sheet2data = [ { name: "张三", do: "整理文件" }, { name: "李四", do: "打印" } ];
-                let sheet3data = [ { name: "张大人", do: "vue" }, { name: "李大人", do: "react" } ];
-                // var sheet0 = XLSX.utils.json_to_sheet(sheet0data);
-                var sheet1 = XLSX.utils.json_to_sheet(sheet1data);
-                var sheet2 = XLSX.utils.json_to_sheet(sheet2data);
-                var sheet3 = XLSX.utils.json_to_sheet(sheet3data);
-        
-                /* create a new blank workbook */
-                var wb = XLSX.utils.book_new();
-                // XLSX.utils.book_append_sheet(wb, sheet0, "注意事项");
-                XLSX.utils.book_append_sheet(wb, sheet1, "部门统计");
-                XLSX.utils.book_append_sheet(wb, sheet2, "行政部");
-                XLSX.utils.book_append_sheet(wb, sheet3, "前端部");
-                debugger
+                let label = ''
+                switch (Number(that.activeName)) {
+                case 0: {
+                    label = `[${that.$t('insSettingView.remotePatrol')}]`;
+                    break;
+                }
+                case 1:{
+                    label = `[${that.$t('insSettingView.onsitePatrol')}]`;
+                    break;
+                }
+                default:{
+                    label = `[${that.elTableData[Number(that.activeName)].label}]`
+                }
+                }
+                let fileName = label+' '+name+'.xlsx';
                 const workbookBlob = that.workbook2blob(wb);
-                that.openDownloadDialog(workbookBlob, `部门统计.xlsx`);
-                // const list = excelData;
-                // const data = that.formatJson(filterVal, list);
-                // let fileName = '';
-                // let label = '';
-                // switch (Number(that.activeName)) {
-                //   case 0: {
-                //     label = `[${that.$t('insSettingView.remotePatrol')}]`;
-                //     break;
-                //   }
-                //   case 1:{
-                //     label = `[${that.$t('insSettingView.onsitePatrol')}]`;
-                //     break;
-                //   }
-                //   default:{
-                //     label = `[${that.elTableData[Number(that.activeName)].label}]`
-                //   }
-                // }
-                // fileName = label+' '+name;
-                // export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
+                that.openDownloadDialog(workbookBlob,fileName);
             })
         },
         // 将workbook装化成blob对象

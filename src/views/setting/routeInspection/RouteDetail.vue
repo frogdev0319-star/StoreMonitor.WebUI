@@ -80,9 +80,9 @@
                                 <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
                                 <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
                                 <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
-                                <span class="score-title" :style="sheetName[1].isClick?'width: calc((100% - 405px) * 2.5/29);':''" v-if="sheetName[0].isClick||sheetName[1].isClick">{{generateInsSettingLang('sheetscore0')}}</span>
-                                <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="sheetName[1].isClick">{{generateInsSettingLang('sheetscore1')}}</span>
-                                <span class="score-title" v-if="sheetName[2].isClick">{{generateInsSettingLang('sheetscore2')}}</span>
+                                <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{generateInsSettingLang('sheetscore0')}}</span>
+                                <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="showSheet1">{{generateInsSettingLang('sheetscore1')}}</span>
+                                <span class="score-title" v-if="showSheet2">{{generateInsSettingLang('sheetscore2')}}</span>
                                 <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
                             </div>
 
@@ -104,8 +104,8 @@
                                     </el-table-column>
                                     <el-table-column prop="name" :label="generateInsSettingLang('inspectName')" width="300px"></el-table-column>
                                     <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='24%'></el-table-column>
-                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" align="center" :min-width="sheetName[1].isClick?'4%':'15%'"></el-table-column>
-                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" align="center" min-width="11%" v-if="sheetName[1].isClick"></el-table-column>
+                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" align="center" :min-width="showSheet1?'4%':'15%'"></el-table-column>
+                                    <el-table-column prop="qualifiedScore" :label="generateInsSettingLang('score')" align="center" min-width="11%" v-if="showSheet1"></el-table-column>
                                     <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="6%">
                                         <template slot-scope="scope">
                                                 <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
@@ -191,7 +191,9 @@ export default {
         routeData:Array,
         tabName:String,
         downSrc:String,
-        routeName:String
+        routeName:String,
+        allRoutedata:Array,
+        sheetName:Array
     },
     data(){
         return{
@@ -219,18 +221,16 @@ export default {
             tabNameLang: '',
             tabNameInput:'',
             varyWindowWidth:window.innerHeight,
-            sheetName:[
-                {id:0,isClick:true,label:this.$t('insSettingView.sheetpassfail')},
-                {id:1,isClick:false,label:this.$t('insSettingView.sheetscore')},
-                {id:2,isClick:false,label:this.$t('insSettingView.sheetother')}
-            ],
             allchecked:false,
             curDeleteId:'',
             fileName: this.$t('insSettingView.patrolExample'),
             lang: this.$i18n.locale,
             delItems:[],
             delGroup:[],
-            ModelPost:null
+            ModelPost:null,
+            showSheet0:true,
+            showSheet1:false,
+            showSheet2:false
         }
     },
     computed:{
@@ -240,7 +240,7 @@ export default {
             handler:function(val,oldval){
                 console.log('bval',val,oldval)
                 if(val!=oldval){
-                    this.getNum();
+                    // this.getNum();
                 }
             },
             deep:true//对象内部的属性监听，也叫深度监听
@@ -249,28 +249,12 @@ export default {
     mounted(){
         let self=this;
         self.getNum();
-        // self.initLang();
 
     },
     methods:{
         generateInsSettingLang,
-        // initLang(){
-        //   let self = this;
-        //   if(self.tabName=='远程巡检'){
-        //      self.tabNameLang = self.$t('insSettingView.remotePatrol')
-        //   }
-        //   else if(self.tabName=='现场巡检'){
-        //      self.tabNameLang = self.$t('insSettingView.onsitePatrol')
-        //   }
-        // },
         getNum(){
             let self=this;
-            // if(self.tabName=='远程巡检'||self.tabName=='现场巡检'){
-            //     self.checkValue=self.tabName;
-            // }
-            // else{
-            //     self.checkValue='新增巡检表';
-            // }
             self.typeNum=self.routeData.length;
             //获取当前巡检项总数
             let allcount=0;
@@ -292,11 +276,19 @@ export default {
         },
         changeSheet(e){
             let self = this
+            self.showSheet0= e==0 ? true : false
+            self.showSheet1= e==1 ? true : false
+            self.showSheet2= e==2 ? true : false
             self.sheetName.forEach(item=>{
                 if(item.id==e){
-                    item.isClick = true
+                    item.isClick=true
                 }else{
-                    item.isClick = false
+                    item.isClick=false
+                }
+            })
+            self.allRoutedata.forEach(item=>{
+                if(e==item[0].type){
+                    self.$emit('change-routeData',item)
                 }
             })
         },

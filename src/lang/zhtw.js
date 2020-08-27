@@ -466,6 +466,7 @@ export default {
     tHeaderB:'巡檢項名稱（必填，100字符）',
     tHeaderC:'項目分值（1~100分）',
     tHeaderD:'巡檢項目詳細說明（選填，300字符）',
+    tHeaderF:'低于*分，需由门店负责人处理（必填，1~10分）',//Sprint8 新增
     bindWith: '已綁定',
     bindStore: '家門店',
     bindList: '巡檢表綁定',

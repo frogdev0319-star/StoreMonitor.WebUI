@@ -270,7 +270,8 @@ export default {
                 storeId:storeId,
                 mode:0,
                 authorizedOnly:0,
-                tagName:self.appliedInspect[index].name
+                tagName:self.appliedInspect[index].name,
+                inspectId:self.appliedInspect[index].id
             }
           checkOutInspectItemV3(params).then(res=>{
                 console.log(res);
