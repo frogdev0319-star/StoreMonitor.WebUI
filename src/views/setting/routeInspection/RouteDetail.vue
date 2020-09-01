@@ -7,7 +7,7 @@
                         {{itemNum}} {{generateInsSettingLang('item')}}</span> -->
                     <i class="iconfont icon-quxiaolianjie"></i>
                     <span class="post-label">{{$t('insSettingView.relationDuty')}}:</span>
-                    <span class="post-concent">{{ModelPost}}</span>
+                    <span class="post-concent">{{routeData[0].ModelPost}}</span>
                 </div>
                 <div class="route-btns">
                      <el-button
@@ -235,17 +235,16 @@ export default {
     },
     computed:{
     },
-    watch:{
-        routeData:{
-            handler:function(val,oldval){
-                console.log('bval',val,oldval)
-                if(val!=oldval){
-                    // this.getNum();
-                }
-            },
-            deep:true//对象内部的属性监听，也叫深度监听
-      },
-    },
+    // watch:{
+    //     routeData:{
+    //         handler:function(val,oldval){
+    //             if(val!=oldval){
+    //                 // this.getNum();
+    //             }
+    //         },
+    //         deep:true//对象内部的属性监听，也叫深度监听
+    //   },
+    // },
     mounted(){
         let self=this;
         self.getNum();
@@ -262,7 +261,6 @@ export default {
                 allcount+=item.itemData.length;
             })
             self.itemNum=allcount;
-            self.ModelPost = self.routeData[0].ModelPost
         },
         changeAllData(val){
             console.log(val);
@@ -538,7 +536,6 @@ export default {
             sessionStorage.setItem('NapeItem',JSON.stringify(self.routeData));
             sessionStorage.setItem('GroupName',self.tabName);
             self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}});
-            console.log(self.routeData);
         },
         // bindPatrol(index,item){
         //     let self=this;

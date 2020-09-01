@@ -4,7 +4,6 @@
     <div class="el-header">
       <img class="title-icon" :src="report.inspectSrc"/>
       <span class="report-title">{{report.storeName+' '+report.tagName+' ('+report.inspectType+')'}}</span>
-      <!-- <span class="report-title">这里是四十个汉字这里是四十个汉字这里是四十个汉字这里是四十个汉字这里是四十个汉字 (远程巡检)</span> -->
       <div class="info-content" :style="isexportPDF?'margin-right:40px;':''">
         <span class="info-label">{{generateReportLang('submitter')}}</span>
         <span class="info-value">{{report.submitterName}}</span>
@@ -28,10 +27,10 @@
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="8" class="radior-content">
+        <el-col :span="24" class="radior-content">
           <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
         </el-col>
-        <el-col :span="16" class="report-table">
+        <!-- <el-col :span="16" class="report-table">
           <div class="header-score">
               <span class="span-1">{{$t('remotePatrol.getscore')}}：</span>
               <span class="span-2">{{totalScore}} <span>{{$t('remotePatrol.scorecount')}}</span></span>
@@ -53,12 +52,69 @@
                   </div>
                   <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div>
               </td>
-              <!-- <td><span>{{item.numOfExcellentItems}}</span></td> -->
               <td class="tdPrintfont"><span>{{item.numOfQualifiedItems}}</span></td>
               <td class="tdPrintfont"><span>{{item.numOfUnqualifiedItems}}</span></td>
             </tr>
             </tbody>
           </table>
+        </el-col> -->
+      </el-row>
+      <el-row>
+        <el-col>
+                <table class="table table-bordered" v-if="tableData.passfail!=undefined">
+                    <thead>
+                        <tr>
+                            <th scope="col" v-for="(item ,index) in theaderPassFail" :key="index" :style="item.width">{{item.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td :rowspan="tableData.passfail.length+1"><span class="sheet_title">{{$t('insSettingView.sheetpassfail')}}</span></td>
+                        </tr>
+                        <tr v-for="(item,index) in tableData.passfail" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td><span>{{item.numOfQualifiedItems}}</span></td>
+                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered" v-if="tableData.Score!=undefined">
+                    <thead>
+                        <tr>
+                            <th scope="col" v-for="(item ,index) in theaderScore" :key="index" :style="item.width">{{item.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td :rowspan="tableData.Score.length+1"><span class="sheet_title">{{$t('insSettingView.sheetscore')}}</span></td>
+                        </tr>
+                        <tr v-for="(item,index) in tableData.Score" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td><span>{{item.numOfQualifiedItems}}</span></td>
+                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
+                            <td><span>8</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered" v-if="tableData.Other!=undefined">
+                    <thead>
+                        <tr>
+                            <th scope="col" v-for="(item ,index) in theaderOther" :key="index" :style="item.width">{{item.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td :rowspan="tableData.Other.length+1"><span class="sheet_title">{{$t('insSettingView.sheetother')}}</span></td>
+                        </tr>
+                        <tr v-for="(item,index) in tableData.Other" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td><span>{{item.numOfQualifiedItems}}</span></td>
+                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
+                            <td><span>8</span></td>
+                            <td><span>8</span></td>
+                        </tr>
+                    </tbody>
+                </table>
         </el-col>
       </el-row>
       <el-row class="row-footer">
@@ -269,6 +325,7 @@
         suggest: '',
         summary: [],
         totalScore:'',
+        tableData:null,
         tempList: [],
         options: null,
         theaderList: [
@@ -304,6 +361,27 @@
         startIcon:require('../../../static/img/pic_play_icon.png'),
         videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
         deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
+        theaderPassFail:[
+            {name: '',width:'width:11%;'},
+            {name: this.$t('remotePatrol.item'),width:'width:22.2%;'},
+            {name: this.$t('remotePatrol.pass'),width:'width:35%;'},
+            {name: this.$t('remotePatrol.failed'),width:'width:35%;'}
+        ],
+        theaderScore:[
+            {name: '',width:'width:10%;'},
+            {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.TableTotal'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.TableGet'),width:'width:20%;'}
+        ],
+        theaderOther:[
+            {name: '',width:'width:10%;'},
+            {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.pass'),width:'width:15%;'},
+            {name: this.$t('remotePatrol.failed'),width:'width:15%;'},
+            {name: this.$t('remotePatrol.TableIgnore'),width:'width:15%;'},
+            {name: this.$t('remotePatrol.TableGet'),width:'width:15%;'}
+        ],
       }
     },
     methods: {
@@ -637,6 +715,18 @@
           let data = res.data[0].info;
           self.suggest = data.comment;
           let summary = data.summary;
+          let te_temp={}
+          for(let i=0;i<3;i++){
+              let Typeindex=summary.filter(x=>x.type==i);
+              if(Typeindex.length!=0){
+                Typeindex[0].type==0 ? te_temp.passfail=Typeindex : ''
+                Typeindex[0].type==1 ? te_temp.Score=Typeindex : ''
+                Typeindex[0].type==2 ? te_temp.Other=Typeindex : ''
+              }
+          }
+          self.tableData = te_temp
+
+
           self.totalScore=data.totalScore
           let summaryTemp = [];
           summary.forEach(item => {

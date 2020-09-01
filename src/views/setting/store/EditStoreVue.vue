@@ -95,11 +95,8 @@ export default {
                 isWarning:true,
                 dialogCosed:false
             },
-            sheetName:[
-                {id:0,isClick:true,label:this.$t('insSettingView.sheetpassfail')},
-                {id:1,isClick:false,label:this.$t('insSettingView.sheetscore')},
-                {id:2,isClick:false,label:this.$t('insSettingView.sheetother')}
-            ],
+            allRoutedata:[],
+            sheetName:[],
             activeName:'0',
             curTag:'远程巡检',
             storeTitle:'',
@@ -181,11 +178,13 @@ export default {
         beforeleave(e,w){
             let self = this
             let isshowdialog=false
-            self.scheduleData.forEach(item=>{
-                item.itemData.forEach(_item=>{
-                    if(_item.oldChannelvalue.toString()!=_item.channelvalue.toString()){
-                        isshowdialog=true
-                    }
+            self.allRoutedata.forEach(item=>{
+                item.forEach(a_item=>{
+                    a_item.itemData.forEach(_item=>{
+                        if(_item.oldChannelvalue.toString()!=_item.channelvalue.toString()){
+                            isshowdialog=true
+                        }
+                    })
                 })
             })
             !isshowdialog?self.getNapeByStore(self.store.storeId,Number(e)):null
@@ -214,6 +213,11 @@ export default {
                     item.isClick = true
                 }else{
                     item.isClick = false
+                }
+            })
+            self.allRoutedata.forEach(item=>{
+                if(e==item[0].type){
+                    self.scheduleData=item
                 }
             })
         },
@@ -261,6 +265,7 @@ export default {
       getNapeByStore(storeId,idx){
             let self=this;
             let index = 0
+            self.sheetName=[]
             if(idx!=undefined){
                 index=idx
             }else{
@@ -282,6 +287,7 @@ export default {
                         let obj={};
                         obj.id=item.groupId;
                         obj.napeName=item.groupName;
+                        obj.type=item.type;
                         obj.napeNum=item.items.length;
                         let _temp=[];
                         for(const _item of item.items){
@@ -306,7 +312,27 @@ export default {
                     })
 
                 }
-                self.scheduleData=temp;
+                let te_temp=[]
+                for(let i=0;i<3;i++){
+                    let Typeindex=temp.filter(x=>x.type==i);
+                    let obj={}
+                    if(Typeindex.length!=0){
+                        te_temp.push(Typeindex)
+                        if(Typeindex[0].type==0){
+                            obj={'id':0,'isClick':false,'label':self.$t('insSettingView.sheetpassfail')}
+                        }
+                        if(Typeindex[0].type==1){
+                            obj={'id':1,'isClick':false,'label':self.$t('insSettingView.sheetscore')}
+                        }
+                        if(Typeindex[0].type==2){
+                            obj={'id':2,'isClick':false,'label':self.$t('insSettingView.sheetother')}
+                        }
+                        self.sheetName.push(obj)
+                    }
+                }
+                self.allRoutedata=te_temp
+                self.sheetName[0].isClick=true
+                self.scheduleData=te_temp[0];
             })
         },
         changePerson(val){
@@ -357,28 +383,30 @@ export default {
             let countChannel=0;
             let temp=[];
             let unbindTemp = [];
-            self.scheduleData.forEach(item=>{
-                count+=item.itemData.length;
-                item.itemData.forEach(_item=>{
-                    let obj={};
-                    let unbindObj = {};
-                    if(_item.channelvalue.length!=0){
-                        countChannel++;
-                        obj.inspectItemId=_item.id;
-                        obj.storeId=self.store.storeId;
-                        obj.deviceIds = _item.channelvalue;
-                        if(_item.oldChannelvalue.length > 0 && JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())){
-                          unbindObj.inspectItemId=_item.id;
-                          unbindObj.storeId=self.store.storeId;
-                          unbindObj.deviceIds = _item.oldChannelvalue;
-                          unbindTemp.push(unbindObj)
+            self.allRoutedata.forEach(all_item=>{
+                all_item.forEach(item=>{
+                    count+=item.itemData.length;
+                    item.itemData.forEach(_item=>{
+                        let obj={};
+                        let unbindObj = {};
+                        if(_item.channelvalue.length!=0){
+                            countChannel++;
+                            obj.inspectItemId=_item.id;
+                            obj.storeId=self.store.storeId;
+                            obj.deviceIds = _item.channelvalue;
+                            if(_item.oldChannelvalue.length > 0 && JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())){
+                            unbindObj.inspectItemId=_item.id;
+                            unbindObj.storeId=self.store.storeId;
+                            unbindObj.deviceIds = _item.oldChannelvalue;
+                            unbindTemp.push(unbindObj)
+                            }
+                            // _item.channelvalue.forEach(channelName=>{
+                            //   obj.deviceIds.push(self.alleList[self.alleList.map(x=>x.name).indexOf(channelName)].id)
+                            // })
+                            //obj.deviceId=self.alleList[self.alleList.map(x=>x.name).indexOf(_item.channelvalue)].id;
+                            temp.push(obj);
                         }
-                        // _item.channelvalue.forEach(channelName=>{
-                        //   obj.deviceIds.push(self.alleList[self.alleList.map(x=>x.name).indexOf(channelName)].id)
-                        // })
-                        //obj.deviceId=self.alleList[self.alleList.map(x=>x.name).indexOf(_item.channelvalue)].id;
-                        temp.push(obj);
-                    }
+                    })
                 })
             })
             let paramsUpdateStore={

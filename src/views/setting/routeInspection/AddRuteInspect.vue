@@ -42,10 +42,8 @@
                <div class="group-items group-title" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="top-group-title">
                        <div class="group-name-title">
-                           <el-tabs v-model="activeSheetName" id="group-content" @tab-click="handleSheetClick">
-                                <el-tab-pane :label="$t('insSettingView.sheetpassfail')" name="0"></el-tab-pane>
-                                <el-tab-pane :label="$t('insSettingView.sheetscore')" name="1"></el-tab-pane>
-                                <el-tab-pane :label="$t('insSettingView.sheetother')" name="2"></el-tab-pane>
+                            <el-tabs v-model="activeSheetName" id="group-content" @tab-click="handleSheetClick">
+                                <el-tab-pane v-for="(item,index) in sheetName" :key="index" :label="item.label" :name="item.id"></el-tab-pane>
                             </el-tabs>
                        </div>
                    </div>
@@ -154,20 +152,20 @@
                            <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <span style="margin-left:40px;" v-if="!item.isClick">10分</span>
-                           <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="FullScore" @change="selectFullScore">
+                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_1}}</span>
+                           <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="item.Score_1" @change="selectFullScore">
                                 <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <span style="margin-left:40px;" v-if="!item.isClick">5分</span>
-                           <el-select size="mini" class="critical-input" v-if="item.isClick" v-model="critical">
+                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_2}}</span>
+                           <el-select size="mini" class="critical-input" v-if="item.isClick" v-model="item.Score_2">
                                 <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
-                           <span style="margin-left:73px;" v-if="!item.isClick">+20分</span>
-                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick"></el-input>
+                           <span style="margin-left:73px;" v-if="!item.isClick">{{item.Score_3}}</span>
+                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3"></el-input>
                        </div>
                        <div class="nape-items-handle" v-if="!item.isClick" style="flex:1;">
                            <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"  @click="handleEdit(index,item)"></i>
@@ -282,6 +280,7 @@ export default {
             newScore:0,
             newCritical:0,
             newAddScore:0,
+            firstLoad:true,
             groupTitle: this.$t('insSettingView.category'),
             tabName:'',
             ModelPost:[],
@@ -322,8 +321,11 @@ export default {
             noData:'',
             groupIds:[],
             ScoreList:[],
-            FullScore:'',
-            critical:''
+            Score_1:'',
+            Score_2:'',
+            Score_3:'',
+            sheetName:[],
+            allRoutedata:[]
         }
     },
     computed:{
@@ -422,6 +424,7 @@ export default {
         },
         handleSheetClick(val){
             let self = this
+            self.refreshData(0)
         },
         clickGroupItem(index,item){
             let self=this;
@@ -505,14 +508,16 @@ export default {
             }else{
                 bindtitleIds=self.ModelPost
             }
-            self.groupList.forEach(g_item=>{
-                let obj = {
-                    groupId:'',
-                    titleIds:[]
-                }
-                obj.groupId=g_item.id
-                obj.titleIds=bindtitleIds
-                groupBindItems.push(obj)
+            self.allRoutedata.forEach(a_item=>{
+                a_item.forEach(g_item=>{
+                    let obj = {
+                        groupId:'',
+                        titleIds:[]
+                    }
+                    obj.groupId=g_item.id
+                    obj.titleIds=bindtitleIds
+                    groupBindItems.push(obj)
+                })
             })
             // 解绑职务参数
             paramsUnbind={
@@ -879,7 +884,6 @@ export default {
                 qualifiedScore:qualifiedScore
             }
             temp.push(obj);
-            debugger
             let params={
                 "items":temp
             };
@@ -948,6 +952,9 @@ export default {
                         napeName:self.newNapeName,
                         napeNameShow:`${self.napeList.length+1}，${self.newNapeName}`,
                         napeDep:self.newNapeDep,
+                        Score_1:self.newScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                        Score_2:self.newCritical + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                        Score_3:self.newAddScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
                         isClick:false,
                         checked:false
                     };
@@ -1065,6 +1072,7 @@ export default {
                 obj.showEdit=false;
                 obj.isEdit=false;
                 obj.itemData=item.items;
+                obj.type=item.type
                 temp.push(obj);
                 groupIds.push(item.id)
             })
@@ -1098,11 +1106,32 @@ export default {
                 })
             })
             self.ModelPost = temp[0].ModelPost
-            self.groupList=temp;
+            let te_temp=[]
+            for(let i=0;i<3;i++){
+                let Typeindex=temp.filter(x=>x.type==i);
+                let obj={}
+                if(Typeindex.length!=0){
+                    te_temp.push(Typeindex)
+                    if(self.firstLoad){
+                        if(Typeindex[0].type==0){
+                            obj={'id':'0','label':self.$t('insSettingView.sheetpassfail')}
+                        }
+                        if(Typeindex[0].type==1){
+                            obj={'id':'1','label':self.$t('insSettingView.sheetscore')}
+                        }
+                        if(Typeindex[0].type==2){
+                            obj={'id':'2','label':self.$t('insSettingView.sheetother')}
+                        }
+                        self.sheetName.push(obj)
+                    }
+                }
+            }
+            self.firstLoad=false
+            self.allRoutedata=te_temp
+            self.groupList=te_temp[Number(self.activeSheetName)];
             self.groupList[index].isClick=true;
             self.curGroup=self.groupList[index];
             self.groupIndex=index;
-            //self.napeTitle=`${self.groupList[index].groupName}类别巡检项`;
             if(self.lang == 'en'){
               self.napeTitle= `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
             }
@@ -1121,7 +1150,9 @@ export default {
                     napeName:_item.subject,
                     napeNameShow:`${index+1}，${_item.subject}`,
                     napeDep:_item.description,
-                    score:_item.itemScore,
+                    Score_1:_item.itemScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                    Score_2:_item.qualifiedScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                    Score_3:_item.itemScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
                     isClick:false,
                     checked: false
                 }

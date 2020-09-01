@@ -165,7 +165,7 @@ export const getInspectReportList=data=>{
 
 export const getInspectReportInfo=data=>{
     return request({
-        url:`${version2}/inspect/report/info`,
+        url:`v3.0/inspect/report/info`,
         method:'post',
         data
     })

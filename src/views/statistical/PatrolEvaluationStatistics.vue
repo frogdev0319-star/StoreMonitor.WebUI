@@ -464,10 +464,10 @@
             'type': this.$t("overview.danger"),
             'percent': '0%',
           },
-          {
-            'type': this.$t("overview.improve"),
-            'percent': '0%',
-          },
+          // {
+          //   'type': this.$t("overview.improve"),
+          //   'percent': '0%',
+          // },
           {
             'type': this.$t("overview.echartGood"),
             'percent': '0%',
@@ -522,15 +522,15 @@
             "width": '160',
             "maxWidth": '160'
           },
-          {
-            "prop":"numOfImproved",
-            "label": this.$t('overview.improve'),
-            "sortable":'custom',
-            "pdfwidth": '12%',
-            "pdfmaxWidth": '12%',
-            "width": '160',
-            "maxWidth": '160'
-          },
+          // {
+          //   "prop":"numOfImproved",
+          //   "label": this.$t('overview.improve'),
+          //   "sortable":'custom',
+          //   "pdfwidth": '12%',
+          //   "pdfmaxWidth": '12%',
+          //   "width": '160',
+          //   "maxWidth": '160'
+          // },
           {
             "prop":"numOfDangerous",
             "label": this.$t('overview.danger'),
@@ -599,15 +599,15 @@
             "width": '160',
             "maxWidth": '160'
           },
-          {
-            "prop":"numOfImproved",
-            "label": this.$t('overview.improve'),
-            "sortable":'custom',
-            "pdfwidth": '12%',
-            "pdfmaxWidth": '12%',
-            "width": '160',
-            "maxWidth": '160'
-          },
+          // {
+          //   "prop":"numOfImproved",
+          //   "label": this.$t('overview.improve'),
+          //   "sortable":'custom',
+          //   "pdfwidth": '12%',
+          //   "pdfmaxWidth": '12%',
+          //   "width": '160',
+          //   "maxWidth": '160'
+          // },
           {
             "prop":"numOfDangerous",
             "label": this.$t('overview.danger'),
@@ -1864,7 +1864,7 @@
         let totalQualified = 0;
         // let totalExcellent = 0;
         let totalReport = 0;
-        let jsonArray = self.resultLegend.slice(0,3);
+        let jsonArray = self.resultLegend.slice(0,2);
         let seriesData = [];
         let params = {};
         params.beginTs = self.params.beginTs;
@@ -1896,14 +1896,14 @@
             }
             seriesData = [
               {value: totalDargerous, name: self.$t('overview.danger')},
-              {value: totalImproved, name: self.$t('overview.improve')},
+              // {value: totalImproved, name: self.$t('overview.improve')},
               {value: totalQualified, name: self.$t('overview.echartGood')},
               // {value: totalExcellent, name: self.$t('overview.excellent')}
             ];
-            let totalArray = [totalDargerous, totalImproved, totalQualified];
+            let totalArray = [totalDargerous, totalQualified];
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-            jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+            // jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
             // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           }
           else {
@@ -1911,7 +1911,7 @@
             let totalArray = [0, 0, 0, 0];
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-            jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+            // jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
             // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           }
         }
@@ -1919,7 +1919,7 @@
           let totalArray = [0, 0, 0, 0];
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-          jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+          // jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
           // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
         }
         self.regionsOptions = {
@@ -1962,7 +1962,7 @@
                 normal: {
                   color: function (params) {
                     //自定义颜色
-                    var colorList = ['#f31d65', '#ffd035', '#72a1f3'];
+                    var colorList = ['#f31d65', '#72a1f3'];
                     return colorList[params.dataIndex]
                   }
                 }

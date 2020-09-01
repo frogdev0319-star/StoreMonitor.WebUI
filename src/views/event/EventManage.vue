@@ -93,9 +93,17 @@
                                         <span class="event-subject">{{scope.row.subject}}</span>
                                     </template>
                                 </el-table-column>
-                            <el-table-column v-for="(_item,_index) in tableInfoData" :key="_index"
-                                :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
+                            <el-table-column prop="storeName" align="left" :label="$t('eventView.stores')" min-width="160" sortable="custom"></el-table-column>
+                            <el-table-column prop="inspectTagName" align="left" :label="$t('overview.patrolLists')" min-width="160" sortable="custom"></el-table-column>
+                            <el-table-column align="left" :label="$t('eventView.enclosure')" min-width="160" sortable='custom'>
+                                  <template slot-scope="scope">
+                                      <div v-if="scope.row.attachment.length!=0">
+                                          <img class='sourceType-icon' v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url"/>
+                                      </div>
+                                  </template>
                             </el-table-column>
+                            <el-table-column prop="assignerName" align="left" :label="$t('eventView.submitter')" width="120" sortable="custom"></el-table-column>
+                            <el-table-column prop="ts" align="left" :label="$t('eventView.submitTime')" width="140" sortable="custom"></el-table-column>
                             <el-table-column
                                 prop="option"
                                 :label="generateEventLang('operation')"
@@ -188,38 +196,9 @@ export default {
             videoSrc:require('../../../static/img/监控icon.png'),
             inspectSrc:require('../../../static/img/远程icon.png'),
             insiteInspectSrc:require('../../../static/img/现场icon.png'),
-            tableInfoData:[
-                {
-                    "prop": "storeName",
-                    "label": this.$t('eventView.stores'),
-                    "sortable":'custom',
-                    "width":160
-                },
-                {
-                    "prop": "patrolLists",
-                    "label": this.$t('overview.patrolLists'),
-                    "sortable":'custom',
-                    "width":160
-                },
-                {
-                    "prop": "enclosure",
-                    "label": this.$t('eventView.enclosure'),
-                    "sortable":'custom',
-                    "width":160
-                },
-                {
-                    "prop":"assignerName",
-                    "label": this.$t('eventView.submitter'),
-                    "sortable":'custom',
-                    "width":120
-                },
-                {
-                    "prop":"ts",
-                    "label": this.$t('eventView.submitTime'),
-                    "sortable":'custom',
-                    "width":140
-                }
-            ],
+            attachmentVideo:require('../../../static/img/视频icon.png'),
+            attachmentImg:require('../../../static/img/照片icon.png'),
+            attachmentAudio:require('../../../static/img/音频icon.png'),
             event,
             total:0,
             page:1,
@@ -665,6 +644,12 @@ export default {
                 let data=res.data.content;
                 let temp=[];
                 data.forEach(item=>{
+                    let attachment=[]
+                    if(item.initialComment.attachment.length!=0){
+                        item.initialComment.attachment.some(x=>x.mediaType==0) ? attachment.push({url:self.attachmentVideo}) : ''
+                        item.initialComment.attachment.some(x=>x.mediaType==1) ? attachment.push({url:self.attachmentAudio}) : ''
+                        item.initialComment.attachment.some(x=>x.mediaType==2) ? attachment.push({url:self.attachmentImg}) : ''
+                    }
                     let obj={
                         id:item.id,
                         ts:util.getDateTime(item.ts),
@@ -678,6 +663,7 @@ export default {
                         subject:item.subject,
                         score:item.score,
                         sourceType:item.sourceType,
+                        attachment:attachment,
                         initialComment:item.initialComment,
                         relatedDeviceIds: item.relatedDeviceIds
                     }

@@ -198,6 +198,7 @@ export default {
     TableTotal:'项目总分值',//Sprint8 新增
     TableIgnore:'不适用数量',//Sprint8 新增
     TableGet:'得分',//Sprint8 新增
+    alertContent:'合格率评估项为必填，巡检项评估项至少填写一项',//Sprint8 新增
     Patroltips2:'此巡检表名称已存在',
     stared: '已关注',
     clickToStar: '点击关注',

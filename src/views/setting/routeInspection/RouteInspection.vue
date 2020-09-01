@@ -240,6 +240,7 @@ export default {
             checkValue:'',
             tabNameInput:'',
             hideUpload:false,
+            tempdata:[],
             btnList:[
                 {
                     id:0,
@@ -453,8 +454,14 @@ export default {
                 if(val=='accountChanged'){
                     self.patrolActive = '0'
                 }
+                let tagIndex=0
+                if(val=='add'){
+                    tagIndex=TagData.length-1
+                }else{
+                    tagIndex=Number(self.patrolActive)
+                }
                 let params={
-                    inspectId:TagData[Number(self.patrolActive)].id
+                    inspectId:TagData[tagIndex].id
                 }
                 let NapeData=await self.getNapeList(params)
                 let tempAllData=[];
@@ -524,18 +531,19 @@ export default {
                         if(Typeindex.length!=0){
                             te_temp.push(Typeindex)
                             if(Typeindex[0].type==0){
-                                obj={'id':0,'isClick':false,'label':this.$t('insSettingView.sheetpassfail')}
+                                obj={'id':0,'isClick':false,'label':self.$t('insSettingView.sheetpassfail')}
                             }
                             if(Typeindex[0].type==1){
-                                obj={'id':1,'isClick':false,'label':this.$t('insSettingView.sheetscore')}
+                                obj={'id':1,'isClick':false,'label':self.$t('insSettingView.sheetscore')}
                             }
                             if(Typeindex[0].type==2){
-                                obj={'id':2,'isClick':false,'label':this.$t('insSettingView.sheetother')}
+                                obj={'id':2,'isClick':false,'label':self.$t('insSettingView.sheetother')}
                             }
                             sheetName.push(obj)
                         }
                     }
                     sheetName[0].isClick=true
+                    self.tempdata=temp
                     let tagTemp=[]
                     TagData.forEach((tag_item,tag_index)=>{
                         let tagObj={};
@@ -735,22 +743,19 @@ export default {
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
-            self.elTableData[Number(self.activeName)].data.forEach(item=>{
-                item.routeData.forEach(r_item=>{
-                    r_item.itemData.forEach(_item=>{
-                        arr.push(_item.id);
-                    });
-                })
-            });
+            self.tempdata.forEach(r_item=>{
+                r_item.itemData.forEach(_item=>{
+                    arr.push(_item.id);
+                });
+            })
             console.log(arr);
             if(arr.length==0){
-                //self.notify('请新增巡检项后进行操作！','warning',3000);
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             sessionStorage.setItem('TabName',self.activeName);
             sessionStorage.setItem('NapeId',JSON.stringify(arr));
-            self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
+            self.$router.push({name:'bindStore',params:{inspectId:self.tempdata[0].inspectId}});
 
         },
         changeValue(obj){
@@ -877,7 +882,7 @@ export default {
             let self=this;
             let arrGroup=[];
             let arrItem=[];
-            self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData.forEach(item=>{
+            self.tempdata.forEach(item=>{
                 arrGroup.push(item.id);
                 item.itemData.forEach(_item=>{
                     arrItem.push(_item.id);
@@ -933,10 +938,10 @@ export default {
             let ret= self.isLoginIn();
             console.log(ret);
             let Datalength = self.elTableData[Number(self.activeName)].data.length
-            if(Number(self.activeName)==0&&Datalength==10){
+            if(Number(self.activeName)==0&&Datalength>=10){
                     self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
                     return false;
-            }else if(Number(self.activeName)==1&&Datalength==10){
+            }else if(Number(self.activeName)==1&&Datalength>=10){
                     self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
                     return false;
             }else{
