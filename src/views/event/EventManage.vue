@@ -660,6 +660,7 @@ export default {
                         status:item.status,
                         storeId:item.storeId,
                         storeName:item.storeName,
+                        inspectTagName:item.inspectTagName,
                         subject:item.subject,
                         score:item.score,
                         sourceType:item.sourceType,

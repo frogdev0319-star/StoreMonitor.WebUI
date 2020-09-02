@@ -59,7 +59,7 @@
           </table>
         </el-col> -->
       </el-row>
-      <el-row>
+      <el-row class="row-table">
         <el-col>
                 <table class="table table-bordered" v-if="tableData.passfail!=undefined">
                     <thead>
@@ -72,7 +72,7 @@
                             <td :rowspan="tableData.passfail.length+1"><span class="sheet_title">{{$t('insSettingView.sheetpassfail')}}</span></td>
                         </tr>
                         <tr v-for="(item,index) in tableData.passfail" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">12</span></td>
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
                             <td><span>{{item.numOfUnqualifiedItems}}</span></td>
                         </tr>
@@ -89,7 +89,7 @@
                             <td :rowspan="tableData.Score.length+1"><span class="sheet_title">{{$t('insSettingView.sheetscore')}}</span></td>
                         </tr>
                         <tr v-for="(item,index) in tableData.Score" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">2</span></td>
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
                             <td><span>{{item.numOfUnqualifiedItems}}</span></td>
                             <td><span>8</span></td>
@@ -107,7 +107,7 @@
                             <td :rowspan="tableData.Other.length+1"><span class="sheet_title">{{$t('insSettingView.sheetother')}}</span></td>
                         </tr>
                         <tr v-for="(item,index) in tableData.Other" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">56</span></td>
                             <td><span>{{item.numOfQualifiedItems}}</span></td>
                             <td><span>{{item.numOfUnqualifiedItems}}</span></td>
                             <td><span>8</span></td>
@@ -325,7 +325,7 @@
         suggest: '',
         summary: [],
         totalScore:'',
-        tableData:null,
+        tableData:[],
         tempList: [],
         options: null,
         theaderList: [
@@ -715,15 +715,16 @@
           let data = res.data[0].info;
           self.suggest = data.comment;
           let summary = data.summary;
-          let te_temp={}
+          let te_temp=[]
           for(let i=0;i<3;i++){
               let Typeindex=summary.filter(x=>x.type==i);
               if(Typeindex.length!=0){
-                Typeindex[0].type==0 ? te_temp.passfail=Typeindex : ''
-                Typeindex[0].type==1 ? te_temp.Score=Typeindex : ''
-                Typeindex[0].type==2 ? te_temp.Other=Typeindex : ''
+                Typeindex[0].type==0 ? te_temp.push(Typeindex) : ''
+                Typeindex[0].type==1 ? te_temp.push(Typeindex) : ''
+                Typeindex[0].type==2 ? te_temp.push(Typeindex) : ''
               }
           }
+          debugger
           self.tableData = te_temp
 
 
@@ -1107,6 +1108,50 @@
           }
         }
       }
+      .row-table{
+        margin-top: calc(10 / 1920 * 100vw);
+        .table-bordered{
+                font-size: calc(14/1920*100vw);
+                margin-top: 20px;
+                th{
+                    color: $tab;
+                    text-align: left;
+                    background-color: $background;
+                    border-bottom-width: 1px;
+                    padding: 0.5rem;
+                    // width: 10%;
+                    padding-left: 1rem;
+                }
+                td{
+                    color: $black;
+                    padding-top:0.5rem;
+                    padding-bottom: 0.5rem;
+                    padding-left: 1.2rem;
+                    text-align: left;
+                    font-weight: bold;
+                }
+                .count-blag{
+                    padding: 2px 12px;
+                    width: auto;
+                    height: auto;
+                    border-radius: 10px;
+                    background-color: #D4DBE5;
+                    color: $tab;
+                    font-size: 12px;
+                    margin-left: calc(20/1920*100vw);
+                    display: inline-block;
+                }
+                .icon-blag{
+                    display: inline-block;
+                    width: 80px;;
+                    padding:3px 6px;
+                    text-align: center;
+                    color: #fff;
+                    font-size: calc(12/1920*100vw);
+                    font-weight: normal;
+                }
+            }
+      }
       .row-footer {
         padding-top: calc(30 / 1920 * 100vw);
         border-top: 1px solid $border;
@@ -1460,6 +1505,149 @@
               }
             }
         }
+        .dialog-source-content{
+            @include point(height,320);
+            @include point(padding,20);
+
+            img{
+                height: 100%;
+                user-select: none;
+            }
+        }
+        .video-dialog-content{
+            width:100%;
+            height:100%;
+            margin: auto;
+            .dialog-hr{
+                border: 0.5px solid ;
+                border-color: #dfe2e9;
+                margin-bottom:10px;
+                bottom: 5px;
+                margin-top: 0;
+            }
+            .video-content{
+                @include point(margin,20);
+                padding-top: 0;
+                position: relative;
+                #channelName{
+                    width: 100%;
+                    color: #fff;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    position: absolute;
+                    z-index: 10;
+                    text-align: left;
+                    span{
+                        margin-left: 30px;
+                    }
+                }
+                .icon-footer{
+                    width: 100%;
+                    position: absolute;
+                    bottom: 0px;
+                    color: #fff;
+                    overflow: hidden;
+                    user-select:none;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    z-index: 10;
+                    .iconlside{
+                        float: left;
+                        text-align: left;
+                        .iconplay{
+                            font-size: 18px;
+                            cursor: pointer;
+                            float: left;
+                            margin-left: 30px;
+                        }
+
+                    }
+                    .iconrside{
+                        max-width: 500px;
+                        float: right;
+                        position: relative;
+                        span{
+                            font-size: 13px;
+                            margin-right:6px;
+                            margin-left: 20px;
+                        }
+                        .speed-content{
+                            display: inline-block;
+                            span{
+                                position: relative;
+                                bottom:3px;
+                            }
+                        }
+                        .screen-content{
+                            display: inline;
+                            margin-left: 30px;
+                            position: absolute;
+                            right: 20px;
+                            .iconscreen{
+                                font-size: 18px;
+                                position: relative;
+                                cursor: pointer;
+                                margin-right: 20px;
+                                bottom: 3px;
+                            }
+                        }
+                    }
+                }
+            }
+            .channel-content{
+              margin: 20px 30px;
+              padding-top: 0;
+              position: relative;
+              .radio-group{
+                display: grid;
+                grid-template-columns: 240px 240px;
+                grid-template-rows: 30px;
+              }
+              .radio-class{
+                display: flex;
+                align-items: center;
+                /deep/ .el-radio__label{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .radio-img{
+                  height: 26px;
+                  width: 26px;
+                  margin-right: 10px;
+                }
+                .radio-span{
+                  display: inline-block;
+                  max-width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-size: 14px;
+                  color: #94a4b4;
+                }
+              }
+            }
+        }
+      /deep/ .el-dialog__footer{
+        line-height: 24px;
+        padding: 30px;
+        padding-top: 20px;
+        #cancelBtn{
+          @include point(width,76);
+          @include point(margin-right,20);
+          background-color: #EAEDF2 !important;
+          color: #708090 !important;
+          font-size: 12px;
+          line-height: 12px;
+        }
+        #confirmBtn{
+          @include point(width,76);
+          font-size: 12px;
+          line-height: 12px;
+        }
+      }
         #previewVideo{
             @include point(min-width,450);
             @include point(min-height,360);

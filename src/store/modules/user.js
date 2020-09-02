@@ -28,7 +28,8 @@ const user={
         routes: [],
         addRoutes: [],
         PatrolHistory:null,
-        InspectHistory:null
+        InspectHistory:null,
+        PatrolComment:''
     },
 
     mutations:{
@@ -83,12 +84,19 @@ const user={
         },
         SET_InspectHistory:(state,InspectHistory)=>{
           state.InspectHistory = InspectHistory
+        },
+        SET_PatrolComment:(state,PatrolComment)=>{
+          state.PatrolComment = PatrolComment
         }
     },
     actions:{
       //远程巡检缓存数据
       setPatrolHistory({commit},PatrolHistory){
         commit('SET_PatrolHistory',PatrolHistory)
+      },
+      //确认总结缓存巡检建议
+      setPatrolComment({commit},PatrolComment){
+        commit('SET_PatrolComment',PatrolComment)
       },
       //当前选中巡检表缓存数据
       setInspectHistory({commit},InspectHistory){

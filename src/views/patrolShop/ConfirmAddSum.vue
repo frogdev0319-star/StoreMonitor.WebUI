@@ -3,12 +3,14 @@
         <el-col :span="24" class="sum-submit">
             <div class="submit-header">
                 <span>{{generatePatrolLang('summary')}}</span>
-                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="sum-btn" type="primary" @click="submit" v-if="inspectList.length!=0">{{generatePatrolLang('submit')}}</el-button>
+                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="sum-btn" type="primary" @click="submit">{{generatePatrolLang('submit')}}</el-button>
             </div>
             <div class="submit-content">
                 <div class="submit-radio">
-                    <span class="el-radio-details" v-for="(item,index) in resultList" :key="index"
+                    <span v-for="(item,index) in resultList" :key="index">
+                        <span class="el-radio-details" v-if="item.isShow"
                           @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
+                    </span>
                 </div>
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
                 <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
@@ -41,193 +43,89 @@
                         <span class="span-3">({{generatePatrolLang('scorerule')}})</span>
                     </div>
                 </div>
-                <table class="table table-bordered">
+                <table class="table table-bordered" v-for="(s_item,s_index) in summary" :key="s_index">
                     <thead>
                         <tr>
-                            <th scope="col" v-for="(item ,index) in theaderPassFail" :key="index" :style="item.width">{{item.name}}</th>
+                            <th scope="col" v-for="(t_item ,t_index) in s_item.tHeader" :key="t_index" :style="t_item.width">{{t_item.name}}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td rowspan="4"><span class="sheet_title">{{$t('insSettingView.sheetpassfail')}}</span></td>
+                            <td :rowspan="s_item.inspectList.length+1"><span class="sheet_title" :style="'line-height:'+32*s_item.inspectList.length+'px;'">{{s_item.label}}</span></td>
                         </tr>
-                        <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
-                            <td><span>{{item.numOfQualifiedItems}}</span></td>
-                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="(item ,index) in theaderScore" :key="index" :style="item.width">{{item.name}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="4"><span class="sheet_title">{{$t('insSettingView.sheetscore')}}</span></td>
-                        </tr>
-                        <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
-                            <td><span>{{item.numOfQualifiedItems}}</span></td>
-                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
-                            <td><span>8</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="(item ,index) in theaderOther" :key="index" :style="item.width">{{item.name}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="4"><span class="sheet_title">{{$t('insSettingView.sheetother')}}</span></td>
-                        </tr>
-                        <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.count}}</span></td>
-                            <td><span>{{item.numOfQualifiedItems}}</span></td>
-                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
-                            <td><span>8</span></td>
-                            <td><span>8</span></td>
+                        <tr v-for="(item,index) in s_item.inspectList" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.items.length}}</span></td>
+                            <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfQualified}}</span></td>
+                            <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfUnqualified}}</span></td>
+                            <td v-if="s_item.type==1"><span>{{item.itemScore}}</span></td>
+                            <td v-if="s_item.type==1||s_item.type==2"><span>{{item.numIgnore}}</span></td>
+                            <td v-if="s_item.type==1||s_item.type==2"><span>{{item.itemgetScore}}</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <!-- <el-row class="row-detail">
-                <el-col>
-                <div class="item-header">
-                    <i class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"></i>
-                    <span class="title-lable">{{$t('remotePatrol.detailInfo')}}</span>
-                </div>
-                <div class="item-content">
-                    <div style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;" v-for="(item,index) in groups" :key="index">
-                        <div class="content-title">{{item.groupName}}</div>
-                        <div class="content-detail" v-for="(_item,_index) in item.items" :key="_index">
-                        <div class="content-detail-title">
-                            <div class="detail-title">
-                            <p class="title1">{{_index+1}}.{{_item.subject}}</p>
-                            <p class="title2">{{_item.description}}</p>
-                            </div>
-                            <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
-                            <div class="title-btn" v-if="_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
-                            <div class="title-btn" v-if="_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
-                        </div>
-                        <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
-                            <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
-                            <div class="cdm-voice" v-if="_item.showAudio">
-                                <div class="speech-info" @click="startSpeechItem(_item,_index)">
-                                    <i class="iconfont icon-yuyin icon-speech"></i>
-                                </div>
-                                <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                                    <source :src="_item.audio.audioSrc" type="audio/mpeg" />
-                                </audio>
-                                <span class="often-text">{{_item.audio.audioOftenText}}</span>
-                            </div>
-                            <div class="cdm-word" v-if="_item.comment!=null&&_item.comment!=''">
-                                <span>{{_item.comment}}</span>
-                            </div>
-                            <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
-                                <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex" class="source-details" :height="imgHeight+'px'">
-                                    <div v-if="sourceitem.mediaType==2" class="img-content">
-                                        <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
-                                        :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
-                                        @click="openOuter(sourceitem,$event)"/>
-                                    </div>
-                                    <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
-                                        <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                        <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
+            <el-row class="row-detail" v-for="(item,index) in tempList" :key="index">
+                <el-col v-if="item.itemList.length!=0">
+                    <div class="item-header">
+                        <i class="iconfont icontemp" :class="item.iconSrc"></i>
+                        <span class="title-lable">{{item.itemTitleName}}</span>
+                        <span style="float:right;" class="count-content"><span class="count">{{item.itemCount}}</span><span class="blag">{{$t('remotePatrol.unit')}}</span></span>
                     </div>
-                    <div style="margin-bottom:20px;" v-if="showFeedBacks">
-                        <div class="content-title">{{$t('remotePatrol.feedbacks')}}</div>
-                        <div class="content-detail" v-for="(item,index) in feedbacks" :key="index">
-                        <div class="content-detail-title" style="background-color:#fff;height:30px;">
-                            <div class="detail-title">
-                            <p class="title1">{{index+1}}.{{item.subject}}</p>
-                            </div>
-                        </div>
-                        <div class="content-detail-main" v-if="item.showAttachment||item.description!=null&&item.description!=''">
-                            <p class="cdm-title">{{$t('remotePatrol.description')}}：</p>
-                            <div class="cdm-voice" v-if="item.showAudio">
-                                <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
-                                    <i class="iconfont icon-yuyin icon-speech"></i>
-                                </div>
-                                <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                                    <source :src="item.audio.audioSrc" type="audio/mpeg" />
-                                </audio>
-                                <span class="often-text">{{item.audio.audioOftenText}}</span>
-                            </div>
-                            <div class="cdm-word" v-if="item.description!=null&&item.description!=''">
-                                <span>{{item.description}}</span>
-                            </div>
-                            <div class="cdm-pic" v-if="item.sourceList!=null&&item.sourceList.length!=0">
-                                <div v-for="(sourceitem,index) in item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
-                                    <div v-if="sourceitem.mediaType==2" class="img-content">
-                                        <img class="imgLittle imgInner" :title="imgTitle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
-                                        :src="sourceitem.url" :height="imgHeight+'px'" :onerror='deafultImg'
-                                        @click="openOuter(sourceitem,$event)"/>
+                    <div class="item-content">
+                        <div style="margin-bottom:20px;">
+                            <div class="content-detail" v-for="(_item,_index) in item.itemList" :key="_index">
+                                <div class="content-detail-title">
+                                    <div class="detail-title">
+                                        <p class="title1">{{_index+1}}.{{_item.subject}}</p>
+                                        <p class="title2">{{_item.description}}</p>
                                     </div>
-                                    <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
-                                        <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                        <img class="imgLittle" :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                    <div class="ignore-btn" v-if="item.detailType==1">{{$t('remotePatrol.ignored')}}</div>
+                                    <div class="title-btn" v-if="(_item.type==0||_item.type==2)&&item.detailType!=1">{{$t('remotePatrol.scoreUnit')}}<span>{{$t('remotePatrol.failed')}}</span></div>
+                                    <div class="title-btn" v-if="_item.type==1&&item.detailType!=1">{{$t('remotePatrol.scoreUnit')}}<span><span>{{_item.itemgetScore}}</span><span v-if="lang!='en'">{{$t('remotePatrol.scorecount')}}</span></span></div>
+                                </div>
+                                <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.sourceList!=null&&_item.sourceList.length!=0||_item.inspectInput!=null&&_item.inspectInput!=''">
+                                    <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
+                                    <div class="cdm-word" v-if="_item.inspectInput!=null&&_item.inspectInput!=''">
+                                        <span>{{_item.inspectInput}}</span>
+                                    </div>
+                                    <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
+                                        <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex" class="source-details" :height="imgHeight+'px'">
+                                            <div v-if="sourceitem.mediaType==2" class="img-content">
+                                                <img class="imgLittle imgInner" :title="imgTitle"
+                                                :src="sourceitem.src" :height="imgHeight+'px'" :onerror='deafultImg'
+                                                @click="openOuter(sourceitem,$event)"/>
+                                            </div>
+                                            <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                                                <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
+                                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        </div>
-                    </div>
-                    <el-dialog  :title="$t('eventView.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
-                    v-if="dialogCommentVideo" width="850px" top="12%" @close="stopCommentVideo" class='rate-video-dialog'>
-                        <div class="video-dialog-content" style="overflow:hidden;">
-                            <hr class="dialog-hr"/>
-                            <div class="video-content" >
-                                <video  height=83% width=90% id="previewVideo" prload  controls
-                                    class="video-js vjs-fill">
-                                </video>
+                        <el-dialog  :title="$t('eventView.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
+                        v-if="dialogCommentVideo" width="850px" top="12%" @close="stopCommentVideo" class='rate-video-dialog'>
+                            <div class="video-dialog-content" style="overflow:hidden;">
+                                <hr class="dialog-hr"/>
+                                <div class="video-content" >
+                                    <video  height=83% width=90% id="previewVideo" prload  controls
+                                        class="video-js vjs-fill">
+                                    </video>
+                                </div>
                             </div>
-                        </div>
-                    </el-dialog>
-                    <transition name="fade">
-                        <el-dialog :title="$t('eventView.view')"
-                        :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width="850px" top="12%">
-                        <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                            <hr class="dialog-hr"/>
-                            <div class="dialog-source-content">
-                                <img v-if="showImg" :src="checkImgSrc"/>
-                            </div>
-                        </div>
                         </el-dialog>
-                    </transition>
-                </div>
-                </el-col>
-            </el-row> -->
-            <el-row class="row-footer">
-                <el-col :span="12" v-for="(item,index) in tempList" :key="index" class="details-content">
-                    <div class="details">
-                        <div class="item-header">
-                            <i class="iconfont icontemp" :class="item.iconSrc"></i>
-                            <span class="title-lable">{{item.itemTitleName}}</span>
-                            <div class="count-content">
-                                <span class="count">{{item.itemCount}}</span>
-                                <span class="blag">{{generatePatrolLang('unit')}}</span>
-                            </div>
-                        </div>
-                        <div class="item-content">
-                            <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                                <div class="item-details" v-for="_item in item.itemList" :key="_item.id">
-                                    <div class="item-blag"></div>
-                                    <span class="item-name">{{index!=2?_item.name:_item.subject}}</span>
-                                    <span class="item-des"></span>
+                        <transition name="fade">
+                            <el-dialog :title="$t('eventView.view')"
+                            :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width="850px" top="12%">
+                            <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                                <hr class="dialog-hr"/>
+                                <div class="dialog-source-content">
+                                    <img v-if="showImg" :src="checkImgSrc"/>
                                 </div>
-                            </el-scrollbar>
-                        </div>
+                            </div>
+                            </el-dialog>
+                        </transition>
                     </div>
                 </el-col>
             </el-row>
@@ -247,30 +145,30 @@ export default {
     name:'ConfirmAddSum',
     data(){
         return{
-            scorecount:'',
+            dialogCommentVideo:false,
+            showOuter:false,
+            showImg:false,
+            checkImgSrc:'',
+            scorecount:0,
             radioList:[],
+            imgTitle:'',
             resultList: [
-            //   {
-            //     'label': 3,
-            //     'name':this.$t('remotePatrol.good'),
-            //     'isActive':false
-            //   },
-              {
-                'label': 2,
-                'name':this.$t('overview.echartGood'),
-                'isActive':false
-              },
-              {
-                'label': 1,
-                'name':this.$t('remotePatrol.improve'),
-                'isActive':false
-              },
               {
                 'label': 0,
+                'name':this.$t('overview.echartGood'),
+                'isActive':false,
+                'isShow':true
+              },
+              {
+                'label': 2,
                 'name':this.$t('remotePatrol.dangerous'),
-                'isActive':false
+                'isActive':false,
+                'isShow':true
               },
             ],
+            startIcon:require('../../../static/img/pic_play_icon.png'),
+            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
+            deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
             theaderPassFail:[
                 {name: '',width:'width:11%;'},
                 {name: this.$t('remotePatrol.item'),width:'width:22.2%;'},
@@ -312,17 +210,60 @@ export default {
             adviceInfoRuletip:false
         }
     },
+    computed: {
+      imgHeight(){
+            let height=0;
+            if(this.varyWindowWidth>1800){
+                height= this.varyWindowWidth*0.039;
+            }
+            else if(this.varyWindowWidth>1400){
+                height= this.varyWindowWidth*0.035;
+            }
+            else{
+                height=75;
+            }
+            return height;
+        }
+    },
     beforeRouteLeave(to, from, next){
         let self = this
         if(to.name !='remotePatrol' ){
             self.$store.dispatch('setPatrolHistory',null);
+            self.$store.dispatch('setPatrolComment',null);
             next();
         }else{
+            self.$store.dispatch('setPatrolComment',self.suggest);
             next();
         }
     },
     methods:{
         generatePatrolLang,
+        stopCommentVideo(){
+            var video = document.getElementById("previewVideo");
+            this.previewplayer = videojs(video);
+            this.previewplayer.pause();
+        },
+        playCommentVideo(item,index){
+            let self=this;
+            self.dialogCommentVideo=true;
+            self.$nextTick(function(){
+                var video = document.getElementById("previewVideo");
+                this.previewplayer = videojs(video);
+                this.previewplayer.src({src:item.url});
+                this.previewplayer.play();
+            })
+
+        },
+        openOuter(item,$ev){
+            let self=this;
+            console.log(item);
+            console.log($ev.target.onerror);
+            if(item!=null){
+                self.showOuter=true;
+                self.checkImgSrc=item.src;
+                self.showImg=true;
+            }
+        },
         getFileUrl(fileName){
             let self=this;
             let bucketName = self.oss.ossBucketName;
@@ -398,7 +339,8 @@ export default {
         },
         async submit(){
             let self=this;
-            let inspectList=self.inspectList;
+            debugger
+            let inspect=self.inspectList;
             let eventList=self.eventList;
             let status=0;
             let flag=false;
@@ -425,35 +367,37 @@ export default {
               }
             })
             let temp=[];
-            for(let i in inspectList){
-                for(let  j in inspectList[i].items){
-                    let objItem={};
-                    objItem.ts=new Date().getTime();
-                    objItem.description=inspectList[i].items[j].inspectInput.trim();
-                    objItem.grade=inspectList[i].items[j].isIgnore?-1:inspectList[i].items[j].itemScore;
-                    objItem.storeId=self.store.storeId;
-                    objItem.inspectItemId=inspectList[i].items[j].id;
-                    let tempFileUrl=[];
-                    if(!inspectList[i].items[j].isIgnore){
-                        for(let k in inspectList[i].items[j].sourceList){
-                            let obj={};
-                            if(inspectList[i].items[j].sourceList[k].mediaType==2){
-                                let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
-                                obj.mediaType=2;
-                                obj.url=url;
-                                obj.deviceId = inspectList[i].items[j].sourceList[k].deviceId;
+            for(let i in inspect){
+                for(let  g in inspect[i].inspectList){
+                    for(let  j in inspect[i].inspectList[g].items){
+                        let objItem={};
+                        objItem.ts=new Date().getTime();
+                        objItem.description=inspect[i].inspectList[g].items[j].inspectInput.trim();
+                        objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:inspect[i].inspectList[g].items[j].itemScore;
+                        objItem.storeId=self.store.storeId;
+                        objItem.inspectItemId=inspect[i].inspectList[g].items[j].id;
+                        let tempFileUrl=[];
+                        if(!inspect[i].inspectList[g].items[j].isIgnore){
+                            for(let k in inspect[i].inspectList[g].items[j].sourceList){
+                                let obj={};
+                                if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
+                                    let url=await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]);
+                                    obj.mediaType=2;
+                                    obj.url=url;
+                                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                                }
+                                else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
+                                    let url=await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]);
+                                    obj.mediaType=1;
+                                    obj.url=url;
+                                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                                }
+                                tempFileUrl.push(obj);
                             }
-                            else if(inspectList[i].items[j].sourceList[k].mediaType==1){
-                                let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
-                                obj.mediaType=1;
-                                obj.url=url;
-                                obj.deviceId = inspectList[i].items[j].sourceList[k].deviceId;
-                            }
-                            tempFileUrl.push(obj);
                         }
+                        objItem.attachment=tempFileUrl;
+                        temp.push(objItem);
                     }
-                    objItem.attachment=tempFileUrl;
-                    temp.push(objItem);
                 }
             }
             let feedEventList=[];
@@ -484,13 +428,8 @@ export default {
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
             }
-
-            // switch(self.curSumIndex){
-            //     case 0: status=2; break;
-            //     case 1: status=1; break;
-            //     case 2: status=0; break;
-            // }
             status = self.curSumIndex;
+            debugger
             let params={
                 status:status,
                 comment:self.suggest.trim(),
@@ -520,103 +459,107 @@ export default {
         },
         getRouteData(){
             let self=this;
-            //let routeData=JSON.parse(sessionStorage.getItem('routeData_confirm'));
+            let PatrolComment = self.$store.getters.PatrolComment;
+            if(PatrolComment!=null){
+                self.suggest=PatrolComment
+            }
             let routeData=self.$route.params.data;
-            console.log(routeData);
-            let inspectList=routeData.inspect;
+            let inspect=routeData.inspect;
             let eventList=routeData.event;
             let store=routeData.store;
             let channel=routeData.channel;
-
             self.store=store;
-            self.channel=channel;
-            self.inspectList=inspectList;
-            self.eventList=eventList;
-            let summary=[];
-            let ignoreTemp=[];
-            let feedBackTemp=[];
-            let tempList=[];
-            let totalExcellent = 0;
-            let totalQualified=0;
-            let totalUnqualified=0;
-            let totalIgnore = 0;
-            let totalItems = 0;
-            inspectList.forEach((item,index)=>{
-                let obj={};
-                obj.groupId=item.groupId;
-                obj.groupName=item.groupName;
-                obj.count=item.items.length;
-                let numOfExcellent=0;
-                let numOfQualified=0;
-                let numOfUnqualified=0;
-                let numIgnore=0;
-                totalItems += obj.count;
-                item.items.forEach((_item,_index)=>{
-                    if(_item.isIgnore){
-                        numIgnore++;
-                        let objIgnore={};
-                        objIgnore.id=_item.id;
-                        objIgnore.name=_item.subject;
-                        ignoreTemp.push(objIgnore);
-                    }
-                    else{
-                        switch(_item.itemScore){
-                            case 0: numOfUnqualified++; break;
-                            case 1: numOfQualified++; break;
-                            case 2: numOfExcellent++; break;
+            self.inspectList=routeData.inspect;
+            self.eventList=routeData.event;
+            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[]
+            let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0
+            inspect.forEach(p_item=>{
+                var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0
+                p_item.inspectList.forEach(item=>{
+                    let QualifiedArr=[],UnqualifiedArr=[],IgnoredArr=[]
+                    let totalScore=0,totalGetscore=0,notIgnoreTotalscore=0
+                    item.items.forEach(s_item=>{
+                        if(s_item.isIgnore){
+                            IgnoredArr.push(s_item)
+                            ignoreTemp.push(s_item)
+                        }else{
+                            if((p_item.type==0||p_item.type==2)&&!s_item.isQualified){
+                                UnqualifiedArr.push(s_item)
+                                UnqualifiedTemp.push(s_item)
+                            }else if((p_item.type==0||p_item.type==2)&&s_item.isQualified){
+                                QualifiedArr.push(s_item)
+                            }else if(p_item.type==1&&(s_item.itemgetScore<s_item.qualifiedScore)){
+                                UnqualifiedTemp.push(s_item)
+                            }
+                            if((p_item.type==1||p_item.type==2)&&s_item.itemgetScore!='--'){
+                                totalGetscore+=s_item.itemgetScore
+                                notIgnoreTotalscore+=s_item.itemScore
+                            }
                         }
+                        if(p_item.type==1){
+                            totalScore+=s_item.itemScore
+                        }
+                    })
+                    item['numOfQualified']=QualifiedArr.length
+                    item['numOfUnqualified']=UnqualifiedArr.length
+                    item['numIgnore']=IgnoredArr.length
+                    item['itemScore']=totalScore
+                    item['itemgetScore']=totalGetscore
+                    item['notIgnoreTotalscore']=notIgnoreTotalscore
+
+                    if(p_item.type==1){
+                        CurItemgetScore += totalGetscore
+                        CurNotIgnoreTotalscore += notIgnoreTotalscore
+                        getscoreTotal=CurItemgetScore
+                        allscoreTotal=CurNotIgnoreTotalscore
+                    }
+                    if(p_item.type==2){
+                        CurOtherTotalScore += totalGetscore
+                        otherGetscoreTotal=CurOtherTotalScore
                     }
                 })
-                if(numOfUnqualified>0){
-                    obj.isQua=false;
+                if(p_item.type==0){
+                    p_item['tHeader']=self.theaderPassFail
+                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)){
+                        self.resultList[0].isShow=false
+                        self.resultList[1].isActive=true
+                    }
+                }else if(p_item.type==1){
+                    p_item['tHeader']=self.theaderScore
+                }else if(p_item.type==2){
+                    p_item['tHeader']=self.theaderOther
                 }
-                else{
-                    obj.isQua=true;
-                }
-                obj.numOfExcellentItems=numOfExcellent;
-                obj.numOfQualifiedItems=numOfQualified;
-                obj.numOfUnqualifiedItems=numOfUnqualified;
-                totalExcellent += numOfExcellent;
-                totalQualified += numOfQualified;
-                totalUnqualified += numOfUnqualified
-                totalIgnore += numIgnore;
-                summary.push(obj);
             })
-          console.log(totalIgnore);
-          console.log(totalExcellent);
-          console.log(totalQualified);
-          console.log(totalUnqualified)
-          console.log(totalItems)
-          console.log(self.resultList)
-          let totalScoreItems = totalItems - totalIgnore
-          self.scorecount = Math.round(totalQualified/totalScoreItems*100)
-
-            if(self.scorecount < 90){
-              self.scorecount >= 75 ? self.curSumIndex = 0: self.curSumIndex = 1;
-              self.curSumIndex == 0 ? self.resultList[1].isActive = true: self.resultList[2].isActive = true;
-            }
-            else{
-              self.scorecount >= 90 ? self.curSumIndex = 2: self.curSumIndex = 1;
-              self.curSumIndex == 2 ? self.resultList[0].isActive = true : self.resultList[1].isActive = true;
-            }
-            self.summary=summary;
+            self.scorecount = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            self.summary=inspect
             eventList.forEach((item,index)=>{
                 let objFeedBack={};
-                objFeedBack.name=item.eventName;
+                objFeedBack.subject=item.eventName;
                 objFeedBack.description=item.eventDes;
+                objFeedBack.sourceList=[]
+                item.sourceObj!=null ? objFeedBack.sourceList.push(item.sourceObj) : ''
                 feedBackTemp.push(objFeedBack);
             })
             tempList[0]={
+                itemTitleName: self.$t('reportView.notableItem'),
+                iconSrc:'icon-zhongxindingwei',
+                itemCount:UnqualifiedTemp.length,
+                itemList:UnqualifiedTemp,
+                detailType:0
+            }
+            tempList[1]={
                 itemTitleName: self.$t('remotePatrol.ignoreds'),
                 iconSrc:'icon-hulve',
                 itemCount:ignoreTemp.length,
-                itemList:ignoreTemp
+                itemList:ignoreTemp,
+                detailType:1
             }
-            tempList[1]={
+            tempList[2]={
                 itemTitleName:self.$t('remotePatrol.feedbacks'),
                 iconSrc:'icon-fankui',
                 itemCount:feedBackTemp.length,
-                itemList:feedBackTemp
+                itemList:feedBackTemp,
+                detailType:2
             }
             self.tempList=tempList;
         },
@@ -711,6 +654,153 @@ $h1:#292e36;
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
 }
+.dialog-source-content{
+            @include point(height,320);
+            @include point(padding,20);
+
+            img{
+                height: 100%;
+                user-select: none;
+            }
+        }
+        .video-dialog-content{
+            width:100%;
+            height:100%;
+            margin: auto;
+            .dialog-hr{
+                border: 0.5px solid ;
+                border-color: #dfe2e9;
+                margin-bottom:10px;
+                bottom: 5px;
+                margin-top: 0;
+            }
+            .video-content{
+                @include point(margin,20);
+                padding-top: 0;
+                position: relative;
+                #channelName{
+                    width: 100%;
+                    color: #fff;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    position: absolute;
+                    z-index: 10;
+                    text-align: left;
+                    span{
+                        margin-left: 30px;
+                    }
+                }
+                .icon-footer{
+                    width: 100%;
+                    position: absolute;
+                    bottom: 0px;
+                    color: #fff;
+                    overflow: hidden;
+                    user-select:none;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    z-index: 10;
+                    .iconlside{
+                        float: left;
+                        text-align: left;
+                        .iconplay{
+                            font-size: 18px;
+                            cursor: pointer;
+                            float: left;
+                            margin-left: 30px;
+                        }
+
+                    }
+                    .iconrside{
+                        max-width: 500px;
+                        float: right;
+                        position: relative;
+                        span{
+                            font-size: 13px;
+                            margin-right:6px;
+                            margin-left: 20px;
+                        }
+                        .speed-content{
+                            display: inline-block;
+                            span{
+                                position: relative;
+                                bottom:3px;
+                            }
+                        }
+                        .screen-content{
+                            display: inline;
+                            margin-left: 30px;
+                            position: absolute;
+                            right: 20px;
+                            .iconscreen{
+                                font-size: 18px;
+                                position: relative;
+                                cursor: pointer;
+                                margin-right: 20px;
+                                bottom: 3px;
+                            }
+                        }
+                    }
+                }
+            }
+            .channel-content{
+              margin: 20px 30px;
+              padding-top: 0;
+              position: relative;
+              .radio-group{
+                display: grid;
+                grid-template-columns: 240px 240px;
+                grid-template-rows: 30px;
+              }
+              .radio-class{
+                display: flex;
+                align-items: center;
+                /deep/ .el-radio__label{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .radio-img{
+                  height: 26px;
+                  width: 26px;
+                  margin-right: 10px;
+                }
+                .radio-span{
+                  display: inline-block;
+                  max-width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-size: 14px;
+                  color: #94a4b4;
+                }
+              }
+            }
+        }
+      /deep/ .el-dialog__footer{
+        line-height: 24px;
+        padding: 30px;
+        padding-top: 20px;
+        #cancelBtn{
+          @include point(width,76);
+          @include point(margin-right,20);
+          background-color: #EAEDF2 !important;
+          color: #708090 !important;
+          font-size: 12px;
+          line-height: 12px;
+        }
+        #confirmBtn{
+          @include point(width,76);
+          font-size: 12px;
+          line-height: 12px;
+        }
+      }
+        #previewVideo{
+            @include point(min-width,450);
+            @include point(min-height,360);
+        }
 .activeClass{
     background-color: #FDE8EF !important;
     color: $red;
@@ -860,9 +950,6 @@ $h1:#292e36;
                     text-align: left;
                     font-weight: bold;
                 }
-                .sheet_title{
-                    line-height: 88px;
-                }
                 .count-blag{
                     padding: 2px 12px;
                     width: auto;
@@ -886,23 +973,35 @@ $h1:#292e36;
             }
         }
         .row-detail{
-            margin-bottom: 50px !important;
+            margin-top: 20px;
+            text-align: left;
             .item-header{
                 position: relative;
                 background-color: $background;
                 height: 40px;
                 line-height: 40px;
                 border: 1px solid $border;
-                padding-left: calc(20 / 1920 * 100vw);
+                padding:0 calc(20 / 1920 * 100vw);
                 cursor: pointer;
-            .icontemp {
-                font-size: calc(14 / 1920 * 100vw);
-                margin-right: calc(15 / 1920 * 100vw);
-                }
-            .title-lable {
-                font-size: calc(14 / 1920 * 100vw);
-                font-weight: bold;
-            }
+                    .icontemp {
+                        font-size: calc(14 / 1920 * 100vw);
+                        margin-right: calc(15 / 1920 * 100vw);
+                        }
+                    .title-lable {
+                        font-size: calc(14 / 1920 * 100vw);
+                        font-weight: bold;
+                    }
+                    .count-content{
+                        position:absolute;
+                        right: calc(20/1920*100vw);
+                        top: 0;
+                        .count{
+                            font-size: calc(30/1920*100vw);
+                        }
+                        .blag{
+                            font-size: calc(12/1920*100vw);
+                        }
+                    }
             }
             .item-content{
             padding-top: calc(20 / 1920 * 100vw);
@@ -1014,12 +1113,14 @@ $h1:#292e36;
                             }
                         .imgLittle{
                             min-width: 70px;
+                            width: calc(130/1920*100vw);
                         }
                         }
                     @media screen and (min-width: 1280px) and(max-width: 1366px){
                         width: 90px;
                         .img-content .imgLittle{
-                        width: 85px;
+                            width: 85px;
+                            width: calc(130/1920*100vw);
                         }
                     }
                     }

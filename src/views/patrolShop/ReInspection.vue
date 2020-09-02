@@ -9,7 +9,7 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" @click="submit1"  type="primary" v-if="showStoreUp">
+                <el-button :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" @click="submit1"  type="primary" v-if="sheetName.length!=0">
                   {{generatePatrolLang('confirmSum')}}
                 </el-button>
             </div>
@@ -254,17 +254,22 @@
                 </el-row> -->
                 <el-row v-if="sheetName.length!=0" class="inspect-title">
                     <el-col :span="24">
-                        <el-alert :title="alertContent" type="warning" :closable="false" :show-icon="false"></el-alert>
+                        <el-alert :title="$t('remotePatrol.alertContent')" type="warning" :closable="false" v-if="!isShowWarn&&!showIgnoreItem"></el-alert>
+                        <el-alert type="warning" :closable="false" v-if="isShowWarn&&!showIgnoreItem" show-icon><span @click="hasIgnoreItem" style="cursor: pointer;">{{$t('remotePatrol.clickToContent')}}</span></el-alert>
+                        <el-alert type="info" :closable="false" v-if="showIgnoreItem"><span style="color:#182752;">{{$t('remotePatrol.hasIgnoreContent')}}</span></el-alert>
                     </el-col>
                 </el-row>
-                <el-row class="inspect-content" v-if="sheetName.length!=0">
+                <el-row class="inspect-content" v-if="sheetName.length!=0&&!showIgnoreItem">
                     <el-col :span="8">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                             <div style="background-color:#f4f5f9;height:316.06px;">
                                 <div v-for="(_item,_index) in sheetName" :key="_index" class="Group-content">
-                                    <div @click="changeSheet(_item,_index)" class="Group-content-title" :class="_item.isClick?'noraml-color':'noraml-groupColor'">
+                                    <div @click="changeSheet(_item,_index)" class="Group-content-title" :class="_item.isClick?'noraml-color':'noraml-groupColor'" :style="_item.label==$t('insSettingView.sheetpassfail')?'margin-left:-10px;':''">
+                                        <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span>
                                         <span>{{_item.label}}</span>
                                         <span v-if="_item.groupId==undefined">（{{_item.dealCount+'/'+_item.count}}）</span>
+                                        <i class="el-icon-arrow-right" v-if="_item.groupId==undefined&&!_item.isClick"></i>
+                                        <i class="el-icon-arrow-down" v-if="_item.groupId==undefined&&_item.isClick"></i>
                                     </div>
                                     <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
                                         <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
@@ -290,17 +295,17 @@
                                         </span>
                                         <el-dropdown-menu slot="dropdown" class="score-menu" v-if="inspectList[0].type!=1">
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="itemDS in scoreList"
-                                            :key="itemDS.val" @click.native="checkScore(item,itemDS,0)">{{itemDS.scoreTitle}}</el-dropdown-item>
+                                            v-for="(itemDS,indexDs) in scoreList"
+                                            :key="indexDs" @click.native="checkScore(item,itemDS,0)">{{itemDS.scoreTitle}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                         <el-dropdown-menu slot="dropdown" class="score-menu" v-else>
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="itemDS in 10"
+                                            v-for="itemDS in item.itemScore"
                                             :key="itemDS" @click.native="checkScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
-                                    <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)" v-if="!item.isIgnore&&inspectList[0].type!=0"></i>
-                                    <span class="ignored-icon" v-if="item.isIgnore">{{generatePatrolLang('ignored')}}</span>
+                                    <!-- <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i> -->
+                                    <!-- <span class="ignored-icon" v-if="item.isIgnore">{{generatePatrolLang('ignored')}}</span> -->
                                     <div class="icon-clicked" v-if="item.checked"></div>
                                     <div class="details-content" :class="!item.isIgnore?'noraml-title':'ignore-title'">
                                         <span>{{item.description}}</span>
@@ -355,7 +360,58 @@
                         </el-scrollbar>
                     </el-col>
                 </el-row>
-                <el-row class="inspect-content" v-else>
+                <el-row class="inspect-content" v-if="showIgnoreItem">
+                    <el-col :span="24" id="inspectContent">
+                        <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
+                            <div style="height:299.84px;">
+                                <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details">
+                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'"
+                                          :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
+                                    <div class="dropdown-model" v-if="item.disabled"></div>
+                                    <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                        <span class="el-dropdown-link">
+                                            {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
+                                            <i class="el-icon-arrow-down el-icon--right"></i>
+                                        </span>
+                                        <el-dropdown-menu slot="dropdown" class="score-menu" v-if="item.type!=1">
+                                            <el-dropdown-item style="width:70px;text-align:center;"
+                                            v-for="(itemDS,indexDs) in scoreList"
+                                            :key="indexDs" @click.native="checkIgnoreScore(item,itemDS,0)">{{itemDS.scoreTitle}}</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                        <el-dropdown-menu slot="dropdown" class="score-menu" v-else>
+                                            <el-dropdown-item style="width:70px;text-align:center;"
+                                            v-for="itemDS in item.itemScore"
+                                            :key="itemDS" @click.native="checkIgnoreScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
+                                    <!-- <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i> -->
+                                    <!-- <span class="ignored-icon" v-if="item.isIgnore">{{generatePatrolLang('ignored')}}</span> -->
+                                    <div class="icon-clicked" v-if="item.checked"></div>
+                                    <div class="details-content" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                        <span>{{item.description}}</span>
+                                    </div>
+                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                        <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
+                                            <div class="img-content" v-if="_item.mediaType==2">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img :src="_item.src" :width="_item.width" :height="_item.height" @click="openOuter(_item)" style="cursor: pointer"/>
+                                            </div>
+                                            <div class="img-content" v-if="_item.mediaType==1">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
+                                                <img class="imgLittle" :src="videoImgSrc" :height="_item.height"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
+                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="generatePatrolLang('coment')" :disabled="item.disabled" @blur="notShowInputRuleTips('item',item)"></el-input>
+                                    <span class="rules" v-if="item.Ruletip">{{generatePatrolLang('comentRuletip')}}</span>
+                                </div>
+                            </div>
+                        </el-scrollbar>
+                    </el-col>
+                </el-row>
+                <el-row class="inspect-content" v-if="sheetName.length==0">
                     <div class="inspect-empty">
                         <span>{{generatePatrolLang('noItems')}}</span>
                     </div>
@@ -476,12 +532,13 @@ export default {
     data(){
         return{
             sheetName:[],
-            alertContent:this.$t('remotePatrol.alertContent'),
+            isShowWarn:false,
             patrolstore:'',
             PatrolList:[],
             showControls:false,
             showGuide:true,
             sourceList:[],
+            isDisabled:false,
             penBtnSrc:require('../../../static/img/pen_btn.png'),
             showPenBtn:true,
             showPen:false,
@@ -593,7 +650,7 @@ export default {
             accountId:'',
             userId:'',
             scoreList:[
-                {val:1,scoreTitle: this.$t('remotePatrol.pass')},
+                {val:10,scoreTitle: this.$t('remotePatrol.pass')},
                 {val:0,scoreTitle: this.$t('remotePatrol.failed')},
             ],
             tempStoreList:[],
@@ -727,7 +784,9 @@ export default {
             eventDesRuletip:false,
             oldVal:'',
             historyObj:null,
-            beforepatrolstore:''
+            beforepatrolstore:'',
+            showIgnoreItem:false,
+            hasIgnoretemp:[]
         }
     },
     computed:{
@@ -782,6 +841,7 @@ export default {
             //   from.meta.keepAlive=false;
               self.previewplayer && self.previewplayer.dispose()
               self.$store.dispatch('setPatrolHistory',null);
+              self.$store.dispatch('setPatrolComment',null);
             }
             else{
             //   from.meta.keepAlive = true;
@@ -806,6 +866,7 @@ export default {
           if(to.name !='confirmSum'){
             // from.meta.keepAlive=false;
             self.$store.dispatch('setPatrolHistory',null);
+            self.$store.dispatch('setPatrolComment',null);
           }
           else{
             // from.meta.keepAlive=true;
@@ -853,10 +914,28 @@ export default {
         if(PatrolHistory!=null){
             self.activeIndex = PatrolHistory.activeIndex
             self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList
+
+            let indexFeed=PatrolHistory.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=PatrolHistory.sheetName.slice(0,indexFeed);
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(n_item=>{
+                    n_item.items.forEach(item=>{
+                        item.isIgnore=false
+                    })
+                })
+            })
+            self.sheetName = PatrolHistory.sheetName
             self.PatrolList = PatrolHistory.PatrolList
             self.patrolstore = PatrolHistory.patrolstore
-            self.inspectList = PatrolHistory.inspect
-            let isClick = self.inspectList[self.inspectList.length-1].isClick
+            self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList
+            self.showChannelBtns = PatrolHistory.showChannelBtns
+            self.allChannelBtns = PatrolHistory.allChannelBtns
+            self.curSheetIndex=PatrolHistory.curSheetIndex
+            self.curGroupIndex=PatrolHistory.curGroupIndex
+            self.curItemIndex=PatrolHistory.curItemIndex
+            self.isShowWarn = true
+            self.isDisabled=true
+            let isClick = self.sheetName[self.sheetName.length-1].isClick
             if(isClick){
                 if(PatrolHistory.eventList.length>0){
                     self.eventList = PatrolHistory.eventList
@@ -1562,20 +1641,42 @@ export default {
                 })
             })
         },
+        checkIgnoreScore(item,itemDS,e){
+            let self=this;
+            console.log(item);
+            if(e==0){
+                item.itemgetScore=itemDS.val;
+                item.itemScoreTitle=itemDS.scoreTitle;
+            }else{
+                item.itemgetScore=itemDS;
+                item.itemScoreTitle=itemDS;
+            }
+            item.dealCount=1
+            item.inputCount=1
+        },
         checkScore(item,itemDS,e){
             let self=this;
             console.log(item);
             if(e==0){
-                item.itemScore=itemDS.val;
+                if(item.type==2){
+                    if(item.itemScore<0){
+                        item.itemgetScore = itemDS.val==0 ? item.itemScore : 0
+                    }else{
+                        item.itemgetScore = itemDS.val==10 ? item.itemScore : 0
+                    }
+                }else{
+                    item.itemgetScore = itemDS.val
+                }
+                item.isQualified = itemDS.val == 0 ? false : true
                 item.itemScoreTitle=itemDS.scoreTitle;
             }else{
-                item.itemScore=itemDS;
+                item.itemgetScore=itemDS;
                 item.itemScoreTitle=itemDS;
             }
-            
-            if(item.itemScore!='--'){
+            if(item.itemScoreTitle!='--'){
                 if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                     self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount+1;
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount=self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount+1
                 }
                 self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
             }
@@ -1584,6 +1685,22 @@ export default {
                     self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
                     self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
                 }
+            }
+            let isSheet1=false,isSheet2=false
+            self.sheetName.forEach(item=>{
+                if(item.type==0){
+                    item.dealCount==item.count ? isSheet1=true : isSheet1=false
+                }
+                if(item.type==1){
+                    item.dealCount>=1 ? isSheet2=true : isSheet2=false
+                }
+            })
+            if(self.sheetName[0].type==0&&self.sheetName[1].type==1){
+               self.isDisabled = isSheet1&&isSheet2 ? true : false
+            }else if(self.sheetName[0].type==1){
+               self.isDisabled = isSheet2 ? true : false
+            }else if(self.sheetName[0].type==0&&self.sheetName[1].groupId=='feedBack'){
+               self.isDisabled = isSheet1 ? true : false
             }
         },
         getAllStoreList(){
@@ -2061,28 +2178,28 @@ export default {
               return false;
             }
             if(item.deviceId[0] != self.curDeviceId){
-                //Dash
+                    //Dash
                 if(!self.isEzviz){
-                if(self.playState){
-                    self.stopAndRealTime();
+                    if(self.playState){
+                        self.stopAndRealTime();
+                    }
+                    else{
+                        self.realTime();
+                    }
                 }
                 else{
-                    self.realTime();
-                }
-                }
-                else{
-                //Ezviz
-                if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-                    self.$refs.ezvizVideo.stopRealTime();
-                    self.$nextTick(()=>{
-                    self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                    })
-                }
-                else{
-                    self.$nextTick(()=>{
-                    self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                    })
-                }
+                    //Ezviz
+                    if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                        self.$refs.ezvizVideo.stopRealTime();
+                        self.$nextTick(()=>{
+                        self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                        })
+                    }
+                    else{
+                        self.$nextTick(()=>{
+                        self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                        })
+                    }
                 }
                 self.curDeviceId=item.deviceId[0];
             }
@@ -2172,42 +2289,79 @@ export default {
         noAllInspectDialog(){
             let self=this;
             self.noAllInspectObj.dialogCosed=false;
-            let count=0;
-            let ignoreCount = 0;
-            let feedBack = self.inspectList.slice(self.inspectList.length-1)[0]
-            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
-            let inspectList=JSON.parse(JSON.stringify(self.inspectList.slice(0,indexFeed)));
-            inspectList.forEach(item=>{
-                item.dealCount = item.items.length
-                count=count+item.items.length;
-                item.items.forEach((_item,_index)=>{
-                  if(_item.isIgnore==false&&_item.itemScore=='--'||_item.isIgnore==true&&_item.itemScore!='--'||_item.isIgnore==true&&_item.itemScore=='--'){
-                      _item.isIgnore=true
-                      _item.inspectInput = ''
-                      _item.sourceList = []
-                  }
-                  _item.isIgnore ? ignoreCount++ : ''
+            let temp=[]
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            if(self.hasIgnoretemp.length==0){
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        temp.push(item)
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount==0){
+                                _item.isIgnore=true
+                                _item.inspectInput = ''
+                                _item.sourceList = []
+                            }
+                        })
+                    })
                 })
-            })
-            if(ignoreCount == count){
-              self.allIgnoreObj.dialogCosed=true;
-              return false;
+            }else{
+                sheetName.forEach(s_item=>{
+                    let dealtemp=[]
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            self.hasIgnoretemp.forEach(h_item=>{
+                                if(h_item.inputCount==0){
+                                    h_item.isIgnore=true
+                                    h_item.inspectInput = ''
+                                    h_item.sourceList = []
+                                }
+                                if(h_item.id==_item.id){
+                                    _item=h_item
+                                }
+                            })
+                            if(_item.inputCount==1){
+                                let obj={}
+                                obj.dealCount=_item.inputCount
+                                dealtemp.push(obj)
+                            }
+                        })
+                        temp.push(item)
+                    })
+                    s_item.dealCount=dealtemp.length
+                })
             }
             let obj={
-                inspect:inspectList,
+                inspect:sheetName,
                 event:self.eventList,
                 store:self.store,
                 channel:self.channel
             }
+            let hasIgnoretemp=[]
+            temp.forEach(item=>{
+                item.items.forEach(_item=>{
+                    if(_item.isIgnore){
+                        _item['type']=item.type
+                        hasIgnoretemp.push(_item)
+                    }
+                })
+            })
             self.historyObj = {
                 storeList:self.tabList[Number(self.activeIndex)].storeList,
                 patrolstore:self.patrolstore,
+                sheetName:self.sheetName,
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                inspect:self.inspectList,
+                // inspect:self.inspectList,
+                hasIgnoretemp:hasIgnoretemp,
                 inspectItemList:self.inspectItemList,
-                eventList:self.eventList
+                eventList:self.eventList,
+                showChannelBtns:self.showChannelBtns,
+                allChannelBtns:self.allChannelBtns,
+                curSheetIndex:self.curSheetIndex,
+                curGroupIndex:self.curGroupIndex,
+                curItemIndex:self.curItemIndex
             }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
@@ -2237,31 +2391,21 @@ export default {
             let temp=[];
             let count=0;
             let dealCount=0;
-            let ignoreCount = 0;
-            let feedBack = self.inspectList.slice(self.inspectList.length-1)[0]
-            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
-            let inspectList=self.inspectList.slice(0,indexFeed);
-
-            inspectList.forEach(item=>{
-                count=count+item.items.length;
-                dealCount=dealCount+item.dealCount;
-                var items = item.items;
-                items.forEach((it)=>{
-                  if(it.isIgnore){
-                    ignoreCount++;
-                  }
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            sheetName.forEach(s_item=>{
+                dealCount=dealCount+s_item.dealCount;
+                s_item.inspectList.forEach(item=>{
+                    temp.push(item)
+                    count=count+item.items.length;
                 })
             })
             if(dealCount<count){
                 self.noAllInspectObj.dialogCosed=true;
                 return false;
             }
-            if(ignoreCount == count){
-              self.allIgnoreObj.dialogCosed=true;
-              return false;
-            }
             let obj={
-                inspect:inspectList,
+                inspect:sheetName,
                 event:self.eventList,
                 store:self.store,
                 channel:self.channel
@@ -2269,12 +2413,19 @@ export default {
             self.historyObj = {
                 storeList:self.tabList[Number(self.activeIndex)].storeList,
                 patrolstore:self.patrolstore,
+                sheetName:self.sheetName,
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                inspect:self.inspectList,
+                // inspect:self.inspectList,
+                hasIgnoretemp:null,
                 inspectItemList:self.inspectItemList,
-                eventList:self.eventList
+                eventList:self.eventList,
+                showChannelBtns:self.showChannelBtns,
+                allChannelBtns:self.allChannelBtns,
+                curSheetIndex:self.curSheetIndex,
+                curGroupIndex:self.curGroupIndex,
+                curItemIndex:self.curItemIndex
             }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
@@ -2748,10 +2899,12 @@ export default {
             self.showStoreUp=true;
             if(!self.isEzviz){
               self.editCount=0;
+              self.playState ? self.stopRealTime() : ''
             }
             else{
-              if(!self.showGuide){
-                self.$refs.ezvizVideo.editCount = 0
+              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : ''
+              if(self.$refs.ezvizVideo!=undefined){
+                 self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : ''
               }
             }
             //self.editCount=0;
@@ -2759,15 +2912,6 @@ export default {
             self.curDeviceId=-1;
             self.showFeedBack=false;
             self.eventList=[];
-            if(!self.isEzviz){
-                if(self.playState){
-                    self.stopRealTime();
-                }
-            }else{
-                if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-                    self.$refs.ezvizVideo.stopRealTime();
-                }
-            }
             self.showGuide=true;
             let obj={};
             obj.storeId=_item.storeId;
@@ -2951,22 +3095,16 @@ export default {
         changeInspectList(val){
             let self = this
             if(!self.isEzviz){
-                if(self.playState){
-                    self.stopRealTime();
-                }
-            }else{
-                if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-                    self.$refs.ezvizVideo.stopRealTime();
-                }
-            }
-            if(!self.isEzviz){
               self.editCount=0;
+              self.playState ? self.stopRealTime() : ''
             }
             else{
-              if(!self.showGuide){
-                self.$refs.ezvizVideo.editCount = 0
+              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : ''
+              if(self.$refs.ezvizVideo!=undefined){
+                 self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : ''
               }
             }
+            self.isDisabled=false
                 self.PatrolList.forEach(item=>{
                     if(item.id==val){
                         self.patrolstore=item.name
@@ -3005,7 +3143,11 @@ export default {
                                 itemObj.groupId=item.groupId;
                                 itemObj.subject=_item.subject;
                                 itemObj.description=_item.description;
-                                itemObj.itemScore='--';
+                                itemObj.itemScore=_item.itemScore;
+                                itemObj.itemgetScore='--';
+                                itemObj.isQualified=false;
+                                itemObj.qualifiedScore=_item.qualifiedScore;
+                                itemObj.type=item.type;
                                 itemObj.itemScoreTitle='--';
                                 //itemObj.deviceId=_item.deviceId;
                                 itemObj.deviceId=_item.deviceIds;
@@ -3040,7 +3182,7 @@ export default {
                                 if(Typeindex[0].type==2){
                                     label=self.$t('insSettingView.sheetother')
                                 }
-                                te_temp.push({inspectList:Typeindex,dealCount:0,count:count,isClick:false,label:label})
+                                te_temp.push({inspectList:Typeindex,dealCount:0,count:count,isClick:false,label:label,type:Typeindex[0].type})
                             }
                         }
                         self.sheetName=te_temp
@@ -3053,6 +3195,21 @@ export default {
                         }
                     }
                 })
+        },
+        hasIgnoreItem(){
+            let self=this
+            self.showIgnoreItem=true
+            let PatrolHistory = self.$store.getters.PatrolHistory;
+            if(PatrolHistory!=null){
+                if(PatrolHistory.hasIgnoretemp!=null){
+                    PatrolHistory.hasIgnoretemp.forEach(item=>{
+                        if(item.isIgnore){
+                            item.isIgnore=false
+                        }
+                    })
+                }
+                self.hasIgnoretemp = PatrolHistory.hasIgnoretemp!=null ? PatrolHistory.hasIgnoretemp : null
+            }
         },
         changeSheet(item,index){
             let self=this
@@ -4381,10 +4538,9 @@ export default {
                         .item-score{
                             box-sizing: border-box;
                             position: absolute;
-                            @include point(right,60);
+                            @include point(right,40);
                             @include point(top,12);
                             font-size: 12px;
-                            margin-right: 20px;
                             //width: 96px;
                             width: 110px;
                             height: 22px;
