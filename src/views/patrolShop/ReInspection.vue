@@ -256,7 +256,10 @@
                     <el-col :span="24">
                         <el-alert :title="$t('remotePatrol.alertContent')" type="warning" :closable="false" v-if="!isShowWarn&&!showIgnoreItem"></el-alert>
                         <el-alert type="warning" :closable="false" v-if="isShowWarn&&!showIgnoreItem" show-icon><span @click="hasIgnoreItem" style="cursor: pointer;">{{$t('remotePatrol.clickToContent')}}</span></el-alert>
-                        <el-alert type="info" :closable="false" v-if="showIgnoreItem"><span style="color:#182752;">{{$t('remotePatrol.hasIgnoreContent')}}</span></el-alert>
+                        <el-alert type="info" :closable="false" v-if="showIgnoreItem" class="info-alert">
+                            <div class="info-left">{{$t('remotePatrol.hasIgnoreContent')}}</div>
+                            <div class="info-right" @click="backToPatrol"><img :src="backicon"><span>{{$t('remotePatrol.backToallsheet')}}</span></div>
+                        </el-alert>
                     </el-col>
                 </el-row>
                 <el-row class="inspect-content" v-if="sheetName.length!=0&&!showIgnoreItem">
@@ -268,8 +271,8 @@
                                         <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span>
                                         <span>{{_item.label}}</span>
                                         <span v-if="_item.groupId==undefined">（{{_item.dealCount+'/'+_item.count}}）</span>
-                                        <i class="el-icon-arrow-right" v-if="_item.groupId==undefined&&!_item.isClick"></i>
-                                        <i class="el-icon-arrow-down" v-if="_item.groupId==undefined&&_item.isClick"></i>
+                                        <i class="el-icon-arrow-right icon" v-if="_item.groupId==undefined&&!_item.isClick"></i>
+                                        <i class="el-icon-arrow-down icon" v-if="_item.groupId==undefined&&_item.isClick"></i>
                                     </div>
                                     <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
                                         <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
@@ -360,7 +363,7 @@
                         </el-scrollbar>
                     </el-col>
                 </el-row>
-                <el-row class="inspect-content" v-if="showIgnoreItem">
+                <el-row class="inspect-content" style="padding-left: calc(15/1920*100vw);" v-if="showIgnoreItem">
                     <el-col :span="24" id="inspectContent">
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div style="height:299.84px;">
@@ -557,6 +560,7 @@ export default {
             plusSrc:require('../../../static/img/plus_icon.png'),
             clearIconSrc:require('../../../static/img/清除.png'),
             removeIconSrc:require('../../../static/img/撤销.png'),
+            backicon:require('../../../static/img/返回icon.png'),
             checkImgSrc:'',
             showOuter:false,
             showModelContent:false,
@@ -916,14 +920,17 @@ export default {
             self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList
 
             let indexFeed=PatrolHistory.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let getdealnum=0
             let sheetName=PatrolHistory.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
+                s_item.count==s_item.dealCount ? getdealnum=0 : getdealnum++
                 s_item.inspectList.forEach(n_item=>{
                     n_item.items.forEach(item=>{
                         item.isIgnore=false
                     })
                 })
             })
+            self.isShowWarn = getdealnum==0 ? false : true
             self.sheetName = PatrolHistory.sheetName
             self.PatrolList = PatrolHistory.PatrolList
             self.patrolstore = PatrolHistory.patrolstore
@@ -933,7 +940,7 @@ export default {
             self.curSheetIndex=PatrolHistory.curSheetIndex
             self.curGroupIndex=PatrolHistory.curGroupIndex
             self.curItemIndex=PatrolHistory.curItemIndex
-            self.isShowWarn = true
+            
             self.isDisabled=true
             let isClick = self.sheetName[self.sheetName.length-1].isClick
             if(isClick){
@@ -1037,6 +1044,9 @@ export default {
             self.showGuide=true;
             self.eventList = []
             self.sheetName=[]
+            self.hasIgnoretemp=null
+            self.showIgnoreItem=false
+            self.isShowWarn=false
             self.showFeedBackInfo = true
             self.accountId=localStorage.getItem('oss_bucket');
             self.showChannelBtns = [];
@@ -1106,6 +1116,7 @@ export default {
             console.log(item);
             console.log(index);
             self.eventList.splice(index,1);
+            self.showFeedBackInfo = self.eventList.length==0 ? true : false
         },
         addFeedBack(){
             let self=this;
@@ -1178,18 +1189,31 @@ export default {
         getIndexById(id){
             let self=this;
             let tempId=null;
-            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
-            let inspectList=self.inspectList.slice(0,indexFeed);
-            inspectList.forEach((item,index)=>{
-                item.items.forEach((_item,_index)=>{
-                    if(_item.id==id){
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            if(!self.isShowWarn){
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach((item,index)=>{
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.id==id){
+                                tempId={
+                                    groupIndex:index,
+                                    itemIndex:_index
+                                };
+                            }
+                        })
+                    })
+                })
+            }else{
+                let s = self.hasIgnoretemp
+                self.hasIgnoretemp.forEach((item,index)=>{
+                    if(item.id==id){
                         tempId={
-                            groupIndex:index,
-                            itemIndex:_index
+                            itemIndex:index
                         };
                     }
                 })
-            })
+            }
             return tempId;
         },
         getChannelIndexById(id){
@@ -1645,7 +1669,16 @@ export default {
             let self=this;
             console.log(item);
             if(e==0){
-                item.itemgetScore=itemDS.val;
+                if(item.type==2){
+                    if(item.itemScore<0){
+                        item.itemgetScore = itemDS.val==0 ? item.itemScore : 0
+                    }else{
+                        item.itemgetScore = itemDS.val==10 ? item.itemScore : 0
+                    }
+                }else{
+                    item.itemgetScore = itemDS.val
+                }
+                item.isQualified = itemDS.val == 0 ? false : true
                 item.itemScoreTitle=itemDS.scoreTitle;
             }else{
                 item.itemgetScore=itemDS;
@@ -1657,6 +1690,7 @@ export default {
         checkScore(item,itemDS,e){
             let self=this;
             console.log(item);
+            debugger
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -1685,6 +1719,11 @@ export default {
                     self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
                     self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
                 }
+            }
+            if(self.isShowWarn){
+                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+                let sheetName=self.sheetName.slice(0,indexFeed);
+                self.isShowWarn = sheetName.some(item=>item.dealCount!=item.count) ? true : false
             }
             let isSheet1=false,isSheet2=false
             self.sheetName.forEach(item=>{
@@ -2189,16 +2228,18 @@ export default {
                 }
                 else{
                     //Ezviz
-                    if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-                        self.$refs.ezvizVideo.stopRealTime();
-                        self.$nextTick(()=>{
-                        self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                        })
-                    }
-                    else{
-                        self.$nextTick(()=>{
-                        self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                        })
+                    if(self.$refs.ezvizVideo!=undefined){
+                        if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                            self.$refs.ezvizVideo.stopRealTime();
+                            self.$nextTick(()=>{
+                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                            })
+                        }
+                        else{
+                            self.$nextTick(()=>{
+                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                            })
+                        }
                     }
                 }
                 self.curDeviceId=item.deviceId[0];
@@ -2261,12 +2302,14 @@ export default {
                     _item.disabled=true;
                 }
             })
-            self.inspectList.slice(0,self.inspectList.length-1).forEach((_item,_index)=>{
-                _item.items.forEach((itemDS,indexDS)=>{
-                    if(itemDS.id!=item.id){
-                        itemDS.checked=false;
-                        itemDS.disabled=true;
-                    }
+            self.sheetName.slice(0,self.sheetName.length-1).forEach((_item,_index)=>{
+                _item.inspectList.forEach((p_item,p_index)=>{
+                    p_item.items.forEach((itemDS,indexDS)=>{
+                        if(itemDS.id!=item.id){
+                            itemDS.checked=false;
+                            itemDS.disabled=true;
+                        }
+                    })
                 })
             })
         },
@@ -2429,112 +2472,6 @@ export default {
             }
             sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
-        },
-        async submit(){
-            let self=this;
-            let temp=[];
-            let count=0;
-            let dealCount=0;
-            let indexFeed=self.inspectList.map(x=>x.groupId).indexOf('feedBack');
-            let inspectList=self.inspectList.slice(0,indexFeed);
-
-            inspectList.forEach(item=>{
-                count=count+item.items.length;
-                dealCount=dealCount+item.dealCount;
-            })
-            if(dealCount<count){
-                self.noAllInspectObj.dialogCosed=true;
-                return false;
-            }
-            for(let i in inspectList){
-                for(let  j in inspectList[i].items){
-                    let objItem={};
-                    objItem.ts=new Date().getTime();
-                    objItem.description=inspectList[i].items[j].inspectInput.trim();
-                    objItem.score=inspectList[i].items[j].isIgnore?-1:inspectList[i].items[j].itemScore;
-                    objItem.storeId=self.store.storeId;
-                    objItem.inspectItemId=inspectList[i].items[j].id;
-                    let tempFileUrl=[];
-                    if(!inspectList[i].items[j].isIgnore){
-                        for(let k in inspectList[i].items[j].sourceList){
-                            let obj={};
-                            if(inspectList[i].items[j].sourceList[k].mediaType==2){
-                                let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
-                                obj.mediaType=2;
-                                obj.url=url;
-                                obj.deviceId = self.channel.id;
-                            }
-                            else if(inspectList[i].items[j].sourceList[k].mediaType==1){
-                                let url=await self.upLoadFile(inspectList[i].items[j].sourceList[k]);
-                                obj.mediaType=1;
-                                obj.url=url;
-                                obj.deviceId = self.channel.id;
-                            }
-                            tempFileUrl.push(obj);
-                        }
-                    }
-                    objItem.attachment=tempFileUrl;
-                    temp.push(objItem);
-                }
-            }
-            let feedEventList=[];
-            console.log(self.eventList);
-
-            for(let i in self.eventList){
-                let obj={};
-                obj.ts=new Date().getTime();
-                obj.storeId=self.store.storeId,
-
-                obj.subject=self.eventList[i].eventName;
-                obj.description=self.eventList[i].eventDes;
-
-                let commentTemp=[];
-                if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
-                    let url=await self.upLoadFile(self.eventList[i].sourceObj);
-                    let commentObj={
-                        mediaType:self.eventList[i].sourceObj.mediaType,
-                        url:url,
-                        deviceId: self.channel.id
-                    }
-                    commentTemp.push(commentObj);
-                    obj.deviceId=self.channel.id;
-                }
-                else{                        //通过加号创建的问题反馈
-                    obj.diviceId = -1;
-                }
-                obj.attachment=commentTemp;
-                feedEventList.push(obj);
-            }
-            let params={
-                items:temp,
-                feedback:feedEventList
-            };
-            let routeData=null;
-            submitInspectItem(params).then(res=>{
-                if(res.errCode==0){
-                    let data=res.data;
-                    self.editFlag=true;
-                    routeData={
-                        isSuccess:true,
-                        user:data.notifiedTo,
-                        ignoredItems:data.ignoredItems,
-                        submitResult:data.submitResult,
-                        store:self.store,
-                        ignoreTemp:self.ignoreTemp
-                    };
-                }
-                else{
-                    routeData={
-                        isSuccess:false
-                    };
-                }
-                if(self.playState){
-                    self.stopRealTime();
-                }
-                sessionStorage.setItem('reinspect_submit',JSON.stringify(routeData));
-                self.$router.push({name:"submitEvent",params:{data:routeData}});
-            })
-
         },
         spreadContent(){
             let self=this;
@@ -2884,12 +2821,16 @@ export default {
         changeStore(item,index,_item,_index){
             let self=this;
             self.patrolstore=''
-            self.inspectItemList=''
-            self.inspectList=''
+            self.inspectItemList=[]
+            self.inspectList=[]
             self.sheetName=[]
             self.showChannelBtns=[]
             self.patrolStoreName = _item.name
             self.PatrolList=[]
+            self.hasIgnoretemp=[]
+            self.$store.dispatch('setPatrolHistory',null);
+            self.isShowWarn=false
+            self.showIgnoreItem=false
             _item.authorizedInspect.forEach(au_item=>{
                 if(au_item.mode==0){
                     self.PatrolList.push(au_item) //门店对应巡检表
@@ -3085,7 +3026,7 @@ export default {
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
-            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
+            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
                 self.changeInspectObj.dialogCosed=true;
                 self.beforepatrolstore=val
             }else{
@@ -3105,6 +3046,10 @@ export default {
               }
             }
             self.isDisabled=false
+            self.hasIgnoretemp=[]
+            self.$store.dispatch('setPatrolHistory',null);
+            self.isShowWarn=false
+            self.showIgnoreItem=false
                 self.PatrolList.forEach(item=>{
                     if(item.id==val){
                         self.patrolstore=item.name
@@ -3199,6 +3144,7 @@ export default {
         hasIgnoreItem(){
             let self=this
             self.showIgnoreItem=true
+            self.showFeedBack=false
             let PatrolHistory = self.$store.getters.PatrolHistory;
             if(PatrolHistory!=null){
                 if(PatrolHistory.hasIgnoretemp!=null){
@@ -3211,29 +3157,38 @@ export default {
                 self.hasIgnoretemp = PatrolHistory.hasIgnoretemp!=null ? PatrolHistory.hasIgnoretemp : null
             }
         },
+        backToPatrol(){
+            let self=this
+            self.showIgnoreItem=false
+        },
         changeSheet(item,index){
             let self=this
             if(item.groupId=='feedBack'){
-                self.showFeedBack=true;
-                if(self.eventList.length==0){
-                    self.showFeedBackInfo=true;
+                let PatrolHistory = self.$store.getters.PatrolHistory;
+                if(PatrolHistory!=null){
+                    self.eventList = PatrolHistory.eventList
+                    self.showFeedBackInfo = self.eventList.length==0 ? true : false
+                    self.showFeedBack = true
+                }else{
+                    self.showFeedBack=true;
+                    self.showFeedBackInfo = self.eventList.length==0 ? true : false
+                    self.showGuide=false;
+                    console.log(self.channel);
+                    self.channelBtns = self.allChannelBtns.concat();
+                    self.channelBtns.forEach((_item,_index)=>{
+                        if(self.channel!=null){
+                            if(_item.id==self.channel.id){
+                                _item.isClick=true;
+                            }
+                            else{
+                                _item.isClick=false;
+                            }
+                        }
+                    })
+                    self.$nextTick(()=>{
+                        self.getshowBtns(self.channelBtns);
+                    })
                 }
-                self.showGuide=false;
-                console.log(self.channel);
-                self.channelBtns = self.allChannelBtns.concat();
-                self.channelBtns.forEach((_item,_index)=>{
-                    if(self.channel!=null){
-                        if(_item.id==self.channel.id){
-                            _item.isClick=true;
-                        }
-                        else{
-                            _item.isClick=false;
-                        }
-                    }
-                })
-                self.$nextTick(()=>{
-                    self.getshowBtns(self.channelBtns);
-                })
             }else{
                 self.inspectList=item.inspectList
                 self.curSheetIndex=index
@@ -3261,7 +3216,7 @@ export default {
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
-            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)){
+            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -3308,12 +3263,20 @@ export default {
           let tempId=self.getIndexById(self.curItemId);
           console.log(tempId);
           if(tempId!=null){
-            self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+              if(!self.isShowWarn){
+                  self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+              }else{
+                  self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
+              }
           }
           else{
             self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
           }
-          self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+          if(!self.isShowWarn){
+              self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+          }else{
+              self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
+          }
           console.log(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList)
         },
       /**
@@ -4203,6 +4166,55 @@ export default {
                 margin-left: calc(25/1920*100vw);
                 margin-right: calc(25/1920*100vw);
                 position: relative;
+                .inspect-title /deep/ .el-alert__title{
+                    font-weight: bold;
+                    color:#f59f23;
+                    font-size: 14px;
+                }
+                // .inspect-title /deep/ .el-alert--warning{
+                //     height:40px;
+                //     line-height: 40px;
+                // }
+                .inspect-title /deep/ .el-alert__icon{
+                    font-size: 16px;
+                    margin-right: calc(10/1920*100vw);
+                }
+                .inspect-title /deep/ .el-alert__content{
+                    padding:0;
+                }
+                .inspect-title{
+                    .el-alert{
+                        height:40px;
+                        line-height: 40px;
+                        padding-left: calc(35/1920*100vw);
+                        padding-right: calc(26/1920*100vw);
+                        vertical-align: middle;
+                    }
+                    .info-alert /deep/ .el-alert__content{
+                        width:100%;
+                    }
+                    .info-alert{
+                        .info-left{
+                            float: left;
+                            color:#182752;
+                            font-weight: bold;
+                            font-size:calc(14/1920*100vw);
+                        }
+                        .info-right{
+                            float: right;
+                            color:#6097f4;
+                            cursor: pointer;
+                            img{
+                                vertical-align: middle;
+                            }
+                            span{
+                                text-decoration: underline;
+                                margin-left:calc(10/1920*100vw);
+                                vertical-align: middle;
+                            }
+                        }
+                    }
+                }
                 .guide-lside{
                     position: absolute;
                     width: auto;
@@ -4266,27 +4278,23 @@ export default {
                     right: 5%;
                   }
                 }
-                .inspect-title /deep/ .el-alert__title{
-                    font-weight: bold;
-                    color:#f59f23;
-                    font-size: 14px;
-                }
-                .inspect-title /deep/ .el-alert--warning{
-                    height:40px;
-                    line-height: 40px;
-                }
                 .inspect-content{
                     padding: 15px auto;
                     .Group-content{
                         text-align: left;
                         .Group-content-title{
                             padding-left:calc(35/1920*100vw);
+                            padding-right:calc(26/1920*100vw);
                             height:50px;
                             line-height: 50px;
                             border-bottom:1px solid #ddd;
                             font-size: calc(14/1920*100vw);
                             color:$tab;
                             cursor: pointer;
+                            .icon{
+                                float:right;
+                                line-height: 50px;
+                            }
                         }
                         .Group-content-details{
                             
@@ -4869,9 +4877,9 @@ export default {
     .des-input .el-textarea__inner{
         font-family:Roboto, Arial, 'Microsoft YaHei';
     }
-  .score-menu.el-dropdown-menu{
+  /* .score-menu.el-dropdown-menu{
     z-index: 0 !important;
-  }
+  } */
   .confirmClass{
     width: 28%;
     font-family: Roboto, Arial, 'Microsoft YaHei';

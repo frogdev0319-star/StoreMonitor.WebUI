@@ -51,7 +51,9 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td :rowspan="s_item.inspectList.length+1"><span class="sheet_title" :style="'line-height:'+32*s_item.inspectList.length+'px;'">{{s_item.label}}</span></td>
+                            <td :rowspan="s_item.inspectList.length+1">
+                                <span class="sheet_title" :style="'line-height:'+s_item.height*s_item.inspectList.length+'px;'">{{s_item.label}}</span>
+                            </td>
                         </tr>
                         <tr v-for="(item,index) in s_item.inspectList" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
                             <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.items.length}}</span></td>
@@ -154,13 +156,13 @@ export default {
             imgTitle:'',
             resultList: [
               {
-                'label': 0,
+                'label': 2,
                 'name':this.$t('overview.echartGood'),
                 'isActive':false,
                 'isShow':true
               },
               {
-                'label': 2,
+                'label': 0,
                 'name':this.$t('remotePatrol.dangerous'),
                 'isActive':false,
                 'isShow':true
@@ -339,7 +341,6 @@ export default {
         },
         async submit(){
             let self=this;
-            debugger
             let inspect=self.inspectList;
             let eventList=self.eventList;
             let status=0;
@@ -373,7 +374,12 @@ export default {
                         let objItem={};
                         objItem.ts=new Date().getTime();
                         objItem.description=inspect[i].inspectList[g].items[j].inspectInput.trim();
-                        objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:inspect[i].inspectList[g].items[j].itemScore;
+                        if(inspect[i].type==0||inspect[i].type==2){
+                            objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:(inspect[i].inspectList[g].items[j].isQualified ? 1 :0);
+                        }else{
+                            objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:inspect[i].inspectList[g].items[j].itemgetScore;
+                        }
+                        
                         objItem.storeId=self.store.storeId;
                         objItem.inspectItemId=inspect[i].inspectList[g].items[j].id;
                         let tempFileUrl=[];
@@ -429,7 +435,6 @@ export default {
                 feedEventList.push(obj);
             }
             status = self.curSumIndex;
-            debugger
             let params={
                 status:status,
                 comment:self.suggest.trim(),
@@ -524,13 +529,18 @@ export default {
                         self.resultList[0].isShow=false
                         self.resultList[1].isActive=true
                     }
+                    p_item['height']=18
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
+                    p_item['height']=30
                 }else if(p_item.type==2){
                     p_item['tHeader']=self.theaderOther
+                    p_item['height']=18
                 }
             })
-            self.scorecount = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            let s_count=0
+            s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
             self.summary=inspect
             eventList.forEach((item,index)=>{
                 let objFeedBack={};

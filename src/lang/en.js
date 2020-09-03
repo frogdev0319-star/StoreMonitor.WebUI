@@ -201,6 +201,8 @@ export default {
     alertContent:'合格率评估项为必填，巡检项评估项至少填写一项',//Sprint8 新增
     clickToContent:'部分巡检未评估，点击查看',//Sprint8 新增
     hasIgnoreContent:'本次巡检，未巡检项目',//Sprint8 新增
+    backToallsheet:'返回巡检表',//Sprint8 新增
+    scoreU:'单位：个',//Sprint8 新增
     Patroltips2:'The inspection list name already exists',
     stared: 'Star',
     clickToStar: 'Click to star',

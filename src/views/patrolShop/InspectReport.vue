@@ -28,90 +28,44 @@
       </div>
       <el-row class="report-content">
         <el-col :span="24" class="radior-content">
-          <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
-        </el-col>
-        <!-- <el-col :span="16" class="report-table">
           <div class="header-score">
               <span class="span-1">{{$t('remotePatrol.getscore')}}：</span>
               <span class="span-2">{{totalScore}} <span>{{$t('remotePatrol.scorecount')}}</span></span>
               <span class="span-3">({{$t('remotePatrol.scorerule')}})</span>
+              <span class="span-4">{{$t('remotePatrol.scoreU')}}</span>
           </div>
-          <table class="table table-bordered">
-            <thead>
-            <tr>
-              <th class="thPrintfont" scope="col" v-for="(item ,index) in theaderList" :key="index">{{item.name}}</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(item,index) in summary" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-              <td class="icon-td tdPrintfont">
-                <div class="icon-content">
-                  <div class="icon-blag"
-                       :style="item.isQua?{'background-color':'#6097F3'}:{'background-color':'#FDBA40'}">
-                    {{item.isQua? pass: failed}}
-                  </div>
-                  <span class="item-name">{{item.groupName+'（'+item.count+'）'}}</span></div>
-              </td>
-              <td class="tdPrintfont"><span>{{item.numOfQualifiedItems}}</span></td>
-              <td class="tdPrintfont"><span>{{item.numOfUnqualifiedItems}}</span></td>
-            </tr>
-            </tbody>
-          </table>
-        </el-col> -->
+          <v-chart :options="options" class="chart-content" :auto-resize='true' ref="chartRadar"/>
+        </el-col>
       </el-row>
       <el-row class="row-table">
         <el-col>
-                <table class="table table-bordered" v-if="tableData.passfail!=undefined">
+          <table class="table table-bordered" v-for="(s_item,s_index) in tableData" :key="s_index">
                     <thead>
-                        <tr>
-                            <th scope="col" v-for="(item ,index) in theaderPassFail" :key="index" :style="item.width">{{item.name}}</th>
+                        <tr v-if="s_item[0].type==0">
+                            <th scope="col" v-for="(t_item ,t_index) in theaderPassFail" :key="t_index" :style="t_item.width">{{t_item.name}}</th>
+                        </tr>
+                        <tr v-if="s_item[0].type==1">
+                            <th scope="col" v-for="(t_item ,t_index) in theaderScore" :key="t_index" :style="t_item.width">{{t_item.name}}</th>
+                        </tr>
+                        <tr v-if="s_item[0].type==2">
+                            <th scope="col" v-for="(t_item ,t_index) in theaderOther" :key="t_index" :style="t_item.width">{{t_item.name}}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td :rowspan="tableData.passfail.length+1"><span class="sheet_title">{{$t('insSettingView.sheetpassfail')}}</span></td>
+                            <td :rowspan="s_item.length+1">
+                                <span v-if="s_item[0].type==0" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetpassfail')}}</span>
+                                <span v-if="s_item[0].type==1" :style="'line-height:'+30*s_item.length+'px;'">{{$t('insSettingView.sheetscore')}}</span>
+                                <span v-if="s_item[0].type==2" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetother')}}</span>
+                            </td>
                         </tr>
-                        <tr v-for="(item,index) in tableData.passfail" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">12</span></td>
-                            <td><span>{{item.numOfQualifiedItems}}</span></td>
-                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="table table-bordered" v-if="tableData.Score!=undefined">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="(item ,index) in theaderScore" :key="index" :style="item.width">{{item.name}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td :rowspan="tableData.Score.length+1"><span class="sheet_title">{{$t('insSettingView.sheetscore')}}</span></td>
-                        </tr>
-                        <tr v-for="(item,index) in tableData.Score" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">2</span></td>
-                            <td><span>{{item.numOfQualifiedItems}}</span></td>
-                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
-                            <td><span>8</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="table table-bordered" v-if="tableData.Other!=undefined">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="(item ,index) in theaderOther" :key="index" :style="item.width">{{item.name}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td :rowspan="tableData.Other.length+1"><span class="sheet_title">{{$t('insSettingView.sheetother')}}</span></td>
-                        </tr>
-                        <tr v-for="(item,index) in tableData.Other" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">56</span></td>
-                            <td><span>{{item.numOfQualifiedItems}}</span></td>
-                            <td><span>{{item.numOfUnqualifiedItems}}</span></td>
-                            <td><span>8</span></td>
-                            <td><span>8</span></td>
+                        <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.numOfTotalItems}}</span></td>
+                            <td v-if="item.type==0||item.type==2"><span>{{item.numOfQualifiedItems}}</span></td>
+                            <td v-if="item.type==0||item.type==2"><span>{{item.numOfUnqualifiedItems}}</span></td>
+                            <td v-if="item.type==1"><span>{{item.totalScore}}</span></td>
+                            <td v-if="item.type==1||item.type==2"><span>{{item.numOfIgnored}}</span></td>
+                            <td v-if="item.type==1||item.type==2"><span>{{item.actualScore}}</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -169,9 +123,9 @@
                       <p class="title2">{{_item.description}}</p>
                     </div>
                     <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
-                    <div class="title-btn" v-if="_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
-                    <div class="title-btn" v-if="_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
-                    <!-- <div class="title-btn" v-if="_item.grade==2">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.good')}}</div> -->
+                    <div class="title-btn" v-if="(item.groupType==0||item.groupType==2)&&_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
+                    <div class="title-btn" v-if="(item.groupType==0||item.groupType==2)&&_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
+                    <div class="title-btn" v-if="item.groupType==1">{{$t('remotePatrol.scoreUnit')}}{{_item.grade}}</div>
                   </div>
                   <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
                     <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
@@ -724,10 +678,7 @@
                 Typeindex[0].type==2 ? te_temp.push(Typeindex) : ''
               }
           }
-          debugger
-          self.tableData = te_temp
-
-
+          self.tableData=te_temp
           self.totalScore=data.totalScore
           let summaryTemp = [];
           summary.forEach(item => {
@@ -860,9 +811,9 @@
         self.summary.forEach(item => {
           let obj = {};
           obj.name = item.groupName;
-          obj.max = item.count * 2;
+          obj.max = Number(item.numOfQualifiedItems+item.numOfUnqualifiedItems)==0 ? 1 : Number(item.numOfQualifiedItems+item.numOfUnqualifiedItems);
           tempIndicator.push(obj);
-          seriesValue.push(item.numOfExcellentItems * 2 + item.numOfQualifiedItems);
+          seriesValue.push(item.numOfQualifiedItems);
         });
         let temp = [];
         let obj = {value: seriesValue};
@@ -895,12 +846,14 @@
         }
       },
     },
+    created(){
+      this.getRouterData();
+    },
     mounted() {
       let self = this;
       window.addEventListener("resize", self.adjustChart, false);
       self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
       self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)
-      self.getRouterData();
       self.getReportInfo();
       self.getReportDetail()
       //self.getRadarOption();
@@ -1039,9 +992,31 @@
         }
       }
       .report-content {
-        margin-top: 30px;
+        margin-top: 15px;
         .radior-content {
           height: 300px;
+          .header-score{
+            margin-bottom: 10px;
+            font-weight: bold;
+              .span-1{
+                  font-size: calc(14/1920*100vw);
+                  color: $black;
+              }
+              .span-2{
+                  color: $red;
+                  font-size: calc(20/1920*100vw);
+              }
+              .span-3{
+                  color: $tab;
+                  font-size: calc(12/1920*100vw);
+              }
+              .span-4{
+                float: right;
+                font-weight: 400;
+                color: $tab;
+                font-size: calc(12/1920*100vw);
+              }
+          }
           .chart-content {
             width: 100%;
             height: 100%;
