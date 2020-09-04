@@ -195,14 +195,14 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    TableTotal:'项目总分值',//Sprint8 新增
-    TableIgnore:'不适用数量',//Sprint8 新增
-    TableGet:'得分',//Sprint8 新增
-    alertContent:'合格率评估项为必填，巡检项评估项至少填写一项',//Sprint8 新增
-    clickToContent:'部分巡检未评估，点击查看',//Sprint8 新增
-    hasIgnoreContent:'本次巡检，未巡检项目',//Sprint8 新增
-    backToallsheet:'返回巡检表',//Sprint8 新增
-    scoreU:'单位：个',//Sprint8 新增
+    TableTotal:'Total project score',//Sprint8 新增
+    TableIgnore:'Inapplicable quantity',//Sprint8 新增
+    TableGet:'Score',//Sprint8 新增
+    alertContent:'Qualification rate evaluation items are required, and at least one inspection item evaluation item',//Sprint8 新增
+    clickToContent:'Some inspections have not been evaluated, click to view',//Sprint8 新增
+    hasIgnoreContent:'Items not inspected in this inspection',//Sprint8 新增
+    backToallsheet:'Return to the inspection list',//Sprint8 新增
+    scoreU:'unit: PCS',//Sprint8 新增
     Patroltips2:'The inspection list name already exists',
     stared: 'Star',
     clickToStar: 'Click to star',
@@ -376,7 +376,7 @@ export default {
   reportView:{
     selectStores: 'Select Stores',
     country: 'Country/Region',
-    selectStoreTag:'标签快选',//Sprint8 新增
+    selectStoreTag:'Fast label selection',//Sprint8 新增
     regionI: 'Region I',
     regionII: 'Region II',
     stores: 'Stores',
@@ -420,7 +420,7 @@ export default {
 
   // event Management page language
   eventView:{
-    enclosure:'附件',//Sprint8 新增
+    enclosure:'annex',//Sprint8 新增
     status: 'Status',
     all : 'All',
     pending: 'Pending',
@@ -459,7 +459,7 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
-    OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8 新增
+    OnlyOthers:'[Inspection scoring item] The content of the sheet page cannot be empty',//Sprint8 新增
     selecttitle:'Please select the related jobs',
     storeNoInspect:'No bound Remote Patrol List with the store',
     // confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
@@ -469,7 +469,7 @@ export default {
     tHeaderB:'Inspection Items(Required, 100 characters)',
     tHeaderC:'Score(1~100points)',
     tHeaderD:'Inspection Item Description(Required,100 characters)',
-    tHeaderF:'低于*分，需由门店负责人处理（必填，1~10分）',//Sprint8 新增
+    tHeaderF:'If the score is lower than *, the person in charge of the store must handle it (required, 1~10 points)',//Sprint8 新增
     bindWith: 'Binded with ',
     bindStore: 'stores',
     bindList: 'Bound List',
@@ -484,12 +484,16 @@ export default {
     Inspector:'Please select inspector',
     inspectName: 'Name',
     inspectionDescp: 'Descriptions',
-    sheetscore0: '项目满分值',//Sprint8 新增
-    sheetscore1: '低于*分，须由门店负责人处理',//Sprint8 新增
-    sheetscore2: '项目分值(必填，-100分~100分)',//Sprint8 新增
-    sheetpassfail:'合格率评估项',//Sprint8 新增
-    sheetscore:'巡检评估项',//Sprint8 新增
-    sheetother:'附加项',//Sprint8 新增
+    sheetscore0: 'Project full score',//Sprint8 新增
+    sheetscore1: 'If the score is lower than *, the person in charge of the store must handle it',//Sprint8 新增
+    sheetscore2: 'Project score (required, -100 points to 100 points)',//Sprint8 新增
+    sheetpassfail:'Pass-Failed',//Sprint8 新增
+    sheetscore:'Score items',//Sprint8 新增
+    sheetother:'Other items',//Sprint8 新增
+    notAllowAdd:'Pass&Fail and Others Tab cannot form a valid inspection table, and it is not allowed to add!',//Sprint8 新增
+    notallowdeletetips:'There is an invalid combination of patrol table Tabs and cannot be deleted!',//Sprint8 新增
+    notallowA:'Pass&Fail and Others',//Sprint8 新增
+    notallowB:'Others',//Sprint8 新增
     score: 'Score',
     selectImprtLoc: 'Select a location for import files.',
     enterListName: 'Enter List Name',
@@ -517,10 +521,10 @@ export default {
     excelLongCategory: 'The length of group supports up to 30 characters!',
     excelIllegalCategory: 'llegal characters outside "@#￥%^&*"!',
     excelEmpty: 'The group name and item name can\'t empty!',
-    passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
-    excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
-    excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
-    excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
+    passfailexcelEmpty: 'The inspection item cannot be empty!',//Sprint8 新增
+    excelFullScoreType:'The full score of the project is required, and the value range is an integer from 1 to 10',//Sprint8 新增
+    excelMinScoreType:'The minimum score of the inspection item is required, and the value range is 1 to the integer of the project full score',//Sprint8 新增
+    excelOtherScoreType:'The project score is required, and the value range is -100~100 integer',//Sprint8 新增
     excelLongItem: 'The length of item is 100 characters at most!',
     excelIllegalDes: 'The length of item description is 300 characters at most!',
     deleteItem: 'Delete Item',
@@ -557,7 +561,7 @@ export default {
     addInsItem: 'Add Items',
     deleteInsItem: 'Delete Items',
     description: 'Description',
-    descriptionRuletip:'Enter up to 300 characters',
+    descriptionRuletip:'Enter up to 1200 characters',
     titleEmpty: 'Title may not be empty.',
     illegalStr: 'Illegal strings!',
     remotePatrol: 'Remote Patrol',

@@ -491,6 +491,10 @@ export default {
     sheetpassfail:'合格率评估项',//Sprint8 新增
     sheetscore:'巡检评估项',//Sprint8 新增
     sheetother:'附加项',//Sprint8 新增
+    notAllowAdd:'Pass&Fail  and Others Tab无法组成有效的巡检表，不允许新增！',//Sprint8 新增
+    notallowdeletetips:'存在无效的巡检表Tab组合，不允许删除！',//Sprint8 新增
+    notallowA:'合格率评估项和附加项',//Sprint8 新增
+    notallowB:'附加项',//Sprint8 新增
     selectImprtLoc: '请选择导入文件的位置',
     enterListName: '请输入巡检表名称',
     enterItemName: '请输入巡检项名称',
@@ -558,7 +562,7 @@ export default {
     addInsItem: '新增巡检项',
     deleteInsItem: '删除巡检项',
     description: '巡检项需求描述',
-    descriptionRuletip:'最多可输入300个字符',
+    descriptionRuletip:'最多可输入1200个字符',
     titleEmpty: '类别名称不能为空！',
     illegalStr: '当前输入含有非法字符！',
     remotePatrol: '远程巡检',

@@ -157,13 +157,16 @@
             <el-col :span="18" class="el-route-tabs">
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :name="index.toString()" :closable="index!=0&&index!=1?true:false" >
-                        <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content">
+                        <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content" :style="{'min-height':varyWindowWidth*0.70+'px'}">
                             <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :label="`${_item.name}`" :name="_index.toString()">
+                                <!-- <el-tooltip class="item" effect="dark" :content="_item.name" placement="top">
+                                </el-tooltip> -->
                                 <div v-if="_item.routeData">
                                     <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName"
                                     :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"></route-detail>
                                 </div>
                             </el-tab-pane>
+                            
                         </el-tabs>
                         <div class="data-empty" v-else :style="{'min-height':varyWindowWidth*0.52+'px'}">
                             <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
@@ -1126,7 +1129,7 @@ export default {
                                         if(validateInput(item.b)){flagItemRexPassFail=true;}
                                     }
                                     if(item.c==undefined){ flagDescNamePassFail=true;}
-                                    else{if(filterString.getContentLength(item.c.toString().trim()) > 300){flagDesLengthPassFail=true;}}
+                                    else{if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthPassFail=true;}}
                             }else if(arr[i][0]=='Score'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryScore.push(index);
@@ -1144,7 +1147,7 @@ export default {
                                         flagMinScoreType=true
                                     }
                                     if(item.e==undefined){ flagDescNameScore=true;}
-                                    else{if(filterString.getContentLength(item.e.toString().trim()) > 300){flagDesLengthScore=true;}}
+                                    else{if(filterString.getContentLength(item.e.toString().trim()) > 1200){flagDesLengthScore=true;}}
                             }else if(arr[i][0]=='Others'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryOthers.push(index);
@@ -1159,7 +1162,7 @@ export default {
                                         flagOtherScoreType=true
                                     }
                                     if(item.d==undefined){ flagDescNameOthers=true;}
-                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 300){flagDesLengthOthers=true;}}
+                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 1200){flagDesLengthOthers=true;}}
                             }
                         })
                     }

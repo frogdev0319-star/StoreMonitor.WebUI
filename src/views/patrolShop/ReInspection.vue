@@ -923,7 +923,7 @@ export default {
             let getdealnum=0
             let sheetName=PatrolHistory.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
-                s_item.count==s_item.dealCount ? getdealnum=0 : getdealnum++
+                s_item.count!=s_item.dealCount ? getdealnum++ : ''
                 s_item.inspectList.forEach(n_item=>{
                     n_item.items.forEach(item=>{
                         item.isIgnore=false
@@ -956,6 +956,7 @@ export default {
                 self.inspectItemList = PatrolHistory.inspectItemList
             }
             self.store = PatrolHistory.store
+            self.patrolStoreName=PatrolHistory.store.storeName
             self.showGuide = false
             self.showStoreUp = true
         }else{
@@ -1690,7 +1691,6 @@ export default {
         checkScore(item,itemDS,e){
             let self=this;
             console.log(item);
-            debugger
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -3026,6 +3026,7 @@ export default {
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
+            //确认总结后，切换巡检表
             if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
                 self.changeInspectObj.dialogCosed=true;
                 self.beforepatrolstore=val
@@ -3048,8 +3049,10 @@ export default {
             self.isDisabled=false
             self.hasIgnoretemp=[]
             self.$store.dispatch('setPatrolHistory',null);
+            self.$store.dispatch('setPatrolComment',null);
             self.isShowWarn=false
             self.showIgnoreItem=false
+            self.eventList=[]
                 self.PatrolList.forEach(item=>{
                     if(item.id==val){
                         self.patrolstore=item.name
@@ -3144,7 +3147,6 @@ export default {
         hasIgnoreItem(){
             let self=this
             self.showIgnoreItem=true
-            self.showFeedBack=false
             let PatrolHistory = self.$store.getters.PatrolHistory;
             if(PatrolHistory!=null){
                 if(PatrolHistory.hasIgnoretemp!=null){
@@ -3160,6 +3162,26 @@ export default {
         backToPatrol(){
             let self=this
             self.showIgnoreItem=false
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            sheetName.forEach(s_item=>{
+                let dealtemp=[]
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        self.hasIgnoretemp.forEach(h_item=>{
+                            if(h_item.id==_item.id){
+                                _item=h_item
+                            }
+                        })
+                        if(_item.inputCount==1){
+                            let obj={}
+                            obj.dealCount=_item.inputCount
+                            dealtemp.push(obj)
+                        }
+                    })
+                })
+                s_item.dealCount=dealtemp.length
+            })
         },
         changeSheet(item,index){
             let self=this

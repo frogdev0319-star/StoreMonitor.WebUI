@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <el-scrollbar id="el-menuscrollbar">
-                    <div v-if="routeData.length!=0" :style="{'max-height':varyWindowWidth*0.58+'px'}">
+                    <div v-if="routeData.length!=0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
                         <div v-for="(item,index) in routeData" :key="index" class="data-content">
                             <div class="header-content tabTitle" v-if="index==0">
                                 <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
@@ -174,6 +174,27 @@
                         <el-button class="file-confirm-btn" @click="showFailInfo = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
                     </div>
                 </el-dialog>
+                <el-dialog :title="$t('remotePatrol.prompt')"
+                :visible.sync="showFaildig" v-if="showFaildig"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="510px"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <div style="margin:20px 20px 20px 26px;">
+                            <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{generateInsSettingLang('notallowdeletetips')}}</span>
+                            <p style="padding-left:40px;color:#182752;">A.{{generateInsSettingLang('notallowA')}}</p>
+                            <p style="padding-left:40px;color:#182752;">B.{{generateInsSettingLang('notallowB')}}</p>
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showFaildig = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="showFaildig = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
             </el-col>
         </el-row>
     </div>
@@ -199,6 +220,7 @@ export default {
         return{
             typeNum:0,
             itemNum:0,
+            showFaildig:false,
             showBtnContent:false,
             showDeleteContent:false,
             showSingleDeleteContent:false,
@@ -223,6 +245,7 @@ export default {
             varyWindowWidth:window.innerHeight,
             allchecked:false,
             curDeleteId:'',
+            curDelGroupId:[],
             fileName: this.$t('insSettingView.patrolExample'),
             lang: this.$i18n.locale,
             delItems:[],
@@ -408,6 +431,19 @@ export default {
                 self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
             }
+            let typeTemp=[]
+            self.allRoutedata.forEach(item=>{
+                item.forEach(_item=>{
+                    typeTemp.push(_item.type)
+                })
+            })
+            let delData=self.routeData.filter(x=>x.itemData.length!=0)
+            if(delData.length==1&&delData[0].itemData.length==1){
+                if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
+                    self.showFaildig=true
+                    return false;
+                }
+            }
             self.showDeleteContent=true;
         },
         afterDeleteNape(){
@@ -487,6 +523,19 @@ export default {
         handleDelete(index,row){
             console.log(index);
             let self=this;
+            let typeTemp=[]
+            self.allRoutedata.forEach(item=>{
+                item.forEach(_item=>{
+                    typeTemp.push(_item.type)
+                })
+            })
+            let delData=self.routeData.filter(x=>x.itemData.length!=0)
+            if(delData.length==1&&delData[0].itemData.length==1){
+                if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
+                    self.showFaildig=true
+                    return false;
+                }
+            }
             self.showSingleDeleteContent=true;
             let id=row.id;
             let arr=[];
@@ -502,16 +551,24 @@ export default {
                 console.log(res.data)
                 let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
-                    self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
-                    self.showSingleDeleteContent=false;
-                    // self.$emit('refreshList');
                     self.routeData.forEach((r_item,r_index)=>{
                         r_item.itemData.forEach((d_item,d_index)=>{
-                            if(self.curDeleteId==d_item.id){
-                                self.routeData[r_index].itemData.splice(d_index,1)
-                                if(self.routeData[r_index].itemData.length==0){
-                                    self.routeData.splice(r_index,1)
+                            if(self.curDeleteId[0]==d_item.id){
+                                self.curDelGroupId=r_item.id
+                                let paramsGroup={
+                                    "groupIds":[self.curDelGroupId]
                                 }
+                                if(self.routeData[r_index].itemData.length==1){
+                                    inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                                        if(resGroup.errMsg=='Success'){
+
+                                        }
+                                    })
+                                }
+                                self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+                                self.showSingleDeleteContent=false;
+                                let val = 'del'
+                                self.$emit('refreshList',val)
                             }
                         })
                     })

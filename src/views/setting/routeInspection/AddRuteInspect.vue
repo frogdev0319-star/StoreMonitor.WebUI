@@ -93,23 +93,43 @@
                     </div>
                </div>
                </el-scrollbar>
-
+                <el-dialog :title="$t('remotePatrol.prompt')"
+                :visible.sync="showFailInfo" v-if="showFailInfo"
+                :append-to-body='true'
+                :close-on-click-modal="false"
+                width="510px"
+                top="35vh"
+                left="40vh">
+                    <div class="dialog-content" style="overflow:hidden;width:100%;">
+                        <hr style="border: 0.5px solid #dfe2e9;"/>
+                        <div style="margin:20px 20px 20px 26px;">
+                            <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
+                            <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{generateInsSettingLang('notallowdeletetips')}}</span>
+                            <p style="padding-left:40px;color:#182752;">A.{{generateInsSettingLang('notallowA')}}</p>
+                            <p style="padding-left:40px;color:#182752;">B.{{generateInsSettingLang('notallowB')}}</p>
+                        </div>
+                    </div>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button class="file-cancel-btn" @click="showFailInfo = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+                        <el-button class="file-confirm-btn" @click="showFailInfo = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
+                    </div>
+                </el-dialog>
            </div>
        </el-col>
        <el-col :span="17" class="el-rute-nape">
            <div class="nape-content">
                <div class="title-content">
-                    <span  v-if="groupList.length!=0" :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
+                    <span :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
                       <i class="iconfont icon-icon-test icontitle"></i>
                       <span class="level2-name">{{napeTitle}}</span></span>
-                    <div class="btn-content" v-if="groupList.length!=0">
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="addNape" type="primary" class="btn-class">
+                    <div class="btn-content">
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" :disabled="groupList.length==0" @click="addNape" type="primary" class="btn-class">
                           <div class="btn-area">
                             <i class="el-icon-plus"></i>
                             <span>{{generateInsSettingLang('addInsItem')}}</span>
                           </div>
                         </el-button>
-                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" @click="deleteNape" type="primary" class="btn-class">
+                        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" :disabled="groupList.length==0" @click="deleteNape" type="primary" class="btn-class">
                           <div class="btn-area">
                             <i class="iconfont icon-shanchu"></i>
                             <span>{{generateInsSettingLang('deleteInsItem')}}</span>
@@ -242,7 +262,7 @@
                             </el-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
-                           <el-input size="mini" class="Itemscores-input" v-model="newAddScore"></el-input>
+                           <el-input size="mini" class="Itemscores-input" v-model="newAddScore" @input="inputChange"></el-input>
                        </div>
                        <div class="iconcontent" style="flex:1;">
                             <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
@@ -269,7 +289,6 @@ import PubSub from 'pubsub-js'
 import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
 import RegionMultiSelect from "@/components/RegionMultiSelect";
-
 export default {
     name:'AddRuteInspect',
     components:{
@@ -282,6 +301,7 @@ export default {
             newAddScore:0,
             firstLoad:true,
             groupTitle: this.$t('insSettingView.category'),
+            showFailInfo:false,
             tabName:'',
             ModelPost:[],
             ModelAddPost:[],
@@ -324,8 +344,13 @@ export default {
             Score_1:'',
             Score_2:'',
             Score_3:'',
-            sheetName:[],
-            allRoutedata:[]
+            sheetName:[
+                {id:'0',label:this.$t('insSettingView.sheetpassfail')},
+                {id:'1',label:this.$t('insSettingView.sheetscore')},
+                {id:'2',label:this.$t('insSettingView.sheetother')}
+            ],
+            allRoutedata:[],
+            typeTemp:[]
         }
     },
     computed:{
@@ -617,6 +642,10 @@ export default {
          */
         addGroup(){
             let self=this;
+            if(self.typeTemp.length==1&&self.typeTemp[0]==0&&self.activeSheetName=='2'){
+                self.notify(self.$t('insSettingView.notAllowAdd'),'warning',3000);
+                return false;
+            }
             self.showAddGroup=true;
             self.groupNameInput='';
             self.groupList.forEach(item=>{
@@ -748,9 +777,16 @@ export default {
             })
         },
         deleteGroup(index,item){
-            this.showDeleteGroup=true;
-            this.curGroup=item;
-            console.log(this.curGroup);
+            let self=this
+            if(self.groupList.length==1){
+                if((self.typeTemp.length==2&&!self.typeTemp.some(x=>x==0)||self.typeTemp.length==3)&&item.type==1){
+                    self.showFailInfo=true
+                    return false;
+                }
+            }
+            self.showDeleteGroup=true;
+            self.curGroup=item;
+            
         },
         async confirmDeleteGroup(){
             let self=this;
@@ -823,6 +859,12 @@ export default {
             if(count==0){
                 self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
                 return false;
+            }
+            if(count==self.napeList.length&&self.groupList.length==1){
+                if((self.typeTemp.length==2&&!self.typeTemp.some(x=>x==0)||self.typeTemp.length==3)&&self.groupList[0].type==1){
+                    self.showFailInfo=true
+                    return false;
+                }
             }
             self.showDeleteItem=true;
             self.deleteItemFlag='G';
@@ -926,8 +968,13 @@ export default {
                 itemScore=self.newScore
                 qualifiedScore=self.newCritical
             }else if(self.activeSheetName=='2'){
-                itemScore=self.newAddScore
-                qualifiedScore=null
+                if(self.newAddScore>100||self.newAddScore<-100){
+                    self.notify(self.$t('insSettingView.sheetscore2'),'warning',3000);
+                    return false;
+                }else{
+                    itemScore=self.newAddScore
+                    qualifiedScore=null
+                }
             }
             let objItem={
                 subject:self.newNapeName.trim(),
@@ -961,6 +1008,7 @@ export default {
                     self.napeList.push(obj);
                     self.newNapeName='';
                     self.newNapeDep='';
+                    self.newAddScore='';
                     self.showAddNape=false;
                     self.refreshData(self.groupIndex);
                     self.groupList[self.groupIndex].groupNum++;
@@ -1013,6 +1061,12 @@ export default {
         handleDelete(index,item){
             console.log(index);
             let self=this;
+            if(self.napeList.length==1&&self.groupList.length==1){
+                if((self.typeTemp.length==2&&!self.typeTemp.some(x=>x==0)||self.typeTemp.length==3)&&self.groupList[0].type==1){
+                    self.showFailInfo=true
+                    return false;
+                }
+            }
             self.showDeleteItem=true;
             self.deleteItemFlag='S';
             self.curItemId=item.id;
@@ -1107,38 +1161,51 @@ export default {
             })
             self.ModelPost = temp[0].ModelPost
             let te_temp=[]
+            let type_temp=[]
+            let sheetTemp=[]
+            let obj={ passfail:[], score:[],other:[]}
             for(let i=0;i<3;i++){
                 let Typeindex=temp.filter(x=>x.type==i);
-                let obj={}
                 if(Typeindex.length!=0){
                     te_temp.push(Typeindex)
-                    if(self.firstLoad){
+                    type_temp.push(Typeindex[0].type)
                         if(Typeindex[0].type==0){
-                            obj={'id':'0','label':self.$t('insSettingView.sheetpassfail')}
+                            obj.passfail=Typeindex
                         }
                         if(Typeindex[0].type==1){
-                            obj={'id':'1','label':self.$t('insSettingView.sheetscore')}
+                            obj.score=Typeindex
                         }
                         if(Typeindex[0].type==2){
-                            obj={'id':'2','label':self.$t('insSettingView.sheetother')}
+                            obj.other=Typeindex
                         }
-                        self.sheetName.push(obj)
-                    }
                 }
             }
+            sheetTemp=obj
+            self.activeSheetName = self.firstLoad ? te_temp[0][0].type.toString() : self.activeSheetName
             self.firstLoad=false
             self.allRoutedata=te_temp
-            self.groupList=te_temp[Number(self.activeSheetName)];
-            self.groupList[index].isClick=true;
-            self.curGroup=self.groupList[index];
-            self.groupIndex=index;
-            if(self.lang == 'en'){
-              self.napeTitle= `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
+            self.typeTemp=type_temp
+            self.groupList = self.activeSheetName=='0' ? sheetTemp.passfail : (self.activeSheetName=='1' ? sheetTemp.score : sheetTemp.other)
+            if(self.groupList.length!=0){
+                self.groupList[index].isClick=true;
+                self.curGroup=self.groupList[index];
+                self.groupIndex=index;
+                if(self.lang == 'en'){
+                    self.napeTitle= `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
+                }
+                else{
+                    self.napeTitle=`${self.groupList[index].groupName} ${self.$t('insSettingView.itemsOfCate')}`;
+                }
+                self.getNapeList(index,self.groupList[index]);
+            }else{
+                self.napeList=[]
+                if(self.lang == 'en'){
+                    self.napeTitle= `${self.$t('insSettingView.itemsOfCate')}`;
+                }
+                else{
+                    self.napeTitle=`${self.$t('insSettingView.itemsOfCate')}`;
+                }
             }
-            else{
-              self.napeTitle=`${self.groupList[index].groupName} ${self.$t('insSettingView.itemsOfCate')}`;
-            }
-            self.getNapeList(index,self.groupList[index]);
         },
         getNapeList(index,item){
             console.log(index);
@@ -1191,6 +1258,14 @@ export default {
               this.enterNameRuletip=false
           }
         },
+        inputChange(val){
+            let self=this
+            if(val.indexOf('-')!=-1){
+                self.newAddScore = '-'+val.replace(/[^\d]/g, '')
+            }else{
+                self.newAddScore = val.replace(/[^\d]/g, '')
+            }
+        },
         selectFullScore(val){
             let self = this
             let arr=[1,2,3,4,5,6,7,8,9,10]
@@ -1215,7 +1290,7 @@ export default {
         },
         napeDepChange(val, item){
           let self = this;
-          let comment = filterString.all(val,300);
+          let comment = filterString.all(val,1200);
           let length = filterString.getContentLength(val);
           console.log(comment,length);
           if(0 == Object.keys(item).length){
@@ -1224,7 +1299,7 @@ export default {
           else{
             item.napeDep = comment;
           }
-          if(length>300){
+          if(length>1200){
               this.descriptionRuletip=true
           }else{
               this.descriptionRuletip=false
@@ -1718,8 +1793,8 @@ export default {
                         text-align: left;
                         width: 80%;
                     }
-                    .inputcontent{
-                        width:90%;
+                    // .inputcontent{
+                    //     width:90%;
                         .rules{
                             font-size: 10px;
                             color:#ff2400;
@@ -1727,7 +1802,7 @@ export default {
                             line-height: 12px;
                             margin-left:25px;
                         }
-                    }
+                    // }
                 }
                 .nape-dep-data{
                     height: 100%;
@@ -1747,8 +1822,8 @@ export default {
                         @include point(margin-left,10);
                         @include point(margin-bottom,3);
                     }
-                    .inputcontent{
-                        float: left;
+                    // .inputcontent{
+                    //     float: left;
                         .rules{
                             font-size: 10px;
                             color:#ff2400;
@@ -1756,7 +1831,7 @@ export default {
                             line-height: 10px;
                             margin-left:10px;
                         }
-                    }
+                    // }
                 }
                 .nape-scores-handle{
                     height: 100%;

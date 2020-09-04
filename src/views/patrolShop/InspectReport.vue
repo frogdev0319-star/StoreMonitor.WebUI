@@ -125,7 +125,7 @@
                     <div class="ignore-btn" v-if="_item.grade==-1">{{$t('remotePatrol.ignored')}}</div>
                     <div class="title-btn" v-if="(item.groupType==0||item.groupType==2)&&_item.grade==0">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.failed')}}</div>
                     <div class="title-btn" v-if="(item.groupType==0||item.groupType==2)&&_item.grade==1">{{$t('remotePatrol.scoreUnit')}}{{$t('remotePatrol.pass')}}</div>
-                    <div class="title-btn" v-if="item.groupType==1">{{$t('remotePatrol.scoreUnit')}}{{_item.grade}}</div>
+                    <div class="title-btn" v-if="item.groupType==1&&_item.grade!=-1">{{$t('remotePatrol.scoreUnit')}}{{_item.grade}}</div>
                   </div>
                   <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.showAttachment||_item.comment!=null&&_item.comment!=''">
                     <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
@@ -476,6 +476,7 @@
             };
             obj.groupId = groupitem.groupId
             obj.groupName = groupitem.groupName
+            obj.groupType=groupitem.groupType
             groupitem.items.forEach((item,index)=>{
               let details = {}
               details.subject = item.subject
