@@ -741,24 +741,28 @@ export default {
         },
         confirmToBind(){
             let self=this;
-            let arr=[];
             if(self.elTableData[Number(self.activeName)].data.length==0){
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
-            self.tempdata.forEach(r_item=>{
-                r_item.itemData.forEach(_item=>{
-                    arr.push(_item.id);
-                });
-            })
-            console.log(arr);
-            if(arr.length==0){
+            let arrData=[]
+            self.elTableData[Number(self.activeName)].data.forEach(item=>{
+                let arr=[];
+                item.routeData.forEach(r_item=>{
+                    r_item.itemData.forEach(_item=>{
+                        arr.push(_item.id);
+                    });
+                })
+                arrData=arr
+            });
+            if(arrData.length==0){
+                //self.notify('请新增巡检项后进行操作！','warning',3000);
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             sessionStorage.setItem('TabName',self.activeName);
-            sessionStorage.setItem('NapeId',JSON.stringify(arr));
-            self.$router.push({name:'bindStore',params:{inspectId:self.tempdata[0].inspectId}});
+            sessionStorage.setItem('NapeId',JSON.stringify(arrData));
+            self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
 
         },
         changeValue(obj){
