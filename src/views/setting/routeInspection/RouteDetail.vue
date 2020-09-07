@@ -624,9 +624,9 @@ export default {
                     if(filterString.getContentLength(item.a.toString().trim()) > 30){
                         flaggroupLength=true;
                     }
-                    if(validateInput(item.a)){
-                        flaggroupRex=true;
-                    }
+                    // if(validateInput(item.a)){
+                    //     flaggroupRex=true;
+                    // }
                 }
                 if(item.b==undefined||item.b.length==0){
                     flagItemName=true;
@@ -635,9 +635,9 @@ export default {
                     if(filterString.getContentLength(item.b.toString().trim()) > 100){
                         flagItemLength=true;
                     }
-                    if(validateInput(item.b)){
-                        flagItemRex=true;
-                    }
+                    // if(validateInput(item.b)){
+                    //     flagItemRex=true;
+                    // }
                 }
                 if(item.d==undefined){
                 flagDescName=true;
@@ -656,11 +656,11 @@ export default {
                     _this.$refs.loadFileEx.value = '';
                     _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
                 }
-                if(flaggroupRex||flagItemRex){
-                    _this.$refs.loadFile.value = ''
-                    _this.$refs.loadFileEx.value = '';
-                    _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
-                }
+                // if(flaggroupRex||flagItemRex){
+                //     _this.$refs.loadFile.value = ''
+                //     _this.$refs.loadFileEx.value = '';
+                //     _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
+                // }
                 if(flagItemName){
                     _this.$refs.loadFile.value = ''
                     _this.$refs.loadFileEx.value = '';

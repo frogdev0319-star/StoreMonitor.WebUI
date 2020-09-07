@@ -681,26 +681,27 @@ export default {
         },
         confirmToBind(){
             let self=this;
-            let arr=[];
             if(self.elTableData[Number(self.activeName)].data.length==0){
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
+            let arrData=[]
             self.elTableData[Number(self.activeName)].data.forEach(item=>{
+                let arr=[];
                 item.routeData.forEach(r_item=>{
                     r_item.itemData.forEach(_item=>{
                         arr.push(_item.id);
                     });
                 })
+                arrData=arr
             });
-            console.log(arr);
-            if(arr.length==0){
+            if(arrData.length==0){
                 //self.notify('请新增巡检项后进行操作！','warning',3000);
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             sessionStorage.setItem('TabName',self.activeName);
-            sessionStorage.setItem('NapeId',JSON.stringify(arr));
+            sessionStorage.setItem('NapeId',JSON.stringify(arrData));
             self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
 
         },
@@ -1024,9 +1025,9 @@ export default {
                             if(filterString.getContentLength(item.a.toString().trim()) > 30){
                                 flaggroupLength=true;
                             }
-                            if(validateInput(item.a)){
-                                flaggroupRex=true;
-                            }
+                            // if(validateInput(item.a)){
+                            //     flaggroupRex=true;
+                            // }
                         }
                         if(item.b==undefined||item.b.length==0){
                             flagItemName=true;
@@ -1035,9 +1036,9 @@ export default {
                             if(filterString.getContentLength(item.b.toString().trim()) > 100){
                                 flagItemLength=true;
                             }
-                            if(validateInput(item.b)){
-                                flagItemRex=true;
-                            }
+                            // if(validateInput(item.b)){
+                            //     flagItemRex=true;
+                            // }
                         }
                       if(item.d==undefined){
                         flagDescName=true;
@@ -1056,11 +1057,11 @@ export default {
                             _this.$refs.loadFileEx.value = '';
                             _this.FileInfo.push(_this.$t('insSettingView.excelLongCategory'))
                         }
-                        if(flaggroupRex||flagItemRex){
-                            _this.$refs.loadFile.value = ''
-                            _this.$refs.loadFileEx.value = '';
-                            _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
-                        }
+                        // if(flaggroupRex||flagItemRex){
+                        //     _this.$refs.loadFile.value = ''
+                        //     _this.$refs.loadFileEx.value = '';
+                        //     _this.FileInfo.push(_this.$t('insSettingView.excelIllegalCategory'))
+                        // }
                         if(flagItemName){
                             _this.$refs.loadFile.value = ''
                             _this.$refs.loadFileEx.value = '';

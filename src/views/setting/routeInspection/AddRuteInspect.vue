@@ -520,10 +520,10 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
-            if(validateInput(item.groupName)){
-                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-                return false;
-            }
+            // if(validateInput(item.groupName)){
+            //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
+            //     return false;
+            // }
             let obj={
                 id:item.id,
                 name:item.groupName,
@@ -599,10 +599,10 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
-            if(validateInput(self.groupNameInput)){
-                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-                return false;
-            }
+            // if(validateInput(self.groupNameInput)){
+            //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
+            //     return false;
+            // }
             let mode=0;
             let tabIndex=sessionStorage.getItem('TabIndex');
             if(tabIndex=='0'){
@@ -829,10 +829,10 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
-            if(validateInput(item.napeName)||validateInput(item.napeDep)){
-                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-                return false;
-            }
+            // if(validateInput(item.napeName)||validateInput(item.napeDep)){
+            //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
+            //     return false;
+            // }
             let obj={
                 id:item.id,
                 subject:item.napeName,
@@ -870,10 +870,10 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
-            if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
-                self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-                return false;
-            }
+            // if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
+            //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
+            //     return false;
+            // }
             let objItem={
                 subject:self.newNapeName.trim(),
                 description:self.newNapeDep.trim(),
