@@ -519,7 +519,7 @@ export default {
     enterSelfListName : '请输入自定义巡检表名称！',
     templateError: '巡检表模板错误！',
     excelLongCategory: '巡检类别长度不可超过30个字符！',
-    excelIllegalCategory: '存在“@#￥%^&*”外的非法字符！',
+    excelIllegalCategory: '存在“@#￥%^&*”非法字符！',
     excelEmpty: '巡检类别与巡检项不能为空！',
     passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
     excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增

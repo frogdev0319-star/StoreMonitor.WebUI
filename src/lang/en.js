@@ -519,7 +519,7 @@ export default {
     enterSelfListName : 'Please Enter Custom List Name',
     templateError: 'The template of inspection tableis wrong!!',
     excelLongCategory: 'The length of group supports up to 30 characters!',
-    excelIllegalCategory: 'llegal characters outside "@#￥%^&*"!',
+    excelIllegalCategory: 'llegal characters "@#￥%^&*"!',
     excelEmpty: 'The group name and item name can\'t empty!',
     passfailexcelEmpty: 'The inspection item cannot be empty!',//Sprint8 新增
     excelFullScoreType:'The full score of the project is required, and the value range is an integer from 1 to 10',//Sprint8 新增

@@ -326,6 +326,7 @@ export default {
             self.curStore=[];
             self.storeList=[];
             self.searchInput='';
+            self.curStoreTag=''
 
         },
         initData(){

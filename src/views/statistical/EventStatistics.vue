@@ -572,6 +572,7 @@
           self.initDaysRange();
           await self.getCountryStore();
           self.initData();
+          self.curStoreTag=''
         }
       }
     },

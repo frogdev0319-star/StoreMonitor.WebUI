@@ -501,6 +501,7 @@
             // await self.getRegionInfo();
             await self.getCountryStore()
             await self.initData();
+            self.curStoreTag=''
           }
         },
         numberOfElements(val,oldVal){

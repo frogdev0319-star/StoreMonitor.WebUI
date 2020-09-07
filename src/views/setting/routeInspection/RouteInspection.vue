@@ -800,6 +800,9 @@ export default {
               if(namerepeat==1){
                     self.isShowWarning = true
                     self.warningContent = self.$t('remotePatrol.Patroltips2')
+                }else if(validateInput(self.ImportName)){
+                    self.isShowWarning = true
+                    self.warningContent = self.$t('insSettingView.excelIllegalCategory')
                 }else{
                     self.isShowWarning = false
                     document.getElementById('loadFileEx').click()
@@ -1122,23 +1125,25 @@ export default {
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryPassFail.push(index);
                                         if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthPassFail=true;}
-                                        if(validateInput(item.a)){flaggroupRexPassFail=true;}
+                                        // if(validateInput(item.a)){flaggroupRexPassFail=true;}
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNamePassFail=true;}
                                     else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthPassFail=true;}
-                                        if(validateInput(item.b)){flagItemRexPassFail=true;}
+                                        // if(validateInput(item.b)){flagItemRexPassFail=true;}
                                     }
                                     if(item.c==undefined){ flagDescNamePassFail=true;}
-                                    else{if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthPassFail=true;}}
+                                    else{if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthPassFail=true;}
+                                        // if(validateInput(item.c)){flagItemRexPassFail=true;}
+                                    }
                             }else if(arr[i][0]=='Score'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryScore.push(index);
                                         if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthScore=true;}
-                                        if(validateInput(item.a)){flaggroupRexScore=true;}
+                                        // if(validateInput(item.a)){flaggroupRexScore=true;}
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNameScore=true;}
                                     else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthScore=true;}
-                                        if(validateInput(item.b)){flagItemRexScore=true;}
+                                        // if(validateInput(item.b)){flagItemRexScore=true;}
                                     }
                                     if(item.c==undefined||item.c.length==0||!Number.isInteger(item.c)||parseInt(item.c)<1||parseInt(item.c)>10){//项目满分值必填，字符类型为1~10整数
                                         flagFullScoreType=true
@@ -1147,22 +1152,26 @@ export default {
                                         flagMinScoreType=true
                                     }
                                     if(item.e==undefined){ flagDescNameScore=true;}
-                                    else{if(filterString.getContentLength(item.e.toString().trim()) > 1200){flagDesLengthScore=true;}}
+                                    else{if(filterString.getContentLength(item.e.toString().trim()) > 1200){flagDesLengthScore=true;}
+                                        // if(validateInput(item.e)){flagItemRexScore=true;}
+                                    }
                             }else if(arr[i][0]=='Others'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryOthers.push(index);
                                         if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthOthers=true;}
-                                        if(validateInput(item.a)){flaggroupRexOthers=true;}
+                                        // if(validateInput(item.a)){flaggroupRexOthers=true;}
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNameOthers=true;}
                                     else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthOthers=true;}
-                                        if(validateInput(item.b)){flagItemRexOthers=true;}
+                                        // if(validateInput(item.b)){flagItemRexOthers=true;}
                                     }
                                     if(item.c==undefined||item.c.length==0||!Number.isInteger(Math.abs(item.c))||parseInt(item.c)<-100||parseInt(item.c)>100){//项目分值必填，字符类型为-100~+100整数
                                         flagOtherScoreType=true
                                     }
                                     if(item.d==undefined){ flagDescNameOthers=true;}
-                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 1200){flagDesLengthOthers=true;}}
+                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 1200){flagDesLengthOthers=true;}
+                                        // if(validateInput(item.d)){flagItemRexOthers=true;}
+                                    }
                             }
                         })
                     }
@@ -1185,14 +1194,14 @@ export default {
                             let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelLongCategory')
                             _this.FileInfo.push(flag)
                         }
-                        if(flaggroupRexPassFail||flagItemRexPassFail||flaggroupRexScore||flagItemRexScore||flaggroupRexOthers||flagItemRexOthers){
-                            let flagArr = []
-                            if(flaggroupRexPassFail||flagItemRexPassFail){flagArr.push('PassFail')}
-                            if(flaggroupRexScore||flagItemRexScore){flagArr.push('Score')}
-                            if(flaggroupRexOthers||flagItemRexOthers){flagArr.push('Others')}
-                            let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalCategory')
-                            _this.FileInfo.push(flag)
-                        }
+                        // if(flaggroupRexPassFail||flagItemRexPassFail||flaggroupRexScore||flagItemRexScore||flaggroupRexOthers||flagItemRexOthers){
+                        //     let flagArr = []
+                        //     if(flaggroupRexPassFail||flagItemRexPassFail){flagArr.push('PassFail')}
+                        //     if(flaggroupRexScore||flagItemRexScore){flagArr.push('Score')}
+                        //     if(flaggroupRexOthers||flagItemRexOthers){flagArr.push('Others')}
+                        //     let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalCategory')
+                        //     _this.FileInfo.push(flag)
+                        // }
                         if(flagItemNamePassFail||flagItemNameScore||flagItemNameOthers){
                             let flagArr = []
                             if(flagItemNameScore){

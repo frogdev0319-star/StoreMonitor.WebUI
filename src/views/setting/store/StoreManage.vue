@@ -618,6 +618,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.serachVale='';
                 self.multeCityList=[];
+                self.curStoreTag=''
             },
             getInitData(){
                 let self=this;
