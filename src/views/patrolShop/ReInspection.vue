@@ -1192,7 +1192,15 @@ export default {
             let tempId=null;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
-            if(!self.isShowWarn){
+            if(self.showIgnoreItem&&self.isShowWarn){
+                self.hasIgnoretemp.forEach((item,index)=>{
+                    if(item.id==id){
+                        tempId={
+                            itemIndex:index
+                        };
+                    }
+                })
+            }else if(!self.showIgnoreItem){
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach((item,index)=>{
                         item.items.forEach((_item,_index)=>{
@@ -1204,15 +1212,6 @@ export default {
                             }
                         })
                     })
-                })
-            }else{
-                let s = self.hasIgnoretemp
-                self.hasIgnoretemp.forEach((item,index)=>{
-                    if(item.id==id){
-                        tempId={
-                            itemIndex:index
-                        };
-                    }
                 })
             }
             return tempId;
@@ -1590,13 +1589,27 @@ export default {
             let tempId=self.getIndexById(self.curItemId);
             console.log(tempId);
             if(tempId!=null){
-                //self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList=self.sourceList;
-              self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+              if(!self.showIgnoreItem){
+                  self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+              }else{
+                  self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
+              }
             }
             else{
                 self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
             }
-            self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+            if(!self.showIgnoreItem){
+                self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+            }else{
+                self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
+            }
+            // if(tempId!=null){
+            //   self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+            // }
+            // else{
+            //     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+            // }
+            // self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
 
         },
         mouseDownAction(e){
@@ -2406,7 +2419,7 @@ export default {
                 curGroupIndex:self.curGroupIndex,
                 curItemIndex:self.curItemIndex
             }
-            sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
+            // sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         canceldNoAllInspect(){
@@ -2470,7 +2483,7 @@ export default {
                 curGroupIndex:self.curGroupIndex,
                 curItemIndex:self.curItemIndex
             }
-            sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
+            // sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
         spreadContent(){
@@ -3147,6 +3160,7 @@ export default {
         hasIgnoreItem(){
             let self=this
             self.showIgnoreItem=true
+            self.showFeedBack=false
             let PatrolHistory = self.$store.getters.PatrolHistory;
             if(PatrolHistory!=null){
                 if(PatrolHistory.hasIgnoretemp!=null){
@@ -3162,6 +3176,7 @@ export default {
         backToPatrol(){
             let self=this
             self.showIgnoreItem=false
+            self.showFeedBack = self.sheetName[Number(self.sheetName.length-1)].isClick ? true : false
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
@@ -3285,7 +3300,7 @@ export default {
           let tempId=self.getIndexById(self.curItemId);
           console.log(tempId);
           if(tempId!=null){
-              if(!self.isShowWarn){
+              if(!self.showIgnoreItem){
                   self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
               }else{
                   self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
@@ -3294,12 +3309,11 @@ export default {
           else{
             self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
           }
-          if(!self.isShowWarn){
+          if(!self.showIgnoreItem){
               self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
           }else{
               self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
           }
-          console.log(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList)
         },
       /**
        * handle ezviz video picture feedback

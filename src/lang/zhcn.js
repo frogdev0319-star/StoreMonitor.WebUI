@@ -57,6 +57,7 @@ export default {
     loginAbnormal: '登录信息异常，请重新登录！'
   },
   overview:{
+    averageScore:'平均分',//Sprint8 新增
     everydays:'每',
     act:'执行',
     daysww:'号',
@@ -525,6 +526,7 @@ export default {
     excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
     excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
     excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
+    bindingstore:'绑定中',//Sprint8 新增
     excelLongItem: '巡检项长度不可超过100个字符！',
     excelIllegalDes: '巡检项目详细说明不可超过300个字符！',
     deleteItem: '删除巡检项',
@@ -564,6 +566,7 @@ export default {
     description: '巡检项需求描述',
     descriptionRuletip:'最多可输入1200个字符',
     titleEmpty: '类别名称不能为空！',
+    ScoreEmpty:'项目分值不能为空',//Sprint8 新增
     illegalStr: '当前输入含有非法字符！',
     remotePatrol: '远程巡检',
     onsitePatrol: '现场巡检',

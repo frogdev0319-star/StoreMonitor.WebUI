@@ -140,12 +140,12 @@
                     </el-select>
                   </div>
                   <div class="operation-data titles">
-                    <div class="iconcontent" v-if="item.isEditing">
+                    <div class="iconcontent" v-if="item.isEditing" style="top:15px;">
                       <div class="iconlised"  @click="confirmEditNvr(index,item)">
-                        <i class="el-icon-check"></i>
+                        <i class="el-icon-check" style="position:absolute;top:6px;margin-left:2px;"></i>
                       </div>
                       <div class="iconrised" @click="cancelEditNvr(index,item)">
-                        <i class="el-icon-close"></i>
+                        <i class="el-icon-close" style="position:absolute;top:6px;margin-left:2px;"></i>
                       </div>
                     </div>
                     <div class="iconcontent" v-if="!item.isEditing">
@@ -2053,9 +2053,10 @@
             bottom: 2px;
           }
           .nvr-select{
-            @include point(width,50);
+            @include point(width,60);
             position: relative;
             bottom: 2px;
+            left:20px;
             /deep/ .el-input--suffix .el-input__inner{
               padding: 10px;
             }
@@ -2092,6 +2093,7 @@
             span{
               display: inline-block;
               width: 70%;
+              margin-left:15px;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
@@ -2118,23 +2120,27 @@
                 color: $tab;
               }
               .iconlised{
-                float: left;
-                position: relative;
+                // float: left;
+                // position: relative;
                 background-color: $mainColor;
                 padding: 1px 6px;
                 color: #fff;
                 border-width: 1px 1px 1px 1px;
                 border-style: solid;
                 border-color: #ddd;
+                width:20px;
+                height:23px;
               }
               .iconrised{
-                float: left;
-                position: relative;
+                // float: left;
+                // position: relative;
                 padding: 1px 6px;
                 border-width: 1px 1px 1px 0px;
                 border-style: solid;
                 border-color: #ddd;
                 background-color: rgba(255, 255, 255, 0);
+                width:20px;
+                height:23px;
               }
             }
 

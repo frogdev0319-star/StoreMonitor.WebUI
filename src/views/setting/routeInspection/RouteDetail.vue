@@ -102,11 +102,11 @@
                                             <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"></el-checkbox>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="name" :label="generateInsSettingLang('inspectName')" width="300px"></el-table-column>
-                                    <el-table-column prop="description" :label="generateInsSettingLang('inspectionDescp')" min-width='24%'></el-table-column>
-                                    <el-table-column prop="score" :label="generateInsSettingLang('score')" align="center" :min-width="showSheet1?'4%':'15%'"></el-table-column>
-                                    <el-table-column prop="qualifiedScore" :label="generateInsSettingLang('score')" align="center" min-width="11%" v-if="showSheet1"></el-table-column>
-                                    <el-table-column prop="handle" :label="generateInsSettingLang('operation')" min-width="6%">
+                                    <el-table-column prop="name" width="300px"></el-table-column>
+                                    <el-table-column prop="description" min-width='24%'></el-table-column>
+                                    <el-table-column prop="score" align="center" :min-width="showSheet1?'4%':'15%'"></el-table-column>
+                                    <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="showSheet1"></el-table-column>
+                                    <el-table-column prop="handle" min-width="6%">
                                         <template slot-scope="scope">
                                                 <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
                                             </template>

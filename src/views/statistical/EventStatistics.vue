@@ -570,7 +570,7 @@
           self.params.beginTs = start;
           self.params.endTs = end;
           self.initDaysRange();
-          await self.getCountryStore();
+          // await self.getCountryStore();
           self.initData();
           self.curStoreTag=''
         }
@@ -689,7 +689,8 @@
         let params = {};
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        params.storeIds = self.params.storeIds;
+        let storeIds = self.curStore.filter(item=> item!= -1)
+        params.storeIds = storeIds;
         params.timeMode = self.timeMode;
         let storeEventResult = await self.getStoreEventData(params);
         let option = {
@@ -1225,6 +1226,7 @@
           storeArr.push(item.storeId)
         })
         self.curStore = storeArr;
+        self.searchData()
         self.changeStore(self.curStore)
       },
 
@@ -1312,12 +1314,16 @@
         self.params.storeIds = storeIds;
         self.params.filter={page:self.page - 1,size:self.sizeNum};
         self.params.order = {direction: self.direction, property: self.property}
-        await self.getEventTableData();
-        await self.getAllEventData();
-        self.getStoreEventStatics();
+        self.getCountryStore()
+        self.getTagListData()
+        // await self.getEventTableData();
+        // await self.getAllEventData();
+        // self.getStoreEventStatics();
       },
       async getEventTableData(){
         let self = this;
+        let storeIds = self.curStore.filter(item=> item!= -1)
+        self.params.storeIds=storeIds
         let eventResult = await self.getEventTableDataInfo(self.params);
         let excellentPer = 0;
         let qualifiedPer = 0;
@@ -1608,8 +1614,8 @@
     },
     mounted(){
       let self=this;
-      self.getCountryStore()
-      self.getTagListData()
+      // self.getCountryStore()
+      // self.getTagListData()
       window.addEventListener("resize", self.adjustChart, false);
       self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
       self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)

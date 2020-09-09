@@ -1031,7 +1031,7 @@ $h1:#292e36;
             .content-detail{
                 margin-top: 10px;
                 .content-detail-title{
-                height:70px;
+                min-height:70px;
                 background-color:$background;
                 padding-left:calc(20 / 1920 * 100vw);
                 padding-right: calc(20 / 1920 * 100vw);

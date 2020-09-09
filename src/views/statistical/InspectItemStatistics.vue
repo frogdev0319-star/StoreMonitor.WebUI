@@ -499,7 +499,7 @@
             console.log(self.lang)
             self.initDaysRange();
             // await self.getRegionInfo();
-            await self.getCountryStore()
+            // await self.getCountryStore()
             await self.initData();
             self.curStoreTag=''
           }
@@ -1092,6 +1092,7 @@
           })
           self.curStore = storeArr;
           console.log('create 调用完毕')
+          self.searchData()
           self.changeStore(self.curStore)
         },
         clearProviceInfo(){
@@ -1447,8 +1448,10 @@
           self.params.filter={page:self.page - 1,size:self.sizeNum};
           self.params.order = {direction: self.direction, property: self.property}
           self.params.mode = self.curType;
-          await self.getInspectItemsTable();
-          await self.getInspectCharts();
+          self.getCountryStore()
+          self.getTagListData()
+          // await self.getInspectItemsTable();
+          // await self.getInspectCharts();
         },
         export2Excel(){
           var that = this;
@@ -1519,8 +1522,8 @@
       },
       mounted(){
         let self = this;
-        self.getCountryStore()
-        self.getTagListData()
+        // self.getCountryStore()
+        // self.getTagListData()
         window.addEventListener("resize", self.adjustChart, false);
         self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
         self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)

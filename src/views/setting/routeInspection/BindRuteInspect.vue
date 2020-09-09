@@ -3,25 +3,25 @@
         <div class="el-bind-header">
             <div class="seacrh-content">
                 <span>{{$t('reportView.selectStores')}}</span>
-                <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry">
+                <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry" :disabled="loading">
                     <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
                         <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-option-group>
                 </el-select>
-                <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini" class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
+                <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini" class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0||loading">
                         <el-option v-for="item in StoreTagList" :key="item.tagId" :label="item.tagName" :value="item.tagId"></el-option>
                 </el-select>
-                <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" class="el-province" @changeInput="handleProChange"
-                                    style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
-                <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" class="el-province" @changeInput="handleCityChange"
-                                    style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+                <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
+                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''||loading" :all="$t('overview.allZoneI')"></region-multi-select>
+                <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
+                                    style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''||loading" :all="$t('overview.allZoneII')"></region-multi-select>
 
-                <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" class="el-province" @changeInput="handleStoreChange"
+                <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange" :disabled="loading"
                                     style="display: inline" ref="multiSelect"></multi-select>
 
             </div>
         </div>
-        <div class="el-bind-content-box">
+        <div class="el-bind-content-box"  v-loading="loading" :element-loading-text="$t('insSettingView.bindingstore')" element-loading-background="rgba(255, 255, 255, 0.6)">
             <p class="el-header-title" v-if="lang==='en'">{{generateInsSettingLang('bindStores')}}</p>
             <p class="el-header-title" v-else >{{generateInsSettingLang('selectStore')}}{{tabName}}{{generateInsSettingLang('needBind')}}</p>
             <p class="choice-device" v-if="lang=='en'"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{totalCount}} {{generateInsSettingLang('total')}}
@@ -82,6 +82,7 @@ export default {
     },
     data(){
         return{
+            loading:false,
             allData:false,
             tabName:'',
             tabNameLang: '',
@@ -121,21 +122,21 @@ export default {
         generateStoreLang,
         generateInsSettingLang,
       //切换省份
-        changePro(val){
-            let self=this;
-            if(val == ''){
-              self.cityList=[];
-              self.showCityContent=false;
-              self.curCitys = self.$t('storeView.cityPlaceholder');
-              self.multeCityList.length=0;
-            }
-            else{
-              self.getCityByProvince(val);
-              self.curCitys= self.$t('storeView.cityPlaceholder');
-              self.multeCityList.length=0;
-              self.allCityChecked=false;
-            }
-        },
+        // changePro(val){
+        //     let self=this;
+        //     if(val == ''){
+        //       self.cityList=[];
+        //       self.showCityContent=false;
+        //       self.curCitys = self.$t('storeView.cityPlaceholder');
+        //       self.multeCityList.length=0;
+        //     }
+        //     else{
+        //       self.getCityByProvince(val);
+        //       self.curCitys= self.$t('storeView.cityPlaceholder');
+        //       self.multeCityList.length=0;
+        //       self.allCityChecked=false;
+        //     }
+        // },
         getBriefStoreData(){
             let self=this;
             return new Promise((resolve,reject)=>{
@@ -581,6 +582,10 @@ export default {
             }else{
                 params.clause={};
             }
+            params.filter={
+                        page:0,
+                        size:1000
+                    }
             let resData=await self.getStoreData(params);
             self.storeData=resData.content;
             self.getStoreByCity(self.storeData);
@@ -727,7 +732,7 @@ export default {
                 if(cityList.indexOf(item.city)==-1){
                     cityList.push(item.city);
                 }
-                bindStoreId.forEach(_item=>{
+                bindStoreId.data.forEach(_item=>{
                     if(item.storeId==_item){
                         bindArr.push(_item)
                     }
@@ -762,7 +767,7 @@ export default {
                 let _tempCount=0;
                 item.store.forEach(_item=>{
                     let _obj={};
-                    if(bindStoreId.indexOf(_item.storeId)==-1){
+                    if(bindStoreId.data.indexOf(_item.storeId)==-1){
                         _obj.checked=false;
                     }
                     else{
@@ -813,6 +818,7 @@ export default {
         },
         async applyNape(){
             let self=this;
+            self.loading=true
             let storeIdChecked=[];
             let storeIdUnchecked=[];
             let count=0;
@@ -874,11 +880,15 @@ export default {
             }
             if(flag){
                 let bindIdList=await self.getBindStoreList();
-                self.storeCount=bindIdList.length;
-                //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
-                self.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.length} ${self.$t('insSettingView.storesBound')}`,'success',3000);
+                self.storeCount=bindIdList.data.length;
+                if(bindIdList.errMsg=='Success'){
+                    self.loading=false
+                    self.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.data.length} ${self.$t('insSettingView.storesBound')}`,'success',3000);
+                }
+                
             }
             else{
+                self.loading=false
                 self.notify(self.$t('insSettingView.bindFail'),'warning',3000);
                 return false;
             }
@@ -891,7 +901,7 @@ export default {
                     console.log(res.errMsg);
                     if(res.errMsg!=undefined&&res.errMsg=='Success'){
                         let data=res.data;
-                        resolve(data);
+                        resolve(res);
                     }
                 })
             })

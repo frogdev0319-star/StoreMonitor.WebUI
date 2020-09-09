@@ -284,8 +284,6 @@ export default {
     created(){
       let self=this
       self.isFirstLoad = true
-      self.getCountryStore()
-      self.getTagListData()
     },
     computed:{
         iconSrcHeight(){
@@ -302,9 +300,6 @@ export default {
           self.$refs.multiSelect.selectedArray = [];
           self.$refs.multiSelect.input=''
           self.initData();
-          // self.getRegionInfo();
-          self.getCountryStore()
-          self.getInitReportList();
           window.setTimeout(function(){
               self.$route.meta.keepAlive = true;
               console.log(self.$route.meta.keepAlive);
@@ -332,6 +327,8 @@ export default {
         initData(){
           let self=this;
           self.changeBrand();
+          self.getCountryStore()
+          self.getTagListData()
           self.defaultTime=[];
           self.storeStr = '';
           self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
@@ -852,6 +849,7 @@ export default {
             storeArr.push(item.storeId)
           })
           self.curStore = storeArr;
+          self.getInitReportList()
           self.changeStore(self.curStore)
         },
         clearStore(){
@@ -1019,9 +1017,6 @@ export default {
       let self=this;
       if(!self.$route.meta.isBack || self.isFirstLoad){
         self.initData();
-        // self.getRegionInfo();
-        self.getCountryStore()
-        self.getInitReportList();
       }
       else{
         //

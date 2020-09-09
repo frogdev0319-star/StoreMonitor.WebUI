@@ -548,6 +548,15 @@
             "pdfmaxWidth": '14%',
             "width": '217',
             "maxWidth": '180'
+          },
+          {
+            "prop":"averageScore",
+            "label": this.$t('overview.averageScore'),
+            "sortable":'custom',
+            "pdfwidth": '16%',
+            "pdfmaxWidth": '14%',
+            "width": '217',
+            "maxWidth": '180'
           }
         ],
         regionTableData: [],
@@ -625,6 +634,15 @@
             "pdfmaxWidth": '14%',
             "width": '219',
             "maxWidth": '180'
+          },
+          {
+            "prop":"averageScore",
+            "label": this.$t('overview.averageScore'),
+            "sortable":'custom',
+            "pdfwidth": '16%',
+            "pdfmaxWidth": '14%',
+            "width": '217',
+            "maxWidth": '180'
           }
         ],
         storeTableData: [],
@@ -633,8 +651,8 @@
         pageStore:1,
         sizeNumStore:10,
         curRegionArray: [],
-        exportDataHeader:['门店名称','平均巡店周期','评估次数','合格','待改善', '立即督导','合格率'], //需要导出数据的表头
-        exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格','待改善', '立即督导','合格率'], //需要导出数据的表头
+        exportDataHeader:['门店名称','平均巡店周期','评估次数','合格', '立即督导','合格率','平均分'], //需要导出数据的表头
+        exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格', '立即督导','合格率','平均分'], //需要导出数据的表头
         regionParams: {},
         chartParams:{},
         chartArrayData: [],
@@ -670,7 +688,7 @@
           self.params.endTs = end;
           self.initDaysRange();
           // await self.getRegionInfo();
-          await self.getCountryStore()
+          // await self.getCountryStore()
           await self.initData();
           self.curStoreTag=''
         }
@@ -1027,6 +1045,7 @@
           storeArr.push(item.storeId)
         })
         self.curStore = storeArr;
+        self.searchData()
         self.changeStore(self.curStore)
       },
       getStoreData(params){
@@ -1401,7 +1420,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportRegionHeader; // 导出的表头名
-          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer']; // 导出的表头字段名
+          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfDangerous','qualifiedRatePer','averageScore']; // 导出的表头字段名
           let self=this;
           let size= self.totalRegion;
           let params = {};
@@ -1447,7 +1466,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportDataHeader; // 导出的表头名
-          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer']; // 导出的表头字段名
+          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfDangerous','qualifiedRatePer','averageScore']; // 导出的表头字段名
           let self=this;
           let size= self.totalStore;
           let params = {};
@@ -1720,7 +1739,7 @@
               let percentRegion = 0;
               sunOfExcellent += _item.numOfExcellent
               sumOfQualified += _item.numOfQualified;
-              sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
+              sumOfReports += + _item.numOfQualified + _item.numOfDangerous;
               if(sumOfReports == 0){
                 percentRegion = 0;
               }
@@ -1889,7 +1908,7 @@
             if (result) {
               result.content.forEach(item=>{
                 totalDargerous += item.numOfDangerous;
-                totalImproved += item.numOfImproved;
+                // totalImproved += item.numOfImproved;
                 totalQualified += item.numOfQualified;
                 // totalExcellent += item.numOfExcellent;
                 totalReport += item.numOfReport;
@@ -2138,7 +2157,7 @@
             let percentRegion = 0;
             sunOfExcellent += _item.numOfExcellent
             sumOfQualified += _item.numOfQualified;
-            sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
+            sumOfReports += _item.numOfQualified + _item.numOfDangerous;
             if(sumOfReports == 0){
               percentRegion = 0;
             }
@@ -2170,10 +2189,11 @@
         let storeIds = self.curStore.filter(item=> item!= -1)
         self.params.storeIds = storeIds;
         self.params.filter={page:0,size:self.sizeNumStore};
-
-        self.getInspectStatsOverviewOfRegion();
-        self.getInspectStatsOverviewOfStore();
-        self.getInspectStatsLine();
+        self.getCountryStore()
+        self.getTagListData()
+        // self.getInspectStatsOverviewOfRegion();
+        // self.getInspectStatsOverviewOfStore();
+        // self.getInspectStatsLine();
       },
       adjustChart(){
         let self = this;
@@ -2202,8 +2222,8 @@
     },
     mounted(){
       let self = this;
-      self.getCountryStore()
-      self.getTagListData()
+      // self.getCountryStore()
+      // self.getTagListData()
       window.addEventListener("resize", self.adjustChart, false);
       self.sidebarElm = document.getElementsByClassName('aside-menu')[0]
       self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false)

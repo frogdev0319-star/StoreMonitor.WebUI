@@ -449,6 +449,7 @@ export default {
         },
         handleSheetClick(val){
             let self = this
+            self.showAddNape=false
             self.refreshData(0)
         },
         clickGroupItem(index,item){
@@ -956,6 +957,12 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
+            if(self.newAddScore!=0){
+                if(self.newAddScore.trim().length==0){
+                    self.notify(self.$t('insSettingView.ScoreEmpty'),'warning',3000);
+                    return false;
+                }
+            }
             // if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
             //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
             //     return false;
@@ -1110,6 +1117,7 @@ export default {
         },
         async refreshData(index){
             let self=this;
+            let asds=self.routeData
             let curTag=self.tabName;
             let allData=await self.getAllData();
             // let personData=await self.getPersonData()

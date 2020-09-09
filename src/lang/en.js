@@ -56,6 +56,7 @@ export default {
     loginAbnormal: 'The login information is abnormal, please sign in again!'
   },
   overview:{
+    'averageScore':'averageScore',//Sprint8 新增
     'eachmonth':' each month',
     'everydays':' every week',
     'act':'Executed on ',
@@ -525,6 +526,7 @@ export default {
     excelFullScoreType:'The full score of the project is required, and the value range is an integer from 1 to 10',//Sprint8 新增
     excelMinScoreType:'The minimum score of the inspection item is required, and the value range is 1 to the integer of the project full score',//Sprint8 新增
     excelOtherScoreType:'The project score is required, and the value range is -100~100 integer',//Sprint8 新增
+    bindingstore:'绑定中',//Sprint8 新增
     excelLongItem: 'The length of item is 100 characters at most!',
     excelIllegalDes: 'The length of item description is 300 characters at most!',
     deleteItem: 'Delete Item',
@@ -563,6 +565,7 @@ export default {
     description: 'Description',
     descriptionRuletip:'Enter up to 1200 characters',
     titleEmpty: 'Title may not be empty.',
+    ScoreEmpty:'item score cannot be empty',//Sprint8 新增
     illegalStr: 'Illegal strings!',
     remotePatrol: 'Remote Patrol',
     onsitePatrol: 'Onsite Patrol',

@@ -25,13 +25,13 @@
                     :value="item.tagId">
                     </el-option>
             </el-select>
-            <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" class="el-province" @changeInput="handleProChange"
-                                style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
-            <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" class="el-province" @changeInput="handleCityChange"
-                                style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+            <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
+                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+            <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
+                                style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
 
-            <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" class="el-province" @changeInput="handleStoreChange"
-                                style="display: inline" ref="multiSelect"></multi-select>
+            <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
+                                style="display: inline;" ref="multiSelect"></multi-select>
 
             <div class="store-handle">
               <el-col :span="24" class="header-details1">
@@ -623,6 +623,8 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
             getInitData(){
                 let self=this;
                 self.clearPage();
+                self.getCountryStore()
+                self.getTagListData() 
                 self.params.filter={
                     'page':self.page-1,
                     'size':self.sizeNum

@@ -428,6 +428,10 @@
             "label": this.$t('overview.missionValidity'),
           },
           {
+            "prop":"inspectTagName",
+            "label": this.$t('overview.patrolLists'),
+          },
+          {
             "prop": "completedStoresStr",
             "label": this.$t('overview.inspectedStores'),
           },

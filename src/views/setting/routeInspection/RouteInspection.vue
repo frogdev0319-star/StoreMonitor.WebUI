@@ -12,7 +12,7 @@
             <input id="loadFileEx" type="file" ref="loadFileEx" style="display: none" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
 
             <el-button v-for="(item,index) in btnList"
-                :key="index" size="mini" @click="handleNape(index,item)" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
+                :key="index" size="mini" @click="handleNape(index,item)" :disabled="item.enabled" :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' ">
                   <div class="btn-area">
                     <i :class="item.iconClass" :style="item.style"></i>
                     <span>{{item.btnTitle}}</span>
@@ -158,15 +158,18 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :name="index.toString()" :closable="index!=0&&index!=1?true:false" >
                         <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content" :style="{'min-height':varyWindowWidth*0.70+'px'}">
-                            <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :label="`${_item.name}`" :name="_index.toString()">
-                                <!-- <el-tooltip class="item" effect="dark" :content="_item.name" placement="top">
-                                </el-tooltip> -->
-                                <div v-if="_item.routeData">
+                            <el-tab-pane v-for="(_item,_index) in item.data" :label="_item.name" :key="_index" :name="_index.toString()">
+                                <!-- <span v-if="itemhoverName!=''" class="item_name">{{itemhoverName}}</span>
+                                <span slot="label" @mouseover="overItem" @mouseout="outItem">{{_item.name}}</span> -->
+                                <div v-if="_item.routeData&&!loading">
                                     <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName"
                                     :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"></route-detail>
                                 </div>
+                                <div class="bind-empty" :style="{'line-height':varyWindowWidth*0.52+'px'}" v-if="loading">
+                                    <img :src="loadingGif"/>
+                                    <span class="empty-text">{{generateInsSettingLang('loadingbindstore')}}</span>
+                                </div>
                             </el-tab-pane>
-                            
                         </el-tabs>
                         <div class="data-empty" v-else :style="{'min-height':varyWindowWidth*0.52+'px'}">
                             <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"></i>
@@ -205,6 +208,7 @@ export default {
         return{
             //elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
             elTableData:[{label:'远程巡检',data:[]},{label:'现场巡检',data:[]}],
+            loadingGif: require('../../../../static/img/loading.gif'),
             radioList:[
                 {
                     'value':'1',
@@ -220,6 +224,8 @@ export default {
                 // }
             ],
             showNoPostDialog:false,
+            itemhoverName:'',
+            loading:false,
             varyWindowWidth:window.innerHeight,
             addPatrol: '新增巡检表',
             patrolActive:'0',
@@ -251,7 +257,7 @@ export default {
                     style:'font-size:24px;',
                     name:'import',
                     btnTitle: this.$t('insSettingView.import'),
-                    enabled:true,
+                    enabled:false,
                 },
                 {
                     id:0,
@@ -259,7 +265,7 @@ export default {
                     style:'font-size:24px;',
                     name:'export',
                     btnTitle: this.$t('insSettingView.export'),
-                    enabled:true,
+                    enabled:false,
                 },
                 {
                     id:0,
@@ -267,7 +273,7 @@ export default {
                     style:'font-size:24px;',
                     name:'download',
                     btnTitle: this.$t('insSettingView.download'),
-                    enabled:true,
+                    enabled:false,
                 },
                 {
                     id:0,
@@ -275,7 +281,7 @@ export default {
                     style:'font-size:17px;',
                     name:'delete',
                     btnTitle: this.$t('scheduleView.delete'),
-                    enabled:true,
+                    enabled:false,
                 }
             ],
 
@@ -497,7 +503,7 @@ export default {
                                 tempChild.push(objChild);
                             })
                             _obj.itemData=tempChild;
-                            _obj.inspectId=TagData[Number(self.patrolActive)].id; //巡检表
+                            _obj.inspectId=TagData[tagIndex].id; //巡检表
                             _obj.mode=TagData[Number(self.patrolActive)].mode; //巡检类别
                             groupids.push(_item.id)
                             temp.push(_obj);
@@ -745,23 +751,18 @@ export default {
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
-            let arrData=[]
-            self.elTableData[Number(self.activeName)].data.forEach(item=>{
-                let arr=[];
-                item.routeData.forEach(r_item=>{
-                    r_item.itemData.forEach(_item=>{
+            let arr=[];
+            self.tempdata.forEach(item=>{
+                    item.itemData.forEach(_item=>{
                         arr.push(_item.id);
                     });
-                })
-                arrData=arr
             });
-            if(arrData.length==0){
-                //self.notify('请新增巡检项后进行操作！','warning',3000);
+            if(arr.length==0){
                 self.notify(self.$t('insSettingView.emptyInfo'),'warning',3000);
                 return false;
             }
             sessionStorage.setItem('TabName',self.activeName);
-            sessionStorage.setItem('NapeId',JSON.stringify(arrData));
+            sessionStorage.setItem('NapeId',JSON.stringify(arr));
             self.$router.push({name:'bindStore',params:{inspectId:self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId}});
 
         },
@@ -870,6 +871,14 @@ export default {
             self.getTagList();
 
         },
+        overItem(e){
+            let self=this
+            self.itemhoverName=e.target.innerText
+        },
+        outItem(e){
+            let self=this
+            self.itemhoverName=''
+        },
         handleClickPatrol(val){
             let self = this;
             if(self.activeName=='0'){
@@ -877,6 +886,9 @@ export default {
             }else if(self.activeName=='1'){
                 sessionStorage.setItem('TabPatrolIndex1',val.index);
             }
+            self.loading=true
+            self.btnList[1].enabled=true
+            self.btnList[3].enabled=true
             self.getTagList();
         },
         delAllItem(){
@@ -995,6 +1007,9 @@ export default {
                     if(res.errMsg!=undefined&&res.errMsg=='Success'){
                         let data=res.data;
                         self.storeNum=data.length;
+                        self.loading=false
+                        self.btnList[1].enabled=false
+                        self.btnList[3].enabled=false
                     }
                 })
             }else{
@@ -1110,7 +1125,7 @@ export default {
                     let flagItemNamePassFail=false,flagItemNameScore=false,flagItemNameOthers=false
                     let flagItemRexPassFail=false,flagItemRexScore=false,flagItemRexOthers=false
                     let flagItemLengthPassFail=false,flagItemLengthScore=false,flagItemLengthOthers=false
-                    let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
+                    // let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
                     let flagDesLengthPassFail=false,flagDesLengthScore=false,flagDesLengthOthers=false;
                     let flagFullScoreType=false,flagMinScoreType=false,flagOtherScoreType=false
                     let flagTempError=false
@@ -1129,52 +1144,44 @@ export default {
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryPassFail.push(index);
                                         if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthPassFail=true;}
-                                        // if(validateInput(item.a)){flaggroupRexPassFail=true;}
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNamePassFail=true;}
-                                    else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthPassFail=true;}
-                                        // if(validateInput(item.b)){flagItemRexPassFail=true;}
-                                    }
-                                    if(item.c==undefined){ flagDescNamePassFail=true;}
-                                    else{if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthPassFail=true;}
-                                        // if(validateInput(item.c)){flagItemRexPassFail=true;}
+                                    else if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthPassFail=true;}
+                                    if(item.c!=undefined){
+                                        if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthPassFail=true;}
                                     }
                             }else if(arr[i][0]=='Score'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryScore.push(index);
                                         if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthScore=true;}
-                                        // if(validateInput(item.a)){flaggroupRexScore=true;}
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNameScore=true;}
-                                    else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthScore=true;}
-                                        // if(validateInput(item.b)){flagItemRexScore=true;}
-                                    }
+                                    else if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthScore=true;}
                                     if(item.c==undefined||item.c.length==0||!Number.isInteger(item.c)||parseInt(item.c)<1||parseInt(item.c)>10){//项目满分值必填，字符类型为1~10整数
                                         flagFullScoreType=true
                                     }
-                                    if(item.d==undefined||item.d.length==0||!Number.isInteger(item.d)||parseInt(item.d)<1||parseInt(item.d)>parseInt(item.c)){//最低分值必填，字符类型为1~item.c整数
-                                        flagMinScoreType=true
+                                    if(item.d!=undefined){
+                                        if(!Number.isInteger(item.d)||parseInt(item.d)<1||parseInt(item.d)>parseInt(item.c)){//最低分值必填，字符类型为1~item.c整数
+                                            flagMinScoreType=true
+                                        }
+                                    }else{
+                                        item.d=item.c
                                     }
-                                    if(item.e==undefined){ flagDescNameScore=true;}
-                                    else{if(filterString.getContentLength(item.e.toString().trim()) > 1200){flagDesLengthScore=true;}
-                                        // if(validateInput(item.e)){flagItemRexScore=true;}
+                                    if(item.e!=undefined){
+                                        if(filterString.getContentLength(item.e.toString().trim()) > 1200){flagDesLengthScore=true;}
                                     }
                             }else if(arr[i][0]=='Others'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryOthers.push(index);
                                         if(filterString.getContentLength(item.a.toString().trim()) > 30){flaggroupLengthOthers=true;}
-                                        // if(validateInput(item.a)){flaggroupRexOthers=true;}
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNameOthers=true;}
-                                    else{if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthOthers=true;}
-                                        // if(validateInput(item.b)){flagItemRexOthers=true;}
-                                    }
+                                    else if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthOthers=true;}
                                     if(item.c==undefined||item.c.length==0||!Number.isInteger(Math.abs(item.c))||parseInt(item.c)<-100||parseInt(item.c)>100){//项目分值必填，字符类型为-100~+100整数
                                         flagOtherScoreType=true
                                     }
-                                    if(item.d==undefined){ flagDescNameOthers=true;}
-                                    else{if(filterString.getContentLength(item.d.toString().trim()) > 1200){flagDesLengthOthers=true;}
-                                        // if(validateInput(item.d)){flagItemRexOthers=true;}
+                                    if(item.d!=undefined){
+                                        if(filterString.getContentLength(item.d.toString().trim()) > 1200){flagDesLengthOthers=true;}
                                     }
                             }
                         })
@@ -1554,6 +1561,32 @@ export default {
             .el-route-tabs{
                 width: 98%;
                 margin-left: calc(15/1920*100vw);
+                .item_name{
+                    position: absolute;
+                    top:0;
+                    height:18px;
+                    line-height: 18px;
+                    border-radius: 3px;
+                    background-color: rgba(0, 0, 0,0.7);
+                    color:#fff;
+                    padding:5px 2px;
+                    min-width: 70px;
+                    text-align: center;
+                    font-size: calc(12/1920*100vw);
+                }
+                .bind-empty{
+                    text-align: center;
+                    img{
+                        width:32px;
+                        height:32px;
+                        vertical-align: middle;
+                    }
+                    .empty-text{
+                        font-size: calc(14/1920*100vw);
+                        color:#7d8cad;
+                        vertical-align: middle;
+                    }
+                }
                 .data-empty{
                     margin: 0 auto;
                     margin-top: 14%;

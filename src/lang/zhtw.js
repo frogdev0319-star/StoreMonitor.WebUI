@@ -57,6 +57,7 @@ export default {
     loginAbnormal: '登錄信息異常，請重新登錄！'
   },
   overview:{
+    'averageScore':'平均分',//Sprint8 新增
     'everydays':'每',//新增
     'act':'執行',//新增
     'daysww':'號',//新增
@@ -527,6 +528,7 @@ export default {
     excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
     excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
     excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
+    bindingstore:'绑定中',//Sprint8 新增
     excelLongItem: '巡檢項長度不可超過100個字元！',
     excelIllegalDes: '巡檢項目詳細說明不可超過300個字元！',
     deleteItem: '刪除巡檢項',
@@ -566,6 +568,7 @@ export default {
     description: '巡檢項需求描述',
     descriptionRuletip:'最多可輸入1200個字元',
     titleEmpty: '類別名稱不能為空！',
+    ScoreEmpty:'项目分值不能为空',//Sprint8 新增
     illegalStr: '當前輸入含有非法字元！',
     remotePatrol: '遠端巡檢',
     onsitePatrol: '現場巡檢',
