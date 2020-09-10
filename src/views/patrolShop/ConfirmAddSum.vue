@@ -477,9 +477,9 @@ export default {
             self.inspectList=routeData.inspect;
             self.eventList=routeData.event;
             let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[]
-            let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0
+            let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,allpassfailCount=0
             inspect.forEach(p_item=>{
-                var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0
+                var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
                 p_item.inspectList.forEach(item=>{
                     let QualifiedArr=[],UnqualifiedArr=[],IgnoredArr=[]
                     let totalScore=0,totalGetscore=0,notIgnoreTotalscore=0
@@ -511,7 +511,12 @@ export default {
                     item['itemScore']=totalScore
                     item['itemgetScore']=totalGetscore
                     item['notIgnoreTotalscore']=notIgnoreTotalscore
-
+                    if(p_item.type==0){
+                        CurPassfailQualified += item.numOfQualified
+                        CurpassfailCount += p_item.count
+                        getpassfailQualifiedTotal=CurPassfailQualified
+                        allpassfailCount=CurpassfailCount
+                    }
                     if(p_item.type==1){
                         CurItemgetScore += totalGetscore
                         CurNotIgnoreTotalscore += notIgnoreTotalscore
@@ -539,7 +544,11 @@ export default {
                 }
             })
             let s_count=0
-            s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            if(inspect.length==1&&inspect[0].type==0){
+                s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100)
+            }else{
+                s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            }
             self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
             self.summary=inspect
             eventList.forEach((item,index)=>{

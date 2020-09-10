@@ -1,48 +1,86 @@
 <template>
     <div class="el-event-content" :style="{'minHeight':windowHeight-118+'px'}">
-       <div class="el-date">
-            <span class="date-title">{{generateEventLang('time')}}</span>
-            <el-date-picker
-                ref="datePicker"
-                v-model="dateValue"
-                type="datetimerange"
-                range-separator="~"
-                size="mini"
-                :clearable=false
-                :editable=false
-                format="yyyy/MM/dd HH:mm:ss"
-                class="date-range"
-                :popper-class="poperClass"
-                :picker-options='dateOpt'
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                @change="dateChange"
-                :default-time="defaultTime">
-            </el-date-picker>
-            <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
-                placement="bottom-end">
-                <div slot="content">*{{generateEventLang('timePlaceholder')}}</div>
-                <i class="iconfont icon-bangzhu iconbangzhu"></i>
-            </el-tooltip>
-            <span class="date-title"
-            style="margin-left:30px;margin-right:20px;">{{generateEventLang('status')}}</span>
-            <el-select v-model="value" placeholder="请选择"
-            class="el-select-content" size="small" @change="selectChange" :popper-class="selectpoperClass">
-                <el-option
-                v-for="(item) in states"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-                </el-option>
-            </el-select>
-            <el-input
-                size="small"
-                class="el-search"
-                clearable
-                v-model="serachVale" @clear="searchEventList(true)" @keyup.enter.native="searchEventList(true)">
-                <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;"></i>
-            </el-input>
-       </div>
+        <div class="el-event-header">
+            <div class="el-area">
+                <span class="select-title">{{$t('reportView.selectStores')}}</span>
+                <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
+                        class="el-province" @change="changeCountry">
+                    <el-option-group
+                    v-for="group in CountryList"
+                    :key="group.label"
+                    :label="group.label">
+                    <el-option
+                        v-for="item in group.countryList"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                    </el-option-group>
+                </el-select>
+                <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
+                class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
+                        <el-option
+                        v-for="item in StoreTagList"
+                        :key="item.tagId"
+                        :label="item.tagName"
+                        :value="item.tagId">
+                        </el-option>
+                </el-select>
+                <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
+                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+                <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
+                                    style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+
+                <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
+                                    style="display: inline;" ref="multiSelect"></multi-select>
+                <el-input
+                    size="small"
+                    class="el-search"
+                    clearable
+                    v-model="serachVale" @clear="searchEventList(true)" @keyup.enter.native="searchEventList(true)">
+                    <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;line-height:32px;"></i>
+                </el-input>
+            </div>
+            <div class="el-date">
+                <span class="date-title">{{generateEventLang('time')}}</span>
+                <el-date-picker
+                    ref="datePicker"
+                    v-model="dateValue"
+                    type="datetimerange"
+                    range-separator="~"
+                    size="mini"
+                    :clearable=false
+                    :editable=false
+                    format="yyyy/MM/dd HH:mm:ss"
+                    class="date-range"
+                    :popper-class="poperClass"
+                    :picker-options='dateOpt'
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    @change="dateChange"
+                    :default-time="defaultTime">
+                </el-date-picker>
+                <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
+                    placement="bottom-end">
+                    <div slot="content">*{{generateEventLang('timePlaceholder')}}</div>
+                    <i class="iconfont icon-bangzhu iconbangzhu"></i>
+                </el-tooltip>
+                <span class="date-title"
+                style="margin-left:30px;">{{generateEventLang('status')}}</span>
+                <el-select v-model="value" placeholder="请选择"
+                class="el-select-content" size="small" @change="selectChange" :popper-class="selectpoperClass">
+                    <el-option
+                    v-for="(item) in states"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                    </el-option>
+                </el-select>
+            </div>
+            <div class="store-handle">
+                    <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
+            </div>
+        </div>
         <div class="el-table-content">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
               <div class="btn-area">
@@ -147,13 +185,31 @@ import {getCookie} from '@/common/auth';
 import {isLoginIn} from '@/api/login'
 import {mapGetters} from 'vuex'
 import {generateEventLang} from '@/api/i18n'
+import {getBriefStoreList,GetTagList} from '@/api/store'
+import MultiSelect from '@/components/MultiSelect'
+import RegionMultiSelect from '@/components/RegionMultiSelect'
 // require(['bootstrap-multiselect'], function(purchase){
 //   $('#example-multiple-selected').multiselect();
 // });
 export default {
     name: "ExceptEvent",
+    components: {
+        MultiSelect,
+        RegionMultiSelect
+    },
     data(){
         return{
+            curCountry:'',
+            CountryList:[],
+            StoreTagList:[],
+            curStoreTag:'',
+            curProvince:[],
+            curStore:[],
+            curCity:[],
+            provinceList:[],
+            cityList:[],
+            storeDataList:[],
+            storeStr:'',
             dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
             dateOpt: {
                 disabledDate:(time)=>{
@@ -277,6 +333,320 @@ export default {
         return obj;
       },
         generateEventLang,
+        getTagListData(){
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                GetTagList().then(res=>{
+                    let errMsg=res.errMsg;
+                    if(errMsg!=undefined&&errMsg=='Success'){
+                        self.StoreTagList=res.data;
+                        resolve(res);
+                    }
+                }).catch(res => {
+                    resolve(res);
+                })
+            })
+        },
+        getBriefStoreData(){
+            let self=this;
+            return new Promise((resolve,reject)=>{
+                getBriefStoreList().then(res=>{
+                    let errMsg=res.errMsg;
+                    if(errMsg!=undefined&&errMsg=='Success'){
+                        let data=res.data;
+                        resolve(res);
+                    }
+                }).catch(res => {
+                    resolve(res);
+                })
+            })
+        },
+        async getCountryStore(){
+                let self=this;
+                let data=await self.getBriefStoreData();
+                let temp=[]
+                if(data.errCode==0&&data.errMsg=='Success'){
+                    self.tempStoreData=data.data;
+                    if(self.tempStoreData.length!=0){
+                        self.tempStoreData.forEach(item=>{
+                            let country=item.country;
+                            if(temp.map(x=>x.label).indexOf(country)==-1){
+                                let obj={
+                                    value:country,
+                                    label:country
+                                }
+                                temp.push(obj);
+                            }
+                        })
+                    }
+                    // temp.length>0 ? temp.unshift({value:'', label:self.$t('reportView.country')}) : temp;
+                    let countryList=temp;
+                    self.CountryList[0] = {}
+                    self.CountryList[0].label= self.$t('reportView.country');
+                    self.CountryList[0].countryList = countryList
+                    self.curCountry = countryList[0].label;
+                    // self.curCountry=self.CountryList[1].label
+                    self.selectAllProAndCity(self.curCountry);
+                }
+        },
+        selectAllProAndCity(val){
+            let self = this;
+            let storeList = self.tempStoreData;
+            let temp = [];
+            let tempStore = [];
+            storeList.forEach(item=>{
+                if(item.country==val){
+                if(temp.map(x=>x.value).indexOf(item.province)==-1){
+                    let obj={
+                    label:item.province,
+                    value:item.province
+                    }
+                    temp.push(obj);
+                }
+                let obj={
+                    storeId:item.storeId,
+                    label:item.name,
+                    value:item.name,
+                    userId:item.userId,
+                    tagIds:item.tagIds
+                };
+                tempStore.push(obj);
+                }
+            })
+            self.provinceList = temp;
+            let cityTemp = [];
+            self.provinceList.forEach(_item=>{
+                storeList.forEach(item=>{
+                if(item.province==_item.value){
+                    if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
+                    let obj={
+                        label:item.city,
+                        value:item.city
+                    }
+                    cityTemp.push(obj);
+                    }
+                }
+                })
+            })
+            self.cityList = cityTemp;
+            let provinceArr = [];
+            self.provinceList.forEach(item=>{
+                provinceArr.push(item.value)
+            })
+            self.curProvince = provinceArr;
+
+            let cityArr = [];
+            self.cityList.forEach(item=>{
+                cityArr.push(item.value)
+            })
+            self.curCity = cityArr;
+            self.storeDataList = tempStore;
+            let storeArr = [];
+            self.storeDataList.forEach(item=>{
+                storeArr.push(item.storeId)
+            })
+            self.curStore = storeArr;
+            self.changeStore(self.curStore)
+        },
+        changeStoreTag(val){
+            let self=this
+            let temp=[]
+            self.clearStoreInfo();
+            self.tempStoreData.forEach(item=>{
+                item.tagIds.forEach(_item=>{
+                    if(_item==val&&self.curCountry==item.country){
+                        let obj={
+                            storeId:item.storeId,
+                            label:item.name,
+                            value:item.name,
+                            userId:item.userId,
+                            tagIds:item.tagIds
+                        };
+                        temp.push(obj);
+                    }
+                })
+            })
+            self.storeDataList=temp
+            let str = '',storeArr=[],arr=[]
+            self.storeDataList.forEach(item=>{
+                storeArr.push(item.storeId)
+                arr.push(item.value)
+            })
+            self.curStore=storeArr
+            arr.forEach(item=>{
+                str+=item+'，'
+            })
+            str=str.substr(0,str.length-1)
+            self.storeStr=str;
+            self.searchStore(storeArr)
+        },
+        changeCountry(val){
+            let self=this;
+            let temp=[]
+            self.curStoreTag=''
+            self.clearProviceInfo()
+            self.clearCityInfo();
+            self.clearStoreInfo();
+            self.selectAllProAndCity(val);
+        },
+        changePro(val){
+            let self=this;
+            self.curCity= [];
+            self.clearCityInfo();
+            self.clearStoreInfo();
+            let storeList=self.tempStoreData;
+            let temp=[];
+            let tempStore=[];
+            if(val==''){
+                storeList.forEach(item=>{
+                    if(item.country==self.curCountry){
+                            let obj={
+                                storeId:item.storeId,
+                                label:item.name,
+                                value:item.name,
+                                userId:item.userId,
+                                tagIds:item.tagIds
+                            };
+                            tempStore.push(obj);
+                    }
+                })
+            }else{
+                val.forEach(_item=>{
+                    storeList.forEach(item=>{
+                        if(item.province==_item){
+                        if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                            let obj={
+                            label:item.city,
+                            value:item.city
+                            }
+                            temp.push(obj);
+                        }
+                        let obj={
+                            storeId:item.storeId,
+                            label:item.name,
+                            value:item.name,
+                            userId:item.userId,
+                            tagIds:item.tagIds
+                        };
+                        tempStore.push(obj);
+                        }
+                    })
+                })
+                self.cityList=temp;
+                let cityArr=[]
+                if(self.cityList.length!=0){
+                self.cityList.forEach(item=>{
+                    cityArr.push(item.value)
+                })
+                self.curCity=cityArr
+            }
+            }
+            self.storeDataList=tempStore;
+            let storeArr=[],arr=[]
+            
+            self.storeDataList.forEach(item=>{
+                storeArr.push(item.storeId)
+                arr.push(item.value)
+            })
+            
+            self.curStore=storeArr
+            let str = ''
+            arr.forEach(item=>{
+                str+=item+'，'
+            })
+            str=str.substr(0,str.length-1)
+            self.storeStr=str;
+            self.searchStore(storeArr)
+        },
+        changeCity(val){
+            let self=this;
+            self.clearStoreInfo();
+            let storeList=self.tempStoreData;
+            let temp=[];
+            if(val.length != 0){
+                val.forEach(_item=>{
+                storeList.forEach(item=>{
+                    if(item.city==_item){
+                        if(temp.map(x=>x.value).indexOf(item.city)==-1){
+                            let obj={
+                            storeId:item.storeId,
+                            label:item.name,
+                            value:item.name,
+                            userId:item.userId,
+                            tagIds:item.tagIds
+                            }
+                            temp.push(obj);
+                        }
+                    }
+                })
+                })
+            }
+            self.storeDataList=temp;
+            let str = '',storeArr=[],arr=[]
+            self.storeDataList.forEach(item=>{
+                storeArr.push(item.storeId)
+                arr.push(item.value)
+            })
+            self.curStore=storeArr
+            arr.forEach(item=>{
+                str+=item+'，'
+            })
+            str=str.substr(0,str.length-1)
+            self.storeStr=str;
+            self.searchStore(storeArr)
+        },
+        handleStoreChange (arr) {
+            let self=this;
+            self.curStore = arr
+            self.changeStore(arr)
+        },
+        handleProChange(arr){
+            let self=this;
+            console.log(arr)
+            self.curProvince = arr
+            self.changePro(arr)
+        },
+        handleCityChange(arr){
+            let self=this;
+            console.log(arr)
+            self.curCity = arr
+            self.changeCity(arr)
+        },
+        clearStoreInfo(){
+            let self=this;
+            self.curStore=[];
+            self.storeStr='';
+            self.$refs.multiSelect.selectedArray = [];
+            self.$refs.multiSelect.input=''
+        },
+        clearProviceInfo(){
+            let self=this;
+            self.curProvince=[];
+            self.$refs.proviceSelect.selectedArray = [];
+            self.$refs.proviceSelect.input=''
+        },
+        clearCityInfo(){
+            let self=this;
+            self.curCity=[];
+            self.$refs.citySelect.selectedArray = [];
+            self.$refs.citySelect.input=''
+        },
+        changeStore(val){
+            let self=this;
+            let str='';
+            let storeIds=[]
+            self.tempStoreData.forEach((item,index)=>{
+                val.forEach(_item=>{
+                if(item.storeId==_item){
+                    str+=item.name+'，'
+                    storeIds.push(_item)
+                }
+                })
+            })
+            str=str.substr(0,str.length-1)
+            self.storeStr=str;
+            self.searchStore(storeIds)
+        },
         dateChange(val){
             let self=this;
             console.log(val);
@@ -315,29 +685,30 @@ export default {
             console.log(val.index);
             let selectValue=self.value;
             let tabIndex=Number(val.index);
+            let storeIds = self.curStore.filter(item=> item!= '-1')
             switch(tabIndex){
                 case 0:
                 if(selectValue==0||selectValue==1){
-                    self.params.clause={"status":0,"assignee":self.userId};
+                    self.params.clause={"status":0,"assignee":self.userId,'storeId':storeIds};
                 }
                 else{
-                    self.params.clause={"status":-1,"assignee":self.userId};
+                    self.params.clause={"status":-1,"assignee":self.userId,'storeId':storeIds};
                 }
                 break;
                 case 1:
                 if(selectValue==0){
-                    self.params.clause={"status":[0,1,2],"assigner":self.userId};
+                    self.params.clause={"status":[0,1,2],"assigner":self.userId,'storeId':storeIds};
                 }
                 else{
-                    self.params.clause={"status":selectValue-1,"assigner":self.userId};
+                    self.params.clause={"status":selectValue-1,"assigner":self.userId,'storeId':storeIds};
                 }
                 break;
                 case 2:
                 if(selectValue==0){
-                    self.params.clause={"status":[0,1,2]};
+                    self.params.clause={"status":[0,1,2],'storeId':storeIds};
                 }
                 else{
-                    self.params.clause={"status":selectValue-1};
+                    self.params.clause={"status":selectValue-1,'storeId':storeIds};
                 }
                 break;
             }
@@ -378,23 +749,27 @@ export default {
             console.log(val);
             let self=this;
             let tabIndex=Number(self.activeName);
+            let storeIds = self.curStore.filter(item=> item!= '-1')
             switch(val){
                 case 0:
                     if(tabIndex==0){
                         self.params.clause={
                             status:0,
-                            assignee:self.userId
+                            assignee:self.userId,
+                            storeId: storeIds
                         };
                     }
                     else if(tabIndex==1){
                         self.params.clause={
                             status:[0,1,2],
-                            assigner:self.userId
+                            assigner:self.userId,
+                            storeId: storeIds
                         };
                     }
                     else{
                         self.params.clause={
-                            status:[0,1,2]
+                            status:[0,1,2],
+                            storeId: storeIds
                         };
                     }
                 break;
@@ -402,18 +777,21 @@ export default {
                     if(tabIndex==0){
                         self.params.clause={
                             status:0,
-                            assignee:self.userId
+                            assignee:self.userId,
+                            storeId: storeIds
                         };
                     }
                     else if(tabIndex==1){
                         self.params.clause={
                             status:0,
-                            assigner:self.userId
+                            assigner:self.userId,
+                            storeId: storeIds
                         };
                     }
                     else{
                         self.params.clause={
-                            status:0
+                            status:0,
+                            storeId: storeIds
                         };
                     }
                 break;
@@ -421,18 +799,21 @@ export default {
                 if(tabIndex==0){
                     self.params.clause={
                         status:-1,  //表示选择其他状态时为空。
-                        assignee:self.userId
+                        assignee:self.userId,
+                        storeId: storeIds
                     }
                 }
                 else if(tabIndex==1){
                     self.params.clause={
                         status:val-1,
-                        assigner:self.userId
+                        assigner:self.userId,
+                        storeId: storeIds
                     }
                 }
                 else{
                     self.params.clause={
-                        status:val-1
+                        status:val-1,
+                        storeId: storeIds
                     }
                 }
                 break;
@@ -463,6 +844,100 @@ export default {
             }
 
             self.getEventCount(start,end,status);
+        },
+        searchStore(val){
+            let self=this
+            self.serachData='';
+            let tabIndex=Number(self.activeName);
+            self.tableDataList[tabIndex].page=1;
+            self.params.like={};
+            let storeIds = val.filter(item=> item!= '-1')
+            // self.params.clause = {storeId: storeIds}
+            switch(self.value){
+                case 0:
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:0,
+                            assignee:self.userId,
+                            storeId: storeIds
+                        };
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:[0,1,2],
+                            assigner:self.userId,
+                            storeId: storeIds
+                        };
+                    }
+                    else{
+                        self.params.clause={
+                            status:[0,1,2],
+                            storeId: storeIds
+                        };
+                    }
+                break;
+                case 1:
+                    if(tabIndex==0){
+                        self.params.clause={
+                            status:0,
+                            assignee:self.userId,
+                            storeId: storeIds
+                        };
+                    }
+                    else if(tabIndex==1){
+                        self.params.clause={
+                            status:0,
+                            assigner:self.userId,
+                            storeId: storeIds
+                        };
+                    }
+                    else{
+                        self.params.clause={
+                            status:0,
+                            storeId: storeIds
+                        };
+                    }
+                break;
+                default:
+                if(tabIndex==0){
+                    self.params.clause={
+                        status:-1,  //表示选择其他状态时为空。
+                        assignee:self.userId,
+                        storeId: storeIds
+                    }
+                }
+                else if(tabIndex==1){
+                    self.params.clause={
+                        status:val-1,
+                        assigner:self.userId,
+                        storeId: storeIds
+                    }
+                }
+                else{
+                    self.params.clause={
+                        status:val-1,
+                        storeId: storeIds
+                    }
+                }
+                break;
+            }
+            let dateval=self.dateValue;
+            let start=dateval[0];
+            let endTime = dateval[1];
+            let end = endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
+            
+            self.params.beginTs = start;
+            self.params.endTs = end;
+            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
+            self.getEventList(self.params);
+            let selectValue=self.value;
+            let status=[];
+            switch(selectValue){
+                case 0:status=[0,1,2];break;
+                default:status=selectValue-1;break;
+            }
+            let clause=self.params.clause
+            self.getEventCount(start,end,status,clause);
         },
         searchEventList(flag){
             let self=this;
@@ -620,25 +1095,25 @@ export default {
             let start=new Date().getTime()-1000*3600*24;
             let end=new Date().getTime();
             let status=[0,1,2];
-            self.getEventCount(start,end,status);  //初始加载
+            // self.getEventCount(start,end,status);  //初始加载
         },
         async getEventList(params){
             let self=this;
             let tabIndex=Number(self.activeName);
-            if(params.hasOwnProperty('clause')&&typeof(params.clause.status)=='object'){  //传入的是一个数组类型
-                if(tabIndex==2){
-                    for(var key in params){
-                        if(key=='clause'){
-                            delete params["clause"]
-                        }
-                    }
-                }
-                if(tabIndex==1){
-                    params.clause={
-                        assigner:self.userId
-                    }
-                }
-            }
+            // if(params.hasOwnProperty('clause')&&typeof(params.clause.status)=='object'){  //传入的是一个数组类型
+            //     if(tabIndex==2){
+            //         for(var key in params){
+            //             if(key=='clause'){
+            //                 delete params["clause"]
+            //             }
+            //         }
+            //     }
+            //     if(tabIndex==1){
+            //         params.clause={
+            //             assigner:self.userId
+            //         }
+            //     }
+            // }
 
             eventRESTful.getEventList(params).then((res)=>{
                 let data=res.data.content;
@@ -711,7 +1186,7 @@ export default {
             self.params.clause={"status":0,"assignee":self.userId};
             self.params.order={"direction": "desc","property": "ts"};
             self.params.filter = {size:self.sizeNum};
-            self.getEventList(self.params);
+            // self.getEventList(self.params);
         },
         getEventCount(start,end,status,...value){
             console.log(value);
@@ -905,7 +1380,8 @@ export default {
         console.log(self.tableHeight);
         self.getUserId();
         self.getInitList();
-
+        self.getCountryStore()
+        self.getTagListData()
       }
     },
     created(){
@@ -919,6 +1395,8 @@ export default {
         if(windowHeight>800){
             self.tableHeight=770+'px';
         }
+        self.getCountryStore() //查询门店列表
+        self.getTagListData() //查询门店标签
         self.getUserId();
         self.getInitList();
     },
@@ -1019,34 +1497,62 @@ $h1:#292e36;
       cursor: pointer;
       color: #7d8cad;
     }
-    .el-date{
-        height: 70px;
-        line-height: 70px;
+    .el-event-header{
         text-align: left;
-        border-bottom: 1px solid #e3e9f4;
         position: relative;
         background-color: #fff;
-        .date-title{
-            @include point(margin-left,30);
-            @include point(margin-right,20);
-            font-size: 14px;
-            color: $black;
+        border-bottom: 1px solid #e3e9f4;
+        padding: 30px 20px 30px 30px;
+        font-size: 14px;
+        color: $black;
+        .el-area{
+            // position: relative;
+            .el-province{
+                width: calc(160/1920*100vw);
+                min-width: 85px;
+                margin-left: calc(20/1920*100vw);
+                margin-right: 0;
+                @media screen and (max-width: 1024px){
+                    margin-right: 10px;
+                    margin-left: 10px;
+                }
+            }
+            .el-search{
+                // position:absolute;
+                // right: 0px;
+                float:right;
+                @include point(margin-right,20);
+                @include point(width,160);
+            }
         }
-        .iconbangzhu{
-           margin-left:10px;
-           font-size: calc(20/1920*100vw);
-           position:relative;
-           top:2px;
-           color:$tab;
+        .el-date{
+            margin:20px 0;
+            text-align: left;
+            // position: relative;
+            .date-title{
+                margin-right:20px;
+            }
+            .iconbangzhu{
+                margin-left:10px;
+                font-size: calc(20/1920*100vw);
+                position:relative;
+                top:2px;
+                color:$tab;
+            }
+            .date-range{
+                width:290px;
+            }
         }
-        .date-range{
-            width:290px;
-        }
-        .el-search{
-            position:absolute;
-            right: 0px;
-            @include point(margin-right,20);
-            @include point(width,160);
+        .store-handle{
+            .choice-store{
+                color: $tab;
+                i{
+                    margin-right: calc(15/1920*100vw);
+                }
+                .icon-tishi1{
+                    font-size: calc(16/1920*100vw);
+                }
+            }
         }
     }
     .dialog-footer{

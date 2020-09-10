@@ -1,6 +1,7 @@
 <template>
     <el-row class="el-route-container">
         <el-col :span="24" class="el-route-header">
+            <div v-if="itemhoverName!=''" class="item_name" :style="{'left':120*itemIndex+4*itemIndex+'px'}">{{itemhoverName}}<div class="triangle"></div></div>
           <el-col :span="7" class="el-route-btns">
             <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{generateInsSettingLang('bindWith')}}{{storeNum}} {{generateInsSettingLang('bindStore')}}</span>
             <el-button size="mini" @click="bindStore" :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " class="btn-class" :disabled="elTableData[Number(activeName)].data.length==0" type="primary">
@@ -158,9 +159,8 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick" id="en-patrltabs-content">
                     <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :name="index.toString()" :closable="index!=0&&index!=1?true:false" >
                         <el-tabs v-model="patrolActive" v-if="item.data.length!=0" @tab-click="handleClickPatrol" id="patrltabs-content" :style="{'min-height':varyWindowWidth*0.70+'px'}">
-                            <el-tab-pane v-for="(_item,_index) in item.data" :label="_item.name" :key="_index" :name="_index.toString()">
-                                <!-- <span v-if="itemhoverName!=''" class="item_name">{{itemhoverName}}</span>
-                                <span slot="label" @mouseover="overItem" @mouseout="outItem">{{_item.name}}</span> -->
+                            <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
+                                <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{_item.name}}</span>
                                 <div v-if="_item.routeData&&!loading">
                                     <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName"
                                     :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"></route-detail>
@@ -225,6 +225,7 @@ export default {
             ],
             showNoPostDialog:false,
             itemhoverName:'',
+            itemIndex:0,
             loading:false,
             varyWindowWidth:window.innerHeight,
             addPatrol: '新增巡检表',
@@ -871,11 +872,12 @@ export default {
             self.getTagList();
 
         },
-        overItem(e){
+        overItem(item,index){
             let self=this
-            self.itemhoverName=e.target.innerText
+            self.itemhoverName=item.name
+            self.itemIndex=index
         },
-        outItem(e){
+        outItem(item,index){
             let self=this
             self.itemhoverName=''
         },
@@ -1558,22 +1560,32 @@ export default {
         background-color: #fff;
         .el-route-header{
             margin-top: calc(15/1920*100vw);
-            .el-route-tabs{
-                width: 98%;
-                margin-left: calc(15/1920*100vw);
-                .item_name{
+            .item_name{
                     position: absolute;
-                    top:0;
+                    top:55px;
+                    margin-left:47px;
+                    z-index: 100;
                     height:18px;
                     line-height: 18px;
                     border-radius: 3px;
-                    background-color: rgba(0, 0, 0,0.7);
+                    background-color: rgb(0, 0, 0);
                     color:#fff;
                     padding:5px 2px;
-                    min-width: 70px;
+                    min-width: 100px;
                     text-align: center;
                     font-size: calc(12/1920*100vw);
+                    .triangle{
+                        width:10px;
+                        height:10px;
+                        margin:0 auto;
+                        transform:rotate(45deg);
+                        background-color: rgb(0, 0, 0);
+                    }
                 }
+            .el-route-tabs{
+                width: 98%;
+                margin-left: calc(15/1920*100vw);
+                
                 .bind-empty{
                     text-align: center;
                     img{

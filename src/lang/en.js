@@ -486,7 +486,7 @@ export default {
     inspectName: 'Name',
     inspectionDescp: 'Descriptions',
     sheetscore0: 'Project full score',//Sprint8 新增
-    sheetscore1: 'If the score is lower than *, the person in charge of the store must handle it',//Sprint8 新增
+    sheetscore1: 'the score is not allow lower than *',//Sprint8 新增
     sheetscore2: 'Project score (required, -100 points to 100 points)',//Sprint8 新增
     sheetpassfail:'Pass-Failed',//Sprint8 新增
     sheetscore:'Score items',//Sprint8 新增

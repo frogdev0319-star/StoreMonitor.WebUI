@@ -1567,8 +1567,8 @@
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(30/1920*100vw);
-        height: 20px;
-        line-height: 20px;
+        // height: 20px;
+        // line-height: 20px;
         position: relative;
         span{
           font-size: calc(14/1920*100vw);
@@ -1577,10 +1577,10 @@
         }
         .choice-store{
           color: $tab;
-          white-space: nowrap;
-          overflow: hidden;
+          // white-space: nowrap;
+          // overflow: hidden;
           /* text-overflow: ellipsis; */
-          width: 90%;
+          // width: 90%;
           display: inline-block;
           i{
             margin-right: calc(16/1920*100vw);

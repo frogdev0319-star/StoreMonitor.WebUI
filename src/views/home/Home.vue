@@ -534,11 +534,13 @@
       this.getAccountList();
       this.updateTitle();
       console.log(this.$router.options.routes)
-      this.$nextTick(function() {
-        this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
-          "scroll-opacity"
-        );
-      });
+      if(this.$refs.fieldSelect!=undefined){
+        this.$nextTick(function() {
+          this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
+            "scroll-opacity"
+          );
+        });
+      }
     },
   }
 </script>
