@@ -37,7 +37,7 @@
                     size="small"
                     class="el-search"
                     clearable
-                    v-model="serachVale" @clear="searchEventList(true)" @keyup.enter.native="searchEventList(true)">
+                    v-model="serachVale" @clear="searchData(true)" @keyup.enter.native="searchData(true)">
                     <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;line-height:32px;"></i>
                 </el-input>
             </div>
@@ -68,7 +68,7 @@
                 <span class="date-title"
                 style="margin-left:30px;">{{generateEventLang('status')}}</span>
                 <el-select v-model="value" placeholder="请选择"
-                class="el-select-content" size="small" @change="selectChange" :popper-class="selectpoperClass">
+                class="el-select-content" size="small" @change="searchEventList" :popper-class="selectpoperClass">
                     <el-option
                     v-for="(item) in states"
                     :key="item.value"
@@ -88,7 +88,7 @@
                 <span class="spanClass">{{generateEventLang('exportReport')}}</span>
               </div>
             </el-button>
-            <el-tabs v-model="activeName" @tab-click="handleClick" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
+            <el-tabs v-model="activeName" @tab-click="getEventList" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
                 <el-tab-pane v-for="(item,index) in tableDataList"
                 :key="index" :label="`${item.label} （${item.eventCount}）`">
                     <div class="el-table-panel">
@@ -300,7 +300,7 @@ export default {
             let self=this;
             if(val!=0) {
               console.log(self.dateValue)
-              self.searchEventList(false)
+            //   self.searchEventList(false)
               window.setTimeout(function(){
                   self.$route.meta.keepAlive = true;
                   console.log(self.$route.meta.keepAlive);
@@ -315,7 +315,7 @@ export default {
           let self = this;
           if(val == 0 && self.totalElements > 0){
             self.params.filter.page -= 1;
-            self.getEventList(self.params);
+            self.getEventList();
           }
         }
     },
@@ -379,13 +379,11 @@ export default {
                             }
                         })
                     }
-                    // temp.length>0 ? temp.unshift({value:'', label:self.$t('reportView.country')}) : temp;
                     let countryList=temp;
                     self.CountryList[0] = {}
                     self.CountryList[0].label= self.$t('reportView.country');
                     self.CountryList[0].countryList = countryList
                     self.curCountry = countryList[0].label;
-                    // self.curCountry=self.CountryList[1].label
                     self.selectAllProAndCity(self.curCountry);
                 }
         },
@@ -478,7 +476,7 @@ export default {
             })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
-            self.searchStore(storeArr)
+            self.searchEventList(storeArr)
         },
         changeCountry(val){
             let self=this;
@@ -556,7 +554,7 @@ export default {
             })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
-            self.searchStore(storeArr)
+            self.searchEventList(storeArr)
         },
         changeCity(val){
             let self=this;
@@ -593,7 +591,7 @@ export default {
             })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
-            self.searchStore(storeArr)
+            self.searchEventList(storeArr)
         },
         handleStoreChange (arr) {
             let self=this;
@@ -645,11 +643,11 @@ export default {
             })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
-            self.searchStore(storeIds)
+            self.searchEventList(storeIds)
         },
         dateChange(val){
             let self=this;
-            console.log(val);
+            // 参数需要时间、状态、门店
             let tabIndex=Number(self.activeName);
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
@@ -665,376 +663,20 @@ export default {
             else{
               self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
             }
-            self.serachData='';
-            self.tableDataList[tabIndex].page=1;
-            self.params.like={};
-            self.params.beginTs=start;
-            self.params.endTs=end;
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            let selectValue=self.value;
-            let status=[];
-          self.getEventList(self.params);
-            switch(selectValue){
-                case 0:status=[0,1,2];break;
-                default:status=selectValue-1;break;
-            }
-            self.getEventCount(start,end,status);
+            self.serachVale=''
+            self.getEventList(0);
+            self.getEventCount();
         },
-        handleClick(val){
+        searchEventList(){
             let self=this;
-            console.log(val.index);
-            let selectValue=self.value;
-            let tabIndex=Number(val.index);
-            let storeIds = self.curStore.filter(item=> item!= '-1')
-            switch(tabIndex){
-                case 0:
-                if(selectValue==0||selectValue==1){
-                    self.params.clause={"status":0,"assignee":self.userId,'storeId':storeIds};
-                }
-                else{
-                    self.params.clause={"status":-1,"assignee":self.userId,'storeId':storeIds};
-                }
-                break;
-                case 1:
-                if(selectValue==0){
-                    self.params.clause={"status":[0,1,2],"assigner":self.userId,'storeId':storeIds};
-                }
-                else{
-                    self.params.clause={"status":selectValue-1,"assigner":self.userId,'storeId':storeIds};
-                }
-                break;
-                case 2:
-                if(selectValue==0){
-                    self.params.clause={"status":[0,1,2],'storeId':storeIds};
-                }
-                else{
-                    self.params.clause={"status":selectValue-1,'storeId':storeIds};
-                }
-                break;
-            }
-            if(self.serachData!=undefined&&self.serachData.length!=0){
-                self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
-            }
-            else{
-                self.params.like={};
-            }
-            //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            let dateval=self.dateValue;
-            console.log(dateval)
-            let startStr=dateval[0];
-            let endTime = dateval[1];
-            let endStr= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-
-            // let start=new Date(startStr).getTime();
-            // let end=new Date(endStr).getTime();
-
-            self.params.beginTs=startStr;
-            self.params.endTs=endStr;
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            console.log(self.params);
-            let curTabSortColumn = self.sortColumnOfTab[tabIndex];
-              let order = curTabSortColumn.sortType.order;
-              let prop = curTabSortColumn.sortType.prop;
-              if(order!= '' && prop != ''){
-                self.params.order={
-                  "direction": order,
-                  "property": prop
-                }
-              }
-              this.getEventList(self.params);
-          },
-        //点击状态搜索时，总共需要时间范围，状态
-        selectChange(val){
-            console.log(val);
-            let self=this;
-            let tabIndex=Number(self.activeName);
-            let storeIds = self.curStore.filter(item=> item!= '-1')
-            switch(val){
-                case 0:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:0,
-                            assignee:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:[0,1,2],
-                            assigner:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else{
-                        self.params.clause={
-                            status:[0,1,2],
-                            storeId: storeIds
-                        };
-                    }
-                break;
-                case 1:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:0,
-                            assignee:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:0,
-                            assigner:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else{
-                        self.params.clause={
-                            status:0,
-                            storeId: storeIds
-                        };
-                    }
-                break;
-                default:
-                if(tabIndex==0){
-                    self.params.clause={
-                        status:-1,  //表示选择其他状态时为空。
-                        assignee:self.userId,
-                        storeId: storeIds
-                    }
-                }
-                else if(tabIndex==1){
-                    self.params.clause={
-                        status:val-1,
-                        assigner:self.userId,
-                        storeId: storeIds
-                    }
-                }
-                else{
-                    self.params.clause={
-                        status:val-1,
-                        storeId: storeIds
-                    }
-                }
-                break;
-            }
-
-            self.serachData='';
-            self.tableDataList[tabIndex].page=1;
-            self.params.like={};
-
-            //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            let dateval=self.dateValue;
-            console.log(dateval)
-            let start=dateval[0];
-            let endTime = dateval[1];
-            let end = endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-
-            self.params.beginTs = start;
-            self.params.endTs = end;
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            self.getEventList(self.params);
-            let status=[];
-            if(val==0){
-                status=[0,1,2];
-            }
-            else{
-                status=val-1;
-            }
-
-            self.getEventCount(start,end,status);
+            self.serachVale=''
+            self.getEventList();
+            self.getEventCount();
         },
-        searchStore(val){
-            let self=this
-            self.serachData='';
-            let tabIndex=Number(self.activeName);
-            self.tableDataList[tabIndex].page=1;
-            self.params.like={};
-            let storeIds = val.filter(item=> item!= '-1')
-            // self.params.clause = {storeId: storeIds}
-            switch(self.value){
-                case 0:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:0,
-                            assignee:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:[0,1,2],
-                            assigner:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else{
-                        self.params.clause={
-                            status:[0,1,2],
-                            storeId: storeIds
-                        };
-                    }
-                break;
-                case 1:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:0,
-                            assignee:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:0,
-                            assigner:self.userId,
-                            storeId: storeIds
-                        };
-                    }
-                    else{
-                        self.params.clause={
-                            status:0,
-                            storeId: storeIds
-                        };
-                    }
-                break;
-                default:
-                if(tabIndex==0){
-                    self.params.clause={
-                        status:-1,  //表示选择其他状态时为空。
-                        assignee:self.userId,
-                        storeId: storeIds
-                    }
-                }
-                else if(tabIndex==1){
-                    self.params.clause={
-                        status:val-1,
-                        assigner:self.userId,
-                        storeId: storeIds
-                    }
-                }
-                else{
-                    self.params.clause={
-                        status:val-1,
-                        storeId: storeIds
-                    }
-                }
-                break;
-            }
-            let dateval=self.dateValue;
-            let start=dateval[0];
-            let endTime = dateval[1];
-            let end = endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-            
-            self.params.beginTs = start;
-            self.params.endTs = end;
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            self.getEventList(self.params);
-            let selectValue=self.value;
-            let status=[];
-            switch(selectValue){
-                case 0:status=[0,1,2];break;
-                default:status=selectValue-1;break;
-            }
-            let clause=self.params.clause
-            self.getEventCount(start,end,status,clause);
-        },
-        searchEventList(flag){
+        searchData(){
             let self=this;
-            let tabIndex=Number(self.activeName);
-            let val=self.value;
-            self.tableDataList[tabIndex].page=1;
-            self.serachData=self.serachVale.trim();
-            switch(val){
-                case 0:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:0,
-                            assignee:self.userId
-                        }
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:[0,1,2],
-                            assigner:self.userId
-                        }
-                    }
-                    else{
-                        self.params.clause={
-                            status:[0,1,2]
-                        }
-                    }
-                break;
-                case 1:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:0,
-                            assignee:self.userId
-                        }
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:0,
-                            assigner:self.userId
-                        }
-                    }
-                    else{
-                        self.params.clause={
-                            status:0
-                        }
-                    }
-                break;
-                default:
-                    if(tabIndex==0){
-                        self.params.clause={
-                            status:-1,
-                            assignee:self.userId
-                        }
-                    }
-                    else if(tabIndex==1){
-                        self.params.clause={
-                            status:val-1,
-                            assigner:self.userId
-                        };
-                    }
-                    else{
-                        self.params.clause={
-                            status:val-1
-                        };
-                    }
-                break;
-            }
-            if(self.serachData!=undefined&&self.serachData.length!=0){
-                if(flag){
-                    self.params.like={subject:this.serachData,assignerName:this.serachData,storeName:this.serachData};
-                }
-                else{
-                    self.params.like={};
-                }
-            }
-            else{
-                self.params.like={};
-            }
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:self.tableDataList[tabIndex].sizeNum};
-            self.getEventList(self.params);
-
-            //let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            //let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            let dateval=self.dateValue;
-            console.log(dateval)
-            let start=dateval[0];
-            let endTime = dateval[1];
-            let end= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-            console.log(start)
-          console.log(end)
-            let status=[];
-            let selectValue=self.value;
-            switch(selectValue){
-                case 0:status=[0,1,2];break;
-                default:status=selectValue-1;break;
-            }
-            let like=self.params.like;
-            self.getEventCount(start,end,status,like);
+            self.getEventList();
+            self.getEventCount();
         },
         rowClickItem(row,column,event){
             let self=this;
@@ -1082,40 +724,83 @@ export default {
             }
             self.sortColumnOfTab[tabIndex].sortType.prop = prop;
             self.sortColumnOfTab[tabIndex].sortType.order = tempOrder;
-          console.log(self.sortColumnOfTab);
-          self.params.filter={
-                page:self.tableDataList[tabIndex].page-1,
-                size:self.tableDataList[tabIndex].sizeNum
-            }
-            self.getEventList(self.params);
+            self.getEventList();
         },
-        getUserId(){
-            let self=this;
-            self.userId=getCookie('UserId');
-            let start=new Date().getTime()-1000*3600*24;
-            let end=new Date().getTime();
-            let status=[0,1,2];
-            // self.getEventCount(start,end,status);  //初始加载
-        },
-        async getEventList(params){
+        // getUserId(){
+        //     let self=this;
+        //     self.userId=getCookie('UserId');
+        //     let start=new Date().getTime()-1000*3600*24;
+        //     let end=new Date().getTime();
+        //     let status=[0,1,2];
+        //     self.getEventCount(start,end,status);  //初始加载
+        // },
+        async getEventList(val){
             let self=this;
             let tabIndex=Number(self.activeName);
-            // if(params.hasOwnProperty('clause')&&typeof(params.clause.status)=='object'){  //传入的是一个数组类型
-            //     if(tabIndex==2){
-            //         for(var key in params){
-            //             if(key=='clause'){
-            //                 delete params["clause"]
-            //             }
-            //         }
-            //     }
-            //     if(tabIndex==1){
-            //         params.clause={
-            //             assigner:self.userId
-            //         }
-            //     }
-            // }
-
-            eventRESTful.getEventList(params).then((res)=>{
+            self.tableDataList[tabIndex].page=1;
+            let like={}
+            if(self.serachVale.trim().length!=0){
+                like={subject:self.serachVale.trim(),assignerName:self.serachVale.trim(),storeName:self.serachVale.trim()};
+            }
+            else{
+                like={};
+            }
+            let storeId = self.curStore.filter(item=> item!= '-1')
+            let status=''
+            switch(self.value){
+                case 0:
+                    status = tabIndex==0 ? 0 :  [0,1,2] 
+                    break;
+                case 1:
+                    status = 0
+                    break;
+                default:
+                    status = tabIndex==0 ? -1 :  self.value-1
+                    break;
+            }
+            self.tableDataList[tabIndex].page=1;
+            let start='',end=''
+            if(val==0){
+                start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
+                end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
+            }else{
+                start=self.dateValue[0];
+                let endTime = self.dateValue[1];
+                end = endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
+            }
+            self.params={
+                beginTs:start,
+                endTs:end,
+                clause:{
+                    status:status,
+                    assigner:self.userId,
+                    storeId: storeId
+                },
+                filter:{
+                    page:self.tableDataList[tabIndex].page-1,
+                    size:self.tableDataList[tabIndex].sizeNum
+                },
+                like:like
+            }
+            let curTabSortColumn = self.sortColumnOfTab[tabIndex];
+            let order = curTabSortColumn.sortType.order;
+            let prop = curTabSortColumn.sortType.prop;
+            if(order!= '' && prop != ''){
+                self.params.order={
+                    direction: order,
+                    property: prop
+                }
+            }
+            if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
+                if(tabIndex==2){
+                    for(var key in self.params){
+                        if(key=='clause'){
+                            delete self.params.clause.assigner
+                        }
+                    }
+                }
+            }
+            eventRESTful.getEventList(self.params).then((res)=>{
                 let data=res.data.content;
                 let temp=[];
                 data.forEach(item=>{
@@ -1158,66 +843,65 @@ export default {
         },
         sizeChange(val){
             let self=this;
-            let tabIndex=Number(self.activeName);
-            self.tableDataList[tabIndex].sizeNum=val;
-            //self.page=1;
-            self.tableDataList[tabIndex].page=1;
-            self.params.filter={page:self.tableDataList[tabIndex].page-1,size:val};
-            self.getEventList(self.params);
+            self.tableDataList[Number(self.activeName)].sizeNum=val;
+            self.getEventList();
         },
         currentChange(val){
             let self=this;
-            let tabIndex=Number(self.activeName);
-            self.tableDataList[tabIndex].page=val;
-            self.params.filter={page:val-1,size:self.tableDataList[tabIndex].sizeNum};
-            this.getEventList(this.params);
+            self.tableDataList[Number(self.activeName)].page=val;
+            self.getEventList();
             let dom=document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
             let offestTop=dom.offsetTop;
             if(dom!=undefined){
                 document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop=0;
             }
         },
-        getInitList(){
+        // getInitList(){
+        //     let self=this;
+        //     let start=new Date().getTime()-1000*3600*24;
+        //     let end=new Date().getTime();
+        //     self.params.beginTs=start;
+        //     self.params.endTs=end;
+        //     self.params.clause={"status":0,"assignee":self.userId};
+        //     self.params.order={"direction": "desc","property": "ts"};
+        //     self.params.filter = {size:self.sizeNum};
+        //     self.getEventList(self.params);
+        // },
+        getEventCount(){
             let self=this;
-            let start=new Date().getTime()-1000*3600*24;
-            let end=new Date().getTime();
-            self.params.beginTs=start;
-            self.params.endTs=end;
-            self.params.clause={"status":0,"assignee":self.userId};
-            self.params.order={"direction": "desc","property": "ts"};
-            self.params.filter = {size:self.sizeNum};
-            // self.getEventList(self.params);
-        },
-        getEventCount(start,end,status,...value){
-            console.log(value);
-            let self=this;
+            let status=[]
+            switch(self.value){
+                case 0:status=[0,1,2];break;
+                default:status=self.value-1;break;
+            }
+            let start=self.dateValue[0];
+            let endTime = self.dateValue[1];
+            let end= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
+            let storeId = self.curStore.filter(item=> item!= '-1')
+            let like={}
+            if(self.serachVale.trim().length!=0){
+                like={subject:self.serachVale.trim(),assignerName:self.serachVale.trim(),storeName:self.serachVale.trim()};
+            }
+            else{
+                like={};
+            }
             let params={
                 beginTs:start,
                 endTs:end,
-                "cases": [
-                    1,
-                    2,
-                    3
-                ],
-                "clause":{
-                    "status":status
+                cases: [1, 2,3],
+                clause:{
+                    status:status,
+                    storeId:storeId
                 },
-
+                like:like
             };
-            if(typeof(status)=='number'){  //只有是数值类型时才带
-                params.clause.status=status;
-            }
-            else{
-                for(var key in params){
-                    console.log(key)
-                    if(key=='clause'){
-                        delete params["clause"];
-                    }
-                }
-            }
-            if(value.length!=0){
-                params.like=value[0];
-            }
+            // if(typeof(status)!='number'){
+            //     for(var key in params){
+            //         if(key=='clause'){
+            //             delete params.clause.status
+            //         }
+            //     }
+            // }
             eventRESTful.getEventCount(params).then(res=>{
                 let data=res.data;
                 let errMsg=res.errMsg;
@@ -1378,10 +1062,10 @@ export default {
           self.tableHeight=770+'px';
         }
         console.log(self.tableHeight);
-        self.getUserId();
-        self.getInitList();
-        self.getCountryStore()
-        self.getTagListData()
+        // self.getUserId();
+        // self.getInitList();
+        // self.getCountryStore()
+        // self.getTagListData()
       }
     },
     created(){
@@ -1389,6 +1073,7 @@ export default {
     },
     async mounted(){
         let self=this;
+        self.userId=getCookie('UserId');
         self.getDeafultTime();
         //await self.isLoginIn();
         let windowHeight=window.innerHeight;
@@ -1397,8 +1082,8 @@ export default {
         }
         self.getCountryStore() //查询门店列表
         self.getTagListData() //查询门店标签
-        self.getUserId();
-        self.getInitList();
+        // self.getUserId();
+        // self.getInitList();
     },
   beforeRouteEnter (to, from, next) {
     to.meta.keepAlive = true
@@ -1411,28 +1096,28 @@ export default {
       next();
     }
   },
-  activated(){
-    let self=this;
-    self.windowHeight = window.innerHeight;
-    if(!self.$route.meta.isBack || self.isFirstLoad){
-      self.initData()
-    }
-    else{
-      self.getEventList(self.params);
-      let status=[];
-      let selectValue=self.value;
-      switch(selectValue){
-        case 0:status=[0,1,2];break;
-        default:status=selectValue-1;break;
-      }
-      let like=self.params.like;
-      let start = self.params.beginTs;
-      let end = self.params.endTs;
-      self.getEventCount(start,end,status);
-    }
-    self.$route.meta.isBack = false;
-    self.isFirstLoad = false;
-  },
+//   activated(){
+//     let self=this;
+//     self.windowHeight = window.innerHeight;
+//     if(!self.$route.meta.isBack || self.isFirstLoad){
+//       self.initData()
+//     }
+//     else{
+//       self.getEventList(self.params);
+//       let status=[];
+//       let selectValue=self.value;
+//       switch(selectValue){
+//         case 0:status=[0,1,2];break;
+//         default:status=selectValue-1;break;
+//       }
+//       let like=self.params.like;
+//       let start = self.params.beginTs;
+//       let end = self.params.endTs;
+//       self.getEventCount(start,end,status);
+//     }
+//     self.$route.meta.isBack = false;
+//     self.isFirstLoad = false;
+//   },
     beforeRouteLeave (to, from, next) {
       console.log(this.params);
       if(to.name != 'eventDetails'){
