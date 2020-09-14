@@ -79,8 +79,9 @@
                             <div class="header-content tabTitle" v-if="index==0">
                                 <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
                                 <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
-                                <span class="description-title">{{generateInsSettingLang('inspectionDescp')}}</span>
-                                <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{generateInsSettingLang('sheetscore0')}}</span>
+                                <span class="description-title" :style="showSheet0?'width: calc((100% - 405px) * 25/29);':''">{{generateInsSettingLang('inspectionDescp')}}</span>
+                                <span class="score-title" :style="'width: calc((100% - 405px) * 2.5/29);'" v-if="showSheet1">{{generateInsSettingLang('sheetscore0')}}</span>
+                                <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{generateInsSettingLang('sheetscore0')}}</span> -->
                                 <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="showSheet1">{{generateInsSettingLang('sheetscore1')}}</span>
                                 <span class="score-title" v-if="showSheet2">{{generateInsSettingLang('sheetscore2')}}</span>
                                 <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
@@ -103,8 +104,8 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="name" width="300px"></el-table-column>
-                                    <el-table-column prop="description" min-width='24%'></el-table-column>
-                                    <el-table-column prop="score" align="center" :min-width="showSheet1?'4%':'15%'"></el-table-column>
+                                    <el-table-column prop="description" :min-width="showSheet0?'40%':'23%'"></el-table-column>
+                                    <el-table-column prop="score" align="center" v-if="showSheet1||showSheet2" :min-width="showSheet1?'4%':'15%'"></el-table-column>
                                     <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="showSheet1"></el-table-column>
                                     <el-table-column prop="handle" min-width="6%">
                                         <template slot-scope="scope">
