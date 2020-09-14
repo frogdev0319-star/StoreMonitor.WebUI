@@ -104,7 +104,7 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="name" width="300px"></el-table-column>
-                                    <el-table-column prop="description" :min-width="showSheet0?'40%':'23%'"></el-table-column>
+                                    <el-table-column prop="description" :min-width="showSheet0?'40%':'24%'"></el-table-column>
                                     <el-table-column prop="score" align="center" v-if="showSheet1||showSheet2" :min-width="showSheet1?'4%':'15%'"></el-table-column>
                                     <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="showSheet1"></el-table-column>
                                     <el-table-column prop="handle" min-width="6%">

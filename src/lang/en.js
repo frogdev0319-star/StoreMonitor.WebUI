@@ -422,6 +422,10 @@ export default {
   // event Management page language
   eventView:{
     enclosure:'annex',//Sprint8 新增
+    ProcessedEvent:'Processed Events',//Sprint9 新增
+    ClosedEvent:'Closed Events',//Sprint9 新增
+    ReturnEvent:'Return Events',//Sprint9 新增
+    returnStatus:'Return',//Sprint9 新增
     status: 'Status',
     all : 'All',
     pending: 'Pending',

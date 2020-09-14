@@ -422,6 +422,10 @@ export default {
   // event Management page language
   eventView:{
     enclosure:'附件',//Sprint8 新增
+    ProcessedEvent:'已处理事件',//Sprint9 新增
+    ClosedEvent:'已结案事件',//Sprint9 新增
+    ReturnEvent:'退回再处理事件',//Sprint9 新增
+    returnStatus:'退回',//Sprint9 新增
     status: '处理状态',
     all : '全部',
     pending: '未处理',

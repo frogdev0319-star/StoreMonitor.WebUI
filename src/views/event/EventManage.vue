@@ -67,7 +67,7 @@
                 </el-tooltip>
                 <span class="date-title"
                 style="margin-left:30px;">{{generateEventLang('status')}}</span>
-                <multi-select :selected="curState" :alltype="0" :options="states" @changeInput="handleStateChange"
+                <multi-select :selected="curState" :alltype="0" :options="states" :disabled="curState.length<5" @changeInput="handleStateChange"
                                     style="display:inline;" ref="multiState"></multi-select>
             </div>
             <div class="store-handle">
@@ -81,7 +81,7 @@
                 <span class="spanClass">{{generateEventLang('exportReport')}}</span>
               </div>
             </el-button>
-            <el-tabs v-model="activeName" @tab-click="getEventList" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
+            <el-tabs v-model="activeName" @tab-click="handleTabClick" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
                 <el-tab-pane v-for="(item,index) in tableDataList"
                 :key="index" :label="`${item.label} （${item.eventCount}）`">
                     <div class="el-table-panel">
@@ -212,7 +212,7 @@ export default {
                 }
             },
             toolTipClass: 'page-login-toolTipClass',
-            states:[{value: 0,label: this.$t('eventView.pending'),disabled:false}, {value: 1,label: this.$t('eventView.handled'),disabled:false}, {value: 2,label: this.$t('eventView.closed'),disabled:false}],
+            states:[{value: 0,label: this.$t('eventView.pending'),disabled:false}, {value: 1,label: this.$t('eventView.handled'),disabled:false}, {value: 2,label: this.$t('eventView.closed'),disabled:false},{value: 3,label: this.$t('eventView.returnStatus'),disabled:false},],
             curState:[],
             value:0,
             serachVale:'',
@@ -227,7 +227,23 @@ export default {
                     page:1
                 },
                 {
-                    label: this.$t('eventView.myEvent'),
+                    label: this.$t('eventView.ProcessedEvent'),
+                    eventCount:0,
+                    tableData:[],
+                    total:0,
+                    sizeNum:10,
+                    page:1
+                },
+                {
+                    label: this.$t('eventView.ClosedEvent'),
+                    eventCount:0,
+                    tableData:[],
+                    total:0,
+                    sizeNum:10,
+                    page:1
+                },
+                {
+                    label: this.$t('eventView.ReturnEvent'),
                     eventCount:0,
                     tableData:[],
                     total:0,
@@ -269,7 +285,7 @@ export default {
           ifChangeAccount: false,
           numberOfElements: 0,
           totalElements: 0,
-          sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }],
+          sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }, {tabIndex: 3, sortType:{prop: '', order: ''} }, {tabIndex: 4, sortType:{prop: '', order: ''} }],
           exportPng: require('../../../static/img/icon_excel.png'),
           selfClassName: 'self-class-name'
         }
@@ -438,11 +454,7 @@ export default {
             })
             self.curStore = storeArr;
             let stateArr=[]
-            self.states.forEach(item=>{
-                stateArr.push(item.value)
-            })
-            self.curState=stateArr
-            self.curState.unshift('-1')
+            self.curState=[0]
             self.changeStore(self.curStore)
         },
         changeStoreTag(val){
@@ -672,6 +684,20 @@ export default {
             self.getEventList(0);
             self.getEventCount();
         },
+        handleTabClick(val){
+            let self=this;
+            if(Number(val.index)<4){
+                self.curState=[Number(val.index)]
+            }else{
+                let stateArr=[]
+                self.states.forEach(item=>{
+                    stateArr.push(item.value)
+                })
+                self.curState=stateArr
+                self.curState.unshift('-1')
+            }
+            self.getEventList();
+        },
         searchEventList(val){
             let self=this;
             self.serachVale=''
@@ -752,17 +778,27 @@ export default {
                 like={};
             }
             let storeId = self.curStore.filter(item=> item!= '-1')
-            let allStatus = self.curState.some(item=>item=='-1')
-            let status= ''
-            if(allStatus){
-                status = tabIndex==0 ? 0 :  [0,1,2]
-            }else{
-                if(self.curState.some(item=>item==0)&&tabIndex==0){
-                    status=0
+            let status= []
+            if(self.curState.length!=0){
+                let allStatus = self.curState.some(item=>item=='-1')
+                if(allStatus){
+                    status = [0,1,2,3]
                 }else{
-                    status = tabIndex==0 ? -1 :  self.curState
+                    status = self.curState
                 }
+            }else{
+                status=-1
             }
+            // let status= ''
+            // if(allStatus){
+            //     status = tabIndex==0 ? 0 :  [0,1,2]
+            // }else{
+            //     if(self.curState.some(item=>item==0)&&tabIndex==0){
+            //         status=0
+            //     }else{
+            //         status = tabIndex==0 ? -1 :  self.curState
+            //     }
+            // }
             let page=0
             if(val=='currentChange'){
                 page = self.tableDataList[tabIndex].page-1
@@ -782,11 +818,6 @@ export default {
             self.params={
                 beginTs:start,
                 endTs:end,
-                // clause:{
-                //     status:status,
-                //     assigner:self.userId,
-                //     storeId: storeId
-                // },
                 filter:{
                     page:page,
                     size:self.tableDataList[tabIndex].sizeNum
@@ -899,7 +930,7 @@ export default {
             if(self.curState.length!=0){
                 let allStatus = self.curState.some(item=>item=='-1')
                 if(allStatus){
-                    status = [0,1,2]
+                    status = [0,1,2,3]
                 }else{
                     status = self.curState
                 }
@@ -1059,36 +1090,10 @@ export default {
         // self.value = 0;
         self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
         self.serachVale='';
-         self.total= 0;
-           self.page=1;
-           self.sizeNum=10;
-           self.params={};
-         self.tableDataList = [
-           {
-             label: this.$t('eventView.pendingEve'),
-             eventCount:0,
-             tableData:[],
-             total:0,
-             sizeNum:10,
-             page:1
-           },
-           {
-             label: this.$t('eventView.myEvent'),
-             eventCount:0,
-             tableData:[],
-             total:0,
-             sizeNum:10,
-             page:1
-           },
-           {
-             label: this.$t('eventView.allEvents'),
-             eventCount:0,
-             tableData:[],
-             total:0,
-             sizeNum:10,
-             page:1
-           }
-         ],
+        self.total= 0;
+        self.page=1;
+        self.sizeNum=10;
+        self.params={};
         self.getDeafultTime();
         let windowHeight=window.innerHeight;
         if(windowHeight>800){
