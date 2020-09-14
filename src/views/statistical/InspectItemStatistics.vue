@@ -159,6 +159,15 @@
             </el-col>
           </el-col>
           <el-col :span="24" class="items-table">
+            <div class="exprotBtn">
+              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                <div class="btn-area">
+                  <i class="iconfont icon-excel"></i>
+                  <!-- <img :src="exportPng" class="icon-excel"> -->
+                  <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                </div>
+              </el-button>
+            </div>
             <div class="table">
               <div class="el-table-panel">
                 <el-table
@@ -1750,10 +1759,6 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                .icon-excel{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                }
                 .icon-pdf{
                   margin-right: calc(18/1920*100vw);
                   font-size: calc(24/1920*100vw);
@@ -1785,10 +1790,6 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-                  font-size: 24px;
-                }
                 .icon-pdf{
                   margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
                   font-size: 24px;
@@ -2049,6 +2050,74 @@
         .table{
           margin: 0 calc(30/1920*100vw);
         }
+        .exprotBtn{
+            margin-bottom: 10px;
+            padding-right: calc(30 / 1920 * 100vw);
+            float: right;
+            .export-btn{
+              border-color: $red;
+              z-index: 990;
+              height: calc(36/1920*100vw);
+              width: calc(130/1920*100vw);
+              margin: 0;
+              padding: 0;
+              font-size: calc(14/1920*100vw);
+              line-height: calc(36/1920*100vw);
+              color: #ffffff;
+              border-width: 0;
+              border-radius: 4px;
+              top: calc(24/1920*100vw);
+              min-height: 28px;
+              min-width: 120px;
+              .btn-area{
+                position: relative;
+                padding: 0 calc(6/1920*100vw);
+                height: calc(36/1920*100vw);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .icon-excel{
+                  margin-right: calc(18/1920*100vw);
+                  font-size: calc(24/1920*100vw);
+                }
+                .spanClass{
+                  font-size: calc(14/1920*100vw);
+                  display: inline-block;
+                }
+              }
+            }
+            .en-export-btn{
+              border-color: $red;
+              z-index: 990;
+              height: calc(36/1920*100vw);
+              width: calc(160/1920*100vw);
+              margin: 0;
+              padding: 0;
+              font-size: calc(14/1920*100vw);
+              line-height: calc(36/1920*100vw);
+              color: #ffffff;
+              border-width: 0;
+              border-radius: 4px;
+              min-height: 28px;
+              min-width: 120px;
+              .btn-area{
+                position: relative;
+                padding: 0 calc(6/1920*100vw);
+                height: calc(36/1920*100vw);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .icon-excel{
+                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
+                  font-size: 24px;
+                }
+                .spanClass{
+                  font-size: calc(14/1920*100vw);
+                  display: inline-block;
+                }
+              }
+            }
+          }
         .clearfix{
           content: "";
           display: block;

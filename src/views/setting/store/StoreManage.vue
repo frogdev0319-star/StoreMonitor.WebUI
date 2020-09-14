@@ -32,7 +32,13 @@
 
             <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                                 style="display: inline;" ref="multiSelect"></multi-select>
-
+            <el-input
+                size="small"
+                class="el-search-input"
+                clearable
+                v-model="serachVale" @keyup.enter.native="searchEventList" @clear="searchEventList">
+                <i slot="prefix" class="iconfont icon-sousuo iconsou"></i>
+            </el-input>
             <div class="store-handle">
               <el-col :span="24" class="header-details1">
                 <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
@@ -981,6 +987,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
         .iconsou{
             position:relative;
             left:6px;
+            top:7px;
             font-size:18px;
         }
     }

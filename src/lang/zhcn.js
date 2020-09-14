@@ -444,7 +444,7 @@ export default {
     adding: '追加',
     details: '处理详情',
     addDetails: '添加处理信息',
-    exportReport: '导出报表',
+    exportReport: '导出Excel',
     describe: '请输入处理评论文字',
     RateRuletip:'最多可输入200个字符',
     time: '起止时间',

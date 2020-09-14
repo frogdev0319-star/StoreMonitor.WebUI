@@ -67,15 +67,8 @@
                 </el-tooltip>
                 <span class="date-title"
                 style="margin-left:30px;">{{generateEventLang('status')}}</span>
-                <el-select v-model="value" placeholder="请选择"
-                class="el-select-content" size="small" @change="searchEventList" :popper-class="selectpoperClass">
-                    <el-option
-                    v-for="(item) in states"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                    </el-option>
-                </el-select>
+                <multi-select :selected="curState" :alltype="0" :options="states" @changeInput="handleStateChange"
+                                    style="display:inline;" ref="multiState"></multi-select>
             </div>
             <div class="store-handle">
                     <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
@@ -188,12 +181,14 @@ import {generateEventLang} from '@/api/i18n'
 import {getBriefStoreList,GetTagList} from '@/api/store'
 import MultiSelect from '@/components/MultiSelect'
 import RegionMultiSelect from '@/components/RegionMultiSelect'
+import LimitSelect from "@/components/LimitSelect";
 // require(['bootstrap-multiselect'], function(purchase){
 //   $('#example-multiple-selected').multiselect();
 // });
 export default {
     name: "ExceptEvent",
     components: {
+        LimitSelect,
         MultiSelect,
         RegionMultiSelect
     },
@@ -217,8 +212,8 @@ export default {
                 }
             },
             toolTipClass: 'page-login-toolTipClass',
-            states:[{value: 0,label: this.$t('eventView.all')},{value: 1,label: this.$t('eventView.pending')}, {value: 2,label: this.$t('eventView.handled')}, {value: 3,label: this.$t('eventView.closed')}],
-            curState:'',
+            states:[{value: 0,label: this.$t('eventView.pending'),disabled:false}, {value: 1,label: this.$t('eventView.handled'),disabled:false}, {value: 2,label: this.$t('eventView.closed'),disabled:false}],
+            curState:[],
             value:0,
             serachVale:'',
             serachData:'',
@@ -310,8 +305,6 @@ export default {
             }
         },
         numberOfElements(val,oldVal){
-          console.log(val);
-          console.log(oldVal);
           let self = this;
           if(val == 0 && self.totalElements > 0){
             self.params.filter.page -= 1;
@@ -444,6 +437,12 @@ export default {
                 storeArr.push(item.storeId)
             })
             self.curStore = storeArr;
+            let stateArr=[]
+            self.states.forEach(item=>{
+                stateArr.push(item.value)
+            })
+            self.curState=stateArr
+            self.curState.unshift('-1')
             self.changeStore(self.curStore)
         },
         changeStoreTag(val){
@@ -593,6 +592,11 @@ export default {
             self.storeStr=str;
             self.searchEventList(storeArr)
         },
+        handleStateChange(val){
+            let self=this
+            self.curState=val
+            self.searchData()
+        },
         handleStoreChange (arr) {
             let self=this;
             self.curStore = arr
@@ -664,17 +668,20 @@ export default {
               self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
             }
             self.serachVale=''
+            self.tableDataList[tabIndex].page=1;
             self.getEventList(0);
             self.getEventCount();
         },
-        searchEventList(){
+        searchEventList(val){
             let self=this;
             self.serachVale=''
+            self.tableDataList[Number(self.activeName)].page=1;
             self.getEventList();
             self.getEventCount();
         },
         searchData(){
             let self=this;
+            self.tableDataList[Number(self.activeName)].page=1;
             self.getEventList();
             self.getEventCount();
         },
@@ -737,7 +744,6 @@ export default {
         async getEventList(val){
             let self=this;
             let tabIndex=Number(self.activeName);
-            self.tableDataList[tabIndex].page=1;
             let like={}
             if(self.serachVale.trim().length!=0){
                 like={subject:self.serachVale.trim(),assignerName:self.serachVale.trim(),storeName:self.serachVale.trim()};
@@ -746,19 +752,24 @@ export default {
                 like={};
             }
             let storeId = self.curStore.filter(item=> item!= '-1')
-            let status=''
-            switch(self.value){
-                case 0:
-                    status = tabIndex==0 ? 0 :  [0,1,2] 
-                    break;
-                case 1:
-                    status = 0
-                    break;
-                default:
-                    status = tabIndex==0 ? -1 :  self.value-1
-                    break;
+            let allStatus = self.curState.some(item=>item=='-1')
+            let status= ''
+            if(allStatus){
+                status = tabIndex==0 ? 0 :  [0,1,2]
+            }else{
+                if(self.curState.length==1&&self.curState[0]==0){
+                    status=0
+                }else{
+                    status = tabIndex==0 ? -1 :  self.curState
+                }
             }
-            self.tableDataList[tabIndex].page=1;
+            let page=0
+            if(val=='currentChange'){
+                page = self.tableDataList[tabIndex].page-1
+            }
+            if(val=='Back'){
+                page = self.params.filter.page
+            }
             let start='',end=''
             if(val==0){
                 start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
@@ -777,7 +788,7 @@ export default {
                     storeId: storeId
                 },
                 filter:{
-                    page:self.tableDataList[tabIndex].page-1,
+                    page:page,
                     size:self.tableDataList[tabIndex].sizeNum
                 },
                 like:like
@@ -844,12 +855,14 @@ export default {
         sizeChange(val){
             let self=this;
             self.tableDataList[Number(self.activeName)].sizeNum=val;
+            self.tableDataList[Number(self.activeName)].page=1;
             self.getEventList();
         },
         currentChange(val){
             let self=this;
             self.tableDataList[Number(self.activeName)].page=val;
-            self.getEventList();
+            self.getEventList('currentChange');
+
             let dom=document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
             let offestTop=dom.offsetTop;
             if(dom!=undefined){
@@ -869,10 +882,12 @@ export default {
         // },
         getEventCount(){
             let self=this;
-            let status=[]
-            switch(self.value){
-                case 0:status=[0,1,2];break;
-                default:status=self.value-1;break;
+            let allStatus = self.curState.some(item=>item=='-1')
+            let status= []
+            if(allStatus){
+                status = [0,1,2]
+            }else{
+                status = self.curState
             }
             let start=self.dateValue[0];
             let endTime = self.dateValue[1];
@@ -1023,7 +1038,7 @@ export default {
        initData(){
         let self=this;
         self.activeName = '0';
-        self.value = 0;
+        // self.value = 0;
         self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
         self.serachVale='';
          self.total= 0;
@@ -1061,11 +1076,10 @@ export default {
         if(windowHeight>800){
           self.tableHeight=770+'px';
         }
-        console.log(self.tableHeight);
         // self.getUserId();
         // self.getInitList();
-        // self.getCountryStore()
-        // self.getTagListData()
+        self.getCountryStore()
+        self.getTagListData()
       }
     },
     created(){
@@ -1080,8 +1094,8 @@ export default {
         if(windowHeight>800){
             self.tableHeight=770+'px';
         }
-        self.getCountryStore() //查询门店列表
-        self.getTagListData() //查询门店标签
+        // self.getCountryStore() //查询门店列表
+        // self.getTagListData() //查询门店标签
         // self.getUserId();
         // self.getInitList();
     },
@@ -1096,28 +1110,19 @@ export default {
       next();
     }
   },
-//   activated(){
-//     let self=this;
-//     self.windowHeight = window.innerHeight;
-//     if(!self.$route.meta.isBack || self.isFirstLoad){
-//       self.initData()
-//     }
-//     else{
-//       self.getEventList(self.params);
-//       let status=[];
-//       let selectValue=self.value;
-//       switch(selectValue){
-//         case 0:status=[0,1,2];break;
-//         default:status=selectValue-1;break;
-//       }
-//       let like=self.params.like;
-//       let start = self.params.beginTs;
-//       let end = self.params.endTs;
-//       self.getEventCount(start,end,status);
-//     }
-//     self.$route.meta.isBack = false;
-//     self.isFirstLoad = false;
-//   },
+  activated(){
+    let self=this;
+    self.windowHeight = window.innerHeight;
+    if(!self.$route.meta.isBack || self.isFirstLoad){
+      self.initData()
+    }
+    else{
+      self.getEventList('Back');
+      self.getEventCount();
+    }
+    self.$route.meta.isBack = false;
+    self.isFirstLoad = false;
+  },
     beforeRouteLeave (to, from, next) {
       console.log(this.params);
       if(to.name != 'eventDetails'){
@@ -1209,6 +1214,30 @@ $h1:#292e36;
                 @include point(margin-right,20);
                 @include point(width,160);
             }
+        }
+        .el-date /deep/ .el-select-dropdown__item{
+            padding: 0 20px 0 50px !important;
+            /*color: #7d8cad;*/
+        }
+        .el-date /deep/ .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
+            font-family: "iconfont" !important;
+            content: '\e6a2';
+            left: 20px;
+            font-size: 14px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .el-date /deep/ .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
+            font-family: "iconfont" !important;
+            position: absolute;
+            left: 20px;
+            content: "\e64a";
+            font-weight: 700;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            font-style: normal;
+            -moz-osx-font-smoothing: grayscale;
         }
         .el-date{
             margin:20px 0;

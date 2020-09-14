@@ -445,7 +445,7 @@ export default {
     adding: '追加',
     details: '處理詳情',
     addDetails: '添加處理資訊',
-    exportReport: '匯出報表',
+    exportReport: '匯出Excel',
     describe: '請輸入處理評論文字',
     RateRuletip:'最多可輸入200個字元',
     time: '起止時間',

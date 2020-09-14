@@ -18,7 +18,15 @@
 
                 <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange" :disabled="loading"
                                     style="display: inline" ref="multiSelect"></multi-select>
-
+               <el-input
+                    size="small"
+                    class="el-search-input"
+                    clearable
+                    :placeholder= "generateInsSettingLang('searchPlaceholder')"
+                    v-model="serachVale" @keyup.enter.native="searchStoreInput">
+                    <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
+                    style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                </el-input>
             </div>
         </div>
         <div class="el-bind-content-box"  v-loading="loading" :element-loading-text="$t('insSettingView.bindingstore')" element-loading-background="rgba(255, 255, 255, 0.6)">

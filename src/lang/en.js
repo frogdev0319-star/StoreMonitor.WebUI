@@ -444,7 +444,7 @@ export default {
     adding: 'Adding',
     details: 'Handling Details',
     addDetails: 'Add Handling Details',
-    exportReport: 'Export Report',
+    exportReport: 'Export Excel',
     describe: 'Please leave your comments and suggestions.',
     RateRuletip:'Enter up to 200 characters',
     time: 'Time',
