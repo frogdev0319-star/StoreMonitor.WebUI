@@ -257,7 +257,7 @@ export default {
             params:{},
             fileName:'数据详情'+'.xlsx',
             exportDataList:[],  //需要导出的数据
-            exportDataHeader:[this.$t('eventView.name'),this.$t('eventView.stores'),this.$t('eventView.submitter'),this.$t('eventView.submitTime')], //需要导出数据的表头
+            exportDataHeader:[this.$t('eventView.name'),this.$t('eventView.stores'),this.$t('overview.patrolLists'),this.$t('eventView.submitter'),this.$t('eventView.submitTime')], //需要导出数据的表头
             windowHeight:window.innerHeight,
             userId:'',
             poperClass:'date-picker-poper',
@@ -974,6 +974,7 @@ export default {
                         let obj={};
                         obj.subject=item.subject;
                         obj.storeName=item.storeName;
+                        obj.inspectTagName=item.inspectTagName
                         obj.assignerName=item.assignerName;
                         obj.ts=util.getDateTime(item.ts);
                         temp.push(obj);
@@ -1014,7 +1015,7 @@ export default {
                 require.ensure([], async() => {
                     const { export_json_to_excel } = require('@/excel/Export2Excel');
                     const tHeader = that.exportDataHeader; // 导出的表头名
-                    const filterVal = ['subject','storeName','assignerName','ts',]; // 导出的表头字段名
+                    const filterVal = ['subject','storeName','inspectTagName','assignerName','ts',]; // 导出的表头字段名
                     console.log(that.activeName);
                     let curData=await that.getExportData();
                     const data = that.formatJson(filterVal, curData);
