@@ -757,7 +757,7 @@ export default {
             if(allStatus){
                 status = tabIndex==0 ? 0 :  [0,1,2]
             }else{
-                if(self.curState.length==1&&self.curState[0]==0){
+                if(self.curState.some(item=>item==0)&&tabIndex==0){
                     status=0
                 }else{
                     status = tabIndex==0 ? -1 :  self.curState
@@ -782,16 +782,29 @@ export default {
             self.params={
                 beginTs:start,
                 endTs:end,
-                clause:{
-                    status:status,
-                    assigner:self.userId,
-                    storeId: storeId
-                },
+                // clause:{
+                //     status:status,
+                //     assigner:self.userId,
+                //     storeId: storeId
+                // },
                 filter:{
                     page:page,
                     size:self.tableDataList[tabIndex].sizeNum
                 },
                 like:like
+            }
+            if(tabIndex==0){
+                self.params.clause={
+                    status:status,
+                    assignee:self.userId,
+                    storeId: storeId
+                }
+            }else{
+                self.params.clause={
+                    status:status,
+                    assigner:self.userId,
+                    storeId: storeId
+                }
             }
             let curTabSortColumn = self.sortColumnOfTab[tabIndex];
             let order = curTabSortColumn.sortType.order;
@@ -882,12 +895,16 @@ export default {
         // },
         getEventCount(){
             let self=this;
-            let allStatus = self.curState.some(item=>item=='-1')
             let status= []
-            if(allStatus){
-                status = [0,1,2]
+            if(self.curState.length!=0){
+                let allStatus = self.curState.some(item=>item=='-1')
+                if(allStatus){
+                    status = [0,1,2]
+                }else{
+                    status = self.curState
+                }
             }else{
-                status = self.curState
+                status=-1
             }
             let start=self.dateValue[0];
             let endTime = self.dateValue[1];
