@@ -959,6 +959,33 @@
           }
           self.provinceList=temp;
           self.storeDataList=tempStore;
+          let cityTemp = [];
+        self.provinceList.forEach(_item=>{
+          storeList.forEach(item=>{
+            if(item.province==_item.value){
+              if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
+                let obj={
+                  label:item.city,
+                  value:item.city
+                }
+                cityTemp.push(obj);
+              }
+            }
+          })
+        })
+        self.cityList = cityTemp;
+        let provinceArr = [];
+        self.provinceList.forEach(item=>{
+          provinceArr.push(item.value)
+        })
+        self.curProvince = provinceArr;
+
+        let cityArr = [];
+        self.cityList.forEach(item=>{
+          cityArr.push(item.value)
+        })
+        self.curCity = cityArr;
+        self.storeDataList = tempStore;
 
         },
         changeCity(val){
