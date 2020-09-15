@@ -67,7 +67,7 @@
                 </el-tooltip>
                 <span class="date-title"
                 style="margin-left:30px;">{{generateEventLang('status')}}</span>
-                <multi-select :selected="curState" :alltype="0" :options="states" :disabled="curState.length<5" @changeInput="handleStateChange"
+                <multi-select :selected="curState" :alltype="0" :options="states" :disabled="activeName!='4'" @changeInput="handleStateChange"
                                     style="display:inline;" ref="multiState"></multi-select>
             </div>
             <div class="store-handle">
@@ -106,7 +106,8 @@
                                         <template slot-scope="scope" >
                                         <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >{{generateEventLang('pending')}}</span>
                                         <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >{{generateEventLang('handled')}}</span>
-                                        <span class="icon-span" style="background-color:#6097F3;" v-else>{{generateEventLang('closed')}}</span>
+                                        <span class="icon-span" style="background-color:#6097F3;" v-else-if="scope.row.status==2" >{{generateEventLang('closed')}}</span>
+                                        <span class="icon-span" style="background-color:#FDBA40;" v-else-if="scope.row.status==3" >{{generateEventLang('Returned')}}</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column
@@ -213,7 +214,7 @@ export default {
             },
             toolTipClass: 'page-login-toolTipClass',
             states:[{value: 0,label: this.$t('eventView.pending'),disabled:false}, {value: 1,label: this.$t('eventView.handled'),disabled:false}, {value: 2,label: this.$t('eventView.closed'),disabled:false},{value: 3,label: this.$t('eventView.returnStatus'),disabled:false},],
-            curState:[],
+            curState:null,
             value:0,
             serachVale:'',
             serachData:'',
@@ -780,25 +781,19 @@ export default {
             let storeId = self.curStore.filter(item=> item!= '-1')
             let status= []
             if(self.curState.length!=0){
-                let allStatus = self.curState.some(item=>item=='-1')
-                if(allStatus){
-                    status = [0,1,2,3]
+                if(self.curState.length==1){
+                    status = self.curState[0]
                 }else{
-                    status = self.curState
+                    let allStatus = self.curState.some(item=>item=='-1')
+                    if(allStatus){
+                        status = [0,1,2,3]
+                    }else{
+                        status = self.curState
+                    }
                 }
             }else{
                 status=-1
             }
-            // let status= ''
-            // if(allStatus){
-            //     status = tabIndex==0 ? 0 :  [0,1,2]
-            // }else{
-            //     if(self.curState.some(item=>item==0)&&tabIndex==0){
-            //         status=0
-            //     }else{
-            //         status = tabIndex==0 ? -1 :  self.curState
-            //     }
-            // }
             let page=0
             if(val=='currentChange'){
                 page = self.tableDataList[tabIndex].page-1
@@ -818,24 +813,15 @@ export default {
             self.params={
                 beginTs:start,
                 endTs:end,
+                clause:{
+                    status:status,
+                    storeId: storeId
+                },
                 filter:{
                     page:page,
                     size:self.tableDataList[tabIndex].sizeNum
                 },
                 like:like
-            }
-            if(tabIndex==0){
-                self.params.clause={
-                    status:status,
-                    assignee:self.userId,
-                    storeId: storeId
-                }
-            }else{
-                self.params.clause={
-                    status:status,
-                    assigner:self.userId,
-                    storeId: storeId
-                }
             }
             let curTabSortColumn = self.sortColumnOfTab[tabIndex];
             let order = curTabSortColumn.sortType.order;
@@ -846,15 +832,15 @@ export default {
                     property: prop
                 }
             }
-            if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
-                if(tabIndex==2){
-                    for(var key in self.params){
-                        if(key=='clause'){
-                            delete self.params.clause.assigner
-                        }
-                    }
-                }
-            }
+            // if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
+            //     if(tabIndex==4){
+            //         for(var key in self.params){
+            //             if(key=='clause'){
+            //                 delete self.params.clause.assigner
+            //             }
+            //         }
+            //     }
+            // }
             eventRESTful.getEventList(self.params).then((res)=>{
                 let data=res.data.content;
                 let temp=[];
@@ -926,17 +912,6 @@ export default {
         // },
         getEventCount(){
             let self=this;
-            let status= []
-            if(self.curState.length!=0){
-                let allStatus = self.curState.some(item=>item=='-1')
-                if(allStatus){
-                    status = [0,1,2,3]
-                }else{
-                    status = self.curState
-                }
-            }else{
-                status=-1
-            }
             let start=self.dateValue[0];
             let endTime = self.dateValue[1];
             let end= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
@@ -951,26 +926,20 @@ export default {
             let params={
                 beginTs:start,
                 endTs:end,
-                cases: [1, 2,3],
                 clause:{
-                    status:status,
                     storeId:storeId
                 },
                 like:like
             };
-            // if(typeof(status)!='number'){
-            //     for(var key in params){
-            //         if(key=='clause'){
-            //             delete params.clause.status
-            //         }
-            //     }
-            // }
-            eventRESTful.getEventCount(params).then(res=>{
+            eventRESTful.GetEventCountByStatus(params).then(res=>{
                 let data=res.data;
                 let errMsg=res.errMsg;
-                self.tableDataList[0].eventCount=data.assigned;
-                self.tableDataList[1].eventCount=data.reported;
-                self.tableDataList[2].eventCount=data.total;
+                let numOfEventTotal=0
+                for(let i=0;i<4;i++){
+                    self.tableDataList[i].eventCount=data[i].numOfEvent;
+                    numOfEventTotal+=data[i].numOfEvent
+                }
+                self.tableDataList[4].eventCount=numOfEventTotal
             })
         },
         getExportDataSize(){

@@ -1747,8 +1747,8 @@ export default {
         cutPicture(...val){
             let self=this;
             self.showCancelContent=false;
-            if(self.sourceList.length>=5){
-                //self.notify('最多上传5个资源！','warning',3000);
+            if(self.sourceList.length>=10){
+                //self.notify('最多上传10个资源！','warning',3000);
                 self.notify(self.$t('storeMonitor.maximumAttach'),'warning',3000);
                 return false;
             }
@@ -1999,8 +1999,8 @@ export default {
         },
         getVideo(...val){
             let self=this;
-            if(self.sourceList.length>=5){
-                //self.notify('最多上传5个资源！','warning',3000);
+            if(self.sourceList.length>=10){
+                //self.notify('最多上传10个资源！','warning',3000);
                 self.notify(self.$t('storeMonitor.maximumAttach'),'warning',3000);
                 return false;
             }

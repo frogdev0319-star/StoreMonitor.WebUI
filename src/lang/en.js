@@ -183,11 +183,13 @@ export default {
     sumUnprocessEvents: 'Pending Events',
     sumProcessEvents: 'Processed Events',
     sumClosedEvents: 'Closing Events',
+    sumReturnedEvents:'Returned Events',//Sprint9 新增
     eventList: 'Event List',
     area: 'Region',
     numUnprocessEvents: 'Pending Events',
     numProcessEvents: 'Processed Events',
     numClosedEvents: 'Closing Events',
+    numReturndEvents:'Returned Events',//Sprint9 新增
     emptyEventList: 'The event list is empty, please refilter the data',
     none: 'None',
     allZoneI: 'All Region I',
@@ -249,7 +251,7 @@ export default {
     emptyTitle: 'Title may not empty!',
     recording: 'Recording',
     recordSucc: 'Successfully Recorded',
-    maximumAttach: 'Up to 5 attachments!',
+    maximumAttach: 'Up to 10 attachments!',
     sentSucc: 'Successfully Sent!',
     sentFail: 'Failed to sent!',
     copyFail: 'Copy failed items to ',
@@ -298,7 +300,7 @@ export default {
     createProblem: 'Create Problem',
     relateProblem: 'Historical problem',
     title: 'Title',
-    maximumAttach: 'Up to 5 attachments!',
+    maximumAttach: 'Up to 10 attachments!',
     relevantEvent: 'Relevant Event',
     edit: 'Edit Screenshot',
     selectDate: 'Select Date',
@@ -426,6 +428,7 @@ export default {
     ClosedEvent:'Closed Events',//Sprint9 新增
     ReturnEvent:'Return Events',//Sprint9 新增
     returnStatus:'Return',//Sprint9 新增
+    Returned:'Returned',//Sprint9 新增
     status: 'Status',
     all : 'All',
     pending: 'Pending',

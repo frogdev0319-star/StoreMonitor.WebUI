@@ -341,11 +341,11 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                     self.cityList=temp;
                     let cityArr=[]
                     if(self.cityList.length!=0){
-                    self.cityList.forEach(item=>{
-                        cityArr.push(item.value)
-                    })
-                    self.curCity=cityArr
-                }
+                        self.cityList.forEach(item=>{
+                            cityArr.push(item.value)
+                        })
+                        self.curCity=cityArr
+                    }
                 }
                 self.storeDataList=tempStore;
                 let storeArr=[],arr=[]

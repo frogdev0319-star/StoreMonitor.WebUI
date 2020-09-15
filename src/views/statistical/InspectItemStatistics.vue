@@ -985,7 +985,6 @@
           cityArr.push(item.value)
         })
         self.curCity = cityArr;
-        self.storeDataList = tempStore;
 
         },
         changeCity(val){

@@ -221,6 +221,11 @@
                     roleName: this.$t('eventView.adding'),
                     checked: false,
                     disabled: false,
+                  },
+                  {
+                    roleName: this.$t('eventView.returnStatus'),
+                    checked: false,
+                    disabled: false,
                   }
                 ]
               },
@@ -443,6 +448,7 @@
           self.roleNameList[2].children[0].disabled = PermissionHelper.enableEventHandle() ? false : true;
           self.roleNameList[2].children[1].disabled = PermissionHelper.enableEventClose() ? false : true;
           self.roleNameList[2].children[2].disabled = PermissionHelper.enableEventAdd() ? false : true;
+          self.roleNameList[2].children[3].disabled = PermissionHelper.enableEventReturn() ? false : true;
 
           self.roleNameList[3].children[0].disabled = PermissionHelper.enablePatrolEvaStatistics() ? false: true;
           self.roleNameList[3].children[1].disabled = PermissionHelper.enableInspectStatistics() ? false: true;
@@ -493,7 +499,7 @@
             self.roleNameList[2].children[0].checked = true;
             self.roleNameList[2].children[0].disabled = true;
           }
-          console.log(self.roleNameList)
+          console.log('哈哈哈哈',self.roleNameList)
           self.roleNameList.forEach(item=>{
             let disabledNum = 0;
             item.children.forEach(_item=>{
@@ -525,8 +531,6 @@
               self.roleNameList[1].children[1].disabled = false;
               self.roleNameList[1].children[7].checked = false;
               self.roleNameList[1].children[7].disabled = false;
-            }else{
-              //这里添加退回权限
             }
           }
           else{
@@ -548,6 +552,7 @@
             self.roleNameList[2].children[0].checked = PermissionHelper.enableEventHandle() ? true : false;
             self.roleNameList[2].children[1].checked = PermissionHelper.enableEventClose() ? true : false;
             self.roleNameList[2].children[2].checked = PermissionHelper.enableEventAdd() ? true : false;
+            self.roleNameList[2].children[3].checked = PermissionHelper.enableEventReturn() ? true : false;
 
             self.roleNameList[3].children[0].checked = PermissionHelper.enablePatrolEvaStatistics() ? true : false;
             self.roleNameList[3].children[1].checked = PermissionHelper.enableInspectStatistics() ? true : false;

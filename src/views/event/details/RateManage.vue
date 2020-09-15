@@ -161,9 +161,9 @@
             </div>
             <div class="submit-content" :style="{'height':windowHeight*0.34+'px'}" v-show="showWinpBtn">
                 <span class="dealInfo-label">{{generateEventLang('events')}}</span>
-                <span>{{generateEventLang('methods')}}</span>
-                <div class="btn-content">
-                    <span v-for="(item,index) in subBtnList" :key="index" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
+                <span>{{generateEventLang('methods')}}</span><br>
+                <div class="btn-content" v-for="(item,index) in subBtnList" :key="index">
+                    <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
                         {{item.name}}
                     </span>
                 </div>
@@ -771,6 +771,14 @@ export default {
                     let dataComments=comments.comment;
                     let temp=[];
                     self.curStatus=dataComments[0].status;
+                    if(self.curStatus==1){
+                        // 只在已处理事件显示退回按钮
+                        self.subBtnList.forEach(item=>{
+                            if(item.order==3){
+                                item.isShow=true
+                            }
+                        })
+                    }
                     dataComments.forEach((item,index)=>{
                         let obj={};
                         obj.createOr=item.accountName;
@@ -785,6 +793,8 @@ export default {
                                 obj.process= this.$t('eventView.handled'); break;
                             case 2: obj.showLabel=true;obj.spanStyle={'background-color':'#6097F4'};
                                 obj.process=this.$t('eventView.closed'); break;
+                            case 3: obj.showLabel=true;obj.spanStyle={'background-color':'#FCB83B'};
+                                obj.process=this.$t('eventView.Returned'); break;
                         }
                         if(item.status==2){
                             self.showWinpBtn=false;
@@ -892,20 +902,28 @@ export default {
                 status=self.curStatus;
               }
             }
+            else if(self.subBtnList[2].isActive){
+              if(self.subBtnList[2].order==3){
+                status = 3;
+              }
+              else{
+                //追加状态，需判断当前状态
+                status=self.curStatus;
+              }
+            }
+            else if(self.subBtnList[3].isActive){
+              if(self.subBtnList[3].order==3){
+                status = 3;
+              }
+              else{
+                //追加状态，需判断当前状态
+                status=self.curStatus;
+              }
+            }
             else{
               //追加状态，需判断当前状态
               status=self.curStatus;
             }
-            console.log(status)
-            // if(self.subBtnList[0].isActive==true){
-            //     status=1;
-            // }
-            // else if(self.subBtnList[1].isActive==true){
-            //     status=2;
-            // }
-            // else{  //追加状态，需判断当前状态
-            //     status=self.curStatus;
-            // }
             self.addComment(status,description);
         },
         checkFull(){
@@ -956,14 +974,22 @@ export default {
             PermissionHelper.enableEventHandle()  && tempBtnList.push({
               name:this.$t('eventView.handling'),
               order: 0,
+              isShow:true
             });
             PermissionHelper.enableEventClose()  && tempBtnList.push({
               name:this.$t('eventView.closing'),
               order: 1,
+              isShow:true
             })
             PermissionHelper.enableEventAdd() && tempBtnList.push({
               name:this.$t('eventView.adding'),
-              order: 2
+              order: 2,
+              isShow:true
+            })
+            PermissionHelper.enableEventReturn() && tempBtnList.push({
+              name:this.$t('eventView.returnStatus'),
+              order: 3,
+              isShow:false
             })
             tempBtnList.forEach((item, index)=>{
               item.isActive = index == 0 ? true: false;
@@ -1455,10 +1481,12 @@ $h1:#292e36;
             }
             .btn-content{
                 margin-top: 10px;
-                margin-bottom: 25px;;
+                margin-bottom: 25px;
+                display: inline-block;
+                @include point(margin-right,20);
                 span{
                     display: inline-block;
-                    @include point(margin-left,20);
+                    // @include point(margin-left,20);
                     border: 1px solid #ddd;
                     padding:6px;
                     font-size: 12px;
@@ -1468,10 +1496,10 @@ $h1:#292e36;
                     @include point(padding,6);
                     text-align: center;
                     background-color: #fff;
-                    &:first-child{
-                        margin-left: 0;
-                    }
                 }
+                //  &:first-child{
+                //         margin-left: 0;
+                //     }
                 .activeClass{
                     background-color: #FDE8EF !important;
                     color: $red;

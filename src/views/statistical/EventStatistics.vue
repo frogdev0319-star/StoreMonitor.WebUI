@@ -419,6 +419,10 @@
           {
             eventTitle: this.$t('overview.sumClosedEvents'),
             eventNum: 0,
+          },
+          {
+            eventTitle: this.$t('overview.sumReturnedEvents'),
+            eventNum: 0,
           }
         ],
         storeDataList: [],
@@ -486,40 +490,48 @@
             "prop":"regionName",
             "label": this.$t('overview.area'),
             "sortable": false,
-            "width": '165',
-            "maxWidth": '165',
+            "width": '140',
+            "maxWidth": '140',
             "pdfwidth":'11%'
           },
           {
             "prop":"numOfTotal",
             "label": this.$t('overview.sumEvents'),
             "sortable":'custom',
-            "width": '165',
-            "maxWidth": '165',
+            "width": '140',
+            "maxWidth": '140',
             "pdfwidth":'11%'
           },
           {
             "prop": "numOfUnprocessed",
             "label": this.$t('overview.numUnprocessEvents'),
             "sortable":'custom',
-            "width": '165',
-            "maxWidth": '165',
+            "width": '140',
+            "maxWidth": '140',
             "pdfwidth":'11%'
           },
           {
             "prop":"numOfInprocess",
             "label": this.$t('overview.numProcessEvents'),
             "sortable":'custom',
-            "width": '165',
-            "maxWidth": '165',
+            "width": '140',
+            "maxWidth": '140',
             "pdfwidth":'11%'
           },
           {
             "prop":"numOfProcessed",
             "label": this.$t('overview.numClosedEvents'),
             "sortable":'custom',
-            "width": '165',
-            "maxWidth": '165',
+            "width": '140',
+            "maxWidth": '140',
+            "pdfwidth":'11%'
+          },
+          {
+            "prop":"numOfRejected",
+            "label": this.$t('overview.numReturndEvents'),
+            "sortable":'custom',
+            "width": '140',
+            "maxWidth": '140',
             "pdfwidth":'11%'
           },
           // {
@@ -550,7 +562,7 @@
         headerClass: 'header-class',
         cellClass: 'cell-class',
         rowClass: 'row-class',
-        exportEventHeader: ['门店名称','所属区域','事件总数', '待处理事件数量','已处理事件数量', '已结案事件数量', '远程巡检', '现场巡检', '门店监控'],
+        exportEventHeader: ['门店名称','所属区域','事件总数', '待处理事件数量','已处理事件数量', '已结案事件数量','已退回事件数量', '远程巡检', '现场巡检', '门店监控'],
         hasNoData: false,
         sidebarElm: null,
         fontFamily: 'Roboto, Microsoft YaHei'
@@ -1128,13 +1140,11 @@
           provinceArr.push(item.value)
         })
         self.curProvince = provinceArr;
-
         let cityArr = [];
         self.cityList.forEach(item=>{
           cityArr.push(item.value)
         })
         self.curCity = cityArr;
-        self.storeDataList = tempStore;
 
       },
       changeCity(val){
@@ -1269,7 +1279,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportEventHeader; // 导出的表头名
-          const filterVal = ['storeName','regionName','numOfTotal','numOfUnprocessed','numOfInprocess','numOfProcessed','remotePer','onsitePer','videoPer']; // 导出的表头字段名
+          const filterVal = ['storeName','regionName','numOfTotal','numOfUnprocessed','numOfInprocess','numOfProcessed','numOfRejected','remotePer','onsitePer','videoPer']; // 导出的表头字段名
           let curData = [];
           curData = that.allEventData;
           const data = that.formatJson(filterVal, curData);
@@ -1453,16 +1463,19 @@
         let totalUnprocessed = 0;
         let totalInprocess = 0;
         let totalProcessed = 0;
+        let totalRejected = 0
         self.allEventData.forEach(item=>{
           totalEvents += item.numOfTotal;
           totalUnprocessed += item.numOfUnprocessed;
           totalInprocess += item.numOfInprocess;
           totalProcessed += item.numOfProcessed;
+          totalRejected += item.numOfRejected;
         })
         self.eventKPIs[0].eventNum = totalEvents;
         self.eventKPIs[1].eventNum = totalUnprocessed;
         self.eventKPIs[2].eventNum = totalInprocess;
         self.eventKPIs[3].eventNum = totalProcessed;
+        self.eventKPIs[4].eventNum = totalRejected;
       },
       getEventBySourcePie(){
         let self = this;
@@ -1854,8 +1867,9 @@
             display: flex;
             flex-direction: column;
             .event-list{
-              height:  106px;
-              padding-top: 24px;
+              // height:  106px;
+              height:  85px;
+              padding-top: 15px;
               padding-left: calc(34/1920*100vw);
               padding-bottom: 20px;
               border-bottom: 1px solid $border;
@@ -1875,7 +1889,7 @@
                 height: calc(30/1920*100vw);
                 color: $h1;
                 text-align: left;
-                margin-top: 20px;
+                margin-top: 15px;
                 :last-child{
                   padding-bottom: 20px;
                 }

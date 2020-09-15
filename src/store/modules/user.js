@@ -360,7 +360,7 @@ const user={
             hidden: false,
             children:[]
           };
-          (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() )&& route3.children.push(
+          (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn())&& route3.children.push(
             {
               path:'/event',
               name:'eventManage',

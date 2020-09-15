@@ -183,11 +183,13 @@ export default {
     sumUnprocessEvents: '待處理事件總數',
     sumProcessEvents: '已處理事件總數',
     sumClosedEvents: '已結案事件總數',
+    sumReturnedEvents:'已退回事件总数',//Sprint9 新增
     eventList: '事件列表',
     area: '所屬區域',
     numUnprocessEvents: '待處理事件數量',
     numProcessEvents: '已處理事件數量',
     numClosedEvents: '已結案事件數量',
+    numReturndEvents:'已退回事件数量',//Sprint9 新增
     emptyEventList: '事件列表為空，請重新篩選數據',
     none: '無',
     allZoneI: '全部區域一',
@@ -249,7 +251,7 @@ export default {
     emptyTitle: '問題回饋名稱不能為空！',
     recording: '正在錄製',
     recordSucc: '錄製成功',
-    maximumAttach: '每個巡檢項最多上傳5個資源檔​！',
+    maximumAttach: '每個巡檢項最多上傳10個資源檔​！',
     sentSucc: '提交成功！',
     sentFail: '提交失敗！',
     copyFail: '已將不合格項抄送至',
@@ -299,7 +301,7 @@ export default {
     createProblem: '新建問題',
     relateProblem: '已創建問題',
     title: '問題名稱',
-    maximumAttach: '影像圖片最多支援插入5個。',
+    maximumAttach: '影像圖片最多支援插入10個。',
     relevantEvent: '相關事件',
     edit: '編輯截圖',
     selectDate: '選擇日期',
@@ -427,6 +429,7 @@ export default {
     ClosedEvent:'已结案事件',//Sprint9 新增
     ReturnEvent:'退回再处理事件',//Sprint9 新增
     returnStatus:'退回',//Sprint9 新增
+    Returned:'已退回',//Sprint9 新增
     status: '處理狀態',
     all : '全部',
     pending: '未處理',

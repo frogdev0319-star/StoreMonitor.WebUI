@@ -46,3 +46,11 @@ export const getStorageInfo=params=>{
         params
     })
 }
+
+export const GetEventCountByStatus=data=>{
+    return request({
+        url:`${version}/event/count/status`,
+        method:'post',
+        data
+    })
+}

@@ -69,6 +69,9 @@ export default class PermissionHelper {
   static enableEventAdd(){
     return this.enableAuthorities(2,0x0,0x4);
   }
+  static enableEventReturn(){
+    return this.enableAuthorities(2,0x0,0x8);
+  }
 
   // index(3) => ID(8): Statistics
   static enablePatrolEvaStatistics(){

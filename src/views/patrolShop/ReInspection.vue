@@ -1455,7 +1455,7 @@ export default {
         getVideo(){
             let self=this;
             console.log(self.curGroupIndex);
-            if(self.sourceListLength >=5){
+            if(self.sourceListLength >=10){
                 self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
                 return false;
             }
@@ -1503,7 +1503,7 @@ export default {
             }
             else{
                 self.showCancelContent=false;
-                if(self.sourceListLength >= 5){
+                if(self.sourceListLength >= 10){
                     self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
                     return false;
                 }

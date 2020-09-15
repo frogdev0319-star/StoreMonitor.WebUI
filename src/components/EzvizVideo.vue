@@ -1305,7 +1305,7 @@
         }
         else {
           self.showCancelContent = false;
-          if (self.sourceListLength >= 5) {
+          if (self.sourceListLength >= 10) {
             let msg = self.isStoreMonitor ? self.$t('storeMonitor.maximumAttach'): self.$t('remotePatrol.maximumAttach')
             self.notify(msg, 'warning', 3000);
             return false;
@@ -1339,7 +1339,7 @@
       getVideo(){
         //点击开始录像，10秒后关闭
         let self = this;
-        if (self.sourceListLength >= 5) {
+        if (self.sourceListLength >= 10) {
           self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
           return false;
         }
