@@ -69,12 +69,12 @@
             <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
           </el-tooltip>
           <div class="exprotBtn" style="float:right;">
-              <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData"
+              <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" style="vertical-align: middle;"
                     type="primary" :disabled="storeDataList.length==0">{{$t('reportView.search')}}</el-button>
-              <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()">
+              <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()" style="vertical-align: middle;">
                 <div class="btn-area">
-                  <i class="iconfont icon-pdf" style="font-size: calc(14/1920*100vw)"></i>
-                  <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{$t('reportView.InspectionDetail')}}</span>
+                  <i class="iconfont icon-pdf" style="font-size: calc(24/1920*100vw);vertical-align: middle;"></i>
+                  <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;vertical-align: middle;">{{$t('reportView.InspectionDetail')}}</span>
                 </div>
               </el-button>
             </div>

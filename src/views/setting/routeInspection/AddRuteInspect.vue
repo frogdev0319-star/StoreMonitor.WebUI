@@ -172,19 +172,19 @@
                            <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_1}}</span>
+                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_1}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
                            <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="item.Score_1" @change="selectFullScore">
                                 <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_2}}</span>
+                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_2}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
                            <el-select size="mini" class="critical-input" v-if="item.isClick" v-model="item.Score_2">
                                 <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
-                           <span style="margin-left:73px;" v-if="!item.isClick">{{item.Score_3}}</span>
+                           <span style="margin-left:73px;" v-if="!item.isClick">{{item.Score_3}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
                            <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3"></el-input>
                        </div>
                        <div class="nape-items-handle" v-if="!item.isClick" style="flex:1;">
@@ -296,8 +296,8 @@ export default {
     },
     data(){
         return{
-            newScore:0,
-            newCritical:0,
+            newScore:10,
+            newCritical:10,
             newAddScore:0,
             firstLoad:true,
             groupTitle: this.$t('insSettingView.category'),
@@ -913,10 +913,10 @@ export default {
                 itemScore=10
                 qualifiedScore=null
             }else if(self.activeSheetName=='1'){
-                itemScore=self.newScore
-                qualifiedScore=self.newCritical
+                itemScore=item.Score_1
+                qualifiedScore=item.Score_2
             }else if(self.activeSheetName=='2'){
-                itemScore=self.newAddScore
+                itemScore=item.Score_3
                 qualifiedScore=null
             }
             let obj={
@@ -1006,9 +1006,12 @@ export default {
                         napeName:self.newNapeName,
                         napeNameShow:`${self.napeList.length+1}，${self.newNapeName}`,
                         napeDep:self.newNapeDep,
-                        Score_1:self.newScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
-                        Score_2:self.newCritical + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
-                        Score_3:self.newAddScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                        Score_1:self.newScore,
+                        Score_2:self.newCritical,
+                        Score_3:self.newAddScore,
+                        // Score_1:self.newScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                        // Score_2:self.newCritical + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                        // Score_3:self.newAddScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
                         isClick:false,
                         checked:false
                     };
@@ -1225,9 +1228,9 @@ export default {
                     napeName:_item.subject,
                     napeNameShow:`${index+1}，${_item.subject}`,
                     napeDep:_item.description,
-                    Score_1:_item.itemScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
-                    Score_2:_item.qualifiedScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
-                    Score_3:_item.itemScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
+                    Score_1:_item.itemScore,
+                    Score_2:_item.qualifiedScore,
+                    Score_3:_item.itemScore,
                     isClick:false,
                     checked: false
                 }

@@ -162,8 +162,8 @@
             <div class="exprotBtn">
               <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
                 <div class="btn-area">
-                  <i class="iconfont icon-excel"></i>
-                  <!-- <img :src="exportPng" class="icon-excel"> -->
+                  <!-- <i class="iconfont icon-excel"></i> -->
+                  <img :src="exportPng" class="icon-excel">
                   <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                 </div>
               </el-button>

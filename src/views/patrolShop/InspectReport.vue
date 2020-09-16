@@ -55,7 +55,7 @@
                         <tr>
                             <td :rowspan="s_item.length+1">
                                 <span v-if="s_item[0].type==0" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetpassfail')}}</span>
-                                <span v-if="s_item[0].type==1" :style="'line-height:'+30*s_item.length+'px;'">{{$t('insSettingView.sheetscore')}}</span>
+                                <span v-if="s_item[0].type==1" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetscore')}}</span>
                                 <span v-if="s_item[0].type==2" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetother')}}</span>
                             </td>
                         </tr>
