@@ -64,11 +64,11 @@
           </el-tooltip>
 
           <div class="exprotBtn" style="float:right;">
-            <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="storeDataList.length==0">{{generateReportLang('search')}}</el-button>
-            <el-button type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()">
+            <el-button style="vertical-align: middle;" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="storeDataList.length==0">{{generateReportLang('search')}}</el-button>
+            <el-button style="vertical-align: middle;" type="primary" size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="handleDown()">
               <div class="btn-area">
-                <i class="iconfont icon-pdf"></i>
-                <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;">{{generateReportLang('InspectionDetail')}}</span>
+                <i class="iconfont icon-pdf" style="font-size: calc(24/1920*100vw);vertical-align: middle;"></i>
+                <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;vertical-align: middle;">{{generateReportLang('InspectionDetail')}}</span>
               </div>
             </el-button>
           </div>

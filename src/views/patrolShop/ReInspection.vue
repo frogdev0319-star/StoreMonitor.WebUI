@@ -3066,6 +3066,7 @@ export default {
             self.isShowWarn=false
             self.showIgnoreItem=false
             self.eventList=[]
+            self.curSheetIndex=0
                 self.PatrolList.forEach(item=>{
                     if(item.id==val){
                         self.patrolstore=item.name
@@ -4570,7 +4571,7 @@ export default {
                         }
                         .dropdown-model{
                             position: absolute;
-                            @include point(right,60);
+                            @include point(right,20);
                             @include point(top,12);
                             margin-right: 10px;
                             width: 120px;

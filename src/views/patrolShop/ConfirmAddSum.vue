@@ -537,7 +537,7 @@ export default {
                     p_item['height']=18
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
-                    p_item['height']=30
+                    p_item['height']=18
                 }else if(p_item.type==2){
                     p_item['tHeader']=self.theaderOther
                     p_item['height']=18
