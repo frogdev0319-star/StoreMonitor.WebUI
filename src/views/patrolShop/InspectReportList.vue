@@ -260,7 +260,7 @@ export default {
             appraiseList:[
                 {'status':-1,'label':this.$t('reportView.all')},
                 {'status':0,'label':this.$t('reportView.dangerous')},
-                // {'status':1,'label':this.$t('reportView.improve')},
+                {'status':1,'label':this.$t('reportView.improve')},
                 {'status':2,'label':this.$t('reportView.qualified')},
                 // {'status':3,'label':this.$t('reportView.excellent')},
             ],
