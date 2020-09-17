@@ -464,10 +464,10 @@
             'type': this.$t("overview.danger"),
             'percent': '0%',
           },
-          // {
-          //   'type': this.$t("overview.improve"),
-          //   'percent': '0%',
-          // },
+          {
+            'type': this.$t("overview.improve"),
+            'percent': '0%',
+          },
           {
             'type': this.$t("overview.echartGood"),
             'percent': '0%',
@@ -522,15 +522,15 @@
             "width": '160',
             "maxWidth": '160'
           },
-          // {
-          //   "prop":"numOfImproved",
-          //   "label": this.$t('overview.improve'),
-          //   "sortable":'custom',
-          //   "pdfwidth": '12%',
-          //   "pdfmaxWidth": '12%',
-          //   "width": '160',
-          //   "maxWidth": '160'
-          // },
+          {
+            "prop":"numOfImproved",
+            "label": this.$t('overview.improve'),
+            "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
+            "width": '160',
+            "maxWidth": '160'
+          },
           {
             "prop":"numOfDangerous",
             "label": this.$t('overview.danger'),
@@ -608,15 +608,15 @@
             "width": '160',
             "maxWidth": '160'
           },
-          // {
-          //   "prop":"numOfImproved",
-          //   "label": this.$t('overview.improve'),
-          //   "sortable":'custom',
-          //   "pdfwidth": '12%',
-          //   "pdfmaxWidth": '12%',
-          //   "width": '160',
-          //   "maxWidth": '160'
-          // },
+          {
+            "prop":"numOfImproved",
+            "label": this.$t('overview.improve'),
+            "sortable":'custom',
+            "pdfwidth": '12%',
+            "pdfmaxWidth": '12%',
+            "width": '160',
+            "maxWidth": '160'
+          },
           {
             "prop":"numOfDangerous",
             "label": this.$t('overview.danger'),
@@ -651,8 +651,8 @@
         pageStore:1,
         sizeNumStore:10,
         curRegionArray: [],
-        exportDataHeader:['门店名称','平均巡店周期','评估次数','合格', '立即督导','合格率','平均分'], //需要导出数据的表头
-        exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格', '立即督导','合格率','平均分'], //需要导出数据的表头
+        exportDataHeader:['门店名称','平均巡店周期','评估次数','合格','待改善','立即督导','合格率','平均分'], //需要导出数据的表头
+        exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格','待改善','立即督导','合格率','平均分'], //需要导出数据的表头
         regionParams: {},
         chartParams:{},
         chartArrayData: [],
@@ -1446,7 +1446,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportRegionHeader; // 导出的表头名
-          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfDangerous','qualifiedRatePer','averageScore']; // 导出的表头字段名
+          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer','averageScore']; // 导出的表头字段名
           let self=this;
           let size= self.totalRegion;
           let params = {};
@@ -1492,7 +1492,7 @@
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const tHeader = that.exportDataHeader; // 导出的表头名
-          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfDangerous','qualifiedRatePer','averageScore']; // 导出的表头字段名
+          const filterVal = ['region','cycleOfInspect','numOfReport','numOfQualified','numOfImproved','numOfDangerous','qualifiedRatePer','averageScore']; // 导出的表头字段名
           let self=this;
           let size= self.totalStore;
           let params = {};
@@ -1910,7 +1910,7 @@
         let totalQualified = 0;
         // let totalExcellent = 0;
         let totalReport = 0;
-        let jsonArray = self.resultLegend.slice(0,2);
+        let jsonArray = self.resultLegend.slice(0,3);
         let seriesData = [];
         let params = {};
         params.beginTs = self.params.beginTs;
@@ -1934,7 +1934,7 @@
             if (result) {
               result.content.forEach(item=>{
                 totalDargerous += item.numOfDangerous;
-                // totalImproved += item.numOfImproved;
+                totalImproved += item.numOfImproved;
                 totalQualified += item.numOfQualified;
                 // totalExcellent += item.numOfExcellent;
                 totalReport += item.numOfReport;
@@ -1942,14 +1942,14 @@
             }
             seriesData = [
               {value: totalDargerous, name: self.$t('overview.danger')},
-              // {value: totalImproved, name: self.$t('overview.improve')},
+              {value: totalImproved, name: self.$t('overview.improve')},
               {value: totalQualified, name: self.$t('overview.echartGood')},
               // {value: totalExcellent, name: self.$t('overview.excellent')}
             ];
             let totalArray = [totalDargerous, totalQualified];
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-            // jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+            jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
             // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           }
           else {
@@ -1957,7 +1957,7 @@
             let totalArray = [0, 0, 0, 0];
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-            // jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+            jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
             // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
           }
         }
@@ -1965,7 +1965,7 @@
           let totalArray = [0, 0, 0, 0];
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-          // jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+          jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
           // jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
         }
         self.regionsOptions = {
@@ -2008,7 +2008,7 @@
                 normal: {
                   color: function (params) {
                     //自定义颜色
-                    var colorList = ['#f31d65', '#72a1f3'];
+                    var colorList = ['#f31d65', '#ffd035','#72a1f3'];
                     return colorList[params.dataIndex]
                   }
                 }
@@ -2573,10 +2573,10 @@
                 .label-0 {
                   background-color: $dangerous;
                 }
-                // .label-1 {
-                //   background-color: $improved;
-                // }
                 .label-1 {
+                  background-color: $improved;
+                }
+                .label-2 {
                   background-color: $pass;
                 }
                 // .label-3 {

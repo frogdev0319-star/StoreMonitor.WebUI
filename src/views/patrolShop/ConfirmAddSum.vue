@@ -162,6 +162,12 @@ export default {
                 'isShow':true
               },
               {
+                'label': 1,
+                'name':this.$t('remotePatrol.improve'),
+                'isActive':false,
+                'isShow':true
+              },
+              {
                 'label': 0,
                 'name':this.$t('remotePatrol.dangerous'),
                 'isActive':false,
@@ -532,7 +538,8 @@ export default {
                     p_item['tHeader']=self.theaderPassFail
                     if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)){
                         self.resultList[0].isShow=false
-                        self.resultList[1].isActive=true
+                        self.resultList[1].isShow=false
+                        self.resultList[2].isActive=true
                     }
                     p_item['height']=18
                 }else if(p_item.type==1){
@@ -546,6 +553,9 @@ export default {
             let s_count=0
             if(inspect.length==1&&inspect[0].type==0){
                 s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100)
+                self.resultList[1].isShow=false
+                self.resultList[2].isShow=false
+                self.resultList[0].isActive=true
             }else{
                 s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
             }

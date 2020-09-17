@@ -82,14 +82,14 @@
               <div class="region-name">{{item.region}}</div>
               <div class="item-titles">
                 <el-tooltip placement="bottom" :key="index" :popper-class="elTooltipClass">
-                  <div slot="content">{{item.region}}<br/><span v-if="isWorstArea">{{item.firstName}}: {{item.firstNum}}<br/></span>
-                      <span v-else>{{item.secondName}}:{{item.secondNum}}</span>
+                  <div slot="content">{{item.region}}<br/><span v-if="isWorstArea">{{item.firstName}}: {{item.firstNum}}<br/></span>{{item.secondName}}:
+                    {{item.secondNum}}
                   </div>
                   <div class="process-list">
                     <el-progress :percentage="item.firstPercent" :stroke-width="10" :color="item.firstColor" v-if="isWorstArea"
                                  :show-text="false"
                                  :class="item.firstNum > 0 ? 'item-process': 'region-process'"></el-progress>
-                    <el-progress :percentage="item.secondPercent" :stroke-width="10" :color="item.secondColor" v-else
+                    <el-progress :percentage="item.secondPercent" :stroke-width="10" :color="item.secondColor"
                                  :show-text="false"
                                  :class="item.secondNum > 0 ? 'item-process': 'region-process'"></el-progress>
                   </div>
@@ -333,7 +333,7 @@
             'desc': '优秀≤60%'
           },
         ],
-        resultList: [this.$t('overview.danger'), this.$t('overview.pass')],
+        resultList: [this.$t('overview.danger'), this.$t('overview.improve'), this.$t('overview.echartGood')],
         itemsLegend: [
           {
             'type': this.$t("overview.excellent"),
@@ -456,7 +456,7 @@
         console.log(self.curGroupIndex)
         let option = {
           baseOption: {
-            color: ["#f31d65", "#72a1f3"],
+            color: ["#f31d65","#ffd035","#72a1f3"],
             timeline: {
               axisType: 'category',
               currentIndex: self.currentIndex,
@@ -585,8 +585,8 @@
             ],
             series: [
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
-              // {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10'},
               // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
@@ -607,14 +607,14 @@
           option.baseOption.xAxis[0].data = self.regionList;
           //遍历立即督导、待改善、合格、优秀
           let dangerJson = {};
-          // let improvedJson = {};
+          let improvedJson = {};
           let passJson = {};
           // let excellentJson = {};
           resultData.forEach((item, index) => {
             let dateTime = item.ts;
             let region = item.regions;
             let dangerousList = [];
-            // let improvedList = [];
+            let improvedList = [];
             let passList = [];
             // let excellentList = [];
             region.forEach(_item => {
@@ -625,10 +625,10 @@
               itemDangerJson.name = _item.region;
               itemDangerJson.value = _item.numOfDangerous;
               dangerousList.push(itemDangerJson);
-              // let itemImprovedJson = {};
-              // itemImprovedJson.name = _item.region;
-              // itemImprovedJson.value = _item.numOfImproved;
-              // improvedList.push(itemImprovedJson);
+              let itemImprovedJson = {};
+              itemImprovedJson.name = _item.region;
+              itemImprovedJson.value = _item.numOfImproved;
+              improvedList.push(itemImprovedJson);
               let itemQualifiedJson = {};
               itemQualifiedJson.name = _item.region;
               itemQualifiedJson.value = _item.numOfQualified;
@@ -645,10 +645,10 @@
             seriesDanJson.data = dangerousList;
             seriesArray[0] = seriesDanJson;
 
-            // let seriesImproveJson = {};
-            // seriesImproveJson.stack = 'test';
-            // seriesImproveJson.data = improvedList;
-            // seriesArray[1] = seriesImproveJson;
+            let seriesImproveJson = {};
+            seriesImproveJson.stack = 'test';
+            seriesImproveJson.data = improvedList;
+            seriesArray[1] = seriesImproveJson;
 
             let seriesPassJson = {};
             seriesPassJson.stack = 'test';
@@ -666,7 +666,7 @@
         }
         else {
           self.dataMap.dataDanger = {0: []};
-          // self.dataMap.dataImproved = {0: []};
+          self.dataMap.dataImproved = {0: []};
           self.dataMap.dataQualified = {0: []}
           // self.dataMap.dataExcellent = {0: []};
           self.regionChartEmpty = true;
@@ -687,7 +687,7 @@
         console.log(self.curGroupIndex)
         let option = {
           baseOption: {
-            color: ["#f31d65", "#72a1f3"],
+            color: ["#f31d65","#ffd035","#72a1f3"],
             timeline: {
               axisType: 'category',
               currentIndex: self.currentIndex,
@@ -816,8 +816,8 @@
             ],
             series: [
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
-              // {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10'},
               // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
@@ -838,14 +838,14 @@
           option.baseOption.xAxis[0].data = self.regionList;
           //遍历立即督导、待改善、合格、优秀
           let dangerJson = {};
-          // let improvedJson = {};
+          let improvedJson = {};
           let passJson = {};
           // let excellentJson = {};
           resultData.forEach((item, index) => {
             let dateTime = item.ts;
             let region = item.regions;
             let dangerousList = [];
-            // let improvedList = [];
+            let improvedList = [];
             let passList = [];
             // let excellentList = [];
             region.forEach(_item => {
@@ -856,10 +856,10 @@
               itemDangerJson.name = _item.region;
               itemDangerJson.value = _item.numOfDangerous;
               dangerousList.push(itemDangerJson);
-              // let itemImprovedJson = {};
-              // itemImprovedJson.name = _item.region;
-              // itemImprovedJson.value = _item.numOfImproved;
-              // improvedList.push(itemImprovedJson);
+              let itemImprovedJson = {};
+              itemImprovedJson.name = _item.region;
+              itemImprovedJson.value = _item.numOfImproved;
+              improvedList.push(itemImprovedJson);
               let itemQualifiedJson = {};
               itemQualifiedJson.name = _item.region;
               itemQualifiedJson.value = _item.numOfQualified;
@@ -876,10 +876,10 @@
             seriesDanJson.data = dangerousList;
             seriesArray[0] = seriesDanJson;
 
-            // let seriesImproveJson = {};
-            // seriesImproveJson.stack = 'test';
-            // seriesImproveJson.data = improvedList;
-            // seriesArray[1] = seriesImproveJson;
+            let seriesImproveJson = {};
+            seriesImproveJson.stack = 'test';
+            seriesImproveJson.data = improvedList;
+            seriesArray[1] = seriesImproveJson;
 
             let seriesPassJson = {};
             seriesPassJson.stack = 'test';
@@ -1217,7 +1217,7 @@
           firstColor = '#f31d65';
           secondColor = '#ffd035';
           firstName = self.$t("overview.danger");
-          // secondName = self.$t("overview.improve");
+          secondName = self.$t("overview.improve");
           try {
             result.sort(self.compareDanger)
             maxValue = self.findMaxDanger(result);
@@ -1229,8 +1229,8 @@
         else {
           firstColor = '#57e78f';
           secondColor = '#72a1f3';
-          // firstName = self.$t("overview.excellent");
-          secondName = self.$t("overview.pass");
+          firstName = self.$t("overview.excellent");
+          secondName = self.$t("overview.echartGood");
           try {
             result.sort(self.compareExcellent);
             maxValue = self.findMaxExcellent(result);
@@ -1257,7 +1257,7 @@
             json.firstColor = firstColor;
             json.secondColor = secondColor;
             json.firstName = firstName;
-            // json.secondName = secondName;
+            json.secondName = secondName;
             json.firstNum = item.numOfDangerous
             json.secondNum = item.numOfImproved;
             fiveArray.push(json)
@@ -1978,7 +1978,7 @@
         self.regionInspectListData = [];
         let option = {
           baseOption: {
-            color: ["#f31d65", "#72a1f3"],
+            color: ["#f31d65","#ffd035","#72a1f3"],
             timeline: {
               axisType: 'category',
               currentIndex: self.currentIndex,
@@ -2110,8 +2110,8 @@
             ],
             series: [
               {name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10'},
-              // {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
-              {name: self.$t('overview.pass'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10'},
+              {name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10'},
               // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
             ]
           },
@@ -2152,14 +2152,14 @@
             option.baseOption.xAxis[0].data = self.regionList;
             //遍历立即督导、待改善、合格、优秀
             let dangerJson = {};
-            // let improvedJson = {};
+            let improvedJson = {};
             let passJson = {};
             // let excellentJson = {};
             resultData.forEach((item, index) => {
               let dateTime = item.ts;
               let region = item.regions;
               let dangerousList = [];
-              // let improvedList = [];
+              let improvedList = [];
               let passList = [];
               // let excellentList = [];
               region.forEach(_item => {
@@ -2167,10 +2167,10 @@
                 itemDangerJson.name = _item.region;
                 itemDangerJson.value = _item.numOfDangerous;
                 dangerousList.push(itemDangerJson);
-                // let itemImprovedJson = {};
-                // itemImprovedJson.name = _item.region;
-                // itemImprovedJson.value = _item.numOfImproved;
-                // improvedList.push(itemImprovedJson);
+                let itemImprovedJson = {};
+                itemImprovedJson.name = _item.region;
+                itemImprovedJson.value = _item.numOfImproved;
+                improvedList.push(itemImprovedJson);
                 let itemQualifiedJson = {};
                 itemQualifiedJson.name = _item.region;
                 itemQualifiedJson.value = _item.numOfQualified;
@@ -2187,10 +2187,10 @@
               seriesDanJson.data = dangerousList;
               seriesArray[0] = seriesDanJson;
 
-              // let seriesImproveJson = {};
-              // seriesImproveJson.stack = 'test';
-              // seriesImproveJson.data = improvedList;
-              // seriesArray[1] = seriesImproveJson;
+              let seriesImproveJson = {};
+              seriesImproveJson.stack = 'test';
+              seriesImproveJson.data = improvedList;
+              seriesArray[1] = seriesImproveJson;
 
               let seriesPassJson = {};
               seriesPassJson.stack = 'test';
@@ -2208,7 +2208,7 @@
           }
           else {
             self.dataMap.dataDanger = {0: []};
-            // self.dataMap.dataImproved = {0: []};
+            self.dataMap.dataImproved = {0: []};
             self.dataMap.dataQualified = {0: []}
             // self.dataMap.dataExcellent = {0: []};
             self.regionChartEmpty = true;
@@ -2216,7 +2216,7 @@
         }
         else {
           self.dataMap.dataDanger = {0: []};
-          // self.dataMap.dataImproved = {0: []};
+          self.dataMap.dataImproved = {0: []};
           self.dataMap.dataQualified = {0: []}
           // self.dataMap.dataExcellent = {0: []}
           self.regionChartEmpty = true;
