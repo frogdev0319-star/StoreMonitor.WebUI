@@ -1250,8 +1250,15 @@ $h1:#292e36;
             }
         }
         .store-handle{
+            height: 30px;
+            line-height: calc(30/1920*100vw);
             .choice-store{
                 color: $tab;
+                white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    float:left;
+                    width: 98%;
                 i{
                     margin-right: calc(15/1920*100vw);
                 }

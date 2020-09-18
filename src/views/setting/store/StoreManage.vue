@@ -898,7 +898,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
             margin-top:30px;
             .header-details1{
                 text-align: left;
-                height: auto;
+                height: 30px;
                 line-height: calc(30/1920*100vw);
                 span{
                     font-size: calc(14/1920*100vw);
@@ -906,6 +906,11 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 }
                 .choice-store{
                     color: $tab;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    float:left;
+                    width: 98%;
                     i{
                         margin-right: calc(15/1920*100vw);
                     }
