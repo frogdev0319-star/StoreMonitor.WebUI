@@ -84,11 +84,13 @@
           <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="storeDataList.length==0">{{$t('reportView.search')}}</el-button>
         </el-col>
         <el-col :span="24" class="header-details1">
+          <!-- <el-tooltip class="item" effect="dark" placement="bottom" :content="storeStr"> -->
                   <span class="choice-store">
                     <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
                     {{$t('reportView.selected')}}
                     <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
                   </span>
+          <!-- </el-tooltip> -->
           <div class="store-selected" v-if="showStoreInfo">
             <h1>{{$t('reportView.selected')}}</h1>
             <ul class="store-list" v-show="storeStr.length > 0">
@@ -1603,8 +1605,8 @@
         text-align: left;
         padding-left: calc(30/1920*100vw);
         padding-right: calc(30/1920*100vw);
-        // height: 20px;
-        // line-height: 20px;
+        height: 20px;
+        line-height: 20px;
         position: relative;
         span{
           font-size: calc(14/1920*100vw);
@@ -1613,10 +1615,10 @@
         }
         .choice-store{
           color: $tab;
-          // white-space: nowrap;
-          // overflow: hidden;
-          /* text-overflow: ellipsis; */
-          // width: 90%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 90%;
           display: inline-block;
           i{
             margin-right: calc(16/1920*100vw);
