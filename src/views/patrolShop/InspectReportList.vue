@@ -261,7 +261,7 @@ export default {
                 {'status':-1,'label':this.$t('reportView.all')},
                 {'status':0,'label':this.$t('reportView.dangerous')},
                 {'status':1,'label':this.$t('reportView.improve')},
-                {'status':2,'label':this.$t('reportView.qualified')},
+                {'status':2,'label':this.$t('overview.echartGood')},
                 // {'status':3,'label':this.$t('reportView.excellent')},
             ],
             storeStr:'',
@@ -698,7 +698,7 @@ export default {
           self.clearStoreInfo();
           self.storeList.forEach(item=>{
               item.tagIds.forEach(_item=>{
-                  if(_item==val){
+                  if(_item==val&&self.curCountry==item.country){
                       let obj={
                           storeId:item.storeId,
                           label:item.name,

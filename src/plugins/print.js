@@ -82,16 +82,22 @@ Print.prototype = {
     }
 
      //canvass echars图表转为图片
-    for (var k4 = 0; k4 < canvass.length; k4++) {
+     for (var k4 = 0; k4 < canvass.length; k4++) {
       var imageURL = canvass[k4].toDataURL("image/png");
       var imgs = canvass[k4].parentNode.getElementsByTagName("img")
+      var sectoin = document.body.children[0].children[0].children[0].children[1].children[1]
       if(imgs.length==0){
         var img = document.createElement("img");
         img.src = imageURL;
-        // img.setAttribute('style', 'width: calc(600/1920 * 100vw);');
-        img.setAttribute('style', 'margin:0 auto;');
+        img.setAttribute('style', 'margin:0 auto;height:300px;text-align:center;');
         img.className = 'isNeedRemove'
         canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
+      }
+      else if(imgs.length==1){
+        imgs[0].setAttribute('style', 'margin:0 auto;height:300px;text-align:center;');
+      }
+      if(sectoin.offsetLeft<=100){
+        imgs[0].setAttribute('style', 'width:'+Number(sectoin.offsetWidth-sectoin.offsetLeft*2)+'px;height:300px;text-align:center;');
       }
     }
     //做分页

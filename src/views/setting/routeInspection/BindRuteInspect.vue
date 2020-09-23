@@ -36,8 +36,8 @@
                {{storeCount}} {{generateInsSettingLang('bind')}}</p>
             <p class="choice-device" v-else><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}{{generateInsSettingLang('total')}}{{totalCount}}
                 {{generateInsSettingLang('bindStore')}},{{generateInsSettingLang('bindWith')}}{{storeCount}}{{generateInsSettingLang('bindStore')}}</p>
-            <div class="el-bind-content" :style="{'min-height':varyWindowHeight*0.56+'px'}">
-                <div class="bind-empty" :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0">
+            <div class="el-bind-content" :style="{'height':varyWindowHeight*0.56+'px'}">
+                <div class="bind-empty" :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0&&Havestore">
                     <img :src="loadingGif"/>
                     <span class="empty-text">{{generateInsSettingLang('loadingbindstore')}}</span>
                 </div>
@@ -117,6 +117,7 @@ export default {
             allCityChecked:false,
             showCityContent:false,
             showDrap:true,
+            Havestore:false,
             storeData:[],
             napeIdList:[],
             serachVale:'',
@@ -536,8 +537,10 @@ export default {
         },
         async searchStoreInput(){
             let self=this;
-            self.curProvince='';
-            self.citys='';
+            self.curProvince=[];
+            // self.citys='';
+            self.curCity= [];
+            self.clearCityInfo();
             let params={};
             if(self.serachVale.length!=0){
                 params={
@@ -561,6 +564,7 @@ export default {
             }
             let resData=await self.getStoreData(params);
             let data=resData.content;
+            self.Havestore=resData.content.length>0 ? true : false
             self.getStoreByCity(data);
 
             let count=0;
@@ -596,6 +600,7 @@ export default {
                     }
             let resData=await self.getStoreData(params);
             self.storeData=resData.content;
+            self.Havestore=resData.content.length>0 ? true : false
             self.getStoreByCity(self.storeData);
 
             self.totalCount=resData.totalElements;
@@ -814,6 +819,8 @@ export default {
             return new Promise((resolve,reject)=>{
                 applyItemInspectItem(params).then(res=>{
                     resolve(res);
+                }).catch((err)=>{
+                    reject(err)
                 })
             })
         },
@@ -821,6 +828,8 @@ export default {
             return new Promise((resolve,reject)=>{
                 UnapplyInspectItem(params).then(res=>{
                     resolve(res);
+                }).catch((err)=>{
+                    reject(err)
                 })
             })
         },
@@ -866,22 +875,22 @@ export default {
             };
             let flag=false;
             if(storeIdChecked.length==count){  //全部勾选，只有绑定操作
-                let resBind=await self.bindNapeToStore(paramsBind);
+                let resBind=await self.bindNapeToStore(paramsBind).catch((err)=>self.loading=false)
                 console.log(resBind);
                 if(resBind.errMsg=='Success'&&resBind.errCode=='0'){
                     flag=true;
                 }
             }
             else if(storeIdUnchecked.length==count){ //全部取消勾选，只有解绑操作
-                let resUnBind=await self.UnbindNapeToStore(paramsUnBind);
+                let resUnBind=await self.UnbindNapeToStore(paramsUnBind).catch((err)=>self.loading=false)
                 console.log(resUnBind);
                  if(resUnBind.errMsg=='Success'&&resUnBind.errCode=='0'){
                     flag=true;
                 }
             }
             else{
-                let resBind=await self.bindNapeToStore(paramsBind);
-                let resUnBind=await self.UnbindNapeToStore(paramsUnBind);
+                let resBind=await self.bindNapeToStore(paramsBind).catch((err)=>self.loading=false)
+                let resUnBind=await self.UnbindNapeToStore(paramsUnBind).catch((err)=>self.loading=false)
                 if(resBind.errMsg=='Success'&&resUnBind.errMsg=='Success'){
                     flag=true;
                 }

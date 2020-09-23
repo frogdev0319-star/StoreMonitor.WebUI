@@ -1264,8 +1264,8 @@ export default {
                             }
                         }else{
                             if(outdata.PassFail.length!=0){
-                                arrsheet1 = outdata.PassFail
-                                arrsheet1[0].a = '评级项目'
+                                arrsheet1.push(outdata.PassFail)
+                                arrsheet1[0][0].a = _this.$t('insSettingView.Ratingitems')
                             }
                         }
                     }
@@ -1285,8 +1285,8 @@ export default {
                             }
                         }else{
                             if(outdata.Others.length!=0){
-                                arrsheet3 = outdata.Others
-                                arrsheet3[0].a = '附加评分项目'
+                                arrsheet3.push(outdata.Others)
+                                arrsheet3[0][0].a = _this.$t('insSettingView.Addscoreitems')
                             }
                         }
                     }

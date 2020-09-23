@@ -56,7 +56,7 @@ export default {
     loginAbnormal: 'The login information is abnormal, please sign in again!'
   },
   overview:{
-    'averageScore':'averageScore',//Sprint8 新增
+    'averageScore':'AVG',//Sprint8 新增
     'eachmonth':' each month',
     'everydays':' every week',
     'act':'Executed on ',
@@ -86,7 +86,7 @@ export default {
     'patrolStatus': 'Regional Patrol Status',
     'danger': 'Dangerous',
     'improve' : 'Improve',
-    'pass': 'Qualified',
+    'pass': 'Pass',
     'excellent' : 'Excellent',
     'worstRegion': 'Worst Region',
     'bestRegion': 'Best Region',
@@ -196,14 +196,15 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    TableTotal:'Total project score',//Sprint8 新增
-    TableIgnore:'Inapplicable quantity',//Sprint8 新增
+    TableTotal:'Total score',//Sprint8 新增
+    TableIgnore:'Ignored',//Sprint8 新增
     TableGet:'Score',//Sprint8 新增
-    alertContent:'Qualification rate evaluation items are required, and at least one inspection item evaluation item',//Sprint8 新增
-    clickToContent:'Some inspections have not been evaluated, click to view',//Sprint8 新增
-    hasIgnoreContent:'Items not inspected in this inspection',//Sprint8 新增
-    backToallsheet:'Return to the inspection list',//Sprint8 新增
-    scoreU:'unit: PCS',//Sprint8 新增
+    alertContent:'Please evaluate all inspection items',//Sprint8 新增
+    alertTips1:'Fill in at least 1 item for the scoring item.',//Sprint8 新增
+    clickToContent:'Existing unevaluated items, Clicking to view!',//Sprint8 新增
+    hasIgnoreContent:'The inspection, Unevaluated items',//Sprint8 新增
+    backToallsheet:'Return',//Sprint8 新增
+    scoreU:'Unit: PCS',//Sprint8 新增
     Patroltips2:'The inspection list name already exists',
     stared: 'Star',
     clickToStar: 'Click to star',
@@ -261,7 +262,7 @@ export default {
     score: 'Score',
     totalScore: 'Total Score',
     failed: 'Failed',
-    pass: 'Qualified',
+    pass: 'Pass',
     good: 'Good',
     total: 'Total',
     getscore:'Inspection score',
@@ -377,7 +378,7 @@ export default {
   reportView:{
     selectStores: 'Select Stores',
     country: 'Country/Region',
-    selectStoreTag:'Fast label selection',//Sprint8 新增
+    selectStoreTag:'Quick Select',//Sprint8 新增
     regionI: 'Region I',
     regionII: 'Region II',
     stores: 'Stores',
@@ -421,7 +422,7 @@ export default {
 
   // event Management page language
   eventView:{
-    enclosure:'annex',//Sprint8 新增
+    enclosure:'Attachment',//Sprint8 新增
     status: 'Status',
     all : 'All',
     pending: 'Pending',
@@ -460,7 +461,9 @@ export default {
   },
   // Inspection Management page language
   insSettingView:{
-    OnlyOthers:'[Inspection scoring item] The content of the sheet page cannot be empty',//Sprint8 新增
+    OnlyOthers:'The content of the [Score] sheet page cannot be empty',//Sprint8 新增
+    Ratingitems:'Rating items',//Sprint8
+    Addscoreitems:'Additional scoring items',//Sprint8
     selecttitle:'Please select the related jobs',
     storeNoInspect:'No bound Remote Patrol List with the store',
     // confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
@@ -470,7 +473,7 @@ export default {
     tHeaderB:'Inspection Items(Required, 100 characters)',
     tHeaderC:'Score(1~100points)',
     tHeaderD:'Inspection Item Description(Required,100 characters)',
-    tHeaderF:'If the score is lower than *, the person in charge of the store must handle it (required, 1~10 points)',//Sprint8 新增
+    tHeaderF:'Anomaly Events-Score Threshold（Optional，1~10points）',//Sprint8 新增
     bindWith: 'Binded with ',
     bindStore: 'stores',
     bindList: 'Bound List',
@@ -485,16 +488,16 @@ export default {
     Inspector:'Please select inspector',
     inspectName: 'Name',
     inspectionDescp: 'Descriptions',
-    sheetscore0: 'Project full score',//Sprint8 新增
-    sheetscore1: 'the score is not allow lower than *',//Sprint8 新增
-    sheetscore2: 'Project score (required, -100 points to 100 points)',//Sprint8 新增
+    sheetscore0: 'Total score',//Sprint8 新增
+    sheetscore1: 'Anomaly Events-Score Threshold',//Sprint8 新增
+    sheetscore2: 'Score(Required, -100~100points)',//Sprint8 新增
     sheetpassfail:'Pass-Failed',//Sprint8 新增
     sheetscore:'Score items',//Sprint8 新增
     sheetother:'Other items',//Sprint8 新增
-    notAllowAdd:'Pass&Fail and Others Tab cannot form a valid inspection table, and it is not allowed to add!',//Sprint8 新增
-    notallowdeletetips:'There is an invalid combination of patrol table Tabs and cannot be deleted!',//Sprint8 新增
-    notallowA:'Pass&Fail and Others',//Sprint8 新增
-    notallowB:'Others',//Sprint8 新增
+    notAllowAdd:'Adding is not allowed when the [Pass-Failed]  tab is combined with the [Others].',//Sprint8 新增
+    notallowdeletetips:'Existing invalid tab combination on inspection table',//Sprint8 新增
+    notallowA:' [Pass-Failed] tab & [Score Items] tab',//Sprint8 新增
+    notallowB:'Single [Others] tab',//Sprint8 新增
     score: 'Score',
     selectImprtLoc: 'Select a location for import files.',
     enterListName: 'Enter List Name',
@@ -519,14 +522,14 @@ export default {
     emptyInfo: 'List is empty, please add inspection items!',
     enterSelfListName : 'Please Enter Custom List Name',
     templateError: 'The template of inspection tableis wrong!!',
-    excelLongCategory: 'The length of group supports up to 30 characters!',
+    excelLongCategory: 'The length of category supports up to 30 characters',
     excelIllegalCategory: 'llegal characters "@#￥%^&*"!',
-    excelEmpty: 'The group name and item name can\'t empty!',
-    passfailexcelEmpty: 'The inspection item cannot be empty!',//Sprint8 新增
-    excelFullScoreType:'The full score of the project is required, and the value range is an integer from 1 to 10',//Sprint8 新增
-    excelMinScoreType:'The minimum score of the inspection item is required, and the value range is 1 to the integer of the project full score',//Sprint8 新增
-    excelOtherScoreType:'The project score is required, and the value range is -100~100 integer',//Sprint8 新增
-    bindingstore:'绑定中',//Sprint8 新增
+    excelEmpty: 'The inspection category and item name can\'t empty',
+    passfailexcelEmpty: 'The inspection item can\'t empty',//Sprint8 新增
+    excelFullScoreType:'Total Score: Required, Integer, 1~10points',//Sprint8 新增
+    excelMinScoreType:'Anomaly Events-Score Threshold: Optional, Integer, 1point~Total Score',//Sprint8 新增
+    excelOtherScoreType:'Score: Required, Integer,  -100~100points',//Sprint8 新增
+    bindingstore:'Binding',//Sprint8 新增
     excelLongItem: 'The length of item is 100 characters at most!',
     excelIllegalDes: 'The length of item description is 300 characters at most!',
     deleteItem: 'Delete Item',
@@ -565,7 +568,7 @@ export default {
     description: 'Description',
     descriptionRuletip:'Enter up to 1200 characters',
     titleEmpty: 'Title may not be empty.',
-    ScoreEmpty:'item score cannot be empty',//Sprint8 新增
+    ScoreEmpty:'The Score can\'t empty',//Sprint8 新增
     illegalStr: 'Illegal strings!',
     remotePatrol: 'Remote Patrol',
     onsitePatrol: 'Onsite Patrol',

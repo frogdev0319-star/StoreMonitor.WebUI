@@ -60,7 +60,7 @@
                             <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfQualified}}</span></td>
                             <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfUnqualified}}</span></td>
                             <td v-if="s_item.type==1"><span>{{item.itemScore}}</span></td>
-                            <td v-if="s_item.type==1||s_item.type==2"><span>{{item.numIgnore}}</span></td>
+                            <td><span>{{item.numIgnore}}</span></td>
                             <td v-if="s_item.type==1||s_item.type==2"><span>{{item.itemgetScore}}</span></td>
                         </tr>
                     </tbody>
@@ -179,19 +179,20 @@ export default {
             deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
             theaderPassFail:[
                 {name: '',width:'width:11%;'},
-                {name: this.$t('remotePatrol.item'),width:'width:22.2%;'},
-                {name: this.$t('remotePatrol.pass'),width:'width:35%;'},
-                {name: this.$t('remotePatrol.failed'),width:'width:35%;'}
+                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.pass'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.failed'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'}
             ],
             theaderScore:[
-                {name: '',width:'width:10%;'},
+                {name: '',width:'width:11%;'},
                 {name: this.$t('remotePatrol.item'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.TableTotal'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.TableGet'),width:'width:20%;'}
             ],
             theaderOther:[
-                {name: '',width:'width:10%;'},
+                {name: '',width:'width:11%;'},
                 {name: this.$t('remotePatrol.item'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.pass'),width:'width:15%;'},
                 {name: this.$t('remotePatrol.failed'),width:'width:15%;'},
@@ -482,8 +483,13 @@ export default {
             self.store=store;
             self.inspectList=routeData.inspect;
             self.eventList=routeData.event;
-            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[]
+            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[],dealType=[]
             let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,allpassfailCount=0
+            inspect.forEach(p_item=>{
+                if(p_item.dealCount!=0){
+                    dealType.push(p_item.type)
+                }
+            })
             inspect.forEach(p_item=>{
                 var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
                 p_item.inspectList.forEach(item=>{
@@ -519,9 +525,9 @@ export default {
                     item['notIgnoreTotalscore']=notIgnoreTotalscore
                     if(p_item.type==0){
                         CurPassfailQualified += item.numOfQualified
-                        CurpassfailCount += p_item.count
+                        CurpassfailCount += item.numOfUnqualified
                         getpassfailQualifiedTotal=CurPassfailQualified
-                        allpassfailCount=CurpassfailCount
+                        allpassfailCount=Number(CurpassfailCount+CurPassfailQualified)
                     }
                     if(p_item.type==1){
                         CurItemgetScore += totalGetscore
@@ -540,24 +546,33 @@ export default {
                         self.resultList[0].isShow=false
                         self.resultList[1].isShow=false
                         self.resultList[2].isActive=true
+                    }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1){
+                        self.resultList[1].isShow=false
+                        self.resultList[2].isShow=false
+                        self.resultList[0].isActive=true
                     }
-                    p_item['height']=18
+                    p_item['height']=18+2.5*p_item.inspectList.length
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
-                    p_item['height']=18
+                    p_item['height']=18+2.5*p_item.inspectList.length
                 }else if(p_item.type==2){
                     p_item['tHeader']=self.theaderOther
-                    p_item['height']=18
+                    p_item['height']=18+2.5*p_item.inspectList.length
                 }
             })
             let s_count=0
-            if(inspect.length==1&&inspect[0].type==0){
+            if(dealType.length==1&&dealType[0]==0){
                 s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100)
-                self.resultList[1].isShow=false
-                self.resultList[2].isShow=false
-                self.resultList[0].isActive=true
             }else{
                 s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            }
+            if(dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+                self.resultList[0].isShow=true
+                self.resultList[1].isShow=true
+                self.resultList[2].isShow=true
+                self.resultList[0].isActive=false
+                self.resultList[1].isActive=false
+                self.resultList[2].isActive=false
             }
             self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
             self.summary=inspect

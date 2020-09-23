@@ -254,8 +254,9 @@
                 </el-row> -->
                 <el-row v-if="sheetName.length!=0" class="inspect-title">
                     <el-col :span="24">
-                        <el-alert :title="$t('remotePatrol.alertContent')" type="warning" :closable="false" v-if="!isShowWarn&&!showIgnoreItem"></el-alert>
-                        <el-alert type="warning" :closable="false" v-if="isShowWarn&&!showIgnoreItem" show-icon><span @click="hasIgnoreItem" style="cursor: pointer;">{{$t('remotePatrol.clickToContent')}}</span></el-alert>
+                        <el-alert :title="$t('remotePatrol.alertContent')" type="warning" :closable="false" v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3"></el-alert>
+                        <el-alert :title="$t('remotePatrol.alertTips1')" type="warning" :closable="false" v-if="hasSheet3&&!showIgnoreItem&&!isShowWarn"></el-alert>
+                        <el-alert type="warning" :closable="false" v-if="isShowWarn" show-icon><span @click="hasIgnoreItem" style="cursor: pointer;font-weight:bold;">{{$t('remotePatrol.clickToContent')}}</span></el-alert>
                         <el-alert type="info" :closable="false" v-if="showIgnoreItem" class="info-alert">
                             <div class="info-left">{{$t('remotePatrol.hasIgnoreContent')}}</div>
                             <div class="info-right" @click="backToPatrol"><img :src="backicon"><span>{{$t('remotePatrol.backToallsheet')}}</span></div>
@@ -267,8 +268,8 @@
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                             <div style="background-color:#f4f5f9;height:316.06px;">
                                 <div v-for="(_item,_index) in sheetName" :key="_index" class="Group-content">
-                                    <div @click="changeSheet(_item,_index)" class="Group-content-title" :class="_item.isClick?'noraml-color':'noraml-groupColor'" :style="_item.label==$t('insSettingView.sheetpassfail')?'margin-left:-10px;':''">
-                                        <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span>
+                                    <div @click="changeSheet(_item,_index)" class="Group-content-title" :class="_item.isClick?'noraml-color':'noraml-groupColor'">
+                                        <!-- <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span> -->
                                         <span>{{_item.label}}</span>
                                         <span v-if="_item.groupId==undefined">（{{_item.dealCount+'/'+_item.count}}）</span>
                                         <i class="el-icon-arrow-right icon" v-if="_item.groupId==undefined&&!_item.isClick"></i>
@@ -536,6 +537,7 @@ export default {
         return{
             sheetName:[],
             isShowWarn:false,
+            hasSheet3:false,
             patrolstore:'',
             PatrolList:[],
             showControls:false,
@@ -570,6 +572,7 @@ export default {
             varyWindowHeight:window.innerHeight,
             varyWindowWidth:window.innerWidth,
             showDate:true,
+            tempArr:[],
             playDate:new Date(),
             channel:null,
             penList:[
@@ -1048,6 +1051,7 @@ export default {
             self.hasIgnoretemp=null
             self.showIgnoreItem=false
             self.isShowWarn=false
+            self.hasSheet3=false
             self.showFeedBackInfo = true
             self.accountId=localStorage.getItem('oss_bucket');
             self.showChannelBtns = [];
@@ -1681,7 +1685,6 @@ export default {
         },
         checkIgnoreScore(item,itemDS,e){
             let self=this;
-            console.log(item);
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -1700,6 +1703,27 @@ export default {
             }
             item.dealCount=1
             item.inputCount=1
+            // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
+            let isSheet1=false,isSheet2=false
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
+            if(sheetName.length==1){
+                isSheet1 = isSheet2 = true
+            }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
+                if(sheetName.some(item=>item.type==2)){
+                    if(sheetName[2].dealCount==0&&self.tempArr.every(x=>x==0)){
+                        isSheet1 = isSheet2 = item.type!=2 ? true : false
+                        self.hasSheet3 = item.type!=2 ? false : true
+                    }else{
+                        isSheet1 = isSheet2 =  true
+                    }
+                }else{
+                    isSheet1 = isSheet2 = true
+                }
+            }else{
+                isSheet2 = true
+            }
+            self.isDisabled = isSheet1 || isSheet2
         },
         checkScore(item,itemDS,e){
             let self=this;
@@ -1727,33 +1751,48 @@ export default {
                 }
                 self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
             }
-            else{
-                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!=0){
-                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
-                    self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
-                }
-            }
-            if(self.isShowWarn){
-                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-                let sheetName=self.sheetName.slice(0,indexFeed);
-                self.isShowWarn = sheetName.some(item=>item.dealCount!=item.count) ? true : false
-            }
+            // else{
+            //     if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!=0){
+            //         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
+            //         self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
+            //     }
+            // }
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
+            // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
             let isSheet1=false,isSheet2=false
-            self.sheetName.forEach(item=>{
-                if(item.type==0){
-                    item.dealCount==item.count ? isSheet1=true : isSheet1=false
+            if(sheetName.length==1){
+                isSheet1 = sheetName[0].type==0 ? (sheetName[0].dealCount>=1 ? true : false) : false
+                isSheet2 = sheetName[0].type==1 ? (sheetName[0].dealCount>=1 ? true : false) : false
+            }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
+                if(sheetName.some(item=>item.type==2)){
+                    if(sheetName[2].dealCount==0){
+                        isSheet1 = isSheet2 = sheetName[1].dealCount>=1||sheetName[0].dealCount>=1 ? true : false
+                    }else{
+                        isSheet1 = isSheet2 = sheetName[1].dealCount>=1 ? true : false
+                        self.hasSheet3 = sheetName[1].dealCount>=1 ? false : true
+                    }
+                }else{
+                    isSheet1 = isSheet2 = sheetName[0].dealCount>=1||sheetName[1].dealCount>=1 ? true : false
                 }
-                if(item.type==1){
-                    item.dealCount>=1 ? isSheet2=true : isSheet2=false
-                }
-            })
-            if(self.sheetName[0].type==0&&self.sheetName[1].type==1){
-               self.isDisabled = isSheet1&&isSheet2 ? true : false
-            }else if(self.sheetName[0].type==1){
-               self.isDisabled = isSheet2 ? true : false
-            }else if(self.sheetName[0].type==0&&self.sheetName[1].groupId=='feedBack'){
-               self.isDisabled = isSheet1 ? true : false
+            }else{
+                isSheet2 = sheetName[0].dealCount>=1 ? true : false
             }
+            self.isDisabled = isSheet1 || isSheet2
+            self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.dealCount!=item.count) ? true : false
+            let hasIgnoretemp=[]
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        if(_item.inputCount==0){
+                            hasIgnoretemp.push(_item)
+                        }else{
+                            self.tempArr.push(_item.type)
+                        }
+                    })
+                })
+            })
+            self.hasIgnoretemp=hasIgnoretemp
         },
         getAllStoreList(){
             let self=this;
@@ -2315,6 +2354,17 @@ export default {
                     _item.disabled=true;
                 }
             })
+            if(self.hasIgnoretemp.length!=0&&self.showIgnoreItem){
+                self.hasIgnoretemp.forEach((_item,_index)=>{
+                    if(index!=_index){
+                        _item.checked=false;
+                        _item.disabled=true;
+                    }else{
+                        _item.checked=true;
+                        _item.disabled=false; 
+                    }
+                })
+            }
             self.sheetName.slice(0,self.sheetName.length-1).forEach((_item,_index)=>{
                 _item.inspectList.forEach((p_item,p_index)=>{
                     p_item.items.forEach((itemDS,indexDS)=>{
@@ -2449,17 +2499,58 @@ export default {
             let dealCount=0;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
-            sheetName.forEach(s_item=>{
-                dealCount=dealCount+s_item.dealCount;
-                s_item.inspectList.forEach(item=>{
-                    temp.push(item)
-                    count=count+item.items.length;
+            if(self.hasIgnoretemp.length==0){
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        temp.push(item)
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount==0){
+                                _item.isIgnore=true
+                                _item.inspectInput = ''
+                                _item.sourceList = []
+                            }
+                        })
+                    })
+                })
+            }else{
+                sheetName.forEach(s_item=>{
+                    let dealtemp=[]
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            self.hasIgnoretemp.forEach((h_item,h_index)=>{
+                                if(self.hasIgnoretemp[h_index].inputCount==0){
+                                    self.hasIgnoretemp[h_index].isIgnore=true
+                                    self.hasIgnoretemp[h_index].inspectInput = ''
+                                    self.hasIgnoretemp[h_index].sourceList = []
+                                }
+                                if(self.hasIgnoretemp[h_index].id==item.items[_index].id){
+                                    item.items[_index]=self.hasIgnoretemp[h_index]
+                                }
+                            })
+                            if(_item.inputCount!=0){
+                                let obj={}
+                                obj.dealCount=1
+                                dealtemp.push(obj)
+                            }
+                        })
+                        temp.push(item)
+                    })
+                    s_item.dealCount=dealtemp.length
+                })
+            }
+            let hasIgnoretemp=[]
+            temp.forEach(item=>{
+                item.items.forEach(_item=>{
+                    if(_item.isIgnore){
+                        _item['type']=item.type
+                        hasIgnoretemp.push(_item)
+                    }
                 })
             })
-            if(dealCount<count){
-                self.noAllInspectObj.dialogCosed=true;
-                return false;
-            }
+            // if(dealCount<count){
+            //     self.noAllInspectObj.dialogCosed=true;
+            //     return false;
+            // }
             let obj={
                 inspect:sheetName,
                 event:self.eventList,
@@ -2474,7 +2565,7 @@ export default {
                 activeIndex:self.activeIndex,
                 store:self.store,
                 // inspect:self.inspectList,
-                hasIgnoretemp:null,
+                hasIgnoretemp:hasIgnoretemp,
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList,
                 showChannelBtns:self.showChannelBtns,
@@ -2483,6 +2574,7 @@ export default {
                 curGroupIndex:self.curGroupIndex,
                 curItemIndex:self.curItemIndex
             }
+            self.hasIgnoretemp=[]
             // sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
@@ -2803,6 +2895,13 @@ export default {
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
                             obj.hasInspect=data[j].hasInspect;
+                            if(data[j].authorizedInspect.length!=0){
+                                obj.authorizedInspect=data[j].authorizedInspect
+                                obj.hasInspect=true;
+                            }
+                            else{
+                                obj.hasInspect=false;
+                            }
                             temp.push(obj);
                         }
                     }
@@ -2834,6 +2933,7 @@ export default {
         changeStore(item,index,_item,_index){
             let self=this;
             self.patrolstore=''
+            self.curSheetIndex=0
             self.inspectItemList=[]
             self.inspectList=[]
             self.sheetName=[]
@@ -2844,6 +2944,7 @@ export default {
             self.$store.dispatch('setPatrolHistory',null);
             self.isShowWarn=false
             self.showIgnoreItem=false
+            self.hasSheet3=false
             _item.authorizedInspect.forEach(au_item=>{
                 if(au_item.mode==0){
                     self.PatrolList.push(au_item) //门店对应巡检表
@@ -3065,6 +3166,7 @@ export default {
             self.$store.dispatch('setPatrolComment',null);
             self.isShowWarn=false
             self.showIgnoreItem=false
+            self.hasSheet3=false
             self.eventList=[]
             self.curSheetIndex=0
                 self.PatrolList.forEach(item=>{
@@ -3162,13 +3264,12 @@ export default {
             let self=this
             self.showIgnoreItem=true
             self.showFeedBack=false
+            self.isShowWarn=false
             let PatrolHistory = self.$store.getters.PatrolHistory;
             if(PatrolHistory!=null){
                 if(PatrolHistory.hasIgnoretemp!=null){
                     PatrolHistory.hasIgnoretemp.forEach(item=>{
-                        if(item.isIgnore){
-                            item.isIgnore=false
-                        }
+                        item.isIgnore ? item.isIgnore=false : ''
                     })
                 }
                 self.hasIgnoretemp = PatrolHistory.hasIgnoretemp!=null ? PatrolHistory.hasIgnoretemp : null
@@ -3184,20 +3285,24 @@ export default {
                 let dealtemp=[]
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        self.hasIgnoretemp.forEach(h_item=>{
+                        self.hasIgnoretemp.forEach((h_item,h_index)=>{
                             if(h_item.id==_item.id){
-                                _item=h_item
+                                item.items[_index]=self.hasIgnoretemp[h_index]
                             }
                         })
-                        if(_item.inputCount==1){
+                        if(item.items[_index].inputCount==1){
                             let obj={}
-                            obj.dealCount=_item.inputCount
+                            obj.dealCount=item.items[_index].inputCount
                             dealtemp.push(obj)
                         }
                     })
                 })
                 s_item.dealCount=dealtemp.length
+                if(s_item.isClick&&!self.showFeedBack){
+                    self.inspectItemList=s_item.inspectList[self.curGroupIndex].items
+                }
             })
+            self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount==0) ? true : false
         },
         changeSheet(item,index){
             let self=this
@@ -4215,6 +4320,9 @@ export default {
                 .inspect-title /deep/ .el-alert__icon{
                     font-size: 16px;
                     margin-right: calc(10/1920*100vw);
+                }
+                .inspect-title /deep/ .el-alert__description{
+                    margin:0;
                 }
                 .inspect-title /deep/ .el-alert__content{
                     padding:0;

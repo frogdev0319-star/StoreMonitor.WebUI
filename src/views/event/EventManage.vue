@@ -100,7 +100,7 @@
                             :cell-style="cellStyle"
                         >
                                 <el-table-column
-                                    min-width="80"
+                                    min-width="100"
                                     header-align="center"
                                     align="center">
                                         <template slot-scope="scope" >
@@ -126,7 +126,7 @@
                                 </el-table-column>
                             <el-table-column prop="storeName" align="left" :label="$t('eventView.stores')" min-width="160" sortable="custom"></el-table-column>
                             <el-table-column prop="inspectTagName" align="left" :label="$t('overview.patrolLists')" min-width="160" sortable="custom"></el-table-column>
-                            <el-table-column align="left" :label="$t('eventView.enclosure')" min-width="160" sortable='custom'>
+                            <el-table-column align="left" :label="$t('eventView.enclosure')" min-width="120" sortable='custom'>
                                   <template slot-scope="scope">
                                       <div v-if="scope.row.attachment.length!=0">
                                           <img class='sourceType-icon' v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url"/>

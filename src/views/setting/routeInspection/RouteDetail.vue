@@ -298,6 +298,13 @@ export default {
         },
         changeSheet(e){
             let self = this
+            self.allchecked=false
+            self.routeData.forEach(item=>{
+                item.checked=false
+                item.itemData.forEach(_item=>{
+                    _item.checked=false
+                })
+            })
             self.showSheet0= e==0 ? true : false
             self.showSheet1= e==1 ? true : false
             self.showSheet2= e==2 ? true : false
@@ -439,7 +446,7 @@ export default {
                 })
             })
             let delData=self.routeData.filter(x=>x.itemData.length!=0)
-            if(delData.length==1&&delData[0].itemData.length==1){
+            if(delData.length==1&&delData[0].itemData.length==1||self.allchecked){
                 if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
                     self.showFaildig=true
                     return false;
@@ -447,12 +454,26 @@ export default {
             }
             self.showDeleteContent=true;
         },
-        afterDeleteNape(){
+        afterDeleteNape(arrItem,arrGroup){
             let self=this;
             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
             let val = 'del'
-            self.$emit('refreshList',val)
+            // self.$emit('refreshList',val)
+            self.routeData.forEach((item,index)=>{
+                arrGroup.forEach(G_item=>{
+                    if(G_item==item.id){
+                        self.routeData.splice(index,1)
+                    }
+                })
+                item.itemData.forEach((_item,_index)=>{
+                    arrItem.forEach(I_item=>{
+                        if(I_item==_item.id){
+                            item.itemData.splice(_index,1)
+                        }
+                    })
+                });
+            });
         },
         confirmDelete(){
             let self=this;
@@ -482,12 +503,12 @@ export default {
                         if(arrGroup.length!=0){
                             inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
                                 if(resGroup.errMsg=='Success'){
-                                    self.afterDeleteNape();
+                                    self.afterDeleteNape(arrItem,arrGroup);
                                 }
                             })
                         }
                         else{
-                            self.afterDeleteNape();
+                            self.afterDeleteNape(arrItem,arrGroup);
                         }
                     }
                     else{
@@ -500,7 +521,7 @@ export default {
             else{
                 inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
                     if(resGroup.errMsg=='Success'){
-                        self.afterDeleteNape();
+                        self.afterDeleteNape(arrItem,arrGroup);
                     }
                     else{
                         self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
@@ -562,14 +583,15 @@ export default {
                                 if(self.routeData[r_index].itemData.length==1){
                                     inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
                                         if(resGroup.errMsg=='Success'){
-
+                                            self.routeData.splice(r_index,1)
                                         }
                                     })
                                 }
+                                r_item.itemData.splice(d_index,1)
                                 self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                                 self.showSingleDeleteContent=false;
-                                let val = 'del'
-                                self.$emit('refreshList',val)
+                                // let val = 'del'
+                                // self.$emit('refreshList',val)
                             }
                         })
                     })
