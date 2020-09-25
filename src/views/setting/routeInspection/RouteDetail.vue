@@ -79,11 +79,11 @@
                             <div class="header-content tabTitle" v-if="index==0">
                                 <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
                                 <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
-                                <span class="description-title" :style="showSheet0?'width: calc((100% - 405px) * 25/29);':''">{{generateInsSettingLang('inspectionDescp')}}</span>
-                                <span class="score-title" :style="'width: calc((100% - 405px) * 2.5/29);'" v-if="showSheet1">{{generateInsSettingLang('sheetscore0')}}</span>
+                                <span class="description-title" :style="sheetName.some(x=>x.id==0&&x.isClick)?'width: calc((100% - 405px) * 25/29);':''">{{generateInsSettingLang('inspectionDescp')}}</span>
+                                <span class="score-title" :style="'width: calc((100% - 405px) * 2.5/29);'" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore0')}}</span>
                                 <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{generateInsSettingLang('sheetscore0')}}</span> -->
-                                <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="showSheet1">{{generateInsSettingLang('sheetscore1')}}</span>
-                                <span class="score-title" v-if="showSheet2">{{generateInsSettingLang('sheetscore2')}}</span>
+                                <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore1')}}</span>
+                                <span class="score-title" v-if="sheetName.some(x=>x.id==2&&x.isClick)">{{generateInsSettingLang('sheetscore2')}}</span>
                                 <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
                             </div>
 
@@ -104,9 +104,9 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="name" width="300px"></el-table-column>
-                                    <el-table-column prop="description" :min-width="showSheet0?'40%':'23%'"></el-table-column>
-                                    <el-table-column prop="score" align="center" v-if="showSheet1||showSheet2" :min-width="showSheet1?'4%':'15%'"></el-table-column>
-                                    <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="showSheet1"></el-table-column>
+                                    <el-table-column prop="description" :min-width="sheetName.some(x=>x.id==0&&x.isClick)?'40%':'23%'"></el-table-column>
+                                    <el-table-column prop="score" align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)||sheetName.some(x=>x.id==2&&x.isClick)" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'"></el-table-column>
+                                    <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="sheetName.some(x=>x.id==1&&x.isClick)"></el-table-column>
                                     <el-table-column prop="handle" min-width="6%">
                                         <template slot-scope="scope">
                                                 <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
@@ -305,9 +305,9 @@ export default {
                     _item.checked=false
                 })
             })
-            self.showSheet0= e==0 ? true : false
-            self.showSheet1= e==1 ? true : false
-            self.showSheet2= e==2 ? true : false
+            // self.showSheet0= e==0 ? true : false
+            // self.showSheet1= e==1 ? true : false
+            // self.showSheet2= e==2 ? true : false
             self.sheetName.forEach(item=>{
                 if(item.id==e){
                     item.isClick=true
@@ -454,26 +454,12 @@ export default {
             }
             self.showDeleteContent=true;
         },
-        afterDeleteNape(arrItem,arrGroup){
+        afterDeleteNape(){
             let self=this;
             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
             let val = 'del'
-            // self.$emit('refreshList',val)
-            self.routeData.forEach((item,index)=>{
-                arrGroup.forEach(G_item=>{
-                    if(G_item==item.id){
-                        self.routeData.splice(index,1)
-                    }
-                })
-                item.itemData.forEach((_item,_index)=>{
-                    arrItem.forEach(I_item=>{
-                        if(I_item==_item.id){
-                            item.itemData.splice(_index,1)
-                        }
-                    })
-                });
-            });
+            self.$emit('refreshList',val)
         },
         confirmDelete(){
             let self=this;
@@ -503,12 +489,12 @@ export default {
                         if(arrGroup.length!=0){
                             inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
                                 if(resGroup.errMsg=='Success'){
-                                    self.afterDeleteNape(arrItem,arrGroup);
+                                    self.afterDeleteNape();
                                 }
                             })
                         }
                         else{
-                            self.afterDeleteNape(arrItem,arrGroup);
+                            self.afterDeleteNape();
                         }
                     }
                     else{
@@ -521,7 +507,7 @@ export default {
             else{
                 inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
                     if(resGroup.errMsg=='Success'){
-                        self.afterDeleteNape(arrItem,arrGroup);
+                        self.afterDeleteNape();
                     }
                     else{
                         self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
@@ -583,15 +569,14 @@ export default {
                                 if(self.routeData[r_index].itemData.length==1){
                                     inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
                                         if(resGroup.errMsg=='Success'){
-                                            self.routeData.splice(r_index,1)
+
                                         }
                                     })
                                 }
-                                r_item.itemData.splice(d_index,1)
                                 self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                                 self.showSingleDeleteContent=false;
-                                // let val = 'del'
-                                // self.$emit('refreshList',val)
+                                let val = 'del'
+                                self.$emit('refreshList',val)
                             }
                         })
                     })

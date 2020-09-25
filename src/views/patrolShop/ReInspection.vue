@@ -1728,6 +1728,7 @@ export default {
         checkScore(item,itemDS,e){
             let self=this;
             console.log(item);
+            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -1777,6 +1778,7 @@ export default {
                 }
             }else{
                 isSheet2 = sheetName[0].dealCount>=1 ? true : false
+                self.hasSheet3 = sheetName[0].dealCount>=1 ? false : true
             }
             self.isDisabled = isSheet1 || isSheet2
             self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.dealCount!=item.count) ? true : false

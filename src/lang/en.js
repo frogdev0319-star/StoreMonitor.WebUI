@@ -469,10 +469,11 @@ export default {
     // confirmSubmitThis:'是否确认绑定当前巡检表自定义需确认',
     storesupervisor:'Supervisor',
     storesuperManage:'Store Manager',
-    tHeaderA:'Inspection Category(Required, 30 characters)',
+    tHeaderA:'Inspection Category(Optional, 30 characters)',
+    tHeaderA2:'Inspection Category(Required, 30 characters)',
     tHeaderB:'Inspection Items(Required, 100 characters)',
     tHeaderC:'Score(1~100points)',
-    tHeaderD:'Inspection Item Description(Required,100 characters)',
+    tHeaderD:'Inspection Item Description(Optional,1200 characters)',
     tHeaderF:'Anomaly Events-Score Threshold（Optional，1~10points）',//Sprint8 新增
     bindWith: 'Binded with ',
     bindStore: 'stores',

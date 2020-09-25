@@ -314,6 +314,7 @@ export default {
                     resolve(url);
                   })
                   .catch((err) => {
+                      reject(err)
                     console.log(err)
                   })
               })
@@ -348,6 +349,7 @@ export default {
         },
         async submit(){
             let self=this;
+            let upload=0
             let inspect=self.inspectList;
             let eventList=self.eventList;
             let status=0;
@@ -393,14 +395,18 @@ export default {
                         if(!inspect[i].inspectList[g].items[j].isIgnore){
                             for(let k in inspect[i].inspectList[g].items[j].sourceList){
                                 let obj={};
+                                let url=''
+                                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url)=>{
+                                    url=url
+                                }).catch((err)=>{
+                                    upload++
+                                })
                                 if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
-                                    let url=await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]);
                                     obj.mediaType=2;
                                     obj.url=url;
                                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
                                 }
                                 else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
-                                    let url=await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]);
                                     obj.mediaType=1;
                                     obj.url=url;
                                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
@@ -426,7 +432,13 @@ export default {
 
                 let commentTemp=[];
                 if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
-                    let url=await self.upLoadFile(self.eventList[i].sourceObj);
+                    let url=''
+                    await self.upLoadFile(self.eventList[i].sourceObj).then((url)=>{
+                        url=url
+                    }).catch((err)=>{
+                        upload++
+                    })
+                    // let url=await self.upLoadFile(self.eventList[i].sourceObj);
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
                         url:url,
@@ -449,7 +461,7 @@ export default {
                 feedback:feedEventList
             };
             let routeData=null;
-            submitInspectItem1(params).then(res=>{
+            upload==0 && submitInspectItem1(params).then(res=>{
                 if(res.errCode==0){
                     let data=res.data;
                     self.editFlag=true;
@@ -468,6 +480,8 @@ export default {
                 self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                 return false;
             })
+
+            upload!=0 && self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
         },
         getRouteData(){
             let self=this;
@@ -490,6 +504,7 @@ export default {
                     dealType.push(p_item.type)
                 }
             })
+            let Tab0Status=false
             inspect.forEach(p_item=>{
                 var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
                 p_item.inspectList.forEach(item=>{
@@ -542,22 +557,24 @@ export default {
                 })
                 if(p_item.type==0){
                     p_item['tHeader']=self.theaderPassFail
-                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)){
+                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
                         self.resultList[0].isShow=false
                         self.resultList[1].isShow=false
                         self.resultList[2].isActive=true
-                    }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1){
+                        Tab0Status=true
+                    }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
                         self.resultList[1].isShow=false
                         self.resultList[2].isShow=false
                         self.resultList[0].isActive=true
+                        Tab0Status=true
                     }
-                    p_item['height']=18+2.5*p_item.inspectList.length
+                    p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
-                    p_item['height']=18+2.5*p_item.inspectList.length
+                    p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==2){
                     p_item['tHeader']=self.theaderOther
-                    p_item['height']=18+2.5*p_item.inspectList.length
+                    p_item['height']=18+2.3*p_item.inspectList.length
                 }
             })
             let s_count=0
@@ -566,7 +583,7 @@ export default {
             }else{
                 s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
             }
-            if(dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+            if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
                 self.resultList[0].isShow=true
                 self.resultList[1].isShow=true
                 self.resultList[2].isShow=true

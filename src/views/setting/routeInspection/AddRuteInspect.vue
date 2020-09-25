@@ -340,7 +340,7 @@ export default {
             tableData:[],
             noData:'',
             groupIds:[],
-            ScoreList:[],
+            ScoreList:[1],
             Score_1:'',
             Score_2:'',
             Score_3:'',
@@ -848,6 +848,9 @@ export default {
             self.napeList.forEach((_item,_index)=>{
                 _item.isClick=false;
             })
+            self.newScore=10
+            self.newCritical=1
+            self.ScoreList=[1]
         },
         deleteNape(item){
             let self=this;

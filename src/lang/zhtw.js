@@ -471,10 +471,11 @@ export default {
     confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'門店督導',
     storesuperManage:'門店負責人',
-    tHeaderA:'巡檢類別（必填，30字符）',
+    tHeaderA:'巡檢類別（選填，30字符）',
+    tHeaderA2:'巡檢類別（必填，30字符）',
     tHeaderB:'巡檢項名稱（必填，100字符）',
     tHeaderC:'項目分值（1~100分）',
-    tHeaderD:'巡檢項目詳細說明（選填，300字符）',
+    tHeaderD:'巡檢項目詳細說明（選填，1200字符）',
     tHeaderF:'低於*分，須門店負責人處理（選填，1~10分）',//Sprint8 新增
     bindWith: '已綁定',
     bindStore: '家門店',

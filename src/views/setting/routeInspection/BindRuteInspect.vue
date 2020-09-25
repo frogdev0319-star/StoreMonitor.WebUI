@@ -37,7 +37,7 @@
             <p class="choice-device" v-else><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}{{generateInsSettingLang('total')}}{{totalCount}}
                 {{generateInsSettingLang('bindStore')}},{{generateInsSettingLang('bindWith')}}{{storeCount}}{{generateInsSettingLang('bindStore')}}</p>
             <div class="el-bind-content" :style="{'height':varyWindowHeight*0.56+'px'}">
-                <div class="bind-empty" :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0&&Havestore">
+                <div class="bind-empty" :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0&&Havestore!=0">
                     <img :src="loadingGif"/>
                     <span class="empty-text">{{generateInsSettingLang('loadingbindstore')}}</span>
                 </div>
@@ -117,7 +117,7 @@ export default {
             allCityChecked:false,
             showCityContent:false,
             showDrap:true,
-            Havestore:false,
+            Havestore:0,
             storeData:[],
             napeIdList:[],
             serachVale:'',
@@ -564,7 +564,7 @@ export default {
             }
             let resData=await self.getStoreData(params);
             let data=resData.content;
-            self.Havestore=resData.content.length>0 ? true : false
+            resData.content.length>0 ? self.Havestore++ : self.Havestore=0
             self.getStoreByCity(data);
 
             let count=0;
@@ -600,7 +600,7 @@ export default {
                     }
             let resData=await self.getStoreData(params);
             self.storeData=resData.content;
-            self.Havestore=resData.content.length>0 ? true : false
+            resData.content.length>0 ? self.Havestore++ : self.Havestore=0
             self.getStoreByCity(self.storeData);
 
             self.totalCount=resData.totalElements;
@@ -960,7 +960,7 @@ export default {
     },
     mounted(){
         let self=this;
-        self.InitData();
+        // self.InitData();
         self.getCountryStore()
         self.getTagListData()
     }
