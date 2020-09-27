@@ -497,14 +497,8 @@ export default {
                                 objChild.checked=false;
                                 objChild.name=itemChild.subject;
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
-                                if(self.lang == 'en'){
                                 objChild.score=itemChild.itemScore ;
-                                objChild.qualifiedScore=itemChild.qualifiedScore ;
-                                }
-                                else{
-                                objChild.score=itemChild.itemScore + " " + self.$t('insSettingView.scores');
-                                objChild.qualifiedScore=itemChild.qualifiedScore + " " + self.$t('insSettingView.scores');
-                                }
+                                objChild.qualifiedScore=itemChild.qualifiedScore
 
                                 tempChild.push(objChild);
                             })
@@ -1140,7 +1134,13 @@ export default {
                     if((outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others!=undefined)||(outdata.PassFail!=undefined&&outdata.Score==undefined&&outdata.Others!=undefined)){
                         _this.$refs.loadFile.value = ''
                         _this.$refs.loadFileEx.value = '';
-                        _this.notify(_this.$t('insSettingView.OnlyOthers'),'warning',3000);
+                        let msg=''
+                        if(_this.lang=='en'){
+                            msg = _this.$t('insSettingView.OnlyOthers')
+                        }else{
+                            msg = '【Score】' + _this.$t('insSettingView.beforeImport')
+                        }
+                        _this.notify(msg,'warning',3000);
                         return false;
                     }
                     outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others==undefined ? flagTempError=true : flagTempError=false

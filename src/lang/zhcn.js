@@ -463,6 +463,7 @@ export default {
   // Inspection Management page language
   insSettingView:{
     OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8
+    beforeImport:'sheet页内容不能为空',//Sprint8
     Ratingitems:'评级项目',//Sprint8
     Addscoreitems:'附加评分项目',//Sprint8
     selecttitle:'请选择关联职务',

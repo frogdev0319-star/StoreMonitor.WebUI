@@ -143,7 +143,7 @@
                        <div class="nape-name-title" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
                            <span>{{generateInsSettingLang('inspectName')}}</span>
                        </div>
-                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:3;':(activeSheetName=='2'?'flex:4;':'flex:3;')">
+                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:3;':(activeSheetName=='2'?'flex:4;':'flex:3.3;')">
                            <span :style="activeSheetName=='1'?'left:5%;':(activeSheetName=='2'?'left:2%;':'')">{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
                        <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;">
@@ -340,7 +340,7 @@ export default {
             tableData:[],
             noData:'',
             groupIds:[],
-            ScoreList:[1],
+            ScoreList:[1,2,3,4,5,6,7,8,9,10],
             Score_1:'',
             Score_2:'',
             Score_3:'',
@@ -850,7 +850,7 @@ export default {
             })
             self.newScore=10
             self.newCritical=1
-            self.ScoreList=[1]
+            self.ScoreList=[1,2,3,4,5,6,7,8,9,10]
         },
         deleteNape(item){
             let self=this;
@@ -1069,6 +1069,8 @@ export default {
             self.napeDepTemp=item.napeDep;
             item.isClick=true;
             self.showAddNape=false;
+            let arr=[1,2,3,4,5,6,7,8,9,10]
+            self.ScoreList=arr.slice(0,item.Score_2)
             //item.napeName=item.napeNameShow.slice(indexOf(',')+1);
             self.napeList.forEach((_item,_index)=>{
                 if(index!=_index){
@@ -1745,7 +1747,7 @@ export default {
             .nape-score1-title{
                 display: inline-block;
                 min-width: 117px;
-                @media screen and (max-width: 1515px){
+                @media screen and (max-width: 1450px){
                     line-height:20px;
                     padding-top:10px;
                 }
@@ -1754,7 +1756,7 @@ export default {
                 display: inline-block;
                 span{
                     position: relative;
-                    left: 0%;
+                    left: 5%;
                 }
             }
             .en-nape-handle-title{

@@ -332,6 +332,7 @@ export default {
                     resolve(url);
                   })
                   .catch((err) => {
+                      reject(err)
                     console.log(err)
                   })
               })
@@ -401,6 +402,10 @@ export default {
                                 }).catch((err)=>{
                                     upload++
                                 })
+                                if(upload!=0){
+                                    self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
+                                    return false
+                                }
                                 if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
                                     obj.mediaType=2;
                                     obj.url=url;
@@ -438,7 +443,10 @@ export default {
                     }).catch((err)=>{
                         upload++
                     })
-                    // let url=await self.upLoadFile(self.eventList[i].sourceObj);
+                    if(upload!=0){
+                        self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
+                        return false
+                    }
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
                         url:url,
@@ -480,8 +488,6 @@ export default {
                 self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                 return false;
             })
-
-            upload!=0 && self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
         },
         getRouteData(){
             let self=this;
