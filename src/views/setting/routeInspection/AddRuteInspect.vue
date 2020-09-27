@@ -1180,7 +1180,9 @@ export default {
                     }
                 })
             })
-            self.ModelPost = temp[0].ModelPost
+            if(self.ModelPost.length==0){
+                self.ModelPost = temp[0].ModelPost
+            }
             let te_temp=[]
             let type_temp=[]
             let sheetTemp=[]
