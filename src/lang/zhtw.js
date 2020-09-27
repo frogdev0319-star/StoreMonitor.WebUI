@@ -471,6 +471,7 @@ export default {
   // Inspection Management page language
   insSettingView:{
     OnlyOthers:'【巡檢評分項】sheet頁內容不能為空',//Sprint8 新增
+    beforeImport:'sheet頁內容不能為空',//Sprint8
     Ratingitems:'評級項目',//Sprint8
     Addscoreitems:'附加評分項目',//Sprint8
     selecttitle:'請選擇關聯職務',

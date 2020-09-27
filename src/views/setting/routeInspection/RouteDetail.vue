@@ -105,8 +105,16 @@
                                     </el-table-column>
                                     <el-table-column prop="name" width="300px"></el-table-column>
                                     <el-table-column prop="description" :min-width="sheetName.some(x=>x.id==0&&x.isClick)?'40%':'23%'"></el-table-column>
-                                    <el-table-column prop="score" align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)||sheetName.some(x=>x.id==2&&x.isClick)" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'"></el-table-column>
-                                    <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="sheetName.some(x=>x.id==1&&x.isClick)"></el-table-column>
+                                    <el-table-column prop="score" align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)||sheetName.some(x=>x.id==2&&x.isClick)" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'">
+                                         <template slot-scope="scope">
+                                            <span>{{scope.row.score}}{{$t('insSettingView.scores')}}</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="sheetName.some(x=>x.id==1&&x.isClick)">
+                                        <template slot-scope="scope">
+                                            <span>{{scope.row.qualifiedScore}}{{$t('insSettingView.scores')}}</span>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="handle" min-width="6%">
                                         <template slot-scope="scope">
                                                 <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
