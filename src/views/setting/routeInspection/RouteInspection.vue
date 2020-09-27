@@ -238,6 +238,7 @@ export default {
             curIndex:'id0',
             showBtnContent:false,
             showSingleDeleteContent:false,
+            reload:true,
             storeNum:0,
             // BindStoreList:[],
             activeName:'',
@@ -450,7 +451,11 @@ export default {
         },
         changerouteData(val){
             let self=this;
-            self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData=val
+            // self.reload=false
+            // self.$nextTick(() => {
+                // self.reload=true
+                   self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData=val
+	      	// })
         },
         async getTagList(val){
             let self=this;
@@ -962,16 +967,16 @@ export default {
             let ret= self.isLoginIn();
             console.log(ret);
             let Datalength = self.elTableData[Number(self.activeName)].data.length
-            if(Number(self.activeName)==0&&Datalength>=10){
-                    self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
-                    return false;
-            }else if(Number(self.activeName)==1&&Datalength>=10){
-                    self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
-                    return false;
-            }else{
+            // if(Number(self.activeName)==0&&Datalength>=10){
+            //         self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
+            //         return false;
+            // }else if(Number(self.activeName)==1&&Datalength>=10){
+            //         self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
+            //         return false;
+            // }else{
                     self.showNameImport=true
                     self.ImportName=''
-            }
+            // }
             // if(ret.data!=undefined&&ret.data.isLogin){
             //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){
             //         self.showConfirmImport=true;
@@ -1264,8 +1269,8 @@ export default {
                             }
                         }else{
                             if(outdata.PassFail.length!=0){
-                                arrsheet1 = outdata.PassFail
-                                arrsheet1[0].a = '评级项目'
+                                arrsheet1.push(outdata.PassFail)
+                                arrsheet1[0][0].a = _this.$t('insSettingView.Ratingitems')
                             }
                         }
                     }
@@ -1285,8 +1290,8 @@ export default {
                             }
                         }else{
                             if(outdata.Others.length!=0){
-                                arrsheet3 = outdata.Others
-                                arrsheet3[0].a = '附加评分项目'
+                                arrsheet3.push(outdata.Others)
+                                arrsheet3[0][0].a = _this.$t('insSettingView.Addscoreitems')
                             }
                         }
                     }
@@ -1331,7 +1336,7 @@ export default {
             var that = this;
             require.ensure([], () => {
                 const { export_json_to_excel } = require('@/excel/Export2Excel');
-                const tHeader = [that.$t('insSettingView.tHeaderA'),that.$t('insSettingView.tHeaderB'),that.$t('insSettingView.tHeaderC'),that.$t('insSettingView.tHeaderD'),that.$t('insSettingView.tHeaderF')]
+                const tHeader = [that.$t('insSettingView.tHeaderA'),that.$t('insSettingView.tHeaderB'),that.$t('insSettingView.tHeaderC'),that.$t('insSettingView.tHeaderD'),that.$t('insSettingView.tHeaderF'),that.$t('insSettingView.tHeaderA2')]
                 let excelData=[];
                 let name = '';
                 var wb = XLSX.utils.book_new();
@@ -1383,10 +1388,10 @@ export default {
                                 item.itemData.forEach((_item,_index)=>{
                                     let obj={};
                                     if(_index==0){
-                                        obj[tHeader[0]]=item.groupName;
+                                        obj[tHeader[5]]=item.groupName;
                                     }
                                     else{
-                                        obj[tHeader[0]]='';
+                                        obj[tHeader[5]]='';
                                     }
                                     obj[tHeader[1]]=_item.name;
                                     obj[tHeader[2]]=_item.score;
@@ -1396,7 +1401,7 @@ export default {
                                 })
                             }else{
                                 let obj={};
-                                obj[tHeader[0]]=item.groupName;
+                                obj[tHeader[5]]=item.groupName;
                                 obj[tHeader[1]]='';
                                 obj[tHeader[2]]='';
                                 obj[tHeader[4]]=_item.qualifiedScore

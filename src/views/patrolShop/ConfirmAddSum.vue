@@ -60,7 +60,7 @@
                             <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfQualified}}</span></td>
                             <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfUnqualified}}</span></td>
                             <td v-if="s_item.type==1"><span>{{item.itemScore}}</span></td>
-                            <td v-if="s_item.type==1||s_item.type==2"><span>{{item.numIgnore}}</span></td>
+                            <td><span>{{item.numIgnore}}</span></td>
                             <td v-if="s_item.type==1||s_item.type==2"><span>{{item.itemgetScore}}</span></td>
                         </tr>
                     </tbody>
@@ -132,6 +132,13 @@
                 </el-col>
             </el-row>
         </el-col>
+        <el-dialog :visible.sync="uploadProgress" width="510px" top="35vh" left="40vh" class="AddSumupLoad" :close-on-click-modal="false">
+            <div class="body-content">
+                <p>正在上传中</p>
+                <p style="margin-bottom:15px;">共<span>{{totalnumOfPic}}</span>个附件，已上传<span>{{uploadingnumOfPic}}</span>个</p>
+                <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"></el-progress>
+            </div>
+        </el-dialog>
     </el-row>
 </template>
 <script>
@@ -148,6 +155,9 @@ export default {
     data(){
         return{
             dialogCommentVideo:false,
+            uploadProgress:false,
+            totalnumOfPic:0,
+            uploadingnumOfPic:0,
             showOuter:false,
             showImg:false,
             checkImgSrc:'',
@@ -179,19 +189,20 @@ export default {
             deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
             theaderPassFail:[
                 {name: '',width:'width:11%;'},
-                {name: this.$t('remotePatrol.item'),width:'width:22.2%;'},
-                {name: this.$t('remotePatrol.pass'),width:'width:35%;'},
-                {name: this.$t('remotePatrol.failed'),width:'width:35%;'}
+                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.pass'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.failed'),width:'width:20%;'},
+                {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'}
             ],
             theaderScore:[
-                {name: '',width:'width:10%;'},
+                {name: '',width:'width:11%;'},
                 {name: this.$t('remotePatrol.item'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.TableTotal'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.TableGet'),width:'width:20%;'}
             ],
             theaderOther:[
-                {name: '',width:'width:10%;'},
+                {name: '',width:'width:11%;'},
                 {name: this.$t('remotePatrol.item'),width:'width:20%;'},
                 {name: this.$t('remotePatrol.pass'),width:'width:15%;'},
                 {name: this.$t('remotePatrol.failed'),width:'width:15%;'},
@@ -306,14 +317,32 @@ export default {
                     self.percentage = percentage
                   }
                 })
-                  .then((results) => {
-                    // 上传完成
-                    const url = self.getFileUrl(results.name);
-                    console.log(url);
-                    resolve(url);
-                  })
-                  .catch((err) => {
-                    console.log(err)
+                //   .then((results) => {
+                //     // 上传完成
+                //     const url = self.getFileUrl(results.name);
+                //     console.log(url);
+                //     resolve(url);
+                //   })
+                //   .catch((err) => {
+                //       reject(err)
+                //     console.log(err)
+                //   })
+                  .then(
+                    function(response){
+                        // 上传完成
+                        const url = self.getFileUrl(results.name);
+                        console.log(url);
+                        resolve(url);
+                    },
+                    function(error){
+                        debugger
+                        throw(error)
+                    }
+                  )
+                  .catch((error) => {
+                      debugger
+                      reject(error)
+                    console.log(error)
                   })
               })
             }
@@ -323,14 +352,25 @@ export default {
               let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
               return new Promise((resolve,reject)=>{
                 azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-                  .then((results) => {
+                //   .then((results) => {
                     // 上传完成
-                    const url = self.getFileUrl(fileItem.fileName);
-                    console.log(url);
-                    resolve(url);
-                  })
-                  .catch((err) => {
-                    console.log(err)
+                    // const url = self.getFileUrl(fileItem.fileName);
+                    // console.log(url);
+                    // resolve(url);
+                .then(
+                    function(response){
+                        // 上传完成
+                        const url = self.getFileUrl(fileItem.fileName);
+                        console.log(url);
+                        resolve(url);
+                    },
+                    function(error){
+                        throw(error)
+                    }
+                  )
+                  .catch((error) => {
+                      reject(error)
+                    console.log(error)
                   })
               })
             }
@@ -347,10 +387,12 @@ export default {
         },
         async submit(){
             let self=this;
+            let upload=0
             let inspect=self.inspectList;
             let eventList=self.eventList;
             let status=0;
             let flag=false;
+            self.uploadingnumOfPic=0
             self.resultList.forEach(item=>{
                 if(item.isActive){
                     flag=true;
@@ -364,6 +406,7 @@ export default {
               self.notify(self.$t('remotePatrol.suggestEmpty'),'warning',3000);
               return false;
             }
+            self.totalnumOfPic>0 ? self.uploadProgress=true : self.uploadProgress=false
             let storageParams = {};
             storageParams.storeId = self.store.storeId;
             //上传文件时获取门店对应的BucketName
@@ -392,14 +435,24 @@ export default {
                         if(!inspect[i].inspectList[g].items[j].isIgnore){
                             for(let k in inspect[i].inspectList[g].items[j].sourceList){
                                 let obj={};
+                                let url=''
+                                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url)=>{
+                                    url=url
+                                    self.uploadingnumOfPic++
+                                }).catch((err)=>{
+                                    upload++
+                                })
+                                if(upload!=0){
+                                    self.uploadProgress=false
+                                    self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
+                                    return false
+                                }
                                 if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
-                                    let url=await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]);
                                     obj.mediaType=2;
                                     obj.url=url;
                                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
                                 }
                                 else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
-                                    let url=await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]);
                                     obj.mediaType=1;
                                     obj.url=url;
                                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
@@ -425,7 +478,18 @@ export default {
 
                 let commentTemp=[];
                 if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
-                    let url=await self.upLoadFile(self.eventList[i].sourceObj);
+                    let url=''
+                    await self.upLoadFile(self.eventList[i].sourceObj).then((url)=>{
+                        url=url
+                        self.uploadingnumOfPic++
+                    }).catch((err)=>{
+                        upload++
+                    })
+                    if(upload!=0){
+                        self.uploadProgress=false
+                        self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
+                        return false
+                    }
                     let commentObj={
                         mediaType:self.eventList[i].sourceObj.mediaType,
                         url:url,
@@ -448,7 +512,7 @@ export default {
                 feedback:feedEventList
             };
             let routeData=null;
-            submitInspectItem1(params).then(res=>{
+            upload==0 && submitInspectItem1(params).then(res=>{
                 if(res.errCode==0){
                     let data=res.data;
                     self.editFlag=true;
@@ -467,6 +531,7 @@ export default {
                 self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                 return false;
             })
+            self.uploadProgress=false
         },
         getRouteData(){
             let self=this;
@@ -482,8 +547,14 @@ export default {
             self.store=store;
             self.inspectList=routeData.inspect;
             self.eventList=routeData.event;
-            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[]
+            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[],dealType=[]
             let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,allpassfailCount=0
+            inspect.forEach(p_item=>{
+                if(p_item.dealCount!=0){
+                    dealType.push(p_item.type)
+                }
+            })
+            let Tab0Status=false
             inspect.forEach(p_item=>{
                 var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
                 p_item.inspectList.forEach(item=>{
@@ -510,6 +581,7 @@ export default {
                         if(p_item.type==1){
                             totalScore+=s_item.itemScore
                         }
+                        self.totalnumOfPic+=s_item.sourceList.length
                     })
                     item['numOfQualified']=QualifiedArr.length
                     item['numOfUnqualified']=UnqualifiedArr.length
@@ -519,9 +591,9 @@ export default {
                     item['notIgnoreTotalscore']=notIgnoreTotalscore
                     if(p_item.type==0){
                         CurPassfailQualified += item.numOfQualified
-                        CurpassfailCount += p_item.count
+                        CurpassfailCount += item.numOfUnqualified
                         getpassfailQualifiedTotal=CurPassfailQualified
-                        allpassfailCount=CurpassfailCount
+                        allpassfailCount=Number(CurpassfailCount+CurPassfailQualified)
                     }
                     if(p_item.type==1){
                         CurItemgetScore += totalGetscore
@@ -536,28 +608,39 @@ export default {
                 })
                 if(p_item.type==0){
                     p_item['tHeader']=self.theaderPassFail
-                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)){
+                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
                         self.resultList[0].isShow=false
                         self.resultList[1].isShow=false
                         self.resultList[2].isActive=true
+                        Tab0Status=true
+                    }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
+                        self.resultList[1].isShow=false
+                        self.resultList[2].isShow=false
+                        self.resultList[0].isActive=true
+                        Tab0Status=true
                     }
-                    p_item['height']=18
+                    p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
-                    p_item['height']=18
+                    p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==2){
                     p_item['tHeader']=self.theaderOther
-                    p_item['height']=18
+                    p_item['height']=18+2.3*p_item.inspectList.length
                 }
             })
             let s_count=0
-            if(inspect.length==1&&inspect[0].type==0){
+            if(dealType.length==1&&dealType[0]==0){
                 s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100)
-                self.resultList[1].isShow=false
-                self.resultList[2].isShow=false
-                self.resultList[0].isActive=true
             }else{
                 s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+            }
+            if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+                self.resultList[0].isShow=true
+                self.resultList[1].isShow=true
+                self.resultList[2].isShow=true
+                self.resultList[0].isActive=false
+                self.resultList[1].isActive=false
+                self.resultList[2].isActive=false
             }
             self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
             self.summary=inspect
@@ -682,6 +765,17 @@ $h1:#292e36;
 }
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
+}
+.AddSumupLoad /deep/ .el-dialog__body{
+    padding:30px 40px !important;
+    text-align: left;
+    .body-content{
+        p{
+            margin-bottom:0;
+            color:#182752;
+            font-size: calc(14/1920*100vw);
+        }
+    }
 }
 .dialog-source-content{
             @include point(height,320);
@@ -1242,6 +1336,9 @@ $h1:#292e36;
 
 </style>
 <style>
+.AddSumupLoad .el-dialog__header{
+        display: none !important;
+    }
   .el-menuscrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }

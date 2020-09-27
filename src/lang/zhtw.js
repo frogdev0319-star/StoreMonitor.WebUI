@@ -198,14 +198,15 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    TableTotal:'项目总分值',//Sprint8 新增
-    TableIgnore:'不适用数量',//Sprint8 新增
+    TableTotal:'項目總分值',//Sprint8 新增
+    TableIgnore:'不適用',//Sprint8 新增
     TableGet:'得分',//Sprint8 新增
-    alertContent:'合格率评估项为必填，巡检项评估项至少填写一项',//Sprint8 新增
-    clickToContent:'部分巡检未评估，点击查看',//Sprint8 新增
-    hasIgnoreContent:'本次巡检，未巡检项目',//Sprint8 新增
-    backToallsheet:'返回巡检表',//Sprint8 新增
-    scoreU:'单位：个',//Sprint8 新增
+    alertContent:'請評估所有巡檢項',//Sprint8 新增
+    alertTips1:'巡檢評分項至少填寫1項',//Sprint8 新增
+    clickToContent:'部分巡檢未評估，點擊查看！',//Sprint8 新增
+    hasIgnoreContent:'本次巡檢，未巡檢項目',//Sprint8 新增
+    backToallsheet:'返回巡檢表',//Sprint8 新增
+    scoreU:'單位：個',//Sprint8 新增
     Patroltips2:'此巡檢錶名稱已存在',
     stared: '已關注',
     clickToStar: '點擊關注',
@@ -380,7 +381,7 @@ export default {
   reportView:{
     selectStores: '選擇門店',
     country: '國家/地區',
-    selectStoreTag:'标签快选',//Sprint8 新增
+    selectStoreTag:'標籤快選',//Sprint8 新增
     regionI: '區域一',
     regionII: '區域二',
     stores: '門店',
@@ -469,17 +470,20 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-    OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8 新增
+    OnlyOthers:'【巡檢評分項】sheet頁內容不能為空',//Sprint8 新增
+    Ratingitems:'評級項目',//Sprint8
+    Addscoreitems:'附加評分項目',//Sprint8
     selecttitle:'請選擇關聯職務',
     storeNoInspect:'此門店尚未綁定遠程巡檢表',
     confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'門店督導',
     storesuperManage:'門店負責人',
-    tHeaderA:'巡檢類別（必填，30字符）',
+    tHeaderA:'巡檢類別（選填，30字符）',
+    tHeaderA2:'巡檢類別（必填，30字符）',
     tHeaderB:'巡檢項名稱（必填，100字符）',
     tHeaderC:'項目分值（1~100分）',
-    tHeaderD:'巡檢項目詳細說明（選填，300字符）',
-    tHeaderF:'低于*分，需由门店负责人处理（必填，1~10分）',//Sprint8 新增
+    tHeaderD:'巡檢項目詳細說明（選填，1200字符）',
+    tHeaderF:'低於*分，須門店負責人處理（選填，1~10分）',//Sprint8 新增
     bindWith: '已綁定',
     bindStore: '家門店',
     bindList: '巡檢表綁定',
@@ -494,16 +498,16 @@ export default {
     Inspector:'請選擇巡檢人',
     inspectName: '巡檢名稱',
     inspectionDescp: '巡檢項要求描述',
-    sheetscore0: '项目满分值',//Sprint8 新增
-    sheetscore1: '低于*分，须由门店负责人处理',//Sprint8 新增
-    sheetscore2: '项目分值(必填，-100分~100分)',//Sprint8 新增
-    sheetpassfail:'合格率评估项',//Sprint8 新增
-    sheetscore:'巡检评估项',//Sprint8 新增
-    sheetother:'附加项',//Sprint8 新增
-    notAllowAdd:'Pass&Fail  and Others Tab无法组成有效的巡检表，不允许新增！',//Sprint8 新增
-    notallowdeletetips:'存在无效的巡检表Tab组合，不允许删除！',//Sprint8 新增
-    notallowA:'合格率评估项和附加项',//Sprint8 新增
-    notallowB:'附加项',//Sprint8 新增
+    sheetscore0: '項目總分值',//Sprint8 新增
+    sheetscore1: '低於*分，須門店負責人處理',//Sprint8 新增
+    sheetscore2: '項目分值（必填，-100分~100分）',//Sprint8 新增
+    sheetpassfail:'合格率評估項',//Sprint8 新增
+    sheetscore:'巡檢評分項',//Sprint8 新增
+    sheetother:'附加評分項',//Sprint8 新增
+    notAllowAdd:'[Pass-Failed] 和 [Others]Tab無法組成有效的巡檢表，不允許新增！',//Sprint8 新增
+    notallowdeletetips:'存在無效的巡檢表Tab組合，不允許刪除！',//Sprint8 新增
+    notallowA:'合格率評估項和附加評分項',//Sprint8 新增
+    notallowB:'附加評分項',//Sprint8 新增
     score: '項目分值',
     selectImprtLoc: '請選擇導入檔案的位置',
     enterListName: '請輸入巡檢表名稱',
@@ -530,12 +534,12 @@ export default {
     templateError: '巡檢表模板錯誤！',
     excelLongCategory: '巡檢類別長度不可超過30個字元！',
     excelIllegalCategory: '存在“@#￥%^&*”非法字符！',
-    excelEmpty: '巡檢類別與巡檢項不能為空！',
+    excelEmpty: '巡檢類別與巡檢項名稱不能為空',
     passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
-    excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
-    excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
-    excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
-    bindingstore:'绑定中',//Sprint8 新增
+    excelFullScoreType:'項目總分值必填，取值範圍為1~10的整數',//Sprint8 新增
+    excelMinScoreType:'巡檢項最低分值必填，取值範圍為1~項目總分值的整數',//Sprint8 新增
+    excelOtherScoreType:'項目分值必填，取值範圍為-100~100的整數',//Sprint8 新增
+    bindingstore:'綁定中',//Sprint8 新增
     excelLongItem: '巡檢項長度不可超過100個字元！',
     excelIllegalDes: '巡檢項目詳細說明不可超過300個字元！',
     deleteItem: '刪除巡檢項',
@@ -575,7 +579,7 @@ export default {
     description: '巡檢項需求描述',
     descriptionRuletip:'最多可輸入1200個字元',
     titleEmpty: '類別名稱不能為空！',
-    ScoreEmpty:'项目分值不能为空',//Sprint8 新增
+    ScoreEmpty:'項目分值不能為空',//Sprint8 新增
     illegalStr: '當前輸入含有非法字元！',
     remotePatrol: '遠端巡檢',
     onsitePatrol: '現場巡檢',

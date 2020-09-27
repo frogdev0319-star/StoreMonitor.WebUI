@@ -54,9 +54,9 @@
                     <tbody>
                         <tr>
                             <td :rowspan="s_item.length+1">
-                                <span v-if="s_item[0].type==0" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetpassfail')}}</span>
-                                <span v-if="s_item[0].type==1" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetscore')}}</span>
-                                <span v-if="s_item[0].type==2" :style="'line-height:'+18*s_item.length+'px;'">{{$t('insSettingView.sheetother')}}</span>
+                                <span v-if="s_item[0].type==0" :style="'line-height:'+Number(18+2.3*s_item.length)*s_item.length+'px;'">{{$t('insSettingView.sheetpassfail')}}</span>
+                                <span v-if="s_item[0].type==1" :style="'line-height:'+Number(18+2.3*s_item.length)*s_item.length+'px;'">{{$t('insSettingView.sheetscore')}}</span>
+                                <span v-if="s_item[0].type==2" :style="'line-height:'+Number(18+2.3*s_item.length)*s_item.length+'px;'">{{$t('insSettingView.sheetother')}}</span>
                             </td>
                         </tr>
                         <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
@@ -64,7 +64,7 @@
                             <td v-if="item.type==0||item.type==2"><span>{{item.numOfQualifiedItems}}</span></td>
                             <td v-if="item.type==0||item.type==2"><span>{{item.numOfUnqualifiedItems}}</span></td>
                             <td v-if="item.type==1"><span>{{item.totalScore}}</span></td>
-                            <td v-if="item.type==1||item.type==2"><span>{{item.numOfIgnored}}</span></td>
+                            <td><span>{{item.numOfIgnored}}</span></td>
                             <td v-if="item.type==1||item.type==2"><span>{{item.actualScore}}</span></td>
                         </tr>
                     </tbody>
@@ -160,7 +160,7 @@
               <div style="margin-bottom:20px;" v-if="showFeedBacks">
                 <div class="content-title">{{$t('remotePatrol.feedbacks')}}</div>
                 <div class="content-detail" v-for="(item,index) in feedbacks" :key="index">
-                  <div class="content-detail-title" style="background-color:#fff;height:30px;">
+                  <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
                     <div class="detail-title">
                       <p class="title1">{{index+1}}.{{item.subject}}</p>
                     </div>
@@ -317,19 +317,20 @@
         deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
         theaderPassFail:[
             {name: '',width:'width:11%;'},
-            {name: this.$t('remotePatrol.item'),width:'width:22.2%;'},
-            {name: this.$t('remotePatrol.pass'),width:'width:35%;'},
-            {name: this.$t('remotePatrol.failed'),width:'width:35%;'}
+            {name: this.$t('remotePatrol.item'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.pass'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.failed'),width:'width:20%;'},
+            {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'}
         ],
         theaderScore:[
-            {name: '',width:'width:10%;'},
+            {name: '',width:'width:11%;'},
             {name: this.$t('remotePatrol.item'),width:'width:20%;'},
             {name: this.$t('remotePatrol.TableTotal'),width:'width:20%;'},
             {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'},
             {name: this.$t('remotePatrol.TableGet'),width:'width:20%;'}
         ],
         theaderOther:[
-            {name: '',width:'width:10%;'},
+            {name: '',width:'width:11%;'},
             {name: this.$t('remotePatrol.item'),width:'width:20%;'},
             {name: this.$t('remotePatrol.pass'),width:'width:15%;'},
             {name: this.$t('remotePatrol.failed'),width:'width:15%;'},
@@ -989,6 +990,7 @@
           display: flex;
         }
         span:first-child {
+          width:80px;
           padding-right: calc(20 / 1920 * 100vw);
         }
       }
@@ -1184,6 +1186,7 @@
               padding-right: calc(20 / 1920 * 100vw);
               margin-bottom: 30px;
               color: #4b5262;
+              display: flex;
               .item-blag {
                 width: calc(12 / 1920 * 100vw);
                 height: calc(12 / 1920 * 100vw);
@@ -1191,6 +1194,10 @@
                 background-color: $tab;
                 display: inline-block;
                 margin-right: calc(16 / 1920 * 100vw);
+              }
+              .item-name{
+                flex: 1;
+                margin-top:-3px;
               }
               .item-des {
                 display: block;

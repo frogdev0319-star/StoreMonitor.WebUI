@@ -297,7 +297,7 @@ export default {
     data(){
         return{
             newScore:10,
-            newCritical:10,
+            newCritical:1,
             newAddScore:0,
             firstLoad:true,
             groupTitle: this.$t('insSettingView.category'),
@@ -340,7 +340,7 @@ export default {
             tableData:[],
             noData:'',
             groupIds:[],
-            ScoreList:[],
+            ScoreList:[1],
             Score_1:'',
             Score_2:'',
             Score_3:'',
@@ -848,6 +848,9 @@ export default {
             self.napeList.forEach((_item,_index)=>{
                 _item.isClick=false;
             })
+            self.newScore=10
+            self.newCritical=1
+            self.ScoreList=[1]
         },
         deleteNape(item){
             let self=this;
@@ -972,8 +975,13 @@ export default {
                 itemScore=10
                 qualifiedScore=null
             }else if(self.activeSheetName=='1'){
-                itemScore=self.newScore
-                qualifiedScore=self.newCritical
+                if(self.newCritical>self.newScore){
+                    self.notify(self.$t('insSettingView.excelMinScoreType'),'warning',3000);
+                    return false;
+                }else{
+                    itemScore=self.newScore
+                    qualifiedScore=self.newCritical
+                }
             }else if(self.activeSheetName=='2'){
                 if(self.newAddScore>100||self.newAddScore<-100){
                     self.notify(self.$t('insSettingView.sheetscore2'),'warning',3000);

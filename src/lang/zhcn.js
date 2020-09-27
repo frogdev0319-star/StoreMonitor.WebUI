@@ -57,7 +57,7 @@ export default {
     loginAbnormal: '登录信息异常，请重新登录！'
   },
   overview:{
-    averageScore:'平均分',//Sprint8 新增
+    averageScore:'平均分',//Sprint8
     everydays:'每',
     act:'执行',
     daysww:'号',
@@ -198,14 +198,15 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    TableTotal:'项目总分值',//Sprint8 新增
-    TableIgnore:'不适用数量',//Sprint8 新增
-    TableGet:'得分',//Sprint8 新增
-    alertContent:'合格率评估项为必填，巡检评估项至少填写一项',//Sprint8 新增
-    clickToContent:'部分巡检未评估，点击查看',//Sprint8 新增
-    hasIgnoreContent:'本次巡检，未巡检项目',//Sprint8 新增
-    backToallsheet:'返回巡检表',//Sprint8 新增
-    scoreU:'单位：个',//Sprint8 新增
+    TableTotal:'项目总分值',//Sprint8
+    TableIgnore:'不适用',//Sprint8
+    TableGet:'得分',//Sprint8
+    alertContent:'请评估所有巡检项',//Sprint8 新增
+    alertTips1:'巡检评分项至少填写1项',//Sprint8
+    clickToContent:'部分巡检未评估，点击查看！',//Sprint8
+    hasIgnoreContent:'本次巡检，未巡检项目',//Sprint8
+    backToallsheet:'返回巡检表',//Sprint8
+    scoreU:'单位：个',//Sprint8
     Patroltips2:'此巡检表名称已存在',
     stared: '已关注',
     clickToStar: '点击关注',
@@ -379,7 +380,7 @@ export default {
   reportView:{
     selectStores: '门店选择',
     country: '国家/地区',
-    selectStoreTag:'标签快选',//Sprint8 新增
+    selectStoreTag:'标签快选',//Sprint8
     regionI: '区域一',
     regionII: '区域二',
     stores: '门店',
@@ -423,12 +424,12 @@ export default {
 
   // event Management page language
   eventView:{
-    enclosure:'附件',//Sprint8 新增
     ProcessedEvent:'已处理事件',//Sprint9 新增
     ClosedEvent:'已结案事件',//Sprint9 新增
     ReturnEvent:'退回再处理事件',//Sprint9 新增
     returnStatus:'退回',//Sprint9 新增
     Returned:'已退回',//Sprint9 新增
+    enclosure:'附件',//Sprint8
     status: '处理状态',
     all : '全部',
     pending: '未处理',
@@ -468,17 +469,20 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-    OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8 新增
+    OnlyOthers:'【巡检评分项】sheet页内容不能为空',//Sprint8
+    Ratingitems:'评级项目',//Sprint8
+    Addscoreitems:'附加评分项目',//Sprint8
     selecttitle:'请选择关联职务',
     storeNoInspect:'此门店尚未绑定远程巡检表',
     confirmSubmitThis:'是否确认绑定当前巡检表',
     storesupervisor:'门店督导',
     storesuperManage:'门店负责人',
-    tHeaderA:'巡检类别（必填，30字符）',
+    tHeaderA:'巡检类别（选填，30字符）',
+    tHeaderA2:'巡检类别（必填，30字符）',
     tHeaderB:'巡检项名称（必填，100字符）',
     tHeaderC:'项目满分值（1~100分）',
-    tHeaderD:'巡检项目详细说明（选填，300字符）',
-    tHeaderF:'低于*分，需由门店负责人处理（必填，1~10分）',//Sprint8 新增
+    tHeaderD:'巡检项目详细说明（选填，1200字符）',
+    tHeaderF:'低于*分，须门店负责人处理（选填，1~10分）',//Sprint8
     bindWith: '已绑定',
     bindStore: '家门店',
     bindList: '巡检表绑定',
@@ -493,16 +497,16 @@ export default {
     Inspector:'请选择巡检人',
     inspectName: '巡检名称',
     inspectionDescp: '巡检项要求描述',
-    sheetscore0: '项目满分值',//Sprint8 新增
-    sheetscore1: '低于*分，须由门店负责人处理',//Sprint8 新增
-    sheetscore2: '项目分值(必填，-100分~100分)',//Sprint8 新增
-    sheetpassfail:'合格率评估项',//Sprint8 新增
-    sheetscore:'巡检评估项',//Sprint8 新增
-    sheetother:'附加项',//Sprint8 新增
-    notAllowAdd:'Pass&Fail  and Others Tab无法组成有效的巡检表，不允许新增！',//Sprint8 新增
-    notallowdeletetips:'存在无效的巡检表Tab组合，不允许删除！',//Sprint8 新增
-    notallowA:'合格率评估项和附加项',//Sprint8 新增
-    notallowB:'附加项',//Sprint8 新增
+    sheetscore0: '项目总分值',//Sprint8
+    sheetscore1: '低于*分，须门店负责人处理',//Sprint8
+    sheetscore2: '项目分值(必填，-100分~100分)',//Sprint8
+    sheetpassfail:'合格率评估项',//Sprint8
+    sheetscore:'巡检评分项',//Sprint8
+    sheetother:'附加评分项',//Sprint8
+    notAllowAdd:' [Pass-Failed] 和 [Others]Tab无法组成有效的巡检表，不允许新增！',//Sprint8
+    notallowdeletetips:'存在无效的巡检表Tab组合，不允许删除！',//Sprint8
+    notallowA:'合格率评估项和附加评分项',//Sprint8
+    notallowB:'附加评分项',//Sprint8
     selectImprtLoc: '请选择导入文件的位置',
     enterListName: '请输入巡检表名称',
     enterItemName: '请输入巡检项名称',
@@ -528,12 +532,12 @@ export default {
     templateError: '巡检表模板错误！',
     excelLongCategory: '巡检类别长度不可超过30个字符！',
     excelIllegalCategory: '存在“@#￥%^&*”非法字符！',
-    excelEmpty: '巡检类别与巡检项不能为空！',
-    passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
-    excelFullScoreType:'项目满分值必填，取值范围为1~10整数',//Sprint8 新增
-    excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目满分值整数',//Sprint8 新增
-    excelOtherScoreType:'项目分值必填，取值范围为-100~100整数',//Sprint8 新增
-    bindingstore:'绑定中',//Sprint8 新增
+    excelEmpty: '巡检类别与巡检项名称不能为空',
+    passfailexcelEmpty: '巡检项名称不能为空！',//Sprint8
+    excelFullScoreType:'项目总分值必填，取值范围为1~10的整数',//Sprint8
+    excelMinScoreType:'巡检项最低分值必填，取值范围为1~项目总分值的整数',//Sprint8
+    excelOtherScoreType:'项目分值必填，取值范围为-100~100的整数',//Sprint8
+    bindingstore:'绑定中',//Sprint8
     excelLongItem: '巡检项长度不可超过100个字符！',
     excelIllegalDes: '巡检项目详细说明不可超过300个字符！',
     deleteItem: '删除巡检项',
@@ -573,7 +577,7 @@ export default {
     description: '巡检项需求描述',
     descriptionRuletip:'最多可输入1200个字符',
     titleEmpty: '类别名称不能为空！',
-    ScoreEmpty:'项目分值不能为空',//Sprint8 新增
+    ScoreEmpty:'项目分值不能为空',//Sprint8
     illegalStr: '当前输入含有非法字符！',
     remotePatrol: '远程巡检',
     onsitePatrol: '现场巡检',

@@ -713,8 +713,9 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 let self=this;
                 self.params.clause={};
                 self.curProvince=[];
-                //self.curCitys='城市';
-                self.curCitys=this.$t('storeView.cityPlaceholder');
+                self.curCity= [];
+                self.clearCityInfo();
+                // self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.page=1;
                 if(self.serachVale.length!=0){
                     self.params.like={
