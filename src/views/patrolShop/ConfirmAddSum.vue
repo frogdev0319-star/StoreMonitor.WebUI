@@ -317,33 +317,31 @@ export default {
                     self.percentage = percentage
                   }
                 })
-                //   .then((results) => {
-                //     // 上传完成
-                //     const url = self.getFileUrl(results.name);
-                //     console.log(url);
-                //     resolve(url);
-                //   })
-                //   .catch((err) => {
-                //       reject(err)
-                //     console.log(err)
-                //   })
-                  .then(
-                    function(response){
-                        // 上传完成
-                        const url = self.getFileUrl(results.name);
-                        console.log(url);
-                        resolve(url);
-                    },
-                    function(error){
-                        debugger
-                        throw(error)
-                    }
-                  )
-                  .catch((error) => {
-                      debugger
-                      reject(error)
-                    console.log(error)
+                  .then((results) => {
+                    // 上传完成
+                    const url = self.getFileUrl(results.name);
+                    console.log(url);
+                    resolve(url);
                   })
+                  .catch((err) => {
+                      reject(err)
+                    console.log(err)
+                  })
+                //   .then(
+                //     function(response){
+                //         // 上传完成
+                //         const url = self.getFileUrl(results.name);
+                //         console.log(url);
+                //         resolve(url);
+                //     },
+                //     function(error){
+                //         throw(error)
+                //     }
+                //   )
+                //   .catch((error) => {
+                //       reject(error)
+                //     console.log(error)
+                //   })
               })
             }
             else{
@@ -352,22 +350,22 @@ export default {
               let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
               return new Promise((resolve,reject)=>{
                 azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-                //   .then((results) => {
-                    // 上传完成
-                    // const url = self.getFileUrl(fileItem.fileName);
-                    // console.log(url);
-                    // resolve(url);
-                .then(
-                    function(response){
-                        // 上传完成
-                        const url = self.getFileUrl(fileItem.fileName);
-                        console.log(url);
-                        resolve(url);
-                    },
-                    function(error){
-                        throw(error)
-                    }
-                  )
+                  .then((results) => {
+                    //上传完成
+                    const url = self.getFileUrl(fileItem.fileName);
+                    console.log(url);
+                    resolve(url);
+                // .then(
+                //     function(response){
+                //         // 上传完成
+                //         const url = self.getFileUrl(fileItem.fileName);
+                //         console.log(url);
+                //         resolve(url);
+                //     },
+                //     function(error){
+                //         throw(error)
+                //     }
+                  })
                   .catch((error) => {
                       reject(error)
                     console.log(error)

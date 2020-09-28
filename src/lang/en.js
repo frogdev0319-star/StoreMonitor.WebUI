@@ -244,6 +244,7 @@ export default {
     notCombined: 'Not binding with inspection items yet!',
     confirmChangeBind:'The current inspection list has not been submitted. Confirm to switch the  other inspection list?',
     confirmSwitch: 'Not finish yet, confirm switching?',
+    confirmSwitchBrand:'Not finish yet, confirm switching?',
     confirmSwitchInspect:'Not finish yet, confirm switching?',
     confirmIgnore: 'Confirm ignore items?',
     notBindCamera: 'Items hasn\'t bind with devices!',

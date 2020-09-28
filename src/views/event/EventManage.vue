@@ -831,6 +831,11 @@ export default {
                     direction: order,
                     property: prop
                 }
+            }else{
+                self.params.order={
+                    direction: 'desc',
+                    property: 'ts'
+                }
             }
             // if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
             //     if(tabIndex==4){
