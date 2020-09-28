@@ -528,6 +528,7 @@ export default {
     OnsiteLength:'現場巡檢表數量超限，請刪除後再導入',
     SchdRemoteLength:'排程數量超限，請刪除後再創建',
     deletePatrolList:'當前沒有可刪除的巡檢表',
+    deletebindSchedule:'請删除該巡檢錶綁定的排程後再删除巡檢錶',
     selectPost:'請選擇',
     FailTitle:'錯誤資訊：',
     emptyInfo: '當前巡檢表為空，請新增巡檢項後進行操作！',

@@ -285,6 +285,7 @@
   import filterString from '@/common/filterString'
   import RegionMultiSelect from "@/components/RegionMultiSelect";
   import LimitSelect from "../../../components/LimitSelect";
+  import {getInspectBindList} from '@/api/inspect'
 
   export default {
     name: "RemoteDetail",
@@ -707,6 +708,19 @@
 
     methods: {
       generateScheduleLang,
+      getBindStore(){
+            let self=this;
+            let params={inspectId:self.inspectId};
+            return new Promise((resolve,reject)=>{
+                getInspectBindList(params).then(res=>{
+                    console.log(res.errMsg);
+                    if(res.errMsg!=undefined&&res.errMsg=='Success'){
+                        let data=res.data;
+                        resolve(res);
+                    }
+                })
+            })
+        },
       noWeekDialog(val){
         let self=this;
         self.selectWeekObj.dialogCosed=false;
@@ -1028,6 +1042,7 @@
       },
       async getStoreByCity(data) {
         let self = this;
+        let bindStore = await self.getBindStore()
         let bindStoreId=await self.getBindStoreList();
         self.storeCount=bindStoreId.length;
         console.log(data);
@@ -1075,15 +1090,23 @@
             //   _tempCount++;
             // }
             // if(mode === 3){
-              if (bindStoreId.indexOf(_item.storeId) == -1) {
-                _obj.checked = false;
-                _obj.disabled = false;
+              if (bindStore.data.indexOf(_item.storeId) == -1) {
+                _obj.disabled = true;
+                _tempDisCount++;
               }
-              else {
+              if(bindStoreId.indexOf(_item.storeId) != -1){
                 _obj.checked = true;
-                _obj.disabled = false;
                 _tempCount++;
               }
+              // if (bindStoreId.indexOf(_item.storeId) == -1) {
+              //   _obj.checked = false;
+              //   _obj.disabled = false;
+              // }
+              // else {
+              //   _obj.checked = true;
+              //   _obj.disabled = false;
+              //   _tempCount++;
+              // }
             // }
             // else{
             //   if (bindStoreId.indexOf(_item.storeId) != -1) {
@@ -1129,9 +1152,6 @@
           if (_tempDisCount == item.store.length) {
             groupObj.disabled = true;
             groupObj.checked = false;
-          }
-          else{
-            groupObj.disabled = false;
           }
           groupObj.itemData = _temp;
           groupTemp.push(groupObj);
@@ -1451,16 +1471,15 @@
         else{
           item.disabled = false;
         }
-        let length=0, countItem=0;
+        let length=0, countItem=0,alldisCount=0;
         self.storeList.forEach(_item=>{
           length+=_item.itemData.length;
           _item.itemData.forEach(itemS=>{
-            if(itemS.checked){
-              countItem++;
-            }
+            itemS.checked ? countItem++ : ''
+            itemS.disabled ? alldisCount++ : ''
           })
         })
-        if(length==countItem){
+        if(length==Number(countItem+alldisCount)){
           self.allData=true;
         }
         else{

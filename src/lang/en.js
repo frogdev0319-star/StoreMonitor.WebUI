@@ -525,6 +525,7 @@ export default {
     OnsiteLength:'The number of Onsite Patrol List exceeds the limit, please delete and then import',
     SchdRemoteLength:'The number of schedules exceeds the limit, please delete and then create',
     deletePatrolList:'There is currently no inspection list to delete',
+    deletebindSchedule:'Please delete the schedule bound by the patrol table before deleting the patrol table',
     selectPost:'Please select',
     FailTitle:'Error message:',
     emptyInfo: 'List is empty, please add inspection items!',

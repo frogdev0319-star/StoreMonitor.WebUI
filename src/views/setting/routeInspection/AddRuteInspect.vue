@@ -289,6 +289,7 @@ import PubSub from 'pubsub-js'
 import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
 import RegionMultiSelect from "@/components/RegionMultiSelect";
+import {getScheduleListService} from '@/api/schedule'
 export default {
     name:'AddRuteInspect',
     components:{
@@ -777,17 +778,39 @@ export default {
                 })
             })
         },
-        deleteGroup(index,item){
+        async deleteGroup(index,item){
             let self=this
             if(self.groupList.length==1){
                 if((self.typeTemp.length==2&&!self.typeTemp.some(x=>x==0)||self.typeTemp.length==3)&&item.type==1){
                     self.showFailInfo=true
                     return false;
+                }else if(self.typeTemp.length==1){
+                    let bindSchedule = await self.getScheduleFromDB()
+                    let arrtemp=[]
+                    bindSchedule.forEach(item=>{
+                        if(item.extra!=null){
+                            arrtemp.push(item.extra.inspectId)
+                        }
+                    })
+                    if(arrtemp.indexOf(self.routeData[0].inspectId)!=-1){
+                        self.notify(self.$t('insSettingView.deletebindSchedule'),'warning',3000);
+                        return false;
+                    }
                 }
             }
             self.showDeleteGroup=true;
             self.curGroup=item;
             
+        },
+        getScheduleFromDB(params){
+            return new Promise((resolve, reject) => {
+                getScheduleListService(params).then(res => {
+                    console.log(res);
+                    let errMsg = res.errMsg;
+                    let data = res.data;
+                    resolve(data);
+                })
+            })
         },
         async confirmDeleteGroup(){
             let self=this;
@@ -840,6 +863,9 @@ export default {
                     self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;
                 }
+            }
+            if(self.typeTemp.length==1&&self.groupList.length==0){
+                self.$router.push({name:"inspectSetting",params:{val:'del'}});
             }
         },
         addNape(){

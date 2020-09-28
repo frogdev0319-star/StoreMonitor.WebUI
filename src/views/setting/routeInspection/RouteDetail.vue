@@ -107,12 +107,12 @@
                                     <el-table-column prop="description" :min-width="sheetName.some(x=>x.id==0&&x.isClick)?'40%':'23%'"></el-table-column>
                                     <el-table-column prop="score" align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)||sheetName.some(x=>x.id==2&&x.isClick)" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'">
                                          <template slot-scope="scope">
-                                            <span>{{scope.row.score}}{{$t('insSettingView.scores')}}</span>
+                                            <span>{{scope.row.score}}<span v-if="lang!='en'">{{$t('insSettingView.scores')}}</span></span>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="sheetName.some(x=>x.id==1&&x.isClick)">
                                         <template slot-scope="scope">
-                                            <span>{{scope.row.qualifiedScore}}{{$t('insSettingView.scores')}}</span>
+                                            <span>{{scope.row.qualifiedScore}}<span v-if="lang!='en'">{{$t('insSettingView.scores')}}</span></span>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="handle" min-width="6%">
@@ -214,6 +214,7 @@ import {inpectRESTful} from '@/api/index'
 import {validateInput,validateInspectGroup} from '@/common/validate'
 import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
+import {getScheduleListService} from '@/api/schedule'
 
 export default {
     name:'RouteDetail',
@@ -427,7 +428,7 @@ export default {
             }
         },
 
-        deleteNapes(){
+        async deleteNapes(){
             let self=this;
             let arr=[];
             let countGroup=[];
@@ -458,9 +459,31 @@ export default {
                 if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
                     self.showFaildig=true
                     return false;
+                }else if(self.allRoutedata.length==1){
+                    let bindSchedule = await self.getScheduleFromDB()
+                    let arrtemp=[]
+                    bindSchedule.forEach(item=>{
+                        if(item.extra!=null){
+                            arrtemp.push(item.extra.inspectId)
+                        }
+                    })
+                    if(arrtemp.indexOf(self.routeData[0].inspectId)!=-1){
+                        self.notify(self.$t('insSettingView.deletebindSchedule'),'warning',3000);
+                        return false;
+                    }
                 }
             }
             self.showDeleteContent=true;
+        },
+        getScheduleFromDB(params){
+            return new Promise((resolve, reject) => {
+                getScheduleListService(params).then(res => {
+                    console.log(res);
+                    let errMsg = res.errMsg;
+                    let data = res.data;
+                    resolve(data);
+                })
+            })
         },
         afterDeleteNape(){
             let self=this;
@@ -536,7 +559,7 @@ export default {
                 self.downLoadSrc=objectUrl;
             })
         },
-        handleDelete(index,row){
+        async handleDelete(index,row){
             console.log(index);
             let self=this;
             let typeTemp=[]
@@ -550,6 +573,18 @@ export default {
                 if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
                     self.showFaildig=true
                     return false;
+                }else if(self.allRoutedata.length==1){
+                    let bindSchedule = await self.getScheduleFromDB()
+                    let arrtemp=[]
+                    bindSchedule.forEach(item=>{
+                        if(item.extra!=null){
+                            arrtemp.push(item.extra.inspectId)
+                        }
+                    })
+                    if(arrtemp.indexOf(self.routeData[0].inspectId)!=-1){
+                        self.notify(self.$t('insSettingView.deletebindSchedule'),'warning',3000);
+                        return false;
+                    }
                 }
             }
             self.showSingleDeleteContent=true;
@@ -558,40 +593,41 @@ export default {
             arr.push(id);
             self.curDeleteId=arr;
         },
-        confirmDeleteSingle(){
+        async confirmDeleteSingle(){
             let self=this;
             let params={
                 "itemIds":self.curDeleteId
             };
+            let delstatus=0
             inpectRESTful.deleteInspectItem(params).then(res=>{
                 console.log(res.data)
                 let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
                     self.routeData.forEach((r_item,r_index)=>{
-                        r_item.itemData.forEach((d_item,d_index)=>{
-                            if(self.curDeleteId[0]==d_item.id){
-                                self.curDelGroupId=r_item.id
-                                let paramsGroup={
-                                    "groupIds":[self.curDelGroupId]
-                                }
-                                if(self.routeData[r_index].itemData.length==1){
+                        if(self.routeData[r_index].itemData.length==1){
+                            r_item.itemData.forEach((d_item,d_index)=>{
+                                if(self.curDeleteId[0]==d_item.id){
+                                    self.curDelGroupId=r_item.id
+                                    let paramsGroup={
+                                        "groupIds":[self.curDelGroupId]
+                                    }
                                     inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                                        if(resGroup.errMsg=='Success'){
-
+                                        if(resGroup.errMsg=='Success'&&self.routeData.length==1&&self.sheetName.length==1){
+                                            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+                                            self.showSingleDeleteContent=false;
+                                            let val = 'del'
+                                            self.$emit('refreshList',val)
                                         }
-                                    })
+                                    }) 
                                 }
-                                self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
-                                self.showSingleDeleteContent=false;
-                                let val = 'del'
-                                self.$emit('refreshList',val)
-                            }
-                        })
+                            })
+                        }else{
+                            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+                            self.showSingleDeleteContent=false;
+                            let val = 'del'
+                            self.$emit('refreshList',val)
+                        }
                     })
-                    if(self.routeData.length==0){
-                        // self.$emit('delItem')
-                    }
-                    self.getNum();
                 }
                 else{
                     self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
@@ -600,6 +636,14 @@ export default {
                 self.allchecked = false;
             })
         },
+        // handledelGroup(){
+        //     let self=this;
+        //     return new Promise((resolve,reject)=>{
+        //         inpectRESTful.deleteInspectGroup(paramsGroup).then(res=>{
+        //             resolve(res);
+        //         })
+        //     })
+        // },
         changeValue(value){
 
         },

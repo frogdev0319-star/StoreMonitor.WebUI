@@ -526,6 +526,7 @@ export default {
     OnsiteLength:'现场巡检表数量超限，请删除后再导入',
     SchdRemoteLength:'排程数量超限，请删除后再创建',
     deletePatrolList:'当前没有可删除的巡检表',
+    deletebindSchedule:'请删除该巡检表绑定的排程后再删除巡检表',
     selectPost:'请选择',
     FailTitle:'错误信息：',
     emptyInfo: '当前巡检表为空，请新增巡检项后进行操作！',

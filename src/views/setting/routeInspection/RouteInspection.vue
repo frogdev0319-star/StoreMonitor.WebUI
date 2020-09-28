@@ -197,6 +197,7 @@ import {mapGetters} from 'vuex'
 import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
 import DialogVue from '@/components/DialogVue.vue'
+import {getScheduleListService} from '@/api/schedule'
 
 export default {
     name:'RouteInspection',
@@ -350,6 +351,16 @@ export default {
     },
     methods:{
         generateInsSettingLang,
+        getScheduleFromDB(params){
+            return new Promise((resolve, reject) => {
+                getScheduleListService(params).then(res => {
+                    console.log(res);
+                    let errMsg = res.errMsg;
+                    let data = res.data;
+                    resolve(data);
+                })
+            })
+        },
         emptyImport(){
             let self = this;
             document.getElementById("uploadFile").click();
@@ -453,7 +464,7 @@ export default {
             let self=this;
             // self.reload=false
             // self.$nextTick(() => {
-                // self.reload=true
+            //     self.reload=true
                    self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData=val
 	      	// })
         },
@@ -461,7 +472,8 @@ export default {
             let self=this;
             let TagData=await self.getTagAll();
             if(TagData.length!=0){
-                if(val=='del'){
+                debugger
+                if(val=='del'||self.$route.params.val=='del'){
                     if(Number(self.patrolActive)==TagData.length){
                         self.patrolActive=(TagData.length-1).toString()
                     }
@@ -892,14 +904,26 @@ export default {
             self.btnList[3].enabled=true
             self.getTagList();
         },
-        delAllItem(){
-            let datalength = this.elTableData[Number(this.activeName)].data.length
+        async delAllItem(){
+            let self=this
+            let datalength = self.elTableData[Number(self.activeName)].data.length
             if(datalength==0){
-                this.notify(this.$t('insSettingView.deletePatrolList'),'warning',3000);
+                self.notify(self.$t('insSettingView.deletePatrolList'),'warning',3000);
                 return false;
             }else{
-                this.showSingleDeleteContent=true
+                let bindSchedule = await self.getScheduleFromDB()
+                let arrtemp=[]
+                bindSchedule.forEach(item=>{
+                    if(item.extra!=null){
+                        arrtemp.push(item.extra.inspectId)
+                    }
+                })
+                if(arrtemp.indexOf(self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId)!=-1){
+                    self.notify(self.$t('insSettingView.deletebindSchedule'),'warning',3000);
+                    return false;
+                }
             }
+            self.showSingleDeleteContent=true
         },
         confirmDelete(){
             let self=this;
