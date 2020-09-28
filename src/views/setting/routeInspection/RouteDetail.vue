@@ -567,32 +567,32 @@ export default {
                 console.log(res.data)
                 let code=res.errMsg;
                 if(code!=undefined&&code=='Success'){
-                    self.routeData.forEach((r_item,r_index)=>{
-                        r_item.itemData.forEach((d_item,d_index)=>{
-                            if(self.curDeleteId[0]==d_item.id){
-                                self.curDelGroupId=r_item.id
-                                let paramsGroup={
-                                    "groupIds":[self.curDelGroupId]
-                                }
-                                if(self.routeData[r_index].itemData.length==1){
-                                    inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                                        if(resGroup.errMsg=='Success'){
-
-                                        }
-                                    })
-                                }
-                                self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
-                                self.showSingleDeleteContent=false;
-                                let val = 'del'
-                                self.$emit('refreshList',val)
-                            }
-                        })
-                    })
-                    if(self.routeData.length==0){
-                        // self.$emit('delItem')
-                    }
-                    self.getNum();
-                }
+                    self.routeData.forEach((r_item,r_index)=>{
+                        if(self.routeData[r_index].itemData.length==1){
+                            r_item.itemData.forEach((d_item,d_index)=>{
+                                if(self.curDeleteId[0]==d_item.id){
+                                    self.curDelGroupId=r_item.id
+                                    let paramsGroup={
+                                        "groupIds":[self.curDelGroupId]
+                                    }
+                                    inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
+                                        if(resGroup.errMsg=='Success'&&self.routeData.length==1&&self.sheetName.length==1){
+                                            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+                                            self.showSingleDeleteContent=false;
+                                            let val = 'del'
+                                            self.$emit('refreshList',val)
+                                        }
+                                    }) 
+                                }
+                            })
+                        }else{
+                            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
+                            self.showSingleDeleteContent=false;
+                            let val = 'del'
+                            self.$emit('refreshList',val)
+                        }
+                    })
+                }
                 else{
                     self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
                     return false;

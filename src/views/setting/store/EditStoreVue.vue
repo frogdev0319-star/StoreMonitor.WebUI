@@ -9,8 +9,8 @@
               <strong style="margin-right:20px;">{{generateStoreLang('solver')}}</strong><span style="min-width:100px;display:inline-block;"><el-input v-model="userName" disabled size="mini" class='input'></el-input></span>
                 <strong style="margin-right:20px;">{{generateStoreLang('contact')}}</strong>
               <span style="min-width:100px;display:inline-block;"><el-input v-model="phone" disabled size="mini" style="" class='input'></el-input></span>
-                <span style="font-size:14px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
-                <span style="font-size:14px; display:inline-block;"><el-input v-model="curTag" disabled size="mini" style="" class='input'></el-input></span>
+                <span style="font-size:12px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
+                <span style="font-size:12px; display:inline-block;"><el-input v-model="curTag" disabled size="mini" style="" class='input'></el-input></span>
               <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
               <span style="min-width:100px;display:inline-block;">
                 <el-input v-model="supervisorName" disabled size="mini" class='input'></el-input></span>

@@ -242,6 +242,7 @@ export default {
     notCombined: '該門店暫未綁定巡檢項！',
     confirmChangeBind:'巡檢表尚未提交，是否確認切換巡檢表？',
     confirmSwitch: '本次巡店尚未完成，確認是否切換當前門店？',
+    confirmSwitchBrand:'本次巡店尚未完成，确认是否切换当前品牌？',
     confirmSwitchInspect:'本次巡店尚未完成，確認是否切換當前巡檢表？',
     confirmIgnore: '確認是否忽略當前巡檢項？',
     notBindCamera: '當前門店的巡檢項未綁定設備！',

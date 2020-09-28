@@ -841,6 +841,9 @@ export default {
                     return false;
                 }
             }
+            if(self.typeTemp.length==1&&self.groupList.length==0){
+                self.$router.push({name:"inspectSetting",params:{val:'del'}});
+            }
         },
         addNape(){
             let self=this;

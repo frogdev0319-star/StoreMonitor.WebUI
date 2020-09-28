@@ -461,7 +461,7 @@ export default {
             let self=this;
             let TagData=await self.getTagAll();
             if(TagData.length!=0){
-                if(val=='del'){
+                if(val=='del'||self.$route.params.val=='del'){
                     if(Number(self.patrolActive)==TagData.length){
                         self.patrolActive=(TagData.length-1).toString()
                     }

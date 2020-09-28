@@ -152,6 +152,7 @@
                 </div>
             </el-dialog>
 
+            <dialog-vue :dialog-title='changeBrandObj.title' :show-info='changeBrandObj.showInfo' :is-warning='changeBrandObj.isWarning' :dialog-closed='changeBrandObj.dialogCosed' @confirmed='changeBrandDialog' @canceled='canceldChangeBrand'></dialog-vue>
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='changeInspectObj.title' :show-info='changeInspectObj.showInfo' :is-warning='changeInspectObj.isWarning' :dialog-closed='changeInspectObj.dialogCosed' @confirmed='changeInspectDialog' @canceled='canceldChangeInspect'></dialog-vue>
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
@@ -694,6 +695,12 @@ export default {
             fullScreen:false,
             appliedInspectList:[],
 
+            changeBrandObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmSwitchBrand'),
+                isWarning:true,
+                dialogCosed:false
+            },
             changeStoreObj:{
                 title: this.$t('remotePatrol.confirm'),
                 showInfo: this.$t('remotePatrol.confirmSwitch'),
@@ -1036,6 +1043,9 @@ export default {
                 self.stopRealTime();
                 window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal = null
+            }
+            if(self.isEzviz && !self.showGuide){
+                self.$refs.ezvizVideo.stopRealTime();
             }
 
             self.activeIndex = '0'
@@ -2897,7 +2907,7 @@ export default {
                             obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
                             obj.device=data[j].device;
                             obj.hasInspect=data[j].hasInspect;
-                            if(data[j].authorizedInspect.length!=0){
+                            if(data[j].authorizedInspect!=undefined&&data[j].authorizedInspect.length!=0){
                                 obj.authorizedInspect=data[j].authorizedInspect
                                 obj.hasInspect=true;
                             }
@@ -3012,6 +3022,9 @@ export default {
             };
             self.saveStoreObj(storeObj);
         },
+        changeBrandDialog(){
+            let self = this
+        },
         changeStoreDialog(val){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
@@ -3036,6 +3049,10 @@ export default {
         canceldChangeStore(){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
+        },
+        canceldChangeBrand(){
+            let self=this;
+            self.changeBrandObj.dialogCosed=false;
         },
 
         lastBar(){
