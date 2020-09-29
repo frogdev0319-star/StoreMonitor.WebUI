@@ -1095,8 +1095,8 @@ export default {
             self.napeDepTemp=item.napeDep;
             item.isClick=true;
             self.showAddNape=false;
-            let arr=[1,2,3,4,5,6,7,8,9,10]
-            self.ScoreList=arr.slice(0,item.Score_2)
+            self.ScoreList=[1,2,3,4,5,6,7,8,9,10]
+            // self.ScoreList=arr.slice(0,item.Score_2)
             //item.napeName=item.napeNameShow.slice(indexOf(',')+1);
             self.napeList.forEach((_item,_index)=>{
                 if(index!=_index){
