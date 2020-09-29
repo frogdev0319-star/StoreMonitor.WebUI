@@ -961,16 +961,16 @@ export default {
             let ret= self.isLoginIn();
             console.log(ret);
             let Datalength = self.elTableData[Number(self.activeName)].data.length
-            // if(Number(self.activeName)==0&&Datalength>=10){
-            //         self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
-            //         return false;
-            // }else if(Number(self.activeName)==1&&Datalength>=10){
-            //         self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
-            //         return false;
-            // }else{
+            if(Number(self.activeName)==0&&Datalength>=10){
+                    self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
+                    return false;
+            }else if(Number(self.activeName)==1&&Datalength>=10){
+                    self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
+                    return false;
+            }else{
                     self.showNameImport=true
                     self.ImportName=''
-            // }
+            }
             // if(ret.data!=undefined&&ret.data.isLogin){
             //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){
             //         self.showConfirmImport=true;
