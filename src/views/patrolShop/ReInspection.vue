@@ -305,7 +305,7 @@
                                         </el-dropdown-menu>
                                         <el-dropdown-menu slot="dropdown" class="score-menu" v-else>
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="itemDS in item.itemScore"
+                                            v-for="itemDS in item.itemScoreLength"
                                             :key="itemDS" @click.native="checkScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
@@ -385,7 +385,7 @@
                                         </el-dropdown-menu>
                                         <el-dropdown-menu slot="dropdown" class="score-menu" v-else>
                                             <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="itemDS in item.itemScore"
+                                            v-for="itemDS in item.itemScoreLength"
                                             :key="itemDS" @click.native="checkIgnoreScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
@@ -3222,11 +3222,13 @@ export default {
                             let tempItems=[];
                             item.items.forEach((_item,_index)=>{
                                 let itemObj={};
+                                let arr=[0,1,2,3,4,5,6,7,8,9,10]
                                 itemObj.id=_item.id;
                                 itemObj.groupId=item.groupId;
                                 itemObj.subject=_item.subject;
                                 itemObj.description=_item.description;
                                 itemObj.itemScore=_item.itemScore;
+                                itemObj.itemScoreLength=arr.slice(0,_item.itemScore+1)
                                 itemObj.itemgetScore='--';
                                 itemObj.isQualified=false;
                                 itemObj.qualifiedScore=_item.qualifiedScore;

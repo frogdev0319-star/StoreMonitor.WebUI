@@ -365,16 +365,6 @@
             curType: 0,
             inspectTypeList:[],
             inspectList:'',
-            // inspectTypeList: [
-            //   {
-            //     value: 0,
-            //     label: this.$t('overview.remotePatrolTable'),
-            //   },
-            //   {
-            //     value: 1,
-            //     label: this.$t('overview.onsitePatrolTable'),
-            //   }
-            // ],
             showStoreInfo: false,
             params: {},
             poperClass: 'date-picker-poper',
@@ -490,7 +480,8 @@
             echartAxiasColor: '#e3e9f4',
             rowClass: 'row-class',
             fontFamily: 'Roboto, Microsoft YaHei',
-            sidebarElm: null
+            sidebarElm: null,
+            AllStore:[]
           }
       },
       computed:{
@@ -793,21 +784,44 @@
         },
         changeStore(val){
           let self=this;
+          self.inspectList=''
           console.log(val);
           let str='';
+          let storeArr = [];
           self.storeList.forEach((item,index)=>{
             val.forEach(_item=>{
               if(item.storeId==_item){
                 str+=item.name+'，'
+                storeArr.push(item.storeId)
               }
             })
           })
           str=str.substr(0,str.length-1)
           self.storeStr=str;
+          let InspectArr=[]
+          self.AllStore.data.content.forEach(item=>{
+            if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+              InspectArr.push(item.appliedInspect)
+            }
+          })
+          let newArr=[],InspectList=[]
+          InspectArr.forEach(item=>{
+            item.forEach(_item=>{
+              if(!newArr.includes(_item.id)){
+                newArr.push(_item.id)
+                InspectList.push(_item)
+              }
+            })
+          })
+          self.inspectTypeList=InspectList
+          if(InspectList.length!=0){
+            self.inspectList=InspectList[0].name
+          }
         },
         changePro(val){
           console.log(val)
           let self=this;
+          self.inspectList=''
           self.curCity= [];
           self.clearCityInfo();
           self.clearStoreInfo();
@@ -861,8 +875,46 @@
               })
             })
             self.cityList=temp;
+            let cityArr=[]
+            if(self.cityList.length!=0){
+              self.cityList.forEach(item=>{
+                  cityArr.push(item.value)
+              })
+              self.curCity=cityArr
+            }
           }
           self.storeDataList=tempStore;
+          let storeArr = [],arr=[]
+          self.storeDataList.forEach(item=>{
+            storeArr.push(item.storeId)
+            arr.push(item.value)
+          })
+          self.curStore = storeArr;
+          let str = ''
+          arr.forEach(item=>{
+              str+=item+'，'
+          })
+          str=str.substr(0,str.length-1)
+          self.storeStr=str;
+          let InspectArr=[]
+          self.AllStore.data.content.forEach(item=>{
+            if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+              InspectArr.push(item.appliedInspect)
+            }
+          })
+          let newArr=[],InspectList=[]
+          InspectArr.forEach(item=>{
+            item.forEach(_item=>{
+              if(!newArr.includes(_item.id)){
+                newArr.push(_item.id)
+                InspectList.push(_item)
+              }
+            })
+          })
+          self.inspectTypeList=InspectList
+          if(InspectList.length!=0){
+            self.inspectList=InspectList[0].name
+          }
         },
         getBriefStoreData(){
           let self=this;
@@ -895,6 +947,7 @@
       changeStoreTag(val){
         let self=this
         let temp=[]
+        self.inspectList=''
         self.clearStoreInfo();
         self.storeList.forEach(item=>{
             item.tagIds.forEach(_item=>{
@@ -911,10 +964,42 @@
             })
         })
         self.storeDataList=temp
+        let storeArr = [],arr=[]
+        self.storeDataList.forEach(item=>{
+          storeArr.push(item.storeId)
+          arr.push(item.value)
+        })
+        self.curStore = storeArr;
+        let str = ''
+        arr.forEach(item=>{
+            str+=item+'，'
+        })
+        str=str.substr(0,str.length-1)
+        self.storeStr=str;
+        let InspectArr=[]
+        self.AllStore.data.content.forEach(item=>{
+          if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+            InspectArr.push(item.appliedInspect)
+          }
+        })
+        let newArr=[],InspectList=[]
+        InspectArr.forEach(item=>{
+          item.forEach(_item=>{
+            if(!newArr.includes(_item.id)){
+              newArr.push(_item.id)
+              InspectList.push(_item)
+            }
+          })
+        })
+        self.inspectTypeList=InspectList
+        if(InspectList.length!=0){
+          self.inspectList=InspectList[0].name
+        }
       },
         changeCountry(val){
           let self=this;
           console.log(val);
+          self.inspectList=''
           self.curProvince= [];
           self.curCity=[];
           self.curStoreTag=''
@@ -987,13 +1072,47 @@
           cityArr.push(item.value)
         })
         self.curCity = cityArr;
-        self.storeDataList = tempStore;
+        self.storeDataList = tempStore;        
+
+        let storeArr = [],arr=[]
+        self.storeDataList.forEach(item=>{
+          storeArr.push(item.storeId)
+          arr.push(item.value)
+        })
+        self.curStore = storeArr;
+        let str = ''
+        arr.forEach(item=>{
+            str+=item+'，'
+        })
+        str=str.substr(0,str.length-1)
+        self.storeStr=str;
+
+        let InspectArr=[]
+        self.AllStore.data.content.forEach(item=>{
+          if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+            InspectArr.push(item.appliedInspect)
+          }
+        })
+        let newArr=[],InspectList=[]
+        InspectArr.forEach(item=>{
+          item.forEach(_item=>{
+            if(!newArr.includes(_item.id)){
+              newArr.push(_item.id)
+              InspectList.push(_item)
+            }
+          })
+        })
+        self.inspectTypeList=InspectList
+        if(InspectList.length!=0){
+          self.inspectList=InspectList[0].name
+        }
 
         },
         changeCity(val){
           let self=this;
           self.clearStoreInfo();
           console.log(val)
+          self.inspectList=''
           let storeList=self.storeList;
           let temp=[];
           if(val.length == 0){
@@ -1035,6 +1154,37 @@
           }
           console.log(temp)
           self.storeDataList=temp;
+          let storeArr = [],arr=[]
+          self.storeDataList.forEach(item=>{
+            storeArr.push(item.storeId)
+            arr.push(item.value)
+          })
+          self.curStore = storeArr;
+          let str = ''
+          arr.forEach(item=>{
+              str+=item+'，'
+          })
+          str=str.substr(0,str.length-1)
+          self.storeStr=str;
+          let InspectArr=[]
+          self.AllStore.data.content.forEach(item=>{
+            if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+              InspectArr.push(item.appliedInspect)
+            }
+          })
+          let newArr=[],InspectList=[]
+          InspectArr.forEach(item=>{
+            item.forEach(_item=>{
+              if(!newArr.includes(_item.id)){
+                newArr.push(_item.id)
+                InspectList.push(_item)
+              }
+            })
+          })
+          self.inspectTypeList=InspectList
+          if(InspectList.length!=0){
+            self.inspectList=InspectList[0].name
+          }
         },
         clearStoreInfo(){
           let self=this;
@@ -1066,12 +1216,18 @@
           self.params.filter={page:self.page - 1,size:self.sizeNum};
           self.params.order = {direction: self.direction, property: self.property}
           self.params.mode = self.curType;
-          self.params.inspectId = self.inspectList
+          self.inspectTypeList.forEach(item=>{
+            if(self.inspectList==item.name){
+              self.params.inspectId = item.id
+            }else{
+              self.params.inspectId = self.inspectList
+            }
+          })
           // await self.getInspectCharts();
           await self.getInspectItemsTable();
           
         },
-        selectAllProAndCity(val){
+        async selectAllProAndCity(val){
           let self = this;
           let storeList = self.storeList;
           let temp = [];
@@ -1130,6 +1286,32 @@
           })
           self.curStore = storeArr;
           console.log('create 调用完毕')
+          let params={
+            "filter":{
+              "page":0,
+              "size":1000
+            }
+          };
+          self.AllStore=await self.getStoreData(params);
+          let InspectArr=[]
+          self.AllStore.data.content.forEach(item=>{
+            if(self.curStore.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+              InspectArr.push(item.appliedInspect)
+            }
+          })
+          let newArr=[],InspectList=[]
+          InspectArr.forEach(item=>{
+            item.forEach(_item=>{
+              if(!newArr.includes(_item.id)){
+                newArr.push(_item.id)
+                InspectList.push(_item)
+              }
+            })
+          })
+          self.inspectTypeList=InspectList
+          if(InspectList.length!=0){
+            self.inspectList=InspectList[0].name
+          }
           self.searchData()
           self.changeStore(self.curStore)
         },
@@ -1554,7 +1736,7 @@
         self.params.beginTs = start;
         self.params.endTs = end;
         self.initDaysRange();
-        self.getTagAll()
+        // self.getTagAll()
         // await self.getRegionInfo();
         await self.initData();
       },
