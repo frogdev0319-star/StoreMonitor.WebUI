@@ -1948,7 +1948,7 @@
               {value: totalQualified, name: self.$t('overview.echartGood')},
               // {value: totalExcellent, name: self.$t('overview.excellent')}
             ];
-            let totalArray = [totalDargerous, totalQualified];
+            let totalArray = [totalDargerous,totalImproved, totalQualified];
             jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
             jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
             jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
