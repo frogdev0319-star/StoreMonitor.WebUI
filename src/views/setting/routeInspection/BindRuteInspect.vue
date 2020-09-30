@@ -550,7 +550,7 @@ export default {
                     },
                     filter:{
                         page:0,
-                        size:1000
+                        size:2000
                     }
                 };
             }
@@ -558,7 +558,7 @@ export default {
                 params={
                     filter:{
                         page:0,
-                        size:1000
+                        size:2000
                     }
                 }
             }
@@ -596,7 +596,7 @@ export default {
             }
             params.filter={
                         page:0,
-                        size:1000
+                        size:2000
                     }
             let resData=await self.getStoreData(params);
             self.storeData=resData.content;
@@ -695,7 +695,7 @@ export default {
             let params={
                 filter:{
                     page:0,
-                    size:1000
+                    size:2000
                 }
             };
             let resStore=await self.getStoreData(params);

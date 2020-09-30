@@ -1158,7 +1158,7 @@
         params = {
           filter: {
             page: 0,
-            size: 1000
+            size: 2000
           }
         }
 
