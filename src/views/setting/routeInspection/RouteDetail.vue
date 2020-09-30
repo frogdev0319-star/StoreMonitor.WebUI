@@ -460,7 +460,9 @@ export default {
                     self.showFaildig=true
                     return false;
                 }else if(self.allRoutedata.length==1){
-                    let bindSchedule = await self.getScheduleFromDB()
+                    let params = {};
+                    params.category = parseInt(self.routeData[0].mode);
+                    let bindSchedule = await self.getScheduleFromDB(params)
                     let arrtemp=[]
                     bindSchedule.forEach(item=>{
                         if(item.extra!=null){
@@ -574,6 +576,8 @@ export default {
                     self.showFaildig=true
                     return false;
                 }else if(self.allRoutedata.length==1){
+                    let params = {};
+                    params.category = parseInt(self.routeData[0].mode);
                     let bindSchedule = await self.getScheduleFromDB()
                     let arrtemp=[]
                     bindSchedule.forEach(item=>{

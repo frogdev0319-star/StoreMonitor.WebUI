@@ -1380,7 +1380,7 @@
         params = {
           filter: {
             page: 0,
-            size: 1000
+            size: 2000
           }
         }
         let resData = await self.getStoreData(params);

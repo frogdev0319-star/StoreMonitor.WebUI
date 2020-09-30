@@ -785,7 +785,9 @@ export default {
                     self.showFailInfo=true
                     return false;
                 }else if(self.typeTemp.length==1){
-                    let bindSchedule = await self.getScheduleFromDB()
+                    let params = {};
+                    params.category = parseInt(self.routeData[0].mode);
+                    let bindSchedule = await self.getScheduleFromDB(params)
                     let arrtemp=[]
                     bindSchedule.forEach(item=>{
                         if(item.extra!=null){

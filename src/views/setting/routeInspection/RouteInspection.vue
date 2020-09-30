@@ -910,7 +910,9 @@ export default {
                 self.notify(self.$t('insSettingView.deletePatrolList'),'warning',3000);
                 return false;
             }else{
-                let bindSchedule = await self.getScheduleFromDB()
+                let params = {};
+                params.category = parseInt(self.activeName);
+                let bindSchedule = await self.getScheduleFromDB(params)
                 let arrtemp=[]
                 bindSchedule.forEach(item=>{
                     if(item.extra!=null){

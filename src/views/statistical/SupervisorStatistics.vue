@@ -619,7 +619,7 @@
         let params={
           "filter":{
             "page":0,
-            "size":1000
+            "size":2000
           }
         };
         let retData=await self.getStoreData(params);
@@ -861,7 +861,7 @@
         let storeparams={
           "filter":{
             "page":0,
-            "size":1000
+            "size":2000
           }
         };
         let retData=await self.getStoreData(storeparams);
