@@ -48,14 +48,14 @@
           <el-col :span="24" class="items-title">
             <span class="title">{{$t('overview.patrolList')}}</span>
             <div class="exprotBtn">
-              <!-- <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" style="vertical-align: middle;">
                 <div class="btn-area">
-                  <i class="iconfont icon-excel"></i>
+                  <!-- <i class="iconfont icon-excel"></i> -->
                   <img :src="exportPng" class="icon-excel">
                   <span class="spanClass">{{$t('eventView.exportReport')}}</span>
                 </div>
-              </el-button> -->
-              <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="margin-top:-15px;">
+              </el-button>
+              <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="vertical-align: middle;">
                 <div class="btn-area">
                   <i class="iconfont icon-pdf"></i>
                   <span class="spanClass">{{$t('reportView.InspectionDetail')}}</span>
@@ -365,7 +365,7 @@
         direction: 'asc',
         property: 'completionRate',
         hasNoData: false,
-        exportItmesHeader: ['督导名称','管辖门店数量', '计划巡店次数', '按计划巡店次数', '计划外巡店次数', '巡店计划完成率'],
+        exportItmesHeader: ['巡检人','管辖门店数量', '计划巡店次数', '按计划巡店次数', '计划外巡店次数', '巡店计划完成率'],
         headerClass: 'header-class',
         cellClass: 'cell-class',
         activeName: 'patrolPlan',
@@ -1226,7 +1226,8 @@
                 justify-content: center;
                 .icon-excel{
                   margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
+                  width:calc(24/1920*100vw);
+                  height:calc(24/1920*100vw);
                 }
                 .icon-pdf{
                   margin-right: calc(18/1920*100vw);
