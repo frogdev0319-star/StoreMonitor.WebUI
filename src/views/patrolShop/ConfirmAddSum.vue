@@ -15,7 +15,7 @@
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
                 <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
                           :placeholder="generatePatrolLang('adviceInfo')" @blur="notShowInputRuleTips"></el-input>
-                <span class="rules" v-if="adviceInfoRuletip">{{generatePatrolLang('comentRuletip')}}</span>
+                <span class="rules" v-if="adviceInfoRuletip">{{generatePatrolLang('comentRuletip_suggest')}}</span>
             </div>
         </el-col>
         <el-col :span="24" class="sum-data">
@@ -396,9 +396,17 @@ export default {
                         if(!inspect[i].inspectList[g].items[j].isIgnore){
                             for(let k in inspect[i].inspectList[g].items[j].sourceList){
                                 let obj={};
-                                let url=''
                                 await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url)=>{
-                                    url=url
+                                    if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
+                                        obj.mediaType=2;
+                                        obj.url=url;
+                                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                                    }
+                                    else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
+                                        obj.mediaType=1;
+                                        obj.url=url;
+                                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                                    }
                                 }).catch((err)=>{
                                     upload++
                                 })
@@ -406,16 +414,7 @@ export default {
                                     self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                                     return false
                                 }
-                                if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
-                                    obj.mediaType=2;
-                                    obj.url=url;
-                                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                                }
-                                else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
-                                    obj.mediaType=1;
-                                    obj.url=url;
-                                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                                }
+                                
                                 tempFileUrl.push(obj);
                             }
                         }
@@ -437,9 +436,13 @@ export default {
 
                 let commentTemp=[];
                 if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
-                    let url=''
                     await self.upLoadFile(self.eventList[i].sourceObj).then((url)=>{
-                        url=url
+                        let commentObj={
+                            mediaType:self.eventList[i].sourceObj.mediaType,
+                            url:url,
+                            deviceId: self.eventList[i].sourceObj.deviceId
+                        }
+                        commentTemp.push(commentObj);
                     }).catch((err)=>{
                         upload++
                     })
@@ -461,7 +464,9 @@ export default {
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
             }
-            status = self.curSumIndex;
+            let curSumIndex=[]
+            curSumIndex = self.resultList.filter(x=>x.isActive)
+            status = curSumIndex[0].label
             let params={
                 status:status,
                 comment:self.suggest.trim(),
@@ -676,11 +681,11 @@ export default {
         },
       adviceChanged(val){
         let self = this;
-        let content = filterString.all(val,200);
+        let content = filterString.all(val,600);
         let length = filterString.getContentLength(val);
         console.log(content);
         self.suggest = content;
-        if(length>200){
+        if(length>600){
               this.adviceInfoRuletip=true
           }else{
               this.adviceInfoRuletip=false

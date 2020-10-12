@@ -23,7 +23,7 @@
       <div class="suggest" v-if="suggest!=null&&suggest.length!=0">
         <div class="suggest-content">
           <span>{{generateReportLang('advice')}}</span>
-          <span v-html="turnSuggest(suggest)"></span>
+          <span v-html="turnSuggest(suggest)" style="flex:1;"></span>
         </div>
       </div>
       <el-row class="report-content">
