@@ -237,6 +237,7 @@ export default {
     cancel: '取 消',
     coment: '请输入处理评论文字',
     comentRuletip:'最多可输入200个字符',
+    comentRuletip_suggest:'最多可输入600个字符',
     scoreUnit: '评分：',
     ignored: '不适用',
     ignoreds: '不适用项',

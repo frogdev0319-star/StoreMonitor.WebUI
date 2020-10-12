@@ -15,7 +15,7 @@
                 <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
                 <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
                           :placeholder="generatePatrolLang('adviceInfo')" @blur="notShowInputRuleTips"></el-input>
-                <span class="rules" v-if="adviceInfoRuletip">{{generatePatrolLang('comentRuletip')}}</span>
+                <span class="rules" v-if="adviceInfoRuletip">{{generatePatrolLang('comentRuletip_suggest')}}</span>
             </div>
         </el-col>
         <el-col :span="24" class="sum-data">
@@ -697,11 +697,11 @@ export default {
         },
       adviceChanged(val){
         let self = this;
-        let content = filterString.all(val,200);
+        let content = filterString.all(val,600);
         let length = filterString.getContentLength(val);
         console.log(content);
         self.suggest = content;
-        if(length>200){
+        if(length>600){
               this.adviceInfoRuletip=true
           }else{
               this.adviceInfoRuletip=false

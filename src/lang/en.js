@@ -237,6 +237,7 @@ export default {
     cancel: 'Cancel',
     coment: 'Enter Descriptions',
     comentRuletip:'Enter up to 200 characters',
+    comentRuletip_suggest:'Enter up to 600 characters',
     scoreUnit: 'Score: ',
     ignored: 'N/A',
     ignoreds: 'Ignored Items',

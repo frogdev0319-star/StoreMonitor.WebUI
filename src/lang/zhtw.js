@@ -237,6 +237,7 @@ export default {
     cancel: '取 消',
     coment: '請輸入處理評論文字',
     comentRuletip:'最多可輸入200個字元',
+    comentRuletip_suggest:'最多可輸入600個字元',
     scoreUnit: '評分：',
     ignored: '不適用',
     ignoreds: '不适用项',
