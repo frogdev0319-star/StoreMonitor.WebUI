@@ -457,7 +457,7 @@
   import {isLoginIn} from '@/api/login'
   import { mapMutations,mapGetters} from 'vuex'
   import {generateDeviceLang} from '@/api/i18n'
-  import {getStoreList} from '@/api/store'
+  import {getStoreList,getBriefStoreList} from '@/api/store'
   import filterString from '@/common/filterString'
 
 
@@ -628,7 +628,7 @@
         let self=this;
         if(val!=0){
           self.InitData();
-          self.getAllStoreList();
+          self.getBriefStoreData();
         }
       }
     },
@@ -1441,6 +1441,27 @@
         })
         self.storeDataList = tempStore;
       },
+      getBriefStoreData(){
+          let self=this;
+          getBriefStoreList().then(res=>{
+              let errMsg=res.errMsg;
+              if(errMsg!=undefined&&errMsg=='Success'){
+                  let storeList=res.data;
+                  self.storeList=storeList;
+                  let tempStore=[];
+                  storeList.forEach(item=>{
+                    let obj={
+                      storeId:item.storeId,
+                      label:item.name,
+                      value:item.name,
+                      userId:item.userId
+                    }
+                    tempStore.push(obj);
+                  })
+                  self.storeDataList = tempStore;
+              }
+          })
+      },
       getStoreData(params){
         let self=this;
         return new Promise((resolve,reject)=>{
@@ -1798,7 +1819,7 @@
     mounted(){
       let self=this;
       self.InitData();
-      self.getAllStoreList();
+      self.getBriefStoreData();
     },
   }
 </script>

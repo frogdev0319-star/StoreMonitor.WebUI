@@ -83,10 +83,11 @@
           <!-- </el-tooltip> -->
           <div class="store-selected" v-if="showStoreInfo">
             <h1>{{generateReportLang('selected')}}</h1>
-            <ul class="store-list" v-show="storeStr.length > 0">
-              <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
+            <ul class="store-list" style="border:none;" v-show="storeStr.length > 0">
+              <li class="store-item">{{storeStr}}</li>
+              <!-- <li v-for="(item,index) in storeStr" :key="index" class="store-item" style="display: block; text-align: left">
                 - {{item}}
-              </li>
+              </li> -->
             </ul>
           </div>
         </el-col>
@@ -2344,10 +2345,11 @@
             margin-left: 10px;
             padding: 0;
             .store-item{
-              white-space: nowrap;
+              // white-space: nowrap;
               font-size: 14px;
               margin: 0;
               list-style-type: none;
+              background-color: rgba(30, 34, 52, 0.75);
               color: #fff;
             }
           }

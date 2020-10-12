@@ -327,21 +327,6 @@ export default {
                       reject(err)
                     console.log(err)
                   })
-                //   .then(
-                //     function(response){
-                //         // 上传完成
-                //         const url = self.getFileUrl(results.name);
-                //         console.log(url);
-                //         resolve(url);
-                //     },
-                //     function(error){
-                //         throw(error)
-                //     }
-                //   )
-                //   .catch((error) => {
-                //       reject(error)
-                //     console.log(error)
-                //   })
               })
             }
             else{
@@ -355,16 +340,6 @@ export default {
                     const url = self.getFileUrl(fileItem.fileName);
                     console.log(url);
                     resolve(url);
-                // .then(
-                //     function(response){
-                //         // 上传完成
-                //         const url = self.getFileUrl(fileItem.fileName);
-                //         console.log(url);
-                //         resolve(url);
-                //     },
-                //     function(error){
-                //         throw(error)
-                //     }
                   })
                   .catch((error) => {
                       reject(error)
@@ -433,10 +408,18 @@ export default {
                         if(!inspect[i].inspectList[g].items[j].isIgnore){
                             for(let k in inspect[i].inspectList[g].items[j].sourceList){
                                 let obj={};
-                                let url=''
                                 await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url)=>{
-                                    url=url
                                     self.uploadingnumOfPic++
+                                    if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
+                                        obj.mediaType=2;
+                                        obj.url=url;
+                                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                                    }
+                                    else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
+                                        obj.mediaType=1;
+                                        obj.url=url;
+                                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                                    }
                                 }).catch((err)=>{
                                     upload++
                                 })
@@ -445,16 +428,7 @@ export default {
                                     self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                                     return false
                                 }
-                                if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
-                                    obj.mediaType=2;
-                                    obj.url=url;
-                                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                                }
-                                else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
-                                    obj.mediaType=1;
-                                    obj.url=url;
-                                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                                }
+                                
                                 tempFileUrl.push(obj);
                             }
                         }
@@ -476,10 +450,14 @@ export default {
 
                 let commentTemp=[];
                 if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
-                    let url=''
                     await self.upLoadFile(self.eventList[i].sourceObj).then((url)=>{
-                        url=url
                         self.uploadingnumOfPic++
+                        let commentObj={
+                            mediaType:self.eventList[i].sourceObj.mediaType,
+                            url:url,
+                            deviceId: self.eventList[i].sourceObj.deviceId
+                        }
+                        commentTemp.push(commentObj);
                     }).catch((err)=>{
                         upload++
                     })
@@ -488,12 +466,7 @@ export default {
                         self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                         return false
                     }
-                    let commentObj={
-                        mediaType:self.eventList[i].sourceObj.mediaType,
-                        url:url,
-                        deviceId: self.eventList[i].sourceObj.deviceId
-                    }
-                    commentTemp.push(commentObj);
+                    
                     obj.deviceId = self.eventList[i].sourceObj.deviceId;
                 }
                 else{                        //通过加号创建的问题反馈
@@ -502,7 +475,9 @@ export default {
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
             }
-            status = self.curSumIndex;
+            let curSumIndex=[]
+            curSumIndex = self.resultList.filter(x=>x.isActive)
+            status = curSumIndex[0].label
             let params={
                 status:status,
                 comment:self.suggest.trim(),
@@ -553,6 +528,7 @@ export default {
                 }
             })
             let Tab0Status=false
+            let inspectPic = 0
             inspect.forEach(p_item=>{
                 var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
                 p_item.inspectList.forEach(item=>{
@@ -579,7 +555,7 @@ export default {
                         if(p_item.type==1){
                             totalScore+=s_item.itemScore
                         }
-                        self.totalnumOfPic+=s_item.sourceList.length
+                        inspectPic+=s_item.sourceList.length
                     })
                     item['numOfQualified']=QualifiedArr.length
                     item['numOfUnqualified']=UnqualifiedArr.length
@@ -650,6 +626,8 @@ export default {
                 item.sourceObj!=null ? objFeedBack.sourceList.push(item.sourceObj) : ''
                 feedBackTemp.push(objFeedBack);
             })
+            let eventpic = eventList.filter(x=>x.sourceObj!=null)
+            self.totalnumOfPic = Number(inspectPic)+Number(eventpic.length)
             tempList[0]={
                 itemTitleName: self.$t('reportView.notableItem'),
                 iconSrc:'icon-zhongxindingwei',

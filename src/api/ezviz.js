@@ -60,6 +60,7 @@ export const getEzvizAccountList=data=> {
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 const instance = axios.create({
   baseURL: 'https://open.ys7.com/api/',
+  // baseURL: 'https://isgpopen.ezvizlife.com/api/',
   timeout: 3*1000,
   withCredentials: false, // 默认的
   headers: {

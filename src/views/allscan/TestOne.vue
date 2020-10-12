@@ -149,7 +149,7 @@
   import 'echarts/map/js/world'
   import 'zrender/lib/svg/svg'
   import util from '../../common/util.js'
-  import {getStoreList} from '@/api/store'
+  import {getStoreList,getBriefStoreList} from '@/api/store'
   import {Message} from 'element-ui'
   import {getCookie} from '@/common/auth';
   import {isLoginIn} from '@/api/login'
@@ -313,7 +313,7 @@
           self.storeIds = [];
           self.storeName = this.$t('overview.all');
           self.curStore = this.$t('overview.all');
-          self.getAllStoreList();
+          self.getBriefStoreData();
           self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date).endOf('d').toDate()];
           let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
           let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
@@ -377,6 +377,32 @@
         self.params.beginTs = start;
         self.params.endTs = end;
         self.initData();
+      },
+      getBriefStoreData(){
+          let self=this;
+          getBriefStoreList().then(res=>{
+              let errMsg=res.errMsg;
+              if(errMsg!=undefined&&errMsg=='Success'){
+                  let storeList=res.data;
+                  let tempStore=[];
+                  tempStore.push(
+                    {storeId:'-1',
+                      label: self.$t('overview.all'),
+                      value:self.$t('overview.all')}
+                  )
+                  storeList.forEach(item=>{
+                    let obj={
+                      storeId:item.storeId,
+                      label:item.name,
+                      value:item.name,
+                      userId:item.userId,
+                      checked: true
+                    }
+                    tempStore.push(obj);
+                  })
+                  self.storeDataList = tempStore;
+              }
+          })
       },
       changeStore(val){
         let self=this;
@@ -1064,7 +1090,7 @@
     },
     created(){
       let self = this;
-      self.getAllStoreList();
+      self.getBriefStoreData();
       let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
       let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
       self.params.beginTs = start;

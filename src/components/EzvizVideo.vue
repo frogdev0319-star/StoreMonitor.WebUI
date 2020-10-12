@@ -335,6 +335,7 @@
     },
     data(){
       return{
+        areaDomain:null,
         proportion:'4:3',
         proportionList:[
           {label:'4:3'},
@@ -651,6 +652,9 @@
               .then(result => {
                 self.currentStoreId = storeId;
                 self.accessToken = result.data.accessToken;
+                self.areaDomain = {
+                  domain:result.data.areaDomain
+                }
                 self.ezvizExpireTime = result.data.expireTime;
                 resolve(result.data.accessToken);
               })
@@ -774,17 +778,18 @@
             self.notify(self.$t('storeMonitor.getAccessTokenError'), 'warning',3000)
             return;
           }
-
           // 初始化视频方法
           self.decoder = new EZUIKit.EZUIPlayer({
             id: 'myPlayer',
             autoplay: true,
             url: self.videoUrl,
             accessToken: self.accessToken,
-            //decoderPath: '../../static/ezuikit/',
-            decoderPath: './static/ezuikit/',
+            decoderPath: '../../static/ezuikit/',
+            // decoderPath: './static/ezuikit/',
             width: width,
             height: height,
+            // splitBasis:1,
+            // env:self.areaDomain,
             handleError: self.handleError,
             handleSuccess: self.handleSuccess,
           })
@@ -1064,8 +1069,8 @@
             autoplay: self.playState,
             url: self.videoUrl,
             accessToken: self.accessToken,
-            //decoderPath: '../../static/ezuikit/',
-            decoderPath: './static/ezuikit/',
+            decoderPath: '../../static/ezuikit/',
+            // decoderPath: './static/ezuikit/',
             width: width,
             height: self.initPlayerHeight,
             handleError: self.handleError,
@@ -1116,8 +1121,8 @@
             autoplay: self.playState,
             url: self.videoUrl,
             accessToken: self.accessToken,
-            //decoderPath: '../../static/ezuikit/',
-            decoderPath: './static/ezuikit/',
+            decoderPath: '../../static/ezuikit/',
+            // decoderPath: './static/ezuikit/',
             width: width,
             height: height,
             handleError: self.handleError,
@@ -1189,8 +1194,8 @@
             autoplay: true,
             url: self.videoUrl,
             accessToken: self.accessToken,
-            //decoderPath: '../../static/ezuikit/',
-            decoderPath: './static/ezuikit/',
+            decoderPath: '../../static/ezuikit/',
+            // decoderPath: './static/ezuikit/',
             width: width,
             height: height,
             handleError: self.handleError,
@@ -1956,6 +1961,7 @@
           }
           else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            // self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
           }
         }
         else{
@@ -1964,6 +1970,7 @@
           }
           else{
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
+            // self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
           }
           //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
         }

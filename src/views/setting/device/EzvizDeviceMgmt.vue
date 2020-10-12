@@ -521,7 +521,7 @@
   import {isLoginIn} from '@/api/login'
   import { mapMutations,mapGetters} from 'vuex'
   import {generateDeviceLang} from '@/api/i18n'
-  import {getStoreList} from '@/api/store'
+  import {getStoreList,getBriefStoreList} from '@/api/store'
   import EzvizAccount from "./EzvizAccount";
   import filterString from '@/common/filterString'
 
@@ -703,7 +703,7 @@
         let self=this;
         if(val!=0){
           self.InitData();
-          self.getAllStoreList();
+          self.getBriefStoreData();
           self.getAccountList();
         }
       }
@@ -741,9 +741,30 @@
           case 1:
             self.InitData();
             self.getAccountList();
-            self.getAllStoreList()
+            self.getBriefStoreData()
             break;
         }
+      },
+      getBriefStoreData(){
+          let self=this;
+          getBriefStoreList().then(res=>{
+              let errMsg=res.errMsg;
+              if(errMsg!=undefined&&errMsg=='Success'){
+                  let storeList=res.data;
+                  self.storeList=storeList;
+                  let tempStore=[];
+                  storeList.forEach(item=>{
+                    let obj={
+                      storeId:item.storeId,
+                      label:item.name,
+                      value:item.name,
+                      userId:item.userId
+                    }
+                    tempStore.push(obj);
+                  })
+                  self.storeDataList = tempStore;
+              }
+          })
       },
       handleChange (file, fileList) {
         this.addChannelData.pictureUrl = file.url;

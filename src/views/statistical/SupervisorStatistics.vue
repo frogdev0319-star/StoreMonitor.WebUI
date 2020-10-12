@@ -259,7 +259,7 @@
 
 <script>
   import {mapGetters} from 'vuex'
-  import {getStoreList} from '@/api/store'
+  import {getStoreList,getBriefStoreList} from '@/api/store'
   import util from '../../common/util.js'
   import {Message} from 'element-ui'
   import RegionMultiSelect from "@/components/RegionMultiSelect";
@@ -658,6 +658,20 @@
         self.curCountry = '中国';
         self.selectAllProAndCity(self.curCountry);
       },
+      getBriefStoreData(){
+          let self=this;
+          return new Promise((resolve,reject)=>{
+              getBriefStoreList().then(res=>{
+                  let errMsg=res.errMsg;
+                  if(errMsg!=undefined&&errMsg=='Success'){
+                      let data=res.data;
+                      resolve(res);
+                  }
+              }).catch(res => {
+                  resolve(res);
+              })
+          })
+      },
       getStoreData(params){
         let self=this;
         return new Promise((resolve,reject)=>{
@@ -858,14 +872,8 @@
         params.category = [0,1]
         console.log(params)
         let result = await self.getInspectorPlan(params)
-        let storeparams={
-          "filter":{
-            "page":0,
-            "size":2000
-          }
-        };
-        let retData=await self.getStoreData(storeparams);
-        let storeList=retData.data.content;
+        let retData=await self.getBriefStoreData();
+        let storeList=retData.data;
         let errCode = result.errCode;
         if (errCode == 0) {
           let resultData = result.data;
