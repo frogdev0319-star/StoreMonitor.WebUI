@@ -654,8 +654,10 @@
         pageStore:1,
         sizeNumStore:10,
         curRegionArray: [],
-        exportDataHeader:['门店名称','平均巡店周期','评估次数','合格','待改善','立即督导','合格率','平均分'], //需要导出数据的表头
-        exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格','待改善','立即督导','合格率','平均分'], //需要导出数据的表头
+        exportDataHeader:[this.$t('overview.storeName'),this.$t('overview.advPatrolCycle'),this.$t('overview.numOfEvaluations'),this.$t('overview.echartGood'),this.$t('overview.improve'),this.$t('overview.danger'),this.$t('overview.passRate'),this.$t('overview.averageScore')],
+        exportRegionHeader:[this.$t('overview.regionName'),this.$t('overview.advPatrolCycle'),this.$t('overview.numOfEvaluations'),this.$t('overview.echartGood'),this.$t('overview.improve'),this.$t('overview.danger'),this.$t('overview.passRate'),this.$t('overview.averageScore')],
+        // exportDataHeader:['门店名称','平均巡店周期','评估次数','合格','待改善','立即督导','合格率','平均分'], //需要导出数据的表头
+        // exportRegionHeader:['区域名称','平均巡店周期','评估次数','合格','待改善','立即督导','合格率','平均分'], //需要导出数据的表头
         regionParams: {},
         chartParams:{},
         chartArrayData: [],

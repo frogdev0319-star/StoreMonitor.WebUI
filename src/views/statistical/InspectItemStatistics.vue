@@ -475,7 +475,8 @@
             direction: 'asc',
             property: 'qualifiedRate',
             hasNoData: false,
-            exportItmesHeader: ['巡检表类别','巡检项', '评估次数', '合格（次）', '不合格（次）', '忽略（次）', '合格率'],
+            exportItmesHeader:[this.$t("overview.patrolCate"),this.$t("overview.items"),this.$t("overview.numOfEvaluations"),`${this.$t("overview.pass")}${this.$t("overview.timesUnit")}`, `${this.$t("overview.failed")}${this.$t("overview.timesUnit")}`,`${this.$t("overview.ignored")}${this.$t("overview.timesUnit")}`,this.$t("overview.passRate")],
+            // exportItmesHeader: ['巡检表类别','巡检项', '评估次数', '合格（次）', '不合格（次）', '忽略（次）', '合格率'],
             headerClass: 'header-class',
             cellClass: 'cell-class',
             echartAxiasColor: '#e3e9f4',
@@ -1219,8 +1220,9 @@
           self.params.mode = self.curType;
           self.inspectTypeList.forEach(item=>{
             if(self.inspectList==item.name){
-              self.params.inspectId = item.id
-            }else{
+              self.params.inspectId = self.inspectList = item.id
+            }
+            else{
               self.params.inspectId = self.inspectList
             }
           })

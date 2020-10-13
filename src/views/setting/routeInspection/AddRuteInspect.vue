@@ -185,7 +185,7 @@
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
                            <span style="margin-left:73px;" v-if="!item.isClick">{{item.Score_3}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
-                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3"></el-input>
+                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3" @input="editinputChange(item,index)"></el-input>
                        </div>
                        <div class="nape-items-handle" v-if="!item.isClick" style="flex:1;">
                            <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"  @click="handleEdit(index,item)"></i>
@@ -450,6 +450,7 @@ export default {
         },
         handleSheetClick(val){
             let self = this
+            self.showAddGroup=false
             self.showAddNape=false
             self.refreshData(0)
         },
@@ -873,6 +874,7 @@ export default {
         addNape(){
             let self=this;
             self.showAddNape=!self.showAddNape;
+            self.newAddScore=0
             self.napeList.forEach((_item,_index)=>{
                 _item.isClick=false;
             })
@@ -935,6 +937,10 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
+            if(typeof(item.Score_3)!='number'&&item.Score_3.trim().length==0){
+                self.notify(self.$t('insSettingView.ScoreEmpty'),'warning',3000);
+                return false;
+            }
             // if(validateInput(item.napeName)||validateInput(item.napeDep)){
             //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
             //     return false;
@@ -947,8 +953,13 @@ export default {
                 itemScore=item.Score_1
                 qualifiedScore=item.Score_2
             }else if(self.activeSheetName=='2'){
-                itemScore=item.Score_3
-                qualifiedScore=null
+                if(item.Score_3>100||item.Score_3<-100){
+                    self.notify(self.$t('insSettingView.sheetscore2'),'warning',3000);
+                    return false;
+                }else{
+                    itemScore=item.Score_3
+                    qualifiedScore=null
+                }
             }
             let obj={
                 id:item.id,
@@ -988,11 +999,9 @@ export default {
                 self.notify(self.$t('insSettingView.titleEmpty'),'warning',3000);
                 return false;
             }
-            if(self.newAddScore!=0){
-                if(self.newAddScore.trim().length==0){
-                    self.notify(self.$t('insSettingView.ScoreEmpty'),'warning',3000);
-                    return false;
-                }
+            if(typeof(self.newAddScore)!='number'&&self.newAddScore.trim().length==0){
+                self.notify(self.$t('insSettingView.ScoreEmpty'),'warning',3000);
+                return false;
             }
             // if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
             //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
@@ -1054,7 +1063,7 @@ export default {
                     self.napeList.push(obj);
                     self.newNapeName='';
                     self.newNapeDep='';
-                    self.newAddScore='';
+                    self.newAddScore=0;
                     self.showAddNape=false;
                     self.refreshData(self.groupIndex);
                     self.groupList[self.groupIndex].groupNum++;
@@ -1315,6 +1324,13 @@ export default {
                 self.newAddScore = '-'+val.replace(/[^\d]/g, '')
             }else{
                 self.newAddScore = val.replace(/[^\d]/g, '')
+            }
+        },
+        editinputChange(item,index){
+            if(item.Score_3.indexOf('-')!=-1){
+                item.Score_3 = '-'+item.Score_3.replace(/[^\d]/g, '')
+            }else{
+                item.Score_3 = item.Score_3.replace(/[^\d]/g, '')
             }
         },
         selectFullScore(val){

@@ -565,7 +565,8 @@
         headerClass: 'header-class',
         cellClass: 'cell-class',
         rowClass: 'row-class',
-        exportEventHeader: ['门店名称','所属区域','事件总数', '待处理事件数量','已处理事件数量', '已结案事件数量','已退回事件数量', '远程巡检', '现场巡检', '门店监控'],
+        exportEventHeader:[this.$t('overview.storeName'),this.$t('overview.area'),this.$t('overview.sumEvents'),this.$t('overview.numUnprocessEvents'),this.$t('overview.numProcessEvents'),this.$t('overview.numClosedEvents'),this.$t('overview.numReturndEvents'),this.$t('overview.remotePatrol'),this.$t('overview.onsitePatrol'),this.$t('overview.storeMonitor')],
+        // exportEventHeader: ['门店名称','所属区域','事件总数', '待处理事件数量','已处理事件数量', '已结案事件数量','已退回事件数量', '远程巡检', '现场巡检', '门店监控'],
         hasNoData: false,
         sidebarElm: null,
         fontFamily: 'Roboto, Microsoft YaHei'

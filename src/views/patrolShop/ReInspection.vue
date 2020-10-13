@@ -2428,19 +2428,19 @@ export default {
                     let dealtemp=[]
                     s_item.inspectList.forEach(item=>{
                         item.items.forEach((_item,_index)=>{
-                            self.hasIgnoretemp.forEach(h_item=>{
-                                if(h_item.inputCount==0){
-                                    h_item.isIgnore=true
-                                    h_item.inspectInput = ''
-                                    h_item.sourceList = []
+                            self.hasIgnoretemp.forEach((h_item,h_index)=>{
+                                if(self.hasIgnoretemp[h_index].inputCount==0){
+                                    self.hasIgnoretemp[h_index].isIgnore=true
+                                    self.hasIgnoretemp[h_index].inspectInput = ''
+                                    self.hasIgnoretemp[h_index].sourceList = []
                                 }
-                                if(h_item.id==_item.id){
-                                    _item=h_item
+                                if(self.hasIgnoretemp[h_index].id==item.items[_index].id){
+                                    item.items[_index]=self.hasIgnoretemp[h_index]
                                 }
                             })
-                            if(_item.inputCount==1){
+                            if(_item.inputCount!=0){
                                 let obj={}
-                                obj.dealCount=_item.inputCount
+                                obj.dealCount=1
                                 dealtemp.push(obj)
                             }
                         })
@@ -2481,6 +2481,7 @@ export default {
                 curGroupIndex:self.curGroupIndex,
                 curItemIndex:self.curItemIndex
             }
+            self.hasIgnoretemp=[]
             // sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
             self.$router.push({name:"confirmSum",params:{data:obj}});
         },
@@ -2511,6 +2512,7 @@ export default {
             let dealCount=0;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
+            debugger
             if(self.hasIgnoretemp.length==0){
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach(item=>{
@@ -2523,6 +2525,8 @@ export default {
                             }
                         })
                     })
+                    dealCount=dealCount+s_item.dealCount;
+                    count=count+s_item.count;
                 })
             }else{
                 sheetName.forEach(s_item=>{
@@ -2548,7 +2552,13 @@ export default {
                         temp.push(item)
                     })
                     s_item.dealCount=dealtemp.length
+                    dealCount=dealCount+s_item.dealCount;
+                    count=count+s_item.count;
                 })
+            }
+            if(dealCount<count){
+                self.noAllInspectObj.dialogCosed=true;
+                return false;
             }
             let hasIgnoretemp=[]
             temp.forEach(item=>{
@@ -2559,10 +2569,6 @@ export default {
                     }
                 })
             })
-            // if(dealCount<count){
-            //     self.noAllInspectObj.dialogCosed=true;
-            //     return false;
-            // }
             let obj={
                 inspect:sheetName,
                 event:self.eventList,
