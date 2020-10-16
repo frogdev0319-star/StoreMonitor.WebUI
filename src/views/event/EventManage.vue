@@ -17,22 +17,15 @@
                     </el-option>
                     </el-option-group>
                 </el-select>
-                <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
-                class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
-                        <el-option
-                        v-for="item in StoreTagList"
-                        :key="item.tagId"
-                        :label="item.tagName"
-                        :value="item.tagId">
-                        </el-option>
-                </el-select>
                 <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
                 <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                    style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+                                    style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
 
                 <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                                     style="display: inline;" ref="multiSelect"></multi-select>
+                <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
+                                style="display: inline;" ref="TagMultiSelect"></multi-select>
                 <el-input
                     size="small"
                     class="el-search"
@@ -70,9 +63,9 @@
                 <multi-select :selected="curState" :alltype="0" :options="states" :disabled="activeName!='4'" @changeInput="handleStateChange"
                                     style="display:inline;" ref="multiState"></multi-select>
             </div>
-            <div class="store-handle">
+            <!-- <div class="store-handle">
                     <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
-            </div>
+            </div> -->
         </div>
         <div class="el-table-content">
             <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
@@ -198,7 +191,7 @@ export default {
             curCountry:'',
             CountryList:[],
             StoreTagList:[],
-            curStoreTag:'',
+            curStoreTag:[],
             curProvince:[],
             curStore:[],
             curCity:[],
@@ -349,7 +342,13 @@ export default {
                 GetTagList().then(res=>{
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
-                        self.StoreTagList=res.data;
+                        res.data.forEach(item=>{
+                            let obj={}
+                            obj.value=item.tagId
+                            obj.label=item.tagName
+                            obj.disabled=false
+                            self.StoreTagList.push(obj)
+                        })
                         resolve(res);
                     }
                 }).catch(res => {
@@ -461,19 +460,22 @@ export default {
         changeStoreTag(val){
             let self=this
             let temp=[]
+            self.curStoreTag=val
             self.clearStoreInfo();
             self.tempStoreData.forEach(item=>{
                 item.tagIds.forEach(_item=>{
-                    if(_item==val&&self.curCountry==item.country){
-                        let obj={
-                            storeId:item.storeId,
-                            label:item.name,
-                            value:item.name,
-                            userId:item.userId,
-                            tagIds:item.tagIds
-                        };
-                        temp.push(obj);
-                    }
+                    val.forEach(v_item=>{
+                        if(_item==v_item&&self.curCountry==item.country){
+                            let obj={
+                                storeId:item.storeId,
+                                label:item.name,
+                                value:item.name,
+                                userId:item.userId,
+                                tagIds:item.tagIds
+                            };
+                            temp.push(obj);
+                        }
+                    })
                 })
             })
             self.storeDataList=temp
@@ -493,10 +495,10 @@ export default {
         changeCountry(val){
             let self=this;
             let temp=[]
-            self.curStoreTag=''
             self.clearProviceInfo()
             self.clearCityInfo();
             self.clearStoreInfo();
+            self.clearTagInfo();
             self.selectAllProAndCity(val);
         },
         changePro(val){
@@ -646,6 +648,12 @@ export default {
             self.$refs.citySelect.selectedArray = [];
             self.$refs.citySelect.input=''
         },
+        clearTagInfo(){
+                let self=this;
+                self.curStoreTag=[];
+                self.$refs.TagMultiSelect.selectedArray = [];
+                self.$refs.TagMultiSelect.input=''
+            },
         changeStore(val){
             let self=this;
             let str='';
@@ -997,8 +1005,10 @@ export default {
             let label='';
             switch(tabIndex){
                 case 0: label=this.$t('eventView.pendingEve');break;
-                case 1: label=this.$t('eventView.myEvent');break;
-                case 2: label=this.$t('eventView.all');break;
+                case 1: label=this.$t('eventView.ProcessedEvent');break;
+                case 2: label=this.$t('eventView.ClosedEvent');break;
+                case 3: label=this.$t('eventView.ReturnEvent');break;
+                case 4: label=this.$t('eventView.allEvents');break;
                 default: console.error('error tab pages！');break;
             }
             let fileName=label+'-'+util.getCurDateStr();
@@ -1237,7 +1247,7 @@ $h1:#292e36;
             -moz-osx-font-smoothing: grayscale;
         }
         .el-date{
-            margin:20px 0;
+            margin-top: 20px;
             text-align: left;
             // position: relative;
             .date-title{

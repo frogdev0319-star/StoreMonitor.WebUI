@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler"
-               :placeholder="alltype==0?$t('reportView.all'):$t('reportView.stores')" class="el-province" :disabled="disabled">
+               :placeholder="alltype==0?(allSelect==0?$t('reportView.selectStoreTag'):$t('reportView.all')):$t('reportView.stores')" class="el-province" :disabled="disabled">
       <el-option :label="alltype==0?$t('reportView.all'):$t('overview.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
       <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='alltype==0?item.value:item.storeId' :disabled="item.disabled"></el-option>
     </el-select>
@@ -23,6 +23,9 @@
             type: Array
           },
           alltype:{
+            type:Number
+          },
+          allSelect:{
             type:Number
           },
           disabled: {
@@ -59,7 +62,9 @@
             })
             if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
               this.input = this.alltype==0?this.$t('reportView.all'):this.$t('overview.all')
-              this.selectedArray.unshift('-1')
+              if(this.allSelect!=0){
+                this.selectedArray.unshift('-1')
+              }
             }  else if(this.selectedArray.includes('-1')){
               this.input = this.alltype==0?this.$t('reportView.all'):this.$t('overview.all')
             }

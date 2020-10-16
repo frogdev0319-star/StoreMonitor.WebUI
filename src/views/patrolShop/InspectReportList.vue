@@ -23,52 +23,14 @@
                     </el-option>
                   </el-option-group>
                 </el-select>
-                <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
-                class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
-                        <el-option
-                        v-for="item in StoreTagList"
-                        :key="item.tagId"
-                        :label="item.tagName"
-                        :value="item.tagId">
-                        </el-option>
-                </el-select>
-                <!--<el-select v-model="curProvince"  :placeholder="generateReportLang('regionI')" size="mini" :disabled="curCountry.length==0"-->
-                <!--class="el-province" @change="changePro" @clear="cleaPro">-->
-                    <!--<el-option-->
-                    <!--v-for="item in provinceList"-->
-                    <!--:key="item.value"-->
-                    <!--:label="item.label"-->
-                    <!--:value="item.value">-->
-                    <!--</el-option>-->
-                <!--</el-select>-->
-                <!--<el-select v-model="curCity"  :placeholder="generateReportLang('regionII')" size="mini" :disabled="curProvince.length==0"-->
-                <!--class="el-province" @change="changeCity" @clear="clearCity">-->
-                    <!--<el-option-->
-                    <!--v-for="item in cityList"-->
-                    <!--:key="item.value"-->
-                    <!--:label="item.label"-->
-                    <!--:value="item.value">-->
-                    <!--</el-option>-->
-                <!--</el-select>-->
                 <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                     style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+                                     style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
                 <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                     style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+                                     style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
                 <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleStoreChange" style="display: inline" ref="multiSelect">
                 </multi-select>
-              <!--<el-select multiple collapse-tags v-model="curStore" clearable  :placeholder="generateReportLang('stores')" size="mini"-->
-                <!--class="el-province select-store" @change="changeStore" @clear="clearStore">-->
-                    <!--<el-option-->
-                    <!--v-for="item in storeDataList"-->
-                    <!--:key="item.storeId"-->
-                    <!--:label="item.label"-->
-                    <!--:value="item.storeId">-->
-                    <!--</el-option>-->
-                <!--</el-select>-->
-                <!--<div class="search-content" v-if="searchContent">-->
-                    <!--<span>{{generateReportLang('keywords')}}</span>-->
-                    <!--<el-input size="mini" v-model="searchInput" class="search-input"></el-input>-->
-                <!--</div>-->
+                <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
+                                style="display: inline;" ref="TagMultiSelect"></multi-select>
             </el-col>
             <el-col :span="24" class="header-details">
                 <span :class="lang== 'en'? 'en-span-class' : ''">{{generateReportLang('time')}}</span>
@@ -119,10 +81,9 @@
                     <span>{{generateReportLang('keywords')}}</span>
                     <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
                 </div>
-                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary"
-                           :disabled="curProvince.length==0&&curStoreTag==''">{{generateReportLang('search')}}</el-button>
+                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{generateReportLang('search')}}</el-button>
             </el-col>
-            <el-col :span="24" class="header-details1">
+            <!-- <el-col :span="24" class="header-details1">
                 <span class="choice-store">
                   <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
                   {{generateReportLang('selected')}}
@@ -132,12 +93,9 @@
                   <h1>{{generateReportLang('selected')}}</h1>
                   <ul class="store-list" v-show="storeStr.length > 0">
                      <li class="store-item">{{storeStr}}</li>
-                    <!-- <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
-                        - {{item}}
-                    </li> -->
                   </ul>
                 </div>
-            </el-col>
+            </el-col> -->
         </el-col>
         <el-col :span="24" class="report-content">
             <el-row class="card-content" v-if="reportList.length!=0">
@@ -237,7 +195,7 @@ export default {
             curCountry:'',
             countryList:[],
             curProvince: [],
-            curStoreTag:'',
+            curStoreTag:[],
             StoreTagList:[],
             provinceList:[],
             curCity:[],
@@ -322,7 +280,7 @@ export default {
             self.curStore=[];
             self.storeList=[];
             self.searchInput='';
-            self.curStoreTag=''
+            self.curStoreTag=[]
 
         },
         initData(){
@@ -467,54 +425,6 @@ export default {
             self.params.clause = {storeId: storeIds}
             self.getReportList(self.params);
         },
-        async getRegionInfo(){
-            let self=this;
-            let params={
-                "filter":{
-                    "page":0,
-                    "size":2000
-                }
-            };
-            let retData=await self.getStoreData(params);
-            let storeList=retData.data.content;
-            self.storeList=storeList;
-
-            let getCountry=storeList=>{
-                let temp=[];
-                // temp.push({label:self.$t('reportView.country'), value:''})
-                storeList.forEach(item=>{
-                    if(temp.map(x=>x.value).indexOf(item.country)==-1){
-                        let obj={
-                            label:item.country,
-                            value:item.country
-                        }
-                        temp.push(obj);
-                    }
-                })
-                return temp;
-            }
-            let countryList=getCountry(storeList);
-            let tempStore=[];
-            storeList.forEach(item=>{
-                let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    userName:item.userName,
-                    checked: false
-                }
-                tempStore.push(obj);
-            })
-            self.storeDataList=tempStore;
-            // self.countryList=countryList;
-            self.countryList[0] = {}
-            self.countryList[0].label= self.$t('reportView.country');
-            self.countryList[0].countryList = countryList
-            console.log(self.countryList);
-            self.curCountry = countryList[0].label;
-            self.selectAllProAndCity(self.curCountry);
-        },
         async getCountryStore(){
                 let self=this;
                 let data=await self.getBriefStoreData();
@@ -639,20 +549,50 @@ export default {
               })
             })
             self.cityList=temp;
+            let cityArr=[]
+            if(self.cityList.length!=0){
+                self.cityList.forEach(item=>{
+                    cityArr.push(item.value)
+                })
+                self.curCity=cityArr
+            }
           }
           self.storeDataList=tempStore;
+          let storeArr=[],arr=[]
+          self.storeDataList.forEach(item=>{
+              storeArr.push(item.storeId)
+              arr.push(item.value)
+          })
+          
+          self.curStore=storeArr
+          let str = ''
+          arr.forEach(item=>{
+              str+=item+'，'
+          })
+          str=str.substr(0,str.length-1)
+          self.storeStr=str;
         },
         changeCountry(val){
+            let self=this;
+            let temp=[]
+            self.clearProviceInfo()
+            self.clearCityInfo();
+            self.clearStoreInfo();
+            self.clearTagInfo();
+            self.selectAllProAndCity(val);
+        },
+        changeCountryss(val){
           let self=this;
           console.log(val);
           self.curProvince= [];
           self.curCity=[];
-          self.curStoreTag=''
+          self.curStoreTag=[]
           let storeList=self.storeList;
           let tempStore=[];
           let temp=[];
           self.clearProviceInfo();
           self.clearCityInfo();
+          self.clearTagInfo();
           self.clearStoreInfo();
           if(val== ''){
             storeList.forEach(item=>{
@@ -696,10 +636,12 @@ export default {
         changeStoreTag(val){
           let self=this
           let temp=[]
+          self.curStoreTag=val
           self.clearStoreInfo();
           self.storeList.forEach(item=>{
               item.tagIds.forEach(_item=>{
-                  if(_item==val&&self.curCountry==item.country){
+                val.forEach(v_item=>{
+                  if(_item==v_item&&self.curCountry==item.country){
                       let obj={
                           storeId:item.storeId,
                           label:item.name,
@@ -709,9 +651,21 @@ export default {
                       };
                       temp.push(obj);
                   }
+                })
               })
           })
           self.storeDataList=temp
+          let str = '',storeArr=[],arr=[]
+          self.storeDataList.forEach(item=>{
+              storeArr.push(item.storeId)
+              arr.push(item.value)
+          })
+          self.curStore=storeArr
+          arr.forEach(item=>{
+              str+=item+'，'
+          })
+          str=str.substr(0,str.length-1)
+          self.storeStr=str;
         },
         getTagListData(){
             let self=this;
@@ -719,7 +673,13 @@ export default {
                 GetTagList().then(res=>{
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
-                        self.StoreTagList=res.data;
+                        res.data.forEach(item=>{
+                            let obj={}
+                            obj.value=item.tagId
+                            obj.label=item.tagName
+                            obj.disabled=false
+                            self.StoreTagList.push(obj)
+                        })
                         resolve(res);
                     }
                 }).catch(res => {
@@ -730,29 +690,9 @@ export default {
         changeCity(val){
           let self=this;
           self.clearStoreInfo();
-          console.log(val)
           let storeList=self.storeList;
           let temp=[];
-          if(val.length == 0){
-            console.log(self.curProvince)
-            self.curProvince.forEach(_item=>{
-              console.log(_item)
-
-              storeList.forEach(item=>{
-                console.log(item)
-                if(item.province==_item){
-                  let obj = {};
-                  obj.storeId = item.storeId;
-                  obj.label = item.name;
-                  obj.value = item.name;
-                  obj.userId = item.userId;
-                  obj.userName = item.userName;
-                  temp.push(obj);
-                }
-              })
-            })
-          }
-          else{
+          if(val.length != 0){
             val.forEach(_item=>{
               storeList.forEach(item=>{
                 if(item.city==_item){
@@ -770,8 +710,18 @@ export default {
               })
             })
           }
-          console.log(temp)
           self.storeDataList=temp;
+          let str = '',storeArr=[],arr=[]
+          self.storeDataList.forEach(item=>{
+              storeArr.push(item.storeId)
+              arr.push(item.value)
+          })
+          self.curStore=storeArr
+          arr.forEach(item=>{
+              str+=item+'，'
+          })
+          str=str.substr(0,str.length-1)
+          self.storeStr=str;
         },
         clearStoreInfo(){
           let self=this;
@@ -791,6 +741,12 @@ export default {
           self.curCity=[];
           self.$refs.citySelect.selectedArray = [];
           self.$refs.citySelect.input=''
+        },
+        clearTagInfo(){
+            let self=this;
+            self.curStoreTag=[];
+            self.$refs.TagMultiSelect.selectedArray = [];
+            self.$refs.TagMultiSelect.input=''
         },
         selectAllProAndCity(val){
           let self = this;
@@ -1011,7 +967,6 @@ export default {
     //     console.log(this.sortTypeList);
     //     let self=this;
     //     //self.getDeafultTime();
-    //     await self.getRegionInfo();
     //     self.getInitReportList();
     // },
     activated(){
@@ -1045,7 +1000,7 @@ $suggestBack:#F1F6FE;
         border-bottom: 1px solid $border;
         background-color: #fff;
         padding-top: 30px;
-        padding-bottom: 30px;
+        // padding-bottom: 30px;
         color: $black;
         .header-details1{
             text-align: left;

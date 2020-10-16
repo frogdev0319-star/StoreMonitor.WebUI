@@ -16,22 +16,15 @@
                 </el-option>
                 </el-option-group>
             </el-select>
-            <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
-             class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
-                    <el-option
-                    v-for="item in StoreTagList"
-                    :key="item.tagId"
-                    :label="item.tagName"
-                    :value="item.tagId">
-                    </el-option>
-            </el-select>
             <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
             <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+                                style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
 
             <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                                 style="display: inline;" ref="multiSelect"></multi-select>
+            <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
+                                style="display: inline;" ref="TagMultiSelect"></multi-select>
             <el-input
                 size="small"
                 class="el-search-input"
@@ -39,11 +32,11 @@
                 v-model="serachVale" @keyup.enter.native="searchEventList" @clear="searchEventList">
                 <i slot="prefix" class="iconfont icon-sousuo iconsou"></i>
             </el-input>
-            <div class="store-handle">
+            <!-- <div class="store-handle">
               <el-col :span="24" class="header-details1">
                 <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
               </el-col>
-            </div>
+            </div> -->
        </el-col>
         <el-col :span="24" class="el-table-content">
             <el-table
@@ -194,7 +187,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 curProvince:[],
                 curCity:[],
                 curStore:[],
-                curStoreTag:'',
+                curStoreTag:[],
                 showDrap:false,
                 showCityContent:false,
                 multeCityList:[],
@@ -257,19 +250,22 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
             changeStoreTag(val){
                 let self=this
                 let temp=[]
+                self.curStoreTag=val
                 self.clearStoreInfo();
                 self.tempStoreData.forEach(item=>{
                     item.tagIds.forEach(_item=>{
-                        if(_item==val&&self.curCountry==item.country){
-                            let obj={
-                                storeId:item.storeId,
-                                label:item.name,
-                                value:item.name,
-                                userId:item.userId,
-                                tagIds:item.tagIds
-                            };
-                            temp.push(obj);
-                        }
+                        val.forEach(v_item=>{
+                            if(_item==v_item&&self.curCountry==item.country){
+                                let obj={
+                                    storeId:item.storeId,
+                                    label:item.name,
+                                    value:item.name,
+                                    userId:item.userId,
+                                    tagIds:item.tagIds
+                                };
+                                temp.push(obj);
+                            }
+                        })
                     })
                 })
                 self.storeDataList=temp
@@ -289,10 +285,10 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
             changeCountry(val){
                 let self=this;
                 let temp=[]
-                self.curStoreTag=''
                 self.clearProviceInfo()
                 self.clearCityInfo();
                 self.clearStoreInfo();
+                self.clearTagInfo();
                 self.selectAllProAndCity(val);
             },
             changePro(val){
@@ -303,20 +299,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 let storeList=self.tempStoreData;
                 let temp=[];
                 let tempStore=[];
-                if(val==''){
-                    storeList.forEach(item=>{
-                        if(item.country==self.curCountry){
-                                let obj={
-                                    storeId:item.storeId,
-                                    label:item.name,
-                                    value:item.name,
-                                    userId:item.userId,
-                                    tagIds:item.tagIds
-                                };
-                                tempStore.push(obj);
-                        }
-                    })
-                }else{
+                if(val!=''){
                     val.forEach(_item=>{
                         storeList.forEach(item=>{
                             if(item.province==_item){
@@ -436,6 +419,12 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 self.curCity=[];
                 self.$refs.citySelect.selectedArray = [];
                 self.$refs.citySelect.input=''
+            },
+            clearTagInfo(){
+                let self=this;
+                self.curStoreTag=[];
+                self.$refs.TagMultiSelect.selectedArray = [];
+                self.$refs.TagMultiSelect.input=''
             },
             changeStore(val){
                 let self=this;
@@ -624,7 +613,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                 self.curCitys=this.$t('storeView.cityPlaceholder');
                 self.serachVale='';
                 self.multeCityList=[];
-                self.curStoreTag=''
+                self.curStoreTag=[]
             },
             getInitData(){
                 let self=this;
@@ -786,7 +775,13 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
                     GetTagList().then(res=>{
                         let errMsg=res.errMsg;
                         if(errMsg!=undefined&&errMsg=='Success'){
-                            self.StoreTagList=res.data;
+                            res.data.forEach(item=>{
+                                let obj={}
+                                obj.value=item.tagId
+                                obj.label=item.tagName
+                                obj.disabled=false
+                                self.StoreTagList.push(obj)
+                            })
                             resolve(res);
                         }
                     }).catch(res => {

@@ -990,7 +990,7 @@
           display: flex;
         }
         span:first-child {
-          width:80px;
+          width:100px;
           padding-right: calc(20 / 1920 * 100vw);
         }
       }

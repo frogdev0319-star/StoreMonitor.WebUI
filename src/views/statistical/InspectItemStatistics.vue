@@ -23,22 +23,15 @@
               </el-option>
             </el-option-group>
           </el-select>
-          <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
-             class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
-                    <el-option
-                    v-for="item in StoreTagList"
-                    :key="item.tagId"
-                    :label="item.tagName"
-                    :value="item.tagId">
-                    </el-option>
-            </el-select>
           <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
           <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect"></multi-select>
+          <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
+                                style="display: inline;" ref="TagMultiSelect"></multi-select>
           <span>{{$t('overview.patrolLists')}}</span>
           <el-select v-model="inspectList"  :placeholder="$t('insSettingView.selectPost')" size="mini" class="el-province">
                   <el-option
@@ -83,24 +76,19 @@
           </el-tooltip>
           <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary" :disabled="storeDataList.length==0">{{$t('reportView.search')}}</el-button>
         </el-col>
-        <el-col :span="24" class="header-details1">
-          <!-- <el-tooltip class="item" effect="dark" placement="bottom" :content="storeStr"> -->
+        <!-- <el-col :span="24" class="header-details1">
                   <span class="choice-store">
                     <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
                     {{$t('reportView.selected')}}
                     <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
                   </span>
-          <!-- </el-tooltip> -->
           <div class="store-selected" v-if="showStoreInfo">
             <h1>{{$t('reportView.selected')}}</h1>
             <ul class="store-list" v-show="storeStr.length > 0">
               <li class="store-item">{{storeStr}}</li>
-              <!-- <li v-for="(item,index) in storeStr.split('，')" :key="index" class="store-item" style="display: block; text-align: left">
-                - {{item}}
-              </li> -->
             </ul>
           </div>
-        </el-col>
+        </el-col> -->
       </el-col>
       <el-col :span="24" class="items-content">
         <el-col :span="24" class="contents-container">
@@ -344,7 +332,7 @@
       data(){
           return {
             curCountry:'',
-            curStoreTag:'',
+            curStoreTag:[],
             StoreTagList:[],
             countryList:[],
             curProvince:[],
@@ -505,7 +493,7 @@
             // await self.getRegionInfo();
             // await self.getCountryStore()
             await self.initData();
-            self.curStoreTag=''
+            self.curStoreTag=[]
           }
         },
         numberOfElements(val,oldVal){
@@ -938,7 +926,13 @@
               GetTagList().then(res=>{
                   let errMsg=res.errMsg;
                   if(errMsg!=undefined&&errMsg=='Success'){
-                      self.StoreTagList=res.data;
+                      res.data.forEach(item=>{
+                          let obj={}
+                          obj.value=item.tagId
+                          obj.label=item.tagName
+                          obj.disabled=false
+                          self.StoreTagList.push(obj)
+                      })
                       resolve(res);
                   }
               }).catch(res => {
@@ -950,10 +944,12 @@
         let self=this
         let temp=[]
         self.inspectList=''
+        self.curStoreTag=val
         self.clearStoreInfo();
         self.storeList.forEach(item=>{
             item.tagIds.forEach(_item=>{
-                if(_item==val&&self.curCountry==item.country){
+              val.forEach(v_item=>{
+                if(_item==v_item&&self.curCountry==item.country){
                     let obj={
                         storeId:item.storeId,
                         label:item.name,
@@ -963,6 +959,7 @@
                     };
                     temp.push(obj);
                 }
+              })
             })
         })
         self.storeDataList=temp
@@ -1004,13 +1001,14 @@
           self.inspectList=''
           self.curProvince= [];
           self.curCity=[];
-          self.curStoreTag=''
+          self.curStoreTag=[]
           let storeList=self.storeList;
           let tempStore=[];
           let temp=[];
           self.clearProviceInfo();
           self.clearCityInfo();
           self.clearStoreInfo();
+          self.clearTagInfo();
           if(val== ''){
             storeList.forEach(item=>{
               let obj={
@@ -1329,6 +1327,12 @@
           self.curCity=[];
           self.$refs.citySelect.selectedArray = [];
           self.$refs.citySelect.input=''
+        },
+        clearTagInfo(){
+            let self=this;
+            self.curStoreTag=[];
+            self.$refs.TagMultiSelect.selectedArray = [];
+            self.$refs.TagMultiSelect.input=''
         },
         async getInspectItemsTable() {
           let self = this;
@@ -1784,7 +1788,7 @@
       border-bottom: 1px solid $border;
       background-color: #fff;
       padding-top: 30px;
-      padding-bottom: 30px;
+      // padding-bottom: 30px;
       color: $black;
       .header-details1{
         text-align: left;

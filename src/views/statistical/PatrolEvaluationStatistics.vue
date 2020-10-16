@@ -18,23 +18,15 @@
               </el-option>
             </el-option-group>
           </el-select>
-          <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini"
-             class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0">
-                    <el-option
-                    v-for="item in StoreTagList"
-                    :key="item.tagId"
-                    :label="item.tagName"
-                    :value="item.tagId">
-                    </el-option>
-            </el-select>
           <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                               style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''" :all="$t('overview.allZoneI')"></region-multi-select>
+                               style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
           <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                               style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''" :all="$t('overview.allZoneII')"></region-multi-select>
+                               style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect"></multi-select>
-
+          <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
+                                style="display: inline;" ref="TagMultiSelect"></multi-select>
         </el-col>
         <el-col :span="24" class="header-details">
           <span :class="lang== 'en'? 'en-span-class' : ''">{{generateReportLang('time')}}</span>
@@ -73,24 +65,19 @@
             </el-button>
           </div>
         </el-col>
-        <el-col :span="24" class="header-details1">
-          <!-- <el-tooltip class="item" effect="dark" placement="bottom" :content="storeStr"> -->
-                <span class="choice-store">
-                  <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
-                  {{generateReportLang('selected')}}
-                  <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
-                </span>
-          <!-- </el-tooltip> -->
+        <!-- <el-col :span="24" class="header-details1">
+          <span class="choice-store">
+            <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
+            {{generateReportLang('selected')}}
+            <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
+          </span>
           <div class="store-selected" v-if="showStoreInfo">
             <h1>{{generateReportLang('selected')}}</h1>
             <ul class="store-list" style="border:none;" v-show="storeStr.length > 0">
               <li class="store-item">{{storeStr}}</li>
-              <!-- <li v-for="(item,index) in storeStr" :key="index" class="store-item" style="display: block; text-align: left">
-                - {{item}}
-              </li> -->
             </ul>
           </div>
-        </el-col>
+        </el-col> -->
       </el-col>
       <div class="statistics-content">
         <el-col :span="24" class="region-chart">
@@ -432,7 +419,7 @@
         htmlTitle:this.$t("overview.htmltopdfA"),
         isexportPDF:false,
         curCountry:'',
-        curStoreTag:'',
+        curStoreTag:[],
         StoreTagList:[],
         countryList:[],
         curProvince:[],
@@ -695,7 +682,7 @@
           // await self.getRegionInfo();
           // await self.getCountryStore()
           await self.initData();
-          self.curStoreTag=''
+          self.curStoreTag=[]
         }
       }
     },
@@ -1112,7 +1099,13 @@
               GetTagList().then(res=>{
                   let errMsg=res.errMsg;
                   if(errMsg!=undefined&&errMsg=='Success'){
-                      self.StoreTagList=res.data;
+                      res.data.forEach(item=>{
+                          let obj={}
+                          obj.value=item.tagId
+                          obj.label=item.tagName
+                          obj.disabled=false
+                          self.StoreTagList.push(obj)
+                      })
                       resolve(res);
                   }
               }).catch(res => {
@@ -1123,10 +1116,12 @@
       changeStoreTag(val){
         let self=this
         let temp=[]
+        self.curStoreTag=val
         self.clearStoreInfo();
         self.storeList.forEach(item=>{
             item.tagIds.forEach(_item=>{
-                if(_item==val&&self.curCountry==item.country){
+              val.forEach(v_item=>{
+                if(_item==v_item&&self.curCountry==item.country){
                     let obj={
                         storeId:item.storeId,
                         label:item.name,
@@ -1136,15 +1131,36 @@
                     };
                     temp.push(obj);
                 }
+              })
             })
         })
         self.storeDataList=temp
+        let str = '',storeArr=[],arr=[]
+        self.storeDataList.forEach(item=>{
+            storeArr.push(item.storeId)
+            arr.push(item.value)
+        })
+        self.curStore=storeArr
+        arr.forEach(item=>{
+            str+=item+'，'
+        })
+        str=str.substr(0,str.length-1)
+        self.storeStr=str;
       },
       changeCountry(val){
+          let self=this;
+          let temp=[]
+          self.clearProviceInfo()
+          self.clearCityInfo();
+          self.clearStoreInfo();
+          self.clearTagInfo();
+          self.selectAllProAndCity(val);
+      },
+      changeCountrysss(val){
         let self=this;
         self.curProvince= [];
         self.curCity=[];
-        self.curStoreTag=''
+        self.curStoreTag=[]
         let storeList=self.storeList;
         let tempStore=[];
         let temp=[];
@@ -1242,34 +1258,10 @@
         self.curCity= [];
         self.clearCityInfo();
         self.clearStoreInfo();
-
         let storeList=self.storeList;
         let temp=[];
         let tempStore=[];
-        if(val == ''){
-          storeList.forEach(item=>{
-            if(item.country==self.curCountry){
-              if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                let obj={
-                  label:item.province,
-                  value:item.province
-                }
-                temp.push(obj);
-              }
-              let obj={
-                storeId:item.storeId,
-                label:item.name,
-                value:item.name,
-                userId:item.userId,
-                userName:item.userName
-              };
-              tempStore.push(obj);
-            }
-          })
-          self.provinceList=temp;
-          self.checkAllStore = false;
-        }
-        else{
+        if(val != ''){
           val.forEach(_item=>{
             storeList.forEach(item=>{
               if(item.province==_item){
@@ -1292,8 +1284,28 @@
             })
           })
           self.cityList=temp;
+          let cityArr=[]
+          if(self.cityList.length!=0){
+              self.cityList.forEach(item=>{
+                  cityArr.push(item.value)
+              })
+              self.curCity=cityArr
+          }
         }
         self.storeDataList=tempStore;
+        let storeArr=[],arr=[]
+        self.storeDataList.forEach(item=>{
+            storeArr.push(item.storeId)
+            arr.push(item.value)
+        })
+        
+        self.curStore=storeArr
+        let str = ''
+        arr.forEach(item=>{
+            str+=item+'，'
+        })
+        str=str.substr(0,str.length-1)
+        self.storeStr=str;
       },
       cleaPro(){
         let self=this;
@@ -1330,22 +1342,7 @@
         self.clearStoreInfo();
         let storeList=self.storeList;
         let temp=[];
-        if(val.length == 0){
-          self.curProvince.forEach(_item=>{
-            storeList.forEach(item=>{
-              if(item.province==_item){
-                let obj = {};
-                obj.storeId = item.storeId;
-                obj.label = item.name;
-                obj.value = item.name;
-                obj.userId = item.userId;
-                obj.userName = item.userName;
-                temp.push(obj);
-              }
-            })
-          })
-        }
-        else{
+        if(val.length != 0){
           val.forEach(_item=>{
             storeList.forEach(item=>{
               if(item.city==_item){
@@ -1364,6 +1361,17 @@
           })
         }
         self.storeDataList=temp;
+        let str = '',storeArr=[],arr=[]
+        self.storeDataList.forEach(item=>{
+            storeArr.push(item.storeId)
+            arr.push(item.value)
+        })
+        self.curStore=storeArr
+        arr.forEach(item=>{
+            str+=item+'，'
+        })
+        str=str.substr(0,str.length-1)
+        self.storeStr=str;
       },
       clearCity(){
         let self=this;
@@ -1403,6 +1411,12 @@
         self.storeStr='';
         self.$refs.multiSelect.selectedArray = [];
         self.$refs.multiSelect.input=''
+      },
+      clearTagInfo(){
+          let self=this;
+          self.curStoreTag=[];
+          self.$refs.TagMultiSelect.selectedArray = [];
+          self.$refs.TagMultiSelect.input=''
       },
       notify(msg,type,time) {
         this.$message({
@@ -2299,7 +2313,7 @@
       border-bottom: 1px solid $border;
       background-color: #fff;
       padding-top: 30px;
-      padding-bottom: 30px;
+      // padding-bottom: 30px;
       color: $black;
       .header-details1{
         text-align: left;

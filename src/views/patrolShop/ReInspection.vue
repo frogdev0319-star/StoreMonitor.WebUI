@@ -1047,7 +1047,7 @@ export default {
             if(self.isEzviz && !self.showGuide){
                 self.$refs.ezvizVideo.stopRealTime();
             }
-
+            self.patrolStoreName=null
             self.activeIndex = '0'
             self.PatrolList = []
             self.patrolstore = ''
@@ -2512,7 +2512,6 @@ export default {
             let dealCount=0;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
-            debugger
             if(self.hasIgnoretemp.length==0){
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach(item=>{

@@ -76,7 +76,7 @@
                     <div class="item-content">
                         <div style="margin-bottom:20px;">
                             <div class="content-detail" v-for="(_item,_index) in item.itemList" :key="_index">
-                                <div class="content-detail-title">
+                                <div class="content-detail-title" v-if="index!=2">
                                     <div class="detail-title">
                                         <p class="title1">{{_index+1}}.{{_item.subject}}</p>
                                         <p class="title2">{{_item.description}}</p>
@@ -85,7 +85,12 @@
                                     <div class="title-btn" v-if="(_item.type==0||_item.type==2)&&item.detailType!=1">{{$t('remotePatrol.scoreUnit')}}<span>{{$t('remotePatrol.failed')}}</span></div>
                                     <div class="title-btn" v-if="_item.type==1&&item.detailType!=1">{{$t('remotePatrol.scoreUnit')}}<span><span>{{_item.itemgetScore}}</span><span v-if="lang!='en'">{{$t('remotePatrol.scorecount')}}</span></span></div>
                                 </div>
-                                <div class="content-detail-main" style="padding-bottom: 20px;" v-if="_item.sourceList!=null&&_item.sourceList.length!=0||_item.inspectInput!=null&&_item.inspectInput!=''">
+                                <div class="content-detail-title" style="background-color:#fff;min-height:30px;" v-if="index==2">
+                                    <div class="detail-title">
+                                    <p class="title1">{{_index+1}}.{{_item.subject}}</p>
+                                    </div>
+                                </div>
+                                <div class="content-detail-main" style="padding-bottom: 20px;"  v-if="index!=2&&_item.sourceList!=null&&_item.sourceList.length!=0||_item.inspectInput!=null&&_item.inspectInput!=''">
                                     <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
                                     <div class="cdm-word" v-if="_item.inspectInput!=null&&_item.inspectInput!=''">
                                         <span>{{_item.inspectInput}}</span>
@@ -98,6 +103,25 @@
                                                 @click="openOuter(sourceitem,$event)"/>
                                             </div>
                                             <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                                                <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
+                                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="content-detail-main" v-if="index==2&&_item.sourceList!=null||item.description!=null&&item.description!=''">
+                                    <p class="cdm-title">{{$t('remotePatrol.description')}}：</p>
+                                    <div class="cdm-word" v-if="_item.description!=null&&_item.description!=''">
+                                        <span>{{_item.description}}</span>
+                                    </div>
+                                    <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
+                                        <div v-for="(sourceitem,index) in _item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
+                                            <div v-if="sourceitem.mediaType==2" class="img-content">
+                                                <img class="imgLittle imgInner" :title="imgTitle"
+                                                :src="sourceitem.src" :height="imgHeight+'px'" :onerror='deafultImg'
+                                                @click="openOuter(sourceitem,$event)"/>
+                                            </div>
+                                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
                                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
                                                 <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
                                             </div>
@@ -649,6 +673,7 @@ export default {
                 itemList:feedBackTemp,
                 detailType:2
             }
+            debugger
             self.tempList=tempList;
         },
         getAccountId(){
@@ -1228,6 +1253,7 @@ $h1:#292e36;
                     margin-top: 10px;
                     font-size: calc(14 / 1920 * 100vw);
                     color:#4b5262;
+                    word-wrap:break-word;
                 }
                 }
             }

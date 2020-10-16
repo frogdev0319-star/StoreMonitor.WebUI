@@ -8,16 +8,15 @@
                         <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-option-group>
                 </el-select>
-                <el-select v-model="curStoreTag" clearable :placeholder="$t('reportView.selectStoreTag')" size="mini" class="el-province" @change="changeStoreTag" :disabled="curProvince.length!=0||loading">
-                        <el-option v-for="item in StoreTagList" :key="item.tagId" :label="item.tagName" :value="item.tagId"></el-option>
-                </el-select>
                 <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag!=''||loading" :all="$t('overview.allZoneI')"></region-multi-select>
+                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0||loading" :all="$t('overview.allZoneI')"></region-multi-select>
                 <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                    style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag!=''||loading" :all="$t('overview.allZoneII')"></region-multi-select>
+                                    style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0||loading" :all="$t('overview.allZoneII')"></region-multi-select>
 
                 <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange" :disabled="loading"
                                     style="display: inline" ref="multiSelect"></multi-select>
+               <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
+                                style="display: inline;" ref="TagMultiSelect"></multi-select>
                <el-input
                     size="small"
                     class="el-search-input"
@@ -37,9 +36,11 @@
             <p class="choice-device" v-else><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>{{tabName}}{{generateInsSettingLang('total')}}{{totalCount}}
                 {{generateInsSettingLang('bindStore')}},{{generateInsSettingLang('bindWith')}}{{storeCount}}{{generateInsSettingLang('bindStore')}}</p>
             <div class="el-bind-content" :style="{'height':varyWindowHeight*0.56+'px'}">
-                <div class="bind-empty" :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0&&Havestore!=0">
-                    <img :src="loadingGif"/>
-                    <span class="empty-text">{{generateInsSettingLang('loadingbindstore')}}</span>
+                <div :style="{'line-height':varyWindowHeight*0.56+'px'}" v-if="storeList.length==0">
+                    <div class="bind-empty" v-if="Havestore==0||resultHavestore&&Havestore!=0">
+                        <img :src="loadingGif"/>
+                        <span class="empty-text">{{generateInsSettingLang('loadingbindstore')}}</span>
+                    </div>
                 </div>
                 <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                     <div class="el-all-checkbox" v-if="storeList.length!=0">
@@ -109,7 +110,7 @@ export default {
             StoreTagList:[],
             curCity:[],
             curStore:[],
-            curStoreTag:'',
+            curStoreTag:[],
             storeStr:'',
             multeCityList:[],
             citys:'',
@@ -118,6 +119,7 @@ export default {
             showCityContent:false,
             showDrap:true,
             Havestore:0,
+            resultHavestore:false,
             storeData:[],
             napeIdList:[],
             serachVale:'',
@@ -166,7 +168,13 @@ export default {
                 GetTagList().then(res=>{
                     let errMsg=res.errMsg;
                     if(errMsg!=undefined&&errMsg=='Success'){
-                        self.StoreTagList=res.data;
+                        res.data.forEach(item=>{
+                            let obj={}
+                            obj.value=item.tagId
+                            obj.label=item.tagName
+                            obj.disabled=false
+                            self.StoreTagList.push(obj)
+                        })
                         resolve(res);
                     }
                 }).catch(res => {
@@ -262,19 +270,22 @@ export default {
         changeStoreTag(val){
             let self=this
             let temp=[]
+            self.curStoreTag=val
             self.clearStoreInfo();
             self.tempStoreData.forEach(item=>{
                 item.tagIds.forEach(_item=>{
-                    if(_item==val&&self.curCountry==item.country){
-                        let obj={
-                            storeId:item.storeId,
-                            label:item.name,
-                            value:item.name,
-                            userId:item.userId,
-                            tagIds:item.tagIds
-                        };
-                        temp.push(obj);
-                    }
+                    val.forEach(v_item=>{
+                        if(_item==v_item&&self.curCountry==item.country){
+                            let obj={
+                                storeId:item.storeId,
+                                label:item.name,
+                                value:item.name,
+                                userId:item.userId,
+                                tagIds:item.tagIds
+                            };
+                            temp.push(obj);
+                        }
+                    })
                 })
             })
             self.storeDataList=temp
@@ -294,10 +305,10 @@ export default {
         changeCountry(val){
             let self=this;
             let temp=[]
-            self.curStoreTag=''
             self.clearProviceInfo()
             self.clearCityInfo();
             self.clearStoreInfo();
+            self.clearTagInfo();
             self.selectAllProAndCity(val);
         },
         changePro(val){
@@ -442,6 +453,12 @@ export default {
             self.$refs.citySelect.selectedArray = [];
             self.$refs.citySelect.input=''
         },
+        clearTagInfo(){
+                let self=this;
+                self.curStoreTag=[];
+                self.$refs.TagMultiSelect.selectedArray = [];
+                self.$refs.TagMultiSelect.input=''
+            },
         changeStore(val){
             let self=this;
             let str='';
@@ -564,7 +581,13 @@ export default {
             }
             let resData=await self.getStoreData(params);
             let data=resData.content;
-            resData.content.length>0 ? self.Havestore++ : self.Havestore=0
+            if(resData.content.length>0){
+                self.resultHavestore=true
+                self.Havestore++
+            }else{
+                self.resultHavestore=false
+                self.Havestore++
+            }
             self.getStoreByCity(data);
 
             let count=0;
@@ -584,6 +607,7 @@ export default {
             let self=this;
             self.showCityContent=false;
             self.serachVale='';
+            self.storeList=[]
             let params={};
             let temp=[];
             let storeList = self.storeStr.split('，')
@@ -600,7 +624,13 @@ export default {
                     }
             let resData=await self.getStoreData(params);
             self.storeData=resData.content;
-            resData.content.length>0 ? self.Havestore++ : self.Havestore=0
+            if(resData.content.length>0){
+                self.resultHavestore=true
+                self.Havestore++
+            }else{
+                self.resultHavestore=false
+                self.Havestore++
+            }
             self.getStoreByCity(self.storeData);
 
             self.totalCount=resData.totalElements;
