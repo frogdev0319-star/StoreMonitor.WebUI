@@ -9,14 +9,15 @@
                     </el-option-group>
                 </el-select>
                 <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0||loading" :all="$t('overview.allZoneI')"></region-multi-select>
+                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curCountry=='-1'||loading" :all="$t('overview.allZoneI')"></region-multi-select>
                 <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                    style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0||loading" :all="$t('overview.allZoneII')"></region-multi-select>
+                                    style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curCountry=='-1'||loading" :all="$t('overview.allZoneII')"></region-multi-select>
 
                 <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange" :disabled="loading"
                                     style="display: inline" ref="multiSelect"></multi-select>
-               <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
-                                style="display: inline;" ref="TagMultiSelect"></multi-select>
+               <span class="select-title">{{$t('reportView.selectStoreTag')}}</span>
+               <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag"
+                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="TagMultiSelect"></multi-select>
                <el-input
                     size="small"
                     class="el-search-input"
@@ -204,7 +205,8 @@ export default {
                 self.CountryList[0] = {}
                 self.CountryList[0].label= self.$t('reportView.country');
                 self.CountryList[0].countryList = countryList
-                self.curCountry = countryList[0].label;
+                self.CountryList[0].countryList.unshift({value:'-1', label:self.$t('reportView.all')})
+                self.curCountry = countryList[0].value;
                 self.selectAllProAndCity(self.curCountry);
             }
         },
@@ -214,7 +216,7 @@ export default {
             let temp = [];
             let tempStore = [];
             storeList.forEach(item=>{
-                if(item.country==val){
+                if(item.country==val||val=='-1'){
                 if(temp.map(x=>x.value).indexOf(item.province)==-1){
                     let obj={
                     label:item.province,
@@ -271,36 +273,7 @@ export default {
             let self=this
             let temp=[]
             self.curStoreTag=val
-            self.clearStoreInfo();
-            self.tempStoreData.forEach(item=>{
-                item.tagIds.forEach(_item=>{
-                    val.forEach(v_item=>{
-                        if(_item==v_item&&self.curCountry==item.country){
-                            let obj={
-                                storeId:item.storeId,
-                                label:item.name,
-                                value:item.name,
-                                userId:item.userId,
-                                tagIds:item.tagIds
-                            };
-                            temp.push(obj);
-                        }
-                    })
-                })
-            })
-            self.storeDataList=temp
-            let str = '',storeArr=[],arr=[]
-            self.storeDataList.forEach(item=>{
-                storeArr.push(item.storeId)
-                arr.push(item.value)
-            })
-            self.curStore=storeArr
-            arr.forEach(item=>{
-                str+=item+'，'
-            })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchStore()
+            self.changeStore(self.curStore)
         },
         changeCountry(val){
             let self=this;
@@ -308,7 +281,6 @@ export default {
             self.clearProviceInfo()
             self.clearCityInfo();
             self.clearStoreInfo();
-            self.clearTagInfo();
             self.selectAllProAndCity(val);
         },
         changePro(val){
@@ -372,13 +344,7 @@ export default {
             })
             
             self.curStore=storeArr
-            let str = ''
-            arr.forEach(item=>{
-                str+=item+'，'
-            })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchStore()
+            self.changeStore(self.curStore)
         },
         changeCity(val){
             let self=this;
@@ -410,12 +376,7 @@ export default {
                 arr.push(item.value)
             })
             self.curStore=storeArr
-            arr.forEach(item=>{
-                str+=item+'，'
-            })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchStore()
+            self.changeStore(self.curStore)
         },
         handleStoreChange (arr) {
             let self=this;
@@ -453,22 +414,22 @@ export default {
             self.$refs.citySelect.selectedArray = [];
             self.$refs.citySelect.input=''
         },
-        clearTagInfo(){
-                let self=this;
-                self.curStoreTag=[];
-                self.$refs.TagMultiSelect.selectedArray = [];
-                self.$refs.TagMultiSelect.input=''
-            },
         changeStore(val){
             let self=this;
             let str='';
             self.tempStoreData.forEach((item,index)=>{
-                val.forEach(_item=>{
-                if(item.storeId==_item){
-                    str+=item.name+'，'
-                }
+                    val.forEach(_item=>{
+                        if(item.storeId==_item){
+                            self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
+                                item.tagIds.forEach(t_item=>{
+                                    if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
+                                        str+=item.name+'，'
+                                    }
+                                })
+                            }) : (item.storeId==_item ? str+=item.name+'，' : null)
+                        }
+                    })
                 })
-            })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
             self.searchStore()
@@ -554,10 +515,10 @@ export default {
         },
         async searchStoreInput(){
             let self=this;
-            self.curProvince=[];
+            // self.curProvince=[];
             // self.citys='';
-            self.curCity= [];
-            self.clearCityInfo();
+            // self.curCity= [];
+            // self.clearCityInfo();
             let params={};
             if(self.serachVale.length!=0){
                 params={

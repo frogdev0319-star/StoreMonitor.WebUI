@@ -673,7 +673,6 @@ export default {
                 itemList:feedBackTemp,
                 detailType:2
             }
-            debugger
             self.tempList=tempList;
         },
         getAccountId(){

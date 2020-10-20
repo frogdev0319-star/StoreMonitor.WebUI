@@ -183,13 +183,13 @@ export default {
     sumUnprocessEvents: '待處理事件總數',
     sumProcessEvents: '已處理事件總數',
     sumClosedEvents: '已結案事件總數',
-    sumReturnedEvents:'已退回事件总数',//Sprint9 新增
+    sumReturnedEvents:'已退回事件總數',//Sprint9 新增
     eventList: '事件列表',
     area: '所屬區域',
     numUnprocessEvents: '待處理事件數量',
     numProcessEvents: '已處理事件數量',
     numClosedEvents: '已結案事件數量',
-    numReturndEvents:'已退回事件数量',//Sprint9 新增
+    numReturndEvents:'已退回事件數量',//Sprint9 新增
     emptyEventList: '事件列表為空，請重新篩選數據',
     none: '無',
     allZoneI: '全部區域一',
@@ -430,7 +430,7 @@ export default {
     enclosure:'附件',//Sprint8 新增
     ProcessedEvent:'已处理事件',//Sprint9 新增
     ClosedEvent:'已结案事件',//Sprint9 新增
-    ReturnEvent:'退回再处理事件',//Sprint9 新增
+    ReturnEvent:'退回再處理事件',//Sprint9 新增
     returnStatus:'退回',//Sprint9 新增
     Returned:'已退回',//Sprint9 新增
     status: '處理狀態',

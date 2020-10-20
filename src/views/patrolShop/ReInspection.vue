@@ -254,7 +254,7 @@
                     </el-col>
                 </el-row> -->
                 <el-row v-if="sheetName.length!=0" class="inspect-title">
-                    <el-col :span="24">
+                    <el-col :span="24" v-if="!notShowAlert">
                         <el-alert :title="$t('remotePatrol.alertContent')" type="warning" :closable="false" v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3"></el-alert>
                         <el-alert :title="$t('remotePatrol.alertTips1')" type="warning" :closable="false" v-if="hasSheet3&&!showIgnoreItem&&!isShowWarn"></el-alert>
                         <el-alert type="warning" :closable="false" v-if="isShowWarn" show-icon><span @click="hasIgnoreItem" style="cursor: pointer;font-weight:bold;">{{$t('remotePatrol.clickToContent')}}</span></el-alert>
@@ -538,6 +538,7 @@ export default {
         return{
             sheetName:[],
             isShowWarn:false,
+            notShowAlert:false,
             hasSheet3:false,
             patrolstore:'',
             PatrolList:[],
@@ -969,6 +970,9 @@ export default {
             self.patrolStoreName=PatrolHistory.store.storeName
             self.showGuide = false
             self.showStoreUp = true
+            if(PatrolHistory.hasIgnoretemp.length==0){
+                self.notShowAlert=true
+            }
         }else{
             self.getFaStoreData();
         }
@@ -1061,6 +1065,7 @@ export default {
             self.hasIgnoretemp=null
             self.showIgnoreItem=false
             self.isShowWarn=false
+            self.notShowAlert=false
             self.hasSheet3=false
             self.showFeedBackInfo = true
             self.accountId=localStorage.getItem('oss_bucket');
@@ -1805,6 +1810,9 @@ export default {
                 })
             })
             self.hasIgnoretemp=hasIgnoretemp
+            if(hasIgnoretemp.length==0){
+                self.notShowAlert=true
+            }
         },
         getAllStoreList(){
             let self=this;
@@ -2960,6 +2968,7 @@ export default {
             self.hasIgnoretemp=[]
             self.$store.dispatch('setPatrolHistory',null);
             self.isShowWarn=false
+            self.notShowAlert=false
             self.showIgnoreItem=false
             self.hasSheet3=false
             _item.authorizedInspect.forEach(au_item=>{
@@ -3189,6 +3198,7 @@ export default {
             self.$store.dispatch('setPatrolHistory',null);
             self.$store.dispatch('setPatrolComment',null);
             self.isShowWarn=false
+            self.notShowAlert=false
             self.showIgnoreItem=false
             self.hasSheet3=false
             self.eventList=[]
@@ -3329,6 +3339,7 @@ export default {
                 }
             })
             self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount==0) ? true : false
+            self.notShowAlert = self.sheetName.every(x=>x.count==x.dealCount)
         },
         changeSheet(item,index){
             let self=this

@@ -4,35 +4,21 @@
       <el-col :span="24" class="statistics-header">
         <el-col :span="24" class="header-details">
           <span>{{$t('reportView.selectStores')}}</span>
-          <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
-                    class="el-province" @change="changeCountry">
-            <!--<el-option-->
-              <!--v-for="item in countryList"-->
-              <!--:key="item.value"-->
-              <!--:label="item.label"-->
-              <!--:value="item.value">-->
-            <!--</el-option>-->
-            <el-option-group
-              v-for="group in countryList"
-              :key="group.label"
-              :label="group.label">
-              <el-option
-                v-for="item in group.countryList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
+          <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry">
+            <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
+              <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-option-group>
           </el-select>
           <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
+                              style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curCountry=='-1'" :all="$t('overview.allZoneI')"></region-multi-select>
           <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
+                              style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curCountry=='-1'" :all="$t('overview.allZoneII')"></region-multi-select>
 
           <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                         style="display: inline" ref="multiSelect"></multi-select>
-          <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
-                                style="display: inline;" ref="TagMultiSelect"></multi-select>
+          <span class="select-title">{{$t('reportView.selectStoreTag')}}</span>
+          <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag"
+                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="TagMultiSelect"></multi-select>
         </el-col>
 
         <el-col :span="24" class="header-details">
@@ -498,7 +484,7 @@
             "label": this.$t('overview.numUnprocessEvents'),
             "sortable":'custom',
             "width": '140',
-            "maxWidth": '140',
+            "maxWidth": '150',
             "pdfwidth":'11%'
           },
           {
@@ -506,7 +492,7 @@
             "label": this.$t('overview.numProcessEvents'),
             "sortable":'custom',
             "width": '140',
-            "maxWidth": '140',
+            "maxWidth": '150',
             "pdfwidth":'11%'
           },
           {
@@ -514,7 +500,7 @@
             "label": this.$t('overview.numClosedEvents'),
             "sortable":'custom',
             "width": '140',
-            "maxWidth": '140',
+            "maxWidth": '150',
             "pdfwidth":'11%'
           },
           {
@@ -522,7 +508,7 @@
             "label": this.$t('overview.numReturndEvents'),
             "sortable":'custom',
             "width": '140',
-            "maxWidth": '140',
+            "maxWidth": '150',
             "pdfwidth":'11%'
           },
           // {
@@ -574,7 +560,6 @@
           self.params.beginTs = start;
           self.params.endTs = end;
           self.initDaysRange();
-          // await self.getCountryStore();
           self.initData();
           self.curStoreTag=[]
         }
@@ -693,8 +678,7 @@
         let params = {};
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        let storeIds = self.curStore.filter(item=> item!= -1)
-        params.storeIds = storeIds;
+        params.storeIds = self.storeStr.split('，');
         params.timeMode = self.timeMode;
         let storeEventResult = await self.getStoreEventData(params);
         let option = {
@@ -915,7 +899,8 @@
               self.countryList[0] = {}
               self.countryList[0].label= self.$t('reportView.country');
               self.countryList[0].countryList = countryList
-              self.curCountry = countryList[0].label;
+              self.countryList[0].countryList.unshift({value:'-1', label:self.$t('reportView.all')})
+              self.curCountry = countryList[0].value;
               self.selectAllProAndCity(self.curCountry);
           }
       },
@@ -949,11 +934,17 @@
         let self=this;
         let str='';
         self.storeList.forEach((item,index)=>{
-          val.forEach(_item=>{
-            if(item.storeId==_item){
-              str+=item.name+'，'
-            }
-          })
+            val.forEach(_item=>{
+                if(item.storeId==_item){
+                    self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
+                        item.tagIds.forEach(t_item=>{
+                            if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
+                                str+=_item+'，'
+                            }
+                        })
+                    }) : (item.storeId==_item ? str+=_item+'，' : null)
+                }
+            })
         })
         str=str.substr(0,str.length-1)
         self.storeStr=str;
@@ -966,7 +957,20 @@
         let storeList=self.storeList;
         let temp=[];
         let tempStore=[];
-        if(val != ''){
+        if(val==''){
+            storeList.forEach(item=>{
+                if(item.country==self.curCountry){
+                    let obj={
+                    storeId:item.storeId,
+                    label:item.name,
+                    value:item.name,
+                    userId:item.userId,
+                    tagIds:item.tagIds
+                    };
+                    tempStore.push(obj);
+                }
+            })
+        }else{
           val.forEach(_item=>{
             storeList.forEach(item=>{
               if(item.province==_item){
@@ -1005,12 +1009,7 @@
         })
         
         self.curStore=storeArr
-        let str = ''
-        arr.forEach(item=>{
-            str+=item+'，'
-        })
-        str=str.substr(0,str.length-1)
-        self.storeStr=str;
+        self.changeStore(self.curStore)
       },
       getBriefStoreData(){
           let self=this;
@@ -1050,35 +1049,7 @@
         let self=this
         let temp=[]
         self.curStoreTag=val
-        self.clearStoreInfo();
-        self.storeList.forEach(item=>{
-            item.tagIds.forEach(_item=>{
-              val.forEach(v_item=>{
-                if(_item==val&&self.curCountry==item.country){
-                    let obj={
-                        storeId:item.storeId,
-                        label:item.name,
-                        value:item.name,
-                        userId:item.userId,
-                        userName:item.userName
-                    };
-                    temp.push(obj);
-                }
-              })
-            })
-        })
-        self.storeDataList=temp
-        let str = '',storeArr=[],arr=[]
-        self.storeDataList.forEach(item=>{
-            storeArr.push(item.storeId)
-            arr.push(item.value)
-        })
-        self.curStore=storeArr
-        arr.forEach(item=>{
-            str+=item+'，'
-        })
-        str=str.substr(0,str.length-1)
-        self.storeStr=str;
+        self.changeStore(self.curStore)
       },
       changeCountry(val){
           let self=this;
@@ -1086,7 +1057,6 @@
           self.clearProviceInfo()
           self.clearCityInfo();
           self.clearStoreInfo();
-          self.clearTagInfo();
           self.selectAllProAndCity(val);
       },
       changeCountrysss(val){
@@ -1194,11 +1164,7 @@
             arr.push(item.value)
         })
         self.curStore=storeArr
-        arr.forEach(item=>{
-            str+=item+'，'
-        })
-        str=str.substr(0,str.length-1)
-        self.storeStr=str;
+        self.changeStore(self.curStore)
       },
       clearStoreInfo(){
         let self=this;
@@ -1219,19 +1185,13 @@
         self.$refs.citySelect.selectedArray = [];
         self.$refs.citySelect.input=''
       },
-      clearTagInfo(){
-          let self=this;
-          self.curStoreTag=[];
-          self.$refs.TagMultiSelect.selectedArray = [];
-          self.$refs.TagMultiSelect.input=''
-      },
       selectAllProAndCity(val){
         let self = this;
         let storeList = self.storeList;
         let temp = [];
         let tempStore = [];
         storeList.forEach(item=>{
-          if(item.country==val){
+          if(item.country==val||val=='-1'){
             if(temp.map(x=>x.value).indexOf(item.province)==-1){
               let obj={
                 label:item.province,
@@ -1282,8 +1242,8 @@
           storeArr.push(item.storeId)
         })
         self.curStore = storeArr;
-        self.searchData()
         self.changeStore(self.curStore)
+        self.searchData()
       },
 
       export2Excel(){
@@ -1311,32 +1271,22 @@
       },
       async searchData(){
         let self = this;
-        let storeIds = [];
-        // if(self.curProvince.length == 0){
-        //   self.hasNoData = true;
-        //   self.eventTableData = [];
-        //   return;
-        // }
-        if(self.curStore.length == 0 ){
-          self.storeDataList.forEach(item=>{
-            storeIds.push(item.storeId)
-          })
-          self.curStore = storeIds.concat();
-          self.changeStore(storeIds)
+        if(self.storeStr==''){
+          self.eventTableData=[]
+          self.total = 0
+          self.allEventData = [];
+          self.getEventsNum();
+          self.storeEventList=[]
+          self.storeEventsOptions.dataset.source=[]
+          self.getEventBySourcePie()
+        }else{
+          self.params.storeIds = self.storeStr.split('，');
+          self.params.filter={page:self.page - 1,size:self.sizeNum};
+          self.params.order = {direction: self.direction, property: self.property}
+          await self.getEventTableData();
+          await self.getAllEventData();
+          self.getStoreEventStatics();
         }
-        else if(self.curStore.includes("-1")){
-          storeIds = self.curStore.filter(item=> item!= -1)
-        }
-        else{
-          storeIds = self.curStore;
-        }
-        self.params.storeIds = storeIds;
-
-        self.params.filter={page:self.page - 1,size:self.sizeNum};
-        self.params.order = {direction: self.direction, property: self.property}
-        await self.getEventTableData();
-        await self.getAllEventData();
-        self.getStoreEventStatics();
       },
       initDaysRange() {
         let self = this;
@@ -1372,13 +1322,10 @@
         self.params.order = {direction: self.direction, property: self.property}
         self.getCountryStore()
         self.getTagListData()
-        // await self.getEventTableData();
-        // await self.getAllEventData();
-        // self.getStoreEventStatics();
       },
       async getEventTableData(){
         let self = this;
-        let storeIds = self.curStore.filter(item=> item!= -1)
+        let storeIds = self.storeStr.split('，')
         self.params.storeIds=storeIds
         let eventResult = await self.getEventTableDataInfo(self.params);
         let excellentPer = 0;
@@ -1422,24 +1369,12 @@
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
         params.timeMode = self.timeMode;
-        let storeIds = [];
         if(self.curProvince.length == 0){
           self.hasNoData = true;
           self.itemsTableData = [];
           return;
         }
-        if(self.curStore.length == 0 ){
-          self.storeDataList.forEach(item=>{
-            storeIds.push(item.storeId)
-          })
-        }
-        else if(self.curStore.includes("-1")){
-          storeIds = self.curStore.filter(item=> item!= -1)
-        }
-        else{
-          storeIds = self.curStore;
-        }
-        params.storeIds = storeIds;
+        params.storeIds = self.storeStr.split('，');
 
         params.filter={page:self.page - 1,size:self.total};
         params.order = {direction: self.direction, property: self.property}

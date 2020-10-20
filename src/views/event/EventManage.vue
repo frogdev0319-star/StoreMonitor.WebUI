@@ -3,29 +3,21 @@
         <div class="el-event-header">
             <div class="el-area">
                 <span class="select-title">{{$t('reportView.selectStores')}}</span>
-                <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini"
-                        class="el-province" @change="changeCountry">
-                    <el-option-group
-                    v-for="group in CountryList"
-                    :key="group.label"
-                    :label="group.label">
-                    <el-option
-                        v-for="item in group.countryList"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
+                <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry">
+                    <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
+                        <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-option-group>
                 </el-select>
                 <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneI')"></region-multi-select>
+                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curCountry=='-1'" :all="$t('overview.allZoneI')"></region-multi-select>
                 <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                    style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curStoreTag.length!=0" :all="$t('overview.allZoneII')"></region-multi-select>
+                                    style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curCountry=='-1'" :all="$t('overview.allZoneII')"></region-multi-select>
 
                 <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
                                     style="display: inline;" ref="multiSelect"></multi-select>
-                <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag" :disabled="curProvince.length!=0"
-                                style="display: inline;" ref="TagMultiSelect"></multi-select>
+                <span class="select-title">{{$t('reportView.selectStoreTag')}}</span>
+                <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag"
+                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="TagMultiSelect"></multi-select>
                 <el-input
                     size="small"
                     class="el-search"
@@ -392,7 +384,8 @@ export default {
                     self.CountryList[0] = {}
                     self.CountryList[0].label= self.$t('reportView.country');
                     self.CountryList[0].countryList = countryList
-                    self.curCountry = countryList[0].label;
+                    self.CountryList[0].countryList.unshift({value:'-1', label:self.$t('reportView.all')})
+                    self.curCountry = countryList[0].value;
                     self.selectAllProAndCity(self.curCountry);
                 }
         },
@@ -402,7 +395,7 @@ export default {
             let temp = [];
             let tempStore = [];
             storeList.forEach(item=>{
-                if(item.country==val){
+                if(item.country==val||val=='-1'){
                 if(temp.map(x=>x.value).indexOf(item.province)==-1){
                     let obj={
                     label:item.province,
@@ -461,36 +454,7 @@ export default {
             let self=this
             let temp=[]
             self.curStoreTag=val
-            self.clearStoreInfo();
-            self.tempStoreData.forEach(item=>{
-                item.tagIds.forEach(_item=>{
-                    val.forEach(v_item=>{
-                        if(_item==v_item&&self.curCountry==item.country){
-                            let obj={
-                                storeId:item.storeId,
-                                label:item.name,
-                                value:item.name,
-                                userId:item.userId,
-                                tagIds:item.tagIds
-                            };
-                            temp.push(obj);
-                        }
-                    })
-                })
-            })
-            self.storeDataList=temp
-            let str = '',storeArr=[],arr=[]
-            self.storeDataList.forEach(item=>{
-                storeArr.push(item.storeId)
-                arr.push(item.value)
-            })
-            self.curStore=storeArr
-            arr.forEach(item=>{
-                str+=item+'，'
-            })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchEventList(storeArr)
+            self.changeStore(self.curStore)
         },
         changeCountry(val){
             let self=this;
@@ -498,7 +462,6 @@ export default {
             self.clearProviceInfo()
             self.clearCityInfo();
             self.clearStoreInfo();
-            self.clearTagInfo();
             self.selectAllProAndCity(val);
         },
         changePro(val){
@@ -562,13 +525,7 @@ export default {
             })
             
             self.curStore=storeArr
-            let str = ''
-            arr.forEach(item=>{
-                str+=item+'，'
-            })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchEventList(storeArr)
+            self.changeStore(self.curStore)
         },
         changeCity(val){
             let self=this;
@@ -600,12 +557,7 @@ export default {
                 arr.push(item.value)
             })
             self.curStore=storeArr
-            arr.forEach(item=>{
-                str+=item+'，'
-            })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchEventList(storeArr)
+            self.changeStore(self.curStore)
         },
         handleStateChange(val){
             let self=this
@@ -648,27 +600,25 @@ export default {
             self.$refs.citySelect.selectedArray = [];
             self.$refs.citySelect.input=''
         },
-        clearTagInfo(){
-                let self=this;
-                self.curStoreTag=[];
-                self.$refs.TagMultiSelect.selectedArray = [];
-                self.$refs.TagMultiSelect.input=''
-            },
         changeStore(val){
             let self=this;
             let str='';
-            let storeIds=[]
             self.tempStoreData.forEach((item,index)=>{
-                val.forEach(_item=>{
-                if(item.storeId==_item){
-                    str+=item.name+'，'
-                    storeIds.push(_item)
-                }
+                    val.forEach(_item=>{
+                        if(item.storeId==_item){
+                            self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
+                                item.tagIds.forEach(t_item=>{
+                                    if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
+                                        str+=_item+'，'
+                                    }
+                                })
+                            }) : (item.storeId==_item ? str+=_item+'，' : null)
+                        }
+                    })
                 })
-            })
             str=str.substr(0,str.length-1)
             self.storeStr=str;
-            self.searchEventList(storeIds)
+            self.searchEventList()
         },
         dateChange(val){
             let self=this;
@@ -707,7 +657,7 @@ export default {
             }
             self.getEventList();
         },
-        searchEventList(val){
+        searchEventList(){
             let self=this;
             self.serachVale=''
             self.tableDataList[Number(self.activeName)].page=1;
@@ -786,7 +736,7 @@ export default {
             else{
                 like={};
             }
-            let storeId = self.curStore.filter(item=> item!= '-1')
+            let storeId = self.storeStr.split('，')
             let status= []
             if(self.curState.length!=0){
                 if(self.curState.length==1){
@@ -928,7 +878,7 @@ export default {
             let start=self.dateValue[0];
             let endTime = self.dateValue[1];
             let end= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-            let storeId = self.curStore.filter(item=> item!= '-1')
+            let storeId = self.storeStr.split('，')
             let like={}
             if(self.serachVale.trim().length!=0){
                 like={subject:self.serachVale.trim(),assignerName:self.serachVale.trim(),storeName:self.serachVale.trim()};
