@@ -428,7 +428,7 @@ export default {
   eventView:{
     ProcessedEvent:'已处理事件',//Sprint9 新增
     ClosedEvent:'已结案事件',//Sprint9 新增
-    ReturnEvent:'退回再处理事件',//Sprint9 新增
+    ReturnEvent:'退回事件',//Sprint9 新增
     returnStatus:'退回',//Sprint9 新增
     Returned:'已退回',//Sprint9 新增
     enclosure:'附件',//Sprint8
@@ -437,7 +437,7 @@ export default {
     pending: '未处理',
     handled: '已处理',
     closed: '已结案',
-    pendingEve: '待处理事件',
+    pendingEve: '未处理事件',
     myEvent: '我创建事件',
     allEvents: '全部事件',
     name: '事件名称',

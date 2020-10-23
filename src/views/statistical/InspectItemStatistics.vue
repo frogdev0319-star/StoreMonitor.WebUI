@@ -262,7 +262,7 @@
                   :row-class-name="rowClass"
                 >
                   <el-table-column v-for="(_item,_index) in itemsInfoData" :key="_index"
-                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
+                                  :prop="_item.prop" :label="_item.label" :min-width="_item.pdfmaxWidth">
                   </el-table-column>
                   <div slot="empty">
                     <div>
@@ -377,7 +377,6 @@
                 "prop": "inspectGroupName",
                 "label": this.$t("overview.patrolCate"),
                 "sortable": false,
-                "pdfwidth": '21%',
                 "pdfmaxWidth": '19%',
                 "width": '280',
                 "maxWidth": '280',
@@ -386,8 +385,7 @@
                 "prop":"inspectItemName",
                 "label": this.$t("overview.items"),
                 "sortable":'custom',
-                "pdfwidth": '29%',
-                "pdfmaxWidth": '26%',
+                "pdfmaxWidth": '24%',
                 "width": '380',
                 "maxWidth": '380'
               },
@@ -395,7 +393,6 @@
                 "prop":"numOfTotal",
                 "label": this.$t("overview.numOfEvaluations"),
                 "sortable":'custom',
-                "pdfwidth": '10%',
                 "pdfmaxWidth": '14%',
                 "width": '130',
                 "maxWidth": '200'
@@ -411,7 +408,6 @@
                 "prop":"numOfQualified",
                 "label": `${this.$t("overview.pass")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "pdfwidth": '10%',
                 "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
@@ -420,7 +416,6 @@
                 "prop":"numOfUnqualified",
                 "label": `${this.$t("overview.failed")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "pdfwidth": '10%',
                 "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
@@ -429,7 +424,6 @@
                 "prop":"numOfIgnored",
                 "label": `${this.$t("overview.ignored")}${this.$t("overview.timesUnit")}`,
                 "sortable":'custom',
-                "pdfwidth": '10%',
                 "pdfmaxWidth": '10%',
                 "width": '130',
                 "maxWidth": '150'
@@ -438,8 +432,7 @@
                 "prop":"qualifiedRateStr",
                 "label": this.$t("overview.passRate"),
                 "sortable":'custom',
-                "pdfwidth": '10%',
-                "pdfmaxWidth": '10%',
+                "pdfmaxWidth": '12%',
                 "width": '130',
                 "maxWidth": '150'
               }

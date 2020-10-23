@@ -428,17 +428,17 @@ export default {
   // event Management page language
   eventView:{
     enclosure:'附件',//Sprint8 新增
-    ProcessedEvent:'已处理事件',//Sprint9 新增
-    ClosedEvent:'已结案事件',//Sprint9 新增
-    ReturnEvent:'退回再處理事件',//Sprint9 新增
-    returnStatus:'退回',//Sprint9 新增
+    ProcessedEvent:'已處理事件',//Sprint9 新增
+    ClosedEvent:'已結案事件',//Sprint9 新增
+    ReturnEvent:'退回事件',//Sprint9 新增
+    returnStatus:'退件',//Sprint9 新增
     Returned:'已退回',//Sprint9 新增
     status: '處理狀態',
     all : '全部',
     pending: '未處理',
     handled: '已處理',
     closed: '已結案',
-    pendingEve: '待處理事件',
+    pendingEve: '未處理事件',
     myEvent: '我創建的事件',
     allEvents: '全部事件',
     name: '事件名稱',

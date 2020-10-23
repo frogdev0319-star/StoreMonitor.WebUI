@@ -131,15 +131,9 @@
 
                     <pre  class="description">{{event.description}}</pre>
                     <div class="photo-content">
-                        <div v-for="(item,index) in sourceList" :key="index" class="source-content">
-                            <div v-if="item.mediaType==2" class="img-content">
-                                <!--图片资源-->
-                                <!-- :width="imgHeight*1.4+'px'" -->
-                                <img class="imgLittle imgInner" :src="item.url" :title="imgTitle" :onerror='deafultImg'
-                                :height="imgHeight+'px'" @click="openOuter(item,$event)"/>
-                            </div>
+                        <div v-for="(item,index) in videosourceList" :key="index" class="source-content">
                                 <!--视频资源-->
-                            <div  v-else class="img-content" @click="playCommentVideo(item,index)">
+                            <div v-if="item.mediaType==1" class="img-content" @click="playCommentVideo(item,index)">
                                 <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
                                 <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
                             </div>
@@ -148,6 +142,14 @@
                                 <i class="iconfont icon-bofang icon-video"></i>
                                 <span class="ahref">{{item.name+'区域'}}</span>
                               </div>
+                            </div>
+                        </div>
+                        <div v-for="(item,index) in imgsourceList" :key="index" class="source-content">
+                            <div v-if="item.mediaType==2" class="img-content">
+                                <!--图片资源-->
+                                <!-- :width="imgHeight*1.4+'px'" -->
+                                <img class="imgLittle imgInner" :src="item.url" :title="imgTitle" :onerror='deafultImg'
+                                :height="imgHeight+'px'" @click="openOuter(item,$event)"/>
                             </div>
                         </div>
                     </div>
@@ -162,10 +164,12 @@
             <div class="submit-content" :style="{'height':windowHeight*0.34+'px'}" v-show="showWinpBtn">
                 <span class="dealInfo-label">{{generateEventLang('events')}}</span>
                 <span>{{generateEventLang('methods')}}</span><br>
-                <div class="btn-content" v-for="(item,index) in subBtnList" :key="index">
-                    <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
-                        {{item.name}}
-                    </span>
+                <div class="btn-content">
+                    <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
+                        <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
+                            {{item.name}}
+                        </span>
+                    </div>
                 </div>
                 <span style="display:block;">{{generateEventLang('addDetails')}}</span>
                 <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2}"
@@ -302,7 +306,10 @@ export default {
             channelRadio: '',
             timerPlayReal: null,
             realTimeSpeed: 0,
-            ivsIdRuletip:false
+            ivsIdRuletip:false,
+            videosourceList:[],
+            imgsourceList:[],
+            Changestatus:''
         }
     },
     computed: {
@@ -644,6 +651,8 @@ export default {
                 }
             })
             self.sourceList=temp;
+            self.videosourceList = temp.filter(x=>x.mediaType==1)
+            self.imgsourceList = temp.filter(x=>x.mediaType==2)
             let relatedDeviceIds = event.relatedDeviceIds.sort();
             self.relatedChannels = [];
             relatedDeviceIds.forEach(item=>{
@@ -709,6 +718,7 @@ export default {
         },
         startSpeech(){
             let self=this;
+            self.$refs.audioRef.ended ? self.isPlaying=false : null
             if(!self.isPlaying){
                 self.$refs.audioRef.play();
                 self.isPlaying=true;
@@ -724,6 +734,7 @@ export default {
         startSpeechItem(item,index){
             let self=this;
             console.log(item);
+            self.$refs[item.audio.audioRef][0].ended ? item.audio.isPlaying=false : null
             if(!item.audio.isPlaying){
                 self.$refs[item.audio.audioRef][0].play();
                 item.audio.isPlaying=true;
@@ -754,7 +765,7 @@ export default {
               self.channelInfo = self.curChannel
             }
         },
-        getCommentList(){
+        getCommentList(e){
             let self=this;
             let eventIds=[];
             self.commentList = [];
@@ -771,11 +782,41 @@ export default {
                     let dataComments=comments.comment;
                     let temp=[];
                     self.curStatus=dataComments[0].status;
-                    if(self.curStatus==1){
-                        // 只在已处理事件显示退回按钮
+                    // 0未处理：处理、追加
+                    // 1已处理：追加、结案、退回
+                    // 2结案：无状态按钮
+                    // 3退回：处理、追加
+                    if(e==0){
+                        self.Changestatus = self.curStatus
                         self.subBtnList.forEach(item=>{
-                            if(item.order==3){
-                                item.isShow=true
+                            if(self.curStatus==0){
+                                item.order==0 ? (item.isShow=true,item.isActive=true) : null
+                                item.order==2 ? item.isShow=true : null
+                            }
+                            if(self.curStatus==1){
+                                item.order==1 ? (item.isShow=true,item.isActive=true) : null
+                                item.order==2 ? item.isShow=true : null
+                                item.order==3 ? item.isShow=true : null
+                            }
+                            if(self.curStatus==3){
+                                item.order==0 ? (item.isShow=true,item.isActive=true) : null
+                                item.order==2 ? item.isShow=true : null
+                            }
+                        })
+                    }else{
+                        self.subBtnList.forEach(item=>{
+                            if(self.Changestatus==0){
+                                item.order==0 ? item.isShow=true : null
+                                item.order==2 ? item.isShow=true : null
+                            }
+                            if(self.Changestatus==1){
+                                item.order==1 ? item.isShow=true : null
+                                item.order==2 ? item.isShow=true : null
+                                item.order==3 ? item.isShow=true : null
+                            }
+                            if(self.Changestatus==3){
+                                item.order==0 ? item.isShow=true : null
+                                item.order==2 ? item.isShow=true : null
                             }
                         })
                     }
@@ -794,7 +835,7 @@ export default {
                             case 2: obj.showLabel=true;obj.spanStyle={'background-color':'#6097F4'};
                                 obj.process=this.$t('eventView.closed'); break;
                             case 3: obj.showLabel=true;obj.spanStyle={'background-color':'#FCB83B'};
-                                obj.process=this.$t('eventView.Returned'); break;
+                                obj.process=this.$t('eventView.returnStatus'); break;
                         }
                         if(item.status==2){
                             self.showWinpBtn=false;
@@ -859,7 +900,7 @@ export default {
                 let errMsg=res.errMsg;
                 if(errMsg=='Success'){
                     self.notify(this.$t('storeView.successSubmit'),'success',3000);
-                    self.getCommentList();
+                    self.getCommentList(1);
                     self.eventDes='';
                     setTimeout(()=>{
                         self.commentList.forEach((_item,_index)=>{
@@ -974,25 +1015,26 @@ export default {
             PermissionHelper.enableEventHandle()  && tempBtnList.push({
               name:this.$t('eventView.handling'),
               order: 0,
-              isShow:true
+              isShow:false,
+              isActive:false
             });
             PermissionHelper.enableEventClose()  && tempBtnList.push({
               name:this.$t('eventView.closing'),
               order: 1,
-              isShow:true
+              isShow:false,
+              isActive:false
             })
             PermissionHelper.enableEventAdd() && tempBtnList.push({
               name:this.$t('eventView.adding'),
               order: 2,
-              isShow:true
+              isShow:false,
+              isActive:false
             })
             PermissionHelper.enableEventReturn() && tempBtnList.push({
               name:this.$t('eventView.returnStatus'),
               order: 3,
-              isShow:false
-            })
-            tempBtnList.forEach((item, index)=>{
-              item.isActive = index == 0 ? true: false;
+              isShow:false,
+              isActive:false
             })
           self.subBtnList = tempBtnList;
         },
@@ -1034,7 +1076,7 @@ export default {
         let self=this;
         self.getBtnList();
         self.getSessionData();  //获取session中存储的event信息
-        self.getCommentList();  //获取comment信息
+        self.getCommentList(0);  //获取comment信息
         self.$nextTick(function(){
             setTimeout(()=>{
                 self.myfun();
@@ -1482,28 +1524,29 @@ $h1:#292e36;
             .btn-content{
                 margin-top: 10px;
                 margin-bottom: 25px;
-                display: inline-block;
-                @include point(margin-right,20);
-                span{
+                .btn_List{
                     display: inline-block;
-                    // @include point(margin-left,20);
-                    border: 1px solid #ddd;
-                    padding:6px;
-                    font-size: 12px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    @include point(width,80);
-                    @include point(padding,6);
-                    text-align: center;
-                    background-color: #fff;
-                }
-                //  &:first-child{
-                //         margin-left: 0;
-                //     }
-                .activeClass{
-                    background-color: #FDE8EF !important;
-                    color: $red;
-                    border-color: $red !important;
+                    span{
+                        display: inline-block;
+                        @include point(margin-right,20);
+                        border: 1px solid #ddd;
+                        padding:6px;
+                        font-size: 12px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        @include point(width,80);
+                        @include point(padding,6);
+                        text-align: center;
+                        background-color: #fff;
+                    }
+                    //  &:first-child{
+                    //         margin-left: 0;
+                    //     }
+                    .activeClass{
+                        background-color: #FDE8EF !important;
+                        color: $red;
+                        border-color: $red !important;
+                    }
                 }
             }
             .des-input{

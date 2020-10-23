@@ -426,10 +426,10 @@ export default {
 
   // event Management page language
   eventView:{
-    ProcessedEvent:'Processed Events',//Sprint9 新增
+    ProcessedEvent:'Done Events',//Sprint9 新增
     ClosedEvent:'Closed Events',//Sprint9 新增
-    ReturnEvent:'Return Events',//Sprint9 新增
-    returnStatus:'Return',//Sprint9 新增
+    ReturnEvent:'Rejected Events',//Sprint9 新增
+    returnStatus:'Reject',//Sprint9 新增
     Returned:'Returned',//Sprint9 新增
     enclosure:'Attachment',//Sprint8 新增
     status: 'Status',
@@ -449,9 +449,9 @@ export default {
     solver: 'Solver',
     events: 'Events',
     methods: 'Select a handling method',
-    handling: 'Handling',
-    closing: 'Closing',
-    adding: 'Adding',
+    handling: 'Handle',
+    closing: 'Close',
+    adding: 'Add',
     details: 'Handling Details',
     addDetails: 'Add Handling Details',
     exportReport: 'Export Excel',

@@ -272,13 +272,12 @@
                   :row-class-name="rowClass"
                 >
                   <el-table-column v-for="(_item,_index) in eventInfoData" :key="_index"
-                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.pdfwidth">
+                                  :prop="_item.prop" :label="_item.label" :min-width="_item.pdfwidth">
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.remotePatrol')"
                     prop="remotePer"
-                    :min-width="lang!=='en'? '8% ': '9%'"
-                    sortable="custom">
+                    :min-width="lang!=='en'? '8% ': '9%'">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper remote">
                         <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer}}</el-tag>
@@ -288,8 +287,7 @@
                   <el-table-column
                     :label="$t('overview.onsitePatrol')"
                     prop="onsitePer"
-                    :min-width="lang!=='en'? '8%' : '9%'"
-                    sortable="custom">
+                    :min-width="lang!=='en'? '8%' : '9%'">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper onsite">
                         <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer}}</el-tag>
@@ -299,8 +297,7 @@
                   <el-table-column
                     :label="$t('overview.storeMonitor')"
                     prop="videoPer"
-                    :min-width="lang!=='en'? '8%' : '9%'"
-                    sortable="custom">
+                    :min-width="lang!=='en'? '8%' : '9%'">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper video">
                         <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer}}</el-tag>
@@ -461,7 +458,7 @@
             "sortable": false,
             "width": '290',
             "maxWidth": '290',
-            "pdfwidth":'20%'
+            "pdfwidth":'16%'
           },
           {
             "prop":"regionName",
@@ -485,15 +482,15 @@
             "sortable":'custom',
             "width": '140',
             "maxWidth": '150',
-            "pdfwidth":'11%'
+            "pdfwidth":'12%'
           },
           {
             "prop":"numOfInprocess",
             "label": this.$t('overview.numProcessEvents'),
             "sortable":'custom',
-            "width": '140',
-            "maxWidth": '150',
-            "pdfwidth":'11%'
+            "width": '145',
+            "maxWidth": '155',
+            "pdfwidth":'12%'
           },
           {
             "prop":"numOfProcessed",
@@ -501,7 +498,7 @@
             "sortable":'custom',
             "width": '140',
             "maxWidth": '150',
-            "pdfwidth":'11%'
+            "pdfwidth":'12%'
           },
           {
             "prop":"numOfRejected",
@@ -509,7 +506,7 @@
             "sortable":'custom',
             "width": '140',
             "maxWidth": '150',
-            "pdfwidth":'11%'
+            "pdfwidth":'12%'
           },
           // {
           //   "prop":"numOfRemote",
