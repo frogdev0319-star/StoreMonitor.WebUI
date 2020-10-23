@@ -1081,8 +1081,8 @@ $h1:#292e36;
                     background-color: #D4DBE5;
                     color: $tab;
                     font-size: 12px;
-                    margin-left: calc(20/1920*100vw);
-                    display: inline-block;
+                    margin-right: calc(20/1920*100vw);
+                    float:right;
                 }
                 .icon-blag{
                     display: inline-block;
