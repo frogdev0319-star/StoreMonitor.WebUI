@@ -92,7 +92,7 @@
                                         <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >{{generateEventLang('pending')}}</span>
                                         <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >{{generateEventLang('handled')}}</span>
                                         <span class="icon-span" style="background-color:#6097F3;" v-else-if="scope.row.status==2" >{{generateEventLang('closed')}}</span>
-                                        <span class="icon-span" style="background-color:#FDBA40;" v-else-if="scope.row.status==3" >{{generateEventLang('Returned')}}</span>
+                                        <span class="icon-span" style="background-color:#FDBA40;" v-else-if="scope.row.status==3" >{{generateEventLang('returnStatus')}}</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column

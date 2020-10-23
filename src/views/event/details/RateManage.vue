@@ -786,40 +786,16 @@ export default {
                     // 1已处理：追加、结案、退回
                     // 2结案：无状态按钮
                     // 3退回：处理、追加
-                    if(e==0){
-                        self.Changestatus = self.curStatus
-                        self.subBtnList.forEach(item=>{
-                            if(self.curStatus==0){
-                                item.order==0 ? (item.isShow=true,item.isActive=true) : null
-                                item.order==2 ? item.isShow=true : null
-                            }
-                            if(self.curStatus==1){
-                                item.order==1 ? (item.isShow=true,item.isActive=true) : null
-                                item.order==2 ? item.isShow=true : null
-                                item.order==3 ? item.isShow=true : null
-                            }
-                            if(self.curStatus==3){
-                                item.order==0 ? (item.isShow=true,item.isActive=true) : null
-                                item.order==2 ? item.isShow=true : null
-                            }
-                        })
-                    }else{
-                        self.subBtnList.forEach(item=>{
-                            if(self.Changestatus==0){
-                                item.order==0 ? item.isShow=true : null
-                                item.order==2 ? item.isShow=true : null
-                            }
-                            if(self.Changestatus==1){
-                                item.order==1 ? item.isShow=true : null
-                                item.order==2 ? item.isShow=true : null
-                                item.order==3 ? item.isShow=true : null
-                            }
-                            if(self.Changestatus==3){
-                                item.order==0 ? item.isShow=true : null
-                                item.order==2 ? item.isShow=true : null
-                            }
-                        })
-                    }
+                    self.subBtnList.forEach(item=>{
+                        if(self.curStatus==0||self.curStatus==3){
+                            item.order==0||item.order==2 ? item.isShow=true : item.isShow=false
+                            item.order==0 ? item.isActive=true : item.isActive=false
+                        }
+                        if(self.curStatus==1){
+                            item.order==1||item.order==2||item.order==3 ? item.isShow=true : item.isShow=false
+                            item.order==1 ? item.isActive=true : item.isActive=false
+                        }
+                    })
                     dataComments.forEach((item,index)=>{
                         let obj={};
                         obj.createOr=item.accountName;
