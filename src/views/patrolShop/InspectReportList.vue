@@ -86,11 +86,29 @@
         <el-col :span="24" class="report-content">
             <el-row class="card-content" v-if="reportList.length!=0">
                 <el-col :span="24" class="card-header" v-if="reportList.length!=0">
-                    <el-radio v-model="curSortType" v-for="(item,index) in sortTypeList" :key="index" :label="item.id" @change="checkSortType">
-                        <span class="sort-name">{{item.name}}</span>
+                    <el-radio style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;" v-model="curSortType" v-for="(item,index) in sortTypeList" :key="index" :label="item.id" @change="checkSortType">
+                      <span>{{item.name}}</span>
                     </el-radio>
+                    <div class="list_card">
+                      <div class="pattern_btn" @click="ShowCard=true" @mouseover="isHoverCard=true" @mouseout="isHoverCard=false" :style="isHoverCard||ShowCard?'color:#f31d65':''">
+                        <i class="iconfont icon-suolvetu iconCard"/>
+                        <span class="text-pattern">{{$t('remotePatrol.cardStyle')}}</span>
+                      </div>
+                      <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
+                      <div class="pattern_btn" @click="ShowCard=false" @mouseover="isHoverList=true" @mouseout="isHoverList=false" :style="isHoverList||!ShowCard?'color:#f31d65':''">
+                        <i class="iconfont icon-liebiao iconCard"/>
+                        <span class="text-pattern">{{$t('remotePatrol.listStyle')}}</span>
+                      </div>
+                      <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
+                        <div class="btn-area">
+                          <img :src="exportPng" class="icon-excel">
+                          <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                        </div>
+                      </el-button>
+                    </div>
                 </el-col>
-                <el-col :span="4" class="report-card" v-for="(item,index) in reportList" :key="index">
+                <div v-if="ShowCard">
+                  <el-col :span="4" class="report-card" v-for="(item,index) in reportList" :key="index">
                     <div class="cards" @click="clickReport(item,index)">
                         <img :src="item.iconSrc" alt="" :height="iconSrcHeight" class="item-img"/>
                         <div class="item-flex">
@@ -110,7 +128,43 @@
                           </div>
                         </div>
                     </div>
-                </el-col>
+                  </el-col>
+                </div>
+                <div v-if="!ShowCard" class="list-table">
+                  <el-table
+                            :data="reportList"
+                            :highlight-current-row="true"
+                            align='left'
+                            stripe
+                            height="calc(500/1920*100vw)"
+                            @row-click='clickReport'
+                            style=""
+                            class="table-content"
+                            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+                            :cell-style="cellStyle"
+                            :cell-class-name="cellClass"
+                            :header-cell-class-name="headerClass"
+                        >
+                            <el-table-column v-for="(_item,_index) in reportInfoTable" :key="_index" align="left"
+                                      :prop="_item.prop" :label="_item.label" :min-width="_item.width">
+                            </el-table-column>
+                            <el-table-column
+                                prop="option"
+                                :label="$t('eventView.operation')"
+                                min-width="150"
+                                align="left">
+                                <template slot-scope="scope">
+                                    <i class="iconfont icon-gengduo" @click="toReportDetail(scope.row)"></i>
+                                </template>
+                            </el-table-column>
+                            <div slot="empty">
+                                <div>
+                                    <i class="iconfont icon-zhengque empty-data-icon"></i>
+                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{$t('eventView.noEvents')}}</span>
+                                </div>
+                            </div>
+                        </el-table>
+                </div>
                 <el-col :span="24" class="el-pat">
                     <el-pagination background small
                         @current-change="currentChange"
@@ -161,8 +215,12 @@ export default {
             inspectSrc8:require('../../../static/img/总评icon8.png'),
             inspectSrc9:require('../../../static/img/总评icon9.png'),
             inspectSrc10:require('../../../static/img/总评icon10.png'),
+            exportPng: require('../../../static/img/icon_excel.png'),
             reportList:[],
             curSortType:0,
+            ShowCard:true,
+            isHoverList:false,
+            isHoverCard:false,
             sortTypeList:[
                 {
                     id:0,
@@ -177,7 +235,48 @@ export default {
                     name: this.$t('reportView.rankStore')
                 }
             ],
-
+            reportInfoTable:[
+              {
+                prop: "storeName",
+                label: this.$t('overview.storeName'),
+                width: '220',
+              },
+              {
+                prop: "storeTag",
+                label: this.$t('remotePatrol.storeTag'),
+                width: '180',
+              },
+              {
+                prop: "submitterName",
+                label: this.$t('scheduleView.InspectPerson'),
+                width: '160',
+              },
+              {
+                prop: "tagName",
+                label: this.$t('overview.patrolLists'),
+                width: '150',
+              },
+              {
+                prop: "modeText",
+                label: this.$t('remotePatrol.patrolWay'),
+                width: '150',
+              },
+              {
+                prop: "status",
+                label: this.$t('remotePatrol.patrolResult'),
+                width: '150',
+              },
+              {
+                prop: "patrolScore",
+                label: this.$t('remotePatrol.TableGet'),
+                width: '150',
+              },
+              {
+                prop: "datestr",
+                label: this.$t('remotePatrol.patrolDate'),
+                width: '184',
+              },
+            ],
             curCountry:'',
             countryList:[],
             curProvince: [],
@@ -223,7 +322,9 @@ export default {
             showStoreContent: false,
             checkAllStore: false,
             noData: '',
-            showStoreInfo: false
+            showStoreInfo: false,
+            cellClass: 'report-cell-class',
+            headerClass:'report-header-class'
         }
     },
     created(){
@@ -286,6 +387,24 @@ export default {
           self.curStore=[];
           self.StoreTagList=[]
         },
+        export2Excel(){
+
+        },
+        toReportDetail(){
+
+        },
+        cellStyle({ row, column, rowIndex, columnIndex}){
+          console.log(row);
+          console.log(columnIndex);
+          let obj = {};
+          if(columnIndex == 0){
+            obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
+          }
+          else{
+            obj = {'border-right':'1px solid #e3e9f4'}
+          }
+          return obj;
+        },
         getReportList(params){
             let self=this;
             getInspectReportList(params).then(res=>{
@@ -305,7 +424,11 @@ export default {
                     obj.submitter=item.submitter;
                     obj.routeObj=item;
                     obj.mode=item.mode;
-
+                    if(item.mode==0){
+                      obj.modeText=self.$t('overview.remotePatrol')
+                    }else if(item.mode==1){
+                      obj.modeText=self.$t('overview.onsitePatrol')
+                    }
                     switch(item.status){
 
                       /**
@@ -313,6 +436,7 @@ export default {
                        */
                       case 0: {
                           // 立即督导
+                          obj.status = self.$t('overview.danger')
                           if(self.lang == 'zh'){
                             obj.iconSrc=self.inspectSrc1;
                           }
@@ -329,6 +453,7 @@ export default {
                         }
                         case 1: {
                           // 待改善
+                          obj.status = self.$t('overview.improve')
                           if(self.lang == 'zh'){
                             obj.iconSrc=self.inspectSrc3;
                           }
@@ -346,6 +471,7 @@ export default {
 
                       case 2:{
                           //合格
+                          obj.status = self.$t('overview.pass')
                           if(self.lang == 'zh'){
                             obj.iconSrc=self.inspectSrc2;
                           }
@@ -1165,9 +1291,104 @@ $suggestBack:#F1F6FE;
         }
         .card-header{
             text-align: left;
-            padding-left: calc(20/1920*100vw);
+            padding: 0 calc(20/1920*100vw);
+            padding-right: 0;
             margin-bottom: 15px;
+            .list_card{
+              float: right;
+              .pattern_btn{
+                display: inline-block;
+                height: calc(36/1920*100vw);
+                line-height: calc(36/1920*100vw);
+                color:'#7d8cad';
+                cursor: pointer;
+                vertical-align: middle;
+                .iconCard{
+                  font-size: calc(18/1920*100vw);
+                  margin-right:calc(10/1920*100vw);
+                  vertical-align: middle;
+                }
+                .text-pattern{
+                  font-size: calc(12/1920*100vw);
+                  vertical-align: middle;
+                }
+              }
+              .export-btn{
+                border-color: $red;
+                height: calc(36/1920*100vw);
+                width: calc(130/1920*100vw);
+                margin: 0;
+                padding: 0;
+                font-size: calc(14/1920*100vw);
+                line-height: calc(36/1920*100vw);
+                color: #ffffff;
+                border-width: 0;
+                border-radius: 4px;
+                top: calc(24/1920*100vw);
+                margin-left: calc(40/1920*100vw);
+                vertical-align: middle;
+                .btn-area{
+                  padding: 0 calc(6/1920*100vw);
+                  height: calc(36/1920*100vw);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  .icon-excel{
+                    margin-right: calc(18/1920*100vw);
+                    font-size: calc(24/1920*100vw);
+                    height: calc(24/1920*100vw);
+                    width: calc(24/1920*100vw);
+                  }
+                  .spanClass{
+                    font-size: calc(14/1920*100vw);
+                    display: inline-block;
+                  }
+                }
+              }
+              .en-export-btn{
+                border-color: $red;
+                height: calc(36/1920*100vw);
+                margin: 0;
+                padding: 0;
+                font-size: calc(14/1920*100vw);
+                line-height: calc(36/1920*100vw);
+                color: #ffffff;
+                border-width: 0;
+                border-radius: 4px;
+                width: calc(130/1920*100vw);
+                min-width: 120px;
+                margin-left: calc(40/1920*100vw);
+                vertical-align: middle;
+                .btn-area{
+                  position: relative;
+                  padding: 0 calc(6/1920*100vw);
+                  height: calc(36/1920*100vw);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  .icon-excel{
+                    margin-right: calc(10/1920*100vw);
+                    width: calc(24/1920*100vw);
+                    height: calc(24/1920*100vw);
+                  }
+                  .spanClass{
+                    font-size: calc(14/1920*100vw);
+                    display: inline-block;
+                  }
+                }
+              }
+            }
         }
+    }
+    .list-table{
+      padding-left: calc(20/1920*100vw);
+      margin-bottom: 20px;
+    }
+    .list-table /deep/ .report-cell-class .cell{
+      padding-left: calc(20/1920*100vw) !important;
+    }
+    .list-table /deep/ .report-header-class .cell{
+      padding-left: calc(20/1920*100vw) !important;
     }
     .report-card{
         margin-bottom: 20px;

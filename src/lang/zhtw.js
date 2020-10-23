@@ -57,10 +57,10 @@ export default {
     loginAbnormal: '登錄信息異常，請重新登錄！'
   },
   overview:{
-    'averageScore':'平均分',//Sprint8 新增
-    'everydays':'每',//新增
-    'act':'執行',//新增
-    'daysww':'號',//新增
+    'averageScore':'平均分',
+    'everydays':'每',
+    'act':'執行',
+    'daysww':'號',
     'eachmonth':'每月',
     'weeks':'週',
     'patrolPlan':'巡店計劃',
@@ -183,13 +183,13 @@ export default {
     sumUnprocessEvents: '待處理事件總數',
     sumProcessEvents: '已處理事件總數',
     sumClosedEvents: '已結案事件總數',
-    sumReturnedEvents:'已退回事件總數',//Sprint9 新增
+    sumReturnedEvents:'已退回事件總數',
     eventList: '事件列表',
     area: '所屬區域',
     numUnprocessEvents: '待處理事件數量',
     numProcessEvents: '已處理事件數量',
     numClosedEvents: '已結案事件數量',
-    numReturndEvents:'已退回事件數量',//Sprint9 新增
+    numReturndEvents:'已退回事件數量',
     emptyEventList: '事件列表為空，請重新篩選數據',
     none: '無',
     allZoneI: '全部區域一',
@@ -198,15 +198,21 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    TableTotal:'項目總分值',//Sprint8 新增
-    TableIgnore:'不適用',//Sprint8 新增
-    TableGet:'得分',//Sprint8 新增
-    alertContent:'請評估所有巡檢項',//Sprint8 新增
-    alertTips1:'巡檢評分項至少填寫1項',//Sprint8 新增
-    clickToContent:'部分巡檢未評估，點擊查看！',//Sprint8 新增
-    hasIgnoreContent:'本次巡檢，未巡檢項目',//Sprint8 新增
-    backToallsheet:'返回巡檢表',//Sprint8 新增
-    scoreU:'單位：個',//Sprint8 新增
+    storeTag:'標籤',
+    patrolWay:'巡檢方法',
+    patrolResult:'巡檢結果',
+    patrolDate:'巡檢日期',
+    cardStyle:'縮略圖模式',
+    listStyle:'清單模式',
+    TableTotal:'項目總分值',
+    TableIgnore:'不適用',
+    TableGet:'得分',
+    alertContent:'請評估所有巡檢項',
+    alertTips1:'巡檢評分項至少填寫1項',
+    clickToContent:'部分巡檢未評估，點擊查看！',
+    hasIgnoreContent:'本次巡檢，未巡檢項目',
+    backToallsheet:'返回巡檢表',
+    scoreU:'單位：個',
     Patroltips2:'此巡檢錶名稱已存在',
     stared: '已關注',
     clickToStar: '點擊關注',
@@ -383,7 +389,7 @@ export default {
   reportView:{
     selectStores: '選擇門店',
     country: '國家/地區',
-    selectStoreTag:'標籤快選',//Sprint8 新增
+    selectStoreTag:'標籤快選',
     regionI: '區域一',
     regionII: '區域二',
     stores: '門店',
@@ -427,12 +433,12 @@ export default {
 
   // event Management page language
   eventView:{
-    enclosure:'附件',//Sprint8 新增
-    ProcessedEvent:'已處理事件',//Sprint9 新增
-    ClosedEvent:'已結案事件',//Sprint9 新增
-    ReturnEvent:'退回事件',//Sprint9 新增
-    returnStatus:'退件',//Sprint9 新增
-    Returned:'已退回',//Sprint9 新增
+    enclosure:'附件',
+    ProcessedEvent:'已處理事件',
+    ClosedEvent:'已結案事件',
+    ReturnEvent:'退回事件',
+    returnStatus:'退件',
+    Returned:'已退回',
     status: '處理狀態',
     all : '全部',
     pending: '未處理',
@@ -472,10 +478,10 @@ export default {
 
   // Inspection Management page language
   insSettingView:{
-    OnlyOthers:'【巡檢評分項】sheet頁內容不能為空',//Sprint8 新增
-    beforeImport:'sheet頁內容不能為空',//Sprint8
-    Ratingitems:'評級項目',//Sprint8
-    Addscoreitems:'附加評分項目',//Sprint8
+    OnlyOthers:'【巡檢評分項】sheet頁內容不能為空',
+    beforeImport:'sheet頁內容不能為空',
+    Ratingitems:'評級項目',
+    Addscoreitems:'附加評分項目',
     selecttitle:'請選擇關聯職務',
     storeNoInspect:'此門店尚未綁定遠程巡檢表',
     confirmSubmitThis:'是否确认绑定当前巡检表',
@@ -486,7 +492,7 @@ export default {
     tHeaderB:'巡檢項名稱（必填，100字符）',
     tHeaderC:'項目分值（1~100分）',
     tHeaderD:'巡檢項目詳細說明（選填，1200字符）',
-    tHeaderF:'低於*分，須門店負責人處理（選填，1~10分）',//Sprint8 新增
+    tHeaderF:'低於*分，須門店負責人處理（選填，1~10分）',
     bindWith: '已綁定',
     bindStore: '家門店',
     bindList: '巡檢表綁定',
@@ -501,16 +507,16 @@ export default {
     Inspector:'請選擇巡檢人',
     inspectName: '巡檢名稱',
     inspectionDescp: '巡檢項要求描述',
-    sheetscore0: '項目總分值',//Sprint8 新增
-    sheetscore1: '低於*分，須門店負責人處理',//Sprint8 新增
-    sheetscore2: '項目分值（必填，-100分~100分）',//Sprint8 新增
-    sheetpassfail:'合格率評估項',//Sprint8 新增
-    sheetscore:'巡檢評分項',//Sprint8 新增
-    sheetother:'附加評分項',//Sprint8 新增
-    notAllowAdd:'[Pass-Failed] 和 [Others]Tab無法組成有效的巡檢表，不允許新增！',//Sprint8 新增
-    notallowdeletetips:'存在無效的巡檢表Tab組合，不允許刪除！',//Sprint8 新增
-    notallowA:'合格率評估項和附加評分項',//Sprint8 新增
-    notallowB:'附加評分項',//Sprint8 新增
+    sheetscore0: '項目總分值',
+    sheetscore1: '低於*分，須門店負責人處理',
+    sheetscore2: '項目分值（必填，-100分~100分）',
+    sheetpassfail:'合格率評估項',
+    sheetscore:'巡檢評分項',
+    sheetother:'附加評分項',
+    notAllowAdd:'[Pass-Failed] 和 [Others]Tab無法組成有效的巡檢表，不允許新增！',
+    notallowdeletetips:'存在無效的巡檢表Tab組合，不允許刪除！',
+    notallowA:'合格率評估項和附加評分項',
+    notallowB:'附加評分項',
     score: '項目分值',
     selectImprtLoc: '請選擇導入檔案的位置',
     enterListName: '請輸入巡檢表名稱',
@@ -539,11 +545,11 @@ export default {
     excelLongCategory: '巡檢類別長度不可超過30個字元！',
     excelIllegalCategory: '存在“@#￥%^&*”非法字符！',
     excelEmpty: '巡檢類別與巡檢項名稱不能為空',
-    passfailexcelEmpty: '巡检项不能为空！',//Sprint8 新增
-    excelFullScoreType:'項目總分值必填，取值範圍為1~10的整數',//Sprint8 新增
-    excelMinScoreType:'巡檢項最低分值必填，取值範圍為1~項目總分值的整數',//Sprint8 新增
-    excelOtherScoreType:'項目分值必填，取值範圍為-100~100的整數',//Sprint8 新增
-    bindingstore:'綁定中',//Sprint8 新增
+    passfailexcelEmpty: '巡检项不能为空！',
+    excelFullScoreType:'項目總分值必填，取值範圍為1~10的整數',
+    excelMinScoreType:'巡檢項最低分值必填，取值範圍為1~項目總分值的整數',
+    excelOtherScoreType:'項目分值必填，取值範圍為-100~100的整數',
+    bindingstore:'綁定中',
     excelLongItem: '巡檢項長度不可超過100個字元！',
     excelIllegalDes: '巡檢項目詳細說明不可超過300個字元！',
     deleteItem: '刪除巡檢項',
@@ -583,7 +589,7 @@ export default {
     description: '巡檢項需求描述',
     descriptionRuletip:'最多可輸入1200個字元',
     titleEmpty: '類別名稱不能為空！',
-    ScoreEmpty:'項目分值不能為空',//Sprint8 新增
+    ScoreEmpty:'項目分值不能為空',
     illegalStr: '當前輸入含有非法字元！',
     remotePatrol: '遠端巡檢',
     onsitePatrol: '現場巡檢',
