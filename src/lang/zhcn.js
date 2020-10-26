@@ -204,6 +204,7 @@ export default {
     patrolDate:'巡检日期',//Sprint10
     cardStyle:'缩略图模式',//Sprint10
     listStyle:'列表模式',//Sprint10
+    cancleIgnore:'确认是否取消忽略当前巡检项',//Sprint10
     TableTotal:'项目总分值',
     TableIgnore:'不适用',
     TableGet:'得分',
@@ -294,7 +295,7 @@ export default {
     qualified: '合格',
     unit: '个',
     summaryInfo: '请选择巡检总评！',
-    allIgnored: '您已忽略所有巡检项，请重新评估',
+    allIgnored: '巡检项不能全部忽略',//Sprint10
     videoLicense: "无视频访问权限，请联系上级管理员",
     suggestEmpty: '请输入本次巡检建议！',
     changPageInfo: '当前巡检尚未完成，确认是否离开页面？',

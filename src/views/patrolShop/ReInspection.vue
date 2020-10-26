@@ -156,6 +156,7 @@
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='changeInspectObj.title' :show-info='changeInspectObj.showInfo' :is-warning='changeInspectObj.isWarning' :dialog-closed='changeInspectObj.dialogCosed' @confirmed='changeInspectDialog' @canceled='canceldChangeInspect'></dialog-vue>
             <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
+            <dialog-vue :dialog-title='CancleIgnoreInspectObj.title' :show-info='CancleIgnoreInspectObj.showInfo' :is-warning='CancleIgnoreInspectObj.isWarning' :dialog-closed='CancleIgnoreInspectObj.dialogCosed' @confirmed='CancleIgnoreDialog' @canceled='IgnoreInspect'></dialog-vue>
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
             <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
@@ -290,32 +291,35 @@
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div style="height:299.84px;" v-if="!showFeedBack">
                                 <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
-                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'"
+                                    <span class="titles" @click="clickItem(item,index)" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                                           :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
                                     <div class="dropdown-model" v-if="item.disabled"></div>
-                                    <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                    <div v-if="inspectList[0].type!=1" class="check_scoring" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <p v-for="(itemDS,indexDs) in scoreList" :key="indexDs" @click="checkScore(item,itemDS,0)" :class="itemDS.isClick?'check_isClick':'check_normal'">{{itemDS.scoreTitle}}</p>
+                                    </div>
+                                    <el-dropdown v-else trigger="click" class="item-score" size="small" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
                                             {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
                                             <i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <el-dropdown-menu slot="dropdown" class="score-menu" v-if="inspectList[0].type!=1">
+                                        <!-- <el-dropdown-menu slot="dropdown" class="score-menu" v-if="inspectList[0].type!=1">
                                             <el-dropdown-item style="width:70px;text-align:center;"
                                             v-for="(itemDS,indexDs) in scoreList"
                                             :key="indexDs" @click.native="checkScore(item,itemDS,0)">{{itemDS.scoreTitle}}</el-dropdown-item>
-                                        </el-dropdown-menu>
-                                        <el-dropdown-menu slot="dropdown" class="score-menu" v-else>
+                                        </el-dropdown-menu> -->
+                                        <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
                                             v-for="itemDS in item.itemScoreLength"
                                             :key="itemDS" @click.native="checkScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
-                                    <!-- <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i> -->
-                                    <!-- <span class="ignored-icon" v-if="item.isIgnore">{{generatePatrolLang('ignored')}}</span> -->
+                                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i>
+                                    <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_back.png" @click="CancleIgnoreItem(item,index)">
                                     <div class="icon-clicked" v-if="item.checked"></div>
-                                    <div class="details-content" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                    <div class="details-content" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <span>{{item.description}}</span>
                                     </div>
-                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
                                             <div class="img-content" v-if="_item.mediaType==2">
                                                 <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
@@ -370,10 +374,10 @@
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div style="height:299.84px;">
                                 <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details">
-                                    <span class="titles" @click="clickItem(item,index)" :class="!item.isIgnore?'noraml-title':'ignore-title'"
+                                    <span class="titles noraml-title" @click="clickItem(item,index)"
                                           :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
                                     <div class="dropdown-model" v-if="item.disabled"></div>
-                                    <el-dropdown trigger="click" class="item-score" size="small" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                    <el-dropdown trigger="click" class="item-score noraml-title" size="small">
                                         <span class="el-dropdown-link">
                                             {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
                                             <i class="el-icon-arrow-down el-icon--right"></i>
@@ -392,10 +396,10 @@
                                     <!-- <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i> -->
                                     <!-- <span class="ignored-icon" v-if="item.isIgnore">{{generatePatrolLang('ignored')}}</span> -->
                                     <div class="icon-clicked" v-if="item.checked"></div>
-                                    <div class="details-content" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                    <div class="details-content noraml-title">
                                         <span>{{item.description}}</span>
                                     </div>
-                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.isIgnore?'noraml-title':'ignore-title'">
+                                    <div class="source-content noraml-title" v-if="item.sourceList.length!=0">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
                                             <div class="img-content" v-if="_item.mediaType==2">
                                                 <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
@@ -659,8 +663,8 @@ export default {
             accountId:'',
             userId:'',
             scoreList:[
-                {val:10,scoreTitle: this.$t('remotePatrol.pass')},
-                {val:0,scoreTitle: this.$t('remotePatrol.failed')},
+                {val:10,scoreTitle: this.$t('remotePatrol.pass'),isClick:false},
+                {val:0,scoreTitle: this.$t('remotePatrol.failed'),isClick:false},
             ],
             tempStoreList:[],
             allInitStoreList:[],
@@ -717,6 +721,12 @@ export default {
             ignoreInspectObj:{
                 title: this.$t('remotePatrol.confirm'),
                 showInfo: this.$t('remotePatrol.confirmIgnore'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            CancleIgnoreInspectObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.cancleIgnore'),
                 isWarning:true,
                 dialogCosed:false
             },
@@ -1700,6 +1710,7 @@ export default {
         },
         checkIgnoreScore(item,itemDS,e){
             let self=this;
+            item.manualIgnore=false
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -1742,7 +1753,8 @@ export default {
         },
         checkScore(item,itemDS,e){
             let self=this;
-            console.log(item);
+            console.log(item,itemDS);
+            itemDS.isClick=true
             self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
             if(e==0){
                 if(item.type==2){
@@ -1763,45 +1775,20 @@ export default {
             if(item.itemScoreTitle!='--'){
                 if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                     self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount+1;
+                    self.sheetName[self.curSheetIndex].Effective = self.sheetName[self.curSheetIndex].Effective+1
                     self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount=self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount+1
                 }
                 self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
             }
-            // else{
-            //     if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!=0){
-            //         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
-            //         self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
-            //     }
-            // }
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
-            // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
-            let isSheet1=false,isSheet2=false
-            if(sheetName.length==1){
-                isSheet1 = sheetName[0].type==0 ? (sheetName[0].dealCount>=1 ? true : false) : false
-                isSheet2 = sheetName[0].type==1 ? (sheetName[0].dealCount>=1 ? true : false) : false
-            }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
-                if(sheetName.some(item=>item.type==2)){
-                    if(sheetName[2].dealCount==0){
-                        isSheet1 = isSheet2 = sheetName[1].dealCount>=1||sheetName[0].dealCount>=1 ? true : false
-                    }else{
-                        isSheet1 = isSheet2 = sheetName[1].dealCount>=1 ? true : false
-                        self.hasSheet3 = sheetName[1].dealCount>=1 ? false : true
-                    }
-                }else{
-                    isSheet1 = isSheet2 = sheetName[0].dealCount>=1||sheetName[1].dealCount>=1 ? true : false
-                }
-            }else{
-                isSheet2 = sheetName[0].dealCount>=1 ? true : false
-                self.hasSheet3 = sheetName[0].dealCount>=1 ? false : true
-            }
-            self.isDisabled = isSheet1 || isSheet2
+            self.getDisabled()
             self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.dealCount!=item.count) ? true : false
             let hasIgnoretemp=[]
             sheetName.forEach(s_item=>{
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        if(_item.inputCount==0){
+                        if(_item.inputCount==0||_item.manualIgnore){
                             hasIgnoretemp.push(_item)
                         }else{
                             self.tempArr.push(_item.type)
@@ -1809,10 +1796,33 @@ export default {
                     })
                 })
             })
-            self.hasIgnoretemp=hasIgnoretemp
-            if(hasIgnoretemp.length==0){
-                self.notShowAlert=true
+            hasIgnoretemp.length==0 ? self.notShowAlert=true : null //没有忽略项时，隐藏提示条
+        },
+        getDisabled(){
+            let self=this;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
+            // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
+            let isSheet1=false,isSheet2=false
+            if(sheetName.length==1){
+                isSheet1 = sheetName[0].type==0 ? (sheetName[0].Effective>=1 ? true : false) : false
+                isSheet2 = sheetName[0].type==1 ? (sheetName[0].Effective>=1 ? true : false) : false
+            }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
+                if(sheetName.some(item=>item.type==2)){
+                    if(sheetName[2].Effective==0){
+                        isSheet1 = isSheet2 = sheetName[1].Effective>=1||sheetName[0].Effective>=1 ? true : false
+                    }else{
+                        isSheet1 = isSheet2 = sheetName[1].Effective>=1 ? true : false
+                        self.hasSheet3 = sheetName[1].Effective>=1 ? false : true
+                    }
+                }else{
+                    isSheet1 = isSheet2 = sheetName[0].Effective>=1||sheetName[1].Effective>=1 ? true : false
+                }
+            }else{
+                isSheet2 = sheetName[0].Effective>=1 ? true : false
+                self.hasSheet3 = sheetName[0].Effective>=1 ? false : true
             }
+            self.isDisabled = isSheet1 || isSheet2
         },
         getAllStoreList(){
             let self=this;
@@ -2187,36 +2197,74 @@ export default {
         },
         ignoreInspectDialog(val){
             let self=this;
-            console.log(val);
-            self.curItem.isIgnore=true;
+            self.curItem.manualIgnore=true
             self.curItem.disabled=true;
             self.showGuide=false;
-            self.ignoreTemp.push(self.curItem);
+            if(self.sheetName[self.curSheetIndex].Effectiv!=0){
+                self.sheetName[self.curSheetIndex].Effective=self.sheetName[self.curSheetIndex].Effective-1
+            }
             if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
                 self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount+1;
             }
+            if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore){
+                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = ''
+                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = []
+                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle='--'
+            }
+            self.notShowAlert ? self.notShowAlert=false : null
             self.ignoreInspectObj.dialogCosed=false
+            !self.isShowWarn ? self.isShowWarn=true : null
+            self.isDisabled ? self.getDisabled() : null
+        },
+        CancleIgnoreDialog(){
+            let self = this
+            self.curItem.manualIgnore=false;
+            self.curItem.disabled=false;
+            self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0
+            self.CancleIgnoreInspectObj.dialogCosed=false
         },
         cancelIgnoreInspect(val){
             let self=this;
-            console.log(val);
             self.ignoreInspectObj.dialogCosed=false;
+        },
+        IgnoreInspect(){
+            let self = this
+            self.CancleIgnoreInspectObj.dialogCosed=false
         },
         ignoreItem(item,index){
             let self=this;
-            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
-            //self.editCount=self.editCount+1;
-            self.curItemIndex=index;
-            self.curItem=item;
-            if(item.isIgnore){
-                self.notify( this.$t('remotePatrol.ignoredItem'),'warning',3000);
+            //判断是否全部忽略了，若是，弹框提示不可全部忽略
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            let count=0,manualCount=1
+            sheetName.forEach(s_item=>{
+                count+=s_item.count
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        _item.manualIgnore ? manualCount++ : null
+                    })
+                })
+            })
+            if(count==manualCount){
+                self.allIgnoreObj.dialogCosed=true;
                 return false;
             }
+            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            self.curItemIndex=index;
+            self.curItem=item;
             if(item.deviceId==-1){
                 self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
             self.ignoreInspectObj.dialogCosed=true;
+        },
+        CancleIgnoreItem(item,index){
+            let self=this;
+            self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
+            self.curItemIndex=index;
+            self.curItem=item;
+            self.CancleIgnoreInspectObj.dialogCosed=true;
         },
         noBindDeviceDialog(val){
             let self=this;
@@ -3257,6 +3305,7 @@ export default {
                                 itemObj.checked=false;   //是否选中状态
                                 itemObj.isIgnore=false;  //是否被忽略
                                 itemObj.Ruletip=false;  //是否显示提示语
+                                itemObj.manualIgnore=false; //是否手动忽略巡检项
                                 itemObj.sourceList=[];
                                 tempItems.push(itemObj);
                             })
@@ -3282,7 +3331,7 @@ export default {
                                 if(Typeindex[0].type==2){
                                     label=self.$t('insSettingView.sheetother')
                                 }
-                                te_temp.push({inspectList:Typeindex,dealCount:0,count:count,isClick:false,label:label,type:Typeindex[0].type})
+                                te_temp.push({inspectList:Typeindex,dealCount:0,Effective:0,count:count,isClick:false,label:label,type:Typeindex[0].type})
                             }
                         }
                         self.sheetName=te_temp
@@ -3309,6 +3358,22 @@ export default {
                     })
                 }
                 self.hasIgnoretemp = PatrolHistory.hasIgnoretemp!=null ? PatrolHistory.hasIgnoretemp : null
+            }else{
+                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+                let sheetName=self.sheetName.slice(0,indexFeed);
+                let hasIgnoretemp=[]
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount==0||_item.manualIgnore){
+                                hasIgnoretemp.push(_item)
+                            }else{
+                                self.tempArr.push(_item.type)
+                            }
+                        })
+                    })
+                })
+                self.hasIgnoretemp=hasIgnoretemp
             }
         },
         backToPatrol(){
@@ -3318,7 +3383,7 @@ export default {
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
-                let dealtemp=[]
+                let dealtemp=[],notIgnoretemp=[]
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
                         self.hasIgnoretemp.forEach((h_item,h_index)=>{
@@ -3326,20 +3391,27 @@ export default {
                                 item.items[_index]=self.hasIgnoretemp[h_index]
                             }
                         })
-                        if(item.items[_index].inputCount==1){
+                        if(item.items[_index].inputCount==1||item.items[_index].manualIgnore){
                             let obj={}
-                            obj.dealCount=item.items[_index].inputCount
+                            obj.dealCount=1
                             dealtemp.push(obj)
                         }
+                        if(item.items[_index].inputCount==1){
+                            let obj={}
+                            obj.manualCount=1
+                            notIgnoretemp.push(obj)
+                        }
+                        
                     })
                 })
                 s_item.dealCount=dealtemp.length
+                s_item.Effective=notIgnoretemp.length
                 if(s_item.isClick&&!self.showFeedBack){
                     self.inspectItemList=s_item.inspectList[self.curGroupIndex].items
                 }
             })
             self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount==0) ? true : false
-            self.notShowAlert = self.sheetName.every(x=>x.count==x.dealCount)
+            self.notShowAlert = self.sheetName.every(x=>x.count==x.Effective)
         },
         changeSheet(item,index){
             let self=this
@@ -4716,7 +4788,7 @@ export default {
                         }
                         .dropdown-model{
                             position: absolute;
-                            @include point(right,20);
+                            @include point(right,40);
                             @include point(top,12);
                             margin-right: 10px;
                             width: 120px;
@@ -4725,10 +4797,32 @@ export default {
                             z-index: 20;
                             cursor: not-allowed;
                         }
+                        .check_scoring{
+                            box-sizing: border-box;
+                            position: absolute;
+                            @include point(right,60);
+                            @include point(top,12);
+                            font-size: 12px;
+                            width: 120px;
+                            height: 22px;
+                            border:1px solid #dcdcdc;
+                            background-color: #f7f8fc;
+                            display: inline-block;
+                            .check_normal{
+                                display: inline-block;
+                                color:#7b8da0;
+                                font-size: calc(12/1920*100vw);
+                            }
+                            .check_isClick{
+                                display: inline-block;
+                                background-color:#fcba3f;
+                                font-size: calc(14/1920*100vw);
+                            }
+                        }
                         .item-score{
                             box-sizing: border-box;
                             position: absolute;
-                            @include point(right,40);
+                            @include point(right,60);
                             @include point(top,12);
                             font-size: 12px;
                             //width: 96px;
