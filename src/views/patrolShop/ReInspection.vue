@@ -295,25 +295,20 @@
                                           :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
                                     <div class="dropdown-model" v-if="item.disabled"></div>
                                     <div v-if="inspectList[0].type!=1" class="check_scoring" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
-                                        <p v-for="(itemDS,indexDs) in scoreList" :key="indexDs" @click="checkScore(item,itemDS,0)" :class="itemDS.isClick?'check_isClick':'check_normal'">{{itemDS.scoreTitle}}</p>
+                                        <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" @click="checkScore(item,itemDS,0)" :class="itemDS.isClick?'check_isClick':'check_normal'">{{itemDS.scoreTitle}}</p>
                                     </div>
                                     <el-dropdown v-else trigger="click" class="item-score" size="small" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
                                             {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
                                             <i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <!-- <el-dropdown-menu slot="dropdown" class="score-menu" v-if="inspectList[0].type!=1">
-                                            <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="(itemDS,indexDs) in scoreList"
-                                            :key="indexDs" @click.native="checkScore(item,itemDS,0)">{{itemDS.scoreTitle}}</el-dropdown-item>
-                                        </el-dropdown-menu> -->
                                         <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
                                             v-for="itemDS in item.itemScoreLength"
                                             :key="itemDS" @click.native="checkScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
-                                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i>
+                                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"></i>
                                     <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_back.png" @click="CancleIgnoreItem(item,index)">
                                     <div class="icon-clicked" v-if="item.checked"></div>
                                     <div class="details-content" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
@@ -374,32 +369,30 @@
                         <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
                             <div style="height:299.84px;">
                                 <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details">
-                                    <span class="titles noraml-title" @click="clickItem(item,index)"
+                                    <span class="titles" @click="clickItem(item,index)"  :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                                           :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
                                     <div class="dropdown-model" v-if="item.disabled"></div>
-                                    <el-dropdown trigger="click" class="item-score noraml-title" size="small">
+                                    <div v-if="item.type!=1" class="check_scoring" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" @click="checkIgnoreScore(item,itemDS,0,index)" :class="itemDS.isClick?'check_isClick':'check_normal'">{{itemDS.scoreTitle}}</p>
+                                    </div>
+                                    <el-dropdown trigger="click" class="item-score" size="small" v-else  :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <span class="el-dropdown-link">
                                             {{`${generatePatrolLang('scoreUnit')}${item.itemScoreTitle}`}}
                                             <i class="el-icon-arrow-down el-icon--right"></i>
                                         </span>
-                                        <el-dropdown-menu slot="dropdown" class="score-menu" v-if="item.type!=1">
-                                            <el-dropdown-item style="width:70px;text-align:center;"
-                                            v-for="(itemDS,indexDs) in scoreList"
-                                            :key="indexDs" @click.native="checkIgnoreScore(item,itemDS,0)">{{itemDS.scoreTitle}}</el-dropdown-item>
-                                        </el-dropdown-menu>
-                                        <el-dropdown-menu slot="dropdown" class="score-menu" v-else>
+                                        <el-dropdown-menu slot="dropdown" class="score-menu">
                                             <el-dropdown-item style="width:70px;text-align:center;"
                                             v-for="itemDS in item.itemScoreLength"
-                                            :key="itemDS" @click.native="checkIgnoreScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
+                                            :key="itemDS" @click.native="checkIgnoreScore(item,itemDS,1,index)">{{itemDS}}</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </el-dropdown>
-                                    <!-- <i class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index)"></i> -->
-                                    <!-- <span class="ignored-icon" v-if="item.isIgnore">{{generatePatrolLang('ignored')}}</span> -->
+                                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,1)"></i>
+                                    <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_back.png" @click="CancleIgnoreItem(item,index)">
                                     <div class="icon-clicked" v-if="item.checked"></div>
-                                    <div class="details-content noraml-title">
+                                    <div class="details-content" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <span>{{item.description}}</span>
                                     </div>
-                                    <div class="source-content noraml-title" v-if="item.sourceList.length!=0">
+                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
                                         <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
                                             <div class="img-content" v-if="_item.mediaType==2">
                                                 <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
@@ -662,10 +655,6 @@ export default {
             percentage:0,
             accountId:'',
             userId:'',
-            scoreList:[
-                {val:10,scoreTitle: this.$t('remotePatrol.pass'),isClick:false},
-                {val:0,scoreTitle: this.$t('remotePatrol.failed'),isClick:false},
-            ],
             tempStoreList:[],
             allInitStoreList:[],
             sessionId:'',
@@ -677,6 +666,7 @@ export default {
             curSheetIndex:0,  //当前点击的 sheet index
             curItem:null,
             curItemId:0,      //当前点击的巡检项id
+            curhasIgnoreItem:0,//当前选中的忽略项index
 
             curTabIndex:0,
             curTabItem:null,
@@ -944,7 +934,7 @@ export default {
             let getdealnum=0
             let sheetName=PatrolHistory.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
-                s_item.count!=s_item.dealCount ? getdealnum++ : ''
+                s_item.count!=s_item.Effective ? getdealnum++ : ''
                 s_item.inspectList.forEach(n_item=>{
                     n_item.items.forEach(item=>{
                         item.isIgnore=false
@@ -1072,6 +1062,7 @@ export default {
             self.showGuide=true;
             self.eventList = []
             self.sheetName=[]
+            self.tempArr=[]
             self.hasIgnoretemp=null
             self.showIgnoreItem=false
             self.isShowWarn=false
@@ -1708,9 +1699,13 @@ export default {
                 })
             })
         },
-        checkIgnoreScore(item,itemDS,e){
+        checkIgnoreScore(item,itemDS,e,index){
             let self=this;
             item.manualIgnore=false
+            self.curhasIgnoreItem=index
+            item.scoreList.forEach(s_item=>{
+                s_item.val==itemDS.val ? s_item.isClick=true : s_item.isClick=false
+            })
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -1727,34 +1722,15 @@ export default {
                 item.itemgetScore=itemDS;
                 item.itemScoreTitle=itemDS;
             }
-            item.dealCount=1
-            item.inputCount=1
-            // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
-            let isSheet1=false,isSheet2=false
-            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
-            if(sheetName.length==1){
-                isSheet1 = isSheet2 = true
-            }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
-                if(sheetName.some(item=>item.type==2)){
-                    if(sheetName[2].dealCount==0&&self.tempArr.every(x=>x==0)){
-                        isSheet1 = isSheet2 = item.type!=2 ? true : false
-                        self.hasSheet3 = item.type!=2 ? false : true
-                    }else{
-                        isSheet1 = isSheet2 =  true
-                    }
-                }else{
-                    isSheet1 = isSheet2 = true
-                }
-            }else{
-                isSheet2 = true
-            }
-            self.isDisabled = isSheet1 || isSheet2
+            item.dealCount=item.Effective=item.inputCount=1
+            self.getDisabled(1)
         },
         checkScore(item,itemDS,e){
             let self=this;
             console.log(item,itemDS);
-            itemDS.isClick=true
+            item.scoreList.forEach(s_item=>{
+                s_item.val==itemDS.val ? s_item.isClick=true : s_item.isClick=false
+            })
             self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
             if(e==0){
                 if(item.type==2){
@@ -1772,57 +1748,77 @@ export default {
                 item.itemgetScore=itemDS;
                 item.itemScoreTitle=itemDS;
             }
+            //按照五种情况逐一测试
             if(item.itemScoreTitle!='--'){
                 if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
-                    self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount+1;
-                    self.sheetName[self.curSheetIndex].Effective = self.sheetName[self.curSheetIndex].Effective+1
-                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount=self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount+1
+                    self.sheetName[self.curSheetIndex].dealCount++
+                    self.sheetName[self.curSheetIndex].Effective++
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].Effective++
                 }
                 self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
             }
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
-            self.getDisabled()
-            self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.dealCount!=item.count) ? true : false
+            self.getDisabled(0)
+            self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.Effective!=item.count) ? true : false
             let hasIgnoretemp=[]
             sheetName.forEach(s_item=>{
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        if(_item.inputCount==0||_item.manualIgnore){
+                        if(_item.inputCount==0){
                             hasIgnoretemp.push(_item)
-                        }else{
-                            self.tempArr.push(_item.type)
                         }
                     })
                 })
             })
             hasIgnoretemp.length==0 ? self.notShowAlert=true : null //没有忽略项时，隐藏提示条
         },
-        getDisabled(){
+        getDisabled(e){
             let self=this;
-            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
             // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
             let isSheet1=false,isSheet2=false
-            if(sheetName.length==1){
-                isSheet1 = sheetName[0].type==0 ? (sheetName[0].Effective>=1 ? true : false) : false
-                isSheet2 = sheetName[0].type==1 ? (sheetName[0].Effective>=1 ? true : false) : false
-            }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
-                if(sheetName.some(item=>item.type==2)){
-                    if(sheetName[2].Effective==0){
-                        isSheet1 = isSheet2 = sheetName[1].Effective>=1||sheetName[0].Effective>=1 ? true : false
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
+            if(e==0){
+                if(sheetName.length==1){
+                    isSheet1 = sheetName[0].type==0 ? (sheetName[0].Effective>=1 ? true : false) : false
+                    isSheet2 = sheetName[0].type==1 ? (sheetName[0].Effective>=1 ? true : false) : false
+                }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
+                    if(sheetName.some(item=>item.type==2)){
+                        if(sheetName[2].Effective==0){
+                            isSheet1 = isSheet2 = sheetName[1].Effective>=1||sheetName[0].Effective>=1 ? true : false
+                        }else{
+                            isSheet1 = isSheet2 = sheetName[1].Effective>=1 ? true : false
+                            self.hasSheet3 = sheetName[1].Effective>=1 ? false : true
+                        }
                     }else{
-                        isSheet1 = isSheet2 = sheetName[1].Effective>=1 ? true : false
-                        self.hasSheet3 = sheetName[1].Effective>=1 ? false : true
+                        isSheet1 = isSheet2 = sheetName[0].Effective>=1||sheetName[1].Effective>=1 ? true : false
                     }
                 }else{
-                    isSheet1 = isSheet2 = sheetName[0].Effective>=1||sheetName[1].Effective>=1 ? true : false
+                    isSheet2 = sheetName[0].Effective>=1 ? true : false
+                    self.hasSheet3 = sheetName[0].Effective>=1 ? false : true
                 }
+                self.isDisabled = isSheet1 || isSheet2
             }else{
-                isSheet2 = sheetName[0].Effective>=1 ? true : false
-                self.hasSheet3 = sheetName[0].Effective>=1 ? false : true
+                if(sheetName.length==1){
+                    isSheet1 = isSheet2 = true
+                }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
+                    if(sheetName.some(item=>item.type==2)){
+                        if(sheetName[2].Effective==0&&self.tempArr.every(x=>x==0)){
+                            isSheet1 = isSheet2 = self.hasIgnoretemp[self.curhasIgnoreItem].type!=2 || (self.hasIgnoretemp[self.curhasIgnoreItem].type==2&&self.hasIgnoretemp[self.curhasIgnoreItem].manualIgnore) ? true : false
+                            self.hasSheet3 = self.hasIgnoretemp[self.curhasIgnoreItem].type!=2 ? false : true
+                        }else{
+                            isSheet1 = isSheet2 =  true
+                        }
+                    }else{
+                        isSheet1 = isSheet2 = true
+                    }
+                }else{
+                    isSheet2 = true
+                }
+                self.isDisabled = isSheet1 || isSheet2
             }
-            self.isDisabled = isSheet1 || isSheet2
         },
         getAllStoreList(){
             let self=this;
@@ -2199,29 +2195,52 @@ export default {
             let self=this;
             self.curItem.manualIgnore=true
             self.curItem.disabled=true;
-            self.showGuide=false;
-            if(self.sheetName[self.curSheetIndex].Effectiv!=0){
-                self.sheetName[self.curSheetIndex].Effective=self.sheetName[self.curSheetIndex].Effective-1
+            if(self.showIgnoreItem){
+                if(self.hasIgnoretemp[self.curItemIndex].dealCount==0){
+                    self.hasIgnoretemp[self.curItemIndex].dealCount=1
+                }
+                if(self.hasIgnoretemp[self.curItemIndex].manualIgnore){
+                    self.hasIgnoretemp[self.curItemIndex].inspectInput = ''
+                    self.hasIgnoretemp[self.curItemIndex].sourceList = []
+                    self.hasIgnoretemp[self.curItemIndex].itemScoreTitle='--'
+                    self.hasIgnoretemp[self.curItemIndex].inputCount=0
+                    self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x=>{
+                        x.isClick=false
+                    })
+                }
+                self.getDisabled(1)
+            }else{
+                self.showGuide=false;
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!=0&&self.sheetName[self.curSheetIndex].Effective!=0){
+                    self.sheetName[self.curSheetIndex].Effective--
+                }
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+                    self.sheetName[self.curSheetIndex].dealCount++
+                }
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore){
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = ''
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = []
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle='--'
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x=>{
+                        x.isClick=false
+                    })
+                }
+                self.notShowAlert ? self.notShowAlert=false : null
+                self.getDisabled(0)
+                self.isDisabled ? self.isShowWarn=true : self.isShowWarn=false
             }
-            if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
-                self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount+1;
-            }
-            if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore){
-                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = ''
-                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = []
-                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle='--'
-            }
-            self.notShowAlert ? self.notShowAlert=false : null
             self.ignoreInspectObj.dialogCosed=false
-            !self.isShowWarn ? self.isShowWarn=true : null
-            self.isDisabled ? self.getDisabled() : null
         },
         CancleIgnoreDialog(){
             let self = this
             self.curItem.manualIgnore=false;
             self.curItem.disabled=false;
-            self.sheetName[self.curSheetIndex].dealCount=self.sheetName[self.curSheetIndex].dealCount-1;
-            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0
+            if(self.showIgnoreItem){
+                self.hasIgnoretemp[self.curItemIndex].dealCount!=0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
+            }else{
+                self.sheetName[self.curSheetIndex].dealCount!=0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
+            }
             self.CancleIgnoreInspectObj.dialogCosed=false
         },
         cancelIgnoreInspect(val){
@@ -2232,23 +2251,25 @@ export default {
             let self = this
             self.CancleIgnoreInspectObj.dialogCosed=false
         },
-        ignoreItem(item,index){
+        ignoreItem(item,index,e){
             let self=this;
-            //判断是否全部忽略了，若是，弹框提示不可全部忽略
-            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-            let sheetName=self.sheetName.slice(0,indexFeed);
-            let count=0,manualCount=1
-            sheetName.forEach(s_item=>{
-                count+=s_item.count
-                s_item.inspectList.forEach(item=>{
-                    item.items.forEach((_item,_index)=>{
-                        _item.manualIgnore ? manualCount++ : null
+            if(e==0){
+                //判断是否全部忽略了，若是，弹框提示不可全部忽略
+                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+                let sheetName=self.sheetName.slice(0,indexFeed);
+                let count=0,manualCount=1
+                sheetName.forEach(s_item=>{
+                    count+=s_item.count
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            _item.manualIgnore ? manualCount++ : null
+                        })
                     })
                 })
-            })
-            if(count==manualCount){
-                self.allIgnoreObj.dialogCosed=true;
-                return false;
+                if(count==manualCount){
+                    self.allIgnoreObj.dialogCosed=true;
+                    return false;
+                }
             }
             self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
             self.curItemIndex=index;
@@ -2494,7 +2515,7 @@ export default {
                                     item.items[_index]=self.hasIgnoretemp[h_index]
                                 }
                             })
-                            if(_item.inputCount!=0){
+                            if(_item.inputCount!=0||_item.manualIgnore){
                                 let obj={}
                                 obj.dealCount=1
                                 dealtemp.push(obj)
@@ -2598,7 +2619,7 @@ export default {
                                     item.items[_index]=self.hasIgnoretemp[h_index]
                                 }
                             })
-                            if(_item.inputCount!=0){
+                            if(_item.inputCount!=0||_item.manualIgnore){
                                 let obj={}
                                 obj.dealCount=1
                                 dealtemp.push(obj)
@@ -3010,6 +3031,7 @@ export default {
             self.inspectItemList=[]
             self.inspectList=[]
             self.sheetName=[]
+            self.tempArr=[]
             self.showChannelBtns=[]
             self.patrolStoreName = _item.name
             self.PatrolList=[]
@@ -3243,6 +3265,7 @@ export default {
             }
             self.isDisabled=false
             self.hasIgnoretemp=[]
+            self.tempArr=[]
             self.$store.dispatch('setPatrolHistory',null);
             self.$store.dispatch('setPatrolComment',null);
             self.isShowWarn=false
@@ -3275,6 +3298,7 @@ export default {
                             obj.type=item.type;
                             obj.groupName=item.groupName;
                             obj.dealCount=0;
+                            obj.Effective=0;
                             obj.isHover=false;
                             if(index==0){
                                 obj.isClick=true;
@@ -3307,6 +3331,8 @@ export default {
                                 itemObj.Ruletip=false;  //是否显示提示语
                                 itemObj.manualIgnore=false; //是否手动忽略巡检项
                                 itemObj.sourceList=[];
+                                itemObj.scoreList=[{val:10,scoreTitle: this.$t('remotePatrol.pass'),isClick:false},
+                                                   {val:0,scoreTitle: this.$t('remotePatrol.failed'),isClick:false}]
                                 tempItems.push(itemObj);
                             })
                             obj.items=tempItems;
@@ -3365,7 +3391,7 @@ export default {
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach(item=>{
                         item.items.forEach((_item,_index)=>{
-                            if(_item.inputCount==0||_item.manualIgnore){
+                            if(_item.inputCount==0){
                                 hasIgnoretemp.push(_item)
                             }else{
                                 self.tempArr.push(_item.type)
@@ -4788,7 +4814,7 @@ export default {
                         }
                         .dropdown-model{
                             position: absolute;
-                            @include point(right,40);
+                            @include point(right,50);
                             @include point(top,12);
                             margin-right: 10px;
                             width: 120px;
@@ -4804,25 +4830,40 @@ export default {
                             @include point(top,12);
                             font-size: 12px;
                             width: 120px;
-                            height: 22px;
+                            height: 25px;
+                            line-height: 24px;
                             border:1px solid #dcdcdc;
                             background-color: #f7f8fc;
                             display: inline-block;
-                            .check_normal{
+                            border-radius: 4px;
+                            margin-top: -2px;
+                            p{
+                                margin:0;
+                                width:58.5px;
+                                text-align: center;
                                 display: inline-block;
+                            }
+                            p:nth-child(1){
+                                border-radius: 4px 0 0 4px;
+                                border-right: 1px solid #dcdcdc;
+                            }
+                            p:nth-child(2){
+                                border-radius: 0 4px 4px 0;
+                            }
+                            .check_normal{
                                 color:#7b8da0;
                                 font-size: calc(12/1920*100vw);
                             }
                             .check_isClick{
-                                display: inline-block;
                                 background-color:#fcba3f;
                                 font-size: calc(14/1920*100vw);
+                                color:#fff;
                             }
                         }
                         .item-score{
                             box-sizing: border-box;
                             position: absolute;
-                            @include point(right,60);
+                            @include point(right,70);
                             @include point(top,12);
                             font-size: 12px;
                             //width: 96px;

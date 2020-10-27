@@ -137,6 +137,7 @@
                             align='left'
                             stripe
                             height="calc(500/1920*100vw)"
+                            @sort-change='sortChange'
                             @row-click='clickReport'
                             style=""
                             class="table-content"
@@ -146,7 +147,7 @@
                             :header-cell-class-name="headerClass"
                         >
                             <el-table-column v-for="(_item,_index) in reportInfoTable" :key="_index" align="left"
-                                      :prop="_item.prop" :label="_item.label" :min-width="_item.width">
+                                      :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
                             </el-table-column>
                             <el-table-column
                                 prop="option"
@@ -239,41 +240,49 @@ export default {
               {
                 prop: "storeName",
                 label: this.$t('overview.storeName'),
+                sortable:false,
                 width: '220',
               },
               {
                 prop: "storeTag",
                 label: this.$t('remotePatrol.storeTag'),
+                sortable:false,
                 width: '180',
               },
               {
                 prop: "submitterName",
                 label: this.$t('scheduleView.InspectPerson'),
+                sortable:false,
                 width: '160',
               },
               {
                 prop: "tagName",
                 label: this.$t('overview.patrolLists'),
+                sortable:false,
                 width: '150',
               },
               {
                 prop: "modeText",
                 label: this.$t('remotePatrol.patrolWay'),
+                sortable:false,
                 width: '150',
               },
               {
                 prop: "status",
                 label: this.$t('remotePatrol.patrolResult'),
+                sortable:false,
                 width: '150',
               },
               {
-                prop: "patrolScore",
+                prop: "totalScore",
                 label: this.$t('remotePatrol.TableGet'),
+                sortable:false,
                 width: '150',
               },
               {
                 prop: "datestr",
                 label: this.$t('remotePatrol.patrolDate'),
+                sortable:true,
                 width: '184',
               },
             ],
@@ -424,11 +433,18 @@ export default {
                     obj.submitter=item.submitter;
                     obj.routeObj=item;
                     obj.mode=item.mode;
+                    obj.totalScore=item.totalScore;
                     if(item.mode==0){
                       obj.modeText=self.$t('overview.remotePatrol')
                     }else if(item.mode==1){
                       obj.modeText=self.$t('overview.onsitePatrol')
                     }
+                    let storeTag=''
+                    item.tags.length!=0 ? item.tags.forEach((_item,_index)=>{
+                      let isuu= _index==item.tags.length-1?'':',';
+                      storeTag+=_item+isuu
+                    }) : storeTag='--'
+                    obj.storeTag=storeTag
                     switch(item.status){
 
                       /**
@@ -991,6 +1007,9 @@ export default {
             console.log(item.routeObj);
             sessionStorage.setItem('report_data',JSON.stringify(item.routeObj));
             self.$router.push({name:"reportDetails",params:{data:item.routeObj}});
+        },
+        sortChange(){
+
         },
         notify(msg,type,time) {
             this.$message({
