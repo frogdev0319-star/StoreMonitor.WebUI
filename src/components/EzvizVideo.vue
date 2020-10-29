@@ -289,7 +289,8 @@
 </template>
 
 <script>
-  import  EZUIKit from '../../static/ezuikit/ezuikit.js'
+  import EZUIKit_China from '../../static/ezuikit/ezuikit_China/ezuikit.js'
+  import EZUIKit_Global from '../../static/ezuikit/ezuikit_Global/ezuikit.js'
   import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword,getDeviceCapacity} from '@/api/ezviz'
   import {generatePatrolLang} from '@/api/i18n'
   import {mapGetters} from 'vuex'
@@ -297,6 +298,7 @@
   import {getCookie} from "../common/auth";
   import RecordRTC from '../../static/RecordRTC.js'
   import filterString from "../common/filterString";
+  import Environment from '../common/environment'
 
   export default {
     name: "EzvizVideo",
@@ -779,19 +781,35 @@
             return;
           }
           // 初始化视频方法
-          self.decoder = new EZUIKit.EZUIPlayer({
-            id: 'myPlayer',
-            autoplay: true,
-            url: self.videoUrl,
-            accessToken: self.accessToken,
-            decoderPath: './static/ezuikit/',
-            width: width,
-            height: height,
-            // splitBasis:1,
-            // env:self.areaDomain,
-            handleError: self.handleError,
-            handleSuccess: self.handleSuccess,
-          })
+          let isGlobalWebsite = Environment.isGlobalWebsite
+          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
+          if(isGlobalWebsite){
+            self.decoder = new EZUIKit_Global.EZUIPlayer({
+              id: 'myPlayer',
+              autoplay: true,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath:decoderPath,
+              width: width,
+              height: height,
+              splitBasis:1,
+              env:self.areaDomain,
+              handleError: self.handleError,
+              handleSuccess: self.handleSuccess,
+            })
+          }else{
+            self.decoder = new EZUIKit_China.EZUIPlayer({
+              id: 'myPlayer',
+              autoplay: true,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath:decoderPath,
+              width: width,
+              height: height,
+              handleError: self.handleError,
+              handleSuccess: self.handleSuccess,
+            })
+          }
         }
 
       },
@@ -1063,17 +1081,35 @@
           console.log(self.initPlayerHeight)
           self.getVideoUrl()
           // 初始化视频方法
-          self.decoder = new EZUIKit.EZUIPlayer({
-            id: 'myPlayer',
-            autoplay: self.playState,
-            url: self.videoUrl,
-            accessToken: self.accessToken,
-            decoderPath: './static/ezuikit/',
-            width: width,
-            height: self.initPlayerHeight,
-            handleError: self.handleError,
-            handleSuccess: self.handleExitFullScreenSuccess,
-          })
+          let isGlobalWebsite = Environment.isGlobalWebsite
+          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
+          if(isGlobalWebsite){
+            self.decoder = new EZUIKit_Global.EZUIPlayer({
+              id: 'myPlayer',
+              autoplay: self.playState,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath: decoderPath,
+              width: width,
+              height: self.initPlayerHeight,
+              splitBasis:1,
+              env:self.areaDomain,
+              handleError: self.handleError,
+              handleSuccess: self.handleExitFullScreenSuccess,
+            })
+          }else{
+            self.decoder = new EZUIKit_China.EZUIPlayer({
+              id: 'myPlayer',
+              autoplay: self.playState,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath: decoderPath,
+              width: width,
+              height: self.initPlayerHeight,
+              handleError: self.handleError,
+              handleSuccess: self.handleExitFullScreenSuccess,
+            })
+          }
         }
         else{
           // do nothing
@@ -1114,17 +1150,35 @@
           console.log(self.playState)
           self.getVideoUrl()
           // 初始化视频方法
-          self.fullDecoder = new EZUIKit.EZUIPlayer({
-            id: 'fullPlayer',
-            autoplay: self.playState,
-            url: self.videoUrl,
-            accessToken: self.accessToken,
-            decoderPath: './static/ezuikit/',
-            width: width,
-            height: height,
-            handleError: self.handleError,
-            handleSuccess: self.handleFullWindowSuccess,
-          })
+          let isGlobalWebsite = Environment.isGlobalWebsite
+          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
+          if(isGlobalWebsite){
+            self.fullDecoder = new EZUIKit_Global.EZUIPlayer({
+              id: 'fullPlayer',
+              autoplay: self.playState,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath: decoderPath,
+              width: width,
+              height: height,
+              splitBasis:1,
+              env:self.areaDomain,
+              handleError: self.handleError,
+              handleSuccess: self.handleFullWindowSuccess,
+            })
+          }else{
+            self.fullDecoder = new EZUIKit_China.EZUIPlayer({
+              id: 'fullPlayer',
+              autoplay: self.playState,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath: decoderPath,
+              width: width,
+              height: height,
+              handleError: self.handleError,
+              handleSuccess: self.handleFullWindowSuccess,
+            })
+          }
         }
         else{
           // do nothing
@@ -1186,17 +1240,35 @@
           self.isLoading = true;
           self.getVideoUrl()
           // 初始化视频方法
-          self.fullDecoder = new EZUIKit.EZUIPlayer({
-            id: 'fullPlayer',
-            autoplay: true,
-            url: self.videoUrl,
-            accessToken: self.accessToken,
-            decoderPath: './static/ezuikit/',
-            width: width,
-            height: height,
-            handleError: self.handleError,
-            handleSuccess: self.handleSuccess,
-          })
+          let isGlobalWebsite = Environment.isGlobalWebsite
+          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
+          if(isGlobalWebsite){
+            self.fullDecoder = new EZUIKit_Global.EZUIPlayer({
+              id: 'fullPlayer',
+              autoplay: true,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath: decoderPath,
+              width: width,
+              height: height,
+              splitBasis:1,
+              env:self.areaDomain,
+              handleError: self.handleError,
+              handleSuccess: self.handleSuccess,
+            })
+          }else{
+            self.fullDecoder = new EZUIKit_China.EZUIPlayer({
+              id: 'fullPlayer',
+              autoplay: true,
+              url: self.videoUrl,
+              accessToken: self.accessToken,
+              decoderPath: decoderPath,
+              width: width,
+              height: height,
+              handleError: self.handleError,
+              handleSuccess: self.handleSuccess,
+            })
+          }
         }
       },
       stopRealTime(){
@@ -1949,15 +2021,23 @@
       },
       getVideoUrl(){
         let self = this;
+        let isGlobalWebsite = Environment.isGlobalWebsite
         if(self.playBack){
           self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
           self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
           if(self.videoPassword.length > 0){
-            self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            if(isGlobalWebsite){
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            }else{
+              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            }
           }
           else {
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            // self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            if(isGlobalWebsite){
+              self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            }else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
+            }
           }
         }
         else{
@@ -1965,8 +2045,11 @@
             self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
           }
           else{
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
-            // self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
+            if(isGlobalWebsite){
+              self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
+            }else{
+              self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
+            }
           }
           //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
         }

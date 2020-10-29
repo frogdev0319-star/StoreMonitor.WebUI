@@ -205,6 +205,8 @@ export default {
     cardStyle:'缩略图模式',//Sprint10
     listStyle:'列表模式',//Sprint10
     cancleIgnore:'确认是否取消忽略当前巡检项',//Sprint10
+    emptyReportList:'巡检报告列表为空，请重新筛选数据',//Sprint10
+    reportExcelList:'巡检报告明细单',//Sprint10
     TableTotal:'项目总分值',
     TableIgnore:'不适用',
     TableGet:'得分',

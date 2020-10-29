@@ -213,6 +213,20 @@
     </div>
     <div class="el-overview-content" v-if="ispdf">
       <el-col :span="24" class="el-overview" id="pdfDom" style="padding:40px 20px;">
+        <div :span="24" class="export-header">
+          <p>
+            <span>{{$t('reportView.selectStores')}}：</span>
+            <span class="content-header">{{storeNameStr}}</span>
+          </p>
+          <p>
+            <span>{{$t('reportView.selectStoreTag')}}：</span>
+            <span class="content-header">{{storeTagStr}}</span>
+          </p>
+          <p>
+            <span>{{$t('reportView.time')}}：</span>
+            <span class="content-header">{{storeDateValue}}</span>
+          </p>
+        </div>
         <el-row class="first-row">
           <el-col :span="24"  class="kpi-list">
             <div class="title">{{$t('overview.eventGraph')}}</div>
@@ -356,6 +370,9 @@
     data(){
       return{
         ispdf:false,
+        storeNameStr:'',
+        storeTagStr:'',
+        storeDateValue:'',
         htmlTitle:this.$t("overview.htmltopdfD"),
         curCountry:'',
         curStoreTag:[],
@@ -929,22 +946,37 @@
       },
       changeStore(val){
         let self=this;
-        let str='';
+        let str='',NameStr='',TagStr=''
         self.storeList.forEach((item,index)=>{
-            val.forEach(_item=>{
+            val.forEach((_item,_index)=>{
+              let isuu= _index==val.length-1?'':'，';
                 if(item.storeId==_item){
-                    self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
+                  if(self.curStoreTag.length!=0){
+                    self.curStoreTag.forEach(v_item=>{
                         item.tagIds.forEach(t_item=>{
                             if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                str+=_item+'，'
+                                str+=_item+isuu
+                                NameStr+=item.name+isuu
+                                self.StoreTagList.forEach(r_item=>{
+                                  if(r_item.value==v_item){
+                                    TagStr.indexOf(r_item.label)=='-1' ? TagStr+=r_item.label+'，' : null
+                                  }
+                                })
                             }
                         })
-                    }) : (item.storeId==_item ? str+=_item+'，' : null)
+                    })
+                  }else{
+                      str+=_item+isuu
+                      NameStr+=item.name+isuu
+                      TagStr='--'
+                    }
                 }
             })
         })
         str=str.substr(0,str.length-1)
         self.storeStr=str;
+        self.storeNameStr=NameStr
+        self.storeTagStr=TagStr
       },
       changePro(val){
         let self=this;
@@ -1268,6 +1300,7 @@
       },
       async searchData(){
         let self = this;
+        self.storeDateValue=util.getDates(self.params.beginTs)+'-'+util.getDates(self.params.endTs)
         if(self.storeStr==''){
           self.eventTableData=[]
           self.total = 0
@@ -1796,6 +1829,23 @@
     .el-overview {
       padding: 0 calc(25/1920*100vw);
       position: relative;
+      .export-header{
+        min-height: 100px;
+        margin-bottom: 20px;
+        border: 1px solid $border;
+        background-color: #fff;
+        padding: 10px 30px;
+        color: $black;
+        text-align: left;
+        font-size: calc(14/1920*100vw);
+        p{
+          margin:10px 0;
+          display: flex;
+          .content-header{
+            flex:1;
+          }
+        }
+      }
       .first-row{
         height: auto;
         border: 1px solid $border;

@@ -205,6 +205,8 @@ export default {
     cardStyle:'Thumbnail mode',
     listStyle:'List mode',
     cancleIgnore:'Confirm whether to cancel ignoring the current patrol item',
+    emptyReportList:'Patrol report list is empty, please re filter the data',
+    reportExcelList:'ReportList',
     TableTotal:'Total score',
     TableIgnore:'Ignored',
     TableGet:'Score',

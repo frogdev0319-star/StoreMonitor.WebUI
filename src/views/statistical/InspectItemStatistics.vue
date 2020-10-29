@@ -204,6 +204,24 @@
     </div>
     <div class="item-container" v-if="ispdf">
       <el-col :span="24" class="items-content"  id="pdfDom"  style="padding:40px 20px;">
+        <div :span="24" class="export-header">
+          <p>
+            <span>{{$t('reportView.selectStores')}}：</span>
+            <span class="content-header">{{storeNameStr}}</span>
+          </p>
+          <p>
+            <span>{{$t('reportView.selectStoreTag')}}：</span>
+            <span class="content-header">{{storeTagStr}}</span>
+          </p>
+          <p>
+            <span>{{$t('overview.patrolLists')}}：</span>
+            <span class="content-header">{{storePatrolLists}}</span>
+          </p>
+          <p>
+            <span>{{$t('reportView.time')}}：</span>
+            <span class="content-header">{{storeDateValue}}</span>
+          </p>
+        </div>
         <el-col :span="24" class="contents-container" style="padding-bottom:20px;">
           <el-col :span="24" class="items-row">
             <el-col :span="24" class="items-title">
@@ -318,6 +336,10 @@
         },
       data(){
           return {
+            storeNameStr:'',
+            storeTagStr:'',
+            storePatrolLists:'',
+            storeDateValue:'',
             curCountry:'',
             curStoreTag:[],
             StoreTagList:[],
@@ -754,23 +776,37 @@
         changeStore(val){
           let self=this;
           self.inspectList=''
-          console.log(val);
-          let str='';
+          let str='',NameStr='',TagStr=''
           self.storeList.forEach((item,index)=>{
-            val.forEach(_item=>{
+            val.forEach((_item,_index)=>{
+              let isuu= _index==val.length-1?'':'，';
                 if(item.storeId==_item){
-                    self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
-                        item.tagIds.forEach(t_item=>{
-                            if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                str+=_item+'，'
-                            }
-                        })
-                    }) : (item.storeId==_item ? str+=_item+'，' : null)
+                    if(self.curStoreTag.length!=0){
+                      self.curStoreTag.forEach(v_item=>{
+                          item.tagIds.forEach(t_item=>{
+                              if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
+                                  str+=_item+isuu
+                                  NameStr+=item.name+isuu
+                                  self.StoreTagList.forEach(r_item=>{
+                                    if(r_item.value==v_item){
+                                      TagStr.indexOf(r_item.label)=='-1' ? TagStr+=r_item.label+'，' : null
+                                    }
+                                  })
+                              }
+                          })
+                      })
+                    }else{
+                        str+=_item+isuu
+                        NameStr+=item.name+isuu
+                        TagStr='--'
+                      }
                 }
             })
           })
           str=str.substr(0,str.length-1)
           self.storeStr=str;
+          self.storeNameStr=NameStr
+          self.storeTagStr=TagStr
           let storeArr = self.storeStr.split('，')
           let InspectArr=[]
           self.AllStore.data.content.forEach(item=>{
@@ -1126,6 +1162,7 @@
         },
         async searchData(){
           let self = this;
+          self.storeDateValue=util.getDates(self.params.beginTs)+'-'+util.getDates(self.params.endTs)
           self.params.storeIds = self.storeStr.split('，');
           self.params.filter={page:self.page - 1,size:self.sizeNum};
           self.params.order = {direction: self.direction, property: self.property}
@@ -1133,6 +1170,7 @@
           self.inspectTypeList.forEach(item=>{
             if(self.inspectList==item.name){
               self.params.inspectId = self.inspectList = item.id
+              self.storePatrolLists = item.name
             }
             else{
               self.params.inspectId = self.inspectList
@@ -1836,6 +1874,23 @@
     }
     .items-content{
       padding: 0 calc(30/1920*100vw) 0;
+      .export-header{
+        min-height: 100px;
+        margin-bottom: 20px;
+        border: 1px solid $border;
+        background-color: #fff;
+        padding: 10px 30px;
+        color: $black;
+        text-align: left;
+        font-size: calc(14/1920*100vw);
+        p{
+          margin:10px 0;
+          display: flex;
+          .content-header{
+            flex:1;
+          }
+        }
+      }
       .contents-container{
         background-color: #fff;
         border: 1px solid $border;

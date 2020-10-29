@@ -107,7 +107,8 @@
                       </el-button>
                     </div>
                 </el-col>
-                <div v-if="ShowCard">
+                <div v-if="ShowCard" :style="{'height':varyWindowHeight*0.54+'px'}" class="showCardHeight">
+                  <el-scrollbar style="height:100%;width:100%" id="el-menuscrollbar">
                   <el-col :span="4" class="report-card" v-for="(item,index) in reportList" :key="index">
                     <div class="cards" @click="clickReport(item,index)">
                         <img :src="item.iconSrc" alt="" :height="iconSrcHeight" class="item-img"/>
@@ -129,6 +130,7 @@
                         </div>
                     </div>
                   </el-col>
+                  </el-scrollbar>
                 </div>
                 <div v-if="!ShowCard" class="list-table">
                   <el-table
@@ -169,10 +171,12 @@
                 <el-col :span="24" class="el-pat">
                     <el-pagination background small
                         @current-change="currentChange"
-                    layout="jumper,total, prev, pager, next"
-                    :page-size="sizeNum" :total="total"
-                    :current-page="page"
-                    class="el-pag">
+                        layout="jumper,total, prev, pager, next,sizes"
+                        :page-size="sizeNum" :total="total"
+                        :current-page="page"
+                        :page-sizes="[10, 20, 50, 100]"
+                        @size-change="sizeChange"
+                        class="el-pag">
                     </el-pagination>
                 </el-col>
             </el-row>
@@ -333,7 +337,17 @@ export default {
             noData: '',
             showStoreInfo: false,
             cellClass: 'report-cell-class',
-            headerClass:'report-header-class'
+            headerClass:'report-header-class',
+            exportReportHeader:[this.$t('reportView.regionI'),
+                                this.$t('reportView.regionII'),
+                                this.$t('overview.storeName'),
+                                this.$t('remotePatrol.storeTag'),
+                                this.$t('scheduleView.InspectPerson'),
+                                this.$t('overview.patrolLists'),
+                                this.$t('remotePatrol.patrolWay'),
+                                this.$t('remotePatrol.patrolResult'),
+                                this.$t('remotePatrol.TableGet'),
+                                this.$t('remotePatrol.patrolDate'),]
         }
     },
     created(){
@@ -397,7 +411,27 @@ export default {
           self.StoreTagList=[]
         },
         export2Excel(){
-
+          let that = this;
+          if(that.reportList.length==0){
+            that.$message({
+              message: that.$t('remotePatrol.emptyReportList'),
+              type:'warning',
+            })
+            return false;
+          }
+          require.ensure([], async() => {
+            const { export_json_to_excel } = require('@/excel/Export2Excel');
+            const tHeader = that.exportReportHeader; // 导出的表头名
+            const filterVal = ['regionI','regionII','storeName','storeTag','submitterName','tagName','modeText','status','totalScore','datestr']; // 导出的表头字段名
+            let curData = [];
+            curData = that.reportList;
+            const data = that.formatJson(filterVal, curData);
+            let fileName = self.$t('remotePatrol.reportExcelList') +'-'+util.getCurDateStr();
+            export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
+          })
+        },
+        formatJson(filterVal, jsonData) {
+          return jsonData.map(v => filterVal.map(j => v[j]))
         },
         toReportDetail(){
 
@@ -434,6 +468,8 @@ export default {
                     obj.routeObj=item;
                     obj.mode=item.mode;
                     obj.totalScore=item.totalScore;
+                    obj.regionI='区域一';
+                    obj.regionII='区域二';
                     if(item.mode==0){
                       obj.modeText=self.$t('overview.remotePatrol')
                     }else if(item.mode==1){
@@ -445,6 +481,12 @@ export default {
                       storeTag+=_item+isuu
                     }) : storeTag='--'
                     obj.storeTag=storeTag
+                    self.storeList.forEach(_item=>{
+                      if(item.storeId==_item.storeId){
+                        obj.regionI=_item.province
+                        obj.regionII=_item.city
+                      }
+                    })
                     switch(item.status){
 
                       /**
@@ -946,6 +988,12 @@ export default {
             self.params.filter={page:val-1,size:self.sizeNum};
             self.getReportList(self.params);
         },
+        sizeChange(val){
+          let self=this;
+          self.sizeNum=val;
+          self.params.filter={page:0,size:val};
+          self.getReportList(self.params);
+        },
         searchData(){
             let self=this;
 
@@ -1399,6 +1447,9 @@ $suggestBack:#F1F6FE;
             }
         }
     }
+    .showCardHeight{
+       margin-bottom: 60px;
+    }
     .list-table{
       padding-left: calc(20/1920*100vw);
       margin-bottom: 20px;
@@ -1508,7 +1559,9 @@ $suggestBack:#F1F6FE;
         /*line-height: 28px !important;*/
     }
     /* 浏览器滚动条样式 */
-
+    #el-menuscrollbar .el-scrollbar__wrap {
+      overflow-x: hidden;
+    }
     /* width */
     ::-webkit-scrollbar {
       width: 4px;

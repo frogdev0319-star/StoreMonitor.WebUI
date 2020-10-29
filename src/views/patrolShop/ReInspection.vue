@@ -155,8 +155,8 @@
             <dialog-vue :dialog-title='changeBrandObj.title' :show-info='changeBrandObj.showInfo' :is-warning='changeBrandObj.isWarning' :dialog-closed='changeBrandObj.dialogCosed' @confirmed='changeBrandDialog' @canceled='canceldChangeBrand'></dialog-vue>
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='changeInspectObj.title' :show-info='changeInspectObj.showInfo' :is-warning='changeInspectObj.isWarning' :dialog-closed='changeInspectObj.dialogCosed' @confirmed='changeInspectDialog' @canceled='canceldChangeInspect'></dialog-vue>
-            <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue>
-            <dialog-vue :dialog-title='CancleIgnoreInspectObj.title' :show-info='CancleIgnoreInspectObj.showInfo' :is-warning='CancleIgnoreInspectObj.isWarning' :dialog-closed='CancleIgnoreInspectObj.dialogCosed' @confirmed='CancleIgnoreDialog' @canceled='IgnoreInspect'></dialog-vue>
+            <!-- <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue> -->
+            <!-- <dialog-vue :dialog-title='CancleIgnoreInspectObj.title' :show-info='CancleIgnoreInspectObj.showInfo' :is-warning='CancleIgnoreInspectObj.isWarning' :dialog-closed='CancleIgnoreInspectObj.dialogCosed' @confirmed='CancleIgnoreDialog' @canceled='IgnoreInspect'></dialog-vue> -->
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
             <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
@@ -708,18 +708,18 @@ export default {
                 isWarning:true,
                 dialogCosed:false
             },
-            ignoreInspectObj:{
-                title: this.$t('remotePatrol.confirm'),
-                showInfo: this.$t('remotePatrol.confirmIgnore'),
-                isWarning:true,
-                dialogCosed:false
-            },
-            CancleIgnoreInspectObj:{
-                title: this.$t('remotePatrol.confirm'),
-                showInfo: this.$t('remotePatrol.cancleIgnore'),
-                isWarning:true,
-                dialogCosed:false
-            },
+            // ignoreInspectObj:{
+            //     title: this.$t('remotePatrol.confirm'),
+            //     showInfo: this.$t('remotePatrol.confirmIgnore'),
+            //     isWarning:true,
+            //     dialogCosed:false
+            // },
+            // CancleIgnoreInspectObj:{
+            //     title: this.$t('remotePatrol.confirm'),
+            //     showInfo: this.$t('remotePatrol.cancleIgnore'),
+            //     isWarning:true,
+            //     dialogCosed:false
+            // },
             noBindDeviceObj:{
                 title: this.$t('remotePatrol.prompt'),
                 showInfo: this.$t('remotePatrol.notBindCamera'),
@@ -2191,7 +2191,7 @@ export default {
             item.sourceList.splice(index,1);
             self.sourceListLength--;
         },
-        ignoreInspectDialog(val){
+        handleIgnore(){
             let self=this;
             self.curItem.manualIgnore=true
             self.curItem.disabled=true;
@@ -2230,9 +2230,8 @@ export default {
                 self.getDisabled(0)
                 self.isDisabled ? self.isShowWarn=true : self.isShowWarn=false
             }
-            self.ignoreInspectObj.dialogCosed=false
         },
-        CancleIgnoreDialog(){
+        cancleIgnore(){
             let self = this
             self.curItem.manualIgnore=false;
             self.curItem.disabled=false;
@@ -2241,7 +2240,6 @@ export default {
             }else{
                 self.sheetName[self.curSheetIndex].dealCount!=0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
             }
-            self.CancleIgnoreInspectObj.dialogCosed=false
         },
         cancelIgnoreInspect(val){
             let self=this;
@@ -2278,14 +2276,14 @@ export default {
                 self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
-            self.ignoreInspectObj.dialogCosed=true;
+            self.handleIgnore()
         },
         CancleIgnoreItem(item,index){
             let self=this;
             self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
             self.curItemIndex=index;
             self.curItem=item;
-            self.CancleIgnoreInspectObj.dialogCosed=true;
+            self.cancleIgnore()
         },
         noBindDeviceDialog(val){
             let self=this;

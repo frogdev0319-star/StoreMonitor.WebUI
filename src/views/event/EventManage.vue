@@ -1128,8 +1128,8 @@ $h1:#292e36;
         position: relative;
         float: left;
         //@include point(bottom,2);
-        height: calc(28/1920*100vw);
-        width: calc(24/1920*100vw);
+        height: 28px;
+        width: 24px;
     }
     .icon-span{
         display:inline-block;

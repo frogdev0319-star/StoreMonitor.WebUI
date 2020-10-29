@@ -198,6 +198,7 @@ import {generateInsSettingLang} from '@/api/i18n'
 import filterString from '@/common/filterString'
 import DialogVue from '@/components/DialogVue.vue'
 import {getScheduleListService} from '@/api/schedule'
+import Environment from '../../../common/environment'
 
 export default {
     name:'RouteInspection',
@@ -985,16 +986,22 @@ export default {
             let self=this;
             let ret= self.isLoginIn();
             console.log(ret);
-            let Datalength = self.elTableData[Number(self.activeName)].data.length
-            if(Number(self.activeName)==0&&Datalength>=10){
-                    self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
-                    return false;
-            }else if(Number(self.activeName)==1&&Datalength>=10){
-                    self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
-                    return false;
+            let isGlobalWebsite = Environment.isGlobalWebsite
+            if(isGlobalWebsite){
+                let Datalength = self.elTableData[Number(self.activeName)].data.length
+                if(Number(self.activeName)==0&&Datalength>=10){
+                        self.notify(self.$t('insSettingView.RemoteLength'),'warning',3000);
+                        return false;
+                }else if(Number(self.activeName)==1&&Datalength>=10){
+                        self.notify(self.$t('insSettingView.OnsiteLength'),'warning',3000);
+                        return false;
+                }else{
+                        self.showNameImport=true
+                        self.ImportName=''
+                }
             }else{
-                    self.showNameImport=true
-                    self.ImportName=''
+                self.showNameImport=true
+                self.ImportName=''
             }
             // if(ret.data!=undefined&&ret.data.isLogin){
             //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){

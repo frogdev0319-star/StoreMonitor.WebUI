@@ -205,6 +205,8 @@ export default {
     cardStyle:'縮略圖模式',
     listStyle:'清單模式',
     cancleIgnore:'確認是否取消忽略當前巡檢項',
+    emptyReportList:'巡檢報告清單為空，請重新篩選數據',
+    reportExcelList:'巡檢報告明細單',
     TableTotal:'項目總分值',
     TableIgnore:'不適用',
     TableGet:'得分',

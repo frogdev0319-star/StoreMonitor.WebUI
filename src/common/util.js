@@ -46,7 +46,7 @@ export default {
         result=hour+':'+min+':'+sec;
         return result;
     },
-    //时间戳转换为年月日
+    //时间戳转换为年月日时分
     getDateTime(ts){
         var result='';
         let t=new Date(ts);
@@ -58,6 +58,16 @@ export default {
         result=years+'/'+month+'/'+day+' '+hour+':'+min;
         return result;
     },
+    //时间戳转换为年月日
+    getDates(ts){
+      var result='';
+      let t=new Date(ts);
+      let years=t.getFullYear();
+      let month=t.getMonth()+1;
+      let day=t.getDate();
+      result=years+'/'+month+'/'+day
+      return result;
+  },
     getDaysCount(){
         var date=new Date();
         var month=date.getMonth();

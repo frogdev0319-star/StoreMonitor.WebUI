@@ -44,12 +44,13 @@ let _Environments = {
 }
 
 let environJSON = _Environments.Debug_XA;
-let isGlobalWebsite = false;
+let isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {
   USHOP_URL: environJSON.USHOP_URL,
   POST_URL: environJSON.POST_URL,
   VERSION: environJSON.VERSION,
+  isGlobalWebsite:isGlobalWebsite,
   BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
 }
