@@ -433,7 +433,9 @@
         cityList:[],
         curStore:[],
         storeList:[],
-        storeStr: '',
+        paramsStoreIds:[],
+        curRegionI:[],
+        curRegionII:[],
         storeNameStr:'',
         storeTagStr:'',
         storeDateValue:'',
@@ -1075,7 +1077,7 @@
       },
       changeStore(val){
         let self=this;
-        let str='',NameStr='',TagStr=''
+        let NameStr='',TagStr='',storeIds=[]
         self.storeList.forEach((item,index)=>{
             val.forEach((_item,_index)=>{
               let isuu= _index==val.length-1?'':'，';
@@ -1084,7 +1086,7 @@
                     self.curStoreTag.forEach(v_item=>{
                         item.tagIds.forEach(t_item=>{
                             if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                str+=_item+isuu
+                                storeIds.push(_item)
                                 NameStr+=item.name+isuu
                                 self.StoreTagList.forEach(r_item=>{
                                   if(r_item.value==v_item){
@@ -1095,17 +1097,33 @@
                         })
                     })
                   }else{
-                      str+=_item+isuu
+                      storeIds.push(_item)
                       NameStr+=item.name+isuu
                       TagStr='--'
                     }
                 }
             })
         })
-        str=str.substr(0,str.length-1)
-        self.storeStr=str;
+        self.paramsStoreIds=storeIds
         self.storeNameStr=NameStr
         self.storeTagStr=TagStr
+        //判断当前选中省市是否为空，若空，则从标签筛选出的门店中整理省市数据
+        if(self.curProvince.length!=0){
+          self.curRegionI = self.curProvince
+          self.curRegionII = self.curCity
+        }else{
+          let rI=[],rII=[]
+          self.storeList.forEach((item,index)=>{
+            self.paramsStoreIds.forEach(_item=>{
+              if(item.storeId==_item){
+                rI.some(x=>x==item.province) ? null : rI.push(item.province)
+                rII.some(x=>x==item.city) ? null : rII.push(item.city)
+              }
+            })
+            self.curRegionI=rI
+            self.curRegionII=rII
+          })
+        }
       },
       getBriefStoreData(){
           let self=this;
@@ -1411,7 +1429,7 @@
       clearStoreInfo(){
         let self=this;
         self.curStore=[];
-        self.storeStr='';
+        self.paramsStoreIds=[];
         self.$refs.multiSelect.selectedArray = [];
         self.$refs.multiSelect.input=''
       },
@@ -1425,7 +1443,7 @@
       searchData(){
         let self=this;
         self.storeDateValue=util.getDates(self.params.beginTs)+'-'+util.getDates(self.params.endTs)
-        self.params.storeIds = self.storeStr.split('，');
+        self.params.storeIds = self.paramsStoreIds;
         self.getInspectStatsOverviewOfRegion();
         self.getInspectStatsOverviewOfStore();
         self.getInspectStatsLine();
@@ -1732,7 +1750,7 @@
           let result = regionResult.data;
           let soureceList = [];
           let sortedProviceOrCity = [];
-          sortedProviceOrCity = region == 1 ?  JSON.parse(JSON.stringify(self.curProvince)) : JSON.parse(JSON.stringify(self.curCity))
+          sortedProviceOrCity = region == 1 ?  JSON.parse(JSON.stringify(self.curRegionI)) : JSON.parse(JSON.stringify(self.curRegionII))
           let filterResult = self.jsonArrayHasSpecifiedValue(sortedProviceOrCity, result);
           self.regionDataList = filterResult; //过滤出已选择区域的记录
           let regionArray = [];
@@ -2284,7 +2302,7 @@
     /*margin-bottom: 20px;*/
     .export-header{
       min-height: 100px;
-      margin: 0 30px 20px 30px;
+      margin: 0 20px 20px 20px;
       border: 1px solid $border;
       background-color: #fff;
       padding: 10px 30px;

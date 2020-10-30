@@ -606,17 +606,17 @@ export default {
                 })
                 if(p_item.type==0){
                     p_item['tHeader']=self.theaderPassFail
-                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
-                        self.resultList[0].isShow=false
-                        self.resultList[1].isShow=false
-                        self.resultList[2].isActive=true
-                        Tab0Status=true
-                    }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
-                        self.resultList[1].isShow=false
-                        self.resultList[2].isShow=false
-                        self.resultList[0].isActive=true
-                        Tab0Status=true
-                    }
+                    // if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
+                    //     self.resultList[0].isShow=false
+                    //     self.resultList[1].isShow=false
+                    //     self.resultList[2].isActive=true
+                    //     Tab0Status=true
+                    // }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
+                    //     self.resultList[1].isShow=false
+                    //     self.resultList[2].isShow=false
+                    //     self.resultList[0].isActive=true
+                    //     Tab0Status=true
+                    // }
                     p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
@@ -632,14 +632,14 @@ export default {
             }else{
                 s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
             }
-            if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
-                self.resultList[0].isShow=true
-                self.resultList[1].isShow=true
-                self.resultList[2].isShow=true
-                self.resultList[0].isActive=false
-                self.resultList[1].isActive=false
-                self.resultList[2].isActive=false
-            }
+            // if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+            //     self.resultList[0].isShow=true
+            //     self.resultList[1].isShow=true
+            //     self.resultList[2].isShow=true
+            //     self.resultList[0].isActive=false
+            //     self.resultList[1].isActive=false
+            //     self.resultList[2].isActive=false
+            // }
             self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
             self.summary=inspect
             eventList.forEach((item,index)=>{

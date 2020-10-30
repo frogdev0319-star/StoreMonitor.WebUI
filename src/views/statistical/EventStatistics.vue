@@ -370,6 +370,7 @@
     data(){
       return{
         ispdf:false,
+        paramsStoreIds:[],
         storeNameStr:'',
         storeTagStr:'',
         storeDateValue:'',
@@ -385,7 +386,6 @@
         curStore:[],
         storeList:[],
         storeDataList: [],
-        storeStr: '',
         dateValue:[this.$moment().startOf('month').toDate(), this.$moment(new Date).endOf('d').toDate()],
         dateOpt: {
           disabledDate:(time)=>{
@@ -506,7 +506,7 @@
             "label": this.$t('overview.numProcessEvents'),
             "sortable":'custom',
             "width": '145',
-            "maxWidth": '155',
+            "maxWidth": '160',
             "pdfwidth":'12%'
           },
           {
@@ -692,7 +692,7 @@
         let params = {};
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        params.storeIds = self.storeStr.split('，');
+        params.storeIds = self.paramsStoreIds;
         params.timeMode = self.timeMode;
         let storeEventResult = await self.getStoreEventData(params);
         let option = {
@@ -946,7 +946,7 @@
       },
       changeStore(val){
         let self=this;
-        let str='',NameStr='',TagStr=''
+        let NameStr='',TagStr='',storeIds=[]
         self.storeList.forEach((item,index)=>{
             val.forEach((_item,_index)=>{
               let isuu= _index==val.length-1?'':'，';
@@ -955,7 +955,7 @@
                     self.curStoreTag.forEach(v_item=>{
                         item.tagIds.forEach(t_item=>{
                             if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                str+=_item+isuu
+                                storeIds.push(_item)
                                 NameStr+=item.name+isuu
                                 self.StoreTagList.forEach(r_item=>{
                                   if(r_item.value==v_item){
@@ -966,15 +966,14 @@
                         })
                     })
                   }else{
-                      str+=_item+isuu
+                      storeIds.push(_item)
                       NameStr+=item.name+isuu
                       TagStr='--'
                     }
                 }
             })
         })
-        str=str.substr(0,str.length-1)
-        self.storeStr=str;
+        self.paramsStoreIds=storeIds
         self.storeNameStr=NameStr
         self.storeTagStr=TagStr
       },
@@ -1198,7 +1197,7 @@
       clearStoreInfo(){
         let self=this;
         self.curStore=[];
-        self.storeStr='';
+        self.paramsStoreIds=[]
         self.$refs.multiSelect.selectedArray = [];
         self.$refs.multiSelect.input=''
       },
@@ -1301,7 +1300,7 @@
       async searchData(){
         let self = this;
         self.storeDateValue=util.getDates(self.params.beginTs)+'-'+util.getDates(self.params.endTs)
-        if(self.storeStr==''){
+        if(self.paramsStoreIds.length==0){
           self.eventTableData=[]
           self.total = 0
           self.allEventData = [];
@@ -1310,7 +1309,7 @@
           self.storeEventsOptions.dataset.source=[]
           self.getEventBySourcePie()
         }else{
-          self.params.storeIds = self.storeStr.split('，');
+          self.params.storeIds = self.paramsStoreIds;
           self.params.filter={page:self.page - 1,size:self.sizeNum};
           self.params.order = {direction: self.direction, property: self.property}
           await self.getEventTableData();
@@ -1355,7 +1354,7 @@
       },
       async getEventTableData(){
         let self = this;
-        let storeIds = self.storeStr.split('，')
+        let storeIds = self.paramsStoreIds
         self.params.storeIds=storeIds
         let eventResult = await self.getEventTableDataInfo(self.params);
         let excellentPer = 0;
@@ -1404,7 +1403,7 @@
           self.itemsTableData = [];
           return;
         }
-        params.storeIds = self.storeStr.split('，');
+        params.storeIds = self.paramsStoreIds;
 
         params.filter={page:self.page - 1,size:self.total};
         params.order = {direction: self.direction, property: self.property}

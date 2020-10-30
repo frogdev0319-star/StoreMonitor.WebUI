@@ -199,13 +199,15 @@ export default {
   //remote Patrol page language
   remotePatrol:{
     storeTag:'標籤',
-    patrolWay:'巡檢方法',
+    patrolWay:'巡店方式',
     patrolResult:'巡檢結果',
     patrolDate:'巡檢日期',
+    patrolStore:'巡檢門店',
+    patrolScore:'巡檢得分',
     cardStyle:'縮略圖模式',
-    listStyle:'清單模式',
+    listStyle:'列表模式',
     cancleIgnore:'確認是否取消忽略當前巡檢項',
-    emptyReportList:'巡檢報告清單為空，請重新篩選數據',
+    emptyReportList:'巡檢報告列表為空，請重新篩選數據',
     reportExcelList:'巡檢報告明細單',
     TableTotal:'項目總分值',
     TableIgnore:'不適用',

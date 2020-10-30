@@ -341,6 +341,7 @@
             storePatrolLists:'',
             storeDateValue:'',
             curCountry:'',
+            paramsStoreIds:[],
             curStoreTag:[],
             StoreTagList:[],
             countryList:[],
@@ -351,7 +352,6 @@
             curStore:[],
             storeList:[],
             storeDataList: [],
-            storeStr: '',
             curRegion: [],
             dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date).endOf('d').toDate()],
             dateOpt: {
@@ -776,7 +776,7 @@
         changeStore(val){
           let self=this;
           self.inspectList=''
-          let str='',NameStr='',TagStr=''
+          let NameStr='',TagStr='',storeIds=[]
           self.storeList.forEach((item,index)=>{
             val.forEach((_item,_index)=>{
               let isuu= _index==val.length-1?'':'，';
@@ -785,7 +785,7 @@
                       self.curStoreTag.forEach(v_item=>{
                           item.tagIds.forEach(t_item=>{
                               if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                  str+=_item+isuu
+                                  storeIds.push(_item)
                                   NameStr+=item.name+isuu
                                   self.StoreTagList.forEach(r_item=>{
                                     if(r_item.value==v_item){
@@ -796,21 +796,19 @@
                           })
                       })
                     }else{
-                        str+=_item+isuu
+                      storeIds.push(_item)
                         NameStr+=item.name+isuu
                         TagStr='--'
                       }
                 }
             })
           })
-          str=str.substr(0,str.length-1)
-          self.storeStr=str;
+          self.paramsStoreIds=storeIds
           self.storeNameStr=NameStr
           self.storeTagStr=TagStr
-          let storeArr = self.storeStr.split('，')
           let InspectArr=[]
           self.AllStore.data.content.forEach(item=>{
-            if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+            if(self.paramsStoreIds.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
               InspectArr.push(item.appliedInspect)
             }
           })
@@ -953,9 +951,8 @@
         self.curStoreTag=val
         self.changeStore(self.curStore)
         let InspectArr=[]
-        let storeArr = self.storeStr.split('，')
         self.AllStore.data.content.forEach(item=>{
-          if(storeArr.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
+          if(self.paramsStoreIds.indexOf(item.storeId)!=-1&&item.appliedInspect.length!=0){
             InspectArr.push(item.appliedInspect)
           }
         })
@@ -1156,14 +1153,14 @@
         clearStoreInfo(){
           let self=this;
           self.curStore=[];
-          self.storeStr='';
+          self.paramsStoreIds=[];
           self.$refs.multiSelect.selectedArray = [];
           self.$refs.multiSelect.input=''
         },
         async searchData(){
           let self = this;
           self.storeDateValue=util.getDates(self.params.beginTs)+'-'+util.getDates(self.params.endTs)
-          self.params.storeIds = self.storeStr.split('，');
+          self.params.storeIds = self.paramsStoreIds;
           self.params.filter={page:self.page - 1,size:self.sizeNum};
           self.params.order = {direction: self.direction, property: self.property}
           self.params.mode = self.curType;

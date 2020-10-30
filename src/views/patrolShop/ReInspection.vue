@@ -3374,31 +3374,21 @@ export default {
             self.showIgnoreItem=true
             self.showFeedBack=false
             self.isShowWarn=false
-            let PatrolHistory = self.$store.getters.PatrolHistory;
-            if(PatrolHistory!=null){
-                if(PatrolHistory.hasIgnoretemp!=null){
-                    PatrolHistory.hasIgnoretemp.forEach(item=>{
-                        item.isIgnore ? item.isIgnore=false : ''
-                    })
-                }
-                self.hasIgnoretemp = PatrolHistory.hasIgnoretemp!=null ? PatrolHistory.hasIgnoretemp : null
-            }else{
-                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-                let sheetName=self.sheetName.slice(0,indexFeed);
-                let hasIgnoretemp=[]
-                sheetName.forEach(s_item=>{
-                    s_item.inspectList.forEach(item=>{
-                        item.items.forEach((_item,_index)=>{
-                            if(_item.inputCount==0){
-                                hasIgnoretemp.push(_item)
-                            }else{
-                                self.tempArr.push(_item.type)
-                            }
-                        })
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            let hasIgnoretemp=[]
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        if(_item.inputCount==0&&!_item.manualIgnore){
+                            hasIgnoretemp.push(_item)
+                        }else if(_item.inputCount!=0){
+                            self.tempArr.push(_item.type)
+                        }
                     })
                 })
-                self.hasIgnoretemp=hasIgnoretemp
-            }
+            })
+            self.hasIgnoretemp=hasIgnoretemp
         },
         backToPatrol(){
             let self=this

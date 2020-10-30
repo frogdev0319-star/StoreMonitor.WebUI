@@ -43,8 +43,8 @@ let _Environments = {
   }
 }
 
-let environJSON = _Environments.Debug_XA;
-let isGlobalWebsite = true;
+let environJSON = _Environments.QA;
+let isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {

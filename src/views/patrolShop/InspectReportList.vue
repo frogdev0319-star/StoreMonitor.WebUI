@@ -243,7 +243,7 @@ export default {
             reportInfoTable:[
               {
                 prop: "storeName",
-                label: this.$t('overview.storeName'),
+                label: this.$t('remotePatrol.patrolStore'),
                 sortable:false,
                 width: '220',
               },
@@ -279,7 +279,7 @@ export default {
               },
               {
                 prop: "totalScore",
-                label: this.$t('remotePatrol.TableGet'),
+                label: this.$t('remotePatrol.patrolScore'),
                 sortable:false,
                 width: '150',
               },
@@ -340,13 +340,13 @@ export default {
             headerClass:'report-header-class',
             exportReportHeader:[this.$t('reportView.regionI'),
                                 this.$t('reportView.regionII'),
-                                this.$t('overview.storeName'),
+                                this.$t('remotePatrol.patrolStore'),
                                 this.$t('remotePatrol.storeTag'),
                                 this.$t('scheduleView.InspectPerson'),
                                 this.$t('overview.patrolLists'),
                                 this.$t('remotePatrol.patrolWay'),
                                 this.$t('remotePatrol.patrolResult'),
-                                this.$t('remotePatrol.TableGet'),
+                                this.$t('remotePatrol.patrolScore'),
                                 this.$t('remotePatrol.patrolDate'),]
         }
     },
@@ -426,7 +426,7 @@ export default {
             let curData = [];
             curData = that.reportList;
             const data = that.formatJson(filterVal, curData);
-            let fileName = self.$t('remotePatrol.reportExcelList') +'-'+util.getCurDateStr();
+            let fileName = that.$t('remotePatrol.reportExcelList') +'-'+util.getCurDateStr();
             export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
           })
         },
@@ -927,8 +927,8 @@ export default {
             storeArr.push(item.storeId)
           })
           self.curStore = storeArr;
-          self.getInitReportList()
           self.changeStore(self.curStore)
+          self.getInitReportList()
         },
         clearStore(){
             let self=this;

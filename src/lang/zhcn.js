@@ -198,14 +198,16 @@ export default {
   },
   //remote Patrol page language
   remotePatrol:{
-    storeTag:'标签',//Sprint10
-    patrolWay:'巡检方式',//Sprint10
-    patrolResult:'巡检结果',//Sprint10
-    patrolDate:'巡检日期',//Sprint10
-    cardStyle:'缩略图模式',//Sprint10
-    listStyle:'列表模式',//Sprint10
-    cancleIgnore:'确认是否取消忽略当前巡检项',//Sprint10
-    emptyReportList:'巡检报告列表为空，请重新筛选数据',//Sprint10
+    storeTag:'标签',
+    patrolWay:'巡检方式',
+    patrolResult:'巡检结果',
+    patrolDate:'巡检日期',
+    patrolStore:'巡检门店',
+    patrolScore:'巡检得分',
+    cardStyle:'缩略图模式',
+    listStyle:'列表模式',
+    cancleIgnore:'确认是否取消忽略当前巡检项',
+    emptyReportList:'巡检报告列表为空，请重新筛选数据',
     reportExcelList:'巡检报告明细单',//Sprint10
     TableTotal:'项目总分值',
     TableIgnore:'不适用',
@@ -297,7 +299,7 @@ export default {
     qualified: '合格',
     unit: '个',
     summaryInfo: '请选择巡检总评！',
-    allIgnored: '巡检项不能全部忽略',//Sprint10
+    allIgnored: '巡检项不能全部忽略',
     videoLicense: "无视频访问权限，请联系上级管理员",
     suggestEmpty: '请输入本次巡检建议！',
     changPageInfo: '当前巡检尚未完成，确认是否离开页面？',
