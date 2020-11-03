@@ -1212,7 +1212,7 @@ export default {
             let tempId=null;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
-            if(self.showIgnoreItem&&self.isShowWarn){
+            if(self.showIgnoreItem){
                 self.hasIgnoretemp.forEach((item,index)=>{
                     if(item.id==id){
                         tempId={
@@ -1220,7 +1220,7 @@ export default {
                         };
                     }
                 })
-            }else if(!self.showIgnoreItem){
+            }else{
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach((item,index)=>{
                         item.items.forEach((_item,_index)=>{
@@ -2251,10 +2251,10 @@ export default {
         },
         ignoreItem(item,index,e){
             let self=this;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
             if(e==0){
                 //判断是否全部忽略了，若是，弹框提示不可全部忽略
-                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-                let sheetName=self.sheetName.slice(0,indexFeed);
                 let count=0,manualCount=1
                 sheetName.forEach(s_item=>{
                     count+=s_item.count
@@ -2269,6 +2269,14 @@ export default {
                     return false;
                 }
             }
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        _item.checked=false
+                        _item.disabled=true
+                    })
+                })
+            })
             self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
             self.curItemIndex=index;
             self.curItem=item;

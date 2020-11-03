@@ -301,6 +301,7 @@ export default {
             curStore:[],
             storeList:[],
             searchInput:'',
+            exportList:[],
             sizeNum:12,
             defaultTime:[],
             dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
@@ -410,7 +411,7 @@ export default {
           self.curStore=[];
           self.StoreTagList=[]
         },
-        export2Excel(){
+        async export2Excel(){
           let that = this;
           if(that.reportList.length==0){
             that.$message({
@@ -419,12 +420,19 @@ export default {
             })
             return false;
           }
+          let start=typeof(that.dateValue[0])==='object'?that.dateValue[0].getTime():that.dateValue[0];
+          let end=typeof(that.dateValue[1])==='object'?that.dateValue[1].getTime():that.dateValue[1];
+          that.params.beginTs=start;
+          that.params.endTs=end;
+          that.params.filter={page:0,size:that.total};
+          let storeIds = that.storeStr.split('，')
+          that.params.clause = {storeId: storeIds}
           require.ensure([], async() => {
             const { export_json_to_excel } = require('@/excel/Export2Excel');
             const tHeader = that.exportReportHeader; // 导出的表头名
             const filterVal = ['regionI','regionII','storeName','storeTag','submitterName','tagName','modeText','status','totalScore','datestr']; // 导出的表头字段名
             let curData = [];
-            curData = that.reportList;
+            curData = await that.getReportList(that.params,1);
             const data = that.formatJson(filterVal, curData);
             let fileName = that.$t('remotePatrol.reportExcelList') +'-'+util.getCurDateStr();
             export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
@@ -448,126 +456,129 @@ export default {
           }
           return obj;
         },
-        getReportList(params){
+        getReportList(params,e){
             let self=this;
-            getInspectReportList(params).then(res=>{
-                let errCode=res.errCode;
-                let data=[];
-                if(errCode==0){
-                    data=res.data.content;
-                }
-                let temp=[];
-                data.forEach(item => {
-                    let obj={};
-                    obj.id=item.id;
-                    obj.datestr=util.getDateStr(item.ts);
-                    obj.storeName=item.storeName;
-                    obj.tagName=item.tagName;
-                    obj.submitterName=item.submitterName;
-                    obj.submitter=item.submitter;
-                    obj.routeObj=item;
-                    obj.mode=item.mode;
-                    obj.totalScore=item.totalScore;
-                    obj.regionI='区域一';
-                    obj.regionII='区域二';
-                    if(item.mode==0){
-                      obj.modeText=self.$t('overview.remotePatrol')
-                    }else if(item.mode==1){
-                      obj.modeText=self.$t('overview.onsitePatrol')
-                    }
-                    let storeTag=''
-                    item.tags.length!=0 ? item.tags.forEach((_item,_index)=>{
-                      let isuu= _index==item.tags.length-1?'':',';
-                      storeTag+=_item+isuu
-                    }) : storeTag='--'
-                    obj.storeTag=storeTag
-                    self.storeList.forEach(_item=>{
-                      if(item.storeId==_item.storeId){
-                        obj.regionI=_item.province
-                        obj.regionII=_item.city
+            return new Promise((resolve,reject)=>{
+              getInspectReportList(params).then(res=>{
+                  let errCode=res.errCode;
+                  let data=[];
+                  if(errCode==0){
+                      data=res.data.content;
+                  }
+                  let temp=[];
+                  data.forEach(item => {
+                      let obj={};
+                      obj.id=item.id;
+                      obj.datestr=util.getDateStr(item.ts);
+                      obj.storeName=item.storeName;
+                      obj.tagName=item.tagName;
+                      obj.submitterName=item.submitterName;
+                      obj.submitter=item.submitter;
+                      obj.routeObj=item;
+                      obj.mode=item.mode;
+                      obj.totalScore=item.totalScore;
+                      obj.regionI='区域一';
+                      obj.regionII='区域二';
+                      if(item.mode==0){
+                        obj.modeText=self.$t('overview.remotePatrol')
+                      }else if(item.mode==1){
+                        obj.modeText=self.$t('overview.onsitePatrol')
                       }
-                    })
-                    switch(item.status){
+                      let storeTag=''
+                      item.tags.length!=0 ? item.tags.forEach((_item,_index)=>{
+                        let isuu= _index==item.tags.length-1?'':',';
+                        storeTag+=_item+isuu
+                      }) : storeTag='--'
+                      obj.storeTag=storeTag
+                      self.storeList.forEach(_item=>{
+                        if(item.storeId==_item.storeId){
+                          obj.regionI=_item.province
+                          obj.regionII=_item.city
+                        }
+                      })
+                      switch(item.status){
 
-                      /**
-                       * 根据语言和类型返回图片形式
-                       */
-                      case 0: {
-                          // 立即督导
-                          obj.status = self.$t('overview.danger')
-                          if(self.lang == 'zh'){
-                            obj.iconSrc=self.inspectSrc1;
+                        /**
+                         * 根据语言和类型返回图片形式
+                         */
+                        case 0: {
+                            // 立即督导
+                            obj.status = self.$t('overview.danger')
+                            if(self.lang == 'zh'){
+                              obj.iconSrc=self.inspectSrc1;
+                            }
+                            else if(self.lang == 'en'){
+                              obj.iconSrc=self.inspectSrc4;
+                            }
+                            else if(self.lang == 'zhtw'){
+                              obj.iconSrc=self.inspectSrc7;
+                            }
+                            else {
+                              obj.iconSrc=self.inspectSrc1;
+                            }
+                            break;
                           }
-                          else if(self.lang == 'en'){
-                            obj.iconSrc=self.inspectSrc4;
+                          case 1: {
+                            // 待改善
+                            obj.status = self.$t('overview.improve')
+                            if(self.lang == 'zh'){
+                              obj.iconSrc=self.inspectSrc3;
+                            }
+                            else if(self.lang == 'en'){
+                              obj.iconSrc=self.inspectSrc6;
+                            }
+                            else if(self.lang == 'zhtw'){
+                              obj.iconSrc=self.inspectSrc3;
+                            }
+                            else {
+                              obj.iconSrc=self.inspectSrc3;
+                            }
+                            break;
                           }
-                          else if(self.lang == 'zhtw'){
-                            obj.iconSrc=self.inspectSrc7;
-                          }
-                          else {
-                            obj.iconSrc=self.inspectSrc1;
-                          }
-                          break;
-                        }
-                        case 1: {
-                          // 待改善
-                          obj.status = self.$t('overview.improve')
-                          if(self.lang == 'zh'){
-                            obj.iconSrc=self.inspectSrc3;
-                          }
-                          else if(self.lang == 'en'){
-                            obj.iconSrc=self.inspectSrc6;
-                          }
-                          else if(self.lang == 'zhtw'){
-                            obj.iconSrc=self.inspectSrc3;
-                          }
-                          else {
-                            obj.iconSrc=self.inspectSrc3;
-                          }
-                          break;
-                        }
 
-                      case 2:{
-                          //合格
-                          obj.status = self.$t('overview.pass')
+                        case 2:{
+                            //合格
+                            obj.status = self.$t('overview.pass')
+                            if(self.lang == 'zh'){
+                              obj.iconSrc=self.inspectSrc2;
+                            }
+                            else if(self.lang == 'en'){
+                              obj.iconSrc=self.inspectSrc5;
+                            }
+                            else if(self.lang == 'zhtw'){
+                              obj.iconSrc=self.inspectSrc2;
+                            }
+                            else {
+                              obj.iconSrc=self.inspectSrc2;
+                            }
+                            break;
+                          }
+                        default :{
+                          //good
                           if(self.lang == 'zh'){
-                            obj.iconSrc=self.inspectSrc2;
+                            obj.iconSrc=self.inspectSrc8;
                           }
                           else if(self.lang == 'en'){
-                            obj.iconSrc=self.inspectSrc5;
+                            obj.iconSrc=self.inspectSrc9;
                           }
                           else if(self.lang == 'zhtw'){
-                            obj.iconSrc=self.inspectSrc2;
+                            obj.iconSrc=self.inspectSrc10;
                           }
                           else {
-                            obj.iconSrc=self.inspectSrc2;
+                            obj.iconSrc=self.inspectSrc8;
                           }
                           break;
                         }
-                      default :{
-                        //good
-                        if(self.lang == 'zh'){
-                          obj.iconSrc=self.inspectSrc8;
-                        }
-                        else if(self.lang == 'en'){
-                          obj.iconSrc=self.inspectSrc9;
-                        }
-                        else if(self.lang == 'zhtw'){
-                          obj.iconSrc=self.inspectSrc10;
-                        }
-                        else {
-                          obj.iconSrc=self.inspectSrc8;
-                        }
-                        break;
                       }
-                    }
-                    temp.push(obj);
-                });
-                self.reportList=temp;
-                self.total=res.data.totalElements;
-                if(self.reportList.length == 0){
-                  self.noData = self.$t('deviceView.noData')
-                }
+                      temp.push(obj);
+                  });
+                  e==0 ? self.reportList=temp : self.exportList=temp
+                  self.total=res.data.totalElements;
+                  if(self.reportList.length == 0){
+                    self.noData = self.$t('deviceView.noData')
+                  }
+                  resolve(temp)
+              })
             })
         },
         getStoreData(params){
@@ -593,7 +604,7 @@ export default {
             self.params.filter={page:0,size:self.sizeNum};
             let storeIds = self.storeStr.split('，')
             self.params.clause = {storeId: storeIds}
-            self.getReportList(self.params);
+            self.getReportList(self.params,0);
         },
         async getCountryStore(){
                 let self=this;
@@ -928,7 +939,7 @@ export default {
           })
           self.curStore = storeArr;
           self.changeStore(self.curStore)
-          self.getInitReportList()
+          self.getInitReportList(0)
         },
         clearStore(){
             let self=this;
@@ -986,13 +997,13 @@ export default {
             let self=this;
             self.page=val;
             self.params.filter={page:val-1,size:self.sizeNum};
-            self.getReportList(self.params);
+            self.getReportList(self.params,0);
         },
         sizeChange(val){
           let self=this;
           self.sizeNum=val;
           self.params.filter={page:0,size:val};
-          self.getReportList(self.params);
+          self.getReportList(self.params,0);
         },
         searchData(){
             let self=this;
@@ -1037,7 +1048,7 @@ export default {
             }
 
             self.params.filter={page:0,size:self.sizeNum};
-            self.getReportList(self.params);
+            self.getReportList(self.params,0);
         },
         checkSortType(typeId){
             console.log(typeId);
@@ -1047,7 +1058,7 @@ export default {
                 case 1: self.params.order={direction:'asc',property:'status'}; break;
                 case 2: self.params.order={direction:'asc',property:'storeName'}; break;
             }
-            self.getReportList(self.params);
+            self.getReportList(self.params,0);
         },
 
         clickReport(item,index){

@@ -167,7 +167,7 @@
       </el-dialog>
     </div>
     <div class="item-container" v-if="ispdf">
-      <el-col :span="24" class="items-content"  id="pdfDom"  style="padding:40px 20px;">
+      <el-col :span="24" class="items-content"  id="pdfDom" ref="printPDF" style="padding:40px 20px;width:1150px;">
         <div :span="24" class="export-header">
           <p>
             <span>{{$t('reportView.time')}}：</span>
@@ -178,8 +178,8 @@
             <span class="content-header">{{ModelPostpdf}}</span>
           </p>
         </div>
-        <el-col :span="24" class="contents-container">
-          <el-col :span="24" class="items-title">
+        <el-col :span="24" class="contents-container" style="border-top:1px solid #e3e9f4;">
+          <el-col :span="24" class="items-title" style="padding:20px 0;">
             <span class="title">{{$t('overview.patrolList')}}</span>
           </el-col>
           <el-col :span="24" class="items-table" style="padding-bottom:20px;">
@@ -533,19 +533,13 @@
                         dataLabel[index] = true;
 
                         if(dataLabel.findIndex(p=>p ==false) == -1){
-                            self.elPDFtableData = result.content;
-                              setTimeout(()=>{
-                                self.getPdf()
-                                if(sessionStorage.getItem('startPDF')=='start'){
-                                  sessionStorage.removeItem('startPDF','start');
-                                  if(sessionStorage.getItem('endPDF')=='end'){
-                                    sessionStorage.removeItem('endPDF','end');
-                                    setTimeout(()=>{
-                                      self.ispdf=false
-                                    },1000)
-                                  }
-                                }
-                              },1000)
+                            new Promise(function(resolve) {
+                                self.elPDFtableData = result.content;
+                                resolve(true)
+                            }).then(function() {
+                                self.$print(self.$refs.printPDF);
+                                self.ispdf=false
+                            })
                         }
                       })
                 }
@@ -556,16 +550,10 @@
               }
             })
           }else{
-            self.getPdf()
-            if(sessionStorage.getItem('startPDF')=='start'){
-              sessionStorage.removeItem('startPDF','start');
-              if(sessionStorage.getItem('endPDF')=='end'){
-                sessionStorage.removeItem('endPDF','end');
-                setTimeout(()=>{
-                  self.ispdf=false
-                },1000)
-              }
-            }
+            self.$print(self.$refs.printPDF);
+            setTimeout(()=>{
+              self.ispdf=false
+            },1000)
           }
         })
       
