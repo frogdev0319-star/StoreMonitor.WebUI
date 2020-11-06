@@ -1766,7 +1766,7 @@ export default {
             sheetName.forEach(s_item=>{
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        if(_item.inputCount==0){
+                        if(_item.inputCount==0&&!_item.manualIgnore){
                             hasIgnoretemp.push(_item)
                         }
                     })
@@ -1797,7 +1797,7 @@ export default {
                     }
                 }else{
                     isSheet2 = sheetName[0].Effective>=1 ? true : false
-                    self.hasSheet3 = sheetName[0].Effective>=1 ? false : true
+                    self.hasSheet3 = sheetName[0].Effective==0&&sheetName[1].Effective>=1 ? true : false
                 }
                 self.isDisabled = isSheet1 || isSheet2
             }else{
@@ -2151,7 +2151,7 @@ export default {
                 self.hideNext = false;
                 self.hideLast = false;
                 self.channelBtns = [];
-                self.showChannelBtns = [];
+                // self.showChannelBtns = [];
                 item.isClick=true;
                 this.$nextTick(()=>{
                     self.anchorLinkTo();
@@ -2226,7 +2226,20 @@ export default {
                         x.isClick=false
                     })
                 }
-                self.notShowAlert ? self.notShowAlert=false : null
+                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+                let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
+                let hasIgnoretemp=[]
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount==0&&!_item.manualIgnore){
+                                hasIgnoretemp.push(_item)
+                            }
+                        })
+                    })
+                })
+                hasIgnoretemp.length==0 ? self.notShowAlert=true : null //没有忽略项时，隐藏提示条
+                // self.notShowAlert ? self.notShowAlert=false : null
                 self.getDisabled(0)
                 self.isDisabled ? self.isShowWarn=true : self.isShowWarn=false
             }
@@ -2541,7 +2554,7 @@ export default {
             let hasIgnoretemp=[]
             temp.forEach(item=>{
                 item.items.forEach(_item=>{
-                    if(_item.isIgnore){
+                    if(_item.inputCount==0&&!_item.manualIgnore){
                         _item['type']=item.type
                         hasIgnoretemp.push(_item)
                     }
@@ -2645,7 +2658,7 @@ export default {
             let hasIgnoretemp=[]
             temp.forEach(item=>{
                 item.items.forEach(_item=>{
-                    if(_item.isIgnore){
+                    if(_item.inputCount==0&&!_item.manualIgnore){
                         _item['type']=item.type
                         hasIgnoretemp.push(_item)
                     }
@@ -3279,6 +3292,7 @@ export default {
             self.showIgnoreItem=false
             self.hasSheet3=false
             self.eventList=[]
+            self.showChannelBtns = [];
             self.curSheetIndex=0
                 self.PatrolList.forEach(item=>{
                     if(item.id==val){
@@ -3433,7 +3447,7 @@ export default {
                 }
             })
             self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount==0) ? true : false
-            self.notShowAlert = self.sheetName.every(x=>x.count==x.Effective)
+            self.notShowAlert = self.sheetName.every(x=>x.count==x.dealCount)
         },
         changeSheet(item,index){
             let self=this
@@ -4453,6 +4467,7 @@ export default {
                     margin-right: calc(10/1920*100vw);
                 }
                 .inspect-title /deep/ .el-alert__description{
+                    font-size: 14px;
                     margin:0;
                 }
                 .inspect-title /deep/ .el-alert__content{

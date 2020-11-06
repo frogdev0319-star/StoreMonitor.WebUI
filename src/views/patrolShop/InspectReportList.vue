@@ -174,7 +174,7 @@
                         layout="jumper,total, prev, pager, next,sizes"
                         :page-size="sizeNum" :total="total"
                         :current-page="page"
-                        :page-sizes="[10, 20, 50, 100]"
+                        :page-sizes="[12,24,50,100]"
                         @size-change="sizeChange"
                         class="el-pag">
                     </el-pagination>

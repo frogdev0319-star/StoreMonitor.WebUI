@@ -1125,7 +1125,7 @@ $h1:#292e36;
     /*overflow: hidden;*/
     .sourceType-icon{
         margin-right: calc(20/1920*100vw);
-        position: relative;
+        // position: relative;
         float: left;
         //@include point(bottom,2);
         height: 28px;
