@@ -14,6 +14,7 @@ const getters= {
   permission_routes: state => state.user.routes,
   PatrolHistory: state => state.user.PatrolHistory,
   InspectHistory:state=> state.user.InspectHistory,
-  PatrolComment:state=> state.user.PatrolComment
+  PatrolComment:state=> state.user.PatrolComment,
+  videoPlatform: state=> state.user.videoPlatform
 }
 export default getters

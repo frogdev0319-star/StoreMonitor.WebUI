@@ -1,5 +1,5 @@
 <template>
-  
+
 </template>
 <script>
 import { mapMutations } from 'vuex'
@@ -23,7 +23,9 @@ export default{
                   let obj = self.queryURL(hash);
                   console.log(obj);
                     this.$store.commit('SET_TOKEN',obj.token);
-                    if(obj.ezvizProtocol == "true"){
+                    setCookie('videoPlatform', obj.videoPlatform)
+                    this.$store.commit('SET_VideoPlatform',obj.videoPlatform);
+                  if(obj.ezvizProtocol == "true"){
                       this.$store.commit('SET_ISEZVIZ',true);
                       setCookie('isEzviz',true);
                     }

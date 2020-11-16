@@ -72,7 +72,7 @@
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
 
-            <div v-if="!isEzviz">
+            <div v-if="videoPlatform == 0">
               <div class="video-content" v-if="!showgongge" id="videoContent" >
                 <div class="getvideo-content" v-if="showGetVideo">
                   <div class="btn-graph">
@@ -198,12 +198,16 @@
                 </div>
               </div>
             </div>
-            <ezviz-video v-else :store-id="store.storeId" :channel-info="channel" :source-list-length= "sourceList.length"
+            <ezviz-video v-else-if = "videoPlatform == 1" :store-id="store.storeId" :channel-info="channel" :source-list-length= "sourceList.length"
                          :is-store-monitor="true" :play-back="playBackState"
                          :cur-time="playBackTime"
                          @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo" ref="ezvizVideo">
 
-            </ezviz-video>
+            </ezviz-video >
+            <beseye-vue v-else :store-id="store.storeId" :channel-info="channel" :source-list-length= "sourceList.length"
+                        :is-store-monitor="true" :play-back="playBackState" :is-event="false"
+                        :cur-time="playBackTime"
+                        @confirmEzvizCanvas="editEzvizCanvas" @emitEzvizVideo="confirmEzvizVideo" ref="beseyeVideo"></beseye-vue>
             <div class="el-event">
                 <div :class="corEvent?'event-lside':''">
                     <span class="event-title">{{generateStoreMonitorLang('createMothod')}}</span>
@@ -410,13 +414,15 @@ import {indexedDB} from '@/common/util'
 import RecordRTC from '../../../static/RecordRTC.js'
 import { clearTimeout, setInterval, setTimeout, clearInterval } from 'timers';
 import EzvizVideo from '@/components/EzvizVideo.vue'
+import BeseyeVue from  '@/components/BeseyeVue.vue'
 
 export default {
     name:'StoreMoinitor',
     components:{
         ChannelIconBtn,
         DialogVue,
-        EzvizVideo
+        EzvizVideo,
+        BeseyeVue
     },
     data(){
         return{
@@ -714,6 +720,10 @@ export default {
           let self = this;
           console.log(self.$store.state.user);
           return self.$store.state.user.isEzviz
+        },
+        videoPlatform(){
+          let self = this;
+          return self.$store.state.user.videoPlatform
         }
     },
     watch:{
@@ -763,13 +773,16 @@ export default {
         self.isPlayingFlag=-1;
         self.timerPlayReal=null;
         self.timeid=null;
-        if(!self.isEzviz){
+        if(!self.isEzviz && self.videoPlatform == 0){
           if(self.playState || self.playBackState){
             self.stopRealTime();
           }
         }
-        else{
+        else if(self.videoPlatform == 1){
           self.$refs.ezvizVideo.stopRealTime();
+        }
+        else{
+          self.$refs.beseyeVideo.stopPlay();
         }
         if(to.name!='storeSubEvent'){
             from.meta.keepAlive=false;
@@ -2661,7 +2674,7 @@ export default {
         },
         clickStore(item,index,_item,_index){
             let self=this;
-            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 && self.$refs.ezvizVideo && self.$refs.ezvizVideo.isLoading) || (self.videoPlatform == 2 && self.$refs.beseyeVideo.isLoading)){
               self.videoLoadingObj.dialogCosed = true;
               return false;
             }
@@ -2671,7 +2684,8 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
-            if( (!self.isEzviz && (self.playState || self.eventName.length!=0 )) || self.isEzviz && (self.$refs.ezvizVideo.playState || self.eventName.length!=0)){
+            if( (!self.isEzviz && (self.playState || self.eventName.length!=0 )) || self.videoPlatform == 1 && (self.$refs.ezvizVideo.playState || self.eventName.length!=0)
+              || (self.videoPlatform == 2 && (self.$refs.beseyeVideo.playState || self.eventName.length!=0)) ){
               self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -2695,11 +2709,16 @@ export default {
                 self.stopRealTime();
               }
             }
-            else{
+            else if(self.videoPlatform == 1){
               self.$refs.ezvizVideo.showError = false;
               self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
               if(self.$refs.ezvizVideo.playState){
                 self.$refs.ezvizVideo.stopRealTime();
+              }
+            }
+            else{
+              if(self.$refs.beseyeVideo.playState){
+                self.$refs.beseyeVideo.stopPlay();
               }
             }
             storeItem.device.forEach((item,index)=>{
@@ -2870,7 +2889,7 @@ export default {
                     _item.isClick=false;
                 }
             })
-            if(!self.isEzviz){
+            if(self.videoPlatform == 0){
               if(self.playState){ //切换前处于播放状态
                 self.stopAndRealTime();
               }
@@ -2878,7 +2897,7 @@ export default {
                 self.realTime(); //播放当前通道对应的视频(ivsId,channelId)
               }
             }
-            else{
+            else if(self.videoPlatform == 1){
               //萤石云处理
               self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
               if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
@@ -2890,6 +2909,19 @@ export default {
               else{
                 self.$nextTick(()=>{
                   self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+            }
+            else{
+              if(self.$refs.beseyeVideo.playState){ //切换前处于播放状态
+                self.$refs.beseyeVideo.stopPlay();
+                self.$nextTick(()=>{
+                  self.$refs.beseyeVideo.startPlay(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+              else{
+                self.$nextTick(()=>{
+                  self.$refs.beseyeVideo.startPlay(); //播放当前通道对应的视频(ivsId,channelId)
                 })
               }
             }
@@ -2971,7 +3003,7 @@ export default {
         },
         clickBtn(item,index){
             let self=this;
-            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 && self.$refs.ezvizVideo.isLoading) || (self.videoPlatform == 2 && self.$refs.beseyeVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }

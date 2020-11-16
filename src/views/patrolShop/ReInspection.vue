@@ -186,7 +186,7 @@
                 </div>
             </div>
             <div v-else>
-              <div v-if="!isEzviz">
+              <div v-if="videoPlatform == 0">
                 <div class="errorVideo-model" v-if="showError">
                   <span>{{errorText}}</span>
                 </div>
@@ -228,13 +228,17 @@
                   </video >
                 </div>
               </div>
-              <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
+              <ezviz-video v-else-if="videoPlatform == 1" :channel-info="channel" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
                            :show-feed-dialog2="showFeedDialog2" :store-id="store.storeId"
                            @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback"  @confirmEzvizVideoFeedback="ezvizVideoFeedback"
                            ref="ezvizVideo"
                            @emitEzvizVideo="confirmEzvizVideo" >
 
               </ezviz-video>
+              <beseye-vue v-else ref="beseyeVideo" :channel-info="channel" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
+                          :show-feed-dialog2="showFeedDialog2" :store-id="store.storeId"
+                          @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback"  @confirmEzvizVideoFeedback="ezvizVideoFeedback"
+                          @emitEzvizVideo="confirmEzvizVideo" ></beseye-vue>
             </div>
             <div class="el-inspect">
                 <div class="guide-lside" v-if="showGuide && sheetName.length > 0">
@@ -278,7 +282,7 @@
                                         <i class="el-icon-arrow-down icon" v-if="_item.groupId==undefined&&_item.isClick"></i>
                                     </div>
                                     <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
-                                        <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
+                                        <div v-for="(item,index) in inspectList" :key="index" class="inspect-details"
                                         @click="getItemByGroup(item,index)" @mouseover="mouseoverGroup(item,index)" @mouseout="mouseoutGroup(item,index)" :style="item.isHover||item.isClick?'color:#f31b65;background-color:#fddde8;':''">
                                             <span>{{item.groupName}}</span>
                                         </div>
@@ -523,10 +527,12 @@ import {validateInput} from '@/common/validate'
 import {generatePatrolLang} from '@/api/i18n'
 import EzvizVideo from '@/components/EzvizVideo.vue'
 import filterString from '@/common/filterString.js'
+import BeseyeVue from "../../components/BeseyeVue.vue";
 
 export default {
     name:'ReInspection',
     components:{
+        BeseyeVue,
         DialogVue,
         ChannelIconBtn,
         EzvizVideo
@@ -801,7 +807,7 @@ export default {
             historyObj:null,
             beforepatrolstore:'',
             showIgnoreItem:false,
-            hasIgnoretemp:[]
+            hasIgnoretemp:[],
         }
     },
     computed:{
@@ -819,6 +825,9 @@ export default {
         }),
         ...mapGetters(
           ['isEzviz']
+        ),
+        ...mapGetters(
+          ['videoPlatform']
         ),
     },
     watch:{
@@ -841,7 +850,8 @@ export default {
     },
     beforeRouteLeave(to, from, next){
         let self=this;
-        let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
+        let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !=0
+        || self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !=0)
         if(canLeave && to.name !='confirmSum'){
           self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
             confirmButtonText: self.$t('remotePatrol.confirm'),
@@ -867,8 +877,11 @@ export default {
               window.clearInterval(self.timerPlayReal);
               self.timerPlayReal=null;
             }
-            if(self.isEzviz && !self.showGuide){
+            if(self.videoPlatform == 1 && !self.showGuide){
               self.$refs.ezvizVideo.stopRealTime();
+            }
+            if(self.videoPlatform == 2 && !self.showGuide){
+              self.$refs.beseyeVideo.stopPlay();
             }
             next()
           }).catch(() => {
@@ -892,8 +905,11 @@ export default {
             window.clearInterval(self.timerPlayReal);
             self.timerPlayReal=null;
           }
-          if(self.isEzviz && !self.showGuide){
+          if(self.videoPlatform == 1 && !self.showGuide){
             self.$refs.ezvizVideo.stopRealTime();
+          }
+          if(self.videoPlatform == 2 && !self.showGuide){
+            self.$refs.beseyeVideo.stopPlay();
           }
           next();
         }
@@ -951,7 +967,7 @@ export default {
             self.curSheetIndex=PatrolHistory.curSheetIndex
             self.curGroupIndex=PatrolHistory.curGroupIndex
             self.curItemIndex=PatrolHistory.curItemIndex
-            
+
             self.isDisabled=true
             let isClick = self.sheetName[self.sheetName.length-1].isClick
             if(isClick){
@@ -1025,7 +1041,7 @@ export default {
         visibilityChange(){
           let self = this;
           console.log(self.isEzviz)
-          if(!self.isEzviz){
+          if(self.videoPlatform == 0){
             if(document.hidden){
               console.log("我暂时离开页面了");
               if(self.playState){  //当前播放的是实时视频
@@ -1731,7 +1747,15 @@ export default {
             item.scoreList.forEach(s_item=>{
                 s_item.val==itemDS.val ? s_item.isClick=true : s_item.isClick=false
             })
-            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            if(self.videoPlatform == 0){
+              self.editCount++;
+            }
+            else if(self.videoPlatform == 0){
+              self.$refs.ezvizVideo.editCount++
+            }
+            else{
+              self.$refs.beseyeVideo.editCount++
+            }
             if(e==0){
                 if(item.type==2){
                     if(item.itemScore<0){
@@ -2141,7 +2165,7 @@ export default {
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
-            
+
             // else{
                 self.curGroupIndex=index;
                 self.curGroup=item;
@@ -2290,7 +2314,16 @@ export default {
                     })
                 })
             })
-            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            //self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            if(self.videoPlatform == 0){
+              self.editCount++;
+            }
+            else if(self.videoPlatform == 0){
+              self.$refs.ezvizVideo.editCount++
+            }
+            else{
+              self.$refs.beseyeVideo.editCount++
+            }
             self.curItemIndex=index;
             self.curItem=item;
             if(item.deviceId==-1){
@@ -2301,7 +2334,16 @@ export default {
         },
         CancleIgnoreItem(item,index){
             let self=this;
-            self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
+            // self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
+            if(self.videoPlatform == 0){
+              self.editCount--;
+            }
+            else if(self.videoPlatform == 0){
+              self.$refs.ezvizVideo.editCount--
+            }
+            else{
+              self.$refs.beseyeVideo.editCount--
+            }
             self.curItemIndex=index;
             self.curItem=item;
             self.cancleIgnore()
@@ -2372,13 +2414,13 @@ export default {
             if(item.isIgnore){
                 return false;
             }
-            if(self.isLoading || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
               self.videoLoadingObj.dialogCosed = true;
               return false;
             }
-            if(item.deviceId[0] != self.curDeviceId){
+          if(item.deviceId[0] != self.curDeviceId){
                     //Dash
-                if(!self.isEzviz){
+                if(!self.isEzviz && self.videoPlatform == 0){
                     if(self.playState){
                         self.stopAndRealTime();
                     }
@@ -2386,7 +2428,7 @@ export default {
                         self.realTime();
                     }
                 }
-                else{
+                else if(self.isEzviz && self.videoPlatform == 1){
                     //Ezviz
                     if(self.$refs.ezvizVideo!=undefined){
                         if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
@@ -2401,6 +2443,20 @@ export default {
                             })
                         }
                     }
+                }
+                else{
+                  if(self.$refs.beseyeVideo != undefined){
+                    if(self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.playState){ //切换前处于播放状态
+                      self.$refs.beseyeVideo.stopPlay();
+                      self.$refs.beseyeVideo.startPlay();
+                      // self.$nextTick(()=>{
+                      //   self.$refs.beseyeVideo.startPlay(); //播放当前通道对应的视频(ivsId,channelId)
+                      // })
+                    }
+                    else{
+
+                    }
+                  }
                 }
                 self.curDeviceId=item.deviceId[0];
             }
@@ -2443,7 +2499,7 @@ export default {
                     item.disabled=false;
                     self.showError=false;
                     self.showGuide=false;
-                    
+
                     // else{
                     //   if(!self.videoAuthority){
                     //     self.showError = true;
@@ -2469,7 +2525,7 @@ export default {
                         _item.disabled=true;
                     }else{
                         _item.checked=true;
-                        _item.disabled=false; 
+                        _item.disabled=false;
                     }
                 })
             }
@@ -2488,13 +2544,21 @@ export default {
             let self=this;
             // self.inspectItemList=[];
         //   checkOutInspectItemV3(params).then(res=>{
-        //         
+        //
         //     })
         },
         leaveDialog(){
           let self=this;
           self.leaveObj.dialogCosed=false;
-          self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+          if(self.videoPlatform == 0){
+            self.editCount = 0;
+          }
+          else if(self.videoPlatform == 0){
+            self.$refs.ezvizVideo.editCount = 0
+          }
+          else{
+            self.$refs.beseyeVideo.editCount = 0
+          }
         },
         cancelLeave(){
           let self=this;
@@ -3071,10 +3135,16 @@ export default {
               self.editCount=0;
               self.playState ? self.stopRealTime() : ''
             }
-            else{
+            else if(self.videoPlatform == 1){
               !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : ''
               if(self.$refs.ezvizVideo!=undefined){
                  self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : ''
+              }
+            }
+            else{
+              !self.showGuide ? self.$refs.beseyeVideo.editCount=0 : ''
+              if(self.$refs.beseyeVideo!=undefined){
+                self.$refs.beseyeVideo.peerConnection ? self.$refs.beseyeVideo.stopPlay() : ''
               }
             }
             //self.editCount=0;
@@ -3143,7 +3213,20 @@ export default {
             let self = this;
             self.changeInspectObj.dialogCosed=false;
             self.changeInspectList(self.beforepatrolstore)
-            self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+            switch (self.videoPlatform) {
+              case 0 :{
+                self.editCount = 0
+                break
+              }
+              case 1:{
+                self.$refs.ezvizVideo.editCount = 0
+                break
+              }
+              case 2:{
+                self.$refs.beseyeVideo.editCount = 0
+                break
+              }
+            }
         },
         canceldChangeInspect(){
             let self = this;
@@ -3258,12 +3341,12 @@ export default {
         },
         changeInspect(val){
             let self = this;
-            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
             //确认总结后，切换巡检表
-            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
+            if( (!self.isEzviz && self.editCount!=0) || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
                 self.changeInspectObj.dialogCosed=true;
                 self.beforepatrolstore=val
             }else{
@@ -3277,9 +3360,12 @@ export default {
               self.playState ? self.stopRealTime() : ''
             }
             else{
-              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : ''
-              if(self.$refs.ezvizVideo!=undefined){
+              self.videoPlatform == 1 && !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : ''
+              if(self.videoPlatform == 1 &&self.$refs.ezvizVideo!=undefined){
                  self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : ''
+              }
+              if(self.videoPlatform == 2 &&self.$refs.beseyeVideo!=undefined){
+                self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : ''
               }
             }
             self.isDisabled=false
@@ -3437,7 +3523,7 @@ export default {
                             obj.manualCount=1
                             notIgnoretemp.push(obj)
                         }
-                        
+
                     })
                 })
                 s_item.dealCount=dealtemp.length
@@ -3500,11 +3586,11 @@ export default {
             self.curTabItem=item;
             self.curStoreIndex=_index;
             self.curStoreItem=_item;
-            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 &&!self.showGuide && !self.$refs.ezvizVideo &&self.$refs.ezvizVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
-            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
+            if( (self.videoPlatform == 0 && self.editCount!=0) || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null || (self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.editCount != 0))){
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -4588,7 +4674,7 @@ export default {
                             }
                         }
                         .Group-content-details{
-                            
+
                         }
                     }
                     .item-content{

@@ -11,7 +11,7 @@
             v-if="dialogFormVisible" width="850px" top=12% @close='closeRealTime' class='rate-video-dialog'>
                 <div class="video-dialog-content" style="overflow:hidden;" @mousemove="showControlInfo=true" @mouseleave="showControlInfo=false">
                     <hr class="dialog-hr"/>
-                    <div class="video-content" id="videoContent" v-if="!isEzviz">
+                    <div class="video-content" id="videoContent" v-if="videoPlatform == 0">
                         <div id="channelName" v-if="showControlInfo"><span>{{curChannel.name}}</span></div>
                         <div class="icon-footer" v-if="showControlInfo">
                             <div class="iconlside">
@@ -30,8 +30,10 @@
                             class="video-js vjs-fill">
                         </video>
                     </div>
-                  <ezviz-video v-else :channel-info="channelInfo" :is-event='isEvent' :store-id="event.storeId" ref="ezvizVideo">
+                  <ezviz-video v-else-if ="videoPlatform == 1" :channel-info="channelInfo" :is-event='isEvent' :store-id="event.storeId" ref="ezvizVideo">
                   </ezviz-video>
+                  <beseye-vue v-else :channel-info="channelInfo" :is-event='isEvent' :store-id="event.storeId" ref="beseyeVideo">
+                  </beseye-vue>
                 </div>
             </el-dialog>
             <el-dialog  :title="generateEventLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
@@ -242,12 +244,14 @@ import {generateEventLang} from  '@/api/i18n'
 import EzvizVideo from '@/components/EzvizVideo.vue'
 import PermissionHelper from "../../../api/PermissionHelper";
  import filterString from '@/common/filterString'
+import BeseyeVue from '@/components/BeseyeVue.vue'
 
 export default {
     name:"RateManage",
     components:{
         AudioVue,
-        EzvizVideo
+        EzvizVideo,
+        BeseyeVue
     },
     data(){
         return{
@@ -359,11 +363,16 @@ export default {
                 return this.windowHeight*0.609;
             }
         },
-      isEzviz() {
-        let self = this;
-        console.log(self.$store.state.user);
-        return self.$store.state.user.isEzviz
-      }
+        isEzviz() {
+          let self = this;
+          console.log(self.$store.state.user);
+          return self.$store.state.user.isEzviz
+        },
+        videoPlatform(){
+          let self = this;
+          console.log(self.$store.state.user.videoPlatform);
+          return self.$store.state.user.videoPlatform
+        }
     },
     watch:{
       realTimeSpeed(val,oldVal){
@@ -505,8 +514,11 @@ export default {
               }
               self.previewplayer.dispose();
             }
-            else{
+            else if(self.videoPlatform == 1){
               self.$refs.ezvizVideo.stopRealTime();
+            }
+            else{
+              self.$refs.beseyeVideo.stopPlay();
             }
         },
         async stopRealTime(){

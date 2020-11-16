@@ -14,7 +14,7 @@ const  Version = new Date().getTime(); // 这里使用的是时间戳 来区分 
 const env = require('../config/prod.env')
 
 
-var GenerateAssetPlugin = require('generate-asset-webpack-plugin'); 
+var GenerateAssetPlugin = require('generate-asset-webpack-plugin');
 var createServerConfig = function(compilation){
   let cfgJson={loginURL:'https://portals.storeviu.com'};
   return JSON.stringify(cfgJson);
@@ -42,7 +42,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       'process.env': env
     }),
 
-    
+
     //生成配置文件
     new GenerateAssetPlugin({
       filename: 'serverconfig.json',
@@ -51,7 +51,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       extraFiles: []
     }),
-    
+
 
     new UglifyJsPlugin({
       uglifyOptions: {
@@ -69,7 +69,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename: utils.assetsPath('css/[name].[contenthash].css'),
       // Setting the following option to `false` will not extract CSS from codesplit chunks.
       // Their CSS will instead be inserted dynamically with style-loader when the codesplit chunk has been loaded by webpack.
-      // It's currently set to `true` because we are seeing that sourcemaps are included in the codesplit bundle as well when it's `false`, 
+      // It's currently set to `true` because we are seeing that sourcemaps are included in the codesplit bundle as well when it's `false`,
       // increasing file size: https://github.com/vuejs-templates/webpack/issues/1110
       allChunks: true,
     }),
@@ -156,7 +156,7 @@ const webpackConfig = merge(baseWebpackConfig, {
 //         ')$'
 //       ),
 //       threshold: 10240,
-//       deleteOriginalAssets:true, 
+//       deleteOriginalAssets:true,
 //       minRatio: 0.8
 //     })
 //   )

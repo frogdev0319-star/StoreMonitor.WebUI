@@ -29,7 +29,8 @@ const user={
         addRoutes: [],
         PatrolHistory:null,
         InspectHistory:null,
-        PatrolComment:''
+        PatrolComment:'',
+        videoPlatform: getCookie('videoPlatform')? parseInt(getCookie('videoPlatform')): 0
     },
 
     mutations:{
@@ -87,6 +88,9 @@ const user={
         },
         SET_PatrolComment:(state,PatrolComment)=>{
           state.PatrolComment = PatrolComment
+        },
+        SET_VideoPlatform:(state, videoPlatform)=>{
+          state.videoPlatform = videoPlatform
         }
     },
     actions:{
@@ -133,14 +137,16 @@ const user={
                         let accountId=params.accountId.toLowerCase();
                         localStorage.setItem('oss_bucket',accountId);
                         commit('SET_ACCOUNTID',accountId);
+                        setCookie('videoPlatform',res.data.videoPlatform)
+                        commit('SET_VideoPlatform', res.data.videoPlatform)
                         if(res.data.ezvizProtocol){
-                          commit('SET_ISEZVIZ', true)
-                          setCookie('isEzviz', true)
-                        }
-                        else{
-                          commit('SET_ISEZVIZ', false)
-                          setCookie('isEzviz', false)
-                        }
+                            commit('SET_ISEZVIZ', true)
+                            setCookie('isEzviz', true)
+                          }
+                          else{
+                            commit('SET_ISEZVIZ', false)
+                            setCookie('isEzviz', false)
+                          }
                     }
                     else{
                         commit('Account_Changed',0);
