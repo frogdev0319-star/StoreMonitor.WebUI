@@ -263,7 +263,8 @@ export default {
             ModelPost:null,
             showSheet0:true,
             showSheet1:false,
-            showSheet2:false
+            showSheet2:false,
+            curSheet:-1
         }
     },
     computed:{
@@ -307,6 +308,7 @@ export default {
         },
         changeSheet(e){
             let self = this
+            self.curSheet = e
             self.allchecked=false
             self.routeData.forEach(item=>{
                 item.checked=false
@@ -492,7 +494,7 @@ export default {
             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
             self.showDeleteContent=false;
             let val = 'del'
-            self.$emit('refreshList',val)
+            self.$emit('refreshList',val,self.curSheet)
         },
         confirmDelete(){
             let self=this;
@@ -616,12 +618,12 @@ export default {
                                         "groupIds":[self.curDelGroupId]
                                     }
                                     inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                                        if(resGroup.errMsg=='Success'&&self.routeData.length==1&&self.sheetName.length==1){
+                                        // if(resGroup.errMsg=='Success'&&self.routeData.length==1&&self.sheetName.length==1){
                                             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                                             self.showSingleDeleteContent=false;
                                             let val = 'del'
-                                            self.$emit('refreshList',val)
-                                        }
+                                            self.$emit('refreshList',val,self.curSheet)
+                                        // }
                                     }) 
                                 }
                             })
@@ -629,7 +631,7 @@ export default {
                             self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
                             self.showSingleDeleteContent=false;
                             let val = 'del'
-                            self.$emit('refreshList',val)
+                            self.$emit('refreshList',val,self.curSheet)
                         }
                     })
                 }

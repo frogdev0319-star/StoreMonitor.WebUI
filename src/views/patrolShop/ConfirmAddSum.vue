@@ -50,9 +50,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td :rowspan="s_item.inspectList.length+1">
-                                <span class="sheet_title" :style="'line-height:'+s_item.height*s_item.inspectList.length+'px;'">{{s_item.label}}</span>
+                        <tr style="vertical-align:middle;">
+                            <td :rowspan="s_item.inspectList.length+1" style="vertical-align:middle;">
+                                <span class="sheet_title">{{s_item.label}}</span>
                             </td>
                         </tr>
                         <tr v-for="(item,index) in s_item.inspectList" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
@@ -617,13 +617,10 @@ export default {
                     //     self.resultList[0].isActive=true
                     //     Tab0Status=true
                     // }
-                    p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==1){
                     p_item['tHeader']=self.theaderScore
-                    p_item['height']=18+2.3*p_item.inspectList.length
                 }else if(p_item.type==2){
                     p_item['tHeader']=self.theaderOther
-                    p_item['height']=18+2.3*p_item.inspectList.length
                 }
             })
             let s_count=0

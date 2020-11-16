@@ -44,7 +44,7 @@ let _Environments = {
 }
 
 let environJSON = _Environments.Preview;
-let isGlobalWebsite = true;
+let isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {

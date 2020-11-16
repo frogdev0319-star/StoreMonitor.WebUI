@@ -52,11 +52,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td :rowspan="s_item.length+1">
-                                <span v-if="s_item[0].type==0" :style="'line-height:'+Number(18+2.3*s_item.length)*s_item.length+'px;'">{{$t('insSettingView.sheetpassfail')}}</span>
-                                <span v-if="s_item[0].type==1" :style="'line-height:'+Number(18+2.3*s_item.length)*s_item.length+'px;'">{{$t('insSettingView.sheetscore')}}</span>
-                                <span v-if="s_item[0].type==2" :style="'line-height:'+Number(18+2.3*s_item.length)*s_item.length+'px;'">{{$t('insSettingView.sheetother')}}</span>
+                        <tr style="vertical-align:middle;">
+                            <td :rowspan="s_item.length+1" style="vertical-align:middle;">
+                                <span v-if="s_item[0].type==0">{{$t('insSettingView.sheetpassfail')}}</span>
+                                <span v-if="s_item[0].type==1">{{$t('insSettingView.sheetscore')}}</span>
+                                <span v-if="s_item[0].type==2">{{$t('insSettingView.sheetother')}}</span>
                             </td>
                         </tr>
                         <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">

@@ -469,7 +469,7 @@ export default {
                    self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData=val
 	      	// })
         },
-        async getTagList(val){
+        async getTagList(val,sheetIndex){
             let self=this;
             let TagData=await self.getTagAll();
             if(TagData.length!=0){
@@ -563,7 +563,8 @@ export default {
                             sheetName.push(obj)
                         }
                     }
-                    sheetName[0].isClick=true
+                    let i = sheetIndex!=undefined ? (sheetIndex>sheetName.length-1 ? 0 : sheetIndex) : 0
+                    sheetName[i].isClick=true
                     self.tempdata=temp
                     let tagTemp=[]
                     TagData.forEach((tag_item,tag_index)=>{
@@ -576,7 +577,7 @@ export default {
                         }
                         tagObj.label=label
                         tagObj.name=tag_item.name
-                        tagObj.routeData=te_temp[0]
+                        tagObj.routeData=te_temp[i]
                         tagObj.allRoutedata=te_temp
                         tagObj.sheetName=sheetName
                         tagTemp.push(tagObj)
