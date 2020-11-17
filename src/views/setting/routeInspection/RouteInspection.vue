@@ -563,7 +563,20 @@ export default {
                             sheetName.push(obj)
                         }
                     }
-                    let i = sheetIndex!=undefined ? (sheetIndex>sheetName.length-1 ? 0 : sheetIndex) : 0
+                    let i=0
+                    if(sheetIndex!=undefined){
+                        if(sheetName.length==3){
+                            i=sheetIndex==-1 ? 0 : sheetIndex
+                        }else if(sheetName.length==2){
+                            if(sheetName.map(x=>x.id==2)){
+                                i=sheetIndex==-1||sheetIndex==0 ? 0 : sheetIndex-1
+                            }else{
+                                i=sheetIndex==-1 ? 0 : sheetIndex
+                            }
+                        }else if(sheetName.length==1){
+                            i=0
+                        }
+                    }
                     sheetName[i].isClick=true
                     self.tempdata=temp
                     let tagTemp=[]
