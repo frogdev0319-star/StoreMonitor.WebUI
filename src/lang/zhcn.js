@@ -513,7 +513,7 @@ export default {
     inspectionDescp: '巡检项要求描述',
     sheetscore0: '项目总分值',
     sheetscore1: '低于*分，须门店负责人处理',
-    sheetscore2: '项目分值(必填，-100分~100分)',
+    sheetscore2: '项目分值',
     sheetpassfail:'合格率评估项',
     sheetscore:'巡检评分项',
     sheetother:'附加评分项',

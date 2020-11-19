@@ -514,7 +514,7 @@ export default {
     inspectionDescp: '巡檢項要求描述',
     sheetscore0: '項目總分值',
     sheetscore1: '低於*分，須門店負責人處理',
-    sheetscore2: '項目分值（必填，-100分~100分）',
+    sheetscore2: '項目分值',
     sheetpassfail:'合格率評估項',
     sheetscore:'巡檢評分項',
     sheetother:'附加評分項',

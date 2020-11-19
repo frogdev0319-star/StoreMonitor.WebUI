@@ -511,7 +511,7 @@ export default {
     inspectionDescp: 'Descriptions',
     sheetscore0: 'Total score',
     sheetscore1: 'Anomaly Events-Score Threshold',
-    sheetscore2: 'Score(Required, -100~100points)',
+    sheetscore2: 'Score',
     sheetpassfail:'Pass-Failed',
     sheetscore:'Score items',
     sheetother:'Other items',

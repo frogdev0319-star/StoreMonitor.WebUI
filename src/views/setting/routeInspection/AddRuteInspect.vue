@@ -152,7 +152,7 @@
                        <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
                            <span>{{generateInsSettingLang('sheetscore1')}}</span>
                        </div>
-                       <div class="nape-score1-title" v-if="activeSheetName=='2'" style="flex:2;">
+                       <div class="nape-score1-title" v-if="activeSheetName=='2'" style="flex:1;">
                            <span>{{generateInsSettingLang('sheetscore2')}}</span>
                        </div>
                        <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
@@ -183,8 +183,8 @@
                                 <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
-                       <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
-                           <span style="margin-left:73px;" v-if="!item.isClick">{{item.Score_3}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
+                       <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:1;">
+                           <span v-if="!item.isClick">{{item.Score_3}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
                            <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3" @input="editinputChange(item,index)"></el-input>
                        </div>
                        <div class="nape-items-handle" v-if="!item.isClick" style="flex:1;">
