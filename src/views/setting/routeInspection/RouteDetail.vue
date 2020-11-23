@@ -624,7 +624,7 @@ export default {
                                             let val = 'del'
                                             self.$emit('refreshList',val,self.curSheet)
                                         // }
-                                    }) 
+                                    })
                                 }
                             })
                         }else{
@@ -662,7 +662,7 @@ export default {
         },
         // bindPatrol(index,item){
         //     let self=this;
-        //     self.$router.push({name:'itemSetting',params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}}); 
+        //     self.$router.push({name:'itemSetting',params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}});
         // },
         downLoadModel(){
             let self=this;

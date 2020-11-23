@@ -68,3 +68,11 @@ export const deleteBeseyeDevice = params =>{
     params
   })
 }
+
+export const getPlaylistInfo = params =>{
+  return request({
+    url: `${version}/beseye/playlist`,
+    method:'get',
+    params
+  })
+}

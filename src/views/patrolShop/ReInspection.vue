@@ -163,7 +163,7 @@
             <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
             <dialog-vue :dialog-title='leaveObj.title' :show-info='leaveObj.showInfo' :is-warning='leaveObj.isWarning' :dialog-closed='leaveObj.dialogCosed' @confirmed='leaveDialog' @canceled='cancelLeave'></dialog-vue>
             <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
-            <div class="guide-content" v-if="showGuide && inspectList.length > 0">
+            <div class="guide-content" v-show="showGuide && inspectList.length > 0">
                 <div class="guide-rside">
                     <div class="num-content">
                         <span class="guide-num">2</span>
@@ -185,7 +185,7 @@
                     </div>
                 </div>
             </div>
-            <div v-else>
+            <div v-show="!showGuide || inspectList.length == 0">
               <div v-if="videoPlatform == 0">
                 <div class="errorVideo-model" v-if="showError">
                   <span>{{errorText}}</span>
@@ -997,7 +997,7 @@ export default {
         self.getUpLoadBucketInfo();
         self.getOssInfo();
         self.getDeviceList();
-      if(!self.isEzviz){
+        if(self.videoPlatform == 0){
           self.looper();
         }
         else{
@@ -2335,14 +2335,22 @@ export default {
         CancleIgnoreItem(item,index){
             let self=this;
             // self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
-            if(self.videoPlatform == 0){
-              self.editCount--;
-            }
-            else if(self.videoPlatform == 0){
-              self.$refs.ezvizVideo.editCount--
-            }
-            else{
-              self.$refs.beseyeVideo.editCount--
+            switch (self.videoPlatform) {
+              case 0:{
+                self.editCount--;
+                break
+              }
+              case 1:{
+                self.$refs.ezvizVideo.editCount--
+                break
+              }
+              case 2:{
+                self.$refs.beseyeVideo.editCount--
+                break
+              }
+              default:{
+                break
+              }
             }
             self.curItemIndex=index;
             self.curItem=item;
@@ -2359,7 +2367,7 @@ export default {
         clickBtn(item,index){
             let self=this;
             console.log(item);
-            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 && self.$refs.ezvizVideo.isLoading) || (self.videoPlatform == 2 && self.$refs.beseyeVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
@@ -2382,7 +2390,7 @@ export default {
                     _item.isClick=false;
                 }
             })
-            if(!self.isEzviz){
+            if(self.videoPlatform == 0){
               //非萤石平台
               self.curDeviceId=item.id;
               if(self.playState){
@@ -2392,7 +2400,7 @@ export default {
                 self.realTime();
               }
             }
-            else{
+            else if(self.videoPlatform == 1){
               //萤石云平台，切换摄像头
               self.curDeviceId=item.id;
               if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
@@ -2407,139 +2415,141 @@ export default {
                 })
               }
             }
+            else{
+              // Beseye
+              self.curDeviceId=item.id;
+              if(self.$refs.beseyeVideo.playState){ //切换前处于播放状态
+                self.$refs.beseyeVideo.stopPlay();
+                self.$nextTick(()=>{
+                  self.$refs.beseyeVideo.startPlay(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+              else{
+                self.$nextTick(()=>{
+                  self.$refs.beseyeVideo.startPlay(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+            }
         },
         clickItem(item,index){
-            console.log(item)
-            let self=this;
-            if(item.isIgnore){
-                return false;
+        console.log(item)
+        let self=this;
+        if(item.isIgnore){
+          return false;
+        }
+        if(self.isLoading || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
+          self.videoLoadingObj.dialogCosed = true;
+          return false;
+        }
+        if(item.deviceId[0] != self.curDeviceId){
+          //Dash
+          if(!self.isEzviz && self.videoPlatform == 0){
+            if(self.playState){
+              self.stopAndRealTime();
             }
-            if(self.isLoading || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
-              self.videoLoadingObj.dialogCosed = true;
-              return false;
+            else{
+              self.realTime();
             }
-          if(item.deviceId[0] != self.curDeviceId){
-                    //Dash
-                if(!self.isEzviz && self.videoPlatform == 0){
-                    if(self.playState){
-                        self.stopAndRealTime();
-                    }
-                    else{
-                        self.realTime();
-                    }
+          }
+          else if(self.isEzviz && self.videoPlatform == 1){
+            //Ezviz
+            if(self.$refs.ezvizVideo!=undefined){
+              if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                self.$refs.ezvizVideo.stopRealTime();
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+              else{
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                })
+              }
+            }
+          }
+          else{}
+          self.curDeviceId=item.deviceId[0];
+        }
+        self.sourceList=[];
+        self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
+        let obj={};
+        if(item.deviceId.length > 0){  //当前选择的巡检项已绑定设备
+          let device=self.getDeviceById(item.deviceId);
+          if(device.length > 0){
+            obj.id=device[0].id;
+            obj.ivsId=device[0].ivsId;
+            obj.channelName=device[0].name;
+            obj.channelId=device[0].channelId;
+            self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
+            self.channelBtns = []
+            device.forEach(item=>{
+              self.allChannelBtns.forEach(_item=>{
+                if(item.id == _item.id){
+                  self.channelBtns.push(_item)
                 }
-                else if(self.isEzviz && self.videoPlatform == 1){
-                    //Ezviz
-                    if(self.$refs.ezvizVideo!=undefined){
-                        if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
-                            self.$refs.ezvizVideo.stopRealTime();
-                            self.$nextTick(()=>{
-                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                            })
-                        }
-                        else{
-                            self.$nextTick(()=>{
-                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                            })
-                        }
-                    }
+              })
+            })
+            self.$nextTick(()=>{
+              self.getshowBtns(self.channelBtns);
+            })
+            self.channelBtns.forEach((_item,_index)=>{
+              if(self.channel!=null){
+                if(_item.id == self.channel.id){
+                  _item.isClick=true;
                 }
                 else{
-                  if(self.$refs.beseyeVideo != undefined){
-                    if(self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.playState){ //切换前处于播放状态
-                      self.$refs.beseyeVideo.stopPlay();
-                      self.$refs.beseyeVideo.startPlay();
-                      // self.$nextTick(()=>{
-                      //   self.$refs.beseyeVideo.startPlay(); //播放当前通道对应的视频(ivsId,channelId)
-                      // })
-                    }
-                    else{
-
-                    }
-                  }
+                  _item.isClick=false;
                 }
-                self.curDeviceId=item.deviceId[0];
-            }
-            self.sourceList=[];
-            self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
-            let obj={};
-            if(item.deviceId.length > 0){  //当前选择的巡检项已绑定设备
-                let device=self.getDeviceById(item.deviceId);
-                if(device.length > 0){
-                    obj.id=device[0].id;
-                    obj.ivsId=device[0].ivsId;
-                    obj.channelName=device[0].name;
-                    obj.channelId=device[0].channelId;
-                    self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
-                    self.channelBtns = []
-                    device.forEach(item=>{
-                      self.allChannelBtns.forEach(_item=>{
-                        if(item.id == _item.id){
-                          self.channelBtns.push(_item)
-                        }
-                      })
-                    })
-                    self.$nextTick(()=>{
-                      self.getshowBtns(self.channelBtns);
-                    })
-                    self.channelBtns.forEach((_item,_index)=>{
-                      if(self.channel!=null){
-                        if(_item.id == self.channel.id){
-                          _item.isClick=true;
-                        }
-                        else{
-                          _item.isClick=false;
-                        }
-                      }
-                    })
-                    item.checked=true;
-                    self.curItem=item;
-                    self.curItemIndex=index;
-                    self.curItemId=item.id;
-                    item.disabled=false;
-                    self.showError=false;
-                    self.showGuide=false;
-
-                    // else{
-                    //   if(!self.videoAuthority){
-                    //     self.showError = true;
-                    //     self.errorText = self.$t('remotePatrol.videoLicense');
-                    //   }
-                    // }
-                }
-            }
-            else if(item.deviceId.length == 0){
-                self.noBindDeviceObj.dialogCosed=true;
-                return false;
-            }
-            self.inspectItemList.forEach((_item,_index)=>{
-                if(index!=_index){
-                    _item.checked=false;
-                    _item.disabled=true;
-                }
+              }
             })
-            if(self.hasIgnoretemp.length!=0&&self.showIgnoreItem){
-                self.hasIgnoretemp.forEach((_item,_index)=>{
-                    if(index!=_index){
-                        _item.checked=false;
-                        _item.disabled=true;
-                    }else{
-                        _item.checked=true;
-                        _item.disabled=false;
-                    }
-                })
+            item.checked=true;
+            self.curItem=item;
+            self.curItemIndex=index;
+            self.curItemId=item.id;
+            item.disabled=false;
+            self.showError=false;
+            self.showGuide=false;
+
+            // else{
+            //   if(!self.videoAuthority){
+            //     self.showError = true;
+            //     self.errorText = self.$t('remotePatrol.videoLicense');
+            //   }
+            // }
+          }
+        }
+        else if(item.deviceId.length == 0){
+          self.noBindDeviceObj.dialogCosed=true;
+          return false;
+        }
+        self.inspectItemList.forEach((_item,_index)=>{
+          if(index!=_index){
+            _item.checked=false;
+            _item.disabled=true;
+          }
+        })
+        if(self.hasIgnoretemp.length!=0&&self.showIgnoreItem){
+          self.hasIgnoretemp.forEach((_item,_index)=>{
+            if(index!=_index){
+              _item.checked=false;
+              _item.disabled=true;
+            }else{
+              _item.checked=true;
+              _item.disabled=false;
             }
-            self.sheetName.slice(0,self.sheetName.length-1).forEach((_item,_index)=>{
-                _item.inspectList.forEach((p_item,p_index)=>{
-                    p_item.items.forEach((itemDS,indexDS)=>{
-                        if(itemDS.id!=item.id){
-                            itemDS.checked=false;
-                            itemDS.disabled=true;
-                        }
-                    })
-                })
+          })
+        }
+        self.sheetName.slice(0,self.sheetName.length-1).forEach((_item,_index)=>{
+          _item.inspectList.forEach((p_item,p_index)=>{
+            p_item.items.forEach((itemDS,indexDS)=>{
+              if(itemDS.id!=item.id){
+                itemDS.checked=false;
+                itemDS.disabled=true;
+              }
             })
-        },
+          })
+        })
+      },
         getInspectByStore(storeId){
             let self=this;
             // self.inspectItemList=[];
@@ -3144,7 +3154,7 @@ export default {
             else{
               !self.showGuide ? self.$refs.beseyeVideo.editCount=0 : ''
               if(self.$refs.beseyeVideo!=undefined){
-                self.$refs.beseyeVideo.peerConnection ? self.$refs.beseyeVideo.stopPlay() : ''
+                self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : ''
               }
             }
             //self.editCount=0;
@@ -3340,13 +3350,16 @@ export default {
             self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
         },
         changeInspect(val){
+          console.log(val)
             let self = this;
-            if(self.isLoading || (self.videoPlatform == 1 &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+            if(self.isLoading || (self.videoPlatform == 1 &&!self.showGuide && self.$refs.ezvizVideo.isLoading)
+              || (self.videoPlatform == 2 &&!self.showGuide && self.$refs.beseyeVideo.isLoading)){
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
             //确认总结后，切换巡检表
-            if( (!self.isEzviz && self.editCount!=0) || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
+            if( (!self.isEzviz && self.editCount!=0) || (self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)
+              || (self.$store.getters.PatrolHistory!=null) || (self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.editCount != 0) ){
                 self.changeInspectObj.dialogCosed=true;
                 self.beforepatrolstore=val
             }else{
@@ -3355,7 +3368,7 @@ export default {
         },
         changeInspectList(val){
             let self = this
-            if(!self.isEzviz){
+            if(self.videoPlatform == 0){
               self.editCount=0;
               self.playState ? self.stopRealTime() : ''
             }

@@ -25,11 +25,11 @@ export default{
                     this.$store.commit('SET_TOKEN',obj.token);
                     setCookie('videoPlatform', obj.videoPlatform)
                     this.$store.commit('SET_VideoPlatform',obj.videoPlatform);
-                  if(obj.ezvizProtocol == "true"){
+                  if(obj.videoPlatform == 1){
                       this.$store.commit('SET_ISEZVIZ',true);
                       setCookie('isEzviz',true);
                     }
-                    else{
+                    else {
                       this.$store.commit('SET_ISEZVIZ',false);
                       setCookie('isEzviz',false);
                     }

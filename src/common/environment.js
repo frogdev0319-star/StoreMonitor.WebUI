@@ -18,7 +18,9 @@ let _Environments = {
   Preview: {
     //BASE_URL: 'http://13.76.227.211:8081/storemonitor/api/',
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://20.184.3.197/storemonitor/api/',
+    //GLOBAL_WEBSITE: 'http://20.184.3.197/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://preview-inspect.storevue.com/storemonitor/api/',
+   // GLOBAL_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     USHOP_URL: 'https://preview.ushop-plus.com/',
     POST_URL: 'http://preview-pos.ushop-plus.com/',
     VERSION: version,
@@ -44,7 +46,7 @@ let _Environments = {
 }
 
 let environJSON = _Environments.Preview;
-let isGlobalWebsite = false;
+let isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {

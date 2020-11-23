@@ -139,7 +139,7 @@ const user={
                         commit('SET_ACCOUNTID',accountId);
                         setCookie('videoPlatform',res.data.videoPlatform)
                         commit('SET_VideoPlatform', res.data.videoPlatform)
-                        if(res.data.ezvizProtocol){
+                        if(res.data.videoPlatform == 1){
                             commit('SET_ISEZVIZ', true)
                             setCookie('isEzviz', true)
                           }

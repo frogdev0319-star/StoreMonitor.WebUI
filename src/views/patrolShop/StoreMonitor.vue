@@ -723,6 +723,7 @@ export default {
         },
         videoPlatform(){
           let self = this;
+          console.log(self.$store.state.user);
           return self.$store.state.user.videoPlatform
         }
     },
@@ -1468,7 +1469,7 @@ export default {
                 self.timeid=null;
                 self.timeid=0;
             }
-            if(!self.isEzviz){
+            if(self.videoPlatform == 0){
               if(self.playState){  //切换时间的时候判断当前视频是否在播放
                 self.stopAndPlayHistoryVideo();
               }
@@ -1476,10 +1477,15 @@ export default {
                 self.playHistoryVideo();
               }
             }
-            else{
+            else if(self.videoPlatform == 1){
               console.log('ezviz')
               self.changeFlag = false
               self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
+            }
+            else{
+              console.log('beseye')
+              self.changeFlag = false
+              self.$refs.beseyeVideo.changeHistoryTime(self.playBackTime);
             }
         },
         afterCurDate(sindex,item){
@@ -2704,7 +2710,7 @@ export default {
             self.hideLast=false;
             self.hideNext=false;
             //切换门店时暂停播放之前播放的视频，并自动播放当前门店下第一个通道的视频
-            if(!self.isEzviz){
+            if(self.videoPlatform == 0){
               if(self.playState){
                 self.stopRealTime();
               }
@@ -2718,6 +2724,7 @@ export default {
             }
             else{
               if(self.$refs.beseyeVideo.playState){
+                self.$refs.beseyeVideo.beseyeVideo2 && (self.$refs.beseyeVideo.beseyeVideo2.style.display = 'none')
                 self.$refs.beseyeVideo.stopPlay();
               }
             }
@@ -3028,7 +3035,7 @@ export default {
             self.curYear=new Date().getFullYear();
             self.curMonth=new Date().getMonth()+1;
             self.getWeekDay();
-            if(!self.isEzviz){
+            if(self.videoPlatform == 0){
               if(self.store.storeId!=undefined){
                 if(self.playState){
                   self.stopAndRealTime();
@@ -3038,11 +3045,17 @@ export default {
                 }
               }
             }
-            else{
+            else if(self.videoPlatform == 1){
               //萤石云
               self.playBackTime = 0;
               self.$nextTick(()=>{
                 self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
+              })
+            }
+            else{
+              self.playBackTime = 0;
+              self.$nextTick(()=>{
+                self.$refs.beseyeVideo.changeHistoryTime(self.playBackTime);
               })
             }
         },
@@ -3055,7 +3068,7 @@ export default {
         self.curYear=new Date().getFullYear();
         self.curMonth=new Date().getMonth()+1;
         self.getWeekDay();
-        if(!self.isEzviz){
+        if(self.videoPlatform == 0){
           if(self.store.storeId!=undefined){
             if(self.playState){
               self.stopAndRealTime();
@@ -3065,8 +3078,20 @@ export default {
             }
           }
         }
+        else if(self.videoPlatform == 2){
+          //beseye
+          if(self.store.storeId!=undefined){
+            if(self.$refs.beseyeVideo.playState){
+              self.stopPlay();
+              self.startPlay()
+            }
+            else{
+              self.startPlay();
+            }
+          }
+        }
         else{
-          //萤石云
+          //ezviz
         }
       },
         forWard(){

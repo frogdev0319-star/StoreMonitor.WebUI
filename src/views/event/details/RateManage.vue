@@ -507,19 +507,27 @@ export default {
             self.playState=false;
         },
         closeRealTime(){
-            let self=this;
-            if(!self.isEzviz){
+          let self=this;
+          switch (self.videoPlatform) {
+            case 0:{
               if(self.playState){
                 self.stopRealTime();
               }
               self.previewplayer.dispose();
+              break
             }
-            else if(self.videoPlatform == 1){
+            case 1:{
               self.$refs.ezvizVideo.stopRealTime();
+              break
             }
-            else{
+            case 2:{
               self.$refs.beseyeVideo.stopPlay();
+              break
             }
+            default:{
+              break
+            }
+          }
         },
         async stopRealTime(){
             let self=this;
@@ -770,11 +778,25 @@ export default {
             if(index != undefined){
               self.curChannel = item
             }
-            if(!self.isEzviz){
-              self.realTime();
-            }
-            else{
-              self.channelInfo = self.curChannel
+            switch (self.videoPlatform) {
+              case 0:{
+                self.realTime();
+                break
+              }
+              case 1:{
+                self.channelInfo = self.curChannel
+                break
+              }
+              case 2:{
+                self.channelInfo = self.curChannel
+                self.$nextTick(()=>{
+                  self.$refs.beseyeVideo.startPlay()
+                })
+                break
+              }
+              default:{
+                break
+              }
             }
         },
         getCommentList(e){
@@ -1045,7 +1067,7 @@ export default {
           self.curChannel = channel[0];
           self.dialogFormVisible=true;
           self.channelRadio = ''
-          if(!self.isEzviz){
+          if(self.videoPlatform == 0){
             self.realTime();
           }
           else{
