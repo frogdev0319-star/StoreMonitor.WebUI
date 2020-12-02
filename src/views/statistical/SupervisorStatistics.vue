@@ -1,64 +1,62 @@
 <template>
   <div>
-    <div class="item-container"  :style="ispdf?'min-height:100vh;':''">
+    <div :style="ispdf?'min-height:100vh;':''" class="item-container">
       <el-col :span="24" class="statistics-header">
         <div class="header-details">
-          <span :class="lang== 'en'? 'en-span-class' : ''">{{$t('reportView.time')}}</span>
+          <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
           <el-date-picker
             ref="datePicker"
             v-model="dateValue"
+            :clearable="false"
+            :editable="false"
+            :popper-class="poperClass"
+            :picker-options="dateOpt"
+            :default-time="['00:00:00', '23:59:59']"
             type="daterange"
             range-separator="-"
             size="mini"
-            :clearable=false
-            :editable=false
             format="yyyy/MM/dd"
             class="date-range"
-            :popper-class="poperClass"
-            :picker-options='dateOpt'
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            @change="dateChange"
-            :default-time="['00:00:00', '23:59:59']"
             unlink-panels
-          >
-          </el-date-picker>
-          <el-tooltip class="item" effect="dark"
-                      placement="right">
-            <div slot="content">{{$t('overview.dataRangeTips')}}</div>
-            <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
+            @change="dateChange"
+          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            placement="right">
+            <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
+            <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
           </el-tooltip>
         </div>
         <div class="header-mul-select">
-          <span class="mul-label">{{$t('scheduleView.InspectPerson')}}</span>
-          <el-select v-model="ModelPost"  placeholder="请选择" size="mini" class="el-province" @change="searchData">
+          <span class="mul-label">{{ $t('scheduleView.InspectPerson') }}</span>
+          <el-select v-model="ModelPost" size="mini" class="el-province" @change="searchData">
             <el-option
               v-for="item in titleList"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
-            </el-option>
+              :value="item.value"/>
           </el-select>
-          <!-- <region-multi-select :options="titleList" :placeholder="$t('insSettingView.Inspector')" :disabled="false"
-            :inputSize="`mini`" :selected="ModelPost" @changeInput="changeSelect(arguments)" :all="$t('reportView.all')"></region-multi-select> -->
         </div>
       </el-col>
       <el-col :span="24" class="items-content">
         <el-col :span="24" class="contents-container">
           <el-col :span="24" class="items-title">
-            <span class="title">{{$t('overview.patrolList')}}</span>
+            <span class="title">{{ $t('overview.patrolList') }}</span>
             <div class="exprotBtn">
-              <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" style="vertical-align: middle;">
+              <el-button :class="lang=='en' ? 'en-export-btn':'export-btn'" type="primary" size="mini" style="vertical-align: middle;"
+                         @click="export2Excel">
                 <div class="btn-area">
                   <!-- <i class="iconfont icon-excel"></i> -->
                   <img :src="exportPng" class="icon-excel">
-                  <span class="spanClass">{{$t('eventView.exportReport')}}</span>
+                  <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
                 </div>
               </el-button>
-              <el-button type="primary" size="mini" :class="lang==='en'? 'en-export-btn':'export-btn' " @click="handleDown()" style="vertical-align: middle;">
+              <el-button :class="lang === 'en'? 'en-export-btn':'export-btn' " type="primary" size="mini" style="vertical-align: middle;"
+                         @click="handleDown()">
                 <div class="btn-area">
-                  <i class="iconfont icon-pdf"></i>
-                  <span class="spanClass">{{$t('reportView.InspectionDetail')}}</span>
+                  <i class="iconfont icon-pdf"/>
+                  <span class="spanClass">{{ $t('remotePatrol.InspectionDetail') }}</span>
                 </div>
               </el-button>
             </div>
@@ -69,61 +67,72 @@
                 <el-table
                   :data="supervisorTableData"
                   :highlight-current-row="true"
-                  empty-text='无数据'
-                  align='left'
-                  stripe
-                  @sort-change='sortChange'
                   :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
+                  :header-cell-class-name="headerClass"
+                  :cell-class-name="cellClass"
+                  :row-key="getRowKeys"
+                  :expand-row-keys="expands"
+                  :row-class-name="rowClass"
+                  empty-text="无数据"
+                  align="left"
+                  stripe
                   border
                   style="width: 100%"
-                  :header-cell-class-name="headerClass"
                   size="mini"
-                  :cell-class-name="cellClass"
-                  :row-key='getRowKeys'
-                  :expand-row-keys="expands"
+                  @sort-change="sortChange"
                   @expand-change="expandSelect"
-                  :row-class-name="rowClass"
                 >
-                  <el-table-column v-for="(_item,_index) in supervisorInfoData" :key="_index"
-                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.width : _item.maxWidth">
-                  </el-table-column>
-                  <el-table-column type="expand" :label="$t('overview.detail')" :width="lang!=='en'? 100: 120">
+                  <el-table-column
+                    v-for="(_item,_index) in supervisorInfoData"
+                    :key="_index"
+                    :prop="_item.prop"
+                    :label="_item.label"
+                    :sortable="_item.sortable"
+                    :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
+                  <el-table-column :label="$t('overview.detail')" :width="lang!=='en'? 100: 120" type="expand">
                     <template slot-scope="props">
                       <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="patrolPlan">
                           <el-table
                             :data="planTableData"
                             :highlight-current-row="true"
-                            align='left'
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                            align="left"
                             stripe
                             border
                             style="width: 100%"
                             size="mini"
-                            :header-cell-class-name="insideHeaderClass"
-                            :row-class-name="insideRowClass"
-                            :cell-class-name="insideCellClass"
                           >
-                            <el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"
-                                            :prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">
-                            </el-table-column>
+                            <el-table-column
+                              v-for="(_item,_index) in planTableInfo"
+                              :key="_index"
+                              :prop="_item.prop"
+                              :label="_item.label"
+                              :class-name="_item.className"
+                              :min-width="_item.width"/>
                           </el-table>
                         </el-tab-pane>
                         <el-tab-pane :label="$t('overview.patrolExecution')" name="planImplementation">
                           <el-table
                             :data="implementTableData"
                             :highlight-current-row="true"
-                            align='left'
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                            align="left"
                             stripe
                             border
                             style="width: 100%"
                             size="mini"
-                            :header-cell-class-name="insideHeaderClass"
-                            :row-class-name="insideRowClass"
-                            :cell-class-name="insideCellClass"
                           >
-                            <el-table-column v-for="(_item,_index) in implementTableInfo" :key="_index"
-                                            :prop="_item.prop" :label="_item.label" :min-width="_item.width">
-                            </el-table-column>
+                            <el-table-column
+                              v-for="(_item,_index) in implementTableInfo"
+                              :key="_index"
+                              :prop="_item.prop"
+                              :label="_item.label"
+                              :min-width="_item.width"/>
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
@@ -132,55 +141,59 @@
 
                   <div slot="empty">
                     <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"></i>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                      <i class="iconfont icon-zhengque empty-data-icon"/>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{ $t('overview.noData') }}</span>
                     </div>
                   </div>
                 </el-table>
               </div>
               <div class="toolbar pagination clearfix">
-                <el-pagination background small
-                              :page-sizes="[10, 20, 50, 100]"
-                              @size-change="sizeChange"
-                              @current-change="currentChange"
-                              :current-page="page"
-                              layout="jumper,total, prev, pager, next,sizes"
-                              :page-size="sizeNum" :total="total">
-                </el-pagination>
+                <el-pagination
+                  :page-sizes="[10, 20, 50, 100]"
+                  :current-page="page"
+                  :page-size="sizeNum"
+                  :total="total"
+                  background
+                  small
+                  layout="jumper,total, prev, pager, next,sizes"
+                  @size-change="sizeChange"
+                  @current-change="currentChange"/>
               </div>
             </div>
           </el-col>
         </el-col>
       </el-col>
-      <el-dialog :title="$t('insSettingView.export')"
-      :visible.sync="ispdf" v-if="ispdf"
-      :append-to-body='true'
-      :close-on-click-modal="false"
-      class="LoadDialog"
-      width="510px"
-      top="35vh"
-      left="40vh">
-          <div style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;"/>
-              <p style="margin-top:40px;color:#000;">{{$t('insSettingView.isExportPDF')}}......</p>
-          </div>
+      <el-dialog
+        v-if="ispdf"
+        :title="$t('insSettingView.export')"
+        :visible.sync="ispdf"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        class="LoadDialog"
+        width="510px"
+        top="35vh"
+        left="40vh">
+        <div style="overflow:hidden;width:100%;">
+          <hr style="border: 0.5px solid #dfe2e9;">
+          <p style="margin-top:40px;color:#000;">{{ $t('insSettingView.isExportPDF') }}......</p>
+        </div>
       </el-dialog>
     </div>
-    <div class="item-container" v-if="ispdf">
-      <el-col :span="24" class="items-content"  id="pdfDom" ref="printPDF" style="padding:40px 20px;width:1150px;">
+    <div v-if="ispdf" class="item-container">
+      <el-col id="pdfDom" ref="printPDF" :span="24" class="items-content" style="padding:40px 20px;width:1150px;">
         <div :span="24" class="export-header">
           <p>
-            <span>{{$t('reportView.time')}}：</span>
-            <span class="content-header">{{storeDateValue}}</span>
+            <span>{{ $t('remotePatrol.time') }}：</span>
+            <span class="content-header">{{ storeDateValue }}</span>
           </p>
           <p>
-            <span>{{$t('scheduleView.InspectPerson')}}：</span>
-            <span class="content-header">{{ModelPostpdf}}</span>
+            <span>{{ $t('scheduleView.InspectPerson') }}：</span>
+            <span class="content-header">{{ ModelPostpdf }}</span>
           </p>
         </div>
         <el-col :span="24" class="contents-container" style="border-top:1px solid #e3e9f4;">
           <el-col :span="24" class="items-title" style="padding:20px 0;">
-            <span class="title">{{$t('overview.patrolList')}}</span>
+            <span class="title">{{ $t('overview.patrolList') }}</span>
           </el-col>
           <el-col :span="24" class="items-table" style="padding-bottom:20px;">
             <div class="table">
@@ -188,63 +201,74 @@
                 <el-table
                   :data="elPDFtableData"
                   :highlight-current-row="true"
-                  empty-text='无数据'
-                  align='left'
-                  stripe
-                  @sort-change='sortChange'
                   :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
+                  :header-cell-class-name="headerClass"
+                  :cell-class-name="cellClass"
+                  :row-key="getRowKeys"
+                  :row-class-name="rowClass"
+                  empty-text="无数据"
+                  align="left"
+                  stripe
                   border
                   style="width: 100%"
-                  :header-cell-class-name="headerClass"
                   size="mini"
-                  :cell-class-name="cellClass"
                   default-expand-all
-                  :row-key='getRowKeys'
+                  @sort-change="sortChange"
                   @expand-change="expandSelect"
-                  :row-class-name="rowClass"
                 >
-                  <el-table-column v-for="(_item,_index) in supervisorInfoData" :key="_index"
-                                  :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth">
-                  </el-table-column>
-                  <el-table-column type="expand" :label="$t('overview.detail')" width="100px">
+                  <el-table-column
+                    v-for="(_item,_index) in supervisorInfoData"
+                    :key="_index"
+                    :prop="_item.prop"
+                    :label="_item.label"
+                    :sortable="_item.sortable"
+                    :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth"/>
+                  <el-table-column :label="$t('overview.detail')" type="expand" width="100px">
                     <template slot-scope="scope">
                       <el-tabs v-model="activePDFFirst" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="First">
                           <el-table
                             :data="scope.row.planTableData"
                             :highlight-current-row="true"
-                            align='left'
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                            align="left"
                             stripe
                             border
                             style="width: 100%"
                             size="mini"
-                            :header-cell-class-name="insideHeaderClass"
-                            :row-class-name="insideRowClass"
-                            :cell-class-name="insideCellClass"
                           >
-                            <el-table-column v-for="(_item,_index) in planTableInfo" :key="_index"
-                                            :prop="_item.prop" :label="_item.label" :class-name="_item.className" :min-width="_item.width">
-                            </el-table-column>
+                            <el-table-column
+                              v-for="(_item,_index) in planTableInfo"
+                              :key="_index"
+                              :prop="_item.prop"
+                              :label="_item.label"
+                              :class-name="_item.className"
+                              :min-width="_item.width"/>
                           </el-table>
                         </el-tab-pane>
-                        </el-tabs>
-                        <el-tabs v-model="activePDFSecond" @tab-click="handleClick">
+                      </el-tabs>
+                      <el-tabs v-model="activePDFSecond" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolExecution')" name="Second">
                           <el-table
                             :data="scope.row.implementTableData"
                             :highlight-current-row="true"
-                            align='left'
+                            :header-cell-class-name="insideHeaderClass"
+                            :row-class-name="insideRowClass"
+                            :cell-class-name="insideCellClass"
+                            align="left"
                             stripe
                             border
                             style="width: 100%"
                             size="mini"
-                            :header-cell-class-name="insideHeaderClass"
-                            :row-class-name="insideRowClass"
-                            :cell-class-name="insideCellClass"
                           >
-                            <el-table-column v-for="(_item,_index) in implementTableInfo" :key="_index"
-                                            :prop="_item.prop" :label="_item.label" :min-width="_item.width">
-                            </el-table-column>
+                            <el-table-column
+                              v-for="(_item,_index) in implementTableInfo"
+                              :key="_index"
+                              :prop="_item.prop"
+                              :label="_item.label"
+                              :min-width="_item.width"/>
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
@@ -253,8 +277,10 @@
 
                   <div slot="empty">
                     <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"></i>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{$t('overview.noData')}}</span>
+                      <i class="iconfont icon-zhengque empty-data-icon"/>
+                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
+                        {{ $t('overview.noData') }}
+                      </span>
                     </div>
                   </div>
                 </el-table>
@@ -268,781 +294,765 @@
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
-  import {getStoreList,getBriefStoreList} from '@/api/store'
-  import util from '../../common/util.js'
-  import {Message} from 'element-ui'
-  import RegionMultiSelect from "@/components/RegionMultiSelect";
-  import {GetScheduleTaskList} from "@/api/schedule"
-  import moment from "moment"
+import { mapGetters } from 'vuex';
+import { getStoreList, getBriefStoreList } from '@/api/store';
+import util from '../../common/util.js';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
+import { GetScheduleTaskList } from '@/api/schedule';
+import {
+  getInspectStatsOverPersonV2,
+  getInspectScheduleOverview
+} from '@/api/inspectOverview';
 
-  import {
-    getInspectStatsOverPersonV2,
-    getInspectScheduleOverview
-  } from '@/api/inspectOverview'
-  export default {
-    name: "SupervisorStatistics",
-    components:{
-        RegionMultiSelect
-    },
-    data(){
-      return {
-        activePDFFirst:'First',
-        activePDFSecond:'Second',
-        dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date).endOf('d').toDate()],
-        dateOpt: {
-          disabledDate: (time) => {
-            return time.getTime() > this.$moment(new Date).endOf('d').toDate();
-          }
+export default {
+  name: 'SupervisorStatistics',
+
+  components: {
+    RegionMultiSelect
+  },
+
+  data() {
+    return {
+      activePDFFirst: 'First',
+      activePDFSecond: 'Second',
+      dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
+      dateOpt: {
+        disabledDate: (time) => {
+          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
+        }
+      },
+      timeMode: 1,
+      ispdf: false,
+      storeDateValue: '',
+      ModelPostpdf: '',
+      params: {},
+      poperClass: 'date-picker-poper',
+      exportPng: require('../../../static/img/excel.png'),
+      lang: this.$i18n.locale,
+      supervisorTableData: [],
+      titleList: [
+        {
+          label: this.$t('insSettingView.storesupervisor'),
+          value: 3
         },
-        timeMode: 1,
-        ispdf:false,
-        storeDateValue:'',
-        ModelPostpdf:'',
-        params: {},
-        poperClass: 'date-picker-poper',
-        exportPng: require('../../../static/img/icon_excel.png'),
-        lang: this.$i18n.locale,
-        supervisorTableData:[],
-        titleList:[
-          {
-           label:this.$t('insSettingView.storesupervisor'),
-           value:3
-           },
-           {
-           label:this.$t('insSettingView.storesuperManage'),
-           value:4
-           }
-        ],
-        ModelPost:3,
-        supervisorInfoData:[
-          {
-            "prop": "supervisorName",
-            "label": this.$t('scheduleView.InspectPerson'),
-            "sortable":false,
-            "pdfwidth": '15%',
-            "pdfmaxWidth": '17%',
-            "width": 232,
-            "maxWidth": 232,
-          },
-          {
-            "prop":"numOfStores",
-            "label": this.$t('overview.storeNum'),
-            "sortable":'custom',
-            "pdfwidth": '15%',
-            "pdfmaxWidth": '17%',
-            "width": 227,
-            "maxWidth": 227,
-          },
-          {
-            "prop":"numOfTasked",
-            "label": this.$t('overview.scheduleNum'),
-            "sortable":'custom',
-            "pdfwidth": '15%',
-            "pdfmaxWidth": '16%',
-            "width": 227,
-            "maxWidth": 210,
-          },
-          {
-            "prop": "numOfCompleted",
-            "label": this.$t('overview.inscheduleNum'),
-            "sortable":'custom',
-            "pdfwidth": '15%',
-            "pdfmaxWidth": '16%',
-            "width": 227,
-            "maxWidth": 220,
-          },
-          {
-            "prop":"numOfUnscheduled",
-            "label": this.$t('overview.unscheduleNum'),
-            "sortable":'custom',
-            "pdfwidth": '15%',
-            "pdfmaxWidth": '16%',
-            "width": 227,
-            "maxWidth": 220,
-          },
-          {
-            "prop":"completionRateStr",
-            "label": this.$t('overview.completeRate'),
-            "sortable":'custom',
-            "pdfwidth": '15%',
-            "pdfmaxWidth": '16%',
-            "width": 227,
-            "maxWidth": 220,
-          }
-        ],
-        total: 0,
-        page:1,
-        sizeNum: 10,
-        direction: 'asc',
-        property: 'completionRate',
-        hasNoData: false,
-        exportItmesHeader:[this.$t('scheduleView.InspectPerson'),this.$t('overview.storeNum'),this.$t('overview.scheduleNum'),this.$t('overview.inscheduleNum'),this.$t('overview.unscheduleNum'),this.$t('overview.completeRate')],
-        // exportItmesHeader: ['巡检人','管辖门店数量', '计划巡店次数', '按计划巡店次数', '计划外巡店次数', '巡店计划完成率'],
-        headerClass: 'header-class',
-        cellClass: 'cell-class',
-        activeName: 'patrolPlan',
-        planTableData: [],
-        planPDFData:[],
-        week:['Mon.','Tues.', 'Wed.','Thur.','Fri.','Sat.','Sun.'],
-        monthly:['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sept.','Oct.','Nov.','Dec.'],
-        month:['st','nd','rd','th'],
-        planTableInfo: [
-          {
-            "prop": "scheduleName",
-            "label": this.$t('scheduleView.scheduleName'),
-            "width": '13%',
-            "className": 'col1'
-          },
-          {
-            "prop": "category",
-            "label": this.$t('overview.patrolMethod'),
-            "width": '13%',
-            "className": 'col1'
-          },
-          {
-            "prop": "inspectTagName",
-            "label": this.$t('overview.patrolLists'),
-            "width": '13%',
-            "className": 'col1'
-          },
-          {
-            "prop":"appliedStores",
-            "label": this.$t('overview.patrolStore'),
-            "width": '27%',
-            "className": 'col2'
-          },
-          {
-            "prop":"schedule",
-            "label": this.$t('overview.planDes'),
-            "width": '35%',
-            "className": 'col3'
-          },
-          {
-            "prop": "mode",
-            "label": this.$t('overview.planFre'),
-            "width": '25%',
-            "className": 'col4'
-          }
-          ],
-        implementTableData: [],
-        implementPDFData:[],
-        implementTableInfo: [
-          {
-            "prop": "fromDateStr",
-            "label": this.$t('overview.patrolDate'),
-          },
-          {
-            "prop":"modeStr",
-            "label": this.$t('overview.patrolMethod'),
-          },
-          {
-            "prop":"toDateStr",
-            "label": this.$t('overview.missionValidity'),
-          },
-          {
-            "prop":"inspectTagName",
-            "label": this.$t('overview.patrolLists'),
-          },
-          {
-            "prop": "completedStoresStr",
-            "label": this.$t('overview.inspectedStores'),
-          },
-          {
-            "prop": "incompletedStoresStr",
-            "label": this.$t('overview.uninspectedStores'),
-          },
-          {
-            "prop": "percentSchedule",
-            "label": this.$t('overview.taskPerformance'),
-          }
-        ],
-        expands: [],
-        rowClass: 'row-class',
-        insideCellClass: 'inside-cell-class',
-        insideHeaderClass: 'inside-header-class',
-        insideRowClass: 'inside-row-class',
-        elPDFtableData:[],
-        htmlTitle:this.$t("overview.htmltopdfC")
-      }
-    },
-    computed:{
-      ...mapGetters({accountChanged:'accountChanged'})
-    },
-    watch:{
-      async accountChanged(val,oldVal){
-        console.log(val);
-        let self=this;
-        if(val!=0) {
-          let self = this;
-          self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date).endOf('d').toDate()];
-          let start = typeof(self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-          let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-          self.params.beginTs = start;
-          self.params.endTs = end;
-          self.initDaysRange();
-          self.initData();
+        {
+          label: this.$t('insSettingView.storesuperManage'),
+          value: 4
         }
-      },
-      numberOfElements(val,oldVal){
-        console.log(val);
-        console.log(oldVal);
-        let self = this;
-        if(val == 0 && self.totalElements > 0){
-          self.params.filter.page -= 1;
-          self.getEventList(self.params);
+      ],
+      ModelPost: 3,
+      supervisorInfoData: [
+        {
+          'prop': 'supervisorName',
+          'label': this.$t('scheduleView.InspectPerson'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'pdfmaxWidth': '17%',
+          'width': 232,
+          'maxWidth': 232
+        },
+        {
+          'prop': 'numOfStores',
+          'label': this.$t('overview.storeNum'),
+          'sortable': 'custom',
+          'pdfwidth': '15%',
+          'pdfmaxWidth': '17%',
+          'width': 227,
+          'maxWidth': 227
+        },
+        {
+          'prop': 'numOfTasked',
+          'label': this.$t('overview.scheduleNum'),
+          'sortable': 'custom',
+          'pdfwidth': '15%',
+          'pdfmaxWidth': '16%',
+          'width': 227,
+          'maxWidth': 210
+        },
+        {
+          'prop': 'numOfCompleted',
+          'label': this.$t('overview.inscheduleNum'),
+          'sortable': 'custom',
+          'pdfwidth': '15%',
+          'pdfmaxWidth': '16%',
+          'width': 227,
+          'maxWidth': 220
+        },
+        {
+          'prop': 'numOfUnscheduled',
+          'label': this.$t('overview.unscheduleNum'),
+          'sortable': 'custom',
+          'pdfwidth': '15%',
+          'pdfmaxWidth': '16%',
+          'width': 227,
+          'maxWidth': 220
+        },
+        {
+          'prop': 'completionRateStr',
+          'label': this.$t('overview.completeRate'),
+          'sortable': 'custom',
+          'pdfwidth': '15%',
+          'pdfmaxWidth': '16%',
+          'width': 227,
+          'maxWidth': 220
         }
-      }
-    },
-    methods:{
-      getInspectorPlan(params){
-        return new Promise((resolve, reject) => {
-          GetScheduleTaskList(params).then(res => {
-            let data = res;
-            resolve(data);
-          })
-        })
-      },
-      async handleDown(){
-        let self = this;
-        self.ispdf=true
-        self.titleList.forEach(item=>{
-          if(item.value==self.ModelPost){
-            self.ModelPostpdf=item.label
-          }
-        })
-        self.storeDateValue=self.storeDateValue=util.getDates(self.params.beginTs)+'-'+util.getDates(self.params.endTs)
-        require.ensure([], async() => {
-          if(self.total>0){
-            require.ensure([], async() => {
-              self.params.filter={
-                "page": 0,
-                "size": self.total
-              };
-              let regionResult = await self.getInspectStatsPersonInfo(self.params);
-              if (regionResult.errCode == 0) {
-                let result = regionResult.data;
-                if (result) {
-                      let dataLabel = new Array(result.content.length).fill(false);
-                      result.content.forEach(async (item,index)=>{
-                        item.completionRateStr = item.completionRate + '%'
-                        await self.getPlanDetail(item.supervisorId)
-                        item.planTableData=self.planTableData;   
-                        await self.getScheduleTaskImplementation(item.supervisorId);
-                        item.implementTableData=self.implementTableData;
-                        dataLabel[index] = true;
+      ],
+      total: 0,
+      page: 1,
+      sizeNum: 10,
+      direction: 'asc',
+      property: 'completionRate',
+      hasNoData: false,
+      exportItmesHeader: [
+        this.$t('scheduleView.InspectPerson'), this.$t('overview.storeNum'),
+        this.$t('overview.scheduleNum'), this.$t('overview.inscheduleNum'),
+        this.$t('overview.unscheduleNum'), this.$t('overview.completeRate')
+      ],
+      headerClass: 'header-class',
+      cellClass: 'cell-class',
+      activeName: 'patrolPlan',
+      planTableData: [],
+      planPDFData: [],
+      week: ['Mon.', 'Tues.', 'Wed.', 'Thur.', 'Fri.', 'Sat.', 'Sun.'],
+      monthly: ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'],
+      month: ['st', 'nd', 'rd', 'th'],
+      planTableInfo: [
+        {
+          'prop': 'scheduleName',
+          'label': this.$t('scheduleView.scheduleName'),
+          'width': '13%',
+          'className': 'col1'
+        },
+        {
+          'prop': 'category',
+          'label': this.$t('overview.patrolMethod'),
+          'width': '13%',
+          'className': 'col1'
+        },
+        {
+          'prop': 'inspectTagName',
+          'label': this.$t('overview.patrolLists'),
+          'width': '13%',
+          'className': 'col1'
+        },
+        {
+          'prop': 'appliedStores',
+          'label': this.$t('overview.patrolStore'),
+          'width': '27%',
+          'className': 'col2'
+        },
+        {
+          'prop': 'schedule',
+          'label': this.$t('overview.planDes'),
+          'width': '35%',
+          'className': 'col3'
+        },
+        {
+          'prop': 'mode',
+          'label': this.$t('overview.planFre'),
+          'width': '25%',
+          'className': 'col4'
+        }
+      ],
+      implementTableData: [],
+      implementPDFData: [],
+      implementTableInfo: [
+        {
+          'prop': 'fromDateStr',
+          'label': this.$t('overview.patrolDate')
+        },
+        {
+          'prop': 'modeStr',
+          'label': this.$t('overview.patrolMethod')
+        },
+        {
+          'prop': 'toDateStr',
+          'label': this.$t('overview.missionValidity')
+        },
+        {
+          'prop': 'inspectTagName',
+          'label': this.$t('overview.patrolLists')
+        },
+        {
+          'prop': 'completedStoresStr',
+          'label': this.$t('overview.inspectedStores')
+        },
+        {
+          'prop': 'incompletedStoresStr',
+          'label': this.$t('overview.uninspectedStores')
+        },
+        {
+          'prop': 'percentSchedule',
+          'label': this.$t('overview.taskPerformance')
+        }
+      ],
+      expands: [],
+      rowClass: 'row-class',
+      insideCellClass: 'inside-cell-class',
+      insideHeaderClass: 'inside-header-class',
+      insideRowClass: 'inside-row-class',
+      elPDFtableData: [],
+      htmlTitle: this.$t('overview.htmltopdfC')
+    };
+  },
 
-                        if(dataLabel.findIndex(p=>p ==false) == -1){
-                            new Promise(function(resolve) {
-                                self.elPDFtableData = result.content;
-                                resolve(true)
-                            }).then(function() {
-                                self.$print(self.$refs.printPDF);
-                                self.ispdf=false
-                            })
-                        }
-                      })
-                }
-              }else{
-                self.ispdf=false
-                self.notify(self.$t('insSettingView.exportFailTitle'),'warning',3000);
-                return false;
-              }
-            })
-          }else{
-            self.$print(self.$refs.printPDF);
-            setTimeout(()=>{
-              self.ispdf=false
-            },1000)
-          }
-        })
-      
-      },
-      getRowKeys(row){
-        return row.supervisorId
-      },
-      expandSelect(row, expandedRows) {
-        let self = this
-        if (expandedRows.length) {
-          self.expands = []
-          if (row) {
-            self.expands.push(row.supervisorId);
-            self.getPlanDetail()
-            self.getScheduleTaskImplementation();
-          }
-        }
-        else {
-          self.expands = []
-        }
-      },
-      sortChange(col){
-        console.log(col);
-        let self=this;
-        let column = col.column;
-        let order = col.order;
-        self.order = order;
-        let prop  = '';
-        let tempOrder = '';
-        if(order=="ascending"){
-          self.params.order={
-            "direction":"asc",
-            "property": col.column.property == 'completionRateStr' ? 'completionRate' : col.column.property
-          }
-          prop = col.column.property;
-          tempOrder =  "asc";
-        }
-        else if(order=="descending"){
-          self.params.order={
-            "direction":"desc",
-            "property": col.column.property == 'completionRateStr' ? 'completionRate' : col.column.property
-          }
-          prop = col.column.property;
-          tempOrder =  "desc";
-        }
-        else{
-          self.params.order={"direction":"asc", "property": 'completionRate'};
-        }
-        self.params.filter={
-          page:self.page-1,
-          size:self.sizeNum
-        }
-        self.getInspectPersonTable();
-      },
-      sizeChange(val){
-        let self=this;
-        self.sizeNum=val;
-        self.page=1;
-        self.params.filter={page:self.page-1,size:val};
-        self.getInspectPersonTable();
-      },
-      currentChange(val){
-        let self=this;
-        self.page = val;
-        self.params.filter={page:val-1,size:self.sizeNum};
-        self.getInspectPersonTable();
-      },
-      async getRegionInfo(){
-        let self=this;
-        let params={
-          "filter":{
-            "page":0,
-            "size":2000
-          }
-        };
-        let retData=await self.getStoreData(params);
-        let storeList=retData.data.content;
-        self.storeList=storeList;
+  computed: {
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
 
-        let getCountry=storeList=>{
-          let temp=[];
-          temp.push({label:self.$t('reportView.country'), value:''})
-          storeList.forEach(item=>{
-            if(temp.map(x=>x.value).indexOf(item.country)==-1){
-              let obj={
-                label:item.country,
-                value:item.country
-              }
-              temp.push(obj);
-            }
-          })
-          return temp;
-        }
-        let countryList=getCountry(storeList);
-        let tempStore=[];
-        storeList.forEach(item=>{
-          let obj={
-            storeId:item.storeId,
-            label:item.name,
-            value:item.name,
-            userId:item.userId,
-            userName:item.userName,
-            checked: false
-          }
-          tempStore.push(obj);
-        })
-        self.storeDataList=tempStore;
-        self.countryList=countryList;
-        self.curCountry = '中国';
-        self.selectAllProAndCity(self.curCountry);
-      },
-      getBriefStoreData(){
-          let self=this;
-          return new Promise((resolve,reject)=>{
-              getBriefStoreList().then(res=>{
-                  let errMsg=res.errMsg;
-                  if(errMsg!=undefined&&errMsg=='Success'){
-                      let data=res.data;
-                      resolve(res);
-                  }
-              }).catch(res => {
-                  resolve(res);
-              })
-          })
-      },
-      getStoreData(params){
-        let self=this;
-        return new Promise((resolve,reject)=>{
-          getStoreList(params).then(res=>{
-            let errMsg=res.errMsg;
-            if(errMsg!=undefined&&errMsg=='Success'){
-              let data=res.data;
-              resolve(res);
-            }
-          }).catch(res => {
-            resolve(res);
-          })
-        })
-      },
-      dateChange(val) {
-        let self = this;
-        console.log(val);
-        self.currentIndex = 0;
-        let start = typeof(val[0]) === 'object' ? val[0].getTime() : val[0];
-        let end = typeof(val[1]) === 'object' ? val[1].getTime() : val[1];
-        let daysDiff = self.$moment(end).diff(start, 'days');
-        if (daysDiff < 6) {  //当前选择的时间范围不到7天
-          // Message({
-          //   message: self.$t('overview.changeTimeRange'),
-          //   type: 'warning',
-          //   duration: 3 * 1000
-          // })
-          self.$message({
-            message: self.$t('overview.changeTimeRange'),
-            type:'warning',
-          })
-          start = end - 3600 * 24 * 6 * 1000;
-          start = self.$moment(start).startOf('d').toDate().valueOf();
-          self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-        }
-        if (daysDiff > 364) {  //当前选择的时间范围超过365天
-          // Message({
-          //   message: self.$t('overview.changeTimeRange'),
-          //   type: 'warning',
-          //   duration: 3 * 1000
-          // })
-          self.$message({
-            message: self.$t('overview.changeTimeRange'),
-            type:'warning',
-          })
-          start = end - 3600 * 24 * 364 * 1000;
-          start = self.$moment(start).startOf('d').toDate().valueOf();
-          self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-        }
-        else {
-          self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-        }
-        daysDiff = self.$moment(end).diff(start, 'days');
-        daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-        console.log(self.timeMode);
+  watch: {
+    async accountChanged(val) {
+      let self = this;
+      if (val !==  0) {
+        self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
+        let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
         self.initDaysRange();
-        self.searchData()
-      },
-      initDaysRange() {
-        let self = this;
-        let start = self.params.beginTs;
-        let end = self.params.endTs;
-        let startDay = self.$moment(start).format('YYYY-MM-DD');
-        let endDay = self.$moment(end).format('YYYY-MM-DD');
-        let startDayWithoutYear = self.$moment(start).format('MM/DD');
-        let endDayWithoutYear = self.$moment(end).format('MM/DD');
-        if (self.timeMode == 1) {
-          let beginDay = new Date(util.judgeStart(startDay));
-          let weekList = util.getWeek(beginDay, endDay)
-          let arrLength = weekList.length;
-          let firstEndTime = weekList[0].split('-')[1];
-          let firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-          let lastStartTime = weekList[arrLength - 1].split('-')[0];
-          let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
-          weekList.splice(0, 1, firstWeekStr);
-          weekList.splice(arrLength - 1, 1, lastWeekStr);
-          console.log(weekList);
-          self.daysRangeList = weekList;
-
-        }
-        else if (self.timeMode == 2) {
-          let monthArray = util.getMonthBetween(startDay, endDay)
-          console.log(monthArray)
-          self.daysRangeList = monthArray;
-        }
-      },
-
-      async searchData(){
-        let self = this;
-        self.params.filter={page:self.page - 1,size:self.sizeNum};
-        self.params.order = {direction: self.direction, property: self.property}
-        self.params.roleId = parseInt(self.ModelPost)
-        await self.getInspectPersonTable();
-      },
-
-      async getInspectPersonTable() {
-        let self = this;
-        let inspectItems = await self.getInspectStatsPersonInfo(self.params);
-        let errCode = inspectItems.errCode;
-
-        if (errCode == 0) {
-          let resultData = inspectItems.data;
-          console.log(resultData)
-          try {
-            let content = resultData.content;
-            content.forEach(item => {
-              item.completionRateStr = item.completionRate + '%';
-            })
-            self.supervisorTableData = resultData.content;
-            self.total = resultData.totalElements;
-            console.log(resultData.content);
-          }
-          catch (e) {
-            self.supervisorTableData = [];
-          }
-        }
-      },
-      getInspectStatsPersonInfo(params) {
-        return new Promise((resolve, reject) => {
-          getInspectStatsOverPersonV2(params).then(res => {
-            resolve(res);
-          })
-        })
-      },
-      getInspectScheduleImplemention(params){
-        return new Promise((resolve, reject) => {
-          getInspectScheduleOverview(params).then(res => {
-            resolve(res);
-          })
-        })
-      },
-      async initData(){
-        let self = this;
-        self.params.filter={page:self.page - 1,size:self.sizeNum};
-        self.params.order = {direction: self.direction, property: self.property};
-        self.params.roleId = parseInt(self.ModelPost)
-        await self.getInspectPersonTable();
-      },
-      export2Excel(){
-        var that = this;
-        if(that.supervisorTableData.length==0){
-          // Message({
-          //   message: that.$t('overview.emptyPatrolList'),
-          //   type:'warning',
-          //   duration:3*1000
-          // })
-          that.$message({
-            message: that.$t('overview.emptyPatrolList'),
-            type:'warning',
-          })
-          return false;
-        }
-        require.ensure([], async() => {
-          const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const tHeader = that.exportItmesHeader; // 导出的表头名
-          const filterVal = ['supervisorName','numOfStores','numOfTasked','numOfCompleted','numOfUnscheduled','completionRatePer']; // 导出的表头字段名
-          let self=this;
-          self.params.filter={
-            "page": 0,
-            "size": self.total
-          };
-          console.log(self.params)
-          let regionResult = await that.getInspectStatsPersonInfo(self.params);
-          let curData = [];
-          if (regionResult.errCode == 0) {
-            let result = regionResult.data;
-            if (result) {
-              result.content.forEach(item=>{
-                item.completionRatePer = item.completionRate + '%'
-              })
-              console.log(result.content)
-              curData = result.content;
-            }
-          }
-          const data = that.formatJson(filterVal, curData);
-          let fileName = 'Supervisor' +'-'+util.getCurDateStr();
-          export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
-        })
-      },
-      formatJson(filterVal, jsonData) {
-        return jsonData.map(v => filterVal.map(j => v[j]))
-      },
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
-      async getPlanDetail(e){
-        let self = this;
-        let params = {}
-        let supervisorId=''
-        if(e!=undefined){
-          supervisorId=e
-        }else{
-          supervisorId=self.expands[0]
-        }
-        params.supervisorId = supervisorId;
-        params.category = [0,1]
-        console.log(params)
-        let result = await self.getInspectorPlan(params)
-        let retData=await self.getBriefStoreData();
-        let storeList=retData.data;
-        let errCode = result.errCode;
-        if (errCode == 0) {
-          let resultData = result.data;
-          console.log(resultData)
-          resultData.forEach(item=>{
-            item.category = item.category== 0 ? self.$t('overview.remotePatrol'): self.$t('overview.onsitePatrol');
-            let scheduleStr = '';
-            let store=''
-            storeList.forEach(store_item=>{
-              item.appliedStores.forEach((app_item,app_index)=>{
-                 if(store_item.storeId==app_item){
-                    let isuu= app_index==item.appliedStores.length-1?'':',';
-                    store += store_item.name+ isuu
-                  }
-              })
-            })
-            item.appliedStores = store
-            switch(item.mode){
-              // case 0:
-              //   item.mode=self.$t('overview.superTaskmode0');
-              //   item.schedule.forEach((_item,_index)=>{
-              //     scheduleStr += _item.day + ','
-              //   })
-              //   item.schedule='每天执行'
-              //   break;
-              case 1:
-                item.mode=self.$t('overview.superTaskmode1');
-                item.schedule.forEach((_item,_index)=>{
-                  let isuu= _index==item.schedule.length-1?'':',';
-                  if(self.lang!='en'){
-                    if(_item.day==7){
-                      _item.day=self.$t('overview.superTaskmode0')
-                    }
-                    scheduleStr += self.$t('overview.weeks')+_item.day + isuu
-                  }else{
-                    scheduleStr += self.week[_item.day-1] + isuu
-                  }
-
-                })
-                if(self.lang!='en'){
-                  item.schedule=self.$t('overview.everydays') + scheduleStr + self.$t('overview.act')
-                }else{
-                  item.schedule=self.$t('overview.act') + scheduleStr + self.$t('overview.everydays')
-                }
-                break;
-              case 2:
-                item.mode=self.$t('overview.superTaskmode2');
-                item.schedule.forEach((_item,_index)=>{
-                  let isuu= _index==item.schedule.length-1?'':',';
-                  if(self.lang!='en'){
-                    scheduleStr += _item.day + self.$t('overview.daysww')+isuu
-                  }else{
-                    let idx = _item.day>3?3:_item.day-1;
-                      scheduleStr += _item.day+self.month[idx] + isuu
-                  }
-                })
-                if(self.lang!='en'){
-                  item.schedule=self.$t('overview.eachmonth') + scheduleStr + self.$t('overview.act')
-                }else{
-                  item.schedule=self.$t('overview.act') + scheduleStr + self.$t('overview.eachmonth')
-                }
-                break;
-              default:
-                item.mode=self.$t('overview.superTaskmode3');
-                item.schedule.forEach((_item,_index)=>{
-                  let days = moment('20200101').add(_item.day,'days')
-                  let isuu= _index==item.schedule.length-1?'':',';
-                  if(self.lang!='en'){
-                    scheduleStr += days.format('M') +self.$t('overview.superTaskmode2')+days.format('D')+self.$t('overview.superTaskmode0')+ isuu
-                  }else{
-                    // scheduleStr += self.monthly[_item.day-1]+_item.day+ isuu
-                    scheduleStr += days.format('LL')+' '
-                  }
-                })
-                if(self.lang!='en'){
-                  item.schedule = scheduleStr + self.$t('overview.act')
-                }else{
-                  item.schedule = self.$t('overview.act')+scheduleStr
-                }
-                break;
-            }
-          })
-          self.planTableData=resultData
-        }else{
-          self.planTableData=[]
-        }
-      },
-      async getScheduleTaskImplementation(e){
-        let self = this;
-        let params = {};
-        let supervisorId=''
-        if(e!=undefined){
-          supervisorId=e
-        }else{
-          supervisorId=self.expands[0]
-        }
-        params.beginTs = self.params.beginTs;
-        params.endTs = self.params.endTs;
-        params.supervisorId = supervisorId;
-        params.filter =  {
-           "page": 0,
-           "size": 3
-        }
-        let result = await self.getInspectScheduleImplemention(params)
-        let errCode = result.errCode;
-        if (errCode == 0) {
-          let resultData = result.data;
-          console.log(resultData)
-          try {
-            let content = resultData.content;
-            content.forEach(item => {
-              item.fromDateStr = self.$moment(item.fromDate).format('YYYY-MM-DD HH:mm:ss');
-              item.toDateStr = self.$moment(item.toDate).format('YYYY-MM-DD HH:mm:ss');
-              item.modeStr = item.mode== 0 ? self.$t('overview.remotePatrol'): self.$t('overview.onsitePatrol');
-              let completedStoresStr = '';
-              let completeStoresNum = 0;
-              completeStoresNum = item.completedStores.length;
-              item.completedStores.forEach(_item=>{
-                completedStoresStr += _item + ','
-              })
-              let incompletedStoresStr = '';
-              let incompleteStoresNum = 0;
-              incompleteStoresNum = item.incompleteStores.length;
-              item.incompleteStores.forEach(_item=>{
-                incompletedStoresStr += _item + ','
-              })
-              completedStoresStr = completedStoresStr.slice(0, completedStoresStr.length - 1)
-              incompletedStoresStr = incompletedStoresStr.slice(0, incompletedStoresStr.length - 1)
-              item.completedStoresStr = completeStoresNum==0 ? self.$t('overview.none'): completedStoresStr;
-              item.incompletedStoresStr = incompleteStoresNum==0 ? self.$t('overview.none'): incompletedStoresStr;
-              let sumStores = completeStoresNum + incompleteStoresNum;
-              let percentSchedule = 0
-              if(sumStores == 0){
-                percentSchedule = 0;
-              }
-              else{
-                let percent = completeStoresNum/sumStores * 100
-                percentSchedule = percent.toFixed(0) + '%';
-              }
-              item.percentSchedule = percentSchedule;
-            })
-            self.implementTableData = content;
-          }
-          catch (e) {
-            self.implementTableData = [];
-          }
-        }
+        self.initData();
       }
     },
-    async created(){
+    numberOfElements(val, oldVal) {
+      console.log(val);
+      console.log(oldVal);
       let self = this;
-      let start = typeof(self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-      let end = typeof(self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+      if (val === 0 && self.totalElements > 0) {
+        self.params.filter.page -= 1;
+        self.getEventList(self.params);
+      }
+    }
+  },
+
+  async created() {
+    let self = this;
+    let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+    let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+    self.params.beginTs = start;
+    self.params.endTs = end;
+    self.initDaysRange();
+    await self.initData();
+  },
+
+  methods: {
+    getInspectorPlan(params) {
+      return new Promise((resolve, reject) => {
+        GetScheduleTaskList(params).then(res => {
+          let data = res;
+          resolve(data);
+        });
+      });
+    },
+
+    async handleDown() {
+      let self = this;
+      self.ispdf = true;
+      self.titleList.forEach(item => {
+        if (item.value === self.ModelPost) {
+          self.ModelPostpdf = item.label;
+        }
+      });
+      self.storeDateValue = self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
+      require.ensure([], async() => {
+        if (self.total > 0) {
+          require.ensure([], async() => {
+            self.params.filter = {
+              'page': 0,
+              'size': self.total
+            };
+            let regionResult = await self.getInspectStatsPersonInfo(self.params);
+            if (regionResult.errCode === 0) {
+              let result = regionResult.data;
+              if (result) {
+                let dataLabel = new Array(result.content.length).fill(false);
+                result.content.forEach(async(item, index) => {
+                  item.completionRateStr = item.completionRate + '%';
+                  await self.getPlanDetail(item.supervisorId);
+                  item.planTableData = self.planTableData;
+                  await self.getScheduleTaskImplementation(item.supervisorId);
+                  item.implementTableData = self.implementTableData;
+                  dataLabel[index] = true;
+
+                  if (dataLabel.findIndex(p => p === false) === -1) {
+                    new Promise(function(resolve) {
+                      self.elPDFtableData = result.content;
+                      resolve(true);
+                    }).then(function() {
+                      self.$print(self.$refs.printPDF);
+                      self.ispdf = false;
+                    });
+                  }
+                });
+              }
+            } else {
+              self.ispdf = false;
+              self.notify(self.$t('insSettingView.exportFailTitle'), 'warning', 3000);
+              return false;
+            }
+          });
+        } else {
+          self.$print(self.$refs.printPDF);
+          setTimeout(() => {
+            self.ispdf = false;
+          }, 1000);
+        }
+      });
+    },
+
+    getRowKeys(row) {
+      return row.supervisorId;
+    },
+
+    expandSelect(row, expandedRows) {
+      let self = this;
+      if (expandedRows.length) {
+        self.expands = [];
+        if (row) {
+          self.expands.push(row.supervisorId);
+          self.getPlanDetail();
+          self.getScheduleTaskImplementation();
+        }
+      } else {
+        self.expands = [];
+      }
+    },
+
+    sortChange(col) {
+      let self = this;
+      let order = col.order;
+      self.order = order;
+      let prop = '';
+      let tempOrder = '';
+      if (order === 'ascending') {
+        self.params.order = {
+          'direction': 'asc',
+          'property': col.column.property === 'completionRateStr' ? 'completionRate' : col.column.property
+        };
+        prop = col.column.property;
+        tempOrder = 'asc';
+      } else if (order === 'descending') {
+        self.params.order = {
+          'direction': 'desc',
+          'property': col.column.property === 'completionRateStr' ? 'completionRate' : col.column.property
+        };
+        prop = col.column.property;
+        tempOrder = 'desc';
+      } else {
+        self.params.order = { 'direction': 'asc', 'property': 'completionRate' };
+      }
+      self.params.filter = {
+        page: self.page - 1,
+        size: self.sizeNum
+      };
+      self.getInspectPersonTable();
+    },
+
+    sizeChange(val) {
+      let self = this;
+      self.sizeNum = val;
+      self.page = 1;
+      self.params.filter = { page: self.page - 1, size: val };
+      self.getInspectPersonTable();
+    },
+
+    currentChange(val) {
+      let self = this;
+      self.page = val;
+      self.params.filter = { page: val - 1, size: self.sizeNum };
+      self.getInspectPersonTable();
+    },
+
+    async getRegionInfo() {
+      let self = this;
+      let params = {
+        'filter': {
+          'page': 0,
+          'size': 2000
+        }
+      };
+      let retData = await self.getStoreData(params);
+      let storeList = retData.data.content;
+      self.storeList = storeList;
+
+      let getCountry = storeList => {
+        let temp = [];
+        temp.push({ label: self.$t('remotePatrol.country'), value: '' });
+        storeList.forEach(item => {
+          if (temp.map(x => x.value).indexOf(item.country) === -1) {
+            let obj = {
+              label: item.country,
+              value: item.country
+            };
+            temp.push(obj);
+          }
+        });
+        return temp;
+      };
+      let countryList = getCountry(storeList);
+      let tempStore = [];
+      storeList.forEach(item => {
+        let obj = {
+          storeId: item.storeId,
+          label: item.name,
+          value: item.name,
+          userId: item.userId,
+          userName: item.userName,
+          checked: false
+        };
+        tempStore.push(obj);
+      });
+      self.storeDataList = tempStore;
+      self.countryList = countryList;
+      self.curCountry = '中国';
+      self.selectAllProAndCity(self.curCountry);
+    },
+
+    getBriefStoreData() {
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          let errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(res => {
+          reject(res);
+        });
+      });
+    },
+
+    getStoreData(params) {
+      return new Promise((resolve, reject) => {
+        getStoreList(params).then(res => {
+          let errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(res => {
+          reject(res);
+        });
+      });
+    },
+
+    dateChange(val) {
+      let self = this;
+      console.log(val);
+      self.currentIndex = 0;
+      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      let daysDiff = self.$moment(end).diff(start, 'days');
+      if (daysDiff < 6) {
+        self.$message({
+          message: self.$t('overview.changeTimeRange'),
+          type: 'warning'
+        });
+        start = end - 3600 * 24 * 6 * 1000;
+        start = self.$moment(start).startOf('d').toDate().valueOf();
+        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
+      }
+      if (daysDiff > 364) {
+        self.$message({
+          message: self.$t('overview.changeTimeRange'),
+          type: 'warning'
+        });
+        start = end - 3600 * 24 * 364 * 1000;
+        start = self.$moment(start).startOf('d').toDate().valueOf();
+        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
+      } else {
+        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
+      }
+      daysDiff = self.$moment(end).diff(start, 'days');
+      daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
+      console.log(self.timeMode);
       self.params.beginTs = start;
       self.params.endTs = end;
       self.initDaysRange();
-      await self.initData();
+      self.searchData();
     },
-    mounted(){
+
+    initDaysRange() {
       let self = this;
+      let start = self.params.beginTs;
+      let end = self.params.endTs;
+      let startDay = self.$moment(start).format('YYYY-MM-DD');
+      let endDay = self.$moment(end).format('YYYY-MM-DD');
+      let startDayWithoutYear = self.$moment(start).format('MM/DD');
+      let endDayWithoutYear = self.$moment(end).format('MM/DD');
+      if (self.timeMode === 1) {
+        let beginDay = new Date(util.judgeStart(startDay));
+        let weekList = util.getWeek(beginDay, endDay);
+        let arrLength = weekList.length;
+        let firstEndTime = weekList[0].split('-')[1];
+        let firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
+        let lastStartTime = weekList[arrLength - 1].split('-')[0];
+        let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
+        weekList.splice(0, 1, firstWeekStr);
+        weekList.splice(arrLength - 1, 1, lastWeekStr);
+        console.log(weekList);
+        self.daysRangeList = weekList;
+      } else if (self.timeMode === 2) {
+        let monthArray = util.getMonthBetween(startDay, endDay);
+        console.log(monthArray);
+        self.daysRangeList = monthArray;
+      }
     },
+
+    async searchData() {
+      let self = this;
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.params.order = { direction: self.direction, property: self.property };
+      self.params.roleId = parseInt(self.ModelPost);
+      await self.getInspectPersonTable();
+    },
+
+    async getInspectPersonTable() {
+      let self = this;
+      let inspectItems = await self.getInspectStatsPersonInfo(self.params);
+      let errCode = inspectItems.errCode;
+
+      if (errCode === 0) {
+        let resultData = inspectItems.data;
+        console.log(resultData);
+        try {
+          let content = resultData.content;
+          content.forEach(item => {
+            item.completionRateStr = item.completionRate + '%';
+          });
+          self.supervisorTableData = resultData.content;
+          self.total = resultData.totalElements;
+          console.log(resultData.content);
+        } catch (e) {
+          self.supervisorTableData = [];
+        }
+      }
+    },
+
+    getInspectStatsPersonInfo(params) {
+      return new Promise((resolve, reject) => {
+        getInspectStatsOverPersonV2(params).then(res => {
+          resolve(res);
+        });
+      });
+    },
+
+    getInspectScheduleImplemention(params) {
+      return new Promise((resolve, reject) => {
+        getInspectScheduleOverview(params).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err)
+        });
+      })
+    },
+
+    async initData() {
+      let self = this;
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.params.order = { direction: self.direction, property: self.property };
+      self.params.roleId = parseInt(self.ModelPost);
+      await self.getInspectPersonTable();
+    },
+
+    export2Excel() {
+      let that = this;
+      if (that.supervisorTableData.length === 0) {
+        that.$message({
+          message: that.$t('overview.emptyPatrolList'),
+          type: 'warning'
+        });
+        return false;
+      }
+      require.ensure([], async() => {
+        let { export_json_to_excel } = require('@/excel/Export2Excel');
+        let tHeader = that.exportItmesHeader;
+        let filterVal = ['supervisorName', 'numOfStores', 'numOfTasked', 'numOfCompleted', 'numOfUnscheduled', 'completionRatePer'];
+        let self = this;
+        self.params.filter = {
+          'page': 0,
+          'size': self.total
+        };
+        console.log(self.params);
+        let regionResult = await that.getInspectStatsPersonInfo(self.params);
+        let curData = [];
+        if (regionResult.errCode === 0) {
+          let result = regionResult.data;
+          if (result) {
+            result.content.forEach(item => {
+              item.completionRatePer = item.completionRate + '%';
+            });
+            console.log(result.content);
+            curData = result.content;
+          }
+        }
+        let data = that.formatJson(filterVal, curData);
+        let fileName = 'Supervisor' + '-' + util.getCurDateStr();
+        export_json_to_excel(tHeader, data, fileName);
+      });
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
+
+    async getPlanDetail(e) {
+      let self = this;
+      let params = {};
+      let supervisorId = '';
+      if (e != undefined) {
+        supervisorId = e;
+      } else {
+        supervisorId = self.expands[0];
+      }
+      params.supervisorId = supervisorId;
+      params.category = [0, 1];
+      console.log(params);
+      let result = await self.getInspectorPlan(params);
+      let retData = await self.getBriefStoreData();
+      let storeList = retData.data;
+      let errCode = result.errCode;
+      if (errCode === 0) {
+        let resultData = result.data;
+        console.log(resultData);
+        resultData.forEach(item => {
+          item.category = item.category === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol');
+          let scheduleStr = '';
+          let store = '';
+          storeList.forEach(store_item => {
+            item.appliedStores.forEach((app_item, app_index) => {
+              if (store_item.storeId === app_item) {
+                let isuu = app_index === item.appliedStores.length - 1 ? '' : ',';
+                store += store_item.name + isuu;
+              }
+            });
+          });
+          item.appliedStores = store;
+          switch (item.mode) {
+            case 1:
+              item.mode = self.$t('overview.superTaskmode1');
+              item.schedule.forEach((_item, _index) => {
+                let isuu = _index === item.schedule.length - 1 ? '' : ',';
+                if (self.lang !== 'en') {
+                  if (_item.day === 7) {
+                    _item.day = self.$t('overview.superTaskmode0');
+                  }
+                  scheduleStr += self.$t('overview.weeks') + _item.day + isuu;
+                } else {
+                  scheduleStr += self.week[_item.day - 1] + isuu;
+                }
+              });
+              if (self.lang !== 'en') {
+                item.schedule = self.$t('overview.everydays') + scheduleStr + self.$t('overview.act');
+              } else {
+                item.schedule = self.$t('overview.act') + scheduleStr + self.$t('overview.everydays');
+              }
+              break;
+            case 2:
+              item.mode = self.$t('overview.superTaskmode2');
+              item.schedule.forEach((_item, _index) => {
+                let isuu = _index === item.schedule.length - 1 ? '' : ',';
+                if (self.lang !== 'en') {
+                  scheduleStr += _item.day + self.$t('overview.daysww') + isuu;
+                } else {
+                  let idx = _item.day > 3 ? 3 : _item.day - 1;
+                  scheduleStr += _item.day + self.month[idx] + isuu;
+                }
+              });
+              if (self.lang !== 'en') {
+                item.schedule = self.$t('overview.eachmonth') + scheduleStr + self.$t('overview.act');
+              } else {
+                item.schedule = self.$t('overview.act') + scheduleStr + self.$t('overview.eachmonth');
+              }
+              break;
+            default:
+              item.mode = self.$t('overview.superTaskmode3');
+              item.schedule.forEach((_item, _index) => {
+                let days = moment('20200101').add(_item.day, 'days');
+                let isuu = _index === item.schedule.length - 1 ? '' : ',';
+                if (self.lang !== 'en') {
+                  scheduleStr += days.format('M') + self.$t('overview.superTaskmode2') + days.format('D') + self.$t('overview.superTaskmode0') + isuu;
+                } else {
+                  scheduleStr += days.format('LL') + ' ';
+                }
+              });
+              if (self.lang !== 'en') {
+                item.schedule = scheduleStr + self.$t('overview.act');
+              } else {
+                item.schedule = self.$t('overview.act') + scheduleStr;
+              }
+              break;
+          }
+        });
+        self.planTableData = resultData;
+      } else {
+        self.planTableData = [];
+      }
+    },
+
+    async getScheduleTaskImplementation(e) {
+      let self = this;
+      let params = {};
+      let supervisorId = '';
+      if (e != undefined) {
+        supervisorId = e;
+      } else {
+        supervisorId = self.expands[0];
+      }
+      params.beginTs = self.params.beginTs;
+      params.endTs = self.params.endTs;
+      params.supervisorId = supervisorId;
+      params.filter = {
+        'page': 0,
+        'size': 3
+      };
+      let result = await self.getInspectScheduleImplemention(params);
+      let errCode = result.errCode;
+      if (errCode === 0) {
+        let resultData = result.data;
+        console.log(resultData);
+        try {
+          let content = resultData.content;
+          content.forEach(item => {
+            item.fromDateStr = self.$moment(item.fromDate).format('YYYY-MM-DD HH:mm:ss');
+            item.toDateStr = self.$moment(item.toDate).format('YYYY-MM-DD HH:mm:ss');
+            item.modeStr = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol');
+            let completedStoresStr = '';
+            let completeStoresNum = 0;
+            completeStoresNum = item.completedStores.length;
+            item.completedStores.forEach(_item => {
+              completedStoresStr += _item + ',';
+            });
+            let incompletedStoresStr = '';
+            let incompleteStoresNum = 0;
+            incompleteStoresNum = item.incompleteStores.length;
+            item.incompleteStores.forEach(_item => {
+              incompletedStoresStr += _item + ',';
+            });
+            completedStoresStr = completedStoresStr.slice(0, completedStoresStr.length - 1);
+            incompletedStoresStr = incompletedStoresStr.slice(0, incompletedStoresStr.length - 1);
+            item.completedStoresStr = completeStoresNum === 0 ? self.$t('overview.none') : completedStoresStr;
+            item.incompletedStoresStr = incompleteStoresNum === 0 ? self.$t('overview.none') : incompletedStoresStr;
+            let sumStores = completeStoresNum + incompleteStoresNum;
+            let percentSchedule = 0;
+            if (sumStores === 0) {
+              percentSchedule = 0;
+            } else {
+              let percent = completeStoresNum / sumStores * 100;
+              percentSchedule = percent.toFixed(0) + '%';
+            }
+            item.percentSchedule = percentSchedule;
+          });
+          self.implementTableData = content;
+        } catch (e) {
+          self.implementTableData = [];
+        }
+      }
+    }
+
   }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -1116,11 +1126,6 @@
         @media screen and(max-width: 1366px){
           .en-span-class{
             margin-right: 60px;
-          }
-        }
-        @media screen and(min-width: 1366px){
-          .en-span-class{
-            //margin-right: 75px;
           }
         }
         .el-province{
