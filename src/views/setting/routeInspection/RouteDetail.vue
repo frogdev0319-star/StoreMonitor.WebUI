@@ -1,697 +1,693 @@
 <template>
-    <div class="detail-container">
-        <el-row>
-            <el-col :span="24" class="detail-title">
-                <div class="table-right-post" @click="setItem">
-                    <!-- <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{generateInsSettingLang('contains')}}{{typeNum}} {{generateInsSettingLang('group')}},
-                        {{itemNum}} {{generateInsSettingLang('item')}}</span> -->
-                    <i class="iconfont icon-quxiaolianjie"></i>
-                    <span class="post-label">{{$t('insSettingView.relationDuty')}}:</span>
-                    <span class="post-concent">{{routeData[0].ModelPost}}</span>
-                </div>
-                <div class="route-btns">
-                     <el-button
-                        :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
-                        @click="deleteNapes"
-                        size="mini" :disabled="routeData.length==0">
-                       <i class="iconfont icon-shanchu"></i>
-                       <span>{{generateInsSettingLang('deleteItem')}}</span>
-                    </el-button>
-                     <el-button
-                        :class="lang=='en'? 'en-el-set-btn':'el-set-btn'" class="btn-class"
-                        @click="setItem"
-                        type="primary"
-                        size="mini" :disabled="routeData.length==0">
-                        <i class="iconfont icon-button"></i>
-                        <span>{{generateInsSettingLang('setItem')}}</span>
-                    </el-button>
-                </div>
-                <el-dialog :title="generateInsSettingLang('confirmDelete')"
-                :visible.sync="showDeleteContent" v-if="showDeleteContent"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                width="28%"
-                top="35vh"
-                left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
-                            <span style="display: inline-block; vertical-align: middle;">{{generateInsSettingLang('confirmSelecDel')}}</span>
-                        </p>
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showDeleteContent = false" size="mini">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmDelete" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
-                    </div>
-                </el-dialog>
+  <div class="detail-container">
+    <el-row>
+      <el-col :span="24" class="detail-title">
+        <div class="table-right-post" @click="setItem">
+          <i class="iconfont icon-quxiaolianjie"/>
+          <span class="post-label">{{ $t('insSettingView.relationDuty') }}:</span>
+          <span class="post-concent">{{ routeData[0].ModelPost }}</span>
+        </div>
+        <div class="route-btns">
+          <el-button
+            :class=" lang === 'en' ? 'en-el-delete-btn':'el-delete-btn'"
+            :disabled="routeData.length === 0"
+            class="btn-class"
+            size="mini"
+            @click="deleteNapes">
+            <i class="iconfont icon-shanchu"/>
+            <span>{{ $t('insSettingView.deleteItem') }}</span>
+          </el-button>
+          <el-button
+            :class="lang === 'en' ? 'en-el-set-btn' : 'el-set-btn'"
+            :disabled="routeData.length === 0"
+            class="btn-class"
+            type="primary"
+            size="mini"
+            @click="setItem">
+            <i class="iconfont icon-button"></i>
+            <span>{{ $t('insSettingView.setItem') }}</span>
+          </el-button>
+        </div>
+        <el-dialog
+          v-if="showDeleteContent"
+          :title="$t('insSettingView.confirmDelete')"
+          :visible.sync="showDeleteContent"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
+              <span style="display: inline-block; vertical-align: middle;">{{ $t('insSettingView.confirmSelecDel') }}</span>
+            </p>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" @click="showDeleteContent = false">
+              {{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">
+              {{ $t('insSettingView.confirm') }}</el-button>
+          </div>
+        </el-dialog>
 
-                <el-dialog :title="generateInsSettingLang('confirmDelete')"
-                :visible.sync="showSingleDeleteContent" v-if="showSingleDeleteContent"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                width="28%"
-                top="35vh"
-                left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
-                            <span style="display: inline-block; vertical-align: middle;" >{{generateInsSettingLang('confirmCurDel')}}</span>
-                        </p>
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showSingleDeleteContent = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmDeleteSingle" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
-                    </div>
-                </el-dialog>
+        <el-dialog
+          v-if="showSingleDeleteContent"
+          :title="$t('insSettingView.confirmDelete')"
+          :visible.sync="showSingleDeleteContent"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;
+              display: inline-block; vertical-align: middle;"/>
+              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmCurDel') }}</span>
+            </p>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showSingleDeleteContent = false">
+              {{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteSingle">
+              {{ $t('insSettingView.confirm') }}</el-button>
+          </div>
+        </el-dialog>
 
-            </el-col>
-            <el-col :span="24">
-                <div class="data-box">
-                    <div class="sheet_title" v-for="item in sheetName" :key="item.id" @click="changeSheet(item.id)">
-                        <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{item.label}}</p>
-                    </div>
-                </div>
-                <el-scrollbar id="el-menuscrollbar">
-                    <div v-if="routeData.length!=0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
-                        <div v-for="(item,index) in routeData" :key="index" class="data-content">
-                            <div class="header-content tabTitle" v-if="index==0">
-                                <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
-                                <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
-                                <span class="description-title" :style="sheetName.some(x=>x.id==0&&x.isClick)?'width: calc((100% - 405px) * 25/29);':''">{{generateInsSettingLang('inspectionDescp')}}</span>
-                                <span class="score-title" :style="'width: calc((100% - 405px) * 2.5/29);'" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore0')}}</span>
-                                <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{generateInsSettingLang('sheetscore0')}}</span> -->
-                                <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore1')}}</span>
-                                <span class="score-title" v-if="sheetName.some(x=>x.id==2&&x.isClick)">{{generateInsSettingLang('sheetscore2')}}</span>
-                                <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
-                            </div>
+      </el-col>
+      <el-col :span="24">
+        <div class="data-box">
+          <div v-for="item in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id)">
+            <p :style="item.isClick ? 'background-color: #f31b65;color:#fff;' : ''" class="item_title">
+              {{ item.label }}
+            </p>
+          </div>
+        </div>
+        <el-scrollbar id="el-menuscrollbar">
+          <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
+            <div v-for="(item,index) in routeData" :key="index" class="data-content">
+              <div v-if="index === 0" class="header-content tabTitle">
+                <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
+                <span class="name-title">{{ $t('insSettingView.inspectName') }}</span>
+                <span :style="sheetName.some(x => x.id === 0 && x.isClick) ? 'width: calc((100% - 405px) * 25/29);' : ''"
+                      class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
+                <span v-if="sheetName.some(x => x.id === 1 && x.isClick)"
+                      :style="'width: calc((100% - 405px) * 2.5/29);'"
+                      class="score-title">{{ $t('insSettingView.sheetscore0') }}</span>
+                <span v-if="sheetName.some(x => x.id === 1 && x.isClick)" class="score-title" style="width: calc((100% - 405px) * 6/29);">
+                  {{ $t('insSettingView.sheetscore1') }}</span>
+                <span v-if="sheetName.some(x => x.id === 2 && x.isClick)" class="score-title">
+                  {{ $t('insSettingView.sheetscore2') }}</span>
+                <span :class="lang === 'en' ? 'en-handle-title':'handle-title'">
+                  {{ $t('insSettingView.operation') }}</span>
+              </div>
 
-                            <div class="table-header-title">
-                                <el-checkbox class="all-checkBox" @change="change(item)" v-model="item.checked"></el-checkbox>
-                                <span class="table-title">{{item.groupName}}（{{item.itemCount}}）</span>
-                            </div>
-                            <div v-if="item.itemData.length!=0" class="table-class">
-                                <el-table
-                                :data="item.itemData"
-                                size="medium"
-                                :ref="item.refId"
-                                :show-header="false">
-                                    <el-table-column prop="checked" width="70px" align="center">
-                                        <template slot-scope="scope">
-                                            <span class="showNewContent" v-if="scope.row.isNew">new</span>
-                                            <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"></el-checkbox>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="name" width="300px"></el-table-column>
-                                    <el-table-column prop="description" :min-width="sheetName.some(x=>x.id==0&&x.isClick)?'40%':'23%'"></el-table-column>
-                                    <el-table-column prop="score" align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)||sheetName.some(x=>x.id==2&&x.isClick)" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'">
-                                         <template slot-scope="scope">
-                                            <span>{{scope.row.score}}<span v-if="lang!='en'">{{$t('insSettingView.scores')}}</span></span>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="sheetName.some(x=>x.id==1&&x.isClick)">
-                                        <template slot-scope="scope">
-                                            <span>{{scope.row.qualifiedScore}}<span v-if="lang!='en'">{{$t('insSettingView.scores')}}</span></span>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="handle" min-width="6%">
-                                        <template slot-scope="scope">
-                                                <i class="iconfont icon-shanchu" style="cursor:pointer;"  @click="handleDelete(scope.$index, scope.row)"></i>
-                                            </template>
-                                    </el-table-column>
-                                </el-table>
-                            </div>
-                        </div>
-                    </div>
-                </el-scrollbar>
-                <el-dialog :title="generateInsSettingLang('import')"
-                :visible.sync="showImportContent" v-if="showImportContent"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                width="28%"
-                top="35vh"
-                left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;">
-                        <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <p style="margin-left:26px;margin-bottom:0px;">{{generateInsSettingLang('selectImprtLoc')}}</p>
-                        <div style="margin-left:20px;">
-                            <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
-                                <el-radio-button style="margin-left:10px;" class="elradio"
-                                v-for="(item,key) in radioList" :key="key"
-                                :label="item.label"></el-radio-button>
-                            </el-radio-group>
-                        </div>
-                        <div class="tabName-input-content">
-                            <input type="text" v-model="tabNameInput" class="tabName-input" :placeholder="generateInsSettingLang('enterListName')"
-                                   v-if="checkValue == addPatrol">
-                        </div>
+              <div class="table-header-title">
+                <el-checkbox v-model="item.checked" class="all-checkBox" @change="change(item)"/>
+                <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
+              </div>
+              <div v-if="item.itemData.length!=0" class="table-class">
+                <el-table
+                  :data="item.itemData"
+                  :ref="item.refId"
+                  :show-header="false"
+                  size="medium">
+                  <el-table-column prop="checked" width="70px" align="center">
+                    <template slot-scope="scope">
+                      <span v-if="scope.row.isNew" class="showNewContent">new</span>
+                      <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;"
+                                   @change="selectRow(index,item,scope.$index,scope.row)"/>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="name" width="300px"/>
+                  <el-table-column :min-width="sheetName.some(x => x.id === 0 && x.isClick)?'40%':'23%'"
+                                   prop="description"/>
+                  <el-table-column v-if="sheetName.some(x => x.id === 1 && x.isClick)
+                   || sheetName.some(x => x.id === 2 && x.isClick)"
+                                   :min-width="sheetName.some(x => x.id === 1 && x.isClick) ? '4%' : '15%'"
+                                   prop="score" align="center">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.score }}
+                        <span v-if="lang !== 'en'">{{ $t('insSettingView.scores') }}</span></span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column v-if="sheetName.some(x => x.id ===1 && x.isClick)" prop="qualifiedScore"
+                                   align="center" min-width="11%">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.qualifiedScore }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="handle" min-width="6%">
+                    <template slot-scope="scope">
+                      <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(scope.$index, scope.row)"/>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </div>
+          </div>
+        </el-scrollbar>
+        <el-dialog
+          v-if="showImportContent"
+          :title="$t('insSettingView.import')"
+          :visible.sync="showImportContent"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <p style="margin-left:26px;margin-bottom:0px;">{{ $t('insSettingView.selectImprtLoc') }}</p>
+            <div style="margin-left:20px;">
+              <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;">
+                <el-radio-button
+                  v-for="(item,key) in radioList"
+                  :key="key"
+                  :label="item.label"
+                  style="margin-left:10px;"
+                  class="elradio"/>
+              </el-radio-group>
+            </div>
+            <div class="tabName-input-content">
+              <input
+                v-if="checkValue === addPatrol"
+                v-model="tabNameInput"
+                :placeholder="$t('insSettingView.enterListName')"
+                type="text"
+                class="tabName-input">
+            </div>
 
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showImportContent = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">
+              {{ $t('insSettingView.cancel') }}</el-button>
 
-                        <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{generateInsSettingLang('select')}}
-                            <!-- <div style="background-color:transparent" v-if="tabNameInput.length==0&&checkValue=='新增巡检表'"> -->
-                                <input id="upload" type="file" @change="importfxx(this)"  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                            <!-- </div> -->
-                        </a>
-                    </div>
-                </el-dialog>
-                <el-dialog :title="generateInsSettingLang('importFailTitle')"
-                :visible.sync="showFailInfo" v-if="showFailInfo"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                width="28%"
-                top="35vh"
-                left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:40px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
-                            <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{generateInsSettingLang('FailTitle')}}</span>
-                            <ul class="ul_style">
-                                <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
-                                    <div class="list_style"></div>
-                                    {{item}}
-                                </li>
-                            </ul>
-                        </p>
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showFailInfo = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="showFailInfo = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
-                    </div>
-                </el-dialog>
-                <el-dialog :title="$t('remotePatrol.prompt')"
-                :visible.sync="showFaildig" v-if="showFaildig"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                width="510px"
-                top="35vh"
-                left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <div style="margin:20px 20px 20px 26px;">
-                            <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
-                            <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{generateInsSettingLang('notallowdeletetips')}}</span>
-                            <p style="padding-left:40px;color:#182752;">A.{{generateInsSettingLang('notallowA')}}</p>
-                            <p style="padding-left:40px;color:#182752;">B.{{generateInsSettingLang('notallowB')}}</p>
-                        </div>
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showFaildig = false" size="mini" style="">{{generateInsSettingLang('cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="showFaildig = false" size="mini" type="primary">{{generateInsSettingLang('confirm')}}</el-button>
-                    </div>
-                </el-dialog>
-            </el-col>
-        </el-row>
-    </div>
+            <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('insSettingView.select') }}
+              <input id="upload" type="file"
+                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                     @change="importfxx(this)" >
+            </a>
+          </div>
+        </el-dialog>
+        <el-dialog
+          v-if="showFailInfo"
+          :title="$t('insSettingView.importFailTitle')"
+          :visible.sync="showFailInfo"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <i class="el-icon-warning" style="font-size:40px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
+              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.FailTitle') }}</span>
+              <ul class="ul_style">
+                <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
+                  <div class="list_style"/>
+                  {{ item }}
+                </li>
+              </ul>
+            </p>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">
+              {{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">
+              {{ $t('insSettingView.confirm') }}</el-button>
+          </div>
+        </el-dialog>
+        <el-dialog
+          v-if="showFaildig"
+          :title="$t('remotePatrol.prompt')"
+          :visible.sync="showFaildig"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="510px"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <div style="margin:20px 20px 20px 26px;">
+              <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
+              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>
+              <p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>
+              <p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>
+            </div>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showFaildig = false">
+              {{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFaildig = false">
+              {{ $t('insSettingView.confirm') }}</el-button>
+          </div>
+        </el-dialog>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 <script>
-import api from '@/api/index'
-import {inpectRESTful} from '@/api/index'
-import {validateInput,validateInspectGroup} from '@/common/validate'
-import {generateInsSettingLang} from '@/api/i18n'
-import filterString from '@/common/filterString'
-import {getScheduleListService} from '@/api/schedule'
+import { inpectRESTful } from '@/api/index';
+import { getScheduleListService } from '@/api/schedule';
 
 export default {
-    name:'RouteDetail',
-    props:{
-        routeData:Array,
-        tabName:String,
-        downSrc:String,
-        routeName:String,
-        allRoutedata:Array,
-        sheetName:Array
-    },
-    data(){
-        return{
-            typeNum:0,
-            itemNum:0,
-            showFaildig:false,
-            showBtnContent:false,
-            showDeleteContent:false,
-            showSingleDeleteContent:false,
-            multeSection:[],
-            showImportContent:false,
-            showFailInfo:false,
-            FileInfo:[],
-            radioList:[
-                {
-                    'value':'1',
-                    'label': '远程巡检'
-                },
-                {
-                    'value':'2',
-                    'label': '现场巡检'
-                },
-            ],
-            checkValue:'',
-            addPatrol: '自定义巡检表',
-            tabNameLang: '',
-            tabNameInput:'',
-            varyWindowWidth:window.innerHeight,
-            allchecked:false,
-            curDeleteId:'',
-            curDelGroupId:[],
-            fileName: this.$t('insSettingView.patrolExample'),
-            lang: this.$i18n.locale,
-            delItems:[],
-            delGroup:[],
-            ModelPost:null,
-            showSheet0:true,
-            showSheet1:false,
-            showSheet2:false,
-            curSheet:-1
+  name: 'RouteDetail',
+
+  props: {
+    routeData: Array,
+    tabName: String,
+    downSrc: String,
+    routeName: String,
+    allRoutedata: Array,
+    sheetName: Array
+  },
+
+  data() {
+    return {
+      typeNum: 0,
+      itemNum: 0,
+      showFaildig: false,
+      showBtnContent: false,
+      showDeleteContent: false,
+      showSingleDeleteContent: false,
+      multeSection: [],
+      showImportContent: false,
+      showFailInfo: false,
+      FileInfo: [],
+      radioList: [
+        {
+          'value': '1',
+          'label': '远程巡检'
+        },
+        {
+          'value': '2',
+          'label': '现场巡检'
         }
+      ],
+      checkValue: '',
+      addPatrol: '自定义巡检表',
+      tabNameLang: '',
+      tabNameInput: '',
+      varyWindowWidth : window.innerHeight,
+      allchecked: false,
+      curDeleteId: '',
+      curDelGroupId: [],
+      fileName: this.$t('insSettingView.patrolExample'),
+      lang: this.$i18n.locale,
+      delItems: [],
+      delGroup: [],
+      ModelPost: null,
+      showSheet0: true,
+      showSheet1: false,
+      showSheet2: false,
+      curSheet: -1
+    };
+  },
+
+  mounted() {
+    let self = this;
+    self.getNum();
+  },
+
+  methods: {
+    getNum() {
+      let self = this;
+      self.typeNum = self.routeData.length;
+      let allcount = 0;
+      self.routeData.forEach(item => {
+        allcount += item.itemData.length;
+      });
+      self.itemNum = allcount;
     },
-    computed:{
+
+    changeAllData(val) {
+      console.log(val);
+      let self = this;
+      self.routeData.forEach(item => {
+        item.checked = val;
+        item.itemData.forEach(_item => {
+          _item.checked = val;
+        });
+      });
     },
-    // watch:{
-    //     routeData:{
-    //         handler:function(val,oldval){
-    //             if(val!=oldval){
-    //                 // this.getNum();
-    //             }
-    //         },
-    //         deep:true//对象内部的属性监听，也叫深度监听
-    //   },
-    // },
-    mounted(){
-        let self=this;
+
+    changeSheet: function (e) {
+      let self = this;
+      self.curSheet = e;
+      self.allchecked = false;
+      self.routeData.forEach(item => {
+        item.checked = false;
+        item.itemData.forEach(_item => {
+          _item.checked = false;
+        });
+      });
+      self.sheetName.forEach(item => {
+        item.isClick = item.id === e;
+      });
+      self.allRoutedata.forEach(item => {
+        if (e === item[0].type) {
+          self.$emit('change-routeData', item);
+        }
+      });
+    },
+
+    change(item) {
+      let self = this;
+      let arr = [];
+      console.log(item);
+      item.itemData.forEach(_item => {
+        _item.checked = item.checked;
+      });
+      self.routeData.forEach(_item => {
+        if (_item.checked) {
+          arr.push(_item);
+        }
+      });
+      self.allchecked = self.routeData.length === arr.length;
+    },
+
+    selectRow(tableIndex, item) {
+      let arr = [];
+      let self = this;
+      item.itemData.forEach(_item => {
+        if (_item.checked) {
+          arr.push(_item);
+        }
+      });
+      console.log(arr.length);
+      item.checked = item.itemData.length === arr.length;
+      let arrCheckedItem = [];
+      let count = 0;
+      self.routeData.forEach(_item => {
+        count += _item.itemData.length;
+        _item.itemData.forEach(itemS => {
+          if (itemS.checked) {
+            arrCheckedItem.push(itemS);
+          }
+        });
+      });
+      self.allchecked = count === arrCheckedItem.length;
+    },
+
+    getNapeList() {
+      let self = this;
+      return new Promise((resolve, reject) => {
+        inpectRESTful.getInspectItemList().then(res => {
+          let code = res.errMsg;
+          let data = res.data;
+          if (code != null && code === 'Success') {
+            self.allData = data;
+          }
+          resolve(data);
+        }).catch(err => {
+          reject(err)
+        });
+      });
+    },
+
+    async refreshData() {
+      let self = this;
+      console.log(self.tabName);
+      let data = await self.getNapeList();
+      if (data.length !== 0) {
+        let temp = [];
+        data.forEach(item => {
+          if (item.tag === self.tabName) {
+            let _obj = {};
+            _obj.id = item.id;
+            _obj.groupName = item.name;
+            _obj.itemCount = item.items.length;
+            _obj.checked = false;
+            let tempChild = [];
+            item.items.forEach(itemChild => {
+              let objChild = {};
+              objChild.id = itemChild.id;
+              objChild.checked = false;
+              objChild.name = itemChild.subject;
+              objChild.description = (itemChild.description === undefined || itemChild.length === 0) ? '--' : itemChild.description;
+              objChild.score = itemChild.itemScore + '分';
+              tempChild.push(objChild);
+            });
+            _obj.itemData = tempChild;
+            temp.push(_obj);
+          }
+        });
+        self.routeData = temp;
         self.getNum();
-
+      }
     },
-    methods:{
-        generateInsSettingLang,
-        getNum(){
-            let self=this;
-            self.typeNum=self.routeData.length;
-            //获取当前巡检项总数
-            let allcount=0;
-            self.routeData.forEach(item=>{
-                allcount+=item.itemData.length;
-            })
-            self.itemNum=allcount;
-        },
-        changeAllData(val){
-            console.log(val);
-            let self=this;
-            self.routeData.forEach(item=>{
-                item.checked=val;
-                item.itemData.forEach(_item=>{
-                    _item.checked=val;
-                })
-            })
-        },
-        changeSheet(e){
-            let self = this
-            self.curSheet = e
-            self.allchecked=false
-            self.routeData.forEach(item=>{
-                item.checked=false
-                item.itemData.forEach(_item=>{
-                    _item.checked=false
-                })
-            })
-            // self.showSheet0= e==0 ? true : false
-            // self.showSheet1= e==1 ? true : false
-            // self.showSheet2= e==2 ? true : false
-            self.sheetName.forEach(item=>{
-                if(item.id==e){
-                    item.isClick=true
-                }else{
-                    item.isClick=false
-                }
-            })
-            self.allRoutedata.forEach(item=>{
-                if(e==item[0].type){
-                    self.$emit('change-routeData',item)
-                }
-            })
-        },
-        change(item){
-            let self=this;
-            let arr=[];
-            console.log(item);
-            item.itemData.forEach(_item=>{
-                _item.checked=item.checked;
-            })
-            self.routeData.forEach(_item=>{
-                if(_item.checked){
-                    arr.push(_item);
-                }
-            })
-            if(self.routeData.length==arr.length){
-                self.allchecked=true;
-            }
-            else{
-                self.allchecked=false;
-            }
-        },
-        selectRow(tableIndex,item,index,row){
-            let arr=[];
-            let self=this;
-            item.itemData.forEach(_item=>{
-                if(_item.checked){
-                    arr.push(_item);
-                }
-            });
-            console.log(arr.length);
-            if(item.itemData.length==arr.length){  //列表中的值全部勾选
-                item.checked=true;    //最上方的全选为勾选状态
-            }
-            else{
-                item.checked=false;
-            }
-            let arrCheckedItem=[];
-            let count=0;
-            self.routeData.forEach(_item=>{
-                count+=_item.itemData.length;
-                _item.itemData.forEach(itemS=>{
-                    if(itemS.checked){
 
-                        arrCheckedItem.push(itemS);
-                    }
-                })
-            })
-            if(count==arrCheckedItem.length){
-                self.allchecked=true;
+    async deleteNapes() {
+      let self = this;
+      let arr = [];
+      let countGroup = [];
+      self.routeData.forEach(item => {
+        if (item.checked) {
+          countGroup.push(item.id);
+        }
+        item.itemData.forEach(_item => {
+          if (_item.checked) {
+            arr.push(_item.id);
+          }
+        });
+      });
+      if (arr.length === 0 && countGroup.length === 0) {
+        self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
+        return false;
+      }
+      let typeTemp = [];
+      self.allRoutedata.forEach(item => {
+        item.forEach(_item => {
+          typeTemp.push(_item.type);
+        });
+      });
+      let delData = self.routeData.filter(x => x.itemData.length !== 0);
+      if (delData.length === 1 && delData[0].itemData.length === 1 || self.allchecked) {
+        if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) || self.allRoutedata.length === 3) && delData[0].type === 1) {
+          self.showFaildig = true;
+          return false;
+        } else if (self.allRoutedata.length === 1) {
+          let params = {};
+          params.category = parseInt(self.routeData[0].mode);
+          let bindSchedule = await self.getScheduleFromDB(params);
+          let arrtemp = [];
+          bindSchedule.forEach(item => {
+            if (item.extra != null) {
+              arrtemp.push(item.extra.inspectId);
             }
-            else{
-                self.allchecked=false;
-            }
-        },
-        getNapeList(){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-                inpectRESTful.getInspectItemList().then(res=>{
-                    let code=res.errMsg;
-                    let data=res.data;
-                    if(code!=null&&code=='Success'){
-                        self.allData=data;
-                        console.log(res.data);
-                    }
-                    resolve(data);
-                })
-            })
-        },
-        async refreshData(){
-            let self=this;
-            console.log(self.tabName);
-            let data=await self.getNapeList();
-            if(data.length!=0){
-                let temp=[];
-                data.forEach(item=>{
-                    if(item.tag==self.tabName){
-                        let _obj={};
-                        _obj.id=item.id;
-                        _obj.groupName=item.name;
-                        _obj.itemCount=item.items.length;
-                        _obj.checked=false;
-                        let tempChild=[];
-                        item.items.forEach(itemChild=>{
-                            let objChild={};
-                            objChild.id=itemChild.id;
-                            objChild.checked=false;
-                            objChild.name=itemChild.subject;
-                            objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
-                            objChild.score=itemChild.itemScore+'分';
-                            tempChild.push(objChild);
-                        })
-                        _obj.itemData=tempChild;
-                        temp.push(_obj);
-                    }
-                })
-                self.routeData=temp;
-                self.getNum();
-            }
-        },
-
-        async deleteNapes(){
-            let self=this;
-            let arr=[];
-            let countGroup=[];
-            self.routeData.forEach(item=>{
-                if(item.checked){
-                    countGroup.push(item.id);
-                }
-                item.itemData.forEach(_item=>{
-                    if(_item.checked){
-                        arr.push(_item.id);
-                    }
-                });
-            });
-            // self.delGroup=countGroup
-            // self.delItems=arr
-            if(arr.length==0&&countGroup.length==0){
-                self.notify(self.$t('insSettingView.selectItems'),'warning',3000);
-                return false;
-            }
-            let typeTemp=[]
-            self.allRoutedata.forEach(item=>{
-                item.forEach(_item=>{
-                    typeTemp.push(_item.type)
-                })
-            })
-            let delData=self.routeData.filter(x=>x.itemData.length!=0)
-            if(delData.length==1&&delData[0].itemData.length==1||self.allchecked){
-                if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
-                    self.showFaildig=true
-                    return false;
-                }else if(self.allRoutedata.length==1){
-                    let params = {};
-                    params.category = parseInt(self.routeData[0].mode);
-                    let bindSchedule = await self.getScheduleFromDB(params)
-                    let arrtemp=[]
-                    bindSchedule.forEach(item=>{
-                        if(item.extra!=null){
-                            arrtemp.push(item.extra.inspectId)
-                        }
-                    })
-                    if(arrtemp.indexOf(self.routeData[0].inspectId)!=-1){
-                        self.notify(self.$t('insSettingView.deletebindSchedule'),'warning',3000);
-                        return false;
-                    }
-                }
-            }
-            self.showDeleteContent=true;
-        },
-        getScheduleFromDB(params){
-            return new Promise((resolve, reject) => {
-                getScheduleListService(params).then(res => {
-                    console.log(res);
-                    let errMsg = res.errMsg;
-                    let data = res.data;
-                    resolve(data);
-                })
-            })
-        },
-        afterDeleteNape(){
-            let self=this;
-            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
-            self.showDeleteContent=false;
-            let val = 'del'
-            self.$emit('refreshList',val,self.curSheet)
-        },
-        confirmDelete(){
-            let self=this;
-            let arrGroup=[];
-            let arrItem=[];
-            self.routeData.forEach(item=>{
-                if(item.checked){
-                    arrGroup.push(item.id);
-                }
-                item.itemData.forEach(_item=>{
-                    if(_item.checked){
-                        arrItem.push(_item.id);
-                    }
-                });
-            });
-            let params={
-                "itemIds":arrItem
-            };
-            let paramsGroup={
-                "groupIds":arrGroup
-            }
-            if(arrItem.length!=0){
-                inpectRESTful.deleteInspectItem(params).then(res=>{
-                    console.log(res.data)
-                    let code=res.errMsg;
-                    if(code!=undefined&&code=='Success'){
-                        if(arrGroup.length!=0){
-                            inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                                if(resGroup.errMsg=='Success'){
-                                    self.afterDeleteNape();
-                                }
-                            })
-                        }
-                        else{
-                            self.afterDeleteNape();
-                        }
-                    }
-                    else{
-                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
-                        return false;
-                    }
-                  self.allchecked = false;
-                })
-            }
-            else{
-                inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                    if(resGroup.errMsg=='Success'){
-                        self.afterDeleteNape();
-                    }
-                    else{
-                        self.notify(self.$t('insSettingView.deleteFail') ,'warning',3000);
-                        return false;
-                    }
-                  self.allchecked = false;
-                })
-            }
-        },
-        getDownLoadURL(){
-            let self=this;
-            inpectRESTful.downLoadTemplate().then(res=>{
-                console.log(res);
-                let blob = new Blob([res],{
-               type:'application/vnd.ms-excel'      //将会被放入到blob中的数组内容的MIME类型
-            });
-                let objectUrl = URL.createObjectURL(blob);
-                self.downLoadSrc=objectUrl;
-            })
-        },
-        async handleDelete(index,row){
-            console.log(index);
-            let self=this;
-            let typeTemp=[]
-            self.allRoutedata.forEach(item=>{
-                item.forEach(_item=>{
-                    typeTemp.push(_item.type)
-                })
-            })
-            let delData=self.routeData.filter(x=>x.itemData.length!=0)
-            if(delData.length==1&&delData[0].itemData.length==1){
-                if((self.allRoutedata.length==2&&!typeTemp.some(x=>x==0)||self.allRoutedata.length==3)&&delData[0].type==1){
-                    self.showFaildig=true
-                    return false;
-                }else if(self.allRoutedata.length==1){
-                    let params = {};
-                    params.category = parseInt(self.routeData[0].mode);
-                    let bindSchedule = await self.getScheduleFromDB()
-                    let arrtemp=[]
-                    bindSchedule.forEach(item=>{
-                        if(item.extra!=null){
-                            arrtemp.push(item.extra.inspectId)
-                        }
-                    })
-                    if(arrtemp.indexOf(self.routeData[0].inspectId)!=-1){
-                        self.notify(self.$t('insSettingView.deletebindSchedule'),'warning',3000);
-                        return false;
-                    }
-                }
-            }
-            self.showSingleDeleteContent=true;
-            let id=row.id;
-            let arr=[];
-            arr.push(id);
-            self.curDeleteId=arr;
-        },
-        async confirmDeleteSingle(){
-            let self=this;
-            let params={
-                "itemIds":self.curDeleteId
-            };
-            let delstatus=0
-            inpectRESTful.deleteInspectItem(params).then(res=>{
-                console.log(res.data)
-                let code=res.errMsg;
-                if(code!=undefined&&code=='Success'){
-                    self.routeData.forEach((r_item,r_index)=>{
-                        if(self.routeData[r_index].itemData.length==1){
-                            r_item.itemData.forEach((d_item,d_index)=>{
-                                if(self.curDeleteId[0]==d_item.id){
-                                    self.curDelGroupId=r_item.id
-                                    let paramsGroup={
-                                        "groupIds":[self.curDelGroupId]
-                                    }
-                                    inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup=>{
-                                        // if(resGroup.errMsg=='Success'&&self.routeData.length==1&&self.sheetName.length==1){
-                                            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
-                                            self.showSingleDeleteContent=false;
-                                            let val = 'del'
-                                            self.$emit('refreshList',val,self.curSheet)
-                                        // }
-                                    }) 
-                                }
-                            })
-                        }else{
-                            self.notify(self.$t('insSettingView.deleteSuss'),'success',3000);
-                            self.showSingleDeleteContent=false;
-                            let val = 'del'
-                            self.$emit('refreshList',val,self.curSheet)
-                        }
-                    })
-                }
-                else{
-                    self.notify(self.$t('insSettingView.deleteFail'),'warning',3000);
-                    return false;
-                }
-                self.allchecked = false;
-            })
-        },
-        // handledelGroup(){
-        //     let self=this;
-        //     return new Promise((resolve,reject)=>{
-        //         inpectRESTful.deleteInspectGroup(paramsGroup).then(res=>{
-        //             resolve(res);
-        //         })
-        //     })
-        // },
-        changeValue(value){
-
-        },
-        //巡检项设置
-        setItem(){
-            let self=this;
-            sessionStorage.setItem('NapeItem',JSON.stringify(self.routeData));
-            sessionStorage.setItem('GroupName',self.tabName);
-            self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}});
-        },
-        // bindPatrol(index,item){
-        //     let self=this;
-        //     self.$router.push({name:'itemSetting',params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}}); 
-        // },
-        downLoadModel(){
-            let self=this;
-            let url='http://'+window.location.host+'/storemonitor/api/v1.0/inspect/template';
-            console.log(url);
-            window.open(url);
-        },
-
-        emptyImport(){
-            //this.showImportContent=true;
-            let self = this;
-            document.getElementById("uploadFile").click();
-        },
-        checkBeforeImport(){
-            let self=this;
-            if(self.checkValue==self.addPatrol &&(self.tabNameInput==null||self.tabNameInput.trim().length==0)){
-                self.notify('请输入自定义巡检表名称!','warning',3000);
-                return false;
-            }
-        },
-        notify(msg,type,time) {
-            this.$message({
-                message: msg,
-                type: type,
-                duration:time
-            });
-        },
+          });
+          if (arrtemp.indexOf(self.routeData[0].inspectId) !== -1) {
+            self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
+            return false;
+          }
+        }
+      }
+      self.showDeleteContent = true;
     },
-}
+
+    getScheduleFromDB(params) {
+      return new Promise((resolve, reject) => {
+        getScheduleListService(params).then(res => {
+          let data = res.data;
+          resolve(data);
+        }).catch(err =>{
+          reject(err)
+        });
+      });
+    },
+
+    afterDeleteNape() {
+      let self = this;
+      self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+      self.showDeleteContent = false;
+      let val = 'del';
+      self.$emit('refreshList', val, self.curSheet);
+    },
+
+    confirmDelete() {
+      let self = this;
+      let arrGroup = [];
+      let arrItem = [];
+      self.routeData.forEach(item => {
+        if (item.checked) {
+          arrGroup.push(item.id);
+        }
+        item.itemData.forEach(_item => {
+          if (_item.checked) {
+            arrItem.push(_item.id);
+          }
+        });
+      });
+      let params = {
+        'itemIds': arrItem
+      };
+      let paramsGroup = {
+        'groupIds': arrGroup
+      };
+      if (arrItem.length !== 0) {
+        inpectRESTful.deleteInspectItem(params).then(res => {
+          console.log(res.data);
+          let code = res.errMsg;
+          if (code != undefined && code === 'Success') {
+            if (arrGroup.length !== 0) {
+              inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+                if (resGroup.errMsg === 'Success') {
+                  self.afterDeleteNape();
+                }
+              });
+            } else {
+              self.afterDeleteNape();
+            }
+          } else {
+            self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+            return false;
+          }
+          self.allchecked = false;
+        });
+      } else {
+        inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+          if (resGroup.errMsg === 'Success') {
+            self.afterDeleteNape();
+          } else {
+            self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+            return false;
+          }
+          self.allchecked = false;
+        });
+      }
+    },
+
+    getDownLoadURL() {
+      let self = this;
+      inpectRESTful.downLoadTemplate().then(res => {
+        console.log(res);
+        let blob = new Blob([res], {
+          type: 'application/vnd.ms-excel'
+        });
+        let objectUrl = URL.createObjectURL(blob);
+        self.downLoadSrc = objectUrl;
+      });
+    },
+
+    async handleDelete(index, row) {
+      console.log(index);
+      let self = this;
+      let typeTemp = [];
+      self.allRoutedata.forEach(item => {
+        item.forEach(_item => {
+          typeTemp.push(_item.type);
+        });
+      });
+      let delData = self.routeData.filter(x => x.itemData.length !== 0);
+      if (delData.length === 1 && delData[0].itemData.length === 1) {
+        if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0)
+          || self.allRoutedata.length === 3) && delData[0].type === 1) {
+          self.showFaildig = true;
+          return false;
+        } else if (self.allRoutedata.length === 1) {
+          let params = {};
+          params.category = parseInt(self.routeData[0].mode);
+          let bindSchedule = await self.getScheduleFromDB();
+          let arrtemp = [];
+          bindSchedule.forEach(item => {
+            if (item.extra != null) {
+              arrtemp.push(item.extra.inspectId);
+            }
+          });
+          if (arrtemp.indexOf(self.routeData[0].inspectId) !== -1) {
+            self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
+            return false;
+          }
+        }
+      }
+      self.showSingleDeleteContent = true;
+      let id = row.id;
+      let arr = [];
+      arr.push(id);
+      self.curDeleteId = arr;
+    },
+
+    async confirmDeleteSingle() {
+      let self = this;
+      let params = {
+        'itemIds': self.curDeleteId
+      };
+      inpectRESTful.deleteInspectItem(params).then(res => {
+        console.log(res.data);
+        let code = res.errMsg;
+        if (code != undefined && code === 'Success') {
+          self.routeData.forEach((r_item, r_index) => {
+            if (self.routeData[r_index].itemData.length === 1) {
+              r_item.itemData.forEach((d_item, d_index) => {
+                if (self.curDeleteId[0] === d_item.id) {
+                  self.curDelGroupId = r_item.id;
+                  let paramsGroup = {
+                    'groupIds': [self.curDelGroupId]
+                  };
+                  inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+                    self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+                    self.showSingleDeleteContent = false;
+                    let val = 'del';
+                    self.$emit('refreshList', val, self.curSheet);
+                  });
+                }
+              });
+            } else {
+              self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+              self.showSingleDeleteContent = false;
+              let val = 'del';
+              self.$emit('refreshList', val, self.curSheet);
+            }
+          });
+        } else {
+          self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+          return false;
+        }
+        self.allchecked = false;
+      });
+    },
+
+    setItem() {
+      let self = this;
+      sessionStorage.setItem('NapeItem', JSON.stringify(self.routeData));
+      sessionStorage.setItem('GroupName', self.tabName);
+      self.$router.push({ name: 'itemSetting', params: { routeData: self.routeData,
+          tabNameLang: self.tabNameLang, routeName: self.routeName }});
+    },
+
+    downLoadModel() {
+      let url = 'http://' + window.location.host + '/storemonitor/api/v1.0/inspect/template';
+      window.open(url);
+    },
+
+    emptyImport() {
+      let self = this;
+      document.getElementById('uploadFile').click();
+    },
+
+    checkBeforeImport() {
+      let self = this;
+      if (self.checkValue === self.addPatrol && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
+        self.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
+        return false;
+      }
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    }
+
+  }
+};
 </script>
 <style>
 @import '../../../assets/css/importfile.css';
@@ -852,7 +848,7 @@ export default {
               min-height: 28px;
               .iconfont{
                 font-size: calc(16/1920*100vw);
-                margin-right: cal(8/1920*100vw);
+                margin-right: calc(8/1920*100vw);
               }
               @media screen and (max-width: 1440px) {
                 width: 100px;
@@ -921,7 +917,6 @@ export default {
 
             .description-title{
                 float: left;
-                width: 50%;
                 width: calc((100% - 405px) * 15.3/29);
             }
             .score-title{

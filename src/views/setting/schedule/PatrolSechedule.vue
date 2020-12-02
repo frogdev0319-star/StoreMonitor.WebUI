@@ -1,46 +1,53 @@
 <template>
-  <el-row class="schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
+  <el-row :style="{'min-height':varyWindowHeight-200+'px'}" class="schedule-container">
     <div class="el-schedule-header">
       <el-col :span="24" class="el-schedule-btns">
         <div class="left-title">
-          <span class="title" v-if="lang!='en'">{{generateScheduleLang('scheduleTitle')}}</span>
-          <span class="title" v-if="lang=='en'&&varyWindowWidth>1366">{{generateScheduleLang('noscheduleInspect')}}</span>
-          <el-tooltip class="item" effect="dark" v-if="varyWindowWidth<=1366" :content="generateScheduleLang('noscheduleInspect')" placement="top">
-              <span class="title" v-if="lang=='en'">{{generateScheduleLang('noscheduleInspect')}}</span>
+          <span v-if="lang !== 'en'" class="title">{{ $t('scheduleView.scheduleTitle') }}</span>
+          <span v-if="lang === 'en' && varyWindowWidth > 1366" class="title">
+            {{ $t('scheduleView.noscheduleInspect') }}</span>
+          <el-tooltip v-if="varyWindowWidth <= 1366" :content="$t('scheduleView.noscheduleInspect')"
+                      class="item" effect="dark" placement="top">
+            <span v-if="lang === 'en'" class="title">{{ $t('scheduleView.noscheduleInspect') }}</span>
           </el-tooltip>
           <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
-            <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"></el-option>
+            <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"/>
           </el-select>
-          <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolList(isActivePatrol,isActive)">
-            <el-option v-for="item in InspectList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')"
+                     @change="changePatrolList(isActivePatrol,isActive)">
+            <el-option v-for="(item,index) in InspectList" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </div>
         <div class="right-title">
-          <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
-                   @click="addScheduleButton">
+          <el-button
+            :class="lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
+            type="primary"
+            size="mini"
+            class="btn-class"
+            @click="addScheduleButton">
             <div class="btn-area">
-              <i class="iconfont el-icon-plus"></i>
-              <span>{{generateScheduleLang('addSchedule')}}</span>
+              <i class="iconfont el-icon-plus"/>
+              <span>{{ $t('scheduleView.addSchedule') }}</span>
             </div>
           </el-button>
-          <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
-                    @click="deleteScheduleButton"
-                    :disabled="Number(activeName) == 0? true: false"
+          <el-button
+            :class="lang === 'en' ? 'en-el-delete-btn' : 'el-delete-btn'"
+            :disabled="Number(activeName)  ===  0 ? true : false"
+            type="primary"
+            size="mini"
+            class="btn-class"
+            @click="deleteScheduleButton"
           >
             <div class="btn-area">
-              <i class="iconfont icon-shanchu"></i>
-              <span>{{generateScheduleLang('delete')}}</span>
+              <i class="iconfont icon-shanchu"/>
+              <span>{{ $t('scheduleView.delete') }}</span>
             </div>
           </el-button>
         </div>
       </el-col>
       <el-col :span="24" class="el-schedule-tabs">
-        <!-- <el-tabs v-model="activePatrol" @tab-click="changePatrol" id="patrol-content"> -->
-          <!-- <el-tab-pane v-for="(item, index) in patrolList" :label="item.tag" :key="index" > -->
-          <!-- </el-tab-pane> -->
-          <remote-detail ref="remoteHandle" v-on:sendActiveName = "changeActiveName" @paneList="getpaneList" :active-patrol = 'activePatrol' :inspectId="isActivePatrol"></remote-detail>
-          <!--<onsite-detail v-if="activePatrol == '1'" ref="onsiteHandle" v-on:sendActiveName = "changeActiveName"></onsite-detail>-->
-        <!-- </el-tabs> -->
+        <remote-detail ref="remoteHandle" :active-patrol = "activePatrol" :inspect-id="isActivePatrol"
+                       @sendActiveName = "changeActiveName" @paneList="getpaneList"/>
       </el-col>
     </div>
   </el-row>
@@ -48,148 +55,175 @@
 
 <script>
 
-  import {generateScheduleLang} from '@/api/i18n'
-  import {getScheduleBindList, addNewSchedule, getScheduleListService, bindScheduleAndStore, unbindScheduleAndStore, updateSchedule,deleteScheduleService} from '@/api/schedule'
-  import {getStoreList} from '@/api/store'
-  import {inpectRESTful} from '@/api/index'
-  import RemoteDetail from '@/views/setting/schedule/RemoteDetail'
-  import OnsiteDetail from '@/views/setting/schedule/OnsiteDetail'
-  import {mapGetters} from 'vuex'
+import {
+  getScheduleBindList,
+  addNewSchedule,
+  getScheduleListService,
+  bindScheduleAndStore,
+  unbindScheduleAndStore,
+  updateSchedule,
+  deleteScheduleService
+} from '@/api/schedule';
+import { getStoreList } from '@/api/store';
+import { inpectRESTful } from '@/api/index';
+import RemoteDetail from '@/views/setting/schedule/RemoteDetail';
+import { mapGetters } from 'vuex';
 
-  export default {
-    name: "PatrolSchedule",
-    components: {
-      OnsiteDetail,
-      RemoteDetail
-    },
-    data() {
-      return {
-        varyWindowHeight: window.innerHeight,
-        varyWindowWidth: window.innerWidth,
-        InspectList:[],
-        patrolList: [{flag: 0, tag: this.$t('scheduleView.remotePatrol')}, {flag: 1, tag: this.$t('scheduleView.onsitePatrol')}],
-        paneList: [],
-        timeArray: ['08:00'], //选中的执行时间
-        lang: this.$i18n.locale,
-        activeName: '0',
-        activePatrol: '0',
-        isActive:0,
-        isActivePatrol:'',
-        paneLength:0
-      }
-    },
-    mounted(){
-      let self=this
-      self.changePatrolType(0)
-    },
-    methods: {
-      generateScheduleLang,
-      changePatrolType(val){//获取巡检表
-            let self=this;
-            self.isActivePatrol=''
-            let params={
-                mode:val
-            }
-            return new Promise((resolve,reject)=>{
-                inpectRESTful.GetInspectTagList(params).then(res=>{
-                    let data=res.data;
-                    let InspectList=[]
-                    data.forEach(item=>{
-                      if(item.appliedTo.length!=0){
-                        let isrole=[]
-                        item.appliedTo.forEach(app_item=>{
-                          if(app_item.roleId==3||app_item.roleId==4){
-                            isrole.push(app_item)
-                          }
-                        })
-                        if(isrole.length!=0){
-                          let obj={}
-                          obj.id=item.id
-                          obj.name=item.name
-                          obj.roleId=item.appliedTo
-                          InspectList.push(obj)
-                        }
-                      }
-                    })
-                    self.InspectList=InspectList
-                    if(self.InspectList.length!=0){
-                      self.isActivePatrol=self.InspectList[0].id
-                      // self.isActive=0
-                      self.changePatrolList(self.isActivePatrol,self.isActive)
-                    }else{
-                      self.changePatrolList('noInspect',self.isActive)
-                    }
-                    resolve(data);
-                }).catch(err => {
-                    console.log(err.message);
-                })
+export default {
+  name: 'PatrolSchedule',
 
-            })
+  components: {
+    RemoteDetail
+  },
+
+  data() {
+    return {
+      varyWindowHeight: window.innerHeight,
+      varyWindowWidth: window.innerWidth,
+      InspectList: [],
+      patrolList: [
+        {
+          flag: 0,
+          tag: this.$t('scheduleView.remotePatrol')
         },
-      changePatrolList(val1,val2){
-        let self=this
-        self.$refs.remoteHandle.getScheduleList(val1,val2);
-      },
-      addScheduleButton() {
-        let self = this;
-        let pleg = self.$refs.remoteHandle.paneList
-        if(pleg.length>=10){
-            self.notify(self.$t('insSettingView.SchdRemoteLength'),'warning',3000);
-            return false;         
-        }else{
-          self.$refs.remoteHandle.addSchedule(self.isActivePatrol);
+        {
+          flag: 1,
+          tag: this.$t('scheduleView.onsitePatrol')
         }
-      },
-      notify(msg,type,time) {
-          this.$message({
-              message: msg,
-              type: type,
-              duration:time
-          });
-      },
-      changeActiveName(val) {
-        console.log(val + 'from sun')
-        this.activeName = val;
-      },
-      getpaneList(val){
-        this.paneLength = val
-      },
-      deleteScheduleButton() {
-        let self = this;
-        self.$refs.remoteHandle.deleteScheduleButton();
-      },
-      changePatrol(val){
-        let self = this;
-        self.activePatrol = val.index;
+      ],
+      paneList: [],
+      timeArray: ['08:00'],
+      lang: this.$i18n.locale,
+      activeName: '0',
+      activePatrol: '0',
+      isActive: 0,
+      isActivePatrol: '',
+      paneLength: 0
+    };
+  },
+  watch: {
+    accountChanged(val, oldVal) {
+      console.log(val);
+      let self = this;
+      if (val !== 0) {
+        self.$refs.remoteHandle.isFirstLoad = true;
+        self.$refs.remoteHandle.activeName = '0';
         self.activeName = '0';
-        self.$refs.remoteHandle.activeName = '0'
-        self.$refs.remoteHandle.isFirstLoad = true
-        self.$nextTick(()=>{
-          self.$refs.remoteHandle.getScheduleList();
-        })
+        self.isActive = 0;
+        self.changePatrolType(0);
+      }
+    }
+  },
+
+  mounted() {
+    let self = this;
+    self.changePatrolType(0);
+  },
+
+  methods: {
+    changePatrolType(val) {
+      let self = this;
+      self.isActivePatrol = '';
+      self.getTagList(val);
+    },
+
+    getTagList(val){
+      let self = this;
+      let params = {
+        mode: val
+      };
+      return new Promise((resolve, reject) => {
+        inpectRESTful.GetInspectTagList(params).then(res => {
+          let data = res.data;
+          let InspectList = [];
+          data.forEach(item => {
+            if (item.appliedTo.length !== 0) {
+              let isrole = [];
+              item.appliedTo.forEach(app_item => {
+                if (app_item.roleId  ===  3 || app_item.roleId  ===  4) {
+                  isrole.push(app_item);
+                }
+              });
+              if (isrole.length !== 0) {
+                let obj = {};
+                obj.id = item.id;
+                obj.name = item.name;
+                obj.roleId = item.appliedTo;
+                InspectList.push(obj);
+              }
+            }
+          });
+          self.InspectList = InspectList;
+          if (self.InspectList.length !== 0) {
+            self.isActivePatrol = self.InspectList[0].id;
+            self.changePatrolList(self.isActivePatrol, self.isActive);
+          } else {
+            self.changePatrolList('noInspect', self.isActive);
+          }
+          resolve(data);
+        }).catch(err => {
+          console.log(err.message);
+          reject(err)
+        });
+      });
+    },
+
+    changePatrolList(val1, val2) {
+      let self = this;
+      self.$refs.remoteHandle.getScheduleList(val1, val2);
+    },
+
+    addScheduleButton() {
+      let self = this;
+      let pleg = self.$refs.remoteHandle.paneList;
+      if (pleg.length >= 10) {
+        self.notify(self.$t('insSettingView.SchdRemoteLength'), 'warning', 3000);
+        return false;
+      } else {
+        self.$refs.remoteHandle.addSchedule(self.isActivePatrol);
       }
     },
-    watch:{
-      accountChanged(val,oldVal){
-        console.log(val);
-        let self=this;
-        if(val!=0){
-          // self.activePatrol = '0';
-          self.$refs.remoteHandle.isFirstLoad = true;
-          self.$refs.remoteHandle.activeName = "0";
-          self.activeName = '0';
-          self.isActive=0
-          self.changePatrolType(0)
-          // self.$refs.remoteHandle.getScheduleList(self.isActivePatrol,self.isActive);
-        }
-      }
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
     },
-    computed:{
-      ...mapGetters({
-        accountChanged:'accountChanged'
-      }),
+
+    changeActiveName(val) {
+      console.log(val + 'from sun');
+      this.activeName = val;
     },
+
+    getpaneList(val) {
+      this.paneLength = val;
+    },
+
+    deleteScheduleButton() {
+      let self = this;
+      self.$refs.remoteHandle.deleteScheduleButton();
+    },
+
+    changePatrol(val) {
+      let self = this;
+      self.activePatrol = val.index;
+      self.activeName = '0';
+      self.$refs.remoteHandle.activeName = '0';
+      self.$refs.remoteHandle.isFirstLoad = true;
+      self.$nextTick(() => {
+        self.$refs.remoteHandle.getScheduleList();
+      });
+    }
+
+  },
+
+  computed: {
+    ...mapGetters({
+      accountChanged: 'accountChanged'
+    })
   }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -217,7 +251,7 @@
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
   }
-  
+
   .el-add-btn{
     color: #fff;
     position: relative;

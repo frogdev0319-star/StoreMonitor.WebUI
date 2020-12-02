@@ -1,811 +1,801 @@
 <template>
-    <div class="el-event-content" :style="{'height':windowHeight-142+'px'}">
-       <el-col :span="24" class="seacrh-content">
-            <span class="select-title">{{$t('reportView.selectStores')}}</span>
-            <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry">
-                <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
-                    <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                </el-option-group>
-            </el-select>
-            <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curCountry=='-1'" :all="$t('overview.allZoneI')"></region-multi-select>
-            <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curCountry=='-1'" :all="$t('overview.allZoneII')"></region-multi-select>
+  <div :style="{'height':windowHeight - 142+'px'}" class="el-event-content">
+    <el-col :span="24" class="seacrh-content">
+      <span class="select-title">{{ $t('remotePatrol.storeSelect') }}</span>
+      <el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" size="mini" class="el-province"
+                 @change="changeCountry">
+        <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
+          <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"/>
+        </el-option-group>
+      </el-select>
+      <region-multi-select
+        ref="proviceSelect"
+        :selected="curProvince"
+        :placeholder="$t('remotePatrol.regionI')"
+        :options="provinceList"
+        :disabled="curCountry.length === 0 || curCountry === '-1'"
+        :all="$t('overview.allZoneI')"
+        style="display: inline;margin-left: calc(20/1920*100vw);"
+        @changeInput="handleProChange"/>
+      <region-multi-select
+        ref="citySelect"
+        :selected="curCity"
+        :placeholder="$t('remotePatrol.regionII')"
+        :options="cityList"
+        :disabled="curProvince.length == 0 || curCountry === '-1'"
+        :all="$t('overview.allZoneII')"
+        style="display: inline;"
+        @changeInput="handleCityChange"/>
 
-            <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                                style="display: inline;" ref="multiSelect"></multi-select>
-            <span class="select-title">{{$t('reportView.selectStoreTag')}}</span>
-            <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag"
-                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="TagMultiSelect"></multi-select>
-            <el-input
-                size="small"
-                class="el-search-input"
-                clearable
-                v-model="serachVale" @keyup.enter.native="searchEventList" @clear="searchEventList">
-                <i slot="prefix" class="iconfont icon-sousuo iconsou"></i>
-            </el-input>
-            <!-- <div class="store-handle">
-              <el-col :span="24" class="header-details1">
-                <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
-              </el-col>
-            </div> -->
-       </el-col>
-        <el-col :span="24" class="el-table-content">
-            <el-table
-            :data="tableData"
-            :highlight-current-row="true"
-            :empty-text="generateStoreLang('noStoreData')"
-            align='left'
-            stripe
-            :height="tableHieght"
-            @sort-change='sortChange'
-            @row-click='toEventDetail'
-            style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;"
-            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-            :cell-style="cellStyle"
-            >
-                <el-table-column
-                    min-width="140"
-                    header-align="center"
-                    align="center">
-                        <template slot-scope="scope" v-if="scope.row.showTag">
-                        <span class="icon-span" style="background-color:#6097F4;"
-                              v-if="scope.row.bindDevice" ><i class="iconfont icon-yichangshijianliebiaocopy"></i> <span>{{generateStoreLang('binded')}}</span></span>
-                        <span class="icon-span" style="background-color:#FEA316;"
-                              v-else><i class="iconfont icon-yichangshijianliebiaocopy"></i> <span>{{generateStoreLang('unbinded')}}</span></span>
-                    </template>
-                </el-table-column>
-                <el-table-column v-for="(item,index) in tableInfoData" :key="index"
-                    :prop="item.prop" :label="item.label" :sortable="item.sortable" :min-width="item.width">
-                </el-table-column>
-                <el-table-column
-                    prop="napeTable"
-                    :label="generateStoreLang('bindInspectList')"
-                    min-width="160"
-                    align="left">
-                    <template slot-scope="scope">
-                        <el-popover
-                        v-if="scope.row.napeTable.length!=0&&(scope.row.napeTable!='--'&&scope.row.napwTable!='现场巡检')"
-                            placement="top-start"
-                            width="200"
-                            trigger="hover">
-                            <span v-for="(_item,_index) in scope.row.napeTable.split('，')"
-                            :key="_index">
-                                {{_item}}
-                            </span>
-                            <!-- :style="_item=='远程巡检'?{'color':'red','font-weight':'bold'}:{}" -->
-                            <span class="napeTable-prp" slot="reference">{{scope.row.napeTable}}</span>
-                        </el-popover>
-                        <span v-else>
-                            {{scope.row.napeTable}}
-                        </span>
-                    </template>
-                </el-table-column>
-                <!-- <el-table-column prop="schedue"
-                    :label="generateStoreLang('bindSchedule')"
-                    min-width="100"
-                    align="left">
-
-                </el-table-column> -->
-                <el-table-column
-                    prop="option"
-                    :label="generateStoreLang('operation')"
-                    align="left"
-                    min-width="100"
-                >
-                    <template slot-scope="scope">
-                        <i class="iconfont icon-gengduo" style="cursor: pointer; vertical-align: middle" @click="toEventDetail(scope.row)"></i>
-                    </template>
-                </el-table-column>
-                <div slot="empty">
-                    <div>
-                        <i class="iconfont icon-zhengque empty-data-icon"></i>
-                        <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{noData}}</span>
-                    </div>
-                </div>
-            </el-table>
-            <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">
-              <el-pagination background small
-                :page-sizes="[10, 20, 50, 100]"
-                @size-change="sizeChange"
-                @current-change="currentChange"
-              layout="jumper,total, prev, pager, next,sizes"
-              :page-size="sizeNum" :total="total"
-              :current-page="page"
-              style="float:right;margin-top:15px;">
-              </el-pagination>
-            </div>
-        </el-col>
-    </div>
+      <multi-select
+        ref="multiSelect"
+        :selected="curStore"
+        :placeholder="$t('remotePatrol.stores')"
+        :options="storeDataList"
+        style="display: inline;"
+        @changeInput="handleStoreChange"/>
+      <span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>
+      <multi-select
+        ref="TagMultiSelect"
+        :selected="curStoreTag"
+        :placeholder="$t('remotePatrol.selectStoreTag')"
+        :all-select="0"
+        :alltype="0"
+        :options="StoreTagList"
+        style="display: inline;margin-left: calc(20/1920*100vw);"
+        @changeInput="changeStoreTag"/>
+      <el-input
+        v-model="serachVale"
+        size="small"
+        class="el-search-input"
+        clearable
+        @keyup.enter.native="searchEventList"
+        @clear="searchEventList">
+        <i slot="prefix" class="iconfont icon-sousuo iconsou"/>
+      </el-input>
+    </el-col>
+    <el-col :span="24" class="el-table-content">
+      <el-table
+        :data="tableData"
+        :highlight-current-row="true"
+        :empty-text="$t('storeView.noStoreData')"
+        :height="tableHieght"
+        :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+        :cell-style="cellStyle"
+        align="left"
+        stripe
+        style="width:100%;margin-left:15px; text-algin:center;height:300px;float:left;border: 0px solid #ebebeb;"
+        @sort-change="sortChange"
+        @row-click="toEventDetail"
+      >
+        <el-table-column
+          min-width="140"
+          header-align="center"
+          align="center">
+          <template v-if="scope.row.showTag" slot-scope="scope">
+            <span
+              v-if="scope.row.bindDevice"
+              class="icon-span"
+              style="background-color:#6097F4;" >
+              <i class="iconfont icon-yichangshijianliebiaocopy"/>
+              <span>{{ $t('storeView.binded') }}</span>
+            </span>
+            <span
+              v-else
+              class="icon-span"
+              style="background-color:#FEA316;">
+              <i class="iconfont icon-yichangshijianliebiaocopy"/>
+              <span>{{ $t('storeView.unbinded') }}</span>
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-for="(item,index) in tableInfoData"
+          :key="index"
+          :prop="item.prop"
+          :label="item.label"
+          :sortable="item.sortable"
+          :min-width="item.width"/>
+        <el-table-column
+          :label="$t('storeView.bindInspectList')"
+          prop="napeTable"
+          min-width="160"
+          align="left">
+          <template slot-scope="scope">
+            <el-popover
+              v-if="scope.row.napeTable.length !== 0 && (scope.row.napeTable !== '--' && scope.row.napwTable !== '现场巡检')"
+              placement="top-start"
+              width="200"
+              trigger="hover">
+              <span
+                v-for="(_item,_index) in scope.row.napeTable.split('，')"
+                :key="_index">
+                {{ _item }}
+              </span>
+=              <span slot="reference" class="napeTable-prp">{{ scope.row.napeTable }}</span>
+            </el-popover>
+            <span v-else>
+              {{ scope.row.napeTable }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="$t('storeView.operation')"
+          prop="option"
+          align="left"
+          min-width="100"
+        >
+          <template slot-scope="scope">
+            <i class="iconfont icon-gengduo" style="cursor: pointer; vertical-align: middle" @click="toEventDetail(scope.row)"/>
+          </template>
+        </el-table-column>
+        <div slot="empty">
+          <div>
+            <i class="iconfont icon-zhengque empty-data-icon"/>
+            <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{ noData }}</span>
+          </div>
+        </div>
+      </el-table>
+      <div class="toolbar pagination" style="width:100%; margin:10px 15px;height:12%;">
+        <el-pagination
+          :page-sizes="[10, 20, 50, 100]"
+          :page-size="sizeNum"
+          :total="total"
+          :current-page="page"
+          background
+          small
+          layout="jumper,total, prev, pager, next,sizes"
+          style="float:right;margin-top:15px;"
+          @size-change="sizeChange"
+          @current-change="currentChange"/>
+      </div>
+    </el-col>
+  </div>
 </template>
 
 <script>
-import api from '@/api/index'
-import {mapGetters} from 'vuex'
-import {getInspectBindCount} from '@/api/inspect'
-import {getStoreList,getBriefStoreList,GetTagList} from '@/api/store'
-import {isLoginIn} from '@/api/login'
-import PubSub from 'pubsub-js'
-import {generateStoreLang} from '@/api/i18n'
-import MultiSelect from '@/components/MultiSelect'
-import RegionMultiSelect from '@/components/RegionMultiSelect'
+import { mapGetters } from 'vuex';
+import { getInspectBindCount } from '@/api/inspect';
+import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
+import { isLoginIn } from '@/api/login';
+import PubSub from 'pubsub-js';
+import MultiSelect from '@/components/MultiSelect';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
 
-    export default {
-        name: "StoreManage",
-        components: {
-            MultiSelect,
-            RegionMultiSelect
-        },
-        data(){
-            return{
-                tableInfoData:[
-                     {
-                        "prop":"name",
-                        "label":this.$t('storeView.storeName'),
-                        "sortable":'custom',
-                        "width":130
-                    },
-                    {
-                        // "prop":"userName",
-                        "prop":"supervisorName",
-                        "label":this.$t('storeView.supervisor'),
-                        "sortable":'custom',
-                        "width":120
-                    },
-                    {
-                      "prop":"userName",
-                      "label":this.$t('storeView.solver'),
-                      "sortable": false,
-                      "width":100
-                    },
-                    {
-                        "prop":"phone",
-                        "label":this.$t('storeView.contact'),
-                        "sortable":false,
-                        "width":120
-                    },
+export default {
+  name: 'StoreManage',
 
-                ],
-                allCityChecked:false,
-                storeData:[],
-                tempStoreData:[],
-                tableData:[],
-                provinceList:[],
-                cityList:[],
-                storeDataList:[],
-                CountryList:[],
-                StoreTagList:[],
-                curCountry:'',
-                curProvince:[],
-                curCity:[],
-                curStore:[],
-                curStoreTag:[],
-                showDrap:false,
-                showCityContent:false,
-                multeCityList:[],
-                tagList:[],
-                windowHeight:window.innerHeight,
-                varyWindowWidth:window.innerWidth,
-                params:{},
-                total:0,
-                sizeNum:10,
-                page:1,
-                serachVale:'',
-                timeid:0,
-                isChecked:false,
-                curCitys:'城市',
-                showPopoVer:true,
-                lang: this.$i18n.locale,
-                noData: '',
-                storeStr:''
-            }
-        },
-        watch:{
-            accountChanged(val,oldVal){
-                console.log(val);
-                let self=this;
-                if(val!=0){
-                    // self.getProvinceList();
-                    self.getInitData();
-                }
-            }
-        },
-        computed:{
-            tableHieght(){
-              console.log(this.windowHeight);
-              if(this.windowHeight>800){
-                    return this.windowHeight*0.70;
-                }
-                else if(this.windowHeight>700){
-                    return this.windowHeight*0.67;
-                }
-                else{
-                    return this.windowHeight*0.55;
-                }
-            },
-            ...mapGetters({accountChanged:'accountChanged'})
-        },
-        methods:{
-          cellStyle({ row, column, rowIndex, columnIndex}){
-            console.log(row);
-            console.log(columnIndex);
-            let obj = {};
-            if(columnIndex == 0){
-              obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
-            }
-            else{
-              obj = {'border-right':'1px solid #e3e9f4'}
-            }
-            return obj;
-          },
-            generateStoreLang,
-            changeStoreTag(val){
-                let self=this
-                let temp=[]
-                self.curStoreTag=val
-                self.changeStore(self.curStore)
-            },
-            changeCountry(val){
-                let self=this;
-                let temp=[]
-                self.clearProviceInfo()
-                self.clearCityInfo();
-                self.clearStoreInfo();
-                self.selectAllProAndCity(val);
-            },
-            changePro(val){
-                let self=this;
-                self.curCity= [];
-                self.clearCityInfo();
-                self.clearStoreInfo();
-                let storeList=self.tempStoreData;
-                let temp=[];
-                let tempStore=[];
-                if(val==''){
-                    storeList.forEach(item=>{
-                        if(item.country==self.curCountry){
-                            let obj={
-                            storeId:item.storeId,
-                            label:item.name,
-                            value:item.name,
-                            userId:item.userId,
-                            tagIds:item.tagIds
-                            };
-                            tempStore.push(obj);
-                        }
-                    })
-                }else{
-                    val.forEach(_item=>{
-                        storeList.forEach(item=>{
-                            if(item.province==_item){
-                            if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                                let obj={
-                                label:item.city,
-                                value:item.city
-                                }
-                                temp.push(obj);
-                            }
-                            let obj={
-                                storeId:item.storeId,
-                                label:item.name,
-                                value:item.name,
-                                userId:item.userId,
-                                tagIds:item.tagIds
-                            };
-                            tempStore.push(obj);
-                            }
-                        })
-                    })
-                    self.cityList=temp;
-                    let cityArr=[]
-                    if(self.cityList.length!=0){
-                        self.cityList.forEach(item=>{
-                            cityArr.push(item.value)
-                        })
-                        self.curCity=cityArr
-                    }
-                }
-                self.storeDataList=tempStore;
-                let storeArr=[],arr=[]
-                
-                self.storeDataList.forEach(item=>{
-                   storeArr.push(item.storeId)
-                   arr.push(item.value)
-                })
-                
-                self.curStore=storeArr
-                self.changeStore(self.curStore)
-            },
-            changeCity(val){
-                let self=this;
-                self.clearStoreInfo();
-                let storeList=self.tempStoreData;
-                let temp=[];
-                if(val.length != 0){
-                    val.forEach(_item=>{
-                    storeList.forEach(item=>{
-                        if(item.city==_item){
-                            if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                                let obj={
-                                storeId:item.storeId,
-                                label:item.name,
-                                value:item.name,
-                                userId:item.userId,
-                                tagIds:item.tagIds
-                                }
-                                temp.push(obj);
-                            }
-                        }
-                    })
-                    })
-                }
-                self.storeDataList=temp;
-                let str = '',storeArr=[],arr=[]
-                self.storeDataList.forEach(item=>{
-                    storeArr.push(item.storeId)
-                    arr.push(item.value)
-                })
-                self.curStore=storeArr
-                self.changeStore(self.curStore)
-            },
-            handleStoreChange (arr) {
-                let self=this;
-                self.curStore = arr
-                self.changeStore(arr)
-            },
-            handleProChange(arr){
-                let self=this;
-                console.log(arr)
-                self.curProvince = arr
-                self.changePro(arr)
-            },
-            handleCityChange(arr){
-                let self=this;
-                console.log(arr)
-                self.curCity = arr
-                self.changeCity(arr)
-            },
-            clearStoreInfo(){
-                let self=this;
-                self.curStore=[];
-                self.storeStr='';
-                self.$refs.multiSelect.selectedArray = [];
-                self.$refs.multiSelect.input=''
-            },
-            clearProviceInfo(){
-                let self=this;
-                self.curProvince=[];
-                self.$refs.proviceSelect.selectedArray = [];
-                self.$refs.proviceSelect.input=''
-            },
-            clearCityInfo(){
-                let self=this;
-                self.curCity=[];
-                self.$refs.citySelect.selectedArray = [];
-                self.$refs.citySelect.input=''
-            },
-            changeStore(val){
-                let self=this;
-                let str='';
-                self.tempStoreData.forEach((item,index)=>{
-                    val.forEach(_item=>{
-                        if(item.storeId==_item){
-                            self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
-                                item.tagIds.forEach(t_item=>{
-                                    if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                        str+=item.name+'，'
-                                    }
-                                })
-                            }) : (item.storeId==_item ? str+=item.name+'，' : null)
-                        }
-                    })
-                })
-                str=str.substr(0,str.length-1)
-                self.storeStr=str;
-                self.searchStore()
-            },
-            choiceCity(){
-                let self=this;
-                if(self.curProvince.length==0){
-                    self.notify(this.$t('storeView.selectProviceInfo'),'warning',3000);
-                    self.showPopoVer=true;
-                    return false;
-                }
-                else{
-                    self.showPopoVer=false;
-                    self.showDrap=!self.showDrap;
-                }
-            },
-            searchStore(){
-                let self=this;
-                self.serachVale=''
-                self.params.like={};
-                let temp=[];
-                self.page=1;
-                let storeList = self.storeStr.split('，')
-                if(storeList.length!=0){
-                    self.params.clause={
-                        name:storeList
-                    }
-                }else{
-                    self.params.clause={};
-                }
-                // self.cityList.forEach(item=>{
-                //     if(item.checked){
-                //         temp.push(item.cityName);
-                //     }
-                // })
-                // if(self.curProvince!= null && self.curProvince.length!=0){
-                //     if(temp.length!=0){
-                //         self.params.clause={
-                //             city:temp,
-                //             province:self.curProvince
-                //         };
-                //     }
-                //     else{
-                //         self.params.clause={
-                //             province:self.curProvince
-                //         }
-                //     }
-                // }
-                // else{
-                //     self.params.clause={};
-                // }
-                self.getStoreList(self.params);
-            },
-            sizeChange(val){
-                let self=this;
-                self.sizeNum=val;
-                self.getStoreList(self.params);
-            },
-            currentChange(val){
-                let self=this;
-                self.page=val;
-                self.getStoreList(self.params);
-                let dom=document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
-                let offestTop=dom.offsetTop;
-                if(dom!=undefined){
-                    document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop=0;
-                }
-            },
-            // getCityByProvince(province){
-            //     let self=this;
-            //     let temp=[];
-            //     self.tempStoreData.forEach(item=>{
-            //         if(item.province==province){
-            //             let obj={};
-            //             obj.cityName=item.city;
-            //             obj.checked=false;
-            //             if(temp.map(x=>x.cityName).indexOf(obj.cityName)==-1){
-            //                 temp.push(obj);
-            //             }
-            //         }
-            //     })
-            //     self.cityList=temp;
-            // },
-            async getCountryStore(){
-                let self=this;
-                let data=await self.getBriefStoreData();
-                let temp=[]
-                if(data.errCode==0&&data.errMsg=='Success'){
-                    self.tempStoreData=data.data;
-                    if(self.tempStoreData.length!=0){
-                        self.tempStoreData.forEach(item=>{
-                            let country=item.country;
-                            if(temp.map(x=>x.label).indexOf(country)==-1){
-                                let obj={
-                                    value:country,
-                                    label:country
-                                }
-                                temp.push(obj);
-                            }
-                        })
-                    }
-                    let countryList=temp;
-                    self.CountryList[0] = {}
-                    self.CountryList[0].label= self.$t('reportView.country');
-                    self.CountryList[0].countryList = countryList
-                    self.CountryList[0].countryList.unshift({value:'-1', label:self.$t('reportView.all')})
-                    self.curCountry = countryList[0].value;
-                    self.selectAllProAndCity(self.curCountry);
-                }
-            },
-            selectAllProAndCity(val){
-                let self = this;
-                let storeList = self.tempStoreData;
-                let temp = [];
-                let tempStore = [];
-                storeList.forEach(item=>{
-                    if(item.country==val||val=='-1'){
-                    if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                        let obj={
-                        label:item.province,
-                        value:item.province
-                        }
-                        temp.push(obj);
-                    }
-                    let obj={
-                        storeId:item.storeId,
-                        label:item.name,
-                        value:item.name,
-                        userId:item.userId,
-                        tagIds:item.tagIds
-                    };
-                    tempStore.push(obj);
-                    }
-                })
-                self.provinceList = temp;
-                let cityTemp = [];
-                self.provinceList.forEach(_item=>{
-                    storeList.forEach(item=>{
-                    if(item.province==_item.value){
-                        if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
-                        let obj={
-                            label:item.city,
-                            value:item.city
-                        }
-                        cityTemp.push(obj);
-                        }
-                    }
-                    })
-                })
-                self.cityList = cityTemp;
-                let provinceArr = [];
-                self.provinceList.forEach(item=>{
-                    provinceArr.push(item.value)
-                })
-                self.curProvince = provinceArr;
+  components: {
+    MultiSelect,
+    RegionMultiSelect
+  },
 
-                let cityArr = [];
-                self.cityList.forEach(item=>{
-                    cityArr.push(item.value)
-                })
-                self.curCity = cityArr;
-                self.storeDataList = tempStore;
-                let storeArr = [];
-                self.storeDataList.forEach(item=>{
-                    storeArr.push(item.storeId)
-                })
-                self.curStore = storeArr;
-                self.changeStore(self.curStore)
-            },
-            clearPage(){
-                let self=this;
-                self.params={};
-                self.curProvince=[];
-                //self.curCitys='城市';
-                self.curCitys=this.$t('storeView.cityPlaceholder');
-                self.serachVale='';
-                self.multeCityList=[];
-                self.curStoreTag=[]
-            },
-            getInitData(){
-                let self=this;
-                self.clearPage();
-                self.getCountryStore()
-                self.getTagListData() 
-                self.params.filter={
-                    'page':self.page-1,
-                    'size':self.sizeNum
-                };
-                self.getStoreList(self.params);
-            },
-            async getStoreList(params){
-                let self=this;
-                params.filter={page:this.page-1,size:this.sizeNum};
-                let data=await self.getStoreData(params);
-                self.storeData=data.data;
-                let temp=[];
-                self.storeData.content.forEach(item=>{
-                    let obj={};
-                    obj.bindDevice=false;
-                    obj.storeId=item.storeId;
-                    obj.name=item.name;
-                    obj.userName=item.userName;
-                    obj.userId=item.userId;
-                    obj.supervisorName = item.supervisorName; //督导名称
-                    obj.supervisorId = item.supervisorId; //督导编号
-                    obj.phone=item.phoneNumber;
-                    obj.favorite=item.favorite;
-                    obj.appliedInspect=item.appliedInspect
-                    if(item.appliedInspect.length!=0){
-                        let au_inspect=[]
-                        let mode=[]
-                        item.appliedInspect.forEach(au_item=>{
-                            mode.push(au_item.mode)
-                        })
-                        if(mode.indexOf(0)!=-1){
-                            au_inspect.push(self.$t('overview.remotePatrol'))
-                        }
-                        if(mode.indexOf(1)!=-1){
-                            au_inspect.push(self.$t('overview.onsitePatrol'))
-                        }
-                        obj.napeTable=au_inspect.join('，')
-                    }else{
-                        obj.napeTable='--'
-                    }
-                    if(obj.napeTable.indexOf(self.$t('overview.remotePatrol'))==-1){
-                        obj.showTag=false;
-                    }
-                    else{
-                        obj.showTag=true;
-                    }
-                    // obj.napeTable=item.appliedInspect.length!=0?item.appliedInspect.join('，'):'--';
-                    obj.schedue='--',
-                    obj.device=item.device;
-                    temp.push(obj);
-                })
-                let paramsGetBind={
-                    "storeIds": temp.map(x=>x.storeId)
-                };
-                let tempStoreId=temp.map(x=>x.storeId);
-                self.tableData=temp;
-                console.log(self.tableData)
-                if(self.tableData.length == 0){
-                  self.noData = self.$t('storeView.noStoreData')
-                }
-                self.total=self.storeData.totalElements;
-                if(paramsGetBind.storeIds.length!=0){
-                    getInspectBindCount(paramsGetBind).then(res=>{
-                        let data=res.data;
-                        let tempRet=[];
-                        for(let i=0;i<tempStoreId.length;i++){
-                            for(let j=0;j<data.length;j++){
-                                if(tempStoreId[i]==data[j].storeId){
-                                    tempRet.push(data[j]);
-                                }
-                            }
-                        }
-                        for(let i=0;i<data.length;i++){
-                            self.tableData[i].bindDevice=(tempRet[i].unbindCount==0)?true:false;
-                        }
-                    })
-                }
-            },
-            searchEventList(){
-                let self=this;
-                self.params.clause={};
-                // self.curProvince=[];
-                // self.curCity= [];
-                // self.clearCityInfo();
-                // self.curCitys=this.$t('storeView.cityPlaceholder');
-                self.page=1;
-                if(self.serachVale.length!=0){
-                    self.params.like={
-                        "name": self.serachVale,
-                       // "userName": self.serachVale,
-                        "supervisorName" : self.serachVale,
-                    };
-                }
-                else{
-                    self.params.like={};
-                }
-
-                self.getStoreList(self.params);
-            },
-            sortChange(column){
-                let self=this;
-                self.params.order={
-                    direction:column.order=='ascending'?'asc':'desc',
-                    property:column.prop
-                };
-                self.page=1;
-                self.getStoreList(self.params);
-            },
-            getINspectItemResult(){
-
-            },
-            toEventDetail(row){
-                let self=this;
-                if(row.napeTable.indexOf(self.$t('overview.remotePatrol'))!=-1){
-                    sessionStorage.setItem('STORE_ROW',JSON.stringify(row));
-                    self.$router.push({name:'storeDetail',params:row});
-                }else{
-                    self.notify(self.$t('insSettingView.storeNoInspect'),'warning',3000);
-                    return false;
-                }
-            },
-            getStoreData(params){
-                let self=this;
-                return new Promise((resolve,reject)=>{
-                    getStoreList(params).then(res=>{
-                        let errMsg=res.errMsg;
-                        if(errMsg!=undefined&&errMsg=='Success'){
-                            let data=res.data;
-                            resolve(res);
-                        }
-                    }).catch(res => {
-                        resolve(res);
-                    })
-                })
-            },
-            getBriefStoreData(){
-                let self=this;
-                return new Promise((resolve,reject)=>{
-                    getBriefStoreList().then(res=>{
-                        let errMsg=res.errMsg;
-                        if(errMsg!=undefined&&errMsg=='Success'){
-                            let data=res.data;
-                            resolve(res);
-                        }
-                    }).catch(res => {
-                        resolve(res);
-                    })
-                })
-            },
-            getTagListData(){
-                let self=this;
-                return new Promise((resolve,reject)=>{
-                    GetTagList().then(res=>{
-                        let errMsg=res.errMsg;
-                        if(errMsg!=undefined&&errMsg=='Success'){
-                            res.data.forEach(item=>{
-                                let obj={}
-                                obj.value=item.tagId
-                                obj.label=item.tagName
-                                obj.disabled=false
-                                self.StoreTagList.push(obj)
-                            })
-                            resolve(res);
-                        }
-                    }).catch(res => {
-                        resolve(res);
-                    })
-                })
-            },
-            // isLoginIn(){
-            //     let self=this;
-            //     return new Promise((resolve,reject)=>{
-            //         isLoginIn().then(res=>{
-            //             self.getProvinceList();
-            //             self.getInitData();
-            //             resolve(res);
-            //         })
-            //     }).catch(err=>{
-            //         console.log(err);
-            //     })
-            // },
-            notify(msg,type,time) {
-                this.$message({
-                    message: msg,
-                    type: type,
-                    duration:time
-                });
-            },
-
+  data() {
+    return {
+      tableInfoData: [
+        {
+          'prop': 'name',
+          'label': this.$t('storeView.storeName'),
+          'sortable': 'custom',
+          'width': 130
         },
-        async  mounted(){
-            let self=this;
-            let windowHeight=window.innerHeight;
-            if(windowHeight>800){
-                this.tableHeight=770+'px';
-                this.sizeNum=20;
-            }
-            self.getCountryStore() //查询门店列表
-            self.getTagListData() //查询门店标签
+        {
+          'prop': 'supervisorName',
+          'label': this.$t('storeView.supervisor'),
+          'sortable': 'custom',
+          'width': 120
+        },
+        {
+          'prop': 'userName',
+          'label': this.$t('storeView.solver'),
+          'sortable': false,
+          'width': 100
+        },
+        {
+          'prop': 'phone',
+          'label': this.$t('storeView.contact'),
+          'sortable': false,
+          'width': 120
+        }
 
-            // self.getProvinceList();
+      ],
+      allCityChecked: false,
+      storeData: [],
+      tempStoreData: [],
+      tableData: [],
+      provinceList: [],
+      cityList: [],
+      storeDataList: [],
+      CountryList: [],
+      StoreTagList: [],
+      curCountry: '',
+      curProvince: [],
+      curCity: [],
+      curStore: [],
+      curStoreTag: [],
+      showDrap: false,
+      showCityContent: false,
+      multeCityList: [],
+      tagList: [],
+      windowHeight: window.innerHeight,
+      varyWindowWidth: window.innerWidth,
+      params: {},
+      total: 0,
+      sizeNum: 10,
+      page: 1,
+      serachVale: '',
+      timeid: 0,
+      isChecked: false,
+      curCitys: '城市',
+      showPopoVer: true,
+      lang: this.$i18n.locale,
+      noData: '',
+      storeStr: ''
+    };
+  },
 
-            // self.getInitData();
-
-            //await this.isLoginIn();
-            // if(!this.timeid){
-            //     this.timeid=window.setInterval(this.getStoreList(this.params),60*1000);
-            // }
-        },
-        beforeRouteEnter(to, from, next){
-            next(vm=>{
-                console.log(vm);
-                PubSub.publish('change-color',{showTag:false});
-            })
-        },
-        beforeDestroy(){
-           window.clearInterval(this.timeid);
-        },
-        activated(){
-            this.getStoreList(this.params);
-        },
+  watch: {
+    accountChanged(val, oldVal) {
+      console.log(val);
+      const self = this;
+      if (val !==0) {
+        self.getInitData();
+      }
     }
+  },
+
+  computed: {
+    tableHieght() {
+      console.log(this.windowHeight);
+      if (this.windowHeight > 800) {
+        return this.windowHeight * 0.70;
+      } else if (this.windowHeight > 700) {
+        return this.windowHeight * 0.67;
+      } else {
+        return this.windowHeight * 0.55;
+      }
+    },
+
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
+
+  async  mounted() {
+    const self = this;
+    const windowHeight = window.innerHeight;
+    if (windowHeight > 800) {
+      this.tableHeight = 770 + 'px';
+      this.sizeNum = 20;
+    }
+    self.getCountryStore();
+    self.getTagListData();
+  },
+
+  beforeDestroy() {
+    window.clearInterval(this.timeid);
+  },
+
+  activated() {
+    this.getStoreList(this.params);
+  },
+
+  methods: {
+    cellStyle({ row, column, rowIndex, columnIndex }) {
+      console.log(row);
+      console.log(columnIndex);
+      let obj = {};
+      if (columnIndex == 0) {
+        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      } else {
+        obj = { 'border-right': '1px solid #e3e9f4' };
+      }
+      return obj;
+    },
+
+    changeStoreTag(val) {
+      const self = this;
+      const temp = [];
+      self.curStoreTag = val;
+      self.changeStore(self.curStore);
+    },
+
+    changeCountry(val) {
+      const self = this;
+      const temp = [];
+      self.clearProviceInfo();
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      self.selectAllProAndCity(val);
+    },
+
+    changePro(val) {
+      const self = this;
+      self.curCity = [];
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      const storeList = self.tempStoreData;
+      const temp = [];
+      const tempStore = [];
+      if (val == '') {
+        storeList.forEach(item => {
+          if (item.country === self.curCountry) {
+            const obj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              tagIds: item.tagIds
+            };
+            tempStore.push(obj);
+          }
+        });
+      } else {
+        val.forEach(_item => {
+          storeList.forEach(item => {
+            if (item.province === _item) {
+              if (temp.map(x => x.value).indexOf(item.city) === -1) {
+                const obj = {
+                  label: item.city,
+                  value: item.city
+                };
+                temp.push(obj);
+              }
+              const obj = {
+                storeId: item.storeId,
+                label: item.name,
+                value: item.name,
+                userId: item.userId,
+                tagIds: item.tagIds
+              };
+              tempStore.push(obj);
+            }
+          });
+        });
+        self.cityList = temp;
+        const cityArr = [];
+        if (self.cityList.length !== 0) {
+          self.cityList.forEach(item => {
+            cityArr.push(item.value);
+          });
+          self.curCity = cityArr;
+        }
+      }
+      self.storeDataList = tempStore;
+      let storeArr = [], arr = [];
+
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+        arr.push(item.value);
+      });
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
+
+    changeCity(val) {
+      const self = this;
+      self.clearStoreInfo();
+      const storeList = self.tempStoreData;
+      const temp = [];
+      if (val.length !== 0) {
+        val.forEach(_item => {
+          storeList.forEach(item => {
+            if (item.city === _item) {
+              if (temp.map(x => x.value).indexOf(item.city) === -1) {
+                const obj = {
+                  storeId: item.storeId,
+                  label: item.name,
+                  value: item.name,
+                  userId: item.userId,
+                  tagIds: item.tagIds
+                };
+                temp.push(obj);
+              }
+            }
+          });
+        });
+      }
+      self.storeDataList = temp;
+      let str = '', storeArr = [], arr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+        arr.push(item.value);
+      });
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
+
+    handleStoreChange(arr) {
+      const self = this;
+      self.curStore = arr;
+      self.changeStore(arr);
+    },
+
+    handleProChange(arr) {
+      const self = this;
+      console.log(arr);
+      self.curProvince = arr;
+      self.changePro(arr);
+    },
+
+    handleCityChange(arr) {
+      const self = this;
+      console.log(arr);
+      self.curCity = arr;
+      self.changeCity(arr);
+    },
+
+    clearStoreInfo() {
+      const self = this;
+      self.curStore = [];
+      self.storeStr = '';
+      self.$refs.multiSelect.selectedArray = [];
+      self.$refs.multiSelect.input = '';
+    },
+
+    clearProviceInfo() {
+      const self = this;
+      self.curProvince = [];
+      self.$refs.proviceSelect.selectedArray = [];
+      self.$refs.proviceSelect.input = '';
+    },
+
+    clearCityInfo() {
+      const self = this;
+      self.curCity = [];
+      self.$refs.citySelect.selectedArray = [];
+      self.$refs.citySelect.input = '';
+    },
+
+    changeStore(val) {
+      const self = this;
+      let str = '';
+      self.tempStoreData.forEach((item, index) => {
+        val.forEach(_item => {
+          if (item.storeId === _item) {
+            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
+              item.tagIds.forEach(t_item => {
+                if ((t_item === v_item && self.curCountry === item.country)
+                  || (t_item === v_item && self.curCountry === '-1')) {
+                  str += item.name + '，';
+                }
+              });
+            }) : (item.storeId === _item ? str += item.name + '，' : null);
+          }
+        });
+      });
+      str = str.substr(0, str.length - 1);
+      self.storeStr = str;
+      self.searchStore();
+    },
+
+    choiceCity() {
+      const self = this;
+      if (self.curProvince.length === 0) {
+        self.notify(this.$t('storeView.selectProviceInfo'), 'warning', 3000);
+        self.showPopoVer = true;
+        return false;
+      } else {
+        self.showPopoVer = false;
+        self.showDrap = !self.showDrap;
+      }
+    },
+
+    searchStore() {
+      const self = this;
+      self.serachVale = '';
+      self.params.like = {};
+      const temp = [];
+      self.page = 1;
+      const storeList = self.storeStr.split('，');
+      if (storeList.length !== 0) {
+        self.params.clause = {
+          name: storeList
+        };
+      } else {
+        self.params.clause = {};
+      }
+      self.getStoreList(self.params);
+    },
+
+    sizeChange(val) {
+      const self = this;
+      self.sizeNum = val;
+      self.getStoreList(self.params);
+    },
+
+    currentChange(val) {
+      const self = this;
+      self.page = val;
+      self.getStoreList(self.params);
+      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+      const offestTop = dom.offsetTop;
+      if (dom != undefined) {
+        document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop = 0;
+      }
+    },
+
+    async getCountryStore() {
+      const self = this;
+      const data = await self.getBriefStoreData();
+      const temp = [];
+      if (data.errCode === 0 && data.errMsg === 'Success') {
+        self.tempStoreData = data.data;
+        if (self.tempStoreData.length !== 0) {
+          self.tempStoreData.forEach(item => {
+            const country = item.country;
+            if (temp.map(x => x.label).indexOf(country) === -1) {
+              const obj = {
+                value: country,
+                label: country
+              };
+              temp.push(obj);
+            }
+          });
+        }
+        const countryList = temp;
+        self.CountryList[0] = {};
+        self.CountryList[0].label = self.$t('remotePatrol.country');
+        self.CountryList[0].countryList = countryList;
+        self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+        self.curCountry = countryList[0].value;
+        self.selectAllProAndCity(self.curCountry);
+      }
+    },
+
+    selectAllProAndCity(val) {
+      const self = this;
+      const storeList = self.tempStoreData;
+      const temp = [];
+      const tempStore = [];
+      storeList.forEach(item => {
+        if (item.country === val || val === '-1') {
+          if (temp.map(x => x.value).indexOf(item.province) === -1) {
+            const obj = {
+              label: item.province,
+              value: item.province
+            };
+            temp.push(obj);
+          }
+          const obj = {
+            storeId: item.storeId,
+            label: item.name,
+            value: item.name,
+            userId: item.userId,
+            tagIds: item.tagIds
+          };
+          tempStore.push(obj);
+        }
+      });
+      self.provinceList = temp;
+      const cityTemp = [];
+      self.provinceList.forEach(_item => {
+        storeList.forEach(item => {
+          if (item.province === _item.value) {
+            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+              const obj = {
+                label: item.city,
+                value: item.city
+              };
+              cityTemp.push(obj);
+            }
+          }
+        });
+      });
+      self.cityList = cityTemp;
+      const provinceArr = [];
+      self.provinceList.forEach(item => {
+        provinceArr.push(item.value);
+      });
+      self.curProvince = provinceArr;
+
+      const cityArr = [];
+      self.cityList.forEach(item => {
+        cityArr.push(item.value);
+      });
+      self.curCity = cityArr;
+      self.storeDataList = tempStore;
+      const storeArr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+      });
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
+
+    clearPage() {
+      const self = this;
+      self.params = {};
+      self.curProvince = [];
+      self.curCitys = this.$t('storeView.cityPlaceholder');
+      self.serachVale = '';
+      self.multeCityList = [];
+      self.curStoreTag = [];
+    },
+
+    getInitData() {
+      const self = this;
+      self.clearPage();
+      self.getCountryStore();
+      self.getTagListData();
+      self.params.filter = {
+        'page': self.page - 1,
+        'size': self.sizeNum
+      };
+      self.getStoreList(self.params);
+    },
+
+    async getStoreList(params) {
+      const self = this;
+      params.filter = { page: this.page - 1, size: this.sizeNum };
+      const data = await self.getStoreData(params);
+      self.storeData = data.data;
+      const temp = [];
+      self.storeData.content.forEach(item => {
+        const storeObj = {};
+        storeObj.bindDevice = false;
+        storeObj.storeId = item.storeId;
+        storeObj.name = item.name;
+        storeObj.userName = item.userName;
+        storeObj.userId = item.userId;
+        storeObj.supervisorName = item.supervisorName;
+        storeObj.supervisorId = item.supervisorId;
+        storeObj.phone = item.phoneNumber;
+        storeObj.favorite = item.favorite;
+        storeObj.appliedInspect = item.appliedInspect;
+        if (item.appliedInspect.length !== 0) {
+          const au_inspect = [];
+          const mode = [];
+          item.appliedInspect.forEach(au_item => {
+            mode.push(au_item.mode);
+          });
+          if (mode.indexOf(0) !== -1) {
+            au_inspect.push(self.$t('overview.remotePatrol'));
+          }
+          if (mode.indexOf(1) !== -1) {
+            au_inspect.push(self.$t('overview.onsitePatrol'));
+          }
+          storeObj.napeTable = au_inspect.join('，');
+        } else {
+          storeObj.napeTable = '--';
+        }
+        if (storeObj.napeTable.indexOf(self.$t('overview.remotePatrol')) === -1) {
+          storeObj.showTag = false;
+        } else {
+          storeObj.showTag = true;
+        }
+        storeObj.schedue = '--';
+        storeObj.device = item.device;
+        temp.push(storeObj);
+      });
+      const paramsGetBind = {
+        'storeIds': temp.map(x => x.storeId)
+      };
+      const tempStoreId = temp.map(x => x.storeId);
+      self.tableData = temp;
+      console.log(self.tableData);
+      if (self.tableData.length === 0) {
+        self.noData = self.$t('storeView.noStoreData');
+      }
+      self.total = self.storeData.totalElements;
+      if (paramsGetBind.storeIds.length !== 0) {
+        getInspectBindCount(paramsGetBind).then(res => {
+          const data = res.data;
+          const tempRet = [];
+          for (let i = 0; i < tempStoreId.length; i++) {
+            for (let j = 0; j < data.length; j++) {
+              if (tempStoreId[i] === data[j].storeId) {
+                tempRet.push(data[j]);
+              }
+            }
+          }
+          for (let i = 0; i < data.length; i++) {
+            self.tableData[i].bindDevice = (tempRet[i].unbindCount === 0);
+          }
+        })
+      }
+    },
+
+    searchEventList() {
+      const self = this;
+      self.params.clause = {};
+      self.page = 1;
+      if (self.serachVale.length !== 0) {
+        self.params.like = {
+          'name': self.serachVale,
+          'supervisorName': self.serachVale
+        };
+      } else {
+        self.params.like = {};
+      }
+      self.getStoreList(self.params);
+    },
+
+    sortChange(column) {
+      const self = this;
+      self.params.order = {
+        direction: column.order === 'ascending' ? 'asc' : 'desc',
+        property: column.prop
+      };
+      self.page = 1;
+      self.getStoreList(self.params);
+    },
+
+    toEventDetail(row) {
+      const self = this;
+      if (row.napeTable.indexOf(self.$t('overview.remotePatrol')) !== -1) {
+        sessionStorage.setItem('STORE_ROW', JSON.stringify(row));
+        self.$router.push({ name: 'storeDetail', params: row });
+      } else {
+        self.notify(self.$t('insSettingView.storeNoInspect'), 'warning', 3000);
+        return false;
+      }
+    },
+
+    getStoreData(params) {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        getStoreList(params).then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(res => {
+          resolve(res);
+        });
+      });
+    },
+
+    getBriefStoreData() {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    getTagListData() {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        GetTagList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            res.data.forEach(item => {
+              const obj = {};
+              obj.value = item.tagId;
+              obj.label = item.tagName;
+              obj.disabled = false;
+              self.StoreTagList.push(obj);
+            });
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    }
+  },
+
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      console.log(vm);
+      PubSub.publish('change-color', { showTag: false });
+    });
+  }
+
+};
 </script>
 
 <style lang="scss" scoped>
@@ -1017,12 +1007,6 @@ import RegionMultiSelect from '@/components/RegionMultiSelect'
     .el-table tbody tr:hover>td {
         background-color: #FDE8EF !important;
     }
-    /*.el-table--border th{*/
-        /*border-right: 0 !important;*/
-    /*}*/
-    /*.el-table--border, .el-table--group{*/
-        /*border: none !important;*/
-    /*}*/
     .el-table__header-wrapper th:nth-last-of-type(2){
         border-right: none !important;
     }

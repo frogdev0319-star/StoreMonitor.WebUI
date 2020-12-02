@@ -1,19 +1,17 @@
 <template>
-  <router-view></router-view>
+  <router-view/>
 </template>
 <script>
 
 export default {
-    name:'ScheduleManage',
-    data(){
-        return{
-        }
-    },
-    methods:{
-    },
-    mounted(){
-    }
-}
+  name: 'ScheduleManage',
+  data() {
+    return {
+    };
+  },
+  methods: {
+  }
+};
 </script>
 <style lang="scss" scoped>
 

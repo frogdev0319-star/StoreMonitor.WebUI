@@ -1,513 +1,500 @@
 <template>
-    <el-row class="el-storeEdit-content">
-        <el-col :span="24" class="storeEdit-header">
-            <div class="store-title ">
-                <span>{{storeTitle}}</span>
-                <el-button @click="submitData"  class="sub-btn" :size="varyWindowWidth>1680?'small':'mini'" type='primary' :disabled="scheduleData.length == 0? true : false">{{generateStoreLang('mySubmit')}}</el-button>
+  <el-row class="el-storeEdit-content">
+    <el-col :span="24" class="storeEdit-header">
+      <div class="store-title ">
+        <span>{{ storeTitle }}</span>
+        <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
+                   :disabled="scheduleData.length === 0? true : false" class="sub-btn" type="primary"
+                   @click="submitData">{{ $t('storeView.mySubmit') }}
+        </el-button>
+      </div>
+      <div class="store-info">
+        <strong style="margin-right:20px;">{{ $t('storeView.solver') }}</strong>
+        <span style="min-width:100px;display:inline-block;">
+          <el-input v-model="userName" disabled size="mini" class="input"/>
+        </span>
+        <strong style="margin-right:20px;">{{ $t('storeView.contact') }}</strong>
+        <span style="min-width:100px;display:inline-block;"><el-input v-model="phone" disabled size="mini" style="" class="input"/></span>
+        <span style="font-size:12px;font-weight:bold;">{{ $t('storeView.bindInspectList') }}</span>
+        <span style="font-size:12px; display:inline-block;"><el-input v-model="curTag" disabled size="mini" style="" class="input"/></span>
+        <span style="margin-right:20px;"><strong>{{ $t('storeView.supervisor') }}</strong></span>
+        <span style="min-width:100px;display:inline-block;">
+        <el-input v-model="supervisorName" disabled size="mini" class="input"/></span>
+      </div>
+    </el-col>
+    <el-col :span="24" :style="{'min-height': emptyContentHeight+'px'}" class="storeEdit-content">
+      <p class="tab-title"><span class="tab-title-1">{{ $t('insSettingView.editStore') }}</span>
+        <span class="tab-title-2">{{ $t('insSettingView.editStoretips') }}
+        </span>
+      </p>
+      <div class="tab-main">
+        <el-tabs id="patrltabs-content" v-model="activeName" :before-leave="beforeleave">
+          <el-tab-pane v-for="(item,index) in appliedInspect" :key="index" :label="item.name" />
+        </el-tabs>
+        <div class="data-box">
+          <div v-for="item in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id)">
+            <p :style="item.isClick ? 'background-color: #f31b65;color:#fff;' : ''" class="item_title">{{ item.label }}</p>
+          </div>
+        </div>
+        <div class="el-table-title tabTitle">
+          <span class="name-title">{{ $t('storeView.patrolName') }}</span>
+          <span class="schedule-title">{{ $t('storeView.bindChanel') }}</span>
+        </div>
+        <div v-for="(item,index) in scheduleData" :key="index" class="el-table-data" >
+          <span class="grouptitle">
+            {{ item.napeName }}（{{ item.napeNum }}）
+          </span>
+          <div class="schedule-data">
+            <div
+              v-for="(_item,_index) in item.itemData"
+              :key="_index"
+              :class="!_item.isClick?'noraml-color':'active-color'"
+              class="schedule-detials"
+              style="overflow:hidden;"
+              @click="clickItem(_item,_index)">
+              <span class="nape-title">
+                {{ `${_index+1}. ${_item.subject}` }}
+              </span>
+              <limit-select
+                :selected="_item.channelvalue"
+                :options="alleList"
+                :input-size="`mini`"
+                :select-limit="5"
+                class="nape-value"
+                @changeInput="changeDeviceId($event, _item)"
+                @changeIfSelect="changeSelect($event, _item,_index)"/>
             </div>
-            <div class="store-info">
-              <strong style="margin-right:20px;">{{generateStoreLang('solver')}}</strong><span style="min-width:100px;display:inline-block;"><el-input v-model="userName" disabled size="mini" class='input'></el-input></span>
-                <strong style="margin-right:20px;">{{generateStoreLang('contact')}}</strong>
-              <span style="min-width:100px;display:inline-block;"><el-input v-model="phone" disabled size="mini" style="" class='input'></el-input></span>
-                <span style="font-size:12px;font-weight:bold;">{{generateStoreLang('bindInspectList')}}</span>
-                <span style="font-size:12px; display:inline-block;"><el-input v-model="curTag" disabled size="mini" style="" class='input'></el-input></span>
-              <span style="margin-right:20px;"><strong>{{generateStoreLang('supervisor')}}</strong></span>
-              <span style="min-width:100px;display:inline-block;">
-                <el-input v-model="supervisorName" disabled size="mini" class='input'></el-input></span>
-            </div>
-            <!-- <div class="store-handle">
-              <el-col :span="24" class="header-details1">
-                <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{generateStoreLang('bindSchedule')}}<span class="storename-str" style="margin-left:20px;">{{schedule}}</span></span>
-              </el-col>
-            </div> -->
-        </el-col>
-        <el-col :span="24" class="storeEdit-content" :style="{'min-height':emptyContentHeight+'px'}">
-            <p class="tab-title"><span class="tab-title-1">{{$t('insSettingView.editStore')}}</span><span class="tab-title-2">{{$t('insSettingView.editStoretips')}}</span></p>
-            <div class="tab-main">
-                <el-tabs v-model="activeName" :before-leave="beforeleave" @tab-click="handleClick" id="patrltabs-content">
-                    <el-tab-pane v-for="(item,index) in appliedInspect" :key="index" :label="item.name" ></el-tab-pane>
-                </el-tabs>
-                <div class="data-box">
-                    <div class="sheet_title" v-for="item in sheetName" :key="item.id" @click="changeSheet(item.id)">
-                        <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{item.label}}</p>
-                    </div>
-                </div>
-                <div class="el-table-title tabTitle">
-                    <span class="name-title">{{generateStoreLang('patrolName')}}</span>
-                    <span class="schedule-title">{{generateStoreLang('bindChanel')}}</span>
-                </div>
-                    <div class="el-table-data" v-for="(item,index) in scheduleData" :key="index" >
-                        <span class="grouptitle">
-                            {{item.napeName}}（{{item.napeNum}}）
-                        </span>
-                        <div class="schedule-data">
-                            <div v-for="(_item,_index) in item.itemData" :key="_index" :class="!_item.isClick?'noraml-color':'active-color'"
-                            class="schedule-detials" style="overflow:hidden;" @click="clickItem(_item,_index)">
-                                <span class="nape-title">
-                                    {{`${_index+1}. ${_item.subject}`}}
-                                </span>
-                            <!-- <el-select v-model="_item.channelvalue" size="mini"  @focus="clickItem(_item,_index)" multiple  collapse-tags>
-                                <el-option
-                                v-for="item in alleList"
-                                :key="item.name"
-                                :label="item.name"
-                                :value="item.name">
-                                </el-option>
-                            </el-select> -->
-                            <limit-select :selected="_item.channelvalue" :options="alleList" :inputSize="`mini`" :selectLimit="5"
-                                            @changeInput="changeDeviceId($event, _item)"  @changeIfSelect="changeSelect($event, _item,_index)" class="nape-value"></limit-select>
-                            </div>
-                        </div>
-                    </div>
-            </div>
-        </el-col>
-        <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
-        <dialog-vue :dialog-title='changeSubmitObj.title' :show-info='changeSubmitObj.showInfo' :is-warning='changeSubmitObj.isWarning' :dialog-closed='changeSubmitObj.dialogCosed' @confirmed='submitData' @canceled='cancelSubmitDialog'></dialog-vue>
-    </el-row>
+          </div>
+        </div>
+      </div>
+    </el-col>
+    <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo"
+                :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed"
+                @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
+    <dialog-vue :dialog-title="changeSubmitObj.title" :show-info="changeSubmitObj.showInfo"
+                :is-warning="changeSubmitObj.isWarning" :dialog-closed="changeSubmitObj.dialogCosed"
+                @confirmed="submitData" @canceled="cancelSubmitDialog"/>
+  </el-row>
 </template>
 
 <script>
-import api from '@/api/index'
-import {getUserInfo} from '@/api/login'
-import {getDeviceList} from '@/api/device'
-import {checkOutInspectItem,bindInspectItem, checkOutInspectItemV3, bindInspectItemV2, unbindInspectItemV2,GetInspectTagList} from '@/api/inspect'
-import {updateStoreInfo,getStoreList} from '@/api/store'
-import {generateStoreLang} from '@/api/i18n'
-import DialogVue from '@/components/DialogVue.vue'
-import LimitSelect from "../../../components/LimitSelect";
+import { getUserInfo } from '@/api/login';
+import { getDeviceList } from '@/api/device';
+import {
+  checkOutInspectItem,
+  bindInspectItem,
+  checkOutInspectItemV3,
+  bindInspectItemV2,
+  unbindInspectItemV2,
+  GetInspectTagList } from '@/api/inspect';
+import { updateStoreInfo, getStoreList } from '@/api/store';
+import DialogVue from '@/components/DialogVue.vue';
+import LimitSelect from '../../../components/LimitSelect';
+
 export default {
-    name:'EditStoreVue',
-    components:{
-      LimitSelect,
-      DialogVue
-    },
-    data(){
-        return{
-            changeStoreObj:{
-                title: this.$t('remotePatrol.confirm'),
-                showInfo: this.$t('remotePatrol.confirmChangeBind'),
-                isWarning:true,
-                dialogCosed:false
-            },
-            changeSubmitObj:{
-                title: this.$t('remotePatrol.confirm'),
-                showInfo: this.$t('insSettingView.confirmSubmitThis'),
-                isWarning:true,
-                dialogCosed:false
-            },
-            allRoutedata:[],
-            sheetName:[],
-            activeName:'0',
-            curTag:'远程巡检',
-            storeTitle:'',
-            store:{},
-            storeLinder:'王三洋',
-            phone:' ',
-            schedule:'',
-            scheduleList:[
-                {
-                    id:0,
-                    label:'排程一',
-                    value:'排程一'
-                },
-                {
-                    id:1,
-                    label:'排程二',
-                    value:'排程二'
-                },
-            ],
-            personList:[],
-            curPerson:'',
-            scheduleData:[],
-            alleList:[],
-            userId:'',
-            supervisorId: '',
-            supervisorName: '',
-            varyWindowHeight:window.innerHeight,
-            varyWindowWidth:window.innerWidth,
-            userName: '',
-            appliedInspect:[]
-        }
-    },
-    computed:{
-        emptyContentHeight(){
-            if(this.varyWindowHeight>800){
-                return this.varyWindowHeight*0.7;
-            }
-            else if(this.varyWindowHeight>700){
-                return this.varyWindowHeight*0.6;
-            }
-            else{
-                return this.varyWindowHeight*0.5;
-            }
-        }
-    },
-    async mounted(){
-        let self=this;
-        self.store=JSON.parse(sessionStorage.getItem('STORE_ROW'));
-        let storeId=self.store.storeId;
-        self.storeTitle=self.store.name;
-        self.userId=self.store.userId;
-        self.userName = self.store.userName;
-        self.supervisorId = self.store.supervisorId;
-        console.log(self.supervisorId)
-        self.supervisorName = self.store.supervisorName;
-        console.log(self.store.napeTable)
-        self.curTag=self.store.napeTable;
-        self.phone=self.store.phone;
-        self.store.appliedInspect.forEach(item=>{
-            if(item.mode==0){
-                self.appliedInspect.push(item)
-            }
-        })
-        await self.getChannelByStore(storeId);
-        await self.getNapeByStore(storeId);
-       //self.getUserList();
-    },
-    methods:{
-        generateStoreLang,
-        changeStoreDialog(){
-            let self=this
-            self.changeStoreObj.dialogCosed=false
-            self.getNapeByStore(self.store.storeId)
-        },
-        canceldChangeStore(){
-            let self=this
-            self.changeStoreObj.dialogCosed=false
-        },
-        beforeleave(e,w){
-            let self = this
-            let isshowdialog=false
-            self.allRoutedata.forEach(item=>{
-                item.forEach(a_item=>{
-                    a_item.itemData.forEach(_item=>{
-                        if(_item.oldChannelvalue.toString()!=_item.channelvalue.toString()){
-                            isshowdialog=true
-                        }
-                    })
-                })
-            })
-            !isshowdialog?self.getNapeByStore(self.store.storeId,Number(e)):null
-                return isshowdialog ? new Promise((resolve,reject)=>{
-                    self.$confirm(self.$t('remotePatrol.confirmChangeBind'), self.$t('remotePatrol.confirm'), {
-                        confirmButtonText: self.$t('remotePatrol.confirm'),
-                        cancelButtonText: self.$t('remotePatrol.cancel'),
-                        type: 'warning'
-                        }).then(() => {
-                            self.getNapeByStore(self.store.storeId,Number(e))
-                            resolve();
-                        }).catch((err) => {
-                            reject(err);
-                        })
-                }) : true;
-        },
-        handleClick(e){
-            console.log(e.index)
-            let self=this
-            // self.getNapeByStore(self.store.storeId)
-        },
-        changeSheet(e){
-            let self = this
-            self.sheetName.forEach(item=>{
-                if(item.id==e){
-                    item.isClick = true
-                }else{
-                    item.isClick = false
-                }
-            })
-            self.allRoutedata.forEach(item=>{
-                if(e==item[0].type){
-                    self.scheduleData=item
-                }
-            })
-        },
-        getChannelByStore(storeId){
-            let self=this;
-            let params={storeId:storeId};
-            getDeviceList(params).then(res=>{
-                console.log(res);
-                let data=res.data;
-                let temp=[];
-                if(data.length!=0){
-                    data.forEach(item=>{
-                        let obj={};
-                        obj.id=item.id;
-                        obj.name=item.name;
-                        obj.ivsId=item.ivsId;
-                        obj.value = item.id;
-                        obj.label = item.name;
-                        obj.disabled = false;
-                        temp.push(obj);
-                    })
-                    self.alleList=temp;
-                    //self.getNapeByStore(storeId)
-                }
-            })
-        },
-        clickItem(item,index){
-            let self=this;
-            item.isClick=true;
-            self.scheduleData.forEach((_item,index)=>{
-                _item.itemData.forEach((itemS,indexS)=>{
-                    if(item.id!=itemS.id){
-                        itemS.isClick=false;
-                    }
-                })
-            })
-        },
-      changeDeviceId(val, item){
-        let self = this
-        item.channelvalue = val;
+  name: 'EditStoreVue',
+  components: {
+    LimitSelect,
+    DialogVue
+  },
+  data() {
+    return {
+      changeStoreObj: {
+        title: this.$t('remotePatrol.confirm'),
+        showInfo: this.$t('remotePatrol.confirmChangeBind'),
+        isWarning: true,
+        dialogCosed: false
       },
-      changeSelect(val, item, index){
-          this.clickItem(item, index)
+      changeSubmitObj: {
+        title: this.$t('remotePatrol.confirm'),
+        showInfo: this.$t('insSettingView.confirmSubmitThis'),
+        isWarning: true,
+        dialogCosed: false
       },
-      getNapeByStore(storeId,idx){
-            let self=this;
-            let index = 0
-            self.sheetName=[]
-            if(idx!=undefined){
-                index=idx
-            }else{
-                index=self.activeName
-            }
-            let params={
-                storeId:storeId,
-                mode:0,
-                authorizedOnly:0,
-                tagName:self.appliedInspect[index].name,
-                inspectId:self.appliedInspect[index].id
-            }
-          checkOutInspectItemV3(params).then(res=>{
-                console.log(res);
-                let data=res.data.groups;
-                let temp=[];
-                if(data.length!=0){
-                    data.forEach(item=>{
-                        let obj={};
-                        obj.id=item.groupId;
-                        obj.napeName=item.groupName;
-                        obj.type=item.type;
-                        obj.napeNum=item.items.length;
-                        let _temp=[];
-                        for(const _item of item.items){
-                            let _obj={};
-                            _obj.id=_item.id;
-                            _obj.subject=_item.subject;
-                            // _obj.channelvalue=_item.deviceId==-1?'': _item.deviceId;
-                            // self.alleList[self.alleList.map(x=>x.id).indexOf(_item.deviceId)].name;
-                            _obj.channelvalue = []
-                            _obj.oldChannelvalue = []
-                            _item.deviceIds.forEach(id=>{
-                              if(id != -1){
-                                _obj.channelvalue.push(id)
-                              }
-                              _obj.oldChannelvalue.push(id)
-                            })
-                            _obj.isClick=false,
-                            _temp.push(_obj);
-                        }
-                        obj.itemData=_temp;
-                        temp.push(obj);
-                    })
-
-                }
-                let te_temp=[]
-                for(let i=0;i<3;i++){
-                    let Typeindex=temp.filter(x=>x.type==i);
-                    let obj={}
-                    if(Typeindex.length!=0){
-                        te_temp.push(Typeindex)
-                        if(Typeindex[0].type==0){
-                            obj={'id':0,'isClick':false,'label':self.$t('insSettingView.sheetpassfail')}
-                        }
-                        if(Typeindex[0].type==1){
-                            obj={'id':1,'isClick':false,'label':self.$t('insSettingView.sheetscore')}
-                        }
-                        if(Typeindex[0].type==2){
-                            obj={'id':2,'isClick':false,'label':self.$t('insSettingView.sheetother')}
-                        }
-                        self.sheetName.push(obj)
-                    }
-                }
-                self.allRoutedata=te_temp
-                self.sheetName[0].isClick=true
-                self.scheduleData=te_temp[0];
-            })
+      allRoutedata: [],
+      sheetName: [],
+      activeName: '0',
+      curTag: '远程巡检',
+      storeTitle: '',
+      store: {},
+      storeLinder: '王三洋',
+      phone: ' ',
+      schedule: '',
+      scheduleList: [
+        {
+          id: 0,
+          label: '排程一',
+          value: '排程一'
         },
-        changePerson(val){
-            console.log(val);
-            let self=this;
-            self.personList.forEach(item=>{
-                if(item.userId==val){
-                    self.phone=item.phoneNumber;
-                }
-            })
-        },
-        getUserList(){
-            let self=this;
-            let params={
-                storeId:self.store.storeId
-            }
-            getUserInfo(params).then(res=>{
-                console.log(res);
-                let temp=res.data;
-                if(self.supervisorId!=null&&self.supervisorId.length!=0){
-                    if(temp.map(x=>x.userId).indexOf(self.supervisorId)==-1){
-                        let obj={
-                            userId:self.store.supervisorId,
-                            userName:self.store.supervisorId,
-                            phoneNumber:self.store.phone
-                        }
-                        temp.push(obj);
-                    }
-                }
-                self.personList=temp;
-              console.log(self.personList);
-              //self.curPerson=self.userId;
-                self.curPerson = self.supervisorId;
-            })
-        },
-        // confirmSubmit(){
-        //     let self=this;
-        //     self.changeSubmitObj.dialogCosed=true
-        // },
-        cancelSubmitDialog(){
-            let self=this;
-            self.changeSubmitObj.dialogCosed=false
-        },
-        async submitData(){
-            let self=this;
-            console.log(self.scheduleData);
-            let count=0;
-            let countChannel=0;
-            let temp=[];
-            let unbindTemp = [];
-            self.allRoutedata.forEach(all_item=>{
-                all_item.forEach(item=>{
-                    count+=item.itemData.length;
-                    item.itemData.forEach(_item=>{
-                        let obj={};
-                        let unbindObj = {};
-                        if(_item.channelvalue.length!=0){
-                            countChannel++;
-                            obj.inspectItemId=_item.id;
-                            obj.storeId=self.store.storeId;
-                            obj.deviceIds = _item.channelvalue;
-                            if(_item.oldChannelvalue.length > 0 && JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())){
-                            unbindObj.inspectItemId=_item.id;
-                            unbindObj.storeId=self.store.storeId;
-                            unbindObj.deviceIds = _item.oldChannelvalue;
-                            unbindTemp.push(unbindObj)
-                            }
-                            // _item.channelvalue.forEach(channelName=>{
-                            //   obj.deviceIds.push(self.alleList[self.alleList.map(x=>x.name).indexOf(channelName)].id)
-                            // })
-                            //obj.deviceId=self.alleList[self.alleList.map(x=>x.name).indexOf(_item.channelvalue)].id;
-                            temp.push(obj);
-                        }
-                    })
-                })
-            })
-            let paramsUpdateStore={
-                "store": [
-                    {
-                        "storeId": self.store.storeId,
-                        //"userId": self.curPerson
-                        "supervisorId": self.supervisorId
-                    }
-                ]
-            };
-            if(self.scheduleData.length==0){
-                // let resUpdateStore=null;
-                // if(self.curPerson==null||self.curPerson.length==0){
-                //     self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
-                //     return false;
-                // }
-                // if(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson)){  //如果没有修改负责人不执行
-                //     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
-                // }
-                // if(resUpdateStore!=null&&resUpdateStore.errMsg=='Success'||resUpdateStore==null){
-                //      self.notify(this.$t('storeView.successSubmit'),'success',3000);
-                //      self.supervisorId = self.curPerson;
-                // }
-            }
-            else{
-                if((count!=0&&(count!=countChannel))||countChannel==0){
-                    self.notify(this.$t('storeView.selectAllChanels'),'warning',3000);
-                    return false;
-                }
-                let paramsInspec={
-                    items:temp
-                };
-
-                let resUpdateStore=null,resBindInspect=null,resUnbindInspect=null;
-                // if(self.curPerson ==null ||self.curPerson.length==0 ){
-                //   self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
-                //   return false;
-                // }
-                // else if(self.curPerson!=null&&(self.curPerson.length!=0&&(self.supervisorId!=self.curPerson))){  //如果没有修改负责人不执行
-                //     resUpdateStore=await self.updateStoreInfo(paramsUpdateStore);
-                // }
-                //else{
-                    // self.notify(this.$t('storeView.selectStoreOwner'),'warning',3000);
-                    // return false;
-               // }
-
-                if(unbindTemp.length > 0){
-                  let unbindParams = {
-                    items: unbindTemp
-                  }
-                  resUnbindInspect = await self.unbindInspectItem(unbindParams);
-                }
-                if(resUnbindInspect == null || resUnbindInspect.errMsg=='Success'){
-                  resBindInspect=await self.bindInspectItem(paramsInspec);
-                }
-              //((resUpdateStore!=null&&resUpdateStore.errMsg=='Success')&&(resBindInspect!=null&&resBindInspect.errMsg=='Success')) ||
-              if((resUpdateStore==null&&(resBindInspect!=null&&resBindInspect.errMsg=='Success'))){
-                    self.notify(this.$t('storeView.successSubmit'),'success',3000);
-                    self.changeSubmitObj.dialogCosed=false
-                    self.getNapeByStore(self.store.storeId)
-                }
-                else{
-                    self.notify(this.$t('storeView.failSubmit'),'warning',3000);
-                    return false;
-                }
-            }
-        },
-        bindInspectItem(params){
-            return new Promise((resolve,reject)=>{
-                bindInspectItemV2(params).then(res=>{
-                    console.log(res);
-                    resolve(res);
-                })
-            })
-        },
-        unbindInspectItem(params){
-          return new Promise((resolve,reject)=>{
-            unbindInspectItemV2(params).then(res=>{
-              console.log(res);
-              resolve(res);
-            })
-          })
-        },
-        updateStoreInfo(params){
-            return new Promise((resolve,reject)=>{
-                updateStoreInfo(params).then(res=>{
-                    console.log(res);
-                    resolve(res);
-                })
-            })
-        },
-        notify(msg,type,time) {
-            this.$message({
-                message: msg,
-                type: type,
-                duration:time
-            });
-        },
+        {
+          id: 1,
+          label: '排程二',
+          value: '排程二'
+        }
+      ],
+      personList: [],
+      curPerson: '',
+      scheduleData: [],
+      alleList: [],
+      userId: '',
+      supervisorId: '',
+      supervisorName: '',
+      varyWindowHeight: window.innerHeight,
+      varyWindowWidth: window.innerWidth,
+      userName: '',
+      appliedInspect: []
+    };
+  },
+  computed: {
+    emptyContentHeight() {
+      if (this.varyWindowHeight > 800) {
+        return this.varyWindowHeight * 0.7;
+      } else if (this.varyWindowHeight > 700) {
+        return this.varyWindowHeight * 0.6;
+      } else {
+        return this.varyWindowHeight * 0.5;
+      }
     }
-}
+  },
+
+  async mounted() {
+    const self = this;
+    self.store = JSON.parse(sessionStorage.getItem('STORE_ROW'));
+    const storeId = self.store.storeId;
+    self.storeTitle = self.store.name;
+    self.userId = self.store.userId;
+    self.userName = self.store.userName;
+    self.supervisorId = self.store.supervisorId;
+    console.log(self.supervisorId);
+    self.supervisorName = self.store.supervisorName;
+    console.log(self.store.napeTable);
+    self.curTag = self.store.napeTable;
+    self.phone = self.store.phone;
+    self.store.appliedInspect.forEach(item => {
+      if (item.mode === 0) {
+        self.appliedInspect.push(item);
+      }
+    });
+    await self.getChannelByStore(storeId);
+    await self.getNapeByStore(storeId);
+  },
+
+  methods: {
+    changeStoreDialog() {
+      const self = this;
+      self.changeStoreObj.dialogCosed = false;
+      self.getNapeByStore(self.store.storeId);
+    },
+
+    canceldChangeStore() {
+      const self = this;
+      self.changeStoreObj.dialogCosed = false;
+    },
+
+    beforeleave(e, w) {
+      const self = this;
+      let isshowdialog = false;
+      self.allRoutedata.forEach(item => {
+        item.forEach(a_item => {
+          a_item.itemData.forEach(_item => {
+            if (_item.oldChannelvalue.toString() !== _item.channelvalue.toString()) {
+              isshowdialog = true;
+            }
+          });
+        });
+      });
+      !isshowdialog ? self.getNapeByStore(self.store.storeId, Number(e)) : null;
+      return isshowdialog ? new Promise((resolve, reject) => {
+        self.$confirm(self.$t('remotePatrol.confirmChangeBind'), self.$t('remotePatrol.confirm'), {
+          confirmButtonText: self.$t('remotePatrol.confirm'),
+          cancelButtonText: self.$t('remotePatrol.cancel'),
+          type: 'warning'
+        }).then(() => {
+          self.getNapeByStore(self.store.storeId, Number(e));
+          resolve();
+        }).catch((err) => {
+          reject(err);
+        });
+      }) : true;
+    },
+
+    changeSheet(e) {
+      const self = this;
+      self.sheetName.forEach(item => {
+        if (item.id === e) {
+          item.isClick = true;
+        } else {
+          item.isClick = false;
+        }
+      });
+      self.allRoutedata.forEach(item => {
+        if (e === item[0].type) {
+          self.scheduleData = item;
+        }
+      });
+    },
+
+    getChannelByStore(storeId) {
+      const self = this;
+      const params = { storeId: storeId };
+      getDeviceList(params).then(res => {
+        console.log(res);
+        const data = res.data;
+        const temp = [];
+        if (data.length !== 0) {
+          data.forEach(item => {
+            const obj = {};
+            obj.id = item.id;
+            obj.name = item.name;
+            obj.ivsId = item.ivsId;
+            obj.value = item.id;
+            obj.label = item.name;
+            obj.disabled = false;
+            temp.push(obj);
+          });
+          self.alleList = temp;
+          // self.getNapeByStore(storeId)
+        }
+      });
+    },
+
+    clickItem(item, index) {
+      const self = this;
+      item.isClick = true;
+      self.scheduleData.forEach((_item, index) => {
+        _item.itemData.forEach((itemS, indexS) => {
+          if (item.id !== itemS.id) {
+            itemS.isClick = false;
+          }
+        });
+      });
+    },
+
+    changeDeviceId(val, item) {
+      const self = this;
+      item.channelvalue = val;
+    },
+
+    changeSelect(val, item, index) {
+      this.clickItem(item, index);
+    },
+
+    getNapeByStore(storeId, idx) {
+      const self = this;
+      let index = 0;
+      self.sheetName = [];
+      if (idx != undefined) {
+        index = idx;
+      } else {
+        index = self.activeName;
+      }
+      const params = {
+        storeId: storeId,
+        mode: 0,
+        authorizedOnly: 0,
+        tagName: self.appliedInspect[index].name,
+        inspectId: self.appliedInspect[index].id
+      };
+      checkOutInspectItemV3(params).then(res => {
+        console.log(res);
+        const data = res.data.groups;
+        const temp = [];
+        if (data.length !== 0) {
+          data.forEach(item => {
+            const obj = {};
+            obj.id = item.groupId;
+            obj.napeName = item.groupName;
+            obj.type = item.type;
+            obj.napeNum = item.items.length;
+            const _temp = [];
+            for (const _item of item.items) {
+              const _obj = {};
+              _obj.id = _item.id;
+              _obj.subject = _item.subject;
+              _obj.channelvalue = [];
+              _obj.oldChannelvalue = [];
+              _item.deviceIds.forEach(id => {
+                if (id !== -1) {
+                  _obj.channelvalue.push(id);
+                }
+                _obj.oldChannelvalue.push(id);
+              });
+              _obj.isClick = false,
+              _temp.push(_obj);
+            }
+            obj.itemData = _temp;
+            temp.push(obj);
+          });
+        }
+        const te_temp = [];
+        for (let i = 0; i < 3; i++) {
+          const Typeindex = temp.filter(x => x.type === i);
+          let obj = {};
+          if (Typeindex.length !== 0) {
+            te_temp.push(Typeindex);
+            if (Typeindex[0].type === 0) {
+              obj = { 'id': 0, 'isClick': false, 'label': self.$t('insSettingView.sheetpassfail') };
+            }
+            if (Typeindex[0].type === 1) {
+              obj = { 'id': 1, 'isClick': false, 'label': self.$t('insSettingView.sheetscore') };
+            }
+            if (Typeindex[0].type === 2) {
+              obj = { 'id': 2, 'isClick': false, 'label': self.$t('insSettingView.sheetother') };
+            }
+            self.sheetName.push(obj);
+          }
+        }
+        self.allRoutedata = te_temp;
+        self.sheetName[0].isClick = true;
+        self.scheduleData = te_temp[0];
+      });
+    },
+
+    changePerson(val) {
+      console.log(val);
+      const self = this;
+      self.personList.forEach(item => {
+        if (item.userId === val) {
+          self.phone = item.phoneNumber;
+        }
+      });
+    },
+
+    getUserList() {
+      const self = this;
+      const params = {
+        storeId: self.store.storeId
+      };
+      getUserInfo(params).then(res => {
+        console.log(res);
+        const temp = res.data;
+        if (self.supervisorId != null && self.supervisorId.length !== 0) {
+          if (temp.map(x => x.userId).indexOf(self.supervisorId) === -1) {
+            const obj = {
+              userId: self.store.supervisorId,
+              userName: self.store.supervisorId,
+              phoneNumber: self.store.phone
+            };
+            temp.push(obj);
+          }
+        }
+        self.personList = temp;
+        console.log(self.personList);
+        // self.curPerson=self.userId;
+        self.curPerson = self.supervisorId;
+      });
+    },
+
+    cancelSubmitDialog() {
+      const self = this;
+      self.changeSubmitObj.dialogCosed = false;
+    },
+
+    async submitData() {
+      const self = this;
+      console.log(self.scheduleData);
+      let count = 0;
+      let countChannel = 0;
+      const temp = [];
+      const unbindTemp = [];
+      self.allRoutedata.forEach(all_item => {
+        all_item.forEach(item => {
+          count += item.itemData.length;
+          item.itemData.forEach(_item => {
+            const obj = {};
+            const unbindObj = {};
+            if (_item.channelvalue.length !== 0) {
+              countChannel++;
+              obj.inspectItemId = _item.id;
+              obj.storeId = self.store.storeId;
+              obj.deviceIds = _item.channelvalue;
+              if (_item.oldChannelvalue.length > 0 && JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())) {
+                unbindObj.inspectItemId = _item.id;
+                unbindObj.storeId = self.store.storeId;
+                unbindObj.deviceIds = _item.oldChannelvalue;
+                unbindTemp.push(unbindObj);
+              }
+              temp.push(obj);
+            }
+          });
+        });
+      });
+      const paramsUpdateStore = {
+        'store': [
+          {
+            'storeId': self.store.storeId,
+            'supervisorId': self.supervisorId
+          }
+        ]
+      };
+      if (self.scheduleData.length === 0) {
+        //do nothing
+      } else {
+        if ((count !== 0 && (count !== countChannel)) || countChannel === 0) {
+          self.notify(this.$t('storeView.selectAllChanels'), 'warning', 3000);
+          return false;
+        }
+        const paramsInspec = {
+          items: temp
+        };
+        let resUpdateStore = null, resBindInspect = null, resUnbindInspect = null;
+        if (unbindTemp.length > 0) {
+          const unbindParams = {
+            items: unbindTemp
+          };
+          resUnbindInspect = await self.unbindInspectItem(unbindParams);
+        }
+        if (resUnbindInspect == null || resUnbindInspect.errMsg === 'Success') {
+          resBindInspect = await self.bindInspectItem(paramsInspec);
+        }
+        if ((resUpdateStore == null && (resBindInspect != null && resBindInspect.errMsg === 'Success'))) {
+          self.notify(this.$t('storeView.successSubmit'), 'success', 3000);
+          self.changeSubmitObj.dialogCosed = false;
+          self.getNapeByStore(self.store.storeId);
+        } else {
+          self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
+          return false;
+        }
+      }
+    },
+
+    bindInspectItem(params) {
+      return new Promise((resolve, reject) => {
+        bindInspectItemV2(params).then(res => {
+          console.log(res);
+          resolve(res);
+        });
+      });
+    },
+
+    unbindInspectItem(params) {
+      return new Promise((resolve, reject) => {
+        unbindInspectItemV2(params).then(res => {
+          console.log(res);
+          resolve(res);
+        });
+      });
+    },
+
+    updateStoreInfo(params) {
+      return new Promise((resolve, reject) => {
+        updateStoreInfo(params).then(res => {
+          console.log(res);
+          resolve(res);
+        });
+      });
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    }
+
+  }
+};
 </script>
 
 <style lang="scss" scoped>

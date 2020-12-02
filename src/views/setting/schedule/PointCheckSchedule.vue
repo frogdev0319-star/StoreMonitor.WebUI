@@ -1,173 +1,264 @@
 <template>
-  <el-row class="el-schedule-container" :style="{'min-height':varyWindowHeight-200+'px'}">
+  <el-row :style="{'min-height':varyWindowHeight-200+'px'}" class="el-schedule-container">
     <div class="el-schedule-header">
       <el-col :span="7" class="el-schedule-btns">
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-add-btn':'el-add-btn'" class="btn-class"
-                   @click="addSchedule">
-          <i style="margin-right:8px;" class="iconfont el-icon-plus"></i><span>{{generateScheduleLang('addSchedule')}}</span>
+        <el-button
+          :class="lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
+          type="primary"
+          size="mini"
+          class="btn-class"
+          @click="addSchedule">
+          <i style="margin-right:8px;" class="iconfont el-icon-plus"/><span>{{ $t('scheduleView.addSchedule') }}</span>
         </el-button>
-        <el-button type="primary" size="mini" :class="lang=='en' ? 'en-el-delete-btn':'el-delete-btn'" class="btn-class"
-                   @click="deleteScheduleBtn" :disabled="Number(activeName) == 0? true: false">
-          <i style="margin-right:8px;" class="iconfont icon-shanchu"></i><span>{{generateScheduleLang('delete')}}</span>
+        <el-button
+          :class="lang === 'en' ? 'en-el-delete-btn':'el-delete-btn'"
+          :disabled="Number(activeName) === 0 ? true : false"
+          type="primary"
+          size="mini"
+          class="btn-class"
+          @click="deleteScheduleBtn">
+          <i style="margin-right:8px;" class="iconfont icon-shanchu"/><span>{{ $t('scheduleView.delete') }}</span>
         </el-button>
       </el-col>
-      <el-dialog :title="generateScheduleLang('delete')"
-                 :visible.sync="showDeleteDialog" v-if="showDeleteDialog"
-                 :append-to-body='true'
-                 :close-on-click-modal="false"
-                 width="28%"
-                 top="35vh"
-                 left="40vh">
+      <el-dialog
+        v-if="showDeleteDialog"
+        :title="$t('scheduleView.delete')"
+        :visible.sync="showDeleteDialog"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        width="28%"
+        top="35vh"
+        left="40vh">
         <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;"/>
+          <hr style="border: 0.5px solid #dfe2e9;">
           <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803; display: inline-block;  vertical-align: middle"></i>
-            <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('saveInfo')}}</span>
+            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803; display: inline-block;  vertical-align: middle"/>
+            <span style="display: inline-block;  vertical-align: middle">{{ $t('scheduleView.saveInfo') }}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" @click="showDeleteDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
-          <el-button class="file-confirm-btn" @click="deleteSchedule" size="mini"
-                     type="primary">{{generateScheduleLang('confirm')}}
+          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
+            {{ $t('scheduleView.cancel') }}
+          </el-button>
+          <el-button
+            class="file-confirm-btn"
+            size="mini"
+            type="primary"
+            @click="deleteSchedule">
+            {{ $t('scheduleView.confirm') }}
           </el-button>
         </div>
       </el-dialog>
       <el-col :span="18" class="el-schedule-tabs">
-        <el-tabs v-model="activeName" @tab-click="handleClick" id='patrltabs-content'>
-          <el-tab-pane v-for="(paneItem,index) in paneList" :name="index.toString()"
-                       :key="index" :label="`${paneItem.name}`">
+        <el-tabs id="patrltabs-content" v-model="activeName" @tab-click="handleClick">
+          <el-tab-pane
+            v-for="(paneItem,index) in paneList"
+            :name="index.toString()"
+            :key="index"
+            :label="`${paneItem.name}`">
             <el-col :span="24" class="header-details">
-              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleName')}}</span>
-              <el-input v-model="paneItem.name"   :placeholder="generateScheduleLang('inputPlaceholder')" size="mini"  ref="scheduleName"
-                        class="el-type"></el-input>
+              <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.scheduleName') }}</span>
+              <el-input
+                ref="scheduleName"
+                v-model="paneItem.name"
+                :placeholder="$t('scheduleView.inputPlaceholder')"
+                size="mini"
+                class="el-type"/>
             </el-col>
             <el-col :span="24" class="header-details">
-              <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('scheduleType')}}</span>
-              <el-select v-model="paneItem.mode"   placeholder="选择类型" size="mini" :disabled="paneItem.modeDisabled" @change="searchStore"
-                         class="el-type" >
+              <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.scheduleType') }}</span>
+              <el-select
+                v-model="paneItem.mode"
+                :disabled="paneItem.modeDisabled"
+                size="mini"
+                class="el-type"
+                @change="searchStore" >
                 <el-option
                   v-for="item in typeList"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
-                </el-option>
+                  :value="item.value"/>
               </el-select>
-              <div  class="day-detail" v-if="paneItem.mode == 2">
-                <span>{{generateScheduleLang('execDays')}}</span>
-                <region-multi-select :options="monthList" :selected="selectMonth" :placeholder="generateScheduleLang('select')" :disabled="false"
-                                     :inputSize="`mini`"  @changeInput="changeSelectMonth(arguments,paneItem)" :all="$t('scheduleView.everyDay')"></region-multi-select>
+              <div v-if="paneItem.mode === 2" class="day-detail">
+                <span>{{ $t('scheduleView.execDays') }}</span>
+                <region-multi-select
+                  :options="monthList"
+                  :selected="selectMonth"
+                  :placeholder="$t('scheduleView.select')"
+                  :disabled="false"
+                  :input-size="`mini`"
+                  :all="$t('scheduleView.everyDay')"
+                  @changeInput="changeSelectMonth(arguments,paneItem)"/>
               </div>
             </el-col>
             <!-- Weekly Mode-->
-            <el-col :span="24" class="header-details" v-if="paneItem.mode == 1" v-for="(_item, _index) in paneItem.weeklySchedule" :key="'mode1'+_index">
+            <el-col v-for="(_item, _index) in paneItem.weeklySchedule" v-if="paneItem.mode === 1"
+                    :span="24" :key="'mode1'+_index" class="header-details">
               <div class="day-detail">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('selectOnDay')}}</span>
-                <region-multi-select :options="_item.weekList" :selected="_item.dayArray" :placeholder="generateScheduleLang('select')" :disabled="false" class="week-days"
-                                     :inputSize="`mini`"  @changeInput="changeSelectWeek(arguments,_item)" :all="$t('scheduleView.everyDay')" :isPointCheck="true"></region-multi-select>
+                <span :id="lang === 'en'? 'en-span': 'span'">
+                  {{ $t('scheduleView.selectOnDay') }}
+                </span>
+                <region-multi-select
+                  :options="_item.weekList"
+                  :selected="_item.dayArray"
+                  :placeholder="$t('scheduleView.select')"
+                  :disabled="false"
+                  :input-size="`mini`"
+                  :all="$t('scheduleView.everyDay')"
+                  :is-point-check="true"
+                  class="week-days"
+                  @changeInput="changeSelectWeek(arguments,_item)"/>
               </div>
               <div class="day-detail">
-                <span :id="lang=='en'? 'en-span': 'span'">{{generateScheduleLang('exectionTime')}}</span>
-                <limit-select :selected="_item.timeArray" :options="weeklyTimeArray" :inputSize="`mini`" class="week-time"
-                              @changeInput="changeSelectWeekTime($event, _item)"  :placeholder="generateScheduleLang('exectionTime')"></limit-select>
+                <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.exectionTime') }}</span>
+                <limit-select
+                  :selected="_item.timeArray"
+                  :options="weeklyTimeArray"
+                  :input-size="`mini`"
+                  :placeholder="$t('scheduleView.exectionTime')"
+                  class="week-time"
+                  @changeInput="changeSelectWeekTime($event, _item)"/>
               </div>
-              <span class="delete-time-btn" size="mini" type="primary"  v-if="paneItem.weeklySchedule.length > 1" style="margin: 0 20px 0 30px"
-                    @click="deleteWeekDays(_index)"><i class="el-icon-error"></i></span>
-              <el-button class="time-btn" size="mini" type="primary" @click="addWeekDays" :style="paneItem.weeklySchedule.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
-                         v-if="_index == paneItem.weeklySchedule.length-1"><i class="el-icon-plus"></i></el-button>
+              <span
+                v-if="paneItem.weeklySchedule.length > 1"
+                class="delete-time-btn"
+                size="mini"
+                type="primary"
+                style="margin: 0 20px 0 30px"
+                @click="deleteWeekDays(_index)"><i class="el-icon-error"/></span>
+              <el-button
+                v-if="_index === paneItem.weeklySchedule.length-1"
+                :style="paneItem.weeklySchedule.length === 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                class="time-btn"
+                size="mini"
+                type="primary"
+                @click="addWeekDays"><i class="el-icon-plus"/></el-button>
             </el-col>
             <!-- Daily and Monthly Mode -->
-            <el-col :span="24" class="header-details" v-if="paneItem.timeList.length > 0 && paneItem.mode != 1" v-for="(timeItem, timeIndex) in paneItem.timeList"
-                      :key="timeIndex">
-                <div class="day-detail">
-                  <span  :id="lang=='en'? 'en-span': 'span'" :style="timeIndex==0 ? 'visibility: visable' :'visibility: hidden'">{{generateScheduleLang('exectionTime')}}</span>
-                  <el-select v-model="timeItem.time" class="time-select" @change="choiceDayTime(timeIndex)" >
-                    <el-option v-for="(timeIt,timeIn) in timeItem.timeArray" :key="timeIn" :label="timeIt.value" :value="timeIt.value" :disabled="timeIt.disabled"></el-option>
-                  </el-select>
-                </div>
-                <span class="delete-time-btn" size="mini" type="primary"  v-if="paneItem.timeList.length > 1" style="margin: 0 20px 0 30px"
-                      @click="deleteCurTime(timeIndex)"><i class="el-icon-error"></i></span>
-                <el-button class="time-btn" size="mini" type="primary" @click="addTime" :style="paneItem.timeList.length == 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
-                           v-if="timeIndex == paneItem.timeList.length-1"><i class="el-icon-plus"></i></el-button>
-              </el-col>
-            <el-col :span="24" class="el-header-hr"></el-col>
+            <el-col
+              v-for="(timeItem, timeIndex) in paneItem.timeList"
+              v-if="paneItem.timeList.length > 0 && paneItem.mode != 1"
+              :span="24"
+              :key="timeIndex"
+              class="header-details">
+              <div class="day-detail">
+                <span :id="lang === 'en'? 'en-span' : 'span'"
+                      :style="timeIndex === 0 ? 'visibility : visable':'visibility: hidden'">
+                  {{ $t('scheduleView.exectionTime') }}
+                </span>
+                <el-select v-model="timeItem.time" class="time-select" @change="choiceDayTime(timeIndex)" >
+                  <el-option v-for="(timeIt,timeIn) in timeItem.timeArray" :key="timeIn" :label="timeIt.value"
+                             :value="timeIt.value" :disabled="timeIt.disabled"/>
+                </el-select>
+              </div>
+              <span
+                v-if="paneItem.timeList.length > 1"
+                class="delete-time-btn"
+                size="mini"
+                type="primary"
+                style="margin: 0 20px 0 30px"
+                @click="deleteCurTime(timeIndex)"><i class="el-icon-error"/></span>
+              <el-button
+                v-if="timeIndex === paneItem.timeList.length - 1"
+                :style="paneItem.timeList.length === 1 ? {margin:'0 0 0 50px'}:{margin:'0 20px 0 30px'}"
+                class="time-btn"
+                size="mini"
+                type="primary"
+                @click="addTime"><i class="el-icon-plus"/></el-button>
+            </el-col>
+            <el-col :span="24" class="el-header-hr"/>
             <el-col :span="24" class="el-bind-header">
               <div style="display: flex">
-                <div class="el-header-title">{{generateScheduleLang('bindStore')}}</div>
+                <div class="el-header-title">{{ $t('scheduleView.bindStore') }}</div>
               </div>
               <div class="select-info">
                 <span class="choice-device">
-                  <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"></i>
-                  {{generateScheduleLang('hasBind')}}{{storeCount}}{{generateScheduleLang('stores')}}
+                  <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
+                  {{ $t('scheduleView.hasBind') }}{{ storeCount }}{{ $t('scheduleView.stores') }}
                 </span>
                 <el-input
+                  :clearable="true"
+                  :placeholder="$t('scheduleView.searchInfo')"
+                  v-model="serachVale"
                   size="small"
                   class="el-search-input"
-                  :clearable=true
-                  :placeholder="generateScheduleLang('searchInfo')"
-                  v-model="serachVale" @keyup.enter.native="searchStoreInput">
-                  <i @click="searchStoreInput" slot="prefix" class="iconfont icon-sousuo"
-                     style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                  @keyup.enter.native="searchStoreInput">
+                  <i
+                    slot="prefix"
+                    class="iconfont icon-sousuo"
+                    style="position:relative;top:6px;left:6px;font-size:18px;"
+                    @click="searchStoreInput"/>
                 </el-input>
               </div>
             </el-col>
             <el-col :span="24">
               <div class="el-bind-content">
-                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
-                  <div  class="el-all-checkbox" v-if="storeList.length!=0">
-                    <el-checkbox v-model="allData" :disabled="allDisabled"  @change="choiceAll"></el-checkbox>
-                    <span class="all-device-title">{{generateScheduleLang('bindAllStore')}}</span>
+                <el-scrollbar id="el-menuscrollbar" style="height:100%;">
+                  <div v-if="storeList.length !== 0" class="el-all-checkbox">
+                    <el-checkbox v-model="allData" :disabled="allDisabled" @change="choiceAll"/>
+                    <span class="all-device-title">{{ $t('scheduleView.bindAllStore') }}</span>
                   </div>
-                  <div class="device-group" v-for="(item,index) in storeList" :key="index">
+                  <div v-for="(item,index) in storeList" :key="index" class="device-group">
                     <div class="device-all-checkbox">
                       <div style="display: block">
-                        <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"></el-checkbox>
-                        <span class="group-name">{{item.cityName}}</span>
+                        <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"/>
+                        <span class="group-name">{{ item.cityName }}</span>
                       </div>
                     </div>
                     <div class="device-content" >
-                      <div class="device-detail" v-for="(_item,_index) in item.itemData" :key="_index">
-                        <el-checkbox v-model="_item.checked" :disabled="_item.disabled"
-                                     @change="choiceAllDevice(index,item,_index,_item)" style="margin-right: 20px"></el-checkbox>
-                        <span class="device-name" :style="{'color': _item.disabled ? '#7d8cad':''}">{{_item.name}}</span>
+                      <div v-for="(_item,_index) in item.itemData" :key="_index" class="device-detail">
+                        <el-checkbox
+                          v-model="_item.checked"
+                          :disabled="_item.disabled"
+                          style="margin-right: 20px"
+                          @change="choiceAllDevice(index,item,_index,_item)"/>
+                        <span :style="{'color': _item.disabled ? '#7d8cad':''}" class="device-name">{{ _item.name }}</span>
                       </div>
                     </div>
                   </div>
                 </el-scrollbar>
               </div>
               <div class="enable-content">
-                <span>{{generateScheduleLang('enable')}}</span>
+                <span>{{ $t('scheduleView.enable') }}</span>
                 <el-switch
-                  v-model="paneItem.enable">
-                </el-switch>
+                  v-model="paneItem.enable"/>
               </div>
               <div class="el-bind-footer">
                 <div class="el-btn-content">
-                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary" @click="bindScheduleBtn">
-                    <span>{{generateScheduleLang('saveAndApply')}}</span>
+                  <el-button :disabled="storeList.length==0" class="btn" size="mini" type="primary"
+                             @click="bindScheduleBtn">
+                    <span>{{ $t('scheduleView.saveAndApply') }}</span>
                   </el-button>
                 </div>
               </div>
             </el-col>
           </el-tab-pane>
         </el-tabs>
-        <el-dialog :title="generateScheduleLang('prompt')"
-                   :visible.sync="showBindDialog" v-if="showBindDialog"
-                   :append-to-body='true'
-                   :close-on-click-modal="false"
-                   width="28%"
-                   top="35vh"
-                   left="40vh">
+        <el-dialog
+          v-if="showBindDialog"
+          :title="$t('scheduleView.prompt')"
+          :visible.sync="showBindDialog"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;"/>
+            <hr style="border: 0.5px solid #dfe2e9;">
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"></i>
-              <span style="display: inline-block;  vertical-align: middle">{{generateScheduleLang('confirmBind')}}</span>
+              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"/>
+              <span style="display: inline-block;  vertical-align: middle">{{ $t('scheduleView.confirmBind') }}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" @click="showBindDialog = false" size="mini" style="">{{generateScheduleLang('cancel')}}</el-button>
-            <el-button class="file-confirm-btn" @click="bindSchedule" size="mini"
-                       type="primary">{{generateScheduleLang('confirm')}}
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showBindDialog = false">
+              {{ $t('scheduleView.cancel') }}
+            </el-button>
+            <el-button
+              class="file-confirm-btn"
+              size="mini"
+              type="primary"
+              @click="bindSchedule">{{ $t('scheduleView.confirm') }}
             </el-button>
           </div>
         </el-dialog>
@@ -178,575 +269,1152 @@
 
 <script>
 
-  import {generateScheduleLang} from '@/api/i18n'
-  import {getScheduleBindList, addNewSchedule, getScheduleListService, bindScheduleAndStore, unbindScheduleAndStore, updateSchedule,deleteScheduleService} from '@/api/schedule'
-  import {getStoreList} from '@/api/store'
-  import util from '@/common/util'
-  import {mapGetters} from 'vuex'
-  import RegionMultiSelect from "@/components/RegionMultiSelect";
-  import LimitSelect from "@/components/LimitSelect"
+import {
+  getScheduleBindList,
+  addNewSchedule,
+  getScheduleListService,
+  bindScheduleAndStore,
+  unbindScheduleAndStore,
+  updateSchedule,
+  deleteScheduleService
+} from '@/api/schedule';
+import { getStoreList } from '@/api/store';
+import util from '@/common/util';
+import { mapGetters } from 'vuex';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
+import LimitSelect from '@/components/LimitSelect';
 
-  export default {
-    name: "PointCheckSch",
-    components:{
-      RegionMultiSelect,
-      LimitSelect
-    },
-    data(){
-      return {
-        varyWindowHeight:window.innerHeight,
-        varyWindowWidth:window.innerWidth,
-        allData:false,
-        allDisabled: false,
-        storeList:[],
-        tempStoreList :[],
-        scheduleList: ['点检排程一'],
-        paneList:[],
-        lang: this.$i18n.locale ,
-        monthList:[
-          {
-            'checked': false,
-            value: 1,
-            name: '1',
-            label: 1
-          },
-          {
-            'checked': false,
-            value: 2,
-            name: '2',
-            label: 2
-          },
-          {
-            'checked': false,
-            value: 3,
-            name: '3',
-            label: 3
-          },
-          {
-            'checked': false,
-            value: 4,
-            name: '4',
-            label: '4'
-          },
-          {
-            'checked': false,
-            value: 5,
-            name: '5',
-            label: '5'
-          },
-          {
-            'checked': false,
-            value: 6,
-            name: '6',
-            label: '6'
-          },
-          {
-            'checked': false,
-            value: 7,
-            name: '7',
-            label: '7'
-          },
-          {
-            'checked': false,
-            value: 8,
-            name: '8',
-            label: '8'
-          },
-          {
-            'checked': false,
-            value: 9,
-            name: '9',
-            label: '9'
-          },
-          {
-            'checked': false,
-            value: 10,
-            name: '10',
-            label: '10'
-          },
-          {
-            'checked': false,
-            value: 11,
-            name: '11',
-            label: '11'
-          },
-          {
-            'checked': false,
-            value: 12,
-            name: '12',
-            label: '12'
-          },
-          {
-            'checked': false,
-            value: 13,
-            name: '13',
-            label: '13'
-          },
-          {
-            'checked': false,
-            value: 14,
-            name: '14',
-            label: '14'
-          },
-          {
-            'checked': false,
-            value: 15,
-            name: '15',
-            label: '15'
-          },
-          {
-            'checked': false,
-            value: 16,
-            name: '16',
-            label: '16'
-          },
-          {
-            'checked': false,
-            value: 17,
-            name: '17',
-            label: '17'
-          },
-          {
-            'checked': false,
-            value: 18,
-            name: '18',
-            label: '18'
-          },
-          {
-            'checked': false,
-            value: 19,
-            name: '19',
-            label: '19'
-          },
-          {
-            'checked': false,
-            value: 20,
-            name: '20',
-            label: '20'
-          },
-          {
-            'checked': false,
-            value: 21,
-            name: '21',
-            label: '21'
-          },
-          {
-            'checked': false,
-            value: 22,
-            name: '22',
-            label: '22'
-          },
-          {
-            'checked': false,
-            value: 23,
-            name: '23',
-            label: '23'
-          },
-          {
-            'checked': false,
-            value: 24,
-            name: '24',
-            label: '24'
-          },
-          {
-            'checked': false,
-            value: 25,
-            name: '25',
-            label: '25'
-          },
-          {
-            'checked': false,
-            value: 26,
-            name: '26',
-            label: '26'
-          },
-          {
-            'checked': false,
-            value: 27,
-            name: '27',
-            label: '27'
-          },
-          {
-            'checked': false,
-            value: 28,
-            name: '28',
-            label: '28'
-          }
-        ],
-        checked:false,
-        activeName: '0',
-        curType: 0,
-        typeList:[
-          {
-            value: 0,
-            label: this.$t('scheduleView.daily')
-          },
-          {
-            value: 1,
-            label: this.$t('scheduleView.weekly')
-          },
-          {
-            value: 2,
-            label: this.$t('scheduleView.monthly')
-          }
-        ],
-        weekList: [
-          {
-            'disabled': false,
-            'name': this.$t('scheduleView.mon'),
-            'label': this.$t('scheduleView.mon'),
-            'value': 1,
-          },
-          {
-            'disabled': false,
-            'name': this.$t('scheduleView.tues'),
-            'label': this.$t('scheduleView.tues'),
-            'value': 2,
-          },
-          {
-            'disabled': false,
-            'name': this.$t('scheduleView.wed'),
-            'label': this.$t('scheduleView.wed'),
-            'value': 3,
-          },
-          {
-            'disabled': false,
-            'name': this.$t('scheduleView.thur'),
-            'label': this.$t('scheduleView.thur'),
-            'value': 4,
-          },
-          {
-            'disabled': false,
-            'name':this.$t('scheduleView.fri'),
-            'label':this.$t('scheduleView.fri'),
-            'value': 5,
-          },
-          {
-            'disabled': false,
-            'name': this.$t('scheduleView.sat'),
-            'label': this.$t('scheduleView.sat'),
-            'value': 6,
-          },
-          {
-            'disabled': false,
-            'name': this.$t('scheduleView.sun'),
-            'label': this.$t('scheduleView.sun'),
-            'value': 7,
-          },
+export default {
+  name: 'PointCheckSch',
 
-        ],
-        showDeleteDialog:false,
-        scheduleName: '',
-        storeCount: 0,
-        serachVale: '',
-        scheduleId: -1,
-        bindStoreId:[],
-        selectTab: '',
-        selectWeek: [],
-        selectMonth: [],
-        isFirstLoad: true,
-        isDisabled: true,
-        showBindDialog: false,
-        hasBoundStoreIds: [], //已经绑定过周、月模式的门店id
-        weeklyTimeArray: [], //自定义时间数组
-        isAdd: false,
-      }
-    },
-    watch:{
-      accountChanged(val,oldVal){
-        console.log(val);
-        let self=this;
-        if(val!=0){
-          self.isFirstLoad = true;
-          self.activeName = '0';
-          self.getScheduleList();
+  components: {
+    RegionMultiSelect,
+    LimitSelect
+  },
+
+  data() {
+    return {
+      varyWindowHeight: window.innerHeight,
+      varyWindowWidth: window.innerWidth,
+      allData: false,
+      allDisabled: false,
+      storeList: [],
+      tempStoreList: [],
+      scheduleList: ['点检排程一'],
+      paneList: [],
+      lang: this.$i18n.locale,
+      monthList: [
+        {
+          'checked': false,
+          value: 1,
+          name: '1',
+          label: 1
+        },
+        {
+          'checked': false,
+          value: 2,
+          name: '2',
+          label: 2
+        },
+        {
+          'checked': false,
+          value: 3,
+          name: '3',
+          label: 3
+        },
+        {
+          'checked': false,
+          value: 4,
+          name: '4',
+          label: '4'
+        },
+        {
+          'checked': false,
+          value: 5,
+          name: '5',
+          label: '5'
+        },
+        {
+          'checked': false,
+          value: 6,
+          name: '6',
+          label: '6'
+        },
+        {
+          'checked': false,
+          value: 7,
+          name: '7',
+          label: '7'
+        },
+        {
+          'checked': false,
+          value: 8,
+          name: '8',
+          label: '8'
+        },
+        {
+          'checked': false,
+          value: 9,
+          name: '9',
+          label: '9'
+        },
+        {
+          'checked': false,
+          value: 10,
+          name: '10',
+          label: '10'
+        },
+        {
+          'checked': false,
+          value: 11,
+          name: '11',
+          label: '11'
+        },
+        {
+          'checked': false,
+          value: 12,
+          name: '12',
+          label: '12'
+        },
+        {
+          'checked': false,
+          value: 13,
+          name: '13',
+          label: '13'
+        },
+        {
+          'checked': false,
+          value: 14,
+          name: '14',
+          label: '14'
+        },
+        {
+          'checked': false,
+          value: 15,
+          name: '15',
+          label: '15'
+        },
+        {
+          'checked': false,
+          value: 16,
+          name: '16',
+          label: '16'
+        },
+        {
+          'checked': false,
+          value: 17,
+          name: '17',
+          label: '17'
+        },
+        {
+          'checked': false,
+          value: 18,
+          name: '18',
+          label: '18'
+        },
+        {
+          'checked': false,
+          value: 19,
+          name: '19',
+          label: '19'
+        },
+        {
+          'checked': false,
+          value: 20,
+          name: '20',
+          label: '20'
+        },
+        {
+          'checked': false,
+          value: 21,
+          name: '21',
+          label: '21'
+        },
+        {
+          'checked': false,
+          value: 22,
+          name: '22',
+          label: '22'
+        },
+        {
+          'checked': false,
+          value: 23,
+          name: '23',
+          label: '23'
+        },
+        {
+          'checked': false,
+          value: 24,
+          name: '24',
+          label: '24'
+        },
+        {
+          'checked': false,
+          value: 25,
+          name: '25',
+          label: '25'
+        },
+        {
+          'checked': false,
+          value: 26,
+          name: '26',
+          label: '26'
+        },
+        {
+          'checked': false,
+          value: 27,
+          name: '27',
+          label: '27'
+        },
+        {
+          'checked': false,
+          value: 28,
+          name: '28',
+          label: '28'
         }
+      ],
+      checked: false,
+      activeName: '0',
+      curType: 0,
+      typeList: [
+        {
+          value: 0,
+          label: this.$t('scheduleView.daily')
+        },
+        {
+          value: 1,
+          label: this.$t('scheduleView.weekly')
+        },
+        {
+          value: 2,
+          label: this.$t('scheduleView.monthly')
+        }
+      ],
+      weekList: [
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.mon'),
+          'label': this.$t('scheduleView.mon'),
+          'value': 1
+        },
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.tues'),
+          'label': this.$t('scheduleView.tues'),
+          'value': 2
+        },
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.wed'),
+          'label': this.$t('scheduleView.wed'),
+          'value': 3
+        },
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.thur'),
+          'label': this.$t('scheduleView.thur'),
+          'value': 4
+        },
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.fri'),
+          'label': this.$t('scheduleView.fri'),
+          'value': 5
+        },
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.sat'),
+          'label': this.$t('scheduleView.sat'),
+          'value': 6
+        },
+        {
+          'disabled': false,
+          'name': this.$t('scheduleView.sun'),
+          'label': this.$t('scheduleView.sun'),
+          'value': 7
+        }
+
+      ],
+      showDeleteDialog: false,
+      scheduleName: '',
+      storeCount: 0,
+      serachVale: '',
+      scheduleId: -1,
+      bindStoreId: [],
+      selectTab: '',
+      selectWeek: [],
+      selectMonth: [],
+      isFirstLoad: true,
+      isDisabled: true,
+      showBindDialog: false,
+      hasBoundStoreIds: [],
+      weeklyTimeArray: [],
+      isAdd: false
+    };
+  },
+  watch: {
+    accountChanged(val) {
+      console.log(val);
+      let self = this;
+      if (val !== 0) {
+        self.isFirstLoad = true;
+        self.activeName = '0';
+        self.getScheduleList();
       }
-    },
-    computed:{
-      ...mapGetters({
-        accountChanged:'accountChanged'
-      }),
-    },
-    methods: {
-      generateScheduleLang,
-      async bindScheduleBtn(){
-        let self = this;
-        let tabIndex = Number(self.activeName);
-        let mode = self.paneList[tabIndex].mode;
-        let timeList = self.paneList[tabIndex].timeList;
-        let name = self.paneList[tabIndex].name;
-        let weekSchedule = self.paneList[tabIndex].weeklySchedule;
-        console.log(weekSchedule)
-        console.log(timeList);
-        if(name == ''){
-          self.notify(self.$t('scheduleView.emptyName'), 'warning',3000);
-          self.$refs.scheduleName[tabIndex].focus();
+    }
+  },
+  computed: {
+    ...mapGetters({
+      accountChanged: 'accountChanged'
+    })
+  },
+  created() {
+    let self = this;
+    self.getSelectTimeArray();
+    self.getScheduleList();
+  },
+
+  methods: {
+    async bindScheduleBtn() {
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      let mode = self.paneList[tabIndex].mode;
+      let timeList = self.paneList[tabIndex].timeList;
+      let name = self.paneList[tabIndex].name;
+      let weekSchedule = self.paneList[tabIndex].weeklySchedule;
+      console.log(weekSchedule);
+      console.log(timeList);
+      if (name === '') {
+        self.notify(self.$t('scheduleView.emptyName'), 'warning', 3000);
+        self.$refs.scheduleName[tabIndex].focus();
+        return false;
+      }
+      if (mode === 0 && timeList[0].time === '') {
+        // daily mode
+        self.notify(self.$t('scheduleView.emptyTime'), 'warning', 3000);
+        return false;
+      }
+      if (mode === 1) {
+        // weekly mode
+        let lackDay = false;
+        let lackTime = false;
+        weekSchedule.forEach(item => {
+          if (item.dayArray.length === 0) {
+            lackDay = true;
+          } else if (item.timeArray.length === 0) {
+            lackTime = true;
+          }
+        });
+        console.log(lackDay + '..' + lackTime);
+        if (lackDay) {
+          self.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
+          return false;
+        } else if (lackTime) {
+          self.notify(self.$t('scheduleView.emptyTime'), 'warning', 3000);
           return false;
         }
-        if(mode == 0 && timeList[0].time == ''){
-          //日模式
-          self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
+      }
+      if (mode === 2) {
+        // monthly mode
+        if (self.selectMonth.length === 0) {
+          self.notify(self.$t('scheduleView.emptyTime'), 'warning', 3000);
+          return false;
+        } else if (timeList[0].time === '') {
+          self.notify(self.$t('scheduleView.emptyTime'), 'warning', 3000);
           return false;
         }
-        if(mode == 1){
-          //周模式
-          let lackDay = false;
-          let lackTime = false;
-           weekSchedule.forEach( item =>{
-            if(item.dayArray.length == 0){
-              lackDay = true;
-            }
-            else if(item.timeArray.length == 0){
-              lackTime = true;
-            }
-          })
-          console.log(lackDay + '..' + lackTime);
-           if(lackDay){
-             self.notify(self.$t('scheduleView.emptyDate'), 'warning',3000);
-             return false;
-           }
-           else if(lackTime){
-             self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
-             return false;
-           }
-        }
-          if(mode == 2){
-            //月模式
-            if(self.selectMonth.length == 0){
-              self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
-              return false;
-            }
-            else if(timeList[0].time == ''){
-              self.notify(self.$t('scheduleView.emptyTime'), 'warning',3000);
-              return false;
-            }
-        }
-        self.showBindDialog = true;
-      },
-      handleClick(val) {
-        console.log(val)
-        let self = this;
-        self.activeName = val.index;
-        self.selectTab = val.label;
-        let tabIndex = Number(self.activeName);
-        self.dayArray =  self.paneList[tabIndex].dayArray;
-        self.echoMonthAndWeek();
-        self.scheduleId = self.paneList[tabIndex].schId;
-        self.searchStore();
-      },
-      echoMonthAndWeek(){
-        let self = this;
-        let type = self.paneList[Number(self.activeName)].mode;
-        let dateStr = '';
-        let count = 0;
-        if(type == 1){
-          let selectedWeek = self.dayArray;
-          self.selectWeek = selectedWeek;
-          console.log(selectedWeek + 'selectedWeek');
-          self.choiceWeek()
-        }
-        else if(type == 2){
-          let selectedMonth = self.dayArray;
-          console.log(selectedMonth + 'selectedMonth');
-          self.selectMonth = selectedMonth;
-          self.choiceDayTime()
-        }
-        else{
-          self.choiceDayTime()
-        }
-      },
+      }
+      self.showBindDialog = true;
+    },
 
-      choiceWeek(index){
-        let self = this;
-        let tabIndex = Number(self.activeName);
-        let actPanList = self.paneList[tabIndex];
-        let schedule = actPanList.weeklySchedule;
-        let count = 0;
-        //不能勾选的周
-        let selectedWeek = [];
-        schedule.forEach(item=>{
-          let dayArr = item.dayArray;
-          dayArr.forEach(_item=>{
-            selectedWeek.push(_item);
-          })
-        })
-        console.log(selectedWeek);
-        schedule.forEach(item=>{
-          item.weekList.forEach(_item=>{
-              _item.disabled = false;
-          })
-        })
-        selectedWeek.forEach(item=>{
+    handleClick(val) {
+      console.log(val);
+      let self = this;
+      self.activeName = val.index;
+      self.selectTab = val.label;
+      let tabIndex = Number(self.activeName);
+      self.dayArray = self.paneList[tabIndex].dayArray;
+      self.echoMonthAndWeek();
+      self.scheduleId = self.paneList[tabIndex].schId;
+      self.searchStore();
+    },
+
+    echoMonthAndWeek() {
+      let self = this;
+      let type = self.paneList[Number(self.activeName)].mode;
+      let dateStr = '';
+      let count = 0;
+      if (type === 1) {
+        let selectedWeek = self.dayArray;
+        self.selectWeek = selectedWeek;
+        console.log(selectedWeek + 'selectedWeek');
+        self.choiceWeek();
+      } else if (type === 2) {
+        let selectedMonth = self.dayArray;
+        console.log(selectedMonth + 'selectedMonth');
+        self.selectMonth = selectedMonth;
+        self.choiceDayTime();
+      } else {
+        self.choiceDayTime();
+      }
+    },
+
+    choiceWeek(index) {
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      let actPanList = self.paneList[tabIndex];
+      let schedule = actPanList.weeklySchedule;
+      let count = 0;
+      // unchecked week
+      let selectedWeek = [];
+      schedule.forEach(item => {
+        let dayArr = item.dayArray;
+        dayArr.forEach(_item => {
+          selectedWeek.push(_item);
+        });
+      });
+      console.log(selectedWeek);
+      schedule.forEach(item => {
+        item.weekList.forEach(_item => {
+          _item.disabled = false;
+        });
+      });
+      selectedWeek.forEach(item => {
+        console.log(item);
+        schedule.forEach(sche => {
+          console.log(sche);
+          sche.weekList.forEach(week => {
+            if (week.value === item) {
+              week.disabled = true;
+            }
+          });
+        });
+      });
+      schedule.forEach(item => {
+        console.log(item);
+        item.dayArray.forEach(day => {
+          console.log(day);
+          item.weekList.forEach(week => {
+            if (week.value === day) {
+              week.disabled = false;
+            }
+          });
+        });
+      });
+    },
+
+    // modify time of daily or weekly mode
+    choiceDayTime() {
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      let actPanList = self.paneList[tabIndex];
+      let selectTime = [];
+      actPanList.timeList.forEach(item => {
+        selectTime.push(item.time);
+        item.timeArray.forEach(_item => {
+          _item.disabled = false;
+        });
+      });
+      selectTime.forEach(item => {
+        console.log(item);
+        actPanList.timeList.forEach(schedule => {
+          console.log(schedule);
+          schedule.timeArray.forEach(time => {
+            if (time.value === item) {
+              time.disabled = true;
+            }
+            console.log(time);
+          });
+        });
+      });
+    },
+
+    addScheduleService() {
+      let params = {};
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      params.name = self.paneList[tabIndex].name;
+      params.comment = '点检计划';
+      params.category = 2;
+      params.mode = self.paneList[tabIndex].mode;
+      params.enable = Number(self.paneList[tabIndex].enable);
+      params.from = new Date().getTime();
+      params.to = -1;
+      params.notityTime = 0;
+      self.isDisabled = true;
+      let tempSchedule = [];
+      if (params.mode === 0) {
+        // Daily Mode
+        let tempPeriod = [];
+        let timeSelect = self.paneList[tabIndex].timeList;
+        timeSelect.forEach(item => {
           console.log(item);
-          schedule.forEach(sche=>{
-            console.log(sche);
-            sche.weekList.forEach(week=>{
-              if(week.value == item){
-                week.disabled = true;
-              }
-            })
-          })
-        })
-        schedule.forEach(item=>{
+          let time = item.time;
+          if (time.length > 0) {
+            let seconds = self.hourToSecond(time);
+            let obj = {};
+            obj.from = seconds;
+            tempPeriod.push(obj);
+          }
+        });
+        tempSchedule.push({
+          'day': 1,
+          'period': tempPeriod
+        });
+      } else if (params.mode === 1) {
+        // Weekly Mode
+        let schedule = self.paneList[tabIndex].weeklySchedule;
+        console.log(schedule);
+        schedule.forEach(item => {
+          let timeArray = item.timeArray;
+          let selectedWeek = item.dayArray.filter(item => item !== '-1');
+          selectedWeek.forEach(_item => {
+            console.log(_item);
+            let timePeriod = [];
+            let tempSche = {};
+            timeArray.forEach(_it => {
+              console.log(_it);
+              let seconds = self.hourToSecond(_it);
+              let obj = {};
+              obj.from = seconds;
+              timePeriod.push(obj);
+            });
+            tempSche.day = Number(_item);
+            tempSche.period = timePeriod;
+            tempSchedule.push(tempSche);
+          });
+        });
+        console.log(tempSchedule);
+      } else if (params.mode === 2) {
+        // Monthly mode
+        let timeSelected = self.paneList[tabIndex].timeList;
+        let selectedMonth = self.selectMonth;
+        self.paneList[tabIndex].dayArray = self.selectMonth;
+        selectedMonth.forEach(item => {
           console.log(item);
-          item.dayArray.forEach(day=>{
-            console.log(day);
-            item.weekList.forEach(week=>{
-              if(week.value == day){
-                week.disabled = false;
-              }
-            })
-          })
-        })
-      },
-      // choiceTime(index){
-      //   let self = this;
-      //   console.log(index);
-      //   let tabIndex = Number(self.activeName);
-      //   let actPanList = self.paneList[tabIndex];
-      //   self.weeklyTimeArray.forEach(item=>{
-      //     item.checked = false;
-      //   })
-      //   actPanList.weeklySchedule[index].timeArray.forEach(_item=>{
-      //     self.weeklyTimeArray.forEach(item => {
-      //       if (item.value == _item) {
-      //         item.checked = true;
-      //       }
-      //     });
-      //   });
-      // },
-      //日、月模式修改时间
-      choiceDayTime(){
-        let self = this;
-        let tabIndex = Number(self.activeName);
-        let actPanList = self.paneList[tabIndex];
-        let selectTime = [];
-        actPanList.timeList.forEach(item=>{
-          selectTime.push(item.time)
-          item.timeArray.forEach(_item=>{
-            _item.disabled = false;
-          })
-        })
-        selectTime.forEach(item=>{
-          console.log(item);
-          actPanList.timeList.forEach(schedule=>{
-            console.log(schedule);
-            schedule.timeArray.forEach(time=>{
-              if(time.value == item){
-                time.disabled = true;
-              }
-              console.log(time);
-            })
-          })
-        })
-      },
-      addScheduleService() {
-        let params = {};
-        let self = this;
-        let tabIndex = Number(self.activeName);
-        params.name = self.paneList[tabIndex].name;
-        params.comment = '点检计划';
-        params.category = 2;
-        let mode = self.paneList[tabIndex].mode;
-        params.mode = mode;
-        params.enable = Number(self.paneList[tabIndex].enable);
-        params.from = new Date().getTime();
-        params.to = -1;
-        params.notityTime = 0;
-        self.isDisabled = true;
-        let tempSchedule = [];
-        if(params.mode == 0){
-          //Daily Mode
-          let tempPeriod = [];
-          let timeSelect = self.paneList[tabIndex].timeList;
-          timeSelect.forEach(item=>{
-            console.log(item);
-            let time = item.time;
-            if(time.length> 0){
+          let timePeriod = [];
+          let tempSche = {};
+          timeSelected.forEach(_item => {
+            console.log(_item);
+            let time = _item.time;
+            if (time.length > 0) {
               let seconds = self.hourToSecond(time);
               let obj = {};
               obj.from = seconds;
-              tempPeriod.push(obj);
+              timePeriod.push(obj);
             }
-          })
-          tempSchedule.push({
-            "day": 1,
-            "period": tempPeriod
+          });
+          tempSche.day = Number(item);
+          tempSche.period = timePeriod;
+          tempSchedule.push(tempSche);
+        });
+        console.log(tempSchedule);
+      }
+      params.schedule = tempSchedule;
+      return new Promise((resolve, reject) => {
+        addNewSchedule(params).then(res => {
+          let data = res.data.scheduleId;
+          console.log(data);
+          resolve(data);
+        }).catch(err => {
+          reject(err)
+        });
+      });
+    },
+
+    async addSchedule() {
+      let self = this;
+      self.scheduleName = self.$t('scheduleView.newSchedule');
+      self.isAdd = true;
+      let scheduleInfo = {
+        name: self.scheduleName,
+        mode: 0,
+        modeDisabled: false,
+        schId: 0,
+        dayArray: [],
+        enable: false,
+        to: -1,
+        dueDays: 1,
+        weeklySchedule: [{ dayArray: [], timeArray: [], weekList: JSON.parse(JSON.stringify(self.weekList)) }],
+        timeList: [{ time: '', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray)) }]
+      };
+      self.paneList.push(scheduleInfo);
+      let pane = self.paneList;
+      self.dayArray = [];
+      self.curType = 0;
+      self.activeName = (pane.length - 1).toString();
+      self.selectTab = self.scheduleName;
+      self.scheduleId = 0;
+      self.isDisabled = false;
+      self.searchStore();
+      self.selectWeek = [];
+      self.selectMonth = [];
+      console.log(self.paneList);
+    },
+
+    async searchStoreInput() {
+      let self = this;
+      console.log(self.tempStoreList);
+      let tempStoreList = self.tempStoreList;
+      let getStore2Temp = data => {
+        let cityList = [];
+        data.forEach(item => {
+          if (cityList.map(x => x.city).indexOf(item.city) === -1) {
+            let obj = {
+              city: item.city,
+              province: item.province
+            };
+            cityList.push(obj);
+          }
+        });
+        let storeListTemp = [];
+        for (let i = 0; i < cityList.length; i++) {
+          let temp = [];
+          let obj = {};
+          for (let j = 0; j < data.length; j++) {
+            if (cityList[i].city === data[j].city) {
+              let obj = {};
+              obj.storeId = data[j].storeId;
+              obj.name = data[j].name;
+              obj.city = data[j].city;
+              obj.checked = data[j].checked;
+              obj.disabled = data[j].disabled;
+              console.log(obj);
+              temp.push(obj);
+            }
+          }
+          obj.cityName = cityList[i].city;
+          obj.province = cityList[i].province;
+          obj.itemData = temp;
+          storeListTemp.push(obj);
+        }
+        return storeListTemp;
+      };
+      let temp = [];
+      let tempArray = [];
+      let tempStore = [];
+      tempStoreList.forEach((_item) => {
+        _item.itemData.forEach((itemDs) => {
+          temp.push(util.getPinyinList(itemDs.name));
+          tempStore.push(itemDs);
+        });
+      });
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i][0].indexOf(self.serachVale.trim()) !== -1 ||
+            temp[i][1].indexOf(self.serachVale.trim()) !== -1) {
+          tempArray.push(tempStore[i]);
+        }
+      }
+      self.storeList = getStore2Temp(tempArray);
+
+      let count = 0;
+      self.storeList.forEach(item => {
+        if (item.checked) {
+          count++;
+        }
+      });
+      self.allData = count === self.storeList.length;
+    },
+
+    getStoreData(params) {
+      let self = this;
+      return new Promise((resolve, reject) => {
+        getStoreList(params).then(res => {
+          console.log(res);
+          let data = res.data;
+          console.log(data);
+          resolve(data);
+        });
+      });
+    },
+
+    async getStoreByCity(data) {
+      let self = this;
+      let bindStoreId = await self.getBindStoreList();
+      self.storeCount = bindStoreId.length;
+      console.log(data);
+      let cityList = [];
+      data.forEach(item => {
+        if (cityList.indexOf(item.city) === -1) {
+          cityList.push(item.city);
+        }
+      });
+      console.log(cityList);
+      let temp = [];
+      cityList.forEach(item => {
+        let obj = {};
+        obj.city = item;
+        let _temp = [];
+        data.forEach(_item => {
+          if (item === _item.city) {
+            let _obj = {};
+            obj.province = _item.province;
+            _obj.storeName = _item.name;
+            _obj.storeId = _item.storeId;
+            _temp.push(_obj);
+          }
+        });
+        obj.store = _temp;
+        temp.push(obj);
+      });
+      console.log(temp);
+      let groupTemp = [];
+      temp.forEach(item => {
+        let groupObj = {};
+        groupObj.province = item.province;
+        groupObj.cityName = item.city;
+        let _temp = [];
+        let _tempCount = 0;
+        let _tempDisCount = 0;
+        item.store.forEach(_item => {
+          let _obj = {};
+          if (bindStoreId.indexOf(_item.storeId) !== -1) {
+            _obj.checked = true;
+            _obj.disabled = false;
+            _tempCount++;
+          } else {
+            // when store bound with weekly or monthly schedule, disabled it in weekly or monthly mode
+            if (self.hasBoundStoreIds.indexOf(_item.storeId) === -1) {
+              _obj.checked = false;
+              _obj.disabled = false;
+            } else {
+              _obj.checked = false;
+              _obj.disabled = true;
+              _tempDisCount++;
+            }
+          }
+          _obj.storeId = _item.storeId;
+          _obj.name = _item.storeName;
+          _obj.city = item.city;
+          _obj.province = item.province;
+          _temp.push(_obj);
+        });
+        groupObj.checked = _tempCount === item.store.length;
+
+        groupObj.checked = _tempDisCount + _tempCount === item.store.length;
+        if (_tempDisCount === item.store.length) {
+          groupObj.disabled = true;
+          groupObj.checked = false;
+        } else {
+          groupObj.disabled = false;
+        }
+        groupObj.itemData = _temp;
+        groupTemp.push(groupObj);
+      });
+      self.storeList = groupTemp;
+      self.tempStoreList = groupTemp;
+      console.log(self.storeList);
+      console.log(self.tempStoreList);
+      let count = 0;
+      self.storeList.forEach(item => {
+        if (item.checked) {
+          count++;
+        }
+      });
+      let disCount = 0;
+      self.storeList.forEach(item => {
+        if (item.disabled) {
+          disCount++;
+        }
+      });
+      if (count === self.storeList.length) {
+        self.allData = true;
+      } else {
+        self.allData = false;
+      }
+      if (count + disCount === self.storeList.length) {
+        self.allData = true;
+      }
+      if (disCount === self.storeList.length) {
+        self.allDisabled = true;
+      } else {
+        self.allDisabled = false;
+      }
+      let totalConut = disCount + count;
+      if (totalConut === self.storeList.length) {
+        if (count > 0) {
+          self.allDisabled = false;
+          self.allData = true;
+        } else {
+          self.allDisabled = true;
+          self.allData = false;
+        }
+      }
+    },
+
+    getBindStoreList() {
+      let self = this;
+      let scheduleId = self.scheduleId;
+      console.log(scheduleId);
+      let params = {};
+      params.scheduleId = scheduleId;
+      if (params.scheduleId === 0) {
+        return [];
+      } else if (params.scheduleId === -1) {
+        console.log(self.paneList);
+        params.scheduleId = self.paneList[0].schId;
+      }
+      return new Promise((resolve, reject) => {
+        getScheduleBindList(params).then(res => {
+          console.log(res);
+          let errMsg = res.errMsg;
+          let data = res.data;
+          console.log(data);
+          resolve(data);
+        });
+      });
+    },
+
+    addTime() {
+      let self = this;
+      self.showAddTime = true;
+      console.log(self.showAddTime);
+      self.paneList[Number(self.activeName)].timeList.push({
+        time: '',
+        timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))
+      });
+      self.choiceDayTime();
+    },
+
+    addWeekDays(index) {
+      let self = this;
+      self.showAddWeek = true;
+      self.paneList[Number(self.activeName)].weeklySchedule.push({
+        dayArray: [],
+        timeArray: [],
+        weekList: JSON.parse(JSON.stringify(self.weekList))
+      });
+      self.choiceWeek(index);
+    },
+
+    deleteWeekDays(index) {
+      console.log(index);
+      let self = this;
+      self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1); // 删除时间
+      console.log(self.paneList[Number(self.activeName)].weeklySchedule);
+      self.choiceWeek(index);
+    },
+
+    bindScheduleToStore(params) {
+      return new Promise((resolve, reject) => {
+        bindScheduleAndStore(params).then(res => {
+          resolve(res);
+        });
+      });
+    },
+
+    unbindScheToStore(params) {
+      return new Promise((resolve, reject) => {
+        unbindScheduleAndStore(params).then(res => {
+          resolve(res);
+        });
+      });
+    },
+
+    async bindSchedule() {
+      let self = this;
+      let scheId = self.paneList[Number(self.activeName)].schId;
+      self.showBindDialog = false;
+      let isAdd = false;
+      // add new schedule to get scheduleId
+      if (scheId === 0) {
+        isAdd = true;
+        scheId = await self.addScheduleService();
+        self.paneList[Number(self.activeName)].schId = scheId;
+        self.scheduleId = scheId;
+        self.scheduleName = '';
+        self.isAdd = false;
+      } else {
+        // do nothing
+      }
+      if (!isAdd) {
+        await self.updateScheduleInfo();
+      }
+      let storeIdChecked = [];
+      let storeIdUnchecked = [];
+      let count = 0;
+      self.storeList.forEach(item => {
+        count += item.itemData.length;
+        item.itemData.forEach(_item => {
+          if (_item.checked) {
+            storeIdChecked.push(_item.storeId);
+          } else {
+            storeIdUnchecked.push(_item.storeId);
+          }
+        });
+      });
+
+      let tempchecked = [];
+      let obj = {
+        scheduleId: scheId,
+        storeIds: storeIdChecked
+      };
+      tempchecked.push(obj);
+      console.log(tempchecked);
+      let paramsBind = {
+        items: tempchecked
+      };
+      console.log(paramsBind);
+
+      let tempUnchecked = [];
+      let unbindobj = {
+        scheduleId: scheId,
+        storeIds: storeIdUnchecked
+      };
+      tempUnchecked.push(unbindobj);
+
+      let paramsUnBind = {
+        items: tempUnchecked
+      };
+      console.log(paramsUnBind);
+      let flag = false;
+      if (storeIdChecked.length === count) {
+        let resBind = await self.bindScheduleToStore(paramsBind);
+        console.log(resBind);
+        if (resBind.errMsg === 'Success' && resBind.errCode === '0') {
+          flag = true;
+        }
+      } else if (storeIdUnchecked.length === count) {
+        let resUnBind = await self.unbindScheToStore(paramsUnBind);
+        console.log(resUnBind);
+        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === '0') {
+          flag = true;
+        }
+      } else {
+        let resBind = await self.bindScheduleToStore(paramsBind);
+        let resUnBind = await self.unbindScheToStore(paramsUnBind);
+        if (resBind.errMsg === 'Success' && resUnBind.errMsg === 'Success') {
+          flag = true;
+        }
+      }
+      if (flag) {
+        let bindIdList = await self.getBindStoreList();
+        self.storeCount = bindIdList.length;
+        self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
+      } else {
+        self.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
+        return false;
+      }
+      self.dayArray = this.paneList[Number(self.activeName)].dayArray;
+      console.log(self.dayArray);
+      self.getHasBoundStroeIds();
+    },
+
+    deleteCurTime(index) {
+      console.log(index);
+      let self = this;
+      self.paneList[Number(self.activeName)].timeList.splice(index, 1);
+      console.log(self.paneList[Number(self.activeName)].timeList);
+      self.choiceDayTime(index);
+    },
+
+    async searchStore() {
+      let self = this;
+      self.showCityContent = false;
+      self.serachVale = '';
+      let params = {};
+      params = {
+        filter: {
+          page: 0,
+          size: 2000
+        }
+      };
+
+      let resData = await self.getStoreData(params);
+      let data = resData.content;
+      console.log(data);
+      self.getStoreByCity(data);
+
+      let count = 0;
+      self.storeList.forEach(item => {
+        if (item.checked) {
+          count++;
+        }
+      });
+      if (count === self.storeList.length) {
+        self.allData = true;
+      } else {
+        self.allData = false;
+      }
+    },
+
+    choiceAll(val) {
+      let self = this;
+      self.storeList.forEach(item => {
+        if (!item.disabled) {
+          item.checked = val;
+          item.itemData.forEach(_item => {
+            if (!_item.disabled) {
+              _item.checked = val;
+            }
           });
         }
-        else if(params.mode == 1){
-          //Weekly Mode
-          let schedule = self.paneList[tabIndex].weeklySchedule;
-          console.log(schedule);
-          schedule.forEach(item=>{
-            let timeArray = item.timeArray;
-            let selectedWeek = item.dayArray.filter(item=>item!= '-1');
-            selectedWeek.forEach(_item=>{
-              console.log(_item);
-              let timePeriod = [];
-              let tempSche = {};
-              timeArray.forEach(_it=>{
-                console.log(_it);
-                let seconds = self.hourToSecond(_it);
-                let obj = {};
-                obj.from = seconds;
-                timePeriod.push(obj);
-              })
-              tempSche.day = Number(_item);
-              tempSche.period = timePeriod;
-              tempSchedule.push(tempSche)
-            })
-          })
-          console.log(tempSchedule);
+      });
+    },
+
+    choiceAllGroup(item) {
+      let self = this;
+      console.log(item);
+      let obj = item;
+      item.itemData.forEach(item => {
+        if (!item.disabled) {
+          item.checked = obj.checked;
         }
-        else if(params.mode == 2){
-          //Monthly mode
-          let timeSelected = self.paneList[tabIndex].timeList;
-          let selectedMonth = self.selectMonth;
-          self.paneList[tabIndex].dayArray = self.selectMonth;
-          selectedMonth.forEach(item=>{
-            console.log(item);
-            let timePeriod = [];
-            let tempSche = {};
-            timeSelected.forEach(_item=>{
-              console.log(_item);
-              let time = _item.time;
-              if(time.length> 0){
-                let seconds = self.hourToSecond(time);
-                let obj = {};
-                obj.from = seconds;
-                timePeriod.push(obj);
+        // item.checked=obj.checked;
+      });
+      let arr = [];
+      self.storeList.forEach(_item => {
+        if (_item.checked) {
+          arr.push(_item);
+        }
+      });
+      let disArr = [];
+      self.storeList.forEach(_item => {
+        if (_item.disabled) {
+          disArr.push(_item);
+        }
+      });
+      self.allData = self.storeList.length === arr.length + disArr.length;
+    },
+
+    choiceAllDevice(index, item) {
+      let self = this;
+      console.log(index);
+      let count = 0;
+      item.itemData.forEach(itemS => {
+        if (itemS.checked) {
+          count++;
+        }
+      });
+      let disCount = 0;
+      item.itemData.forEach(itemS => {
+        if (itemS.disabled) {
+          disCount++;
+        }
+      });
+      if (count + disCount === item.itemData.length) {
+        item.checked = true;
+      } else {
+        item.checked = false;
+      }
+      if (disCount === item.itemData.length) {
+        item.disabled = true;
+      } else {
+        item.disabled = false;
+      }
+      let length = 0, countItem = 0;
+      self.storeList.forEach(_item => {
+        length += _item.itemData.length;
+        _item.itemData.forEach(itemS => {
+          if (itemS.checked) {
+            countItem++;
+          }
+        });
+      });
+      if (length === countItem) {
+        self.allData = true;
+      } else {
+        self.allData = false;
+      }
+    },
+
+    getScheduleFromDB(params) {
+      return new Promise((resolve, reject) => {
+        getScheduleListService(params).then(res => {
+          console.log(res);
+          let errMsg = res.errMsg;
+          let data = res.data;
+          console.log(data);
+          resolve(data);
+        });
+      });
+    },
+
+    async getScheduleList() {
+      // get point check schedule List
+      let self = this;
+      self.paneList = [];
+      let params = {};
+      params.category = 2; // point check schedule
+      let data = await self.getScheduleFromDB(params);
+      if (data.length !== 0) {
+        data.forEach(item => {
+          let name = item.name;
+          if (self.scheduleList.indexOf(name) === -1) {
+            self.scheduleList.push(name);
+          }
+        });
+        let tempAllData = [];
+        data.forEach(_item => {
+          let tempScheduleData = {};
+          tempScheduleData.name = _item.name;
+          tempScheduleData.mode = _item.mode;
+          tempScheduleData.modeDisabled = true;
+          tempScheduleData.schId = _item.id; // 排程id
+          tempScheduleData.scheduleInfo = _item;
+          tempScheduleData.enable = Boolean(_item.enable);
+          let tempSchedules = _item.schedule;
+          console.log(tempSchedules);
+          let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly
+          let dayArray = []; // 存放1，2两种类型选中的时间
+          let timeArray = []; // 存放3种类型的执行时间
+          let weeklyScheduleArray = []; // 存放周模式下的执行天数和时间
+          tempSchedules.forEach(sche => {
+            console.log(sche);
+            let day = sche.day;
+            dayArray.push(day);
+            let tempWeeklySchedule = {};
+            tempWeeklySchedule.day = day;
+            let tempWeeklyTimeArr = [];
+            let period = sche.period.sort(self.getSortFun('from'));
+            period.forEach(periods => {
+              let from = periods.from;
+              let hours = self.secondsToHour(from);
+              tempWeeklyTimeArr.push(hours);
+              if (timeArray.indexOf(hours) === -1) {
+                timeArray.push(self.secondsToHour(from));
+              } else {
+
               }
-            })
-            tempSche.day = Number(item);
-            tempSche.period = timePeriod;
-            tempSchedule.push(tempSche)
-          })
-          console.log(tempSchedule);
-        }
-        else{
+            });
+            tempWeeklySchedule.timeArray = tempWeeklyTimeArr;
+            weeklyScheduleArray.push(tempWeeklySchedule);
+            console.log(tempWeeklySchedule);
+          });
+          let weeklySchedule = self.transformArray(weeklyScheduleArray);
+          console.log(weeklySchedule);
+          console.log(dayArray);
+          tempScheduleData.timeArray = timeArray;
 
-        }
-        params.schedule = tempSchedule;
-        return new Promise((resolve, reject) => {
-          addNewSchedule(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
-            let errCode = res.errCode;
-            let data = res.data.scheduleId;
-            console.log(data);
-            resolve(data);
-          })
-        })
-      },
+          let timeList = [];
+          timeArray.forEach(_item => {
+            let timeJson = {};
+            timeJson.time = _item;
+            timeJson.timeArray = JSON.parse(JSON.stringify(self.weeklyTimeArray));
+            timeList.push(timeJson);
+          });
+          tempScheduleData.timeList = timeList;
+          console.log(timeList);
+          tempScheduleData.weeklySchedule = weeklySchedule;
+          tempScheduleData.dayArray = dayArray;
+          self.paneList.push(tempScheduleData);
+        });
 
-      async addSchedule() {
-        let self = this;
-        self.scheduleName = self.$t('scheduleView.newSchedule');
-        self.isAdd = true;
+        if (self.isFirstLoad) {
+          self.selectTab = self.paneList[0].name;
+          self.scheduleId = self.paneList[0].schId;
+          self.isFirstLoad = false;
+          self.dayArray = this.paneList[0].dayArray;
+          console.log(self.dayArray);
+          self.echoMonthAndWeek(); // 回显初次加载时选择的月和周
+          self.searchStore();
+        }
+        console.log(self.paneList);
+        self.getHasBoundStroeIds();
+      } else if (data.length === 0) {
+        console.log(self.paneList);
         let scheduleInfo = {
-          name: self.scheduleName,
+          name: '点检计划一',
           mode: 0,
           modeDisabled: false,
           schId: 0,
@@ -754,912 +1422,283 @@
           enable: false,
           to: -1,
           dueDays: 1,
-          weeklySchedule: [{dayArray:[],timeArray:[], weekList: JSON.parse(JSON.stringify(self.weekList))}],
-          timeList: [{time:'', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))}]
+          weeklySchedule: [{ dayArray: [], timeArray: [], weekList: JSON.parse(JSON.stringify(self.weekList)) }],
+          timeList: [{ time: '', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray)) }]
         };
         self.paneList.push(scheduleInfo);
-        let pane = self.paneList;
-        self.dayArray = [];
-        self.curType = 0;
-        self.activeName = (pane.length -1).toString() ;
-        self.selectTab = self.scheduleName;
+        self.scheduleName = '点检计划一';
+        self.selectTab = '点检计划一';
         self.scheduleId = 0;
         self.isDisabled = false;
+        self.isAdd = true;
         self.searchStore();
-        self.selectWeek = [];
-        self.selectMonth = [];
-        console.log(self.paneList)
-
-      },
-      async searchStoreInput() {
-        let self = this;
-        let params = {};
-        console.log(self.tempStoreList)
-        let tempStoreList=self.tempStoreList;
-        let getStore2Temp=data=>{
-          let cityList=[];
-          data.forEach(item=>{
-            if(cityList.map(x=>x.city).indexOf(item.city)==-1){
-              let obj={
-                city:item.city,
-                province:item.province
-              }
-              cityList.push(obj);
-            }
-          })
-          let storeListTemp=[];
-          for(let i=0;i<cityList.length;i++){
-            let temp=[];
-            let obj={};
-            for(let j=0;j<data.length;j++){
-              if(cityList[i].city==data[j].city){
-                let obj={};
-                obj.storeId=data[j].storeId;
-                obj.name=data[j].name;
-                obj.city=data[j].city;
-                obj.checked = data[j].checked;
-                obj.disabled = data[j].disabled;
-                console.log(obj)
-                temp.push(obj);
-              }
-            }
-            obj.cityName=cityList[i].city;
-            obj.province = cityList[i].province;
-            obj.itemData=temp;
-            storeListTemp.push(obj);
-          }
-          return storeListTemp;
-        }
-        let temp=[];
-        let tempArray=[];
-        let tempStore=[];
-        tempStoreList.forEach((_item,_index)=>{
-          _item.itemData.forEach((itemDs,indexDs)=>{
-            temp.push(util.getPinyinList(itemDs.name));
-            tempStore.push(itemDs);
-          })
-        })
-        for(var i=0;i<temp.length;i++){
-          if(temp[i][0].indexOf(self.serachVale.trim())!=-1||
-            temp[i][1].indexOf(self.serachVale.trim())!=-1){
-            tempArray.push(tempStore[i]);
-          }
-        }
-        self.storeList=getStore2Temp(tempArray);
-
-        let count = 0;
-        self.storeList.forEach(item => {
-          if (item.checked) {
-            count++;
-          }
-        })
-        if (count == self.storeList.length) {
-          self.allData = true;
-        } else {
-          self.allData = false;
-        }
-      },
-
-      getStoreData(params) {
-        let self = this;
-        return new Promise((resolve, reject) => {
-          getStoreList(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
-            let data = res.data;
-            console.log(data);
-            resolve(data);
-          })
-        })
-      },
-      async getStoreByCity(data) {
-        let self = this;
-        let bindStoreId=await self.getBindStoreList();
-        self.storeCount=bindStoreId.length;
-        console.log(data);
-        let cityList = [];
-        data.forEach(item => {
-          if (cityList.indexOf(item.city) == -1) {
-            cityList.push(item.city);
-          }
-        })
-        console.log(cityList);
-        let temp = [];
-        cityList.forEach(item => {
-          let obj = {};
-          obj.city = item;
-          let _temp = [];
-          data.forEach(_item => {
-            if (item == _item.city) {
-              let _obj = {};
-              obj.province = _item.province;
-              _obj.storeName = _item.name;
-              _obj.storeId = _item.storeId;
-              _temp.push(_obj);
-            }
-          })
-          obj.store = _temp;
-          temp.push(obj);
-        })
-        console.log(temp);
-        let groupTemp = [];
-        temp.forEach(item => {
-          let groupObj = {};
-          groupObj.province = item.province;
-          groupObj.cityName = item.city;
-          let _temp = [];
-          let _tempCount = 0;
-          let _tempDisCount = 0;
-          item.store.forEach(_item => {
-            let _obj = {};
-            if (bindStoreId.indexOf(_item.storeId) != -1) {
-              _obj.checked = true;
-              _obj.disabled = false;
-              _tempCount++;
-            }
-            else {
-              // 周月模式下，剩下的商店id 要看有没有绑定周月模式，若绑定，则不可用，
-              if(self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
-                _obj.checked = false;
-                _obj.disabled = false;
-              }
-              else{
-                _obj.checked = false;
-                _obj.disabled = true;
-                _tempDisCount++;
-              }
-            }
-            _obj.storeId = _item.storeId;
-            _obj.name = _item.storeName;
-            _obj.city = item.city;
-            _obj.province = item.province;
-            _temp.push(_obj);
-
-          })
-          if (_tempCount == item.store.length) {
-            groupObj.checked = true;
-          }
-          else {
-            groupObj.checked = false;
-          }
-
-          if (_tempDisCount + _tempCount == item.store.length) {
-            groupObj.checked = true;
-          }
-          else{
-            groupObj.checked = false;
-          }
-          if (_tempDisCount == item.store.length) {
-            groupObj.disabled = true;
-            groupObj.checked = false;
-          }
-          else{
-            groupObj.disabled = false;
-          }
-          groupObj.itemData = _temp;
-          groupTemp.push(groupObj);
-        })
-        self.storeList = groupTemp;
-        self.tempStoreList = groupTemp;
-        console.log(self.storeList)
-        console.log(self.tempStoreList)
-        let count = 0;
-        self.storeList.forEach(item => {
-          if (item.checked) {
-            count++;
-          }
-        })
-        let disCount = 0; //禁用数目
-        self.storeList.forEach(item => {
-          if (item.disabled) {
-            disCount++;
-          }
-        })
-        if (count == self.storeList.length) {
-          self.allData = true;
-        }
-        else {
-          self.allData = false;
-        }
-        if(count + disCount == self.storeList.length){
-          self.allData = true;
-        }
-        if (disCount == self.storeList.length) {
-          self.allDisabled = true;
-        }
-        else {
-          self.allDisabled = false;
-        }
-        let totalConut = disCount + count; //禁用加勾选数目
-        if(totalConut == self.storeList.length){
-          if(count> 0 ){
-            self.allDisabled = false;
-            self.allData = true;
-          }else{
-            self.allDisabled = true;
-            self.allData = false;
-          }
-        }
-      },
-      getBindStoreList() {
-        let self = this;
-        let scheduleId = self.scheduleId;
-        console.log(scheduleId)
-        let params = {}
-        params.scheduleId = scheduleId;
-        if(params.scheduleId == 0){
-          return [];
-        }
-        else if(params.scheduleId == -1){
-          console.log(self.paneList);
-          params.scheduleId = self.paneList[0].schId;
-        }
-        return new Promise((resolve, reject) => {
-          getScheduleBindList(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
-            let data = res.data;
-            console.log(data);
-            resolve(data);
-          })
-        })
-      },
-
-      addTime() {
-        let self = this;
-        self.showAddTime = true;
-        console.log(self.showAddTime);
-        self.paneList[Number(self.activeName)].timeList.push({
-          time:'',
-          timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))
-        });
-        self.choiceDayTime()
-      },
-      addWeekDays(index){
-        let self = this;
-        self.showAddWeek = true;
-        self.paneList[Number(self.activeName)].weeklySchedule.push({
-          dayArray:[],
-          timeArray:[],
-          weekList: JSON.parse(JSON.stringify(self.weekList))
-        });
-        self.choiceWeek(index)
-      },
-      deleteWeekDays(index){
-        console.log(index)
-        let self = this;
-        self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1); //删除时间
-        console.log(self.paneList[Number(self.activeName)].weeklySchedule);
-        self.choiceWeek(index)
-      },
-      bindScheduleToStore(params){
-        return new Promise((resolve,reject)=>{
-          bindScheduleAndStore(params).then(res=>{
-            resolve(res);
-          })
-        })
-      },
-      unbindScheToStore(params){
-        return new Promise((resolve,reject)=>{
-          unbindScheduleAndStore(params).then(res=>{
-            resolve(res);
-          })
-        })
-      },
-
-      async bindSchedule() {
-        //门店绑定排程
-        let self = this;
-        let scheId = self.paneList[Number(self.activeName)].schId;
-        self.showBindDialog = false;
-        let isAdd = false;
-        //如果是新增排程，则先调用新增排程服务，获得返回的scheduleId
-        if(scheId == 0){
-          isAdd = true;
-          scheId = await self.addScheduleService();
-          self.paneList[Number(self.activeName)].schId = scheId;
-          self.scheduleId = scheId;
-          self.scheduleName = '';
-          self.isAdd = false;
-        }
-        else{
-          // scheId = self.scheduleId;
-        }
-        if(!isAdd){
-          await self.updateScheduleInfo();
-        }
-        let storeIdChecked=[];
-        let storeIdUnchecked=[];
-        let count=0;
-        self.storeList.forEach(item=>{
-          count+=item.itemData.length;
-          item.itemData.forEach(_item=>{
-            if(_item.checked){
-              storeIdChecked.push(_item.storeId);
-            }
-            else{
-              storeIdUnchecked.push(_item.storeId);
-            }
-          })
-        })
-
-        let tempchecked=[];
-        let obj={
-          scheduleId:scheId,
-          storeIds: storeIdChecked,
-        };
-        tempchecked.push(obj);
-        console.log(tempchecked)
-        let paramsBind={
-          items:tempchecked
-        };
-        console.log(paramsBind)
-
-        let tempUnchecked=[];
-        let unbindobj={
-          scheduleId: scheId,
-          storeIds: storeIdUnchecked,
-        };
-        tempUnchecked.push(unbindobj);
-
-        let paramsUnBind={
-          items:tempUnchecked
-        };
-        console.log(paramsUnBind)
-        let flag=false;
-        if(storeIdChecked.length==count){  //全部勾选，只有绑定操作
-          let resBind=await self.bindScheduleToStore(paramsBind);
-          console.log(resBind);
-          if(resBind.errMsg=='Success'&&resBind.errCode=='0'){
-            flag=true;
-          }
-        }
-        else if(storeIdUnchecked.length==count){ //全部取消勾选，只有解绑操作
-          let resUnBind=await self.unbindScheToStore(paramsUnBind);
-          console.log(resUnBind);
-          if(resUnBind.errMsg=='Success'&&resUnBind.errCode=='0'){
-            flag=true;
-          }
-        }
-        else{
-          let resBind=await self.bindScheduleToStore(paramsBind);
-          let resUnBind=await self.unbindScheToStore(paramsUnBind);
-          if(resBind.errMsg=='Success'&&resUnBind.errMsg=='Success'){
-            flag=true;
-          }
-        }
-        if(flag){
-          let bindIdList=await self.getBindStoreList();
-          self.storeCount = bindIdList.length;
-          //self.notify(`门店绑定修改成功，巡检表绑定${bindIdList.length}家门店！`,'success',3000);
-          self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`,'success',3000);
-        }
-        else{
-          self.notify(this.$t('insSettingView.bindFail'),'warning',3000);
-          return false;
-        }
-        self.dayArray = this.paneList[Number(self.activeName)].dayArray;
-        console.log(self.dayArray)
-        self.getHasBoundStroeIds();
-      },
-      deleteCurTime(index) {
-        console.log(index)
-        let self = this;
-        self.paneList[Number(self.activeName)].timeList.splice(index, 1); //删除时间
-        console.log(self.paneList[Number(self.activeName)].timeList)
-        self.choiceDayTime(index)
-      },
-
-      async searchStore() {
-        let self = this;
-        self.showCityContent = false;
-        self.serachVale = '';
-        let params = {};
-        params = {
-          filter: {
-            page: 0,
-            size: 2000
-          }
-        }
-
-        let resData = await self.getStoreData(params);
-        let data = resData.content;
-        console.log(data)
-        self.getStoreByCity(data);
-
-        let count = 0;
-        self.storeList.forEach(item => {
-          if (item.checked) {
-            count++;
-          }
-        })
-        if (count == self.storeList.length) {
-          self.allData = true;
-        }
-        else {
-          self.allData = false;
-        }
-      },
-      choiceAll(val){
-        let self=this;
-        self.storeList.forEach(item=>{
-          if(!item.disabled){
-            item.checked=val;
-            item.itemData.forEach(_item=>{
-              if(!_item.disabled){
-                _item.checked=val;
-              }
-            })
-          }
-        })
-      },
-      choiceAllGroup(item){
-        let self=this;
-        console.log(item);
-        let obj=item;
-        item.itemData.forEach(item=>{
-          if(!item.disabled){
-            item.checked=obj.checked;
-          }
-          //item.checked=obj.checked;
-        })
-        let arr=[];
-        self.storeList.forEach(_item=>{
-          if(_item.checked){
-            arr.push(_item);
-          }
-        })
-        let disArr=[];
-        self.storeList.forEach(_item=>{
-          if(_item.disabled){
-            disArr.push(_item);
-          }
-        })
-        if(self.storeList.length==arr.length + disArr.length){
-          self.allData=true;
-        }
-        else{
-          self.allData=false;
-        }
-      },
-      choiceAllDevice(index,item){
-        let self=this;
-        console.log(index);
-        let count=0;
-        item.itemData.forEach(itemS=>{
-          if(itemS.checked){
-            count++;
-          }
-        })
-        let disCount = 0;
-        item.itemData.forEach(itemS=>{
-          if(itemS.disabled){
-            disCount++;
-          }
-        })
-        if(count + disCount==item.itemData.length){
-          item.checked=true;
-        }
-        else{
-          item.checked=false;
-        }
-        if(disCount == item.itemData.length){
-          item.disabled = true;
-        }
-        else{
-          item.disabled = false;
-        }
-        let length=0, countItem=0;
-        self.storeList.forEach(_item=>{
-          length+=_item.itemData.length;
-          _item.itemData.forEach(itemS=>{
-            if(itemS.checked){
-              countItem++;
-            }
-          })
-        })
-        if(length==countItem){
-          self.allData=true;
-        }
-        else{
-          self.allData=false;
-        }
-      },
-      getScheduleFromDB(params){
-        return new Promise((resolve, reject) => {
-          getScheduleListService(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
-            let data = res.data;
-            console.log(data);
-            resolve(data);
-          })
-        })
-      },
-      async getScheduleList(){
-        //get point check schedule List
-        let self = this;
-        self.paneList = [];
-        let params = {};
-        params.category = 2; //point check schedule
-        let data = await self.getScheduleFromDB(params)
-        if(data.length!=0){
-          data.forEach(item=>{
-            let name = item.name; //排程名称
-            if(self.scheduleList.indexOf(name)==-1){
-              self.scheduleList.push(name);
-            }
-          })
-          let tempAllData=[];
-          data.forEach(_item => {
-            let tempScheduleData = {};
-            tempScheduleData.name = _item.name;
-            tempScheduleData.mode = _item.mode;
-            tempScheduleData.modeDisabled = true;
-            tempScheduleData.schId = _item.id; //排程id
-            tempScheduleData.scheduleInfo = _item;
-            tempScheduleData.enable = Boolean(_item.enable);
-            let tempSchedules = _item.schedule;
-            console.log(tempSchedules)
-            let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly
-            let dayArray = []; //存放1，2两种类型选中的时间
-            let timeArray = []; //存放3种类型的执行时间
-            let weeklyScheduleArray = []; //存放周模式下的执行天数和时间
-            tempSchedules.forEach(sche=>{
-              console.log(sche)
-              let day = sche.day;
-              dayArray.push(day)
-              let tempWeeklySchedule = {};
-              tempWeeklySchedule.day = day;
-              let tempWeeklyTimeArr = [];
-              let period = sche.period.sort(self.getSortFun('from'));
-              period.forEach(periods=>{
-                let from = periods.from;
-                let hours = self.secondsToHour(from);
-                tempWeeklyTimeArr.push(hours);
-                if(timeArray.indexOf(hours) == -1){
-                  timeArray.push(self.secondsToHour(from));
-                }
-                else{
-
-                }
-              })
-              tempWeeklySchedule.timeArray = tempWeeklyTimeArr;
-              weeklyScheduleArray.push(tempWeeklySchedule);
-              console.log(tempWeeklySchedule);
-            })
-            let weeklySchedule = self.transformArray(weeklyScheduleArray);
-            console.log(weeklySchedule);
-            console.log(dayArray);
-            tempScheduleData.timeArray = timeArray;
-
-            let timeList = [];
-            timeArray.forEach(_item=>{
-              let timeJson = {};
-              timeJson.time = _item;
-              timeJson.timeArray = JSON.parse(JSON.stringify(self.weeklyTimeArray));
-              timeList.push(timeJson);
-            })
-            tempScheduleData.timeList = timeList;
-            console.log(timeList);
-            tempScheduleData.weeklySchedule = weeklySchedule;
-            tempScheduleData.dayArray = dayArray;
-            self.paneList.push(tempScheduleData);
-          })
-          //self.paneList.push(tempScheduleData);
-
-          if(self.isFirstLoad == true){
-            self.selectTab  = self.paneList[0].name;
-            self.scheduleId =  self.paneList[0].schId;
-            //获取所有排程绑定的所有门店
-            self.isFirstLoad = false;
-            self.dayArray = this.paneList[0].dayArray;
-            console.log(self.dayArray)
-            self.echoMonthAndWeek() //回显初次加载时选择的月和周
-            self.searchStore();
-          }
-          console.log(self.paneList);
-          self.getHasBoundStroeIds();
-        }
-        else if(data.length == 0){
-          console.log(self.paneList)
-          let scheduleInfo = {
-            name: "点检计划一",
-            mode: 0,
-            modeDisabled: false,
-            schId: 0,
-            dayArray: [],
-            enable: false,
-            to: -1,
-            dueDays: 1,
-            weeklySchedule: [{dayArray:[], timeArray:[], weekList:JSON.parse(JSON.stringify(self.weekList))}],
-            timeList: [{time:'', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))}]
-          };
-          self.paneList.push(scheduleInfo);
-          self.scheduleName = "点检计划一";
-          self.selectTab = "点检计划一";
-          self.scheduleId = 0;
-          self.isDisabled = false;
-          self.isAdd = true;
-          self.searchStore();
-        }
-      },
-      getSortFun(sortBy) {
-        let ordAlpah =  '>' ;
-        let sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
-        return sortFun;
-      },
-      transformArray(json){
-        let self = this;
-        const map = {};
-        for(const o of json){
-          if(!map.hasOwnProperty(JSON.stringify(o.timeArray))){
-            map[JSON.stringify(o.timeArray)] = o;
-            const val = map[JSON.stringify(o.timeArray)].day;
-            map[JSON.stringify(o.timeArray)].dayArray = [val];
-          }else{
-            map[JSON.stringify(o.timeArray)].dayArray.push(o.day);
-          }
-        }
-        var arr = [];
-        for(var item in map){
-          arr.push(map[item]);
-        }
-        console.log(arr);
-        arr.forEach(item=>{
-          item.dayArray.sort();
-          // item.day = item.dayArray.toString();//设置选择的天数
-          item.weekList = JSON.parse(JSON.stringify(self.weekList))
-        })
-        return arr;
+      }
     },
-      getHasBoundStroeIds(){
-            let self = this;
-            self.hasBoundStoreIds = [];
-            self.paneList.forEach(item=>{
-              let sheduleId = item.schId;
-              let mode = item.mode;
-              console.log(sheduleId + '....' + mode)
-              //获取绑定周、月模式商店的id
-              if (mode !== 3) {
-                let params = {};
-                params.scheduleId = sheduleId;
-                return new Promise((resolve, reject) => {
-                  getScheduleBindList(params).then(res => {
-                    console.log(res);
-                    let errMsg = res.errMsg;
-                    let data = res.data;
-                    console.log(data);
-                    data.forEach(_item=>{
-                      if(self.hasBoundStoreIds.indexOf(_item) == -1){
-                        self.hasBoundStoreIds.push(_item);
-                      }
-                      else{
-                        // do nothing
-                      }
-                    })
-                    resolve(data);
-                  })
-                })
-              }
-            })
-            console.log(self.hasBoundStoreIds)
-          },
-      secondsToHour(second){
-        //秒数转化为时分秒
-        console.log(second)
-        let changedData = [parseInt(second / 60 / 60), second / 60 % 60].join(":")
-          .replace(/\b(\d)\b/g, "0$1");
-        console.log(changedData)
-        return changedData;
-      },
-      hourToSecond(hourStr){
-        // 时间字符串转化为距离零点的秒数
-        console.log(hourStr);
-        let hourArray = hourStr.split(':');
-        let changedSec = Number(hourArray[0]) * 3600 + Number(hourArray[1]) * 60;
-        console.log(changedSec);
-        return changedSec;
-      },
-      notify(msg,type,time) {
-        this.$message({
-          message: msg,
-          type: type,
-          duration:time
-        });
-      },
-      updateScheduleInfo(){
-        let params = {};
-        let self = this;
-        let tabIndex = Number(self.activeName);
-        params.id = self.paneList[tabIndex].schId;
-        params.name = self.paneList[tabIndex].name;
-        params.comment = '点检计划';
-        let mode = self.paneList[tabIndex].mode
-        // params.category = 1;
-        // params.mode = 0;
-        params.enable = Number(self.paneList[tabIndex].enable);
-        params.from = new Date().getTime();
-        params.to =  -1;
-        params.notityTime = 0;
-        let tempSchedule = [];
-        //Daily Mode
-        if(mode == 0){
-          let tempPeriod = [];
-          let timeSelect = self.paneList[tabIndex].timeList;
-          timeSelect.forEach(item=>{
-            console.log(item);
-            let time = item.time;
-            let seconds = self.hourToSecond(time);
-            let obj = {};
-            obj.from = seconds;
-            tempPeriod.push(obj);
-          })
-          tempSchedule.push({
-            "day": 1,
-            "period": tempPeriod
+
+    getSortFun(sortBy) {
+      let ordAlpah = '>';
+      let sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
+      return sortFun;
+    },
+
+    transformArray(json) {
+      let self = this;
+      let map = {};
+      for (let o of json) {
+        if (!map.hasOwnProperty(JSON.stringify(o.timeArray))) {
+          map[JSON.stringify(o.timeArray)] = o;
+          let val = map[JSON.stringify(o.timeArray)].day;
+          map[JSON.stringify(o.timeArray)].dayArray = [val];
+        } else {
+          map[JSON.stringify(o.timeArray)].dayArray.push(o.day);
+        }
+      }
+      let arr = [];
+      for (let item in map) {
+        arr.push(map[item]);
+      }
+      console.log(arr);
+      arr.forEach(item => {
+        item.dayArray.sort();
+        item.weekList = JSON.parse(JSON.stringify(self.weekList));
+      });
+      return arr;
+    },
+
+    getHasBoundStroeIds() {
+      let self = this;
+      self.hasBoundStoreIds = [];
+      self.paneList.forEach(item => {
+        let sheduleId = item.schId;
+        let mode = item.mode;
+        console.log(sheduleId + '....' + mode);
+        if (mode !== 3) {
+          let params = {};
+          params.scheduleId = sheduleId;
+          return new Promise((resolve, reject) => {
+            getScheduleBindList(params).then(res => {
+              console.log(res);
+              let errMsg = res.errMsg;
+              let data = res.data;
+              console.log(data);
+              data.forEach(_item => {
+                if (self.hasBoundStoreIds.indexOf(_item) === -1) {
+                  self.hasBoundStoreIds.push(_item);
+                } else {
+                  // do nothing
+                }
+              });
+              resolve(data);
+            });
           });
         }
-        else if(mode == 1){
-          //Weekly Mode
-          let schedule = self.paneList[tabIndex].weeklySchedule;
-          console.log(schedule);
-          schedule.forEach(item=>{
-            let timeArray = item.timeArray;
-            let selectedWeek = item.dayArray.filter(item=>item !== '-1');
-            selectedWeek.forEach(_item=>{
-              console.log(_item);
-              let timePeriod = [];
-              let tempSche = {};
-              timeArray.forEach(_it=>{
-                console.log(_it);
-                let seconds = self.hourToSecond(_it);
-                let obj = {};
-                obj.from = seconds;
-                timePeriod.push(obj);
-              })
-              tempSche.day = Number(_item);
-              tempSche.period = timePeriod;
-              tempSchedule.push(tempSche)
-            })
-          })
-          console.log(tempSchedule);
-        }
-        else if(mode == 2){
-          //Monthly Mode
-          let timeSelected = self.paneList[tabIndex].timeList;
-          let selectedMonth = self.selectMonth;
-          self.paneList[tabIndex].dayArray = self.selectMonth;
-          selectedMonth.forEach(item=>{
-            console.log(item);
+      });
+      console.log(self.hasBoundStoreIds);
+    },
+    secondsToHour(second) {
+      console.log(second);
+      let changedData = [parseInt(second / 60 / 60), second / 60 % 60].join(':')
+        .replace(/\b(\d)\b/g, '0$1');
+      console.log(changedData);
+      return changedData;
+    },
+
+    hourToSecond(hourStr) {
+      console.log(hourStr);
+      let hourArray = hourStr.split(':');
+      let changedSec = Number(hourArray[0]) * 3600 + Number(hourArray[1]) * 60;
+      console.log(changedSec);
+      return changedSec;
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    },
+
+    updateScheduleInfo() {
+      let params = {};
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      params.id = self.paneList[tabIndex].schId;
+      params.name = self.paneList[tabIndex].name;
+      params.comment = '点检计划';
+      let mode = self.paneList[tabIndex].mode;
+      // params.category = 1;
+      // params.mode = 0;
+      params.enable = Number(self.paneList[tabIndex].enable);
+      params.from = new Date().getTime();
+      params.to = -1;
+      params.notityTime = 0;
+      let tempSchedule = [];
+      // Daily Mode
+      if (mode === 0) {
+        let tempPeriod = [];
+        let timeSelect = self.paneList[tabIndex].timeList;
+        timeSelect.forEach(item => {
+          console.log(item);
+          let time = item.time;
+          let seconds = self.hourToSecond(time);
+          let obj = {};
+          obj.from = seconds;
+          tempPeriod.push(obj);
+        });
+        tempSchedule.push({
+          'day': 1,
+          'period': tempPeriod
+        });
+      } else if (mode === 1) {
+        // Weekly Mode
+        let schedule = self.paneList[tabIndex].weeklySchedule;
+        console.log(schedule);
+        schedule.forEach(item => {
+          let timeArray = item.timeArray;
+          let selectedWeek = item.dayArray.filter(item => item !== '-1');
+          selectedWeek.forEach(_item => {
+            console.log(_item);
             let timePeriod = [];
             let tempSche = {};
-            timeSelected.forEach(_item=>{
-              console.log(_item);
-              let time = _item.time;
-              let seconds = self.hourToSecond(time);
+            timeArray.forEach(_it => {
+              console.log(_it);
+              let seconds = self.hourToSecond(_it);
               let obj = {};
               obj.from = seconds;
               timePeriod.push(obj);
-            })
-            tempSche.day = Number(item);
+            });
+            tempSche.day = Number(_item);
             tempSche.period = timePeriod;
-            tempSchedule.push(tempSche)
-          })
-          console.log(tempSchedule);
-        }
-        else{
+            tempSchedule.push(tempSche);
+          });
+        });
+        console.log(tempSchedule);
+      } else if (mode === 2) {
+        // Monthly Mode
+        let timeSelected = self.paneList[tabIndex].timeList;
+        let selectedMonth = self.selectMonth;
+        self.paneList[tabIndex].dayArray = self.selectMonth;
+        selectedMonth.forEach(item => {
+          console.log(item);
+          let timePeriod = [];
+          let tempSche = {};
+          timeSelected.forEach(_item => {
+            console.log(_item);
+            let time = _item.time;
+            let seconds = self.hourToSecond(time);
+            let obj = {};
+            obj.from = seconds;
+            timePeriod.push(obj);
+          });
+          tempSche.day = Number(item);
+          tempSche.period = timePeriod;
+          tempSchedule.push(tempSche);
+        });
+        console.log(tempSchedule);
+      } else {
 
-        }
-        params.schedule = tempSchedule;
-        console.log(params.schedule);
+      }
+      params.schedule = tempSchedule;
+      console.log(params.schedule);
+      return new Promise((resolve, reject) => {
+        updateSchedule(params).then(res => {
+          console.log(res);
+          let errMsg = res.errMsg;
+          let data = res.errCode;
+          console.log(data);
+          resolve(data);
+        });
+      });
+    },
+
+    deleteScheduleBtn() {
+      this.showDeleteDialog = true;
+    },
+    deleteSchedule() {
+      let self = this;
+      self.showDeleteDialog = false;
+      if (self.scheduleId === 0) {
+        self.initData();
+      } else {
+        let scheduleIds = [];
+        scheduleIds.push(self.scheduleId);
+        let params = {};
+        params.scheduleIds = scheduleIds;
+        console.log(params.scheduleIds);
         return new Promise((resolve, reject) => {
-          updateSchedule(params).then(res => {
+          deleteScheduleService(params).then(res => {
             console.log(res);
             let errMsg = res.errMsg;
             let data = res.errCode;
             console.log(data);
+            if (data === 0) {
+              self.notify(self.$t('scheduleView.deleteSuss'), 'success', 3000);
+            } else {
+              self.notify(self.$t('scheduleView.deleteFail'), 'warning', 3000);
+            }
+            self.initData();
             resolve(data);
-          })
-        })
-
-      },
-      deleteScheduleBtn(){
-        this.showDeleteDialog = true
-      },
-      deleteSchedule(){
-        let self = this;
-        self.showDeleteDialog = false;
-        if(self.scheduleId == 0){
-          //还没有新增排程
-          self.initData();
-        }
-        else{
-          let scheduleIds = [];
-          scheduleIds.push(self.scheduleId);
-          let params = {};
-          params.scheduleIds = scheduleIds;
-          console.log(params.scheduleIds);
-          return new Promise((resolve, reject) => {
-            deleteScheduleService(params).then(res => {
-              console.log(res);
-              let errMsg = res.errMsg;
-              let data = res.errCode;
-              console.log(data);
-              if(data == 0){
-                self.notify(self.$t('scheduleView.deleteSuss'),'success',3000);
-              }
-              else{
-                self.notify(self.$t('scheduleView.deleteFail'),'warning',3000);
-              }
-              //刷新页面
-              self.initData();
-              resolve(data);
-            })
-          })
-        }
-      },
-      initData(){
-        let self = this;
-        self.paneList.splice(Number(self.activeName), 1);
-        self.activeName = '0'
-        self.scheduleId = self.paneList[0].schId;
-        // self.curType = (self.paneList[0].mode).toString();
-        // console.log(typeof(self.curType))
-        //self.timeArray = self.paneList[0].timeArray;
-        self.dayArray =  self.paneList[0].dayArray;
-        self.echoMonthAndWeek();
-        self.scheduleId = self.paneList[0].schId;
-        //self.enable = self.paneList[0].enable;
-        console.log(self.scheduleId)
-        self.getHasBoundStroeIds()
-      },
-      getSelectTimeArray(){
-        let self = this;
-        let date = self.$moment().format('YYYY-MM-DD');
-        console.log(date)
-        let startIime = self.$moment(date + ' 08:00:00').valueOf();
-        let endTime = self.$moment(date + ' 23:45:00').valueOf();
-        let timeArray = [];
-        timeArray.push(self.$moment(startIime).format('HH:mm'));
-        while(startIime < endTime){
-          startIime += 15*60*1000; //每隔15分钟，生成时间间隔
-          timeArray.push(self.$moment(startIime).format('HH:mm'));
-        }
-        timeArray.forEach(item=>{
-          let timeJson = {};
-          timeJson.value = item;
-          timeJson.name = item;
-          timeJson.label = item;
-          timeJson.disabled = false;
-          self.weeklyTimeArray.push(timeJson);
-        })
-        console.log(self.weeklyTimeArray)
-      },
-      changeSelectMonth(val, item){
-        let self = this;
-        console.log(Array.from(val)[0])
-        self.selectMonth = Array.from(val)[0];
-      },
-      changeSelectWeek(val, item){
-        let self = this;
-        item.dayArray = Array.from(val)[0];
-        self.choiceWeek()
-      },
-      changeSelectWeekTime(val, item){
-        let self = this;
-        console.log(val)
-        item.timeArray = val;
-        console.log(item.timeArray)
-      },
+          });
+        });
+      }
     },
-    created(){
-      let self = this;
-      self.getSelectTimeArray();
-      self.getScheduleList();
-    }
 
+    initData() {
+      let self = this;
+      self.paneList.splice(Number(self.activeName), 1);
+      self.activeName = '0';
+      self.scheduleId = self.paneList[0].schId;
+      self.dayArray = self.paneList[0].dayArray;
+      self.echoMonthAndWeek();
+      self.scheduleId = self.paneList[0].schId;
+      console.log(self.scheduleId);
+      self.getHasBoundStroeIds();
+    },
+
+    getSelectTimeArray() {
+      let self = this;
+      let date = self.$moment().format('YYYY-MM-DD');
+      console.log(date);
+      let startIime = self.$moment(date + ' 08:00:00').valueOf();
+      let endTime = self.$moment(date + ' 23:45:00').valueOf();
+      let timeArray = [];
+      timeArray.push(self.$moment(startIime).format('HH:mm'));
+      while (startIime < endTime) {
+        startIime += 15 * 60 * 1000;
+        timeArray.push(self.$moment(startIime).format('HH:mm'));
+      }
+      timeArray.forEach(item => {
+        let timeJson = {};
+        timeJson.value = item;
+        timeJson.name = item;
+        timeJson.label = item;
+        timeJson.disabled = false;
+        self.weeklyTimeArray.push(timeJson);
+      });
+      console.log(self.weeklyTimeArray);
+    },
+
+    changeSelectMonth(val, item) {
+      let self = this;
+      console.log(Array.from(val)[0]);
+      self.selectMonth = Array.from(val)[0];
+    },
+
+    changeSelectWeek(val, item) {
+      let self = this;
+      item.dayArray = Array.from(val)[0];
+      self.choiceWeek();
+    },
+
+    changeSelectWeekTime(val, item) {
+      let self = this;
+      console.log(val);
+      item.timeArray = val;
+      console.log(item.timeArray);
+    }
   }
+};
 </script>
 
 <style lang="scss" scoped>
