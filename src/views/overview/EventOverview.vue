@@ -57,21 +57,24 @@
               </el-select>
             </div>
             <div class="charts-content">
-              <v-chart ref="storeEventRef" :options="storeEventsOptions" :auto-resize="true" class="result-content"/>
+              <v-chart ref="storeEventRef" :options="storeEventsOptions" :auto-resize="true"
+                       class="result-content"/>
             </div>
           </div>
 
         </el-col>
-        <el-col :span="isEnSpan? 7: 6" class="source-list">
+        <el-col :span="isEnSpan ? 7 : 6" class="source-list">
           <div class="title">
             <span class="area-title">{{ $t('overview.eventSource') }}</span>
           </div>
           <div class="pct-content">
             <div class="pct-panel">
-              <v-chart ref="eventSourceRef" :auto-resize="true" :options="eventSourceOptions" class="chart-content"/>
+              <v-chart ref="eventSourceRef" :auto-resize="true" :options="eventSourceOptions"
+                       class="chart-content"/>
             </div>
             <div class="pct-nums">
-              <div v-for="(item, index) in sourcePerArray" :class="lang='en'? 'en-label': ''" :key="index" class="content-labels">
+              <div v-for="(item, index) in sourcePerArray" :class="lang === 'en'? 'en-label' : ''" :key="index"
+                   class="content-labels">
                 <div class="excellent_nums">{{ item.percent }}%</div>
                 <div class="excellent_labels">
                   <span :class="`label-` + index" class="labels excellent-label"/>
@@ -89,7 +92,8 @@
           </div>
           <div class="pct-content">
             <div class="pct-panel">
-              <v-chart ref="eventStatusRef" :auto-resize="true" :options="eventStatusOptions" class="chart-content"/>
+              <v-chart ref="eventStatusRef" :auto-resize="true" :options="eventStatusOptions"
+                       class="chart-content"/>
             </div>
             <div class="pct-nums">
               <div v-for="(item, index) in statusPerArray" :key="index" class="content-labels">
@@ -102,7 +106,7 @@
             </div>
           </div>
         </el-col>
-        <el-col :span="isEnSpan? 17: 18">
+        <el-col :span="isEnSpan ? 17 : 18">
           <div class="store-status-panel" >
             <div class="store-statul-title">{{ $t('overview.eventHading') }}</div>
             <div class="store-panel">
@@ -118,7 +122,8 @@
                 </el-select>
               </div>
               <div class="status-content">
-                <v-chart ref="storeStatusRef" :options="storeStatusOptions" :auto-resize="true" class="result-content"/>
+                <v-chart ref="storeStatusRef" :options="storeStatusOptions" :auto-resize="true"
+                         class="result-content"/>
               </div>
             </div>
           </div>
@@ -771,110 +776,15 @@ export default {
       } else {
         axisArray = ['门店名称', self.$t('overview.pendingEvent'), self.$t('overview.processedEvent'), self.$t('overview.closedEvents')];
         colorArray = [self.pendingColor, self.doneColor, self.closedColor];
-        seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 },
+        seriesData = [
           { type: 'bar', stack: 'test', barWidth: 35 },
-          { type: 'bar', stack: 'test', barWidth: 35 }];
+          { type: 'bar', stack: 'test', barWidth: 35 },
+          { type: 'bar', stack: 'test', barWidth: 35 }
+        ];
       }
       let rankingResult = await self.getEventStatsRanking(params);
       console.log(rankingResult);
-      let option = {
-        color: colorArray,
-        legend: {
-          x: 'center',
-          y: 'bottom',
-          itemWidth: 10,
-          itemHeight: 10,
-          itemGap: 20,
-          padding: 0,
-          icon: 'rect',
-          textStyle: {
-            color: self.echartColor,
-            fontSize: 12,
-            padding: [0, 0, 0, 5]
-          }
-        },
-        grid: {
-          containLabel: true,
-          top: '10', // 距上边距
-          left: '8', // 距离左边距
-          right: '0', // 距离右边距
-          bottom: '32'// 距离下边距
-        },
-        textStyle: {
-          fontFamily: self.fontFamily
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { // 坐标轴指示器，坐标轴触发有效
-            type: 'none' // 默认为直线，可选为：'line' | 'shadow'
-          },
-          padding: 5,
-          textStyle: {
-            align: 'left'
-          },
-          backgroundColor: self.echartBackground
-        },
-        dataset: {
-          source: []
-        },
-        xAxis: {
-          type: 'category',
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          splitLine: {
-            show: false,
-            lineStyle: {
-              type: 'dashed'
-            }
-          },
-          axisLine: {
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            fontStyle: 12,
-            margin: 10
-          }
-        },
-        yAxis: {
-          // interval: 20,
-          minInterval: 20,
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: self.echartAxiasColor,
-              width: 1
-            }
-          },
-          axisLine: {
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            fontStyle: 12,
-            margin: 10
-          }
-        },
-        series: seriesData
-      };
+      let rankingOption = self.getEventRankingOption(colorArray, seriesData)
       if (rankingResult.errCode === 0) {
         let result = rankingResult.data;
         console.log(result);
@@ -898,11 +808,113 @@ export default {
           soureceList.push(itemArray);
         });
         console.log(soureceList);
-        option.dataset.source = soureceList;
+        rankingOption.dataset.source = soureceList;
       } else {
-        option.dataset.source = [];
+        rankingOption.dataset.source = [];
       }
-      self.storeStatusOptions = option;
+      self.storeStatusOptions = rankingOption;
+    },
+
+    getEventRankingOption(colorArray, seriesData){
+      let rankingOption = {
+          color: colorArray,
+          legend: {
+            x: 'center',
+            y: 'bottom',
+            itemWidth: 10,
+            itemHeight: 10,
+            itemGap: 20,
+            padding: 0,
+            icon: 'rect',
+            textStyle: {
+            color: this.echartColor,
+              fontSize: 12,
+              padding: [0, 0, 0, 5]
+          }
+        },
+        grid: {
+          containLabel: true,
+            top: '10',
+            left: '8',
+            right: '0',
+            bottom: '32'
+        },
+        textStyle: {
+          fontFamily: this.fontFamily
+        },
+        tooltip: {
+          trigger: 'axis',
+            axisPointer: {
+            type: 'none'
+          },
+          padding: 5,
+            textStyle: {
+            align: 'left'
+          },
+          backgroundColor: this.echartBackground
+        },
+        dataset: {
+          source: []
+        },
+        xAxis: {
+          type: 'category',
+            axisTick: {
+            show: false,
+              inside: true,
+              lineStyle: {
+              color: '#7D8CAB',
+                fontSize: 12
+            }
+          },
+          splitLine: {
+            show: false,
+              lineStyle: {
+              type: 'dashed'
+            }
+          },
+          axisLine: {
+            show: false,
+              lineStyle: {
+              color: '#7D8CAB'
+            }
+          },
+          axisLabel: {
+            fontStyle: 12,
+              margin: 10
+          }
+        },
+        yAxis: {
+          // interval: 20,
+          minInterval: 20,
+            axisTick: {
+            show: false,
+              inside: true,
+              lineStyle: {
+              color: '#7D8CAB',
+                fontSize: 12
+            }
+          },
+          splitLine: {
+            show: true,
+              lineStyle: {
+              color: this.echartAxiasColor,
+                width: 1
+            }
+          },
+          axisLine: {
+            show: false,
+              lineStyle: {
+              color: '#7D8CAB'
+            }
+          },
+          axisLabel: {
+            fontStyle: 12,
+              margin: 10
+          }
+        },
+        series: seriesData
+      };
+      return rankingOption;
     },
 
     getEventStatsRanking(params) {

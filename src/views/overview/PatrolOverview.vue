@@ -42,7 +42,10 @@
             </div>
             <div class="total-store" style="margin-bottom: 0">
               <div class="total-title">{{ $t('overview.advPatrolCycle') }}</div>
-              <div class="total-num">{{ cycleOfInspect }}<span v-if="cycleOfInspect !=='N/A'" class="day">{{ $t('overview.day') }}</span>
+              <div class="total-num">
+                {{ cycleOfInspect }}
+                <span v-if="cycleOfInspect !=='N/A'" class="day">
+                {{ $t('overview.day') }}</span>
               </div>
             </div>
           </div>
@@ -52,7 +55,8 @@
           <div class="region-result">
             <div class="region-content">
               <div class="region-result-panel">
-                <v-chart ref="storeChart" :options="storeOptions" :auto-resize="true" class="result-content" @timelinechanged="timelineHandler"/>
+                <v-chart ref="storeChart" :options="storeOptions" :auto-resize="true" class="result-content"
+                         @timelinechanged="timelineHandler"/>
                 <i v-if="showPreviousGroup" class="el-icon-arrow-left icon-arrow" @click="previousGroup"/>
                 <div v-if="regionChartEmpty" class="empty-text">{{ $t('overview.noData') }}</div>
                 <i v-if="showNextGroup" class="el-icon-arrow-right icon-arrow" @click="nextGroup"/>
@@ -65,10 +69,6 @@
           <div class="title">
             <span v-if="isWorstArea" class="area-title">{{ $t('overview.worstRegion') }}</span>
             <span v-else class="area-title">{{ $t('overview.bestRegion') }}</span>
-            <!--<span class="arrows">-->
-            <!--<i @click="showBestArea" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstArea }"></i>-->
-            <!--<i @click="showWorstArea" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstArea }"></i>-->
-            <!--</span>-->
             <span class="arrows" @click="changBestAndWorst">
               <span v-if="isWorstArea" class="order-span">{{ $t('overview.descendingOrder') }}</span>
               <span v-else class="order-span">{{ $t('overview.ascendingOrder') }}</span>
@@ -83,8 +83,11 @@
               <div class="region-name">{{ item.region }}</div>
               <div class="item-titles">
                 <el-tooltip :key="index" :popper-class="elTooltipClass" placement="bottom">
-                  <div slot="content">{{ item.region }}<br><span v-if="isWorstArea">{{ item.firstName }}: {{ item.firstNum }}<br></span>{{ item.secondName }}:
-                    {{ item.secondNum }}
+                  <div slot="content">{{ item.region }}<br>
+                    <span v-if="isWorstArea">
+                      {{ item.firstName }}: {{ item.firstNum }}<br>
+                    </span>
+                    {{ item.secondName }}: {{ item.secondNum }}
                   </div>
                   <div class="process-list">
                     <el-progress
@@ -120,12 +123,6 @@
               <img v-if="isWorstWork" :src="descending" class="img-class">
               <img v-else :src="ascending" class="img-class">
             </span>
-            <!--<span class="arrows">-->
-            <!--<i @click="showBestWorks" class="iconfont icon-arrow_xiangshang" :class="{ 'active-arrow': !isWorstWork }"></i>-->
-            <!--<i @click="showWorstWorks" class="iconfont icon-arrow-xiangxia-copy" :class="{ 'active-arrow': isWorstWork }"></i>-->
-            <!--</span>-->
-            <!--<span class="five-title" v-if="isWorstWork">{{$t('overview.worstPatrol')}}</span>-->
-            <!--<span class="five-title" v-else>{{$t('overview.bestPatrol')}}</span>-->
           </div>
           <div class="right-select">
             <el-select v-model="ModelPost" size="mini" class="el-province" @change="initData">
@@ -194,7 +191,7 @@
                     :class="item.isClick?'active-color':''"
                     class="item-chart"
                     @click="showItemRadar(item, index)">
-                    <div :class="`item-ranking-${index}`" class="item-ranking">0{{ index+1 }}</div>
+                    <div :class="`item-ranking-${index}`" class="item-ranking">0{{ index + 1 }}</div>
                     <div class="item-titles">
                       <div class="item-title">{{ item.inspectItemName }}</div>
                     </div>
@@ -211,8 +208,6 @@
                 </div>
                 <div v-else class="top-five-empty">
                   {{ $t('overview.noData') }}
-                  <!--<img :src="loadingGif" />-->
-                  <!--<div class="empty-text"> 加载中</div>-->
                 </div>
               </el-col>
               <el-col :span="8" class="item-radar">
@@ -407,9 +402,11 @@ export default {
       fontFamily: 'Roboto, Microsoft YaHei'
     };
   },
+
   computed: {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
+
   watch: {
     accountChanged(val, oldVal) {
       console.log(val);
@@ -427,6 +424,7 @@ export default {
       }
     }
   },
+
   created() {
     let self = this;
     let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
@@ -435,12 +433,14 @@ export default {
     self.params.endTs = end;
     self.initData();
   },
+
   mounted() {
     let self = this;
     window.addEventListener('resize', self.adjustPatrolChart, false);
     self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
     self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
   },
+
   beforeDestroy() {
     let self = this;
     window.removeEventListener('resize', self.adjustPatrolChart);
@@ -450,43 +450,51 @@ export default {
     self.$refs.itemsRadar && self.$refs.itemsRadar.dispose();
     self.$refs.cycleChart && self.$refs.cycleChart.dispose();
   },
+
   methods: {
     changBestAndWorst() {
       let self = this;
       self.isWorstArea = !self.isWorstArea;
       self.isWorstArea ? self.showWorstArea() : self.showBestArea();
     },
+
     changWorkerRanking() {
       let self = this;
       self.isWorstWork = !self.isWorstWork;
       self.isWorstWork ? self.showWorstWorks() : self.showBestWorks();
     },
+
     showWorstArea() {
       let self = this;
       self.isWorstArea = true;
       self.getTopFiveRegionList();
     },
+
     showBestArea() {
       let self = this;
       self.isWorstArea = false;
       self.getTopFiveRegionList();
     },
+
     showWorstWorks() {
       let self = this;
       self.isWorstWork = true;
       self.getInspectTaskRanking();
     },
+
     showBestWorks() {
       let self = this;
       self.isWorstWork = false;
       self.getInspectTaskRanking();
     },
+
     timelineHandler(event) {
       console.log(event);
       let self = this;
       self.currentIndex = event.currentIndex;
       console.log(self.currentIndex);
     },
+
     previousGroup() {
       let self = this;
       self.curGroupIndex === 0 ? 0 : self.curGroupIndex--;
@@ -496,211 +504,9 @@ export default {
       } else {
         self.showPreviousGroup = true;
       }
-      console.log(self.curGroupIndex);
-      let option = {
-        baseOption: {
-          color: ['#f31d65', '#ffd035', '#72a1f3'],
-          timeline: {
-            axisType: 'category',
-            currentIndex: self.currentIndex,
-            autoPlay: true,
-            playInterval: 10 * 1000,
-            data: self.daysRangeList,
-            padding: [10, 0, 5, 0],
-            symbolSize: 5,
-            label: {
-              position: 5,
-              color: self.echartColor,
-              fontSize: 12
-            },
-            lineStyle: {
-              color: self.echartBackground
-            },
-            controlStyle: {
-              color: self.echartColor,
-              borderColor: self.echartColor,
-              itemSize: 12
-            },
-            checkpointStyle: {
-              color: '#f31d65',
-              symbolSize: 5
-            },
-            emphasis: {
-              label: {
-                color: '#f31d65'
-              },
-              itemStyle: {
-                color: '#f31d65'
-              },
-              checkpointStyle: {
-                color: '#f31d65'
-              },
-              controlStyle: {
-                color: '#f31d65'
-              }
-            }
-          },
-          calculable: false,
-          grid: {
-            left: '20',
-            right: '0',
-            top: '10',
-            bottom: '57',
-            containLabel: true
-          },
-          textStyle: {
-            fontFamily: self.fontFamily
-          },
-          tooltip: {
-            trigger: 'axis',
-            padding: 5,
-            axisPointer: { // 坐标轴指示器，坐标轴触发有效
-              type: 'line' // 默认为直线，可选为：'line' | 'shadow'
-            },
-            textStyle: {
-              align: 'left'
-            },
-            backgroundColor: self.echartBackground// 通过设置rgba调节背景颜色与透明度
-          },
-          legend: {
-            x: 'center',
-            y: 'bottom',
-            icon: 'rect',
-            data: self.resultList,
-            itemWidth: 10,
-            itemHeight: 10,
-            itemGap: 10,
-            padding: [15, 0, 0, 0],
-            textStyle: {
-              color: self.echartColor
-            }
-
-          },
-          xAxis: [
-            {
-              'type': 'category',
-              'axisLabel': {
-                'interval': 0
-              },
-              'data': [],
-              padding: 0,
-              axisLine: {
-                show: false,
-                lineStyle: {
-                  color: self.echartAxiasColor
-                }
-              },
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                interval: 0,
-                textStyle: {
-                  color: self.echartColor
-                }
-              }
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value',
-              axisLine: {
-                show: false
-              },
-              nameGap: 10,
-              interval: 100,
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                textStyle: {
-                  color: [self.echartColor]
-                }
-              },
-              splitLine: {
-                show: true,
-                lineStyle: {
-                  color: self.echartAxiasColor,
-                  width: 1
-                }
-              }
-            }
-          ],
-          series: [
-            { name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10' }
-          ]
-        },
-
-        options: []
-      };
-
-      let resultData = self.regionInspectListData;
-      console.log(resultData);
-      if (resultData.length > 0) {
-        let regions = resultData[0].regions;
-        console.log(regions);
-        let regionList = [];
-        self.regionGroups[self.curGroupIndex].forEach((item, index) => {
-          regionList.push(item.region);
-        });
-        self.regionList = regionList;
-        option.baseOption.xAxis[0].data = self.regionList;
-        resultData.forEach((item) => {
-          let dateTime = item.ts;
-          let region = item.regions;
-          let dangerousList = [];
-          let improvedList = [];
-          let passList = [];
-          region.forEach(_item => {
-            if (self.regionList.indexOf(_item.region) === -1) {
-              return;
-            }
-            let itemDangerJson = {};
-            itemDangerJson.name = _item.region;
-            itemDangerJson.value = _item.numOfDangerous;
-            dangerousList.push(itemDangerJson);
-            let itemImprovedJson = {};
-            itemImprovedJson.name = _item.region;
-            itemImprovedJson.value = _item.numOfImproved;
-            improvedList.push(itemImprovedJson);
-            let itemQualifiedJson = {};
-            itemQualifiedJson.name = _item.region;
-            itemQualifiedJson.value = _item.numOfQualified;
-            passList.push(itemQualifiedJson);
-          });
-          let tempOption = {};
-          let seriesArray = new Array(3);
-          let seriesDanJson = {};
-          seriesDanJson.stack = 'test';
-          seriesDanJson.data = dangerousList;
-          seriesArray[0] = seriesDanJson;
-
-          let seriesImproveJson = {};
-          seriesImproveJson.stack = 'test';
-          seriesImproveJson.data = improvedList;
-          seriesArray[1] = seriesImproveJson;
-
-          let seriesPassJson = {};
-          seriesPassJson.stack = 'test';
-          seriesPassJson.data = passList;
-          seriesArray[2] = seriesPassJson;
-
-          tempOption.series = seriesArray;
-          option.options.push(tempOption);
-          self.regionChartEmpty = false;
-        });
-      } else {
-        self.dataMap.dataDanger = { 0: [] };
-        self.dataMap.dataImproved = { 0: [] };
-        self.dataMap.dataQualified = { 0: [] };
-        // self.dataMap.dataExcellent = {0: []};
-        self.regionChartEmpty = true;
-        option.baseOption.timeline.autoPlay = false;
-      }
-      self.storeOptions = option;
+      self.getRegionInspectResultData();
     },
+
     nextGroup() {
       let self = this;
       self.curGroupIndex < self.totalGroupNum - 1 ? self.curGroupIndex++ : self.curGroupIndex;
@@ -711,144 +517,12 @@ export default {
         self.showNextGroup = true;
       }
       console.log(self.curGroupIndex);
-      let option = {
-        baseOption: {
-          color: ['#f31d65', '#ffd035', '#72a1f3'],
-          timeline: {
-            axisType: 'category',
-            currentIndex: self.currentIndex,
-            autoPlay: true,
-            playInterval: 10 * 1000,
-            data: self.daysRangeList,
-            padding: [10, 0, 5, 0],
-            symbolSize: 5,
-            label: {
-              position: 5,
-              color: self.echartColor,
-              fontSize: 12
-            },
-            lineStyle: {
-              color: self.echartColor
-            },
-            controlStyle: {
-              color: self.echartColor,
-              borderColor: self.echartColor,
-              itemSize: 12
-            },
-            checkpointStyle: {
-              color: '#f31d65',
-              symbolSize: 5
-            },
-            emphasis: {
-              label: {
-                color: '#f31d65'
-              },
-              itemStyle: {
-                color: '#f31d65'
-              },
-              checkpointStyle: {
-                color: '#f31d65'
-              },
-              controlStyle: {
-                color: '#f31d65'
-              }
-            }
-          },
-          calculable: false,
-          grid: {
-            left: '20',
-            right: '0',
-            top: '10',
-            bottom: '57',
-            containLabel: true
-          },
-          textStyle: {
-            fontFamily: self.fontFamily
-          },
-          tooltip: {
-            trigger: 'axis',
-            padding: 5,
-            axisPointer: {
-              type: 'line'
-            },
-            textStyle: {
-              align: 'left'
-            },
-            backgroundColor: self.echartBackground
-          },
-          legend: {
-            x: 'center',
-            y: 'bottom',
-            icon: 'rect',
-            data: self.resultList,
-            itemWidth: 10,
-            itemHeight: 10,
-            itemGap: 20,
-            padding: [15, 0, 0, 0],
-            textStyle: {
-              color: self.echartColor
-            }
+      self.getRegionInspectResultData();
+    },
 
-          },
-          xAxis: [
-            {
-              'type': 'category',
-              'axisLabel': {
-                'interval': 0
-              },
-              'data': [],
-              padding: 0,
-              axisLine: {
-                show: false,
-                lineStyle: {
-                  color: self.echartAxiasColor
-                }
-              },
-              axisTick: {
-                show: false
-              }, axisLabel: {
-                interval: 0,
-                textStyle: {
-                  color: self.echartColor
-                }
-              }
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value',
-              axisLine: {
-                show: false
-              },
-              nameGap: 10,
-              interval: 100,
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                textStyle: {
-                  color: self.echartColor
-                }
-              },
-              splitLine: {
-                show: true,
-                lineStyle: {
-                  color: self.echartAxiasColor,
-                  width: 1
-                }
-              }
-            }
-          ],
-          series: [
-            { name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10' }
-            // {name: self.$t('overview.excellent'), type: 'bar', barWidth: 35, barGap: '10'},
-          ]
-        },
-        options: []
-      };
-
+    getRegionInspectResultData(){
+      let self = this;
+      let regionOption = self.getRegionInspectOption();
       let resultData = self.regionInspectListData;
       if (resultData.length > 0) {
         let regions = resultData[0].regions;
@@ -858,7 +532,7 @@ export default {
           regionList.push(item.region);
         });
         self.regionList = regionList;
-        option.baseOption.xAxis[0].data = self.regionList;
+        regionOption.baseOption.xAxis[0].data = self.regionList;
         resultData.forEach((item) => {
           let dateTime = item.ts;
           let region = item.regions;
@@ -900,18 +574,18 @@ export default {
           seriesPassJson.data = passList;
           seriesArray[2] = seriesPassJson;
           tempOption.series = seriesArray;
-          option.options.push(tempOption);
+          regionOption.options.push(tempOption);
           self.regionChartEmpty = false;
         });
       } else {
         self.dataMap.dataDanger = { 0: [] };
         self.dataMap.dataImproved = { 0: [] };
         self.dataMap.dataQualified = { 0: [] };
-        // self.dataMap.dataExcellent = {0: []};
         self.regionChartEmpty = true;
       }
-      self.storeOptions = option;
+      self.storeOptions = regionOption;
     },
+
     async showItemRadar(item, index) {
       console.log(item);
       let self = this;
@@ -930,7 +604,39 @@ export default {
       let result = await self.getInspectItemsOverRegion(itemsParam);
       console.log(result);
 
-      let options = {
+      let options = self.getItemRadarOption();
+      let tempIndicator = [];
+      let seriesValue = [];
+      if (result.errCode === 0) {
+        let resultData = result.data;
+        let max = 0;
+        resultData.map(function(item) {
+          if (item.numOfUnqualified > max) {
+            max = item.numOfUnqualified;
+          }
+        });
+        resultData.forEach(item => {
+          let obj = {};
+          obj.name = item.regionName;
+          obj.max = max;
+          tempIndicator.push(obj);
+          seriesValue.push(item.numOfUnqualified);
+        });
+      }
+      let temp = [];
+      let obj = { value: seriesValue };
+      temp.push(obj);
+      options.radar[0].indicator = tempIndicator;
+      options.radar[1].indicator = tempIndicator;
+      options.series[0].data = temp;
+      options.series[1].data = temp;
+      options.radar.splitNumber = 5;
+      self.itemsRadarOption = options;
+      console.log(self.itemsRadarOption);
+    },
+
+    getItemRadarOption(){
+      let radarOptions = {
         backgroundColor: '#fff',
         tooltip: {
           textStyle: {
@@ -983,34 +689,34 @@ export default {
             }
           }
         },
-        {
-          shape: 'circle',
-          center: ['50%', '50%'],
-          nameGap: 5,
-          indicator: [],
-          name: {
-            textStyle: {
-              color: 'rgba(255,255,255,0)',
-              borderRadius: 3,
-              padding: [3, 5]
-            }
-          },
-          splitArea: {
-            show: false
-          },
-          axisLine: {
-            lineStyle: {
-              color: self.echartAxiasColor
-            }
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              width: 1,
-              color: self.echartAxiasColor
+          {
+            shape: 'circle',
+            center: ['50%', '50%'],
+            nameGap: 5,
+            indicator: [],
+            name: {
+              textStyle: {
+                color: 'rgba(255,255,255,0)',
+                borderRadius: 3,
+                padding: [3, 5]
+              }
+            },
+            splitArea: {
+              show: false
+            },
+            axisLine: {
+              lineStyle: {
+                color: self.echartAxiasColor
+              }
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                width: 1,
+                color: self.echartAxiasColor
+              }
             }
           }
-        }
         ],
         series: [
           {
@@ -1039,34 +745,7 @@ export default {
           }
         ]
       };
-      let tempIndicator = [];
-      let seriesValue = [];
-      if (result.errCode === 0) {
-        let resultData = result.data;
-        let max = 0;
-        resultData.map(function(item) {
-          if (item.numOfUnqualified > max) {
-            max = item.numOfUnqualified;
-          }
-        });
-        resultData.forEach(item => {
-          let obj = {};
-          obj.name = item.regionName;
-          obj.max = max;
-          tempIndicator.push(obj);
-          seriesValue.push(item.numOfUnqualified);
-        });
-      }
-      let temp = [];
-      let obj = { value: seriesValue };
-      temp.push(obj);
-      options.radar[0].indicator = tempIndicator;
-      options.radar[1].indicator = tempIndicator;
-      options.series[0].data = temp;
-      options.series[1].data = temp;
-      options.radar.splitNumber = 5;
-      self.itemsRadarOption = options;
-      console.log(self.itemsRadarOption);
+      return radarOptions;
     },
 
     dateChange(val) {
@@ -1508,13 +1187,62 @@ export default {
       let result = await self.getPassRateAndInspectRate(self.params);
       console.log(result);
       self.regionResultList = result.data;
+      let cycleOptions = self.getPassRateAndCycleOption();
+      let dangerRateMoreArray = [];
+      let dangerRateLessArray = [];
+      let passRateMoreArray = [];
+      let passRateLessArray = [];
+      if (result.errCode === 0) {
+        let resultData = result.data;
+        if (resultData.length > 0) {
+          resultData.forEach(item => {
+            let inspectNum = item.numOfReport;
+            let inspectCycle = item.cycleOfInspect;
+            let qualifiedRate = item.qualifiedRate;
+            let excellentRate = item.excellentRate;
+            let dangerRate = ((item.numOfDangerous / inspectNum) * 100).toFixed(2);
+            let floatRage = parseInt(dangerRate);
+            let region = item.region;
+            let tempArray = [];
+            if (inspectCycle > 0) {
+              tempArray.push(qualifiedRate);
+              tempArray.push(inspectCycle);
+              tempArray.push(excellentRate);
+              tempArray.push(parseFloat(dangerRate));
+              tempArray.push(region);
+              console.log(tempArray);
+              if (qualifiedRate > 50) {
+                qualifiedRate >= 60 ? passRateMoreArray.push(tempArray) : passRateLessArray.push(tempArray);
+              } else {
+                floatRage >= 60 ? dangerRateMoreArray.push(tempArray) : dangerRateLessArray.push(tempArray);
+              }
+            } else {
+              //do nothing
+            }
+          });
+          cycleOptions.series[0].data = dangerRateMoreArray;
+          cycleOptions.series[1].data = dangerRateLessArray;
+          cycleOptions.series[2].data = passRateMoreArray;
+          cycleOptions.series[3].data = passRateLessArray;
+        } else {
+          cycleOptions.series[4].data = [[0, 31]];
+        }
+      } else {
+        cycleOptions.series[4].data = [[0, 31]];
+      }
+      self.cycleOption = cycleOptions;
+      self.getTopFiveRegionList();
+    },
+
+    getPassRateAndCycleOption() {
       let schema = [
-        { name: 'inspectCycle', index: 0, text: self.$t('overview.cycle') },
-        { name: 'passRate', index: 1, text: self.$t('overview.passRate') },
-        { name: 'excellentRate', index: 2, text: self.$t('overview.excellentRate') },
-        { name: 'dangerRate', index: 3, text: self.$t('overview.dangerRate') },
-        { name: 'region', index: 5, text: self.$t('overview.region') }
+        { name: 'inspectCycle', index: 0, text: this.$t('overview.cycle') },
+        { name: 'passRate', index: 1, text: this.$t('overview.passRate') },
+        { name: 'excellentRate', index: 2, text: this.$t('overview.excellentRate') },
+        { name: 'dangerRate', index: 3, text: this.$t('overview.dangerRate') },
+        { name: 'region', index: 5, text: this.$t('overview.region') }
       ];
+
       let itemPassStyle = {
         normal: {
           opacity: 0.8,
@@ -1523,6 +1251,7 @@ export default {
           borderColor: '#72a1f3'
         }
       };
+
       let itemDangerStyle = {
         normal: {
           opacity: 0.8,
@@ -1531,6 +1260,7 @@ export default {
           borderColor: '#f31d65'
         }
       };
+
       let options = {
         backgroundColor: '#fff',
         dataZoom: [
@@ -1550,17 +1280,17 @@ export default {
           fontSize: 12,
           padding: 0,
           textStyle: {
-            color: self.echartColor,
+            color: this.echartColor,
             fontSize: 12
           },
           data: [
-            { name: self.$t('overview.dangerousMore'), icon: 'rect' },
-            { name: self.$t('overview.DangerousLess'), icon: 'rect' },
-            { name: self.$t('overview.excellentLess'), icon: 'rect' },
-            { name: self.$t('overview.excellentMore'), icon: 'rect' }]
+            { name: this.$t('overview.dangerousMore'), icon: 'rect' },
+            { name: this.$t('overview.DangerousLess'), icon: 'rect' },
+            { name: this.$t('overview.excellentLess'), icon: 'rect' },
+            { name: this.$t('overview.excellentMore'), icon: 'rect' }]
         },
         textStyle: {
-          fontFamily: self.fontFamily
+          fontFamily: this.fontFamily
         },
         color: [
           'rgba(243,29,101,1)', 'rgba(243,29,101,0.5)', 'rgba(114,161,243, 1)', 'rgba(114,161,243,0.5)'
@@ -1603,16 +1333,16 @@ export default {
             if (value[0] > 50) {
               htmlF = `${htmlRegion}<br>
                           ${passStr}<br>
-                          ${schema[0].text}: ${value[1]}${self.$t('overview.day')}<br>`;
+                          ${schema[0].text}: ${value[1]}${this.$t('overview.day')}<br>`;
             } else {
               htmlF = `${htmlRegion}<br>
                           ${dangerousStr}<br>
-                          ${schema[0].text}: ${value[1]}${self.$t('overview.day')}<br>`;
+                          ${schema[0].text}: ${value[1]}${this.$t('overview.day')}<br>`;
             }
 
             return htmlF;
           },
-          backgroundColor: self.echartBackground
+          backgroundColor: this.echartBackground
         },
         xAxis: {
           type: 'value',
@@ -1640,12 +1370,12 @@ export default {
           },
           axisLine: {
             lineStyle: {
-              color: self.echartAxiasColor
+              color: this.echartAxiasColor
             }
           },
           axisLabel: {
             fontStyle: 12,
-            color: self.echartColor,
+            color: this.echartColor,
             formatter: function(value, index) {
               if (value === 0) {
                 return '';
@@ -1667,7 +1397,7 @@ export default {
           },
           axisLine: {
             lineStyle: {
-              color: self.echartAxiasColor
+              color: this.echartAxiasColor
             }
           },
           splitLine: {
@@ -1682,13 +1412,13 @@ export default {
           axisLabel: {
             fontSize: 12,
             width: 10,
-            color: self.echartColor
+            color: this.echartColor
           }
         },
 
         series: [
           {
-            name: self.$t('overview.dangerousMore'),
+            name: this.$t('overview.dangerousMore'),
             type: 'scatter',
             itemStyle: itemDangerStyle,
             symbolSize: function() {
@@ -1717,21 +1447,21 @@ export default {
             data: []
           },
           {
-            name: self.$t('overview.DangerousLess'),
+            name: this.$t('overview.DangerousLess'),
             type: 'scatter',
             itemStyle: itemDangerStyle,
             symbolSize: 15,
             data: []
           },
           {
-            name: self.$t('overview.excellentMore'),
+            name: this.$t('overview.excellentMore'),
             type: 'scatter',
             itemStyle: itemPassStyle,
             symbolSize: 15,
             data: []
           },
           {
-            name: self.$t('overview.excellentLess'),
+            name: this.$t('overview.excellentLess'),
             type: 'scatter',
             itemStyle: itemPassStyle,
             symbolSize: 15,
@@ -1746,50 +1476,7 @@ export default {
           }
         ]
       };
-      let dangerRateMoreArray = [];
-      let dangerRateLessArray = [];
-      let passRateMoreArray = [];
-      let passRateLessArray = [];
-      if (result.errCode === 0) {
-        let resultData = result.data;
-        if (resultData.length > 0) {
-          resultData.forEach(item => {
-            let inspectNum = item.numOfReport;
-            let inspectCycle = item.cycleOfInspect;
-            let qualifiedRate = item.qualifiedRate;
-            let excellentRate = item.excellentRate;
-            let dangerRate = ((item.numOfDangerous / inspectNum) * 100).toFixed(2);
-            let floatRage = parseInt(dangerRate);
-            let region = item.region;
-            let tempArray = [];
-            if (inspectCycle > 0) {
-              tempArray.push(qualifiedRate);
-              tempArray.push(inspectCycle);
-              tempArray.push(excellentRate);
-              tempArray.push(parseFloat(dangerRate));
-              tempArray.push(region);
-              console.log(tempArray);
-              if (qualifiedRate > 50) {
-                qualifiedRate >= 60 ? passRateMoreArray.push(tempArray) : passRateLessArray.push(tempArray);
-              } else {
-                floatRage >= 60 ? dangerRateMoreArray.push(tempArray) : dangerRateLessArray.push(tempArray);
-              }
-            } else {
-
-            }
-          });
-          options.series[0].data = dangerRateMoreArray;
-          options.series[1].data = dangerRateLessArray;
-          options.series[2].data = passRateMoreArray;
-          options.series[3].data = passRateLessArray;
-        } else {
-          options.series[4].data = [[0, 31]];
-        }
-      } else {
-        options.series[4].data = [[0, 31]];
-      }
-      self.cycleOption = options;
-      self.getTopFiveRegionList();
+      return options;
     },
 
     getPassRateAndInspectRate(params) {
@@ -1806,147 +1493,7 @@ export default {
       let self = this;
       self.dataMap = {};
       self.regionInspectListData = [];
-      let option = {
-        baseOption: {
-          color: ['#f31d65', '#ffd035', '#72a1f3'],
-          timeline: {
-            axisType: 'category',
-            currentIndex: self.currentIndex,
-            autoPlay: true,
-            playInterval: 10 * 1000,
-            data: self.daysRangeList,
-            padding: [10, 0, 5, 0],
-            symbolSize: 5,
-            left: 30,
-            right: 20,
-            label: {
-              position: 5,
-              color: self.echartColor,
-              fontSize: 12
-            },
-            lineStyle: {
-              color: self.echartColor
-            },
-            controlStyle: {
-              color: self.echartColor,
-              borderColor: self.echartColor,
-              itemSize: 12
-            },
-            checkpointStyle: {
-              color: '#f31d65',
-              symbolSize: 5
-            },
-            emphasis: {
-              label: {
-                color: '#f31d65'
-              },
-              itemStyle: {
-                color: '#f31d65'
-              },
-              checkpointStyle: {
-                color: '#f31d65'
-              },
-              controlStyle: {
-                color: '#f31d65'
-              }
-            }
-          },
-          calculable: false,
-          grid: {
-            left: '20',
-            right: '0',
-            top: '10',
-            bottom: '57',
-            containLabel: true
-          },
-          textStyle: {
-            fontFamily: self.fontFamily
-          },
-          tooltip: {
-            trigger: 'axis',
-            padding: 5,
-            axisPointer: { // 坐标轴指示器，坐标轴触发有效
-              type: 'line' // 默认为直线，可选为：'line' | 'shadow'
-            },
-            textStyle: {
-              align: 'left'
-            },
-            backgroundColor: self.echartBackground
-          },
-          legend: {
-            x: 'center',
-            y: 'bottom',
-            icon: 'rect',
-            data: self.resultList,
-            itemWidth: 10,
-            itemHeight: 10,
-            itemGap: 20,
-            padding: [15, 0, 0, 0],
-            textStyle: {
-              color: self.echartColor
-            }
-
-          },
-          xAxis: [
-            {
-              'type': 'category',
-              'axisLabel': {
-                'interval': 0
-              },
-              'data': [],
-              padding: 0,
-              axisLine: {
-                show: false,
-                lineStyle: {
-                  color: self.echartAxiasColor
-                }
-              },
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                interval: 0,
-                textStyle: {
-                  color: self.echartColor
-                }
-              }
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value',
-              axisLine: {
-                show: false
-              },
-              nameGap: 10,
-              interval: 100,
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                textStyle: {
-                  color: self.echartColor
-                }
-              },
-              splitLine: {
-                show: true,
-                lineStyle: {
-                  color: self.echartAxiasColor,
-                  width: 1
-                }
-
-              }
-            }
-          ],
-          series: [
-            { name: self.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: self.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: self.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10' }
-          ]
-        },
-
-        options: []
-      };
+      let regionOption = self.getRegionInspectOption();
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.region = 1;
@@ -1978,7 +1525,7 @@ export default {
             regionList.push(item.region);
           });
           self.regionList = regionList;
-          option.baseOption.xAxis[0].data = self.regionList;
+          regionOption.baseOption.xAxis[0].data = self.regionList;
           resultData.forEach((item) => {
             let dateTime = item.ts;
             let region = item.regions;
@@ -2016,7 +1563,7 @@ export default {
             seriesPassJson.data = passList;
             seriesArray[2] = seriesPassJson;
             tempOption.series = seriesArray;
-            option.options.push(tempOption);
+            regionOption.options.push(tempOption);
             self.regionChartEmpty = false;
           });
         } else {
@@ -2031,7 +1578,152 @@ export default {
         self.dataMap.dataQualified = { 0: [] };
         self.regionChartEmpty = true;
       }
-      self.storeOptions = option;
+      self.storeOptions = regionOption;
+    },
+
+    getRegionInspectOption() {
+      let regionOption = {
+        baseOption: {
+          color: ['#f31d65', '#ffd035', '#72a1f3'],
+          timeline: {
+            axisType: 'category',
+            currentIndex: this.currentIndex,
+            autoPlay: true,
+            playInterval: 10 * 1000,
+            data: this.daysRangeList,
+            padding: [10, 0, 5, 0],
+            symbolSize: 5,
+            left: 30,
+            right: 20,
+            label: {
+              position: 5,
+              color: this.echartColor,
+              fontSize: 12
+            },
+            lineStyle: {
+              color: this.echartColor
+            },
+            controlStyle: {
+              color: this.echartColor,
+              borderColor: this.echartColor,
+              itemSize: 12
+            },
+            checkpointStyle: {
+              color: '#f31d65',
+              symbolSize: 5
+            },
+            emphasis: {
+              label: {
+                color: '#f31d65'
+              },
+              itemStyle: {
+                color: '#f31d65'
+              },
+              checkpointStyle: {
+                color: '#f31d65'
+              },
+              controlStyle: {
+                color: '#f31d65'
+              }
+            }
+          },
+          calculable: false,
+          grid: {
+            left: '20',
+            right: '0',
+            top: '10',
+            bottom: '57',
+            containLabel: true
+          },
+          textStyle: {
+            fontFamily: this.fontFamily
+          },
+          tooltip: {
+            trigger: 'axis',
+            padding: 5,
+            axisPointer: {
+              type: 'line'
+            },
+            textStyle: {
+              align: 'left'
+            },
+            backgroundColor: this.echartBackground
+          },
+          legend: {
+            x: 'center',
+            y: 'bottom',
+            icon: 'rect',
+            data: this.resultList,
+            itemWidth: 10,
+            itemHeight: 10,
+            itemGap: 20,
+            padding: [15, 0, 0, 0],
+            textStyle: {
+              color: this.echartColor
+            }
+
+          },
+          xAxis: [
+            {
+              'type': 'category',
+              'axisLabel': {
+                'interval': 0
+              },
+              'data': [],
+              padding: 0,
+              axisLine: {
+                show: false,
+                lineStyle: {
+                  color: this.echartAxiasColor
+                }
+              },
+              axisTick: {
+                show: false
+              },
+              axisLabel: {
+                interval: 0,
+                textStyle: {
+                  color: this.echartColor
+                }
+              }
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value',
+              axisLine: {
+                show: false
+              },
+              nameGap: 10,
+              interval: 100,
+              axisTick: {
+                show: false
+              },
+              axisLabel: {
+                textStyle: {
+                  color: this.echartColor
+                }
+              },
+              splitLine: {
+                show: true,
+                lineStyle: {
+                  color: this.echartAxiasColor,
+                  width: 1
+                }
+
+              }
+            }
+          ],
+          series: [
+            { name: this.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10' },
+            { name: this.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10' },
+            { name: this.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10' }
+          ]
+        },
+
+        options: []
+      };
+      return regionOption;
     },
 
     getInspectResultOverRegion(params) {
