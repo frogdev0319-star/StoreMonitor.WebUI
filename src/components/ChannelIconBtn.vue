@@ -1,51 +1,43 @@
 <template>
-    <div class="channel-btn-content">
-        <div class="btn-circle">
-            <img :src="iconSrc" />
-        </div>
-        <span class="btn-title" :class="isClick?'noramlColor':'abnoramlColor'">{{channelName}}</span>
+  <div class="channel-btn-content">
+    <div class="btn-circle">
+      <img :src="iconSrc" >
     </div>
+    <span :class="isClick ? 'noramlColor':'abnoramlColor'" class="btn-title">{{ channelName }}</span>
+  </div>
 </template>
 <script>
-import PubSub from 'pubsub-js'
 export default {
-    name:'ChannelIconBtn',
-    props:{
-        channelName:String,
-        isOnline:Boolean,
-        isClick:Boolean
-    },
-    computed:{
-        iconSrc(){
-            let src='';
-            if(this.isOnline){
-                if(this.isClick){
-                    src=this.onlineSrc;
-                }
-                else{
-                    src=this.onlineSrc1;
-                }
-            }
-            else{
-                src=this.disOnlineSrc;
-            }
-            return src;
+  name: 'ChannelIconBtn',
+  props: {
+    channelName: String,
+    isOnline: Boolean,
+    isClick: Boolean
+  },
+  data() {
+    return {
+      onlineSrc: require('../../static/img/video_online_unselect.png'),
+      onlineSrc1: require('../../static/img/video_online_selected.png'),
+      disOnlineSrc: require('../../static/img/video_offline.png')
+    };
+  },
+
+  computed: {
+    iconSrc() {
+      let src = '';
+      if (this.isOnline) {
+        if (this.isClick) {
+          src = this.onlineSrc;
+        } else {
+          src = this.onlineSrc1;
         }
-    },
-    data(){
-        return{
-            onlineSrc:require('../../static/img/1.png'),
-            onlineSrc1:require('../../static/img/2.png'),
-            disOnlineSrc:require('../../static/img/3.png'),
-        }
-    },
-    watch:{
-    },
-    created(){
-    },
-    methods:{
+      } else {
+        src = this.disOnlineSrc;
+      }
+      return src;
     }
-}
+  },
+};
 </script>
 <style>
     .noramlColor{

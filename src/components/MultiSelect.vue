@@ -1,171 +1,180 @@
 <template>
   <div class="content">
-    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler"
-               :placeholder="alltype==0?(allSelect==0?$t('reportView.selectStoreTag'):$t('reportView.all')):$t('reportView.stores')" class="el-province" :disabled="disabled">
-      <el-option :label="alltype==0?$t('reportView.all'):$t('overview.all')" value='-1' @click.native='selectAll' v-if="options.length > 0"></el-option>
-      <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='alltype==0?item.value:item.storeId' :disabled="item.disabled"></el-option>
+    <el-select
+      v-model="selectedArray"
+      :placeholder="alltype === 0 ? (allSelect === 0 ? $t('remotePatrol.selectStoreTag'):$t('remotePatrol.all')):$t('remotePatrol.stores')"
+      :disabled="disabled"
+      multiple
+      collapse-tags
+      class="el-province"
+      @change="changeSelect"
+      @visible-change="visibileHandler">
+      <el-option v-if="options.length > 0" :label="alltype ===0 ? $t('remotePatrol.all'):$t('overview.all')"
+                 value="-1" @click.native="selectAll"/>
+      <el-option v-for="(item, index) in options" :key="index" :label="item.label"
+                 :value="alltype === 0 ? item.value:item.storeId" :disabled="item.disabled"/>
     </el-select>
-    <el-input placeholder="" readonly
-              v-model="input" class="input-class">
-    </el-input>
+    <el-input
+      v-model="input"
+      placeholder=""
+      readonly
+      class="input-class"/>
   </div>
 </template>
 
 <script>
-    export default {
-        name: "MultiSelect",
-        props: {
-          options: {
-            type: Array,
-            default: () => []
-          },
-          selected: {
-            type: Array
-          },
-          alltype:{
-            type:Number
-          },
-          allSelect:{
-            type:Number
-          },
-          disabled: {
-            type: Boolean,
-            default: false
-          }
-        },
-        data () {
-          return {
-            input: '',
-            disabledLength: 0,
-            selectedArray: this.selected,
-            changed: false,
-          }
-        },
-        mounted () {
-          console.log(this.selected)
-          this.initData();
-        },
-        watch:{
-          selected(val, oldVal){
-            this.selectedArray = val
-            this.initData()
-          }
-        },
-        methods: {
-          initData(){
-            this.disabledLength = 0
-            let self = this;
-            this.options.forEach(item => {
-              if (item.disabled) {
-                self.disabledLength++
-              }
-            })
-            if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
-              this.input = this.alltype==0?this.$t('reportView.all'):this.$t('overview.all')
-              if(this.allSelect!=0){
-                this.selectedArray.unshift('-1')
-              }
-            }  else if(this.selectedArray.includes('-1')){
-              this.input = this.alltype==0?this.$t('reportView.all'):this.$t('overview.all')
-            }
-            else {
-              this.input = ''
-              this.selectedArray.forEach(item => {
-                this.options.forEach(_item => {
-                  if(this.alltype==0){
-                    if (item === _item.value) {
-                      this.input += _item.label + ','
-                    }
-                  }else{
-                    if (item === _item.storeId) {
-                      this.input += _item.label + ','
-                    }
-                  }
-                })
-              })
-              this.input = this.input.slice(0, this.input.length - 1)
-            }
-            if(this.options.length === 0){
-              this.input = ''
-              this.selectedArray = []
-            }
-          },
-          selectAll () {
-            if (this.selectedArray.length < this.options.length - this.disabledLength) {
-              this.selectedArray = []
-              this.options.forEach((item) => {
-                // if (!item.disabled) {
-                  this.alltype==0?this.selectedArray.push(item.value):this.selectedArray.push(item.storeId)
-                
-                // }
-              })
-              this.input = this.alltype==0?this.$t('reportView.all'):this.$t('overview.all')
-              this.selectedArray.unshift('-1')
-            } else {
-              this.selectedArray = []
-              this.input = ''
-            }
-          },
-          changeSelect (val) {
-            console.log(val)
-            this.changed = true;
-            if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
-              this.input = this.alltype==0?this.$t('reportView.all'):this.$t('overview.all')
-              this.selectedArray.unshift('-1')
-            } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
-              this.selectedArray = this.selectedArray.filter((item) => {
-                return item !== '-1'
-              })
-              this.input = ''
-              this.selectedArray.forEach(item => {
-                this.options.forEach(_item => {
-                  if(this.alltype==0){
-                    if (item === _item.value) {
-                      this.input += _item.label + ','
-                    }
-                  }else{
-                    if (item === _item.storeId) {
-                      this.input += _item.label + ','
-                    }
-                  }
-                })
-              })
-              this.input = this.input.slice(0, this.input.length - 1)
-            } else {
-              this.input = ''
-              this.selectedArray.forEach(item => {
-                this.options.forEach(_item => {
-                  if(this.alltype==0){
-                    if (item === _item.value) {
-                      this.input += _item.label + ','
-                    }
-                  }else{
-                    if (item === _item.storeId) {
-                      this.input += _item.label + ','
-                    }
-                  }
-                })
-              })
-              this.input = this.input.slice(0, this.input.length - 1)
-            }
-          },
-          visibileHandler (val) {
-            if (!val && this.changed) {
-              let selectedList = []
-              // if (this.selectedArray.includes('-1')) {
-              //   this.options.forEach(item =>{
-              //     selectedList.push(item.storeId)
-              //   })
-              // } else {
-              //   selectedList = this.selectedArray
-              // }
-              selectedList = this.selectedArray
-              this.$emit('changeInput', selectedList)
-            }
-
-          }
-        }
+export default {
+  name: 'MultiSelect',
+  props: {
+    options: {
+      type: Array,
+      default: () => []
+    },
+    selected: {
+      type: Array
+    },
+    alltype: {
+      type: Number
+    },
+    allSelect: {
+      type: Number
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
+  },
+
+  data() {
+    return {
+      input: '',
+      disabledLength: 0,
+      selectedArray: this.selected,
+      changed: false
+    };
+  },
+
+  watch: {
+    selected(val, oldVal) {
+      this.selectedArray = val;
+      this.initData();
+    }
+  },
+
+  mounted() {
+    console.log(this.selected);
+    this.initData();
+  },
+
+  methods: {
+    initData() {
+      this.disabledLength = 0;
+      const self = this;
+      this.options.forEach(item => {
+        if (item.disabled) {
+          self.disabledLength++;
+        }
+      });
+      if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
+        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+        if (this.allSelect != 0) {
+          this.selectedArray.unshift('-1');
+        }
+      } else if (this.selectedArray.includes('-1')) {
+        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+      } else {
+        this.input = '';
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (this.alltype == 0) {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+              }
+            } else {
+              if (item === _item.storeId) {
+                this.input += _item.label + ',';
+              }
+            }
+          });
+        });
+        this.input = this.input.slice(0, this.input.length - 1);
+      }
+      if (this.options.length === 0) {
+        this.input = '';
+        this.selectedArray = [];
+      }
+    },
+
+    selectAll() {
+      if (this.selectedArray.length < this.options.length - this.disabledLength) {
+        this.selectedArray = [];
+        this.options.forEach((item) => {
+          // if (!item.disabled) {
+          this.alltype == 0 ? this.selectedArray.push(item.value) : this.selectedArray.push(item.storeId);
+
+          // }
+        });
+        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+        this.selectedArray.unshift('-1');
+      } else {
+        this.selectedArray = [];
+        this.input = '';
+      }
+    },
+
+    changeSelect(val) {
+      console.log(val);
+      this.changed = true;
+      if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
+        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+        this.selectedArray.unshift('-1');
+      } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
+        this.selectedArray = this.selectedArray.filter((item) => {
+          return item !== '-1';
+        });
+        this.input = '';
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (this.alltype == 0) {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+              }
+            } else {
+              if (item === _item.storeId) {
+                this.input += _item.label + ',';
+              }
+            }
+          });
+        });
+        this.input = this.input.slice(0, this.input.length - 1);
+      } else {
+        this.input = '';
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (this.alltype == 0) {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+              }
+            } else {
+              if (item === _item.storeId) {
+                this.input += _item.label + ',';
+              }
+            }
+          });
+        });
+        this.input = this.input.slice(0, this.input.length - 1);
+      }
+    },
+
+    visibileHandler(val) {
+      if (!val && this.changed) {
+        let selectedList = [];
+        selectedList = this.selectedArray;
+        this.$emit('changeInput', selectedList);
+      }
+    }
+  }
+};
 </script>
 
 <style scoped>

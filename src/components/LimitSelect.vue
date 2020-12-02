@@ -1,167 +1,184 @@
 <template>
   <div class="content">
-    <el-select multiple collapse-tags v-model='selectedArray' @change='changeSelect' @visible-change="visibileHandler" class="el-province"
-               :size="inputSize" @focus="clickSelect" :placeholder="placeholder" :multiple-limit="selectLimit">
-      <el-option v-for='(item, index) in options' :key='index' :label='item.label' :value='item.value' :disabled="item.disabled"></el-option>
+    <el-select
+      v-model="selectedArray"
+      :size="inputSize"
+      :placeholder="placeholder"
+      :multiple-limit="selectLimit"
+      multiple
+      collapse-tags
+      class="el-province"
+      @change="changeSelect"
+      @visible-change="visibileHandler"
+      @focus="clickSelect">
+      <el-option v-for="(item, index) in options" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled"/>
     </el-select>
-    <el-input placeholder="" readonly  :size="inputSize"
-              v-model="input" class="input-class">
-    </el-input>
+    <el-input
+      :size="inputSize"
+      v-model="input"
+      placeholder=""
+      readonly
+      class="input-class"/>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'LimitSelect',
-    props: {
-      options: {
-        type: Array,
-        default: () => []
-      },
-      selected: {
-        type: Array
-      },
-      limit: {
-        type: Number,
-        default: 0
-      },
-      inputSize:{
-        type: String,
-        default: 'medium'
-      },
-      placeholder:{
-        type: String,
-      },
-      selectLimit:{
-        type: Number,
-        default: 0
-      }
+export default {
+  name: 'LimitSelect',
+
+  props: {
+    options: {
+      type: Array,
+      default: () => []
     },
-    watch: {
-      selected(val, oldVal){
-        console.log(val)
-        this.selectedArray = val;
-        this.initData()
-      }
+    selected: {
+      type: Array
     },
-    data () {
-      return {
-        selectedArray: this.selected,
-        input: '',
-        disabledLength: 0,
-        changed: false
-      }
+    limit: {
+      type: Number,
+      default: 0
     },
-    mounted () {
-      this.disabledLength = 0
-      let self = this
+    inputSize: {
+      type: String,
+      default: 'medium'
+    },
+    placeholder: {
+      type: String
+    },
+    selectLimit: {
+      type: Number,
+      default: 0
+    }
+  },
+
+  data() {
+    return {
+      selectedArray: this.selected,
+      input: '',
+      disabledLength: 0,
+      changed: false
+    };
+  },
+
+  watch: {
+    selected(val) {
+      console.log(val);
+      this.selectedArray = val;
+      this.initData();
+    }
+  },
+
+  mounted() {
+    this.disabledLength = 0;
+    const self = this;
+    this.options.forEach(item => {
+      if (item.disabled !== undefined && item.disabled) {
+        self.disabledLength++;
+      }
+    });
+    this.input = '';
+    this.options.forEach(_item => {
+      this.selectedArray.forEach(item => {
+        if (item === _item.value) {
+          this.input += _item.label + ',';
+        }
+      });
+    });
+    this.input = this.input.slice(0, this.input.length - 1);
+    if (this.limit > 0) {
+      if (this.selectedArray.length === 1) {
+        self.options.forEach(item => {
+          if (item.value === this.selectedArray[0]) {
+            item.disabled = true;
+          }
+        });
+      }
+    }
+  },
+
+  methods: {
+    initData() {
+      this.disabledLength = 0;
+      const self = this;
       this.options.forEach(item => {
         if (item.disabled !== undefined && item.disabled) {
-          self.disabledLength++
+          self.disabledLength++;
         }
-      })
-      this.input = ''
+      });
+      this.input = '';
       this.options.forEach(_item => {
         this.selectedArray.forEach(item => {
           if (item === _item.value) {
-            this.input += _item.label + ','
+            this.input += _item.label + ',';
           }
-        })
-      })
-      this.input = this.input.slice(0, this.input.length - 1)
-      if(this.limit > 0){
+        });
+      });
+      this.input = this.input.slice(0, this.input.length - 1);
+      if (this.limit > 0) {
         if (this.selectedArray.length === 1) {
           self.options.forEach(item => {
             if (item.value === this.selectedArray[0]) {
-              item.disabled = true
+              item.disabled = true;
             }
-          })
+          });
+        } else {
+          self.options.forEach(item => {
+            item.disabled = false;
+          });
         }
       }
     },
-    methods: {
-      initData () {
-        this.disabledLength = 0
-        let self = this
-        this.options.forEach(item => {
-          if (item.disabled !== undefined && item.disabled) {
-            self.disabledLength++
-          }
-        })
-        this.input = ''
-        this.options.forEach(_item => {
-          this.selectedArray.forEach(item => {
-            if (item === _item.value) {
-              this.input += _item.label + ','
-            }
-          })
-        })
-        this.input = this.input.slice(0, this.input.length - 1)
-        if(this.limit > 0){
-          if (this.selectedArray.length === 1) {
-            self.options.forEach(item => {
-              if (item.value === this.selectedArray[0]) {
-                item.disabled = true
-              }
-            })
-          }
-          else{
-            self.options.forEach(item => {
-              item.disabled = false
-            })
-          }
-        }
 
-      },
-      changeSelect (val) {
-        let self = this
-        self.changed = true;
-        if(this.limit > 0){
-          while (val.length > this.limit) {
-            val.shift()
-          }
+    changeSelect(val) {
+      const self = this;
+      self.changed = true;
+      if (this.limit > 0) {
+        while (val.length > this.limit) {
+          val.shift();
         }
-        self.input = ''
-        self.options.forEach(_item => {
-          self.selectedArray.forEach(item => {
-            if (item === _item.value) {
-              this.input += _item.label + ','
-            }
-          })
-        })
-        self.input = this.input.slice(0, this.input.length - 1)
-        if(this.limit > 0){
-          if (this.selectedArray.length === 1) {
-            self.options.forEach(item => {
-              if (item.value === this.selectedArray[0]) {
-                item.disabled = true
-              }
-            })
-          }
-          else{
-            self.options.forEach(item => {
-              item.disabled = false
-            })
-          }
-        }
-        else{
-          self.options.forEach(item => {
-              item.disabled = false
-          })
-        }
-      },
-      visibileHandler (val) {
-        if (!val && this.changed) {
-          let selectedList = []
-          selectedList = this.selectedArray
-          this.$emit('changeInput', selectedList)
-        }
-      },
-      clickSelect(){
-        this.$emit('changeIfSelect')
       }
+      self.input = '';
+      self.options.forEach(_item => {
+        self.selectedArray.forEach(item => {
+          if (item === _item.value) {
+            this.input += _item.label + ',';
+          }
+        });
+      });
+      self.input = this.input.slice(0, this.input.length - 1);
+      if (this.limit > 0) {
+        if (this.selectedArray.length === 1) {
+          self.options.forEach(item => {
+            if (item.value === this.selectedArray[0]) {
+              item.disabled = true;
+            }
+          });
+        } else {
+          self.options.forEach(item => {
+            item.disabled = false;
+          });
+        }
+      } else {
+        self.options.forEach(item => {
+          item.disabled = false;
+        });
+      }
+    },
+
+    visibileHandler(val) {
+      if (!val && this.changed) {
+        let selectedList = [];
+        selectedList = this.selectedArray;
+        this.$emit('changeInput', selectedList);
+      }
+    },
+
+    clickSelect() {
+      this.$emit('changeIfSelect');
     }
+
   }
+};
 </script>
 
 <style scoped>

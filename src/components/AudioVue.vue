@@ -1,68 +1,72 @@
 <template>
-    <div class="speech-content">
-        <div class="speech-info" @click.native="startSpeech"> 
-            <i class="iconfont icon-speech" :class="speech?'icon-yuyin':'icon-yuyin'"></i>
-            </div>
-            <audio :ref="audioRef">
-                <source :src="audioSrc" type="audio/mpeg" />
-            </audio> 
-            <span class="often-text">{{audioOftenText}}</span>
+  <div class="speech-content">
+    <div class="speech-info" @click.native="startSpeech">
+      <i :class="speech ? 'icon-yuyin':'icon-yuyin'" class="iconfont icon-speech"/>
     </div>
+    <audio :ref="audioRef">
+      <source :src="audioSrc" type="audio/mpeg" >
+    </audio>
+    <span class="often-text">{{ audioOftenText }}</span>
+  </div>
 </template>
 <script>
 export default {
-    name:'AudioVue',
-    props:{
-        audioRef:String,
-        audioSrc:String,
+  name: 'AudioVue',
+
+  props: {
+    audioRef: String,
+    audioSrc: String
+  },
+
+  data() {
+    return {
+      speech: false,
+      isPlaying: false,
+      audioOftenText: '',
+      timeid: 0
+    };
+  },
+
+  mounted() {
+    const self = this;
+    self.$nextTick(() => {
+      setTimeout(() => {
+        self.getProcess();
+      }, 1000);
+    });
+  },
+
+  methods: {
+    startSpeech() {
+      const self = this;
+      if (!self.isPlaying) {
+        self.$refs[self.audioRef].play();
+        self.isPlaying = true;
+        self.speech = true;
+        self.timeid = setInterval(function() {
+          self.getProcess();
+        }, 1000);
+      } else {
+        self.$refs[self.audioRef].pause();
+        self.isPlaying = false;
+        self.speech = false;
+        clearInterval(self.timeid);
+      }
+      self.$emit('clickFunc');
     },
-    data(){
-        return{
-            speech:false,
-            isPlaying:false,
-            audioOftenText:'',
-            timeid:0,
-        }
-    },
-    methods:{
-        startSpeech(){
-            let self=this;
-            if(!self.isPlaying){
-                self.$refs[self.audioRef].play();
-                self.isPlaying=true;
-                self.speech=true;
-                self.timeid= setInterval(function(){
-                    self.getProcess();
-                },1000)
-            }
-            else{
-                self.$refs[self.audioRef].pause();
-                self.isPlaying=false;
-                self.speech=false;
-                clearInterval(self.timeid);
-            }
-            self.$emit('clickFunc');
-        },
-        getProcess(){
-            let self=this;
-            let audioOften=parseInt(self.$refs[self.audioRef].duration-self.$refs[self.audioRef].currentTime);
-            self.audioOftenText=parseInt(self.$refs[self.audioRef].duration-self.$refs[self.audioRef].currentTime)+'"';
-            if(audioOften==0){
-                self.isPlaying=false;
-                self.speech=false;
-            }
-        },
-    },
-    mounted(){
-        let self=this;
-        self.$nextTick(()=>{
-            setTimeout(()=>{
-                self.getProcess();
-            },1000);
-        })
-        
+
+    getProcess() {
+      const self = this;
+      const audioOften = parseInt(self.$refs[self.audioRef].duration - self.$refs[self.audioRef].currentTime);
+      self.audioOftenText = parseInt(self.$refs[self.audioRef].duration - self.$refs[self.audioRef].currentTime) + '"';
+      if (audioOften == 0) {
+        self.isPlaying = false;
+        self.speech = false;
+      }
     }
-}
+
+  }
+};
 </script>
 <style lang="scss" scoped>
     @function rem($val){

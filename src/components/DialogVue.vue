@@ -1,52 +1,60 @@
 <template>
-    <el-dialog :title='dialogTitle' style="text-align: left"
-        :visible.sync="dialogClosed" :close-on-click-modal="false" v-if="dialogClosed"  width="28%" top="35vh" @close='cancle'>
-        <div class="dialog-content">
-            <hr style="border: 0.5px solid #dfe2e9;"/>
-            <p style="margin:20px;">
-                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;
-    vertical-align: middle;"></i>
-                <span style="display: inline-block; vertical-align: middle">{{showInfo}}</span>
-            </p>
-        </div>
-        <div slot="footer" class="dialog-footer">
-            <el-button class="cancel-btn" @click="cancle" size="mini" v-if="isWarning">{{generatePatrolLang('cancel')}}</el-button>
-            <el-button class="confirm-btn" @click="confirm" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
-        </div>
-    </el-dialog>
+  <el-dialog
+    v-if="dialogClosed"
+    :title="dialogTitle"
+    :visible.sync="dialogClosed"
+    :close-on-click-modal="false"
+    style="text-align: left"
+    width="28%"
+    top="35vh"
+    @close="cancle">
+    <div class="dialog-content">
+      <hr style="border: 0.5px solid #dfe2e9;">
+      <p style="margin:20px;">
+        <i
+          class="el-icon-warning"
+          style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;
+    vertical-align: middle;"/>
+        <span style="display: inline-block; vertical-align: middle">{{ showInfo }}</span>
+      </p>
+    </div>
+    <div slot="footer" class="dialog-footer">
+      <el-button v-if="isWarning" class="cancel-btn" size="mini" @click="cancle">{{ $t('remotePatrol.cancel') }}</el-button>
+      <el-button class="confirm-btn" size="mini" type="primary" @click="confirm">{{ $t('remotePatrol.confirm') }}</el-button>
+    </div>
+  </el-dialog>
 </template>
 <script>
-  import {generatePatrolLang} from '@/api/i18n'
-  export default {
-    name:'DialogVue',
-    props:{
-        dialogTitle:String,
-        showInfo:String,
-        isWarning:Boolean,
-        dialogClosed:Boolean,
+export default {
+  name: 'DialogVue',
+
+  props: {
+    dialogTitle: String,
+    showInfo: String,
+    isWarning: Boolean,
+    dialogClosed: Boolean
+  },
+
+  data() {
+    return {
+    };
+  },
+
+  methods: {
+    confirm(ev) {
+      const self = this;
+      console.log(ev.target);
+      const value = self.dialogClosed;
+      self.$emit('confirmed', value);
     },
-    data(){
-        return{
-        }
-    },
-    mounted(){
-        let self=this;
-    },
-    methods:{
-        generatePatrolLang,
-        confirm(ev){
-            let self=this;
-            console.log(ev.target);
-            let value=self.dialogClosed;
-            self.$emit('confirmed',value)
-        },
-        cancle(ev){
-            let self=this;
-            let value=self.dialogClosed;
-            self.$emit('canceled',value)
-        },
+
+    cancle(ev) {
+      const self = this;
+      const value = self.dialogClosed;
+      self.$emit('canceled', value);
     }
-}
+  }
+};
 </script>
 <style lang="scss" scoped>
     @function rem($val){

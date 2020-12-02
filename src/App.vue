@@ -7,43 +7,40 @@
 <script>
 export default {
   name: 'App',
-  data(){
-    return{
-       onLine: navigator.onLine,
-    }
+  data() {
+    return {
+      onLine: navigator.onLine
+    };
   },
-  watch:{
-      onLine:{
-            handler:function(val,oldval){
-                if(val!=oldval){
-                  sessionStorage.setItem('onLine',this.onLine);
-                  if(!this.onLine){
-                     this.$message({message: this.$t('route.networkError'),type: 'error',duration:5*1000});
-                  }
-                }
-            },
-            deep:true//对象内部的属性监听，也叫深度监听
+  watch: {
+    onLine: {
+      handler: function(val, oldval) {
+        if (val != oldval) {
+          sessionStorage.setItem('onLine', this.onLine);
+          if (!this.onLine) {
+            this.$message({ message: this.$t('route.networkError'), type: 'error', duration: 5 * 1000 });
+          }
+        }
       },
-    },
-  mounted(){
-    window.addEventListener('online',  this.updateOnlineStatus);
-    window.addEventListener('offline', this.updateOnlineStatus);
-    if(this.onLine){
-      console.log('网络已连接')
+      deep: true
     }
-    sessionStorage.setItem('onLine',this.onLine);
   },
-  methods:{
+  mounted() {
+    window.addEventListener('online', this.updateOnlineStatus);
+    window.addEventListener('offline', this.updateOnlineStatus);
+    sessionStorage.setItem('onLine', this.onLine);
+  },
+  beforeDestroy() {
+    window.removeEventListener('online', this.updateOnlineStatus);
+    window.removeEventListener('offline', this.updateOnlineStatus);
+  },
+  methods: {
     updateOnlineStatus(e) {
     	const { type } = e;
-        this.onLine = type === 'online';
-      },
-  },
-  beforeDestroy(){
-    window.removeEventListener('online',  this.updateOnlineStatus);
-    window.removeEventListener('offline', this.updateOnlineStatus);
+      this.onLine = type === 'online';
+    }
   }
-}
+};
 </script>
 
 <style>

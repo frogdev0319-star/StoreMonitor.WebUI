@@ -1,42 +1,43 @@
 <template>
-    <div id="btn-circle"
-    :class="isClick?'noramlColor':'abnoramlColor'" 
-    :style="isOnline?{'cursor':'pointer'}:{'cursor':'not-allowed'}">
-        <div id="btn-stroke">
-            <span id="btn-title" :class="isOnline?'noramlColor':'abnoramlColor'">{{channelName}}</span>
-        </div>
+  <div
+    id="btn-circle"
+    :class="isClick ? 'noramlColor':'abnoramlColor'"
+    :style="isOnline ? {'cursor':'pointer'} : {'cursor':'not-allowed'}">
+    <div id="btn-stroke">
+      <span id="btn-title" :class="isOnline ? 'noramlColor' : 'abnoramlColor'">{{ channelName }}</span>
     </div>
+  </div>
 
 </template>
 <script>
-import PubSub from 'pubsub-js'
-export default {
-    name:'ChannelBtn',
-    props:{
-        channelName:String,
-        isOnline:Boolean,
-        isClick:Boolean
-    },
-    data(){
-        return{
-        }
-    },
-    watch:{
-    },
-    created(){
-    },
-    methods:{
-        clickChannel(ev){
-            let self=this;
-            self.isClick=true;
-            let value={
-                isClick:self.isClick,
-            }
-            console.log(ev.target);
-            self.$emit('change',value)
-        }
+
+  export default {
+  name: 'ChannelBtn',
+
+  props: {
+    channelName: String,
+    isOnline: Boolean,
+    isClick: Boolean
+  },
+
+  data() {
+    return {
+    };
+  },
+
+  methods: {
+    clickChannel(ev) {
+      const self = this;
+      self.isClick = true;
+      const value = {
+        isClick: self.isClick
+      };
+      console.log(ev.target);
+      self.$emit('change', value);
     }
-}
+  }
+
+};
 </script>
 <style>
     .noramlColor{

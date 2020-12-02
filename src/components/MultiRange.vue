@@ -3,79 +3,85 @@
     <div class="block">
       <el-slider
         v-model="value"
-        range
         :marks="marks"
         :max="86400"
-      >
-      </el-slider>
+        range
+      />
     </div>
-    <div ref="ranger"></div>
+    <div ref="ranger"/>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'MultiRange',
-    props: {
-      timeArray:{
-        type: Array,
-        default: []
+export default {
+  name: 'MultiRange',
+
+  props: {
+    timeArray: {
+      type: Array,
+      default: []
+    }
+  },
+
+  data() {
+    return {
+      slider: null,
+      value: [],
+      computeTimeArray: []
+    };
+  },
+
+  computed: {
+    marks() {
+      const obj = {};
+      for (let i = 0; i <= 24; i++) {
+        const a = i * 3600;
+        obj[a] = `${i}:00`;
       }
-    },
-    data () {
-      return {
-        slider: null,
-        value: [],
-        computeTimeArray: []
+      return obj;
+    }
+  },
+
+  watch: {
+    timeArray: {
+      immediate: true,
+      handler(val) {
+        this.computeTimeArray = val;
       }
+    }
+  },
+
+  beforeDestroy() {
+    this.slider.off('change', this.changeSlider);
+  },
+
+  mounted() {
+    this.addSlider();
+  },
+
+  methods: {
+    addSlider() {
+      const Multirangeslider = require('multirangeslider');
+      this.slider = new Multirangeslider({
+        min: 0,
+        max: 86400, // every option is written here in hours
+        step: 1800, // but slider stores minutes inside
+        minWidth: 1800
+      });
+      const yourElement = this.$refs.ranger;
+      yourElement.appendChild(this.slider.el);
+      this.computeTimeArray.forEach(item => {
+        this.slider.add(item);
+      });
+      this.slider.on('change', this.changeSlider);
     },
-    computed: {
-      marks () {
-        let obj = {}
-        for (let i = 0; i <= 24; i++) {
-          let a = i * 3600
-          obj[a] = `${i}:00`
-        }
-        return obj
-      },
-    },
-    watch:{
-      timeArray:{
-        immediate: true,
-        handler(val){
-          console.log('变化')
-          this.computeTimeArray = val
-        }
-      }
-    },
-    methods: {
-      addSlider () {
-        let Multirangeslider = require('multirangeslider')
-        this.slider = new Multirangeslider({
-          min: 0,
-          max: 86400, // every option is written here in hours
-          step: 1800, // but slider stores minutes inside
-          minWidth: 1800
-        })
-        let yourElement = this.$refs.ranger
-        yourElement.appendChild(this.slider.el)
-        this.computeTimeArray.forEach(item=>{
-          this.slider.add(item)
-        })
-        this.slider.on('change', this.changeSlider)
-      },
-      changeSlider(){
-        let timeArray = this.slider.data();
-        this.$emit('getTimeArray', timeArray)
-      },
-    },
-    beforeDestroy(){
-      this.slider.off('change', this.changeSlider)
-    },
-    mounted () {
-      this.addSlider()
+
+    changeSlider() {
+      const timeArray = this.slider.data();
+      this.$emit('getTimeArray', timeArray);
     }
   }
+};
 </script>
 
 <style scoped>
