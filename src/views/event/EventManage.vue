@@ -1,1101 +1,1147 @@
 <template>
-    <div class="el-event-content" :style="{'minHeight':windowHeight-118+'px'}">
-        <div class="el-event-header">
-            <div class="el-area">
-                <span class="select-title">{{$t('reportView.selectStores')}}</span>
-                <el-select v-model="curCountry"  :placeholder="$t('reportView.country')" size="mini" class="el-province" @change="changeCountry">
-                    <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
-                        <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                    </el-option-group>
-                </el-select>
-                <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                    style="display: inline;margin-left: calc(20/1920*100vw);" ref="proviceSelect" :disabled="curCountry.length==0||curCountry=='-1'" :all="$t('overview.allZoneI')"></region-multi-select>
-                <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                    style="display: inline;" ref="citySelect" :disabled="curProvince.length==0||curCountry=='-1'" :all="$t('overview.allZoneII')"></region-multi-select>
+  <div :style="{'minHeight':windowHeight-118+'px'}" class="el-event-content">
+    <div class="el-event-header">
+      <div class="el-area">
+        <span class="select-title">{{ $t('remotePatrol.storeSelect') }}</span>
+        <el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" size="mini"
+                   class="el-province" @change="changeCountry">
+          <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-option-group>
+        </el-select>
+        <region-multi-select
+          ref="proviceSelect"
+          :selected="curProvince"
+          :placeholder="$t('remotePatrol.regionI')"
+          :options="provinceList"
+          :disabled="curCountry.length === 0 || curCountry === '-1'"
+          :all="$t('overview.allZoneI')"
+          style="display: inline;margin-left: calc(20/1920*100vw);"
+          @changeInput="handleProChange"/>
+        <region-multi-select
+          ref="citySelect"
+          :selected="curCity"
+          :placeholder="$t('remotePatrol.regionII')"
+          :options="cityList"
+          :disabled="curProvince.length === 0 || curCountry === '-1'"
+          :all="$t('overview.allZoneII')"
+          style="display: inline;"
+          @changeInput="handleCityChange"/>
 
-                <multi-select :selected="curStore" :placeholder="$t('reportView.stores')" :options="storeDataList" @changeInput="handleStoreChange"
-                                    style="display: inline;" ref="multiSelect"></multi-select>
-                <span class="select-title">{{$t('reportView.selectStoreTag')}}</span>
-                <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag"
-                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="TagMultiSelect"></multi-select>
-                <el-input
-                    size="small"
-                    class="el-search"
-                    clearable
-                    v-model="serachVale" @clear="searchData(true)" @keyup.enter.native="searchData(true)">
-                    <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;line-height:32px;"></i>
-                </el-input>
-            </div>
-            <div class="el-date">
-                <span class="date-title">{{generateEventLang('time')}}</span>
-                <el-date-picker
-                    ref="datePicker"
-                    v-model="dateValue"
-                    type="datetimerange"
-                    range-separator="~"
-                    size="mini"
-                    :clearable=false
-                    :editable=false
-                    format="yyyy/MM/dd HH:mm:ss"
-                    class="date-range"
-                    :popper-class="poperClass"
-                    :picker-options='dateOpt'
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    @change="dateChange"
-                    :default-time="defaultTime">
-                </el-date-picker>
-                <el-tooltip :popper-class="toolTipClass" class="item" effect="dark"
-                    placement="bottom-end">
-                    <div slot="content">*{{generateEventLang('timePlaceholder')}}</div>
-                    <i class="iconfont icon-bangzhu iconbangzhu"></i>
-                </el-tooltip>
-                <span class="date-title"
-                style="margin-left:30px;">{{generateEventLang('status')}}</span>
-                <multi-select :selected="curState" :alltype="0" :options="states" :disabled="activeName!='4'" @changeInput="handleStateChange"
-                                    style="display:inline;" ref="multiState"></multi-select>
-            </div>
-            <!-- <div class="store-handle">
-                    <span class="choice-store"><i class="iconfont icon-tishi1"></i>{{$t('reportView.selected')}}<span class="storename-str" style="margin-left:20px;">{{storeStr}}</span></span>
-            </div> -->
-        </div>
-        <div class="el-table-content">
-            <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-              <div class="btn-area">
-                <img :src="exportPng" class="icon-excel">
-                <span class="spanClass">{{generateEventLang('exportReport')}}</span>
-              </div>
-            </el-button>
-            <el-tabs v-model="activeName" @tab-click="handleTabClick" :id="lang=='en'? 'en-tabs-content': 'tabs-content'">
-                <el-tab-pane v-for="(item,index) in tableDataList"
-                :key="index" :label="`${item.label} （${item.eventCount}）`">
-                    <div class="el-table-panel">
-                        <el-table
-                            :data="item.tableData"
-                            :highlight-current-row="true"
-                            empty-text='没有事件数据'
-                            align='left'
-                            stripe
-                            :height="windowHeight-260"
-                            @sort-change='sortChange'
-                            @row-click='rowClickItem'
-                            style=""
-                            class="table-content"
-                            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-                            :cell-style="cellStyle"
-                        >
-                                <el-table-column
-                                    min-width="100"
-                                    header-align="center"
-                                    align="center">
-                                        <template slot-scope="scope" >
-                                        <span class="icon-span" style="background-color:#FDBA40;" v-if="scope.row.status==0" >{{generateEventLang('pending')}}</span>
-                                        <span class="icon-span" style="background-color:#434C5E;" v-else-if="scope.row.status==1" >{{generateEventLang('handled')}}</span>
-                                        <span class="icon-span" style="background-color:#6097F3;" v-else-if="scope.row.status==2" >{{generateEventLang('closed')}}</span>
-                                        <span class="icon-span" style="background-color:#FDBA40;" v-else-if="scope.row.status==3" >{{generateEventLang('returnStatus')}}</span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column
-                                    prop="subject"
-                                    :label="generateEventLang('name')"
-                                    min-width="220"
-                                    sortable='custom'
-                                    align="left"
-                                    :class-name = "selfClassName"
-                                >
-                                  <template slot-scope="scope">
-                                        <img class='sourceType-icon' v-if="scope.row.sourceType==0" :src='videoSrc'/>
-                                        <img class='sourceType-icon' v-else-if="scope.row.sourceType==1" :src='inspectSrc'/>
-                                        <img class='sourceType-icon' v-else :src='insiteInspectSrc'/>
-                                        <span class="event-subject">{{scope.row.subject}}</span>
-                                    </template>
-                                </el-table-column>
-                            <el-table-column prop="storeName" align="left" :label="$t('eventView.stores')" min-width="160" sortable="custom"></el-table-column>
-                            <el-table-column prop="inspectTagName" align="left" :label="$t('overview.patrolLists')" min-width="160" sortable="custom"></el-table-column>
-                            <el-table-column align="left" :label="$t('eventView.enclosure')" min-width="120">
-                                  <template slot-scope="scope">
-                                      <div v-if="scope.row.attachment.length!=0">
-                                          <img class='sourceType-icon' v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url"/>
-                                      </div>
-                                  </template>
-                            </el-table-column>
-                            <el-table-column prop="assignerName" align="left" :label="$t('eventView.submitter')" width="120" sortable="custom"></el-table-column>
-                            <el-table-column prop="ts" align="left" :label="$t('eventView.submitTime')" width="140" sortable="custom"></el-table-column>
-                            <el-table-column
-                                prop="option"
-                                :label="generateEventLang('operation')"
-                                min-width="80"
-                                align="left">
-                                <template slot-scope="scope">
-                                    <i class="iconfont icon-gengduo" @click="toEventDetail(scope.row)"></i>
-                                </template>
-                            </el-table-column>
-                            <div slot="empty">
-                                <div>
-                                    <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{generateEventLang('noEvents')}}</span>
-                                </div>
-                            </div>
-                        </el-table>
-                    </div>
-                    <div class="toolbar pagination clearfix" style="width:100%; margin:10px 15px 0px 0px;height:13%;">
-                        <el-pagination background small
-                            :page-sizes="[10, 20, 50, 100]"
-                            @size-change="sizeChange"
-                            @current-change="currentChange"
-                            :current-page="item.page"
-                        layout="jumper,total, prev, pager, next,sizes"
-                        :page-size="item.sizeNum" :total="item.total" style="float:right;margin-top:10px;margin-bottom:10px;margin-right: 10px;">
-                        </el-pagination>
-                    </div>
-                </el-tab-pane>
-            </el-tabs>
-        </div>
+        <multi-select
+          ref="multiSelect"
+          :selected="curStore"
+          :placeholder="$t('remotePatrol.stores')"
+          :options="storeDataList"
+          style="display: inline;"
+          @changeInput="handleStoreChange"/>
+        <span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>
+        <multi-select
+          ref="TagMultiSelect"
+          :selected="curStoreTag"
+          :placeholder="$t('remotePatrol.selectStoreTag')"
+          :all-select="0"
+          :alltype="0"
+          :options="StoreTagList"
+          style="display: inline;margin-left: calc(20/1920*100vw);"
+          @changeInput="changeStoreTag"/>
+        <el-input
+          v-model="serachVale"
+          size="small"
+          class="el-search"
+          clearable
+          @clear="searchData(true)"
+          @keyup.enter.native="searchData(true)">
+          <i slot="prefix" class="iconfont icon-sousuo" style="margin-left:5px;font-size:18px;line-height:32px;"/>
+        </el-input>
+      </div>
+      <div class="el-date">
+        <span class="date-title">{{ $t('eventView.time') }}</span>
+        <el-date-picker
+          ref="datePicker"
+          v-model="dateValue"
+          :clearable="false"
+          :editable="false"
+          :popper-class="poperClass"
+          :picker-options="dateOpt"
+          :default-time="defaultTime"
+          type="datetimerange"
+          range-separator="~"
+          size="mini"
+          format="yyyy/MM/dd HH:mm:ss"
+          class="date-range"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          @change="dateChange"/>
+        <el-tooltip
+          :popper-class="toolTipClass"
+          class="item"
+          effect="dark"
+          placement="bottom-end">
+          <div slot="content">*{{ $t('eventView.timePlaceholder') }}</div>
+          <i class="iconfont icon-bangzhu iconbangzhu"/>
+        </el-tooltip>
+        <span
+          class="date-title"
+          style="margin-left:30px;">{{ $t('eventView.status') }}</span>
+        <multi-select
+          ref="multiState"
+          :selected="curState"
+          :alltype="0"
+          :options="states"
+          :disabled="activeName!=='4'"
+          style="display:inline;"
+          @changeInput="handleStateChange"/>
+      </div>
     </div>
+    <div class="el-table-content">
+      <el-button :class="lang==='en' ? 'en-export-btn':'export-btn'" type="primary" size="mini" @click="export2Excel" >
+        <div class="btn-area">
+          <img :src="exportPng" class="icon-excel">
+          <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+        </div>
+      </el-button>
+      <el-tabs v-model="activeName" :id="lang === 'en' ? 'en-tabs-content' : 'tabs-content'" @tab-click="handleTabClick">
+        <el-tab-pane
+          v-for="(item,index) in tableDataList"
+          :key="index"
+          :label="`${item.label} （${item.eventCount}）`">
+          <div class="el-table-panel">
+            <el-table
+              :data="item.tableData"
+              :highlight-current-row="true"
+              :height="windowHeight-260"
+              :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+              :cell-style="cellStyle"
+              empty-text="没有事件数据"
+              align="left"
+              stripe
+              style=""
+              class="table-content"
+              @sort-change="sortChange"
+              @row-click="rowClickItem"
+            >
+              <el-table-column
+                min-width="100"
+                header-align="center"
+                align="center">
+                <template slot-scope="scope" >
+                  <span v-if="scope.row.status === 0" class="icon-span" style="background-color:#FDBA40;" >{{ $t('eventView.pending') }}</span>
+                  <span v-else-if="scope.row.status === 1" class="icon-span" style="background-color:#434C5E;" >{{ $t('eventView.handled') }}</span>
+                  <span v-else-if="scope.row.status === 2" class="icon-span" style="background-color:#6097F3;" >{{ $t('eventView.closed') }}</span>
+                  <span v-else-if="scope.row.status === 3" class="icon-span" style="background-color:#FDBA40;" >{{ $t('eventView.returnStatus') }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                :label="$t('eventView.name')"
+                :class-name = "selfClassName"
+                prop="subject"
+                min-width="220"
+                sortable="custom"
+                align="left"
+              >
+                <template slot-scope="scope">
+                  <img v-if="scope.row.sourceType === 0" :src="videoSrc" class="sourceType-icon">
+                  <img v-else-if="scope.row.sourceType === 1" :src="inspectSrc" class="sourceType-icon">
+                  <img v-else :src="insiteInspectSrc" class="sourceType-icon">
+                  <span class="event-subject">{{ scope.row.subject }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="160" sortable="custom"/>
+              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="160" sortable="custom"/>
+              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="120">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.attachment.length!==0">
+                    <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="sourceType-icon">
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" width="120" sortable="custom"/>
+              <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="140" sortable="custom"/>
+              <el-table-column
+                :label="$t('eventView.operation')"
+                prop="option"
+                min-width="80"
+                align="left">
+                <template slot-scope="scope">
+                  <i class="iconfont icon-gengduo" @click="toEventDetail(scope.row)"/>
+                </template>
+              </el-table-column>
+              <div slot="empty">
+                <div>
+                  <i class="iconfont icon-zhengque empty-data-icon"/>
+                  <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
+                </div>
+              </div>
+            </el-table>
+          </div>
+          <div class="toolbar pagination clearfix" style="width:100%; margin:10px 15px 0px 0px;height:13%;">
+            <el-pagination
+              :page-sizes="[10, 20, 50, 100]"
+              :current-page="item.page"
+              :page-size="item.sizeNum"
+              :total="item.total"
+              background
+              small
+              layout="jumper,total, prev, pager, next,sizes"
+              style="float:right;margin-top:10px;margin-bottom:10px;margin-right: 10px;"
+              @size-change="sizeChange"
+              @current-change="currentChange"/>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+  </div>
 </template>
 
 <script>
-import api  from '../../api/index';
-import util from '../../common/util.js'
-import CsvExportor from 'csv-exportor'
-import {eventRESTful} from '@/api/index'
-import {Message} from 'element-ui'
-import {getCookie} from '@/common/auth';
-import {isLoginIn} from '@/api/login'
-import {mapGetters} from 'vuex'
-import {generateEventLang} from '@/api/i18n'
-import {getBriefStoreList,GetTagList} from '@/api/store'
-import MultiSelect from '@/components/MultiSelect'
-import RegionMultiSelect from '@/components/RegionMultiSelect'
-import LimitSelect from "@/components/LimitSelect";
-// require(['bootstrap-multiselect'], function(purchase){
-//   $('#example-multiple-selected').multiselect();
-// });
+import util from '../../common/util.js';
+import { eventRESTful } from '@/api/index';
+import { getCookie } from '@/common/auth';
+import { isLoginIn } from '@/api/login';
+import { mapGetters } from 'vuex';
+import { getBriefStoreList, GetTagList } from '@/api/store';
+import MultiSelect from '@/components/MultiSelect';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
+import LimitSelect from '@/components/LimitSelect';
+
 export default {
-    name: "ExceptEvent",
-    components: {
-        LimitSelect,
-        MultiSelect,
-        RegionMultiSelect
-    },
-    data(){
-        return{
-            curCountry:'',
-            CountryList:[],
-            StoreTagList:[],
-            curStoreTag:[],
-            curProvince:[],
-            curStore:[],
-            curCity:[],
-            provinceList:[],
-            cityList:[],
-            storeDataList:[],
-            storeStr:'',
-            dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
-            dateOpt: {
-                disabledDate:(time)=>{
-                    return time.getTime() > Date.now();
-                }
-            },
-            toolTipClass: 'page-login-toolTipClass',
-            states:[{value: 0,label: this.$t('eventView.pending'),disabled:false}, {value: 1,label: this.$t('eventView.handled'),disabled:false}, {value: 2,label: this.$t('eventView.closed'),disabled:false},{value: 3,label: this.$t('eventView.returnStatus'),disabled:false},],
-            curState:null,
-            value:0,
-            serachVale:'',
-            serachData:'',
-            tableDataList:[
-                {
-                    label: this.$t('eventView.pendingEve'),
-                    eventCount:0,
-                    tableData:[],
-                    total:0,
-                    sizeNum:10,
-                    page:1
-                },
-                {
-                    label: this.$t('eventView.ProcessedEvent'),
-                    eventCount:0,
-                    tableData:[],
-                    total:0,
-                    sizeNum:10,
-                    page:1
-                },
-                {
-                    label: this.$t('eventView.ClosedEvent'),
-                    eventCount:0,
-                    tableData:[],
-                    total:0,
-                    sizeNum:10,
-                    page:1
-                },
-                {
-                    label: this.$t('eventView.ReturnEvent'),
-                    eventCount:0,
-                    tableData:[],
-                    total:0,
-                    sizeNum:10,
-                    page:1
-                },
-                {
-                    label: this.$t('eventView.allEvents'),
-                    eventCount:0,
-                    tableData:[],
-                    total:0,
-                    sizeNum:10,
-                    page:1
-                }
-            ],
-            activeName:'0',
-            videoSrc:require('../../../static/img/监控icon.png'),
-            inspectSrc:require('../../../static/img/远程icon.png'),
-            insiteInspectSrc:require('../../../static/img/现场icon.png'),
-            attachmentVideo:require('../../../static/img/视频icon.png'),
-            attachmentImg:require('../../../static/img/照片icon.png'),
-            attachmentAudio:require('../../../static/img/音频icon.png'),
-            event,
-            total:0,
-            page:1,
-            sizeNum:10,
-            params:{},
-            fileName:'数据详情'+'.xlsx',
-            exportDataList:[],  //需要导出的数据
-            exportDataHeader:[this.$t('eventView.name'),this.$t('eventView.stores'),this.$t('overview.patrolLists'),this.$t('eventView.submitter'),this.$t('eventView.submitTime')], //需要导出数据的表头
-            windowHeight:window.innerHeight,
-            userId:'',
-            poperClass:'date-picker-poper',
-            selectpoperClass:'select-poper',
-            defaultTime:[],
-            lang: this.$i18n.locale,
-            isFirstLoad: false, //是否首次加载
-            order: '',
-          ifChangeAccount: false,
-          numberOfElements: 0,
-          totalElements: 0,
-          sortColumnOfTab: [{tabIndex: 0, sortType:{prop: '', order: ''} }, {tabIndex: 1, sortType:{prop: '', order: ''} }, {tabIndex: 2, sortType:{prop: '', order: ''} }, {tabIndex: 3, sortType:{prop: '', order: ''} }, {tabIndex: 4, sortType:{prop: '', order: ''} }],
-          exportPng: require('../../../static/img/icon_excel.png'),
-          selfClassName: 'self-class-name'
-        }
+  name: 'ExceptEvent',
+  components: {
+    LimitSelect,
+    MultiSelect,
+    RegionMultiSelect
+  },
 
-    },
-    computed:{
-        tableHieght(){
-            if(this.windowHeight>800){
-                return this.windowHeight*0.85;
-            }
-            else if(this.windowHeight>700){
-                return this.windowHeight*0.58;
-            }
-            else{
-                return this.windowHeight*0.7;
-            }
-        },
-        ...mapGetters({accountChanged:'accountChanged'})
-    },
-    watch:{
-        accountChanged(val,oldVal){
-            console.log(val);
-            let self=this;
-            if(val!=0) {
-              console.log(self.dateValue)
-            //   self.searchEventList(false)
-              window.setTimeout(function(){
-                  self.$route.meta.keepAlive = true;
-                  console.log(self.$route.meta.keepAlive);
-                },
-                300);
-              self.ifChangeAccount = true;
-            }
-        },
-        numberOfElements(val,oldVal){
-          let self = this;
-          if(val == 0 && self.totalElements > 0){
-            self.params.filter.page -= 1;
-            self.getEventList();
-          }
+  data() {
+    return {
+      curCountry: '',
+      CountryList: [],
+      StoreTagList: [],
+      curStoreTag: [],
+      curProvince: [],
+      curStore: [],
+      curCity: [],
+      provinceList: [],
+      cityList: [],
+      storeDataList: [],
+      storeStr: '',
+      dateValue: [new Date().setTime(new Date().getTime() - 3600 * 1000 * 24), new Date()],
+      dateOpt: {
+        disabledDate: (time) => {
+          return time.getTime() > Date.now();
         }
-    },
-    methods:{
-      cellStyle({ row, column, rowIndex, columnIndex}){
-        console.log(row);
-        console.log(columnIndex);
-        let obj = {};
-        if(columnIndex == 0){
-          obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
-        }
-        else{
-          obj = {'border-right':'1px solid #e3e9f4'}
-        }
-        return obj;
       },
-        generateEventLang,
-        getTagListData(){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-                GetTagList().then(res=>{
-                    let errMsg=res.errMsg;
-                    if(errMsg!=undefined&&errMsg=='Success'){
-                        res.data.forEach(item=>{
-                            let obj={}
-                            obj.value=item.tagId
-                            obj.label=item.tagName
-                            obj.disabled=false
-                            self.StoreTagList.push(obj)
-                        })
-                        resolve(res);
-                    }
-                }).catch(res => {
-                    resolve(res);
-                })
-            })
+      toolTipClass: 'page-login-toolTipClass',
+      states: [
+        { value: 0, label: this.$t('eventView.pending'), disabled: false },
+        { value: 1, label: this.$t('eventView.handled'), disabled: false },
+        { value: 2, label: this.$t('eventView.closed'), disabled: false },
+        { value: 3, label: this.$t('eventView.returnStatus'), disabled: false }
+      ],
+      curState: null,
+      value: 0,
+      serachVale: '',
+      serachData: '',
+      tableDataList: [
+        {
+          label: this.$t('eventView.pendingEve'),
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
         },
-        getBriefStoreData(){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-                getBriefStoreList().then(res=>{
-                    let errMsg=res.errMsg;
-                    if(errMsg!=undefined&&errMsg=='Success'){
-                        let data=res.data;
-                        resolve(res);
-                    }
-                }).catch(res => {
-                    resolve(res);
-                })
-            })
+        {
+          label: this.$t('eventView.ProcessedEvent'),
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
         },
-        async getCountryStore(){
-                let self=this;
-                let data=await self.getBriefStoreData();
-                let temp=[]
-                if(data.errCode==0&&data.errMsg=='Success'){
-                    self.tempStoreData=data.data;
-                    if(self.tempStoreData.length!=0){
-                        self.tempStoreData.forEach(item=>{
-                            let country=item.country;
-                            if(temp.map(x=>x.label).indexOf(country)==-1){
-                                let obj={
-                                    value:country,
-                                    label:country
-                                }
-                                temp.push(obj);
-                            }
-                        })
-                    }
-                    let countryList=temp;
-                    self.CountryList[0] = {}
-                    self.CountryList[0].label= self.$t('reportView.country');
-                    self.CountryList[0].countryList = countryList
-                    self.CountryList[0].countryList.unshift({value:'-1', label:self.$t('reportView.all')})
-                    self.curCountry = countryList[0].value;
-                    self.selectAllProAndCity(self.curCountry);
-                }
+        {
+          label: this.$t('eventView.ClosedEvent'),
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
         },
-        selectAllProAndCity(val){
-            let self = this;
-            let storeList = self.tempStoreData;
-            let temp = [];
-            let tempStore = [];
-            storeList.forEach(item=>{
-                if(item.country==val||val=='-1'){
-                if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                    let obj={
-                    label:item.province,
-                    value:item.province
-                    }
-                    temp.push(obj);
-                }
-                let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    tagIds:item.tagIds
-                };
-                tempStore.push(obj);
-                }
-            })
-            self.provinceList = temp;
-            let cityTemp = [];
-            self.provinceList.forEach(_item=>{
-                storeList.forEach(item=>{
-                if(item.province==_item.value){
-                    if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
-                    let obj={
-                        label:item.city,
-                        value:item.city
-                    }
-                    cityTemp.push(obj);
-                    }
-                }
-                })
-            })
-            self.cityList = cityTemp;
-            let provinceArr = [];
-            self.provinceList.forEach(item=>{
-                provinceArr.push(item.value)
-            })
-            self.curProvince = provinceArr;
-
-            let cityArr = [];
-            self.cityList.forEach(item=>{
-                cityArr.push(item.value)
-            })
-            self.curCity = cityArr;
-            self.storeDataList = tempStore;
-            let storeArr = [];
-            self.storeDataList.forEach(item=>{
-                storeArr.push(item.storeId)
-            })
-            self.curStore = storeArr;
-            let stateArr=[]
-            self.curState=[0]
-            self.changeStore(self.curStore)
+        {
+          label: this.$t('eventView.ReturnEvent'),
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
         },
-        changeStoreTag(val){
-            let self=this
-            let temp=[]
-            self.curStoreTag=val
-            self.changeStore(self.curStore)
-        },
-        changeCountry(val){
-            let self=this;
-            let temp=[]
-            self.clearProviceInfo()
-            self.clearCityInfo();
-            self.clearStoreInfo();
-            self.selectAllProAndCity(val);
-        },
-        changePro(val){
-            let self=this;
-            self.curCity= [];
-            self.clearCityInfo();
-            self.clearStoreInfo();
-            let storeList=self.tempStoreData;
-            let temp=[];
-            let tempStore=[];
-            if(val==''){
-                storeList.forEach(item=>{
-                    if(item.country==self.curCountry){
-                            let obj={
-                                storeId:item.storeId,
-                                label:item.name,
-                                value:item.name,
-                                userId:item.userId,
-                                tagIds:item.tagIds
-                            };
-                            tempStore.push(obj);
-                    }
-                })
-            }else{
-                val.forEach(_item=>{
-                    storeList.forEach(item=>{
-                        if(item.province==_item){
-                        if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                            let obj={
-                            label:item.city,
-                            value:item.city
-                            }
-                            temp.push(obj);
-                        }
-                        let obj={
-                            storeId:item.storeId,
-                            label:item.name,
-                            value:item.name,
-                            userId:item.userId,
-                            tagIds:item.tagIds
-                        };
-                        tempStore.push(obj);
-                        }
-                    })
-                })
-                self.cityList=temp;
-                let cityArr=[]
-                if(self.cityList.length!=0){
-                self.cityList.forEach(item=>{
-                    cityArr.push(item.value)
-                })
-                self.curCity=cityArr
-            }
-            }
-            self.storeDataList=tempStore;
-            let storeArr=[],arr=[]
-            
-            self.storeDataList.forEach(item=>{
-                storeArr.push(item.storeId)
-                arr.push(item.value)
-            })
-            
-            self.curStore=storeArr
-            self.changeStore(self.curStore)
-        },
-        changeCity(val){
-            let self=this;
-            self.clearStoreInfo();
-            let storeList=self.tempStoreData;
-            let temp=[];
-            if(val.length != 0){
-                val.forEach(_item=>{
-                storeList.forEach(item=>{
-                    if(item.city==_item){
-                        if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                            let obj={
-                            storeId:item.storeId,
-                            label:item.name,
-                            value:item.name,
-                            userId:item.userId,
-                            tagIds:item.tagIds
-                            }
-                            temp.push(obj);
-                        }
-                    }
-                })
-                })
-            }
-            self.storeDataList=temp;
-            let str = '',storeArr=[],arr=[]
-            self.storeDataList.forEach(item=>{
-                storeArr.push(item.storeId)
-                arr.push(item.value)
-            })
-            self.curStore=storeArr
-            self.changeStore(self.curStore)
-        },
-        handleStateChange(val){
-            let self=this
-            self.curState=val
-            self.searchData()
-        },
-        handleStoreChange (arr) {
-            let self=this;
-            self.curStore = arr
-            self.changeStore(arr)
-        },
-        handleProChange(arr){
-            let self=this;
-            console.log(arr)
-            self.curProvince = arr
-            self.changePro(arr)
-        },
-        handleCityChange(arr){
-            let self=this;
-            console.log(arr)
-            self.curCity = arr
-            self.changeCity(arr)
-        },
-        clearStoreInfo(){
-            let self=this;
-            self.curStore=[];
-            self.storeStr='';
-            self.$refs.multiSelect.selectedArray = [];
-            self.$refs.multiSelect.input=''
-        },
-        clearProviceInfo(){
-            let self=this;
-            self.curProvince=[];
-            self.$refs.proviceSelect.selectedArray = [];
-            self.$refs.proviceSelect.input=''
-        },
-        clearCityInfo(){
-            let self=this;
-            self.curCity=[];
-            self.$refs.citySelect.selectedArray = [];
-            self.$refs.citySelect.input=''
-        },
-        changeStore(val){
-            let self=this;
-            let str='';
-            self.tempStoreData.forEach((item,index)=>{
-                    val.forEach(_item=>{
-                        if(item.storeId==_item){
-                            self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
-                                item.tagIds.forEach(t_item=>{
-                                    if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                        str+=_item+'，'
-                                    }
-                                })
-                            }) : (item.storeId==_item ? str+=_item+'，' : null)
-                        }
-                    })
-                })
-            str=str.substr(0,str.length-1)
-            self.storeStr=str;
-            self.searchEventList()
-        },
-        dateChange(val){
-            let self=this;
-            // 参数需要时间、状态、门店
-            let tabIndex=Number(self.activeName);
-            let start=typeof(val[0])==='object'?val[0].getTime():val[0];
-            let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-            if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                self.$message({
-                    message: this.$t('eventView.changeTimeRange'),
-                    type:'warning',
-                    duration:3*1000
-                })
-                start=end-3600*24*30*1000;
-                self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
-            }
-            else{
-              self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
-            }
-            self.serachVale=''
-            self.tableDataList[tabIndex].page=1;
-            self.getEventList(0);
-            self.getEventCount();
-        },
-        handleTabClick(val){
-            let self=this;
-            if(Number(val.index)<4){
-                self.curState=[Number(val.index)]
-            }else{
-                let stateArr=[]
-                self.states.forEach(item=>{
-                    stateArr.push(item.value)
-                })
-                self.curState=stateArr
-                self.curState.unshift('-1')
-            }
-            self.getEventList();
-        },
-        searchEventList(){
-            let self=this;
-            self.serachVale=''
-            self.tableDataList[Number(self.activeName)].page=1;
-            self.getEventList();
-            self.getEventCount();
-        },
-        searchData(){
-            let self=this;
-            self.tableDataList[Number(self.activeName)].page=1;
-            self.getEventList();
-            self.getEventCount();
-        },
-        rowClickItem(row,column,event){
-            let self=this;
-            this.event=row;
-            sessionStorage.setItem('event',JSON.stringify(this.event));
-            sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-            this.$router.push({name:"eventDetails",params:{event:this.event}});
-        },
-        toEventDetail(row){
-            console.log(row);
-            let self=this;
-            this.event=row;
-            sessionStorage.setItem('event',JSON.stringify(this.event));
-            sessionStorage.setItem('queryparams',JSON.stringify(self.params));
-            this.$router.push({name:"eventDetails",params:{event:this.event}});
-        },
-        sortChange(col){
-            console.log(col);
-            let self=this;
-            let tabIndex=Number(self.activeName);
-            self.tableDataList[tabIndex].page=1;
-            let column=col.column;
-            let order=col.order;
-            self.order = order;
-            let prop  = '';
-            let tempOrder = '';
-            if(order=="ascending"){
-                self.params.order={
-                    "direction":"asc",
-                    "property":col.column.property
-                }
-              prop = col.column.property;
-              tempOrder =  "asc";
-            }
-            else if(order=="descending"){
-                self.params.order={
-                    "direction":"desc",
-                    "property": col.column.property
-                }
-                prop = col.column.property;
-                tempOrder =  "desc";
-            }
-            else{
-                self.params.order={};
-            }
-            self.sortColumnOfTab[tabIndex].sortType.prop = prop;
-            self.sortColumnOfTab[tabIndex].sortType.order = tempOrder;
-            self.getEventList();
-        },
-        // getUserId(){
-        //     let self=this;
-        //     self.userId=getCookie('UserId');
-        //     let start=new Date().getTime()-1000*3600*24;
-        //     let end=new Date().getTime();
-        //     let status=[0,1,2];
-        //     self.getEventCount(start,end,status);  //初始加载
-        // },
-        async getEventList(val){
-            let self=this;
-            let tabIndex=Number(self.activeName);
-            let like={}
-            if(self.serachVale.trim().length!=0){
-                like={subject:self.serachVale.trim(),assignerName:self.serachVale.trim(),storeName:self.serachVale.trim()};
-            }
-            else{
-                like={};
-            }
-            let storeId = self.storeStr.split('，')
-            let status= []
-            if(self.curState.length!=0){
-                if(self.curState.length==1){
-                    status = self.curState[0]
-                }else{
-                    let allStatus = self.curState.some(item=>item=='-1')
-                    if(allStatus){
-                        status = [0,1,2,3]
-                    }else{
-                        status = self.curState
-                    }
-                }
-            }else{
-                status=-1
-            }
-            let page=0
-            if(val=='currentChange'){
-                page = self.tableDataList[tabIndex].page-1
-            }
-            if(val=='Back'){
-                page = self.params.filter.page
-            }
-            let start='',end=''
-            if(val==0){
-                start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-                end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            }else{
-                start=self.dateValue[0];
-                let endTime = self.dateValue[1];
-                end = endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-            }
-            self.params={
-                beginTs:start,
-                endTs:end,
-                clause:{
-                    status:status,
-                    storeId: storeId
-                },
-                filter:{
-                    page:page,
-                    size:self.tableDataList[tabIndex].sizeNum
-                },
-                like:like
-            }
-            let curTabSortColumn = self.sortColumnOfTab[tabIndex];
-            let order = curTabSortColumn.sortType.order;
-            let prop = curTabSortColumn.sortType.prop;
-            if(order!= '' && prop != ''){
-                self.params.order={
-                    direction: order,
-                    property: prop
-                }
-            }else{
-                self.params.order={
-                    direction: 'desc',
-                    property: 'ts'
-                }
-            }
-            // if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
-            //     if(tabIndex==4){
-            //         for(var key in self.params){
-            //             if(key=='clause'){
-            //                 delete self.params.clause.assigner
-            //             }
-            //         }
-            //     }
-            // }
-            eventRESTful.getEventList(self.params).then((res)=>{
-                let data=res.data.content;
-                let temp=[];
-                data.forEach(item=>{
-                    let attachment=[]
-                    if(item.initialComment.attachment.length!=0){
-                        item.initialComment.attachment.some(x=>x.mediaType==0) ? attachment.push({url:self.attachmentAudio}) : ''
-                        item.initialComment.attachment.some(x=>x.mediaType==1) ? attachment.push({url:self.attachmentVideo}) : ''
-                        item.initialComment.attachment.some(x=>x.mediaType==2) ? attachment.push({url:self.attachmentImg}) : ''
-                    }
-                    let obj={
-                        id:item.id,
-                        ts:util.getDateTime(item.ts),
-                        assignee:item.assignee,
-                        assignerName:item.assignerName,
-                        assigneeName:item.assigneeName,
-                        deviceId:item.deviceId,
-                        status:item.status,
-                        storeId:item.storeId,
-                        storeName:item.storeName,
-                        inspectTagName:item.inspectTagName,
-                        subject:item.subject,
-                        score:item.score,
-                        sourceType:item.sourceType,
-                        attachment:attachment,
-                        initialComment:item.initialComment,
-                        relatedDeviceIds: item.relatedDeviceIds
-                    }
-                    temp.push(obj);
-                })
-                self.tableDataList[tabIndex].tableData=temp;
-                self.tableDataList[tabIndex].total=res.data.totalElements;
-                //if(tabIndex==0){
-                self.tableDataList[tabIndex].eventCount=res.data.totalElements;
-                self.totalElements = res.data.totalElements;
-                self.numberOfElements = res.data.numberOfElements;
-                //}
-            }).catch(err=>{
-                console.log("Error:"+err);
-            });
-        },
-        sizeChange(val){
-            let self=this;
-            self.tableDataList[Number(self.activeName)].sizeNum=val;
-            self.tableDataList[Number(self.activeName)].page=1;
-            self.getEventList();
-        },
-        currentChange(val){
-            let self=this;
-            self.tableDataList[Number(self.activeName)].page=val;
-            self.getEventList('currentChange');
-
-            let dom=document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
-            let offestTop=dom.offsetTop;
-            if(dom!=undefined){
-                document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop=0;
-            }
-        },
-        // getInitList(){
-        //     let self=this;
-        //     let start=new Date().getTime()-1000*3600*24;
-        //     let end=new Date().getTime();
-        //     self.params.beginTs=start;
-        //     self.params.endTs=end;
-        //     self.params.clause={"status":0,"assignee":self.userId};
-        //     self.params.order={"direction": "desc","property": "ts"};
-        //     self.params.filter = {size:self.sizeNum};
-        //     self.getEventList(self.params);
-        // },
-        getEventCount(){
-            let self=this;
-            let start=self.dateValue[0];
-            let endTime = self.dateValue[1];
-            let end= endTime.constructor == Date ? new Date(endTime).getTime() : endTime;
-            let storeId = self.storeStr.split('，')
-            let like={}
-            if(self.serachVale.trim().length!=0){
-                like={subject:self.serachVale.trim(),assignerName:self.serachVale.trim(),storeName:self.serachVale.trim()};
-            }
-            else{
-                like={};
-            }
-            let params={
-                beginTs:start,
-                endTs:end,
-                clause:{
-                    storeId:storeId
-                },
-                like:like
-            };
-            eventRESTful.GetEventCountByStatus(params).then(res=>{
-                let data=res.data;
-                let errMsg=res.errMsg;
-                let numOfEventTotal=0
-                for(let i=0;i<4;i++){
-                    self.tableDataList[i].eventCount=data[i].numOfEvent;
-                    numOfEventTotal+=data[i].numOfEvent
-                }
-                self.tableDataList[4].eventCount=numOfEventTotal
-            })
-        },
-        getExportDataSize(){
-            let self=this;
-            let params=self.params;
-            params.filter={};
-            return new Promise((resolve,reject)=>{
-                eventRESTful.getEventList(params).then((res)=>{
-                    console.log(res);
-                    let size=res.data.totalElements;
-                    resolve(size);
-                })
-                .catch((error) => {
-                    reject(error);
-                })
-            })
-
-        },
-        async getExportData(){
-            let self=this;
-            let size=await self.getExportDataSize();
-            self.params.filter={
-                "page": 0,
-                "size": size
-            };
-            return new Promise((resolve,reject)=>{
-                eventRESTful.getEventList(self.params).then((res)=>{
-                    console.log(res);
-                    let data=res.data.content;
-                    let temp=[];
-                    data.forEach(item=>{
-                        let obj={};
-                        obj.subject=item.subject;
-                        obj.storeName=item.storeName;
-                        obj.inspectTagName=item.inspectTagName
-                        obj.assignerName=item.assignerName;
-                        obj.ts=util.getDateTime(item.ts);
-                        temp.push(obj);
-                    })
-                    resolve(temp);
-                }).catch(err=>{
-                    console.log("Error:"+err);
-                });
-            })
-        },
-        getExportFileName(){
-            let self=this;
-            let tabIndex=Number(self.activeName);
-            console.log(tabIndex);
-            let label='';
-            switch(tabIndex){
-                case 0: label=this.$t('eventView.pendingEve');break;
-                case 1: label=this.$t('eventView.ProcessedEvent');break;
-                case 2: label=this.$t('eventView.ClosedEvent');break;
-                case 3: label=this.$t('eventView.ReturnEvent');break;
-                case 4: label=this.$t('eventView.allEvents');break;
-                default: console.error('error tab pages！');break;
-            }
-            let fileName=label+'-'+util.getCurDateStr();
-            return fileName;
-        },
-        async export2Excel() {
-            var that = this;
-            let ret=await that.isLoginIn();
-            if(ret.data!=undefined&&ret.data.isLogin){
-                let tabIndex=Number(that.activeName);
-                if(that.tableDataList[tabIndex].tableData.length==0){
-                  that.$message({
-                        message: this.$t('eventView.noEvents'),
-                        type:'warning',
-                        duration:3*1000
-                    })
-                    return false;
-                }
-                require.ensure([], async() => {
-                    const { export_json_to_excel } = require('@/excel/Export2Excel');
-                    const tHeader = that.exportDataHeader; // 导出的表头名
-                    const filterVal = ['subject','storeName','inspectTagName','assignerName','ts',]; // 导出的表头字段名
-                    console.log(that.activeName);
-                    let curData=await that.getExportData();
-                    const data = that.formatJson(filterVal, curData);
-
-                    export_json_to_excel(tHeader, data, that.getExportFileName());// 导出的表格名称，根据需要自己命名
-                })
-            }
-            else{
-                window.location.href='https://portals.storeviu.com';
-            }
-        },
-        formatJson(filterVal, jsonData) {
-            return jsonData.map(v => filterVal.map(j => v[j]))
-        },
-        getDeafultTime(){
-            let self=this;
-            let date=new Date();
-            let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
-            let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
-            let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
-            let dateStr=hour+':'+minutes+':'+second;
-            let timeTemp=[];
-            timeTemp[0]=dateStr;
-            timeTemp[1]=dateStr;
-            self.defaultTime=timeTemp;
-        },
-        isLoginIn(){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-                isLoginIn().then(res=>{
-                    console.log(res);
-                    resolve(res);
-                })
-            }).catch(err=>{
-                console.log(err);
-            })
-        },
-       initData(){
-        let self=this;
-        self.activeName = '0';
-        // self.value = 0;
-        self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
-        self.serachVale='';
-        self.total= 0;
-        self.page=1;
-        self.sizeNum=10;
-        self.params={};
-        self.getDeafultTime();
-        let windowHeight=window.innerHeight;
-        if(windowHeight>800){
-          self.tableHeight=770+'px';
+        {
+          label: this.$t('eventView.allEvents'),
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
         }
-        // self.getUserId();
-        // self.getInitList();
-        self.getCountryStore()
-        self.getTagListData()
+      ],
+      activeName: '0',
+      videoSrc: require('../../../static/img/monitor.png'),
+      inspectSrc: require('../../../static/img/remote_patrol.png'),
+      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      attachmentVideo: require('../../../static/img/video.png'),
+      attachmentImg: require('../../../static/img/photo.png'),
+      attachmentAudio: require('../../../static/img/audio.png'),
+      event,
+      total: 0,
+      page: 1,
+      sizeNum: 10,
+      params: {},
+      fileName: '数据详情' + '.xlsx',
+      exportDataList: [],
+      exportDataHeader: [
+        this.$t('eventView.name'),
+        this.$t('eventView.stores'),
+        this.$t('overview.patrolLists'),
+        this.$t('eventView.submitter'),
+        this.$t('eventView.submitTime')],
+      windowHeight: window.innerHeight,
+      userId: '',
+      poperClass: 'date-picker-poper',
+      selectpoperClass: 'select-poper',
+      defaultTime: [],
+      lang: this.$i18n.locale,
+      isFirstLoad: false,
+      order: '',
+      ifChangeAccount: false,
+      numberOfElements: 0,
+      totalElements: 0,
+      sortColumnOfTab: [
+        { tabIndex: 0, sortType: { prop: '', order: '' }},
+        { tabIndex: 1, sortType: { prop: '', order: '' }},
+        { tabIndex: 2, sortType: { prop: '', order: '' }},
+        { tabIndex: 3, sortType: { prop: '', order: '' }},
+        { tabIndex: 4, sortType: { prop: '', order: '' }}
+      ],
+      exportPng: require('../../../static/img/excel.png'),
+      selfClassName: 'self-class-name'
+    };
+  },
+  computed: {
+    tableHieght() {
+      if (this.windowHeight > 800) {
+        return this.windowHeight * 0.85;
+      } else if (this.windowHeight > 700) {
+        return this.windowHeight * 0.58;
+      } else {
+        return this.windowHeight * 0.7;
       }
     },
-    created(){
-      this.isFirstLoad = true
+
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
+  watch: {
+    accountChanged(val, oldVal) {
+      let self = this;
+      if (val !== 0) {
+        window.setTimeout(function() {
+          self.$route.meta.keepAlive = true;
+          console.log(self.$route.meta.keepAlive);
+        },
+        300);
+        self.ifChangeAccount = true;
+      }
     },
-    async mounted(){
-        let self=this;
-        self.userId=getCookie('UserId');
-        self.getDeafultTime();
-        //await self.isLoginIn();
-        let windowHeight=window.innerHeight;
-        if(windowHeight>800){
-            self.tableHeight=770+'px';
-        }
-        // self.getCountryStore() //查询门店列表
-        // self.getTagListData() //查询门店标签
-        // self.getUserId();
-        // self.getInitList();
-    },
-  beforeRouteEnter (to, from, next) {
-    to.meta.keepAlive = true
-    if(from.name=='eventDetails'&& to.name == 'eventManage'){
-      to.meta.isBack = true;
-      next();
-    }
-    else{
-      to.meta.isBack = false;
-      next();
+
+    numberOfElements(val) {
+      let self = this;
+      if (val === 0 && self.totalElements > 0) {
+        self.params.filter.page -= 1;
+        self.getEventList();
+      }
     }
   },
-  activated(){
-    let self=this;
-    self.windowHeight = window.innerHeight;
-    if(!self.$route.meta.isBack || self.isFirstLoad){
-      self.initData()
+
+  created() {
+    this.isFirstLoad = true;
+  },
+
+  async mounted() {
+    let self = this;
+    self.userId = getCookie('UserId');
+    self.getDeafultTime();
+    let windowHeight = window.innerHeight;
+    if (windowHeight > 800) {
+      self.tableHeight = 770 + 'px';
     }
-    else{
+  },
+
+  activated() {
+    let self = this;
+    self.windowHeight = window.innerHeight;
+    if (!self.$route.meta.isBack || self.isFirstLoad) {
+      self.initData();
+    } else {
       self.getEventList('Back');
       self.getEventCount();
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
   },
-    beforeRouteLeave (to, from, next) {
-      console.log(this.params);
-      if(to.name != 'eventDetails'){
-        from.meta.keepAlive = false;
-        next(vm=>{
-          console.log(vm)
-        });
+
+  methods: {
+    cellStyle({ row, column, rowIndex, columnIndex }) {
+      console.log(row);
+      console.log(columnIndex);
+      let obj = {};
+      if (columnIndex === 0) {
+        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      } else {
+        obj = { 'border-right': '1px solid #e3e9f4' };
       }
-      else{
-        from.meta.keepAlive = true;
-        next(vm=>{
-          console.log(vm)
+      return obj;
+    },
+
+    getTagListData() {
+      let self = this;
+      return new Promise((resolve, reject) => {
+        GetTagList().then(res => {
+          let errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            res.data.forEach(item => {
+              let obj = {};
+              obj.value = item.tagId;
+              obj.label = item.tagName;
+              obj.disabled = false;
+              self.StoreTagList.push(obj);
+            });
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
         });
+      });
+    },
+
+    getBriefStoreData() {
+      let self = this;
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          let errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            let data = res.data;
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    async getCountryStore() {
+      let self = this;
+      let data = await self.getBriefStoreData();
+      let temp = [];
+      if (data.errCode === 0 && data.errMsg === 'Success') {
+        self.tempStoreData = data.data;
+        if (self.tempStoreData.length !== 0) {
+          self.tempStoreData.forEach(item => {
+            let country = item.country;
+            if (temp.map(x => x.label).indexOf(country) === -1) {
+              let obj = {
+                value: country,
+                label: country
+              };
+              temp.push(obj);
+            }
+          });
+        }
+        let countryList = temp;
+        self.CountryList[0] = {};
+        self.CountryList[0].label = self.$t('remotePatrol.country');
+        self.CountryList[0].countryList = countryList;
+        self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+        self.curCountry = countryList[0].value;
+        self.selectAllProAndCity(self.curCountry);
       }
     },
-}
+
+    selectAllProAndCity(val) {
+      let self = this;
+      let storeList = self.tempStoreData;
+      let temp = [];
+      let tempStore = [];
+      storeList.forEach(item => {
+        if (item.country === val || val === '-1') {
+          if (temp.map(x => x.value).indexOf(item.province) === -1) {
+            let obj = {
+              label: item.province,
+              value: item.province
+            };
+            temp.push(obj);
+          }
+          let obj = {
+            storeId: item.storeId,
+            label: item.name,
+            value: item.name,
+            userId: item.userId,
+            tagIds: item.tagIds
+          };
+          tempStore.push(obj);
+        }
+      });
+      self.provinceList = temp;
+      let cityTemp = [];
+      self.provinceList.forEach(_item => {
+        storeList.forEach(item => {
+          if (item.province === _item.value) {
+            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+              let obj = {
+                label: item.city,
+                value: item.city
+              };
+              cityTemp.push(obj);
+            }
+          }
+        });
+      });
+      self.cityList = cityTemp;
+      let provinceArr = [];
+      self.provinceList.forEach(item => {
+        provinceArr.push(item.value);
+      });
+      self.curProvince = provinceArr;
+
+      let cityArr = [];
+      self.cityList.forEach(item => {
+        cityArr.push(item.value);
+      });
+      self.curCity = cityArr;
+      self.storeDataList = tempStore;
+      let storeArr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+      });
+      self.curStore = storeArr;
+      self.curState = [0];
+      self.changeStore(self.curStore);
+    },
+
+    changeStoreTag(val) {
+      let self = this;
+      self.curStoreTag = val;
+      self.changeStore(self.curStore);
+    },
+
+    changeCountry(val) {
+      let self = this;
+      self.clearProviceInfo();
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      self.selectAllProAndCity(val);
+    },
+
+    changePro(val) {
+      let self = this;
+      self.curCity = [];
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      let storeList = self.tempStoreData;
+      let temp = [];
+      let tempStore = [];
+      if (val === '') {
+        storeList.forEach(item => {
+          if (item.country === self.curCountry) {
+            let obj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              tagIds: item.tagIds
+            };
+            tempStore.push(obj);
+          }
+        });
+      } else {
+        val.forEach(_item => {
+          storeList.forEach(item => {
+            if (item.province === _item) {
+              if (temp.map(x => x.value).indexOf(item.city) === -1) {
+                let obj = {
+                  label: item.city,
+                  value: item.city
+                };
+                temp.push(obj);
+              }
+              let obj = {
+                storeId: item.storeId,
+                label: item.name,
+                value: item.name,
+                userId: item.userId,
+                tagIds: item.tagIds
+              };
+              tempStore.push(obj);
+            }
+          });
+        });
+        self.cityList = temp;
+        let cityArr = [];
+        if (self.cityList.length !== 0) {
+          self.cityList.forEach(item => {
+            cityArr.push(item.value);
+          });
+          self.curCity = cityArr;
+        }
+      }
+      self.storeDataList = tempStore;
+      let storeArr = [], arr = [];
+
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+        arr.push(item.value);
+      });
+
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
+
+    changeCity(val) {
+      let self = this;
+      self.clearStoreInfo();
+      let storeList = self.tempStoreData;
+      let temp = [];
+      if (val.length !== 0) {
+        val.forEach(_item => {
+          storeList.forEach(item => {
+            if (item.city === _item) {
+              if (temp.map(x => x.value).indexOf(item.city) === -1) {
+                let obj = {
+                  storeId: item.storeId,
+                  label: item.name,
+                  value: item.name,
+                  userId: item.userId,
+                  tagIds: item.tagIds
+                };
+                temp.push(obj);
+              }
+            }
+          });
+        });
+      }
+      self.storeDataList = temp;
+      let storeArr = [], arr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+        arr.push(item.value);
+      });
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
+
+    handleStateChange(val) {
+      let self = this;
+      self.curState = val;
+      self.searchData();
+    },
+
+    handleStoreChange(arr) {
+      let self = this;
+      self.curStore = arr;
+      self.changeStore(arr);
+    },
+
+    handleProChange(arr) {
+      let self = this;
+      console.log(arr);
+      self.curProvince = arr;
+      self.changePro(arr);
+    },
+
+    handleCityChange(arr) {
+      let self = this;
+      console.log(arr);
+      self.curCity = arr;
+      self.changeCity(arr);
+    },
+
+    clearStoreInfo() {
+      let self = this;
+      self.curStore = [];
+      self.storeStr = '';
+      self.$refs.multiSelect.selectedArray = [];
+      self.$refs.multiSelect.input = '';
+    },
+
+    clearProviceInfo() {
+      let self = this;
+      self.curProvince = [];
+      self.$refs.proviceSelect.selectedArray = [];
+      self.$refs.proviceSelect.input = '';
+    },
+
+    clearCityInfo() {
+      let self = this;
+      self.curCity = [];
+      self.$refs.citySelect.selectedArray = [];
+      self.$refs.citySelect.input = '';
+    },
+
+    changeStore(val) {
+      let self = this;
+      let str = '';
+      self.tempStoreData.forEach((item) => {
+        val.forEach(_item => {
+          if (item.storeId === _item) {
+            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
+              item.tagIds.forEach(t_item => {
+                if ((t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1')) {
+                  str += _item + '，';
+                }
+              });
+            }) : (item.storeId === _item ? str += _item + '，' : null);
+          }
+        });
+      });
+      str = str.substr(0, str.length - 1);
+      self.storeStr = str;
+      self.searchEventList();
+    },
+
+    dateChange(val) {
+      let self = this;
+      console.log(val);
+      let tabIndex = Number(self.activeName);
+      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      if ((end - start) / (3600 * 24 * 30 * 1000) > 1) { // 当前选择的时间范围超过了30天
+        self.$message({
+          message: this.$t('eventView.changeTimeRange'),
+          type: 'warning',
+          duration: 3 * 1000
+        });
+        start = end - 3600 * 24 * 30 * 1000;
+        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+      } else {
+        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+      }
+      self.serachVale = '';
+      self.tableDataList[tabIndex].page = 1;
+      self.getEventList(0);
+      self.getEventCount();
+    },
+
+    handleTabClick(val) {
+      let self = this;
+      if (Number(val.index) < 4) {
+        self.curState = [Number(val.index)];
+      } else {
+        let stateArr = [];
+        self.states.forEach(item => {
+          stateArr.push(item.value);
+        });
+        self.curState = stateArr;
+        self.curState.unshift('-1');
+      }
+      self.getEventList();
+    },
+
+    searchEventList() {
+      let self = this;
+      self.serachVale = '';
+      self.tableDataList[Number(self.activeName)].page = 1;
+      self.getEventList();
+      self.getEventCount();
+    },
+
+    searchData() {
+      let self = this;
+      self.tableDataList[Number(self.activeName)].page = 1;
+      self.getEventList();
+      self.getEventCount();
+    },
+
+    rowClickItem(row) {
+      let self = this;
+      this.event = row;
+      sessionStorage.setItem('event', JSON.stringify(this.event));
+      sessionStorage.setItem('queryparams', JSON.stringify(self.params));
+      this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+    },
+
+    toEventDetail(row) {
+      console.log(row);
+      let self = this;
+      this.event = row;
+      sessionStorage.setItem('event', JSON.stringify(this.event));
+      sessionStorage.setItem('queryparams', JSON.stringify(self.params));
+      this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+    },
+
+    sortChange(col) {
+      console.log(col);
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      self.tableDataList[tabIndex].page = 1;
+      let order = col.order;
+      self.order = order;
+      let prop = '';
+      let tempOrder = '';
+      if (order === 'ascending') {
+        self.params.order = {
+          'direction': 'asc',
+          'property': col.column.property
+        };
+        prop = col.column.property;
+        tempOrder = 'asc';
+      } else if (order === 'descending') {
+        self.params.order = {
+          'direction': 'desc',
+          'property': col.column.property
+        };
+        prop = col.column.property;
+        tempOrder = 'desc';
+      } else {
+        self.params.order = {};
+      }
+      self.sortColumnOfTab[tabIndex].sortType.prop = prop;
+      self.sortColumnOfTab[tabIndex].sortType.order = tempOrder;
+      self.getEventList();
+    },
+
+    async getEventList(val) {
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      let like = {};
+      if (self.serachVale.trim().length !== 0) {
+        like = { subject: self.serachVale.trim(), assignerName: self.serachVale.trim(), storeName: self.serachVale.trim() };
+      } else {
+        like = {};
+      }
+      let storeId = self.storeStr.split('，');
+      let status = [];
+      if (self.curState.length !== 0) {
+        if (self.curState.length === 1) {
+          status = self.curState[0];
+        } else {
+          let allStatus = self.curState.some(item => item === '-1');
+          if (allStatus) {
+            status = [0, 1, 2, 3];
+          } else {
+            status = self.curState;
+          }
+        }
+      } else {
+        status = -1;
+      }
+      let page = 0;
+      if (val === 'currentChange') {
+        page = self.tableDataList[tabIndex].page - 1;
+      }
+      if (val === 'Back') {
+        page = self.params.filter.page;
+      }
+      let start = '', end = '';
+      if (val === 0) {
+        start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+      } else {
+        start = self.dateValue[0];
+        let endTime = self.dateValue[1];
+        end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      }
+      self.params = {
+        beginTs: start,
+        endTs: end,
+        clause: {
+          status: status,
+          storeId: storeId
+        },
+        filter: {
+          page: page,
+          size: self.tableDataList[tabIndex].sizeNum
+        },
+        like: like
+      };
+      let curTabSortColumn = self.sortColumnOfTab[tabIndex];
+      let order = curTabSortColumn.sortType.order;
+      let prop = curTabSortColumn.sortType.prop;
+      if (order !== '' && prop !== '') {
+        self.params.order = {
+          direction: order,
+          property: prop
+        };
+      } else {
+        self.params.order = {
+          direction: 'desc',
+          property: 'ts'
+        };
+      }
+      // if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
+      //     if(tabIndex==4){
+      //         for(var key in self.params){
+      //             if(key=='clause'){
+      //                 delete self.params.clause.assigner
+      //             }
+      //         }
+      //     }
+      // }
+      eventRESTful.getEventList(self.params).then((res) => {
+        let data = res.data.content;
+        let temp = [];
+        data.forEach(item => {
+          let attachment = [];
+          if (item.initialComment.attachment.length !== 0) {
+            item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
+            item.initialComment.attachment.some(x => x.mediaType === 1) ? attachment.push({ url: self.attachmentVideo }) : '';
+            item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
+          }
+          let obj = {
+            id: item.id,
+            ts: util.getDateTime(item.ts),
+            assignee: item.assignee,
+            assignerName: item.assignerName,
+            assigneeName: item.assigneeName,
+            deviceId: item.deviceId,
+            status: item.status,
+            storeId: item.storeId,
+            storeName: item.storeName,
+            inspectTagName: item.inspectTagName,
+            subject: item.subject,
+            score: item.score,
+            sourceType: item.sourceType,
+            attachment: attachment,
+            initialComment: item.initialComment,
+            relatedDeviceIds: item.relatedDeviceIds
+          };
+          temp.push(obj);
+        });
+        self.tableDataList[tabIndex].tableData = temp;
+        self.tableDataList[tabIndex].total = res.data.totalElements;
+        // if(tabIndex==0){
+        self.tableDataList[tabIndex].eventCount = res.data.totalElements;
+        self.totalElements = res.data.totalElements;
+        self.numberOfElements = res.data.numberOfElements;
+        // }
+      }).catch(err => {
+        console.log('Error:' + err);
+      });
+    },
+
+    sizeChange(val) {
+      let self = this;
+      self.tableDataList[Number(self.activeName)].sizeNum = val;
+      self.tableDataList[Number(self.activeName)].page = 1;
+      self.getEventList();
+    },
+
+    currentChange(val) {
+      let self = this;
+      self.tableDataList[Number(self.activeName)].page = val;
+      self.getEventList('currentChange');
+
+      let dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+      let offestTop = dom.offsetTop;
+      if (dom != undefined) {
+        document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop = 0;
+      }
+    },
+
+    getEventCount() {
+      let self = this;
+      let start = self.dateValue[0];
+      let endTime = self.dateValue[1];
+      let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      let storeId = self.storeStr.split('，');
+      let like = {};
+      if (self.serachVale.trim().length !== 0) {
+        like = { subject: self.serachVale.trim(), assignerName: self.serachVale.trim(), storeName: self.serachVale.trim() };
+      } else {
+        like = {};
+      }
+      let params = {
+        beginTs: start,
+        endTs: end,
+        clause: {
+          storeId: storeId
+        },
+        like: like
+      };
+      eventRESTful.GetEventCountByStatus(params).then(res => {
+        let data = res.data;
+        let errMsg = res.errMsg;
+        let numOfEventTotal = 0;
+        for (let i = 0; i < 4; i++) {
+          self.tableDataList[i].eventCount = data[i].numOfEvent;
+          numOfEventTotal += data[i].numOfEvent;
+        }
+        self.tableDataList[4].eventCount = numOfEventTotal;
+      });
+    },
+
+    getExportDataSize() {
+      let self = this;
+      let params = self.params;
+      params.filter = {};
+      return new Promise((resolve, reject) => {
+        eventRESTful.getEventList(params).then((res) => {
+          console.log(res);
+          let size = res.data.totalElements;
+          resolve(size);
+        })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+
+    async getExportData() {
+      let self = this;
+      let size = await self.getExportDataSize();
+      self.params.filter = {
+        'page': 0,
+        'size': size
+      };
+      return new Promise((resolve, reject) => {
+        eventRESTful.getEventList(self.params).then((res) => {
+          console.log(res);
+          let data = res.data.content;
+          let temp = [];
+          data.forEach(item => {
+            let obj = {};
+            obj.subject = item.subject;
+            obj.storeName = item.storeName;
+            obj.inspectTagName = item.inspectTagName;
+            obj.assignerName = item.assignerName;
+            obj.ts = util.getDateTime(item.ts);
+            temp.push(obj);
+          });
+          resolve(temp);
+        }).catch(err => {
+          console.log('Error:' + err);
+        });
+      });
+    },
+
+    getExportFileName() {
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      console.log(tabIndex);
+      let label = '';
+      switch (tabIndex) {
+        case 0: label = this.$t('eventView.pendingEve'); break;
+        case 1: label = this.$t('eventView.ProcessedEvent'); break;
+        case 2: label = this.$t('eventView.ClosedEvent'); break;
+        case 3: label = this.$t('eventView.ReturnEvent'); break;
+        case 4: label = this.$t('eventView.allEvents'); break;
+        default: console.error('error tab pages！'); break;
+      }
+      let fileName = label + '-' + util.getCurDateStr();
+      return fileName;
+    },
+
+    async export2Excel() {
+      var that = this;
+      let ret = await that.isLoginIn();
+      if (ret.data != undefined && ret.data.isLogin) {
+        let tabIndex = Number(that.activeName);
+        if (that.tableDataList[tabIndex].tableData.length === 0) {
+          that.$message({
+            message: this.$t('eventView.noEvents'),
+            type: 'warning',
+            duration: 3 * 1000
+          });
+          return false;
+        }
+        require.ensure([], async() => {
+          let { export_json_to_excel } = require('@/excel/Export2Excel');
+          let tHeader = that.exportDataHeader;
+          let filterVal = ['subject', 'storeName', 'inspectTagName', 'assignerName', 'ts'];
+          console.log(that.activeName);
+          let curData = await that.getExportData();
+          let data = that.formatJson(filterVal, curData);
+          export_json_to_excel(tHeader, data, that.getExportFileName());
+        });
+      } else {
+        window.location.href = 'https://portals.storeviu.com';
+      }
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+
+    getDeafultTime() {
+      let self = this;
+      let date = new Date();
+      let hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+      let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+      let second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+      let dateStr = hour + ':' + minutes + ':' + second;
+      let timeTemp = [];
+      timeTemp[0] = dateStr;
+      timeTemp[1] = dateStr;
+      self.defaultTime = timeTemp;
+    },
+
+    isLoginIn() {
+      let self = this;
+      return new Promise((resolve, reject) => {
+        isLoginIn().then(res => {
+          console.log(res);
+          resolve(res);
+        });
+      }).catch(err => {
+        console.log(err);
+      });
+    },
+
+    initData() {
+      let self = this;
+      self.activeName = '0';
+      // self.value = 0;
+      self.dateValue = [new Date().setTime(new Date().getTime() - 3600 * 1000 * 24), new Date()];
+      self.serachVale = '';
+      self.total = 0;
+      self.page = 1;
+      self.sizeNum = 10;
+      self.params = {};
+      self.getDeafultTime();
+      let windowHeight = window.innerHeight;
+      if (windowHeight > 800) {
+        self.tableHeight = 770 + 'px';
+      }
+      self.getCountryStore();
+      self.getTagListData();
+    }
+  },
+
+  beforeRouteEnter(to, from, next) {
+    to.meta.keepAlive = true;
+    if (from.name === 'eventDetails' && to.name === 'eventManage') {
+      to.meta.isBack = true;
+      next();
+    } else {
+      to.meta.isBack = false;
+      next();
+    }
+  },
+
+  beforeRouteLeave(to, from, next) {
+    console.log(this.params);
+    if (to.name !== 'eventDetails') {
+      from.meta.keepAlive = false;
+      next(vm => {
+        console.log(vm);
+      });
+    } else {
+      from.meta.keepAlive = true;
+      next(vm => {
+        console.log(vm);
+      });
+    }
+  }
+
+};
 </script>
 
 <style lang="scss" scoped>
