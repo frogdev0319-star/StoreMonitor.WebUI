@@ -1,6 +1,6 @@
 export default {
-  lengthFilter(content,count){
-    content = content.replace(/(^\s*)/g, "");
+  lengthFilter(content, count) {
+    content = content.replace(/(^\s*)/g, '');
     if (content.replace(/[^\x00-\xff]/g, '**').length <= count) {
       return content;
     }
@@ -17,29 +17,30 @@ export default {
     }
   },
 
-
-  emojiFilter(content){
-    content = content.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]|[\uD800-\uDBFF]|[\uDC00-\uDFFF]/g, "");
-    return content.replace(/[^\u0020-\u007E\u00A0-\u00BE\u2E80-\uA4CF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF\u0080-\u009F\u2000-\u201f\u2026\u2022\u20ac\r\n]/g, "");
+  emojiFilter(content) {
+    content = content.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]|[\uD800-\uDBFF]|[\uDC00-\uDFFF]/g, '');
+    return content.replace(/[^\u0020-\u007E\u00A0-\u00BE\u2E80-\uA4CF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF\u0080-\u009F\u2000-\u201f\u2026\u2022\u20ac\r\n]/g, '');
   },
 
-  unicodeFilter(content){
-    return content.replace(/[^a-zA-Z0-9,、 \u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29\u{20000}-\u{2A6D6}\u{2A700}-\u{2B734}\u{2B740}-\u{2B81D}\u{2B820}-\u{2CEA1}\u{2CEB0}-\u{2EBE0}]/ug,'');
+  unicodeFilter(content) {
+    return content.replace(/[^a-zA-Z0-9,、 \u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29\u{20000}-\u{2A6D6}\u{2A700}-\u{2B734}\u{2B740}-\u{2B81D}\u{2B820}-\u{2CEA1}\u{2CEB0}-\u{2EBE0}]/ug, '');
   },
 
-   standard(content,count){
-    let unicodeContent = this.unicodeFilter(content);
-    let emojiContent = this.emojiFilter(unicodeContent);
+  standard(content, count) {
+    const unicodeContent = this.unicodeFilter(content);
+    const emojiContent = this.emojiFilter(unicodeContent);
 
-    return (count != null) ? this.lengthFilter(emojiContent,count) : emojiContent;
+    return (count != null) ? this.lengthFilter(emojiContent, count) : emojiContent;
   },
-  all(content,count){
-    let emojiContent = this.emojiFilter(content);
-    return (count != null) ? this.lengthFilter(emojiContent,count) : emojiContent;
+
+  all(content, count) {
+    const emojiContent = this.emojiFilter(content);
+    return (count != null) ? this.lengthFilter(emojiContent, count) : emojiContent;
   },
-  getContentLength(content){
-    let length = content.replace(/[^\x00-\xff]/g, '**').length;
+
+  getContentLength(content) {
+    const length = content.replace(/[^\x00-\xff]/g, '**').length;
     return length;
   }
-}
+};
 

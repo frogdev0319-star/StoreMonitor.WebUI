@@ -1,67 +1,67 @@
-import request from '@/common/request'
-import Environment from '@/common/environment'
+import request from '@/common/request';
+import Environment from '@/common/environment';
 const version = Environment.VERSION;
-//const version='v1.0';
-export const getScheduleBindList=params=>{
+
+export const getScheduleBindList = params => {
   return request({
-    url:`${version}/schedule/bind/list`,
-    method:'get',
+    url: `${version}/schedule/bind/list`,
+    method: 'get',
     params
-  })
-}
+  });
+};
 
-export const addNewSchedule=data=>{
+export const addNewSchedule = data => {
   return request({
-    url:`${version}/schedule/add`,
-    method:'post',
+    url: `${version}/schedule/add`,
+    method: 'post',
     data
-  })
-}
+  });
+};
 
-export const getScheduleListService=params=>{
+export const getScheduleListService = params => {
   return request({
-    url:`${version}/schedule/list`,
-    method:'get',
+    url: `${version}/schedule/list`,
+    method: 'get',
     params
-  })
-}
+  });
+};
 
-export const bindScheduleAndStore=data=>{
+export const bindScheduleAndStore = data => {
   return request({
-    url:`${version}/schedule/bind`,
-    method:'post',
+    url: `${version}/schedule/bind`,
+    method: 'post',
     data
-  })
-}
+  });
+};
 
-export const unbindScheduleAndStore=data=>{
+export const unbindScheduleAndStore = data => {
   return request({
-    url:`${version}/schedule/unbind`,
-    method:'post',
+    url: `${version}/schedule/unbind`,
+    method: 'post',
     data
-  })
-}
+  });
+};
 
-export const updateSchedule=data=>{
+export const updateSchedule = data => {
   return request({
-    url:`${version}/schedule/update`,
-    method:'post',
+    url: `${version}/schedule/update`,
+    method: 'post',
     data
-  })
-}
+  });
+};
 
-export const deleteScheduleService=data=>{
+export const deleteScheduleService = data => {
   return request({
-    url:`${version}/schedule/delete`,
-    method:'post',
+    url: `${version}/schedule/delete`,
+    method: 'post',
     data
-  })
-}
+  });
+};
 
-export const GetScheduleTaskList=data=>{
+export const GetScheduleTaskList = data => {
   return request({
-    url:`${version}/schedule/task/list`,
-    method:'post',
+    url: `${version}/schedule/task/list`,
+    method: 'post',
     data
-  })
-}
+  });
+};

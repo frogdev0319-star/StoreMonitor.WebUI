@@ -1,2061 +1,1807 @@
 <template>
   <div >
-    <div class="errorVideo-model" v-if="showError" :class="isEvent? 'event-error': ''" ref="errorModel">
-      <span>{{errorMsg}}</span>
+    <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+      <span>{{ errorMsg }}</span>
     </div>
     <div v-else>
-      <div class="video-content"  id="videoContent" ref="videoContent" :style="isEvent?{}: {'margin-bottom': 0}"
-           @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-if="!fullWindow"
-           v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0.8)">
-        <!-- 录像时的动画 -->
-        <div class="getvideo-content" v-if="showGetVideo">
-          <div class="btn-graph">
-            <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
-          </div>
-          <canvas id="vcanvas"  :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'"></canvas>
-          <img :src="imgSrc" id="imgTest" :width="varyWindowWidth*0.48+'px'" :height="varyWindowWidth*0.28+'px'" style="display: none"/>
-        </div>
-        <span id="channelName" v-if="showInfoContent && channelInfo">{{channelInfo.channelName}}</span>
-        <div class="icon-footer" v-if="showInfoContent|| playBackState">
+      <div
+        v-loading="isLoading"
+        v-if="!fullWindow"
+        id="videoContent"
+        ref="videoContent"
+        :style="isEvent ? {}: {'margin-bottom': 0}"
+        class="video-content"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+        @mouseleave="hiddenModel"
+        @mouseenter="showModel"
+        @mousemove="showModel">
+        <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
+        <div v-if="showInfoContent || playBackState" class="icon-footer">
           <div class="iconlside">
-            <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-if="playState"></i>
-            <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-else></i>
+            <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
+            <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
           </div>
           <div class="iconlside">
-            <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
-            <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
+            <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
+            <i v-else class="iconfont icon-auido icon-jingyin " @click="openSound"/>
           </div>
           <div class="footer-right">
-            <div class="iconrside" v-if="playBackState">
+            <div v-if="playBackState" class="iconrside">
               <div class="speed-content">
-                <span>{{$t('storeMonitor.back')}}</span>
-                <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
+                <span>{{ $t('remotePatrol.back') }}</span>
+                <el-select :value="curBack" :popper-class="popperClass" :popper-append-to-body="false"
+                           class="el-test" size="mini" placeholder="">
                   <el-option
                     v-for="(item) in backList"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
                     @click.native="adjustProcess(item.value, item.label)"
-                  >
-                  </el-option>
+                  />
                 </el-select>
               </div>
             </div>
             <div class="iconrside">
               <div class="speed-content">
-                  <span>{{$t('storeMonitor.ezuikitwidth')}}</span>
-                  <el-select class="el-test" size="mini" :value="proportion" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
-                      <el-option
-                        v-for="(item,index) in proportionList" 
-                        :key="index"
-                        :label="item.label"
-                        :value="item.label"
-                        @click.native="checkPro(item.label)"
-                      >
-                      </el-option>
-                    </el-select>
-                  <!-- <el-dropdown trigger="click" size="mini" split-button style="height:30px;">
-                    <span style="width:80px;">{{proportion}}</span>
-                    <el-dropdown-menu slot="dropdown" style="width:80px;">
-                      <el-dropdown-item v-for="(item,index) in proportionList" :key="index" @click.native="checkPro(item)">{{item.label}}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown> -->
+                <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+                <el-select :value="proportion" :popper-class="popperClass" :popper-append-to-body="false"
+                           class="el-test" size="mini" placeholder="">
+                  <el-option
+                    v-for="(item,index) in proportionList"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.label"
+                    @click.native="checkPro(item.label)"
+                  />
+                </el-select>
               </div>
             </div>
             <div class="screen-content">
-              <i class="iconfont iconscreen"
-                :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
-              <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+              <i
+                :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
+                class="iconfont iconscreen"
+                @click="controlScreen"/>
+              <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
             </div>
           </div>
         </div>
-        <div class="progress-content" v-if="playBackState">
-          <b-progress id="bprogress" :value="currentTimeValue" :max="durationTimeValue" class="mb-3 prog" height="0.2rem"></b-progress>
+        <div v-if="playBackState" class="progress-content">
+          <b-progress id="bprogress" :value="currentTimeValue" :max="durationTimeValue" class="mb-3 prog"
+                      height="0.2rem"/>
         </div>
-        <transition name='fade'>
-          <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent && !isEvent" @click="cutPicture">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-            <span>{{generatePatrolLang('snapshot')}}</span>
+        <transition name="fade">
+          <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
+            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+            <span>{{ $t('remotePatrol.snapshot') }}</span>
           </div>
         </transition>
         <transition name="fade">
-          <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent && !isEvent" @click="getVideo" style="display: none">
-            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
-            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
-            <span>{{generatePatrolLang('record')}}</span>
+          <div v-if="showModelContent && !isEvent" :class="lang === 'en'? 'en-iconright1' : 'iconright1'"
+               style="display: none" @click="getVideo">
+            <i v-if="lang === 'en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
+            <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
+            <span>{{ $t('remotePatrol.record') }}</span>
           </div>
         </transition>
-        <div id="myPlayer" ref="myPlayer"></div>
+        <div id="myPlayer" ref="myPlayer"/>
       </div>
-      <!-- 全屏时 -->
-      <div class="video-content"  id="videoContent" ref="videoContent"
-           @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel"  v-else
-           v-loading="isLoading" element-loading-background="rgba(0, 0, 0, 0.8)">
+      <!-- full screen -->
+      <div
+        v-loading="isLoading"
+        v-else
+        id="videoContent"
+        ref="videoContent"
+        class="video-content"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+        @mouseleave="hiddenModel"
+        @mouseenter="showModel"
+        @mousemove="showModel">
         <div class="video-model">
-          <span id="channelName" v-if="showInfoContent">{{channelInfo.channelName}}</span>
-          <div class="icon-footer" v-if="showInfoContent">
+          <span v-if="showInfoContent" id="channelName">{{ channelInfo.channelName }}</span>
+          <div v-if="showInfoContent" class="icon-footer">
             <div class="iconlside">
-              <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
-              <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+              <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+              <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
             </div>
             <div class="iconlside">
-              <i class="iconfont icon-auido icon-shengyin1" @click="closeSound" v-if="ifOpenSound"></i>
-              <i class="iconfont icon-auido icon-jingyin " @click="openSound" v-else></i>
+              <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
+              <i v-else class="iconfont icon-auido icon-jingyin " @click="openSound"/>
             </div>
             <div class="footer-right">
-              <div class="iconrside" v-if="playBackState">
+              <div v-if="playBackState" class="iconrside">
                 <div class="speed-content">
-                  <span>{{$t('storeMonitor.back')}}</span>
-                  <el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder='' :popper-append-to-body="false">
+                  <span>{{ $t('remotePatrol.back') }}</span>
+                  <el-select :value="curBack" :popper-class="popperClass" :popper-append-to-body="false"
+                             class="el-test" size="mini" placeholder="">
                     <el-option
                       v-for="(item) in backList"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
                       @click.native="adjustProcess(item.value, item.label)"
-                    >
-                    </el-option>
+                    />
                   </el-select>
                 </div>
               </div>
               <div class="iconrside">
-                  <div class="speed-content">
-                    <span>{{$t('storeMonitor.ezuikitwidth')}}</span>
-                    <el-select class="el-test" size="mini" :value="proportion" :popper-class="popperClass"  placeholder='' :popper-append-to-body="false">
-                        <el-option
-                          v-for="(item,index) in proportionList" 
-                          :key="index"
-                          :label="item.label"
-                          :value="item.label"
-                          @click.native="checkPro(item.label)"
-                        >
-                        </el-option>
-                    </el-select>
-                  </div>
+                <div class="speed-content">
+                  <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+                  <el-select :value="proportion" :popper-class="popperClass" :popper-append-to-body="false"
+                             class="el-test" size="mini" placeholder="">
+                    <el-option
+                      v-for="(item,index) in proportionList"
+                      :key="index"
+                      :label="item.label"
+                      :value="item.label"
+                      @click.native="checkPro(item.label)"
+                    />
+                  </el-select>
+                </div>
               </div>
               <div class="screen-content">
-                <i class="iconfont iconscreen"
-                  :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"  @click="controlScreen"></i>
-                <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
+                <i
+                  :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
+                  class="iconfont iconscreen"
+                  @click="controlScreen"/>
               </div>
             </div>
           </div>
-          <div class="progress-content" v-if="playBackState">
-            <b-progress id="bprogress" :value="currentTimeValue" :max="durationTimeValue" class="mb-3 prog" height="0.2rem" style="margin-bottom:0px !important;"/>
+          <div v-if="playBackState" class="progress-content">
+            <b-progress id="bprogress" :value="currentTimeValue" :max="durationTimeValue"
+                        class="mb-3 prog" height="0.2rem" style="margin-bottom:0px !important;"/>
           </div>
         </div>
 
-        <transition name='fade'>
-          <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent && !isEvent" @click="cutPicture">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
-            <span>{{generatePatrolLang('snapshot')}}</span>
-          </div>
-        </transition>
         <transition name="fade">
-          <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent && !isEvent" @click="getVideo" style="display:none;">
-            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
-            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
-            <span>{{generatePatrolLang('record')}}</span>
+          <div v-if="showModelContent && !isEvent" :class="lang === 'en' ? 'en-iconright' : 'iconright'" @click="cutPicture">
+            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+            <span>{{ $t('remotePatrol.snapshot') }}</span>
           </div>
         </transition>
-        <div id="fullPlayer" ref="myPlayer"></div>
+        <div id="fullPlayer" ref="myPlayer"/>
       </div>
     </div>
 
-    <el-dialog :title="generatePatrolLang('edit')"
-               :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
+    <el-dialog
+      v-if="showCutDialog"
+      :title="$t('remotePatrol.edit')"
+      :visible.sync="showCutDialog"
+      :close-on-click-modal="false"
+      :width="860*percentHeight+'px'"
+      height="300px"
+      top="5%">
       <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler" >
-        <hr class="dialog-hr"/>
-        <div class='icon-right' v-if="showPenBtn" id="iconR">
-          <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
-          <transition name='fadepen'>
-            <div class="pen-content" v-if="showPen">
-              <div class="content" v-for="(item,index) in penList" :key="index">
-                <div :class="{colorActive:item.showContent}"></div>
-                <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+        <hr class="dialog-hr">
+        <div v-if="showPenBtn" id="iconR" class="icon-right">
+          <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+          <transition name="fadepen">
+            <div v-if="showPen" class="pen-content">
+              <div v-for="(item,index) in penList" :key="index" class="content">
+                <div :class="{colorActive:item.showContent}"/>
+                <div :id="item.id" class="color" @click="checkPen(item,index)"/>
               </div>
             </div>
           </transition>
         </div>
-        <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
-                @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)"></canvas>
-        <img :src="imgSrc" id="imgTest" style="display: none"/>
-        <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
-                    'margin-left':47*percentHeight+'px'}">
+        <canvas
+          id="icanvas"
+          :width="767*percentHeight"
+          :height="431*percentHeight"
+          @mousedown="mouseDownAction($event)"
+          @mousemove="mouseMoveAction($event)"
+          @mouseleave="mouseLeaveAction($event)"/>
+        <img id="imgTest" :src="imgSrc" style="display: none">
+        <div
+          v-if="showCancelContent"
+          :style="{'width':767*percentHeight+'px',
+                   'margin-left':47*percentHeight+'px'}"
+          class="cancel-content">
           <div class="content" @click="cancelEditCanvas">
-            <img :src="clearIconSrc" class="icon-clear" height="22px"/>
-            <span>{{generatePatrolLang('clear')}}</span>
+            <img :src="clearIconSrc" class="icon-clear" height="22px">
+            <span>{{ $t('remotePatrol.clear') }}</span>
           </div>
           <div class="content" @click="confirmEditCanvas">
-            <img :src="removeIconSrc" class="icon-clear" height="22px"/>
-            <span>{{generatePatrolLang('cancel')}}</span>
+            <img :src="removeIconSrc" class="icon-clear" height="22px">
+            <span>{{ $t('remotePatrol.cancel') }}</span>
           </div>
         </div>
       </div>
       <div slot="footer">
-        <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
-        <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
+        <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
       </div>
     </el-dialog>
-    <el-dialog :title= "generatePatrolLang('feedbacks')"
-               :visible.sync="showFeedDialog2" :close-on-click-modal="false" v-if="showFeedDialog2" :width="860*percentHeight+'px'" height=300px top=5%>
+    <!--feedback based on snapshot -->
+    <el-dialog
+      v-if="showSnapshotFeedbackDialog"
+      :title= "$t('remotePatrol.feedbacks')"
+      :visible.sync="showSnapshotFeedbackDialog"
+      :close-on-click-modal="false"
+      :width="860*percentHeight+'px'"
+      height="300px"
+      top="5%">
       <div class="canvas-content" style="overflow:hidden;">
-        <hr class="dialog-hr"/>
+        <hr class="dialog-hr">
         <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-          <div class='icon-right' v-if="showPenBtn" id="iconR">
-            <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
-            <transition name='fadepen'>
-              <div class="pen-content" v-if="showPen">
-                <div class="content" v-for="(item,index) in penList" :key="index">
-                  <div :class="{colorActive:item.showContent}"></div>
-                  <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+          <div v-if="showPenBtn" id="iconR" class="icon-right">
+            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+            <transition name="fadepen">
+              <div v-if="showPen" class="pen-content">
+                <div v-for="(item,index) in penList" :key="index" class="content">
+                  <div :class="{colorActive:item.showContent}"/>
+                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
                 </div>
               </div>
             </transition>
           </div>
-          <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)" @mouseup="mouseUpHandler"
-                  @mousemove="mouseMoveAction($event)" @mouseleave="mouseLeaveAction($event)"></canvas>
-          <img :src="imgSrc" id="imgTest" style="display: none"/>
-          <div class="cancel-content" v-if="showCancelContent" :style="{'width':520*percentHeight+'px',
-                        'margin-left':47*percentHeight+'px'}">
+          <canvas
+            id="icanvas"
+            :width="520*percentHeight"
+            :height="340*percentHeight"
+            @mousedown="mouseDownAction($event)"
+            @mouseup="mouseUpHandler"
+            @mousemove="mouseMoveAction($event)"
+            @mouseleave="mouseLeaveAction($event)"/>
+          <img id="imgTest" :src="imgSrc" style="display: none">
+          <div
+            v-if="showCancelContent"
+            :style="{'width':520*percentHeight+'px',
+                     'margin-left':47*percentHeight+'px'}"
+            class="cancel-content">
             <div class="content" @click="cancelEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px"/>
-              <span>{{generatePatrolLang('clear')}}</span>
+              <img :src="clearIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.clear') }}</span>
             </div>
             <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px"/>
-              <span>{{generatePatrolLang('cancel')}}</span>
+              <img :src="removeIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.cancel') }}</span>
             </div>
           </div>
         </div>
         <div class="event-content">
-          <span class="event-title"><span class="is-required">*</span>{{generatePatrolLang('name')}}</span>
-          <el-input size="mini" class="name-input" v-model="eventName" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"></el-input>
-          <span class="rules" style="margin-left:0;" v-if="eventNameRuletip">{{generatePatrolLang('eventNameRuletip')}}</span>
-          <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
-          <span class="event-title">{{generatePatrolLang('description')}}</span>
-          <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
-                    @input="eventDesChanged" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')" @blur="notShowInputRuleTips('eventDes')"></el-input>
-          <span class="rules" style="margin-left:0;"  v-if="eventDesRuletip">{{generatePatrolLang('comentRuletip')}}</span>
+          <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
+          <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged"
+                    @blur="notShowInputRuleTips('eventName')"/>
+          <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+          <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
+          <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <el-input
+            :autosize="{ minRows: 4, maxRows:7}"
+            v-model="eventDes"
+            :placeholder="$t('remotePatrol.descPlaceholder')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="eventDesChanged"
+            @blur="notShowInputRuleTips('eventDes')"/>
+          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
         </div>
       </div>
       <div slot="footer">
-        <el-button id="cancelBtn" @click="showFeedDialog2 = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
-        <el-button id="confirmBtn" @click="confirmAddFeedBack2" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
+        <el-button id="cancelBtn" size="mini" @click="showSnapshotFeedbackDialog = false">
+          {{ $t('remotePatrol.cancel') }}
+        </el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmFeedBackOnSnapshot">
+          {{ $t('remotePatrol.confirm') }}
+        </el-button>
       </div>
     </el-dialog>
-    <el-dialog  :title="$t('storeMonitor.enterPassword')"
-                :visible.sync="showInputPassword" v-if="showInputPassword"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                @close='closeDialog'
-                width="28%"
-                top="35vh"
-                left="40vh">
+
+    <!-- enter device validate code -->
+    <el-dialog
+      v-if="showInputPassword"
+      :title="$t('remotePatrol.enterPassword')"
+      :visible.sync="showInputPassword"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      width="28%"
+      top="35vh"
+      left="40vh"
+      @close="closeDialog">
       <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #dfe2e9;"/>
+        <hr style="border: 0.5px solid #dfe2e9;">
         <div style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-          <p>{{$t("storeMonitor.contactInfo") }}</p>
-          <el-input :placeholder="$t('storeMonitor.enterPassword')" v-model="videoPassword" show-password size="mini"></el-input>
-          <p>{{$t("storeMonitor.initialCode") }}</p>
+          <p>{{ $t("remotePatrol.contactInfo") }}</p>
+          <el-input :placeholder="$t('remotePatrol.enterPassword')" v-model="videoPassword" show-password size="mini"/>
+          <p>{{ $t("remotePatrol.initialCode") }}</p>
         </div>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button class="file-cancel-btn" @click="cancelEnterPassword" size="mini" style="">{{$t('storeMonitor.cancel')}}</el-button>
-        <el-button class="file-confirm-btn" @click="verifyEnterPassword" size="mini" type="primary">{{$t('storeMonitor.confirm')}}</el-button>
+        <el-button class="file-cancel-btn" size="mini" style="" @click="cancelEnterPassword">
+          {{ $t('remotePatrol.cancel') }}
+        </el-button>
+        <el-button class="file-confirm-btn" size="mini" type="primary" @click="verifyEnterPassword">
+          {{ $t('remotePatrol.confirm') }}
+        </el-button>
       </div>
     </el-dialog>
-    <el-dialog :title="generatePatrolLang('feedbacks')"
-               :visible.sync="showFeedDialog3" :close-on-click-modal="false" v-if="showFeedDialog3" :width="860*percentHeight+'px'" height=300px top=5%>
-      <div class="canvas-content" style="overflow:hidden;">
-        <hr class="dialog-hr"/>
-        <div class="feed-canvas-content" style="text-align:center">
-          <video  :width="520*percentHeight" :height="340*percentHeight" id="previewCutVideo" prload controls autoplay :src="feedBackVideoFileObj.src"></video>
-        </div>
-        <div class="event-content">
-          <span class="event-title">{{generatePatrolLang('name')}}</span>
-          <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
-          <span class="event-title">{{generatePatrolLang('description')}}</span>
-          <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4}"
-                    maxlength="300" v-model="eventDes" :placeholder="generatePatrolLang('descPlaceholder')"></el-input>
-        </div>
-      </div>
-      <div slot="footer">
-        <el-button id="cancelBtn" @click="showFeedDialog3 = false" size="mini">{{generatePatrolLang('cancel')}}</el-button>
-        <el-button id="confirmBtn" @click="confirmAddFeedBack3" size="mini" type="primary">{{generatePatrolLang('confirm')}}</el-button>
-      </div>
-    </el-dialog>
+
   </div>
 </template>
 
 <script>
-  import EZUIKit_China from '../../static/ezuikit/ezuikit_China/ezuikit.js'
-  import EZUIKit_Global from '../../static/ezuikit/ezuikit_Global/ezuikit.js'
-  import {getEzvizAccessToken, getIsEncrypt, updateDevicePassword,getDeviceCapacity} from '@/api/ezviz'
-  import {generatePatrolLang} from '@/api/i18n'
-  import {mapGetters} from 'vuex'
-  import qs from 'qs'
-  import {getCookie} from "../common/auth";
-  import RecordRTC from '../../static/RecordRTC.js'
-  import filterString from "../common/filterString";
-  import Environment from '../common/environment'
+import EZUIKit_China from '../../static/ezuikit/ezuikit_China/ezuikit.js';
+import EZUIKit_Global from '../../static/ezuikit/ezuikit_Global/ezuikit.js';
+import { getEzvizAccessToken, getIsEncrypt, updateDevicePassword, getDeviceCapacity } from '@/api/ezviz';
+import { mapGetters } from 'vuex';
+import qs from 'qs';
+import { getCookie } from '../common/auth';
+import RecordRTC from '../../static/RecordRTC.js';
+import filterString from '../common/filterString';
+import Environment from '../common/environment';
 
-  export default {
-    name: "EzvizVideo",
-    props:{
-      channelInfo:{
-        type: Object,
-      },
-      curDeviceId: {
-        type: Number,
-        default: -1
-      },
-      sourceListLength:{
-        type: Number,
-        default: 0
-      },
-      showFeedBack: {
-        type: Boolean
-      },
-      isEvent:{
-        type:Boolean
-      },
-      isStoreMonitor:{
-        type:Boolean
-      },
-      playBack:{
-        type:Boolean,
-        default: false
-      },
-      curTime:{
-        type: Number
-      },
-      storeId:{
-        type: String,
-        default: ''
-      }
+export default {
+  name: 'EzvizVideo',
+  props: {
+    channelInfo: {
+      type: Object
     },
-    data(){
-      return{
-        areaDomain:null,
-        proportion:'4:3',
-        proportionList:[
-          {label:'4:3'},
-          {label:'16:9'},
-        ],
-        clearIconSrc:require('../../static/img/清除.png'),
-        removeIconSrc:require('../../static/img/撤销.png'),
-        penBtnSrc:require('../../static/img/pen_btn.png'),
-        videoUrl: '',
-        accessToken : '',
-        showError: false,
-        errorMsg: '',
-        varyWindowHeight:window.innerHeight,
-        varyWindowWidth:window.innerWidth,
-        showInfoContent: true,
-        playState: false,
-        fullWindow: false,
-        showModelContent: false,
-        showGetVideo: false,
-        lang: this.$i18n.locale,
-        decoder: null,
-        fullDecoder: null,
-        videoSpeed:0,
-        videoSpeedId: 0,
-        showgongge: false,
-        ifOpenSound: false,
-        showCutDialog:false,
-        imageCanvas:new Image(),
-        imageCanvasList:[],
-        penList:[
-          {
-            id:'white',
-            showContent:false
-          },
-          {
-            id:'red',
-            showContent:true
-          },
-          {
-            id:'yellow',
-            showContent:false
-          }
-        ],
-        penChecked:'red',
-        showCancelContent: false,
-        showPen: false,
-        showPenBtn: false,
-        imgSrc: '',
-        channel: this.channel,
-        canvasEl: '',
-        isMouseDown: false,
-        flag: 0,
-        eventName: '',
-        eventDes: '',
-        showFeedDialog2:false,
-        showFeedDialog3: false,
-        feedBackVideoFileObj: {},
-        timerPlayReal: null,
-        realTimeSpeed: 0,
-        initPlayerWidth: 0,
-        initPlayerHeight: 0,
-        isLoading: false,
-        lang: this.$i18n.locale,
-        currentTimeValue: 0,
-        durationTimeValue: 0,
-        curBack: '',
-        backList:[
-          {
-            value:0,
-            label:'10s'
-          },
-          {
-            value:1,
-            label:'30s'
-          },
-          {
-            value:2,
-            label:'60s'
-          }
-        ],
-        popperClass:'select-popClass',
-        startTime: 0,
-        endTime : 0,
-        times: 0,
-        showBackState: false,
-        playBackState: false,
-        startTs: 0, //保存视频播放过程中的变化毫秒数
-        clickSnapshot: false,
-        showInputPassword: false,
-        videoPassword: '', //加密视频的密码
-        userId: '',
-        startTimeCutVideo:0,
-        endTImeCutVideo:0,
-        isREC:false,
-        recorder: null,
-        isRecordingStarted: false,
-        isStoppedRecording: true,
-        blob: null,
-        ezvizExpireTime: 0,
-        currentStoreId: null,
-        isLoaded: false,
-        editCount: 0,
-        showEventNameInfo: false,
-        changeId: false,
-        eventNameRuletip:false,
-        eventDesRuletip:false
-      }
+    curDeviceId: {
+      type: Number,
+      default: -1
     },
-    async mounted(){
-      let self=this;
-      console.log(self.storeId)
-      console.log(self.accessToken)
-      if(!self.isStoreMonitor){
-        let result = await self.getEzvizAccessToken(self.storeId);
-        self.checkIfEncry();
+    sourceListLength: {
+      type: Number,
+      default: 0
+    },
+    showFeedBack: {
+      type: Boolean
+    },
+    isEvent: {
+      type: Boolean
+    },
+    isStoreMonitor: {
+      type: Boolean
+    },
+    playBack: {
+      type: Boolean,
+      default: false
+    },
+    curTime: {
+      type: Number
+    },
+    storeId: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
+    return {
+      areaDomain: null,
+      proportion: '4:3',
+      proportionList: [
+        { label: '4:3' },
+        { label: '16:9' }
+      ],
+      clearIconSrc: require('../../static/img/clear.png'),
+      removeIconSrc: require('../../static/img/cancel.png'),
+      penBtnSrc: require('../../static/img/edit_btn.png'),
+      videoUrl: '',
+      accessToken: '',
+      showError: false,
+      errorMsg: '',
+      varyWindowHeight: window.innerHeight,
+      varyWindowWidth: window.innerWidth,
+      showInfoContent: true,
+      playState: false,
+      fullWindow: false,
+      showModelContent: false,
+      lang: this.$i18n.locale,
+      decoder: null,
+      fullDecoder: null,
+      videoSpeed: 0,
+      videoSpeedId: 0,
+      showgongge: false,
+      ifOpenSound: false,
+      showCutDialog: false,
+      imageCanvas: new Image(),
+      imageCanvasList: [],
+      penList: [
+        {
+          id: 'white',
+          showContent: false
+        },
+        {
+          id: 'red',
+          showContent: true
+        },
+        {
+          id: 'yellow',
+          showContent: false
+        }
+      ],
+      penChecked: 'red',
+      showCancelContent: false,
+      showPen: false,
+      showPenBtn: false,
+      imgSrc: '',
+      channel: this.channel,
+      canvasEl: '',
+      isMouseDown: false,
+      flag: 0,
+      eventName: '',
+      eventDes: '',
+      showSnapshotFeedbackDialog: false,
+      feedBackVideoFileObj: {},
+      timerPlayReal: null,
+      realTimeSpeed: 0,
+      initPlayerWidth: 0,
+      initPlayerHeight: 0,
+      isLoading: false,
+      lang: this.$i18n.locale,
+      currentTimeValue: 0,
+      durationTimeValue: 0,
+      curBack: '',
+      backList: [
+        {
+          value: 0,
+          label: '10s'
+        },
+        {
+          value: 1,
+          label: '30s'
+        },
+        {
+          value: 2,
+          label: '60s'
+        }
+      ],
+      popperClass: 'select-popClass',
+      startTime: 0,
+      endTime: 0,
+      times: 0,
+      showBackState: false,
+      playBackState: false,
+      startTs: 0,
+      clickSnapshot: false,
+      showInputPassword: false,
+      videoPassword: '',
+      userId: '',
+      blob: null,
+      ezvizExpireTime: 0,
+      currentStoreId: null,
+      isLoaded: false,
+      editCount: 0,
+      showEventNameInfo: false,
+      changeId: false,
+      eventNameRuletip: false,
+      eventDesRuletip: false
+    };
+  },
+
+  watch: {
+    accountChanged(val) {
+      console.log(val);
+      const self = this;
+      if (val != 0) {
+        self.channelInfo = null;
+        self.stopVideo();
       }
-      else{
-      }
-      window.addEventListener("resize", self.resizeFun, false);
-      /**
-       * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
-       */
-      window.addEventListener("visibilitychange",self.visibleChange, false)
     },
 
-    beforeDestroy() {
-      let self = this;
-      console.log(self.playState)
+    stopVideoTime(val) {
+      const self = this;
       window.clearInterval(self.timerPlayReal);
       self.realTimeSpeed = 0;
-      if(self.playState){
-        self.decoder.closeSound();
-        self.decoder.stop();
+      self.stopVideoTime = false;
+      self.timerPlayReal = null;
+      if (self.playState) {
+        self.timerPlayReal = window.setInterval(() => {
+          console.log(self.realTimeSpeed);
+          self.realTimeSpeed = self.realTimeSpeed + 1;
+          console.log(self.realTimeSpeed);
+        }, 1000);
       }
-      // 清除增加屏幕大小变化时的监听器
-      window.removeEventListener('resize', self.resizeFun);
-      window.removeEventListener("visibilitychange",self.visibleChange)
-      self.resizeFun = null;
-      self.visibleChange = null;
     },
-    watch: {
-      accountChanged(val,oldVal){
-        console.log(val);
-        let self=this;
-        if(val!=0){
-          self.channelInfo = null
-          self.stopVideo();
+
+    realTimeSpeed(val) {
+      const self = this;
+      console.log(val);
+      if (val >= 300) {
+        if (self.fullWindow) {
+          if (self.ifOpenSound) {
+            self.fullDecoder.closeSound();
+          }
+          self.fullDecoder.stop();
+        } else {
+          if (self.ifOpenSound) {
+            self.decoder.closeSound();
+          }
+          self.decoder.stop();
         }
-      },
-      showFeedBack(newValue, old){
-        console.log(newValue + 'showFeedBack')
-      },
-      showFeedDialog2(newValue, old){
-        console.log(newValue + 'showFeedDialog2')
-      },
-      stopVideoTime(val, oldVal){
-        console.log('触发定时器停止')
-        let self = this;
-        window.clearInterval(self.timerPlayReal)
-        self.realTimeSpeed = 0;
-        self.stopVideoTime = false;
+        window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
-        if (self.playState) {
-          self.timerPlayReal = window.setInterval(() => {
-            console.log(self.realTimeSpeed)
-            self.realTimeSpeed = self.realTimeSpeed + 1;
-            console.log(self.realTimeSpeed)
-          }, 1000);
-        }
-
-      },
-      //监听播放时间
-      realTimeSpeed(val,oldVal){
-        let self=this;
-        console.log(val);
-        if(val>=300){
-          //五分钟停止视频
-          if(self.fullWindow){
-            if(self.ifOpenSound){
-              self.fullDecoder.closeSound();
-            }
-            self.fullDecoder.stop();
-          }
-          else{
-            if(self.ifOpenSound){
-              self.decoder.closeSound();
-            }
-            self.decoder.stop();
-          }
-          window.clearInterval(self.timerPlayReal);
-          self.timerPlayReal=null;
-          self.playState = false;
-          self.showModelContent = false;
-          self.ifOpenSound = false;
-          self.times = 0;
-          self.playBackState = false;
-        }
-      },
-      async storeId(newValue, oldValue){
-        console.log(newValue);
-        console.log(oldValue);
-        let self = this;
-        if(newValue.length > 0){
-          await self.getEzvizAccessToken(newValue)
-        }
-      },
-    },
-    computed:{
-      graphBtnWidth:function(){
-        return this.varyWindowHeight*0.185;
-      },
-      btnFontSize:function(){
-        return this.varyWindowHeight*0.022;
-      },
-      percentHeight:function(){
-        return this.varyWindowHeight/758;
-      },
-      ...mapGetters({
-        accountChanged:'accountChanged'
-      }),
-      isEzviz() {
-        let self = this;
-        console.log(self.$store.state.user);
-        return self.$store.state.user.isEzviz
+        self.playState = false;
+        self.showModelContent = false;
+        self.ifOpenSound = false;
+        self.times = 0;
+        self.playBackState = false;
       }
     },
-    methods: {
-      generatePatrolLang,
-      checkPro(item){
-        let self = this;
-        self.proportion = item
-        if(self.fullWindow){
-          if(self.playState){
-            if(self.ifOpenSound){
-              self.fullDecoder.closeSound();
-            }
-            self.fullDecoder.stop();
-            self.fullDecoder = null;
-          }
-          self.resetVideoSize()
-        }else{
-          if(self.playState){
-              if(self.ifOpenSound){
-                self.decoder.closeSound();
-              }
-              self.decoder.stop();
-              self.decoder = null;
-            }
-          self.initVideo();
-        }
-      },
-      async changeHistoryTime(newValue){
-        console.log("curTime")
-        let self = this;
-        if(!self.channelInfo.id || !self.channelInfo.ivsId){
-          self.showError = true;
-          self.errorMsg = self.$t('storeMonitor.lackParams')
-          return;
-        }
-        self.showError = false;
-        self.times = 0;
-        console.log('new:', newValue);
-        console.log(self.curTime)
-        self.startTs = newValue;
-        if(newValue == 0){
-          self.playBack =  false;
-        }
-        if(self.playState){
-          self.decoder.stop();
-          self.playState = false
-        }
-        self.$nextTick(()=> {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer)
-          //self.initVideo();
-          self.checkIfEncry();
-        })
-      },
-      visibleChange(){
-        console.log('子组件退出')
-        let self = this;
-        if(document.hidden){
-          if(self.playState){
-            self.decoder.stop(); //停止视频
-            //window.clearInterval(self.timerPlayReal);
-          }
-        }
-        else{
-          console.log(self.playState);
-          if(self.playState){
-            self.realTime()
-          }
-        }
-      },
-      resizeFun(){
-        let self = this;
-        if(!self.checkFull() && self.fullWindow){
-          self.fullWindow=false;
-          var playerEle =  self.$refs.myPlayer;
-          playerEle.style.width = self.initPlayerWidth + 'px'; //动态设置HTML元素高度
-          playerEle.style.height = self.initPlayerHeight + 'px';
-          self.exitFullscreen()
-        }
-      },
-      getEzvizAccessToken(storeId){
-        let self=this;
-        let params = {};
-        params.storeId = storeId;
-        return new Promise((resolve,reject)=>{
-          if(self.currentStoreId == storeId && (Date.parse(new Date()) < self.ezvizExpireTime)){
-            resolve(self.accessToken);
-          }else{
-            getEzvizAccessToken(params)
-              .then(result => {
-                self.currentStoreId = storeId;
-                self.accessToken = result.data.accessToken;
-                self.areaDomain = {
-                  domain:result.data.areaDomain
-                }
-                self.ezvizExpireTime = result.data.expireTime;
-                resolve(result.data.accessToken);
-              })
-              .catch(error => {
-                reject();
-              })
-          }
-        })
-      },
-      async checkIfEncry(){
-        let self = this;
-        let obj={};
-        obj.accessToken= self.accessToken;// token
-        if(self.channelInfo == null){
-          return;
-        }
-        obj.deviceSerial = self.channelInfo.ivsId; //设备序列号
-        let result = await self.getDeviceIsEncrypt(qs.stringify(obj));
-        console.log(result);
-        let suportUpdatePass = false;
-        if(result == 1){
-          suportUpdatePass = await getDeviceCapacity(qs.stringify(obj));
-        }
-        console.log(suportUpdatePass)
-        if(result == 1){
-          if( suportUpdatePass ){
-            //已加密设备先从缓存中查看是否已经有验证码，有验证码直接取出，没有验证码要弹出对话框
-            let deviceObj = {};
-            deviceObj.deviceSerial = self.channelInfo.ivsId;
-            deviceObj.channelId = self.channelInfo.channelId;
-            let result = self.getDeviceValidateCode(deviceObj);
-            console.log('从缓存中取得的验证码' + result)
-            if(result.length > 0){
-              self.videoPassword = result;
-              self.verifyEnterPassword(); //验证密码是否正确
-            }
-            else{
-              //不存在密码
-              self.isLoading = false;
-              self.showError = true;
-              self.errorMsg = self.$t('storeMonitor.videoEncrypted');
-              self.showInputPassword = true;
-            }
-          }
-          else{
-            //不支持修改密码
-            self.isLoading = false;
-            self.showError = true;
-            self.errorMsg = self.$t('storeMonitor.videoCannotPlay');
-          }
-        }
-        else{
-          self.showError = false;
-          self.videoPassword = '';
-          self.times = 0;
-          self.ifIsEncrypt = false
-          self.changeId && (self.startTs = self.curTime); //切换通道，仍然从最初的时间播放视频
-          if(self.playState) {
-            self.decoder.stop();
-            self.playState = false
-          }
-          self.$nextTick(()=> {
-            self.decoder = null;
-            console.log(self.$refs.myPlayer)
-            if(self.fullWindow){
-              self.initFullWindowVideo()
-            }
-            else{
-              self.initVideo();
-            }
-          })
-        }
-      },
-      /**
-       * 获取当前设备是否加密
-       * @returns {Promise<any>}
-       */
-      async getDeviceIsEncrypt(params){
-        let self = this;
-        console.log(params);
-        const ret = await getIsEncrypt(params);
-        console.log(ret)
-        return ret;
-      },
-      async initVideo() {
-        let self = this
-        self.showError = false;
-        //调用密码设置方法
-        console.log(self.playBack)
-        self.showModelContent=false;
-        if(self.channelInfo==null){
-          return;
-        }
-        if(self.channelInfo.channelId == undefined){
-          return;
-        }
-        else{
-          self.isLoading = true;
-          let o = self.$refs.myPlayer || self.$refs.errorModel;
-          // let width = o.offsetWidth;
-          let height = o.offsetHeight;
-          let width = 0
-          switch(self.proportion){
-            case '4:3':
-              width=560;
-              break;
-            case '16:9':
-              width=746;
-              break;
-            default:
-              width=560;
-                break;
-          }
-          self.initPlayerWidth = o.offsetWidth;
-          self.initPlayerHeight = height;
-          console.log(width);
-          console.log(height)
-          self.getVideoUrl()
-          console.log(self.videoUrl);
-          if(self.accessToken == ''){
-            self.notify(self.$t('storeMonitor.getAccessTokenError'), 'warning',3000)
-            return;
-          }
-          // 初始化视频方法
-          let isGlobalWebsite = Environment.isGlobalWebsite
-          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
-          if(isGlobalWebsite){
-            self.decoder = new EZUIKit_Global.EZUIPlayer({
-              id: 'myPlayer',
-              autoplay: true,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath:decoderPath,
-              width: width,
-              height: height,
-              splitBasis:1,
-              env:self.areaDomain,
-              handleError: self.handleError,
-              handleSuccess: self.handleSuccess,
-            })
-          }else{
-            self.decoder = new EZUIKit_China.EZUIPlayer({
-              id: 'myPlayer',
-              autoplay: true,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath:decoderPath,
-              width: width,
-              height: height,
-              handleError: self.handleError,
-              handleSuccess: self.handleSuccess,
-            })
-          }
-        }
 
-      },
-      handleError(e){
-        console.log(e.msg)
-        let self = this;
-        self.isLoading = false;
-        // self.errorMsg = e.msg;
-        self.showError = true;
-        let retcode = e.retcode;
-        self.errorMsg = self.getErrorMsg(e);
-        if(self.playState){
-          if(!self.fullWindow){
-            if(self.ifOpenSound){
-              self.decoder.closeSound()
-            }
-            self.decoder.stop();
-          }
-          else{
-            if(self.ifOpenSound){
-              self.fullDecoder.closeSound()
-            }
-            self.fullDecoder.stop();
-          }
-        }
-        else{
-          self.decoder.stop();
-        }
-        self.playState = false;
-        self.ifOpenSound = false;
-        self.realTimeSpeed=0;
-        self.times = 0;
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null
-        if(self.playBack){
-          self.playBackState = false;
-        }
-      },
-      getErrorMsg(err){
-        let self = this;
-        let retcode = err.code ;
-        if(!retcode){
-          retcode = err.retcode;
-        }
-        let msg = '';
-        switch (retcode) {
-          case '10001':{
-            msg = self.$t('storeMonitor.partolError');
-            break;
-          }
-          case '10002':{
-            msg = self.$t('storeMonitor.accessTokenError');
-            break;
-          }
-          case '10026':{
-            msg = self.$t('storeMonitor.maxDeviceNum');
-            break;
-          }
-          case '20018':{
-            msg = self.$t('storeMonitor.noDevice');
-            break;
-          }
-          case 9048:{
-            msg = self.$t('storeMonitor.maxConcurrency');
-            break;
-          }
-          case 5451:{
-            msg = self.$t('storeMonitor.deviceOffline');
-            break;
-          }
-          case 5402:{
-            msg = self.$t('storeMonitor.noHistoryVideo');
-            break;
-          }
-          case 5544:{
-            msg = self.$t('storeMonitor.noVideoSource');
-            break;
-          }
-          default:{
-            msg = err.msg;
-            break;
-          }
-        }
-        return msg;
-      },
-      handleSuccess(){
-        let self = this;
-        self.editCount ++;
-        self.showError = false;
-        self.errorMsg = '';
-        self.realTimeSpeed=0;
-        //关闭声音
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal=window.setInterval(()=>{
-          console.log(self.realTimeSpeed)
-          self.realTimeSpeed=self.realTimeSpeed+1;
-          if(self.playBack){
-            self.getProcess();
-          }
-        },1000);
-        setTimeout(() => {
-          self.playState = true;
-          self.isLoading = false;
-          self.showModelContent=true;
-          //self.showInfoContent=false;
-          // self.ifOpenSound = false;
-          if(self.fullWindow){
-            if(self.ifOpenSound){
-              self.fullDecoder.openSound()
-            }
-          }
-          else{
-            if(self.ifOpenSound){
-              self.decoder.openSound()
-            }
-          }
-          if(self.playBack){
-            self.playBackState = true;
-          }
-          else{
-            self.times = 0;
-            self.playBackState = false;
-          }
-        }, 2000);
-      },
+    async storeId(newValue, oldValue) {
+      console.log(newValue);
+      console.log(oldValue);
+      const self = this;
+      if (newValue.length > 0) {
+        await self.getEzvizAccessToken(newValue);
+      }
+    }
+  },
 
-      handleFullWindowSuccess(){
-        let self = this;
-        self.editCount ++;
-        // self.playState = true;
-        self.showError = false;
-        self.errorMsg = '';
-        //非全屏时播放，全屏时也播放，同时定时器继续定时
-        if(self.playState){
-          self.realTimeSpeed=self.realTimeSpeed+1;
-          console.log(self.realTimeSpeed)
-          if(self.playBack){
-            self.getProcess();
-          }
-        }
+  async mounted() {
+    const self = this;
+    console.log(self.storeId);
+    console.log(self.accessToken);
+    if (!self.isStoreMonitor) {
+      const result = await self.getEzvizAccessToken(self.storeId);
+      self.checkIfEncry();
+    } else {
+    }
+    window.addEventListener('resize', self.resizeFun, false);
+    window.addEventListener('visibilitychange', self.visibleChange, false);
+  },
 
-        setTimeout(() => {
-          self.showModelContent=true;
-          //self.showInfoContent=false;
-          self.isLoading = false;
-          if(self.ifOpenSound){
-            self.fullDecoder.openSound()
-          }
-          //self.ifOpenSound = false
-        }, 2000);
-      },
-      handleExitFullScreenSuccess(){
-        let self = this;
-        self.showError = false;
-        self.errorMsg = '';
-        if(self.clickSnapshot){
-          //self.stopRealTime()
-          self.isLoading = false;
-          self.showModelContent=false;
-        }
-        //全屏时播放，非全屏时也播放，同时定时器继续定时
-        if(self.playState){
-          self.realTimeSpeed=self.realTimeSpeed+1;
-          console.log(self.realTimeSpeed)
-          if(self.playBack){
-            self.getProcess()
-          }
-        }
+  beforeDestroy() {
+    const self = this;
+    console.log(self.playState);
+    window.clearInterval(self.timerPlayReal);
+    self.realTimeSpeed = 0;
+    if (self.playState) {
+      self.decoder.closeSound();
+      self.decoder.stop();
+    }
+    window.removeEventListener('resize', self.resizeFun);
+    window.removeEventListener('visibilitychange', self.visibleChange);
+    self.resizeFun = null;
+    self.visibleChange = null;
+  },
 
-        setTimeout(() => {
-          self.isLoading = false;
-          self.showModelContent=true;
-          //self.showInfoContent=false;
-          if(self.ifOpenSound){
-            self.decoder.openSound()
-          }
-        }, 2000);
-      },
-      controlScreen(){
-        let self=this;
-        if(!self.fullWindow){
-          self.fullWindowScreen();
-          setTimeout(() => {
-            self.showModelContent=false;
-            //self.showInfoContent=false;
-          }, 3000);
-        }
-        else{
-          self.exitFullscreen();
-          self.fullWindow=false;
-        }
-      },
-      //进入全屏
-      fullWindowScreen(...val) {
-        console.log(val);
-        let self=this;
-        self.fullWindow = true;
-        var ele = document.getElementById('videoContent');
-        ele.style.width = "100%";
-        ele.style.height = "100%";
-        let width = self.varyWindowWidth;
-        let height = self.varyWindowHeight;
+  computed: {
+    graphBtnWidth: function() {
+      return this.varyWindowHeight * 0.185;
+    },
 
-        if (ele.requestFullscreen) {
-          ele.requestFullscreen();
-        }
-        else if (ele.mozRequestFullScreen) {
-          ele.mozRequestFullScreen();
-        }
-        else if (ele.webkitRequestFullScreen) {
-          ele.webkitRequestFullScreen();
-        }
-        else if(ele.msRequestFullscreen) {
-          ele.msRequestFullscreen();
-        }
-        self.resetVideoSize('fullin');
-      },
-      //退出全屏
-      exitFullscreen() {
-        let self = this;
-        var de = document;
-        self.fullWindow = false;
-        var ele = document.getElementById('videoContent');
-        var playerEle =  self.$refs.myPlayer;
-        playerEle.style.width = self.initPlayerWidth + 'px'; //动态设置HTML元素高度
-        playerEle.style.height = self.initPlayerHeight + 'px';
-        self.$nextTick(()=>{
-          ele.style.width = self.initPlayerWidth + 'px';
-          ele.style.height = self.initPlayerHeight + 'px';
-          // playerEle.style.width = self.initPlayerWidth + 'px';
-          // playerEle.style.height = self.initPlayerHeight + 'px';
-        })
-        let width = ele.offsetWidth;
-        let height = ele.offsetHeight;
+    btnFontSize: function() {
+      return this.varyWindowHeight * 0.022;
+    },
 
-        if (de.exitFullscreen) {
-          de.exitFullscreen();
-        }
-        else if (de.mozCancelFullScreen) {
-          de.mozCancelFullScreen();
-        }
-        else if (de.webkitCancelFullScreen) {
-          de.webkitCancelFullScreen();
-        }
-        self.exitFullScreenPlayer();
-      },
-      exitFullScreenPlayer(){
-        let self = this
-        if(self.playState){
-          if(self.ifOpenSound){
+    percentHeight: function() {
+      return this.varyWindowHeight / 758;
+    },
+
+    ...mapGetters({
+      accountChanged: 'accountChanged'
+    }),
+
+    isEzviz() {
+      const self = this;
+      return self.$store.state.user.isEzviz;
+    }
+  },
+
+  methods: {
+    checkPro(item) {
+      const self = this;
+      self.proportion = item;
+      if (self.fullWindow) {
+        if (self.playState) {
+          if (self.ifOpenSound) {
             self.fullDecoder.closeSound();
           }
           self.fullDecoder.stop();
           self.fullDecoder = null;
-          self.isLoading = true;
-          let width = 0
-          switch(self.proportion){
-            case '4:3':
-              width=560;
-              break;
-            case '16:9':
-              width=746;
-              break;
-            default:
-              width=560;
-                break;
-          }
-          console.log(self.initPlayerWidth);
-          console.log(self.initPlayerHeight)
-          self.getVideoUrl()
-          // 初始化视频方法
-          let isGlobalWebsite = Environment.isGlobalWebsite
-          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
-          if(isGlobalWebsite){
-            self.decoder = new EZUIKit_Global.EZUIPlayer({
-              id: 'myPlayer',
-              autoplay: self.playState,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath: decoderPath,
-              width: width,
-              height: self.initPlayerHeight,
-              splitBasis:1,
-              env:self.areaDomain,
-              handleError: self.handleError,
-              handleSuccess: self.handleExitFullScreenSuccess,
-            })
-          }else{
-            self.decoder = new EZUIKit_China.EZUIPlayer({
-              id: 'myPlayer',
-              autoplay: self.playState,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath: decoderPath,
-              width: width,
-              height: self.initPlayerHeight,
-              handleError: self.handleError,
-              handleSuccess: self.handleExitFullScreenSuccess,
-            })
-          }
         }
-        else{
-          // do nothing
-        }
-      },
-      resetVideoSize(e){
-        let self = this;
-        if(self.channelInfo==null){
-          return;
-        }
-        else if(self.playState){
-          if(e=='fullin'){
+        self.resetVideoSize();
+      } else {
+        if (self.playState) {
+          if (self.ifOpenSound) {
             self.decoder.closeSound();
-            self.decoder.stop();
-            self.decorder = null;
           }
-          self.isLoading = true;
-          // let  width = screen.width;
-          let height = screen.height;
-          let width = 0
-          switch(self.proportion){
-            case '4:3':
-              width = height*4/3;
-              break;
-            case '16:9':
-              width=height*16/9;
-              break;
-            default:
-              width=height*4/3;
-                break;
-          }
-          let playerEle = self.$refs.myPlayer;
-          playerEle.style.width = screen.width + 'px'; //动态设置HTML元素高度
-          playerEle.style.height = screen.height + 'px';
-          console.log(width);
-          console.log(height)
-          console.log(playerEle);
-          console.log(self.playState)
-          self.getVideoUrl()
-          // 初始化视频方法
-          let isGlobalWebsite = Environment.isGlobalWebsite
-          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
-          if(isGlobalWebsite){
-            self.fullDecoder = new EZUIKit_Global.EZUIPlayer({
-              id: 'fullPlayer',
-              autoplay: self.playState,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath: decoderPath,
-              width: width,
-              height: height,
-              splitBasis:1,
-              env:self.areaDomain,
-              handleError: self.handleError,
-              handleSuccess: self.handleFullWindowSuccess,
-            })
-          }else{
-            self.fullDecoder = new EZUIKit_China.EZUIPlayer({
-              id: 'fullPlayer',
-              autoplay: self.playState,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath: decoderPath,
-              width: width,
-              height: height,
-              handleError: self.handleError,
-              handleSuccess: self.handleFullWindowSuccess,
-            })
-          }
+          self.decoder.stop();
+          self.decoder = null;
         }
-        else{
-          // do nothing
-        }
-      },
-      gonggeScreen(){
-        let self=this;
-        self.showgongge=true;
-      },
-      recoverScreen(){
-        let self=this;
-        self.showgongge=false;
-      },
-      showModel(){
-        let self=this;
-        //self.showInfoContent=true;
-        if(self.playState){
-          self.showModelContent=true;
-        }
-      },
-      hiddenModel(){
-        let self=this;
-        self.showModelContent=false;
-        //self.showInfoContent=false;
-      },
-      //关闭实时视频
-      async realTime(){
-        let self = this;
-        self.times = 0;
-        if(self.isStoreMonitor && !self.isLoaded){
-          self.checkIfEncry();
-          self.isLoaded = true;
-        }
-        else{
-          if(self.fullWindow){
-            self.initFullWindowVideo();
-          }
-          else{
-            self.initVideo();
-          }
-        }
-      },
-      initFullWindowVideo(){
-        let self = this;
-        if(self.channelInfo==null){
-          return;
-        }
-        else{
-          let o = document.getElementById('videoContent');
-          // o.style.width= width + 'px'
-          // o.style.height= height + 'px'
-          let width = screen.width;
-          let height = screen.height;
-          let playerEle = self.$refs.myPlayer;
-          playerEle.style.width = screen.width + 'px'; //动态设置HTML元素高度
-          playerEle.style.height = screen.height + 'px';
-          console.log(width);
-          console.log(height)
-          self.isLoading = true;
-          self.getVideoUrl()
-          // 初始化视频方法
-          let isGlobalWebsite = Environment.isGlobalWebsite
-          let decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China'
-          if(isGlobalWebsite){
-            self.fullDecoder = new EZUIKit_Global.EZUIPlayer({
-              id: 'fullPlayer',
-              autoplay: true,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath: decoderPath,
-              width: width,
-              height: height,
-              splitBasis:1,
-              env:self.areaDomain,
-              handleError: self.handleError,
-              handleSuccess: self.handleSuccess,
-            })
-          }else{
-            self.fullDecoder = new EZUIKit_China.EZUIPlayer({
-              id: 'fullPlayer',
-              autoplay: true,
-              url: self.videoUrl,
-              accessToken: self.accessToken,
-              decoderPath: decoderPath,
-              width: width,
-              height: height,
-              handleError: self.handleError,
-              handleSuccess: self.handleSuccess,
-            })
-          }
-        }
-      },
-      stopRealTime(){
-        let self = this;
-        if(self.playState){
-          if(self.fullWindow){
-            self.fullDecoder.closeSound();
-            self.fullDecoder.stop();
-            self.fullDecoder = null;
-          }
-          else{
-            console.log('关闭声音')
-            self.decoder.closeSound();
-            self.decoder.stop();
-            self.decoder = null;
-          }
+        self.initVideo();
+      }
+    },
 
-          window.clearInterval(self.timerPlayReal)
-          self.realTimeSpeed = 0;
-          self.stopVideoTime = false;
-          self.timerPlayReal = null;
-        }
-        self.ifOpenSound = false;
-        self.showModelContent=false;
-        //self.showInfoContent=false;
+    async changeHistoryTime(newValue) {
+      console.log('curTime');
+      const self = this;
+      if (!self.channelInfo.id || !self.channelInfo.ivsId) {
+        self.showError = true;
+        self.errorMsg = self.$t('remotePatrol.lackParams');
+        return;
+      }
+      self.showError = false;
+      self.times = 0;
+      console.log('new:', newValue);
+      console.log(self.curTime);
+      self.startTs = newValue;
+      if (newValue === 0) {
+        self.playBack = false;
+      }
+      if (self.playState) {
+        self.decoder.stop();
         self.playState = false;
-        self.curBack = '';
-        self.currentTimeValue = 0;
-      },
-      openSound(){
-        let self = this;
-        self.ifOpenSound = true;
-        if(self.fullWindow){
-          self.fullDecoder.openSound();
-        }
-        else{
-          self.decoder.openSound();
-        }
-      },
-      closeSound(){
-        let self = this;
-        self.ifOpenSound = false;
-        if(self.fullWindow){
-          self.fullDecoder.closeSound();
-        }
-        else{
-          self.decoder.closeSound();
-        }
-      },
-      stopVideo(){
-        let self = this;
-        if (self.playState){
-          if(self.fullWindow){
-            self.fullDecoder.closeSound();
-            self.fullDecoder.stop();
-            self.fullDecoder = null;
-          }
-          else{
-            self.decoder.closeSound();
-            self.decoder.stop();
-            self.decoder = null;
-          }
-        }
-      },
-      cutPicture(){
-        //截图
-        let self = this;
-        if(self.fullWindow){
-          self.fullDecoder.capturePicture(0,'default');
-        }
-        else{
-          self.decoder.capturePicture(0,'default');
-        }
-        // if(self.playBack && !self.fullWindow){
-        //   //非全屏下直接停止视频
-        //   self.stopRealTime();
-        // }
-        self.imageCanvasList=[];
-        if(self.showFeedBack){
-          self.showFeedDialog2=true;
-          self.eventName='';
-          self.eventDes='';
-          self.showEventNameInfo = false;
-          this.$nextTick(()=>{
-            self.canvasEl = document.getElementById('icanvas');
-            var ctx = self.canvasEl.getContext('2d');
-            let img = new Image();
-            setTimeout(() => {
-              self.imgSrc = sessionStorage.getItem('fileUrl');
-              let img = document.getElementById('imgTest');
-              //self.stopRealTime();
-              if(self.fullWindow){
-                self.exitFullscreen();
-                self.fullWindow=false;
-                self.clickSnapshot = true;
-              }
-              html2canvas(img).then(function (canvas) {
-                ctx.drawImage(img, 0, 0, 520*self.percentHeight,340*self.percentHeight);
-                var oGrayImg = icanvas.toDataURL('image/jpeg');
-                self.imageCanvas.src = oGrayImg;
-                let imgObj = new Image();
-                imgObj.src = oGrayImg;
-                self.imageCanvasList.push(imgObj);
-              })
-            }, 100)
-          })
-        }
-        else {
-          self.showCancelContent = false;
-          if (self.sourceListLength >= 10) {
-            let msg = self.isStoreMonitor ? self.$t('storeMonitor.maximumAttach'): self.$t('remotePatrol.maximumAttach')
-            self.notify(msg, 'warning', 3000);
-            return false;
-          }
-          self.showCutDialog = true;
-          this.$nextTick(() => {
-            self.canvasEl = document.getElementById('icanvas');
-            var ctx = self.canvasEl.getContext('2d');
-            let img = new Image();
-            setTimeout(() => {
-              self.imgSrc = sessionStorage.getItem('fileUrl');
-              //self.stopRealTime();
-              let img = document.getElementById('imgTest');
-              if(self.fullWindow){
-                self.exitFullscreen();
-                self.fullWindow=false;
-                self.clickSnapshot = true;
-              }
-              html2canvas(img).then(function (canvas) {
-                ctx.drawImage(img, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
-                var oGrayImg = icanvas.toDataURL('image/jpeg');
-                self.imageCanvas.src = oGrayImg;
-                let imgObj = new Image();
-                imgObj.src = oGrayImg;
-                self.imageCanvasList.push(imgObj);
-              })
-            }, 100)
-          })
-        }
-      },
-      getVideo(){
-        //点击开始录像，10秒后关闭
-        let self = this;
-        if (self.sourceListLength >= 10) {
-          self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
-          return false;
-        }
-        if(self.fullWindow){
-          self.exitFullscreen();
-          self.fullWindow=false;
-          //等3秒钟后开始截取视频
-          setTimeout(()=>{
-            self.showGetVideo = true;
-            self.videoSpeed = 0;
-            //开始录制
-            self.$nextTick(()=>{
-              self.startTimeCutVideo=new Date().getTime();
-              self.computeFrame();
-              self.looper();
-              setTimeout(()=>{
-                var btn_canvas = document.getElementById("btn-graph-canvas");
-                self.drawMain(btn_canvas, 100, "#f31d65", "#f31d65");
-              },1000)
-            })
-          }, 3000)
+      }
+      self.$nextTick(() => {
+        self.decoder = null;
+        console.log(self.$refs.myPlayer);
+        // self.initVideo();
+        self.checkIfEncry();
+      });
+    },
 
-        }
-        else{
-          self.showGetVideo = true;
-          self.videoSpeed = 0;
-          //开始录制
-          self.$nextTick(()=>{
-            self.startTimeCutVideo=new Date().getTime();
-            self.computeFrame();
-            self.looper();
-            setTimeout(()=>{
-              var btn_canvas = document.getElementById("btn-graph-canvas");
-              self.drawMain(btn_canvas, 100, "#f31d65", "#f31d65");
-            },1000)
-          })
-        }
-        // let startTime = new Date().getTime();
-        // let interval = setInterval(function(){
-        //   if(new Date().getTime() - startTime > 10000){
-        //     self.decoder.stopSave(0);
-        //     self.showGetVideo = false;
-        //     clearInterval(interval);
-        //     setTimeout(()=>{
-        //      // self.$emit('emitEzvizVideo')
-        //     },1000)
-        //
-        //   }
-        // }, 100);
-      },
-      confirmAddFeedBack3(){
-        let self=this;
-        let srcObj=null;
-        srcObj = self.feedBackVideoFileObj;
-        let obj={
-          eventName:self.eventName,
-          eventDes:self.eventDes,
-          sourceObj:srcObj
-        }
-        if(self.eventName.trim().length==0){
-          self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-          return false;
-        }
-        self.$emit('confirmEzvizVideoFeedback', obj)
-        self.showFeedDialog3=false;
-      },
-      /**
-       * 将获取的视频二进制对象返回给父组件
-       */
-      addVideoToList(){
-        let self=this;
-        self.showGetVideo = false;
-        self.recorder.stopRecording(async function(){
-          self.isRecordingStarted=false;
-          self.isStoppedRecording=true;
-          var blob =self.recorder.getBlob();
-          self.$emit('emitEzvizVideo', blob)
-        })
-      },
-      looper(){
-        let self=this;
-        if(!self.isRecordingStarted){
-          self.timeVideo=setTimeout(self.looper, 0);
-        }
-        else{
-          self.endTImeCutVideo=new Date().getTime();
-          if((self.endTImeCutVideo-self.startTimeCutVideo)/1000>11){
-            clearTimeout(self.timeVideo);
-            self.showGetVideo=false;
-            self.isRecordingStarted=false;
-            self.isREC=false;
-            setTimeout(()=>{
-              if(self.showFeedBack){
-                self.showFeedDialog3=true;
-                self.eventName='';
-                self.eventDes='';
-                this.$nextTick(()=>{
-                  self.recorder.stopRecording(function(){
-                    self.isRecordingStarted=false;
-                    self.isStoppedRecording=true;
-                    var blob =self.recorder.getBlob();
-                    let url=URL.createObjectURL(blob);
-                    let obj={};
-                    obj.blob = blob;
-                    obj.src=url;
-                    self.feedBackVideoFileObj=obj;
-                  })
-                })
-              }else{
-                self.blob = null;
-                self.addVideoToList()
-              }
-            },100)
-          }
-          else{
-            self.isREC=true;
-            self.decoder.capturePicture(0,'default');
-            setTimeout(() => {
-              self.imgSrc = sessionStorage.getItem('fileUrl');
-              let img = document.getElementById('imgTest');
-              html2canvas(img).then(function (canvas) {
-                var ctx = self.canvasEl.getContext('2d');
-                let width=self.varyWindowWidth*0.48;
-                let height=self.varyWindowWidth*0.28;
-                ctx.clearRect(0, 0, width, height);
-                ctx.drawImage(img,0,0,width,height);
-                if(self.isStoppedRecording) {
-                  return;
-                }
-                requestAnimationFrame(self.looper);
-              })
-            }, 10)
-          }
-        }
-      },
-      computeFrame(){
-        let self=this;
-        self.canvasEl=document.getElementById('vcanvas');
-        var ctx = self.canvasEl.getContext('2d');
-        self.recorder = RecordRTC(self.canvasEl, {
-          type: 'canvas'
-        });
-        self.isStoppedRecording =false;
-        self.isRecordingStarted = true;
-        self.recorder.startRecording();
-      },
-
-      drawMain(drawing_elem, percent, forecolor, bgcolor) {
-        /*
-            @drawing_elem: 绘制对象
-            @percent：绘制圆环百分比, 范围[0, 100]
-            @forecolor: 绘制圆环的前景色，颜色代码
-            @bgcolor: 绘制圆环的背景色，颜色代码
-        */
-        let self=this;
-        var context = drawing_elem.getContext("2d");
-        var center_x = drawing_elem.width / 2;
-        var center_y = drawing_elem.height / 2;
-        var rad = Math.PI*2/100;
-
-
-        // 绘制背景圆圈
-        function backgroundCircle(){
-          context.beginPath();
-          context.lineWidth = 14; //设置线宽
-          var radius = center_x - context.lineWidth;
-          context.arc(center_x, center_y, radius, 0, Math.PI*2, false);
-          context.fillStyle=bgcolor;
-          context.globalAlpha = 0.5;
-          context.fill();
-        }
-
-        //绘制运动圆环
-        function foregroundCircle(n){
-          context.save();
-          context.strokeStyle = forecolor;
-          context.globalAlpha = 1;
-          context.lineWidth = 6;
-          context.lineCap = "round";
-          var radius = center_x - context.lineWidth;
-          context.beginPath();
-          context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
-          context.stroke();
-          context.closePath();
-          context.restore();
-        }
-
-        //绘制文字
-        function text(n){
-          context.save();
-          context.fillStyle='white';
-          context.globalAlpha = 1;
-          var font_size=self.btnFontSize;
-          context.font='bold '+font_size+'px Helvetica';
-          var textStr='';
-          if(n==100){
-            if(self.lang == 'en'){
-              textStr= '录制成功' ;
-            }
-            else{
-              textStr= '录制成功';
-            }
-          }
-          else{
-            textStr= '正在录制';
-          }
-          var text_width = context.measureText(textStr).width;
-          context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
-          context.restore();
-        }
-        //执行动画
-        function drawFrame(speed){
-          context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
-          backgroundCircle();
-          text(speed);
-          foregroundCircle(speed);
-          if(speed>=percent){
-            clearInterval(self.videoSpeedId);
-          }
-        }
-        self.videoSpeedId=setInterval(() => {
-          if(self.videoSpeed >= percent){
-            return;
-          }
-          else{
-            self.videoSpeed += 2;
-            drawFrame(self.videoSpeed);
-          }
-        }, 100);
-      },
-      showPenList(){
-        let self=this;
-        self.showPen=!self.showPen;
-        self.showCancelContent=false;
-      },
-      checkPen(item,index){
-        let self=this;
-        item.showContent=true;
-        self.penList.forEach((_item,_index)=>{
-          if(index!=_index){
-            _item.showContent=false;
-          }
-        })
-        self.penChecked=item.id;
-      },
-      cancelEditCanvas(){
-        let self=this;
-        self.showCancelContent=false;
-        self.canvasEl=document.getElementById('icanvas');
-        var ctx = self.canvasEl.getContext('2d');
-        let vcanvas = null;
-        if(self.showFeedBack){
-          vcanvas={width:520*self.percentHeight,height:340*self.percentHeight};
-        }
-        else{
-          vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
-        }
-        ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
-        ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
-        self.imageCanvasList=[];
-      },
-      confirmEditCanvas(){
-        let self=this;
-        self.showCancelContent=false;
-        self.imageCanvasList.pop();
-        self.canvasEl=document.getElementById('icanvas');
-        var ctx = self.canvasEl.getContext('2d');
-        let vcanvas=null;
-        if(self.showFeedBack){
-          vcanvas={width:520*self.percentHeight,height:340*self.percentHeight};
-        }
-        else{
-          vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
-        }
-        ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
-        if(self.imageCanvasList.length==0){
-          ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
-        }
-        else{
-          ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,vcanvas.width,vcanvas.height);
-        }
-      },
-      confirmEdit(){
-        let self=this;
-        let obj={};
-        obj.mediaType=2;
-        let src = self.canvasEl.toDataURL("image/jpeg");
-        self.$emit('confirmEzvizCanvas',src);
-        self.showCutDialog=false;
-      },
-      mouseDownAction(e){
-        let self=this;
-        self.isMouseDown=true;
-        self.X=e.offsetX;
-        self.Y=e.offsetY;
-        self.showCutModel=false;
-        self.showPenBtn=false;
-        self.showCancelContent=false;
-      },
-      mouseMoveAction(e){
-        let self=this;
-        if(self.isMouseDown){
-          self.X1=e.offsetX;
-          self.Y1=e.offsetY;
-          self.drawLine(self.X,self.Y,self.X1,self.Y1);
-          self.showPenBtn=false;
-          self.flag++;
-        }
-      },
-      mouseUpHandler(e){
-        let self=this;
-        self.isMouseDown=false;
-        self.showCutModel=true;
-        self.showPenBtn=true;
-        self.showCancelContent=true;  //每次鼠标弹起后显示可以取消的框
-        if(self.flag!=0&&self.canvasEl!=''){
-          let imgObj=new Image();
-          imgObj.src=self.canvasEl.toDataURL("image/jpeg");
-          self.imageCanvasList.push(imgObj);
-        }
-        self.flag=0;
-      },
-      mouseLeaveAction(e){
-        console.log(e)
-        let self=this;
-        self.isMouseDown=false;
-      },
-      drawLine(x,y,x1,y1){
-        let self=this;
-        var ctx=self.canvasEl.getContext('2d');
-        if(self.flag){
-          ctx.beginPath();
-        }
-        ctx.moveTo(x,y);
-        ctx.lineWidth=4;
-        ctx.strokeStyle=self.penChecked;
-        ctx.lineTo(x1,y1);
-        ctx.stroke();
-        if(self.flag!=0){
-          self.X=self.X1;
-          self.Y=self.Y1;
-        }
-      },
-      showCancel(){
-        let self=this;
-        self.showCancelContent=true;
-        self.showPenBtn=true;
-      },
-      hiddenCancel(){
-        let self=this;
-        self.showCancelContent=false;
-        self.showPenBtn=false;
-      },
-      //抓图问题反馈
-      confirmAddFeedBack2(){
-        let self=this;
-        let src=self.canvasEl.toDataURL("image/jpeg");
-
-        let obj={
-          eventName:self.eventName,
-          eventDes:self.eventDes,
-          src: src
-        }
-        if(self.eventName.trim().length==0){
-          //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-          self.showEventNameInfo = true;
-          return false;
-        }
-        self.$emit('ezvizCutPictureFeedback', obj);
-        self.showFeedDialog2=false;
-      },
-      checkFull(){
-        var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
-        if(isFull === undefined)
-        {
-          isFull = false;
-        }
-        return isFull;
-      },
-      notify(msg,type,time) {
-        this.$message({
-          message: msg,
-          type: type,
-          duration:time
-        });
-      },
-      stopAndRealTime() {
-        let self = this;
-        self.showError = false;
+    visibleChange() {
+      const self = this;
+      if (document.hidden) {
         if (self.playState) {
           self.decoder.stop();
         }
-        self.$nextTick(() => {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer)
-          self.initVideo();
-        });
-      },
-      async getProcess(){
-        let self=this;
-        self.times +=1;
-        let duration=300;
-        self.durationTimeValue=duration;
-        self.currentTimeValue= self.times;
-        var callback = function(iTime){
-          self.startTs = iTime
-          console.log("iTime", iTime);
-          console.log("self.startTs", self.startTs);
+      } else {
+        console.log(self.playState);
+        if (self.playState) {
+          self.realTime();
         }
-        if(!self.fullWindow){
-          self.decoder.getOSDTime(callback);
+      }
+    },
+
+    resizeFun() {
+      const self = this;
+      if (!self.checkFull() && self.fullWindow) {
+        self.fullWindow = false;
+        var playerEle = self.$refs.myPlayer;
+        playerEle.style.width = self.initPlayerWidth + 'px'; // 动态设置HTML元素高度
+        playerEle.style.height = self.initPlayerHeight + 'px';
+        self.exitFullscreen();
+      }
+    },
+
+    getEzvizAccessToken(storeId) {
+      const self = this;
+      const params = {};
+      params.storeId = storeId;
+      return new Promise((resolve, reject) => {
+        if (self.currentStoreId === storeId && (Date.parse(new Date()) < self.ezvizExpireTime)) {
+          resolve(self.accessToken);
+        } else {
+          getEzvizAccessToken(params)
+            .then(result => {
+              self.currentStoreId = storeId;
+              self.accessToken = result.data.accessToken;
+              self.areaDomain = {
+                domain: result.data.areaDomain
+              };
+              self.ezvizExpireTime = result.data.expireTime;
+              resolve(result.data.accessToken);
+            })
+            .catch(error => {
+              reject();
+            });
         }
-        else{
-          self.fullDecoder.getOSDTime(callback);
-        }
-        if(self.times >= duration){
-          self.decoder.stop();
-          self.currentTimeValue = 0;
-          self.times = 0;
-          self.playState = false;
-          window.clearInterval(self.timerPlayReal);
-          self.timerPlayReal=null;
-        }
-      },
-      /**
-       * 快进快退实现
-       * @param val
-       */
-      adjustProcess(val, label){
-        console.log(val);
-        let self = this;
-        self.curBack = label;
-        var callback = function(iTime){
-          console.log("iTime",iTime);
-          switch(val){
-            case 0: self.startTs = iTime - 10*1000;break;
-            case 1: self.startTs = iTime - 30*1000;break;
-            case 2: self.startTs = iTime - 60*1000;break;
-            default: break;
-          }
-          self.times = 0;
-          //全屏
-          if(self.fullWindow){
-            if(self.playState){
-              if(self.ifOpenSound){
-                self.fullDecoder.closeSound();
-              }
-              self.fullDecoder.stop();
-              self.fullDecoder = null;
-            }
-            self.initFullWindowVideo();
-            console.log("self.startTs", self.startTs);
-          }
-          else{
-            if(self.playState){
-              if(self.ifOpenSound){
-                self.decoder.closeSound();
-              }
-              self.decoder.stop();
-              self.decoder = null;
-            }
-            self.initVideo();
-            console.log("self.startTs", self.startTs);
-          }
-        }
-        if(self.fullWindow){
-          self.fullDecoder.getOSDTime(callback);
-        }
-        else{
-          self.decoder.getOSDTime(callback);
-        }
-      },
-      //快进快退出现时，显示按钮，否则下拉框不能点击
-      changeInfoContent(val){
-        let self = this;
-        self.showInfoContent = val;
-      },
-      /**
-       * 输入密码后，验证输入的密码是否正确，不正确继续提示输入视频验证码
-       */
-      async verifyEnterPassword(){
-        let self = this;
-        let obj = {};
-        obj.accessToken = self.accessToken;
-        obj.deviceSerial = self.channelInfo.ivsId;
-        obj.oldPassword = self.videoPassword;
-        obj.newPassword = self.videoPassword;
-        let params = qs.stringify(obj)
-        let result = await updateDevicePassword(params);
-        if(result){
-          //验证码输入成功
-          self.showInputPassword = false;
-          self.showError = false;
-          self.times = 0;
-          self.startTs = self.curTime; //切换通道，仍然从最初的时间播放视频
-          // if(self.playState) {
-          //   self.decoder.stop();
-          //   self.playState = false
-          // }
-          //保存验证码到本地
-          let deviceObj = {};
+      });
+    },
+
+    async checkIfEncry() {
+      const self = this;
+      const obj = {};
+      obj.accessToken = self.accessToken;// token
+      if (self.channelInfo == null) {
+        return;
+      }
+      obj.deviceSerial = self.channelInfo.ivsId;
+      const result = await self.getDeviceIsEncrypt(qs.stringify(obj));
+      console.log(result);
+      let suportUpdatePass = false;
+      if (result === 1) {
+        suportUpdatePass = await getDeviceCapacity(qs.stringify(obj));
+      }
+      console.log(suportUpdatePass);
+      if (result === 1) {
+        if (suportUpdatePass) {
+          // if device encried, get validate code from cache firstly
+          // if not exist, show dialog
+          const deviceObj = {};
           deviceObj.deviceSerial = self.channelInfo.ivsId;
           deviceObj.channelId = self.channelInfo.channelId;
-          deviceObj.validateCode = self.videoPassword;
-          self.saveDeviceValidateCode(deviceObj);
-          self.$nextTick(()=> {
-            self.decoder = null;
-            console.log(self.$refs.myPlayer)
-            self.initVideo();
-          })
-        }
-        else{
-          self.videoPassword = '';
-          self.showInputPassword = true;
-        }
-      },
-      //关闭输入验证码框的回调
-      closeDialog(){
-        let self = this;
-        self.videoPassword = ''; //清空数据
-        self.isLoading = false;
-      },
-      cancelEnterPassword(){
-        let self = this;
-        self.videoPassword = '';
-        self.showInputPassword = false;
-      },
-      /**
-       * 缓存加密设备的验证码，防止输入验证码一直弹出
-       */
-      saveDeviceValidateCode(deviceObj){
-        let self=this;
-        let key= 'ezviz'+'_'+ self.userId;
-        let temp= [];
-        if(localStorage.getItem(key)!=null||localStorage.getItem(key) != undefined){
-          temp=JSON.parse(localStorage.getItem(key));
-        }
-        /**
-         * 重新更新验证码
-         */
-        temp.forEach((item,index)=>{
-          if(item.deviceSerial == deviceObj.deviceSerial && item.channelId == deviceObj.channelId){
-            temp.splice(index,1);
+          const result = self.getDeviceValidateCode(deviceObj);
+          if (result.length > 0) {
+            self.videoPassword = result;
+            self.verifyEnterPassword();
+          } else {
+            // not exist password
+            self.isLoading = false;
+            self.showError = true;
+            self.errorMsg = self.$t('remotePatrol.videoEncrypted');
+            self.showInputPassword = true;
           }
-        })
-        temp.push(deviceObj);
-        console.log(temp)
-        localStorage.setItem(key,JSON.stringify(temp));
-      },
+        } else {
+          // not support update password
+          self.isLoading = false;
+          self.showError = true;
+          self.errorMsg = self.$t('remotePatrol.videoCannotPlay');
+        }
+      } else {
+        self.showError = false;
+        self.videoPassword = '';
+        self.times = 0;
+        self.ifIsEncrypt = false;
+        self.changeId && (self.startTs = self.curTime); // 切换通道，仍然从最初的时间播放视频
+        if (self.playState) {
+          self.decoder.stop();
+          self.playState = false;
+        }
+        self.$nextTick(() => {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer);
+          if (self.fullWindow) {
+            self.initFullWindowVideo();
+          } else {
+            self.initVideo();
+          }
+        });
+      }
+    },
+
+    async getDeviceIsEncrypt(params) {
+      const self = this;
+      console.log(params);
+      const ret = await getIsEncrypt(params);
+      console.log(ret);
+      return ret;
+    },
+
+    async initVideo() {
+      const self = this;
+      self.showError = false;
+      console.log(self.playBack);
+      self.showModelContent = false;
+      if (self.channelInfo == null) {
+        return;
+      }
+      if (self.channelInfo.channelId == undefined) {
+        return;
+      } else {
+        self.isLoading = true;
+        const o = self.$refs.myPlayer || self.$refs.errorModel;
+        // let width = o.offsetWidth;
+        const height = o.offsetHeight;
+        let width = 0;
+        switch (self.proportion) {
+          case '4:3':
+            width = 560;
+            break;
+          case '16:9':
+            width = 746;
+            break;
+          default:
+            width = 560;
+            break;
+        }
+        self.initPlayerWidth = o.offsetWidth;
+        self.initPlayerHeight = height;
+        console.log(width);
+        console.log(height);
+        self.getVideoUrl();
+        console.log(self.videoUrl);
+        if (self.accessToken === '') {
+          self.notify(self.$t('remotePatrol.getAccessTokenError'), 'warning', 3000);
+          return;
+        }
+        const isGlobalWebsite = Environment.isGlobalWebsite;
+        const decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China';
+        if (isGlobalWebsite) {
+          self.decoder = new EZUIKit_Global.EZUIPlayer({
+            id: 'myPlayer',
+            autoplay: true,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: height,
+            splitBasis: 1,
+            env: self.areaDomain,
+            handleError: self.handleError,
+            handleSuccess: self.handleSuccess
+          });
+        } else {
+          self.decoder = new EZUIKit_China.EZUIPlayer({
+            id: 'myPlayer',
+            autoplay: true,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: height,
+            handleError: self.handleError,
+            handleSuccess: self.handleSuccess
+          });
+        }
+      }
+    },
+
+    handleError(e) {
+      console.log(e.msg);
+      const self = this;
+      self.isLoading = false;
+      // self.errorMsg = e.msg;
+      self.showError = true;
+      const retcode = e.retcode;
+      self.errorMsg = self.getErrorMsg(e);
+      if (self.playState) {
+        if (!self.fullWindow) {
+          if (self.ifOpenSound) {
+            self.decoder.closeSound();
+          }
+          self.decoder.stop();
+        } else {
+          if (self.ifOpenSound) {
+            self.fullDecoder.closeSound();
+          }
+          self.fullDecoder.stop();
+        }
+      } else {
+        self.decoder.stop();
+      }
+      self.playState = false;
+      self.ifOpenSound = false;
+      self.realTimeSpeed = 0;
+      self.times = 0;
+      window.clearInterval(self.timerPlayReal);
+      self.timerPlayReal = null;
+      if (self.playBack) {
+        self.playBackState = false;
+      }
+    },
+
+    getErrorMsg(err) {
+      const self = this;
+      let retcode = err.code;
+      if (!retcode) {
+        retcode = err.retcode;
+      }
+      let msg = '';
+      switch (retcode) {
+        case '10001': {
+          msg = self.$t('remotePatrol.partolError');
+          break;
+        }
+        case '10002': {
+          msg = self.$t('remotePatrol.accessTokenError');
+          break;
+        }
+        case '10026': {
+          msg = self.$t('remotePatrol.maxDeviceNum');
+          break;
+        }
+        case '20018': {
+          msg = self.$t('remotePatrol.noDevice');
+          break;
+        }
+        case 9048: {
+          msg = self.$t('remotePatrol.maxConcurrency');
+          break;
+        }
+        case 5451: {
+          msg = self.$t('remotePatrol.deviceOffline');
+          break;
+        }
+        case 5402: {
+          msg = self.$t('remotePatrol.noHistoryVideo');
+          break;
+        }
+        case 5544: {
+          msg = self.$t('remotePatrol.noVideoSource');
+          break;
+        }
+        default: {
+          msg = err.msg;
+          break;
+        }
+      }
+      return msg;
+    },
+
+    handleSuccess() {
+      const self = this;
+      self.editCount++;
+      self.showError = false;
+      self.errorMsg = '';
+      self.realTimeSpeed = 0;
+      window.clearInterval(self.timerPlayReal);
+      self.timerPlayReal = window.setInterval(() => {
+        console.log(self.realTimeSpeed);
+        self.realTimeSpeed = self.realTimeSpeed + 1;
+        if (self.playBack) {
+          self.getProcess();
+        }
+      }, 1000);
+      setTimeout(() => {
+        self.playState = true;
+        self.isLoading = false;
+        self.showModelContent = true;
+        // self.showInfoContent=false;
+        // self.ifOpenSound = false;
+        if (self.fullWindow) {
+          if (self.ifOpenSound) {
+            self.fullDecoder.openSound();
+          }
+        } else {
+          if (self.ifOpenSound) {
+            self.decoder.openSound();
+          }
+        }
+        if (self.playBack) {
+          self.playBackState = true;
+        } else {
+          self.times = 0;
+          self.playBackState = false;
+        }
+      }, 2000);
+    },
+
+    handleFullWindowSuccess() {
+      const self = this;
+      self.editCount++;
+      // self.playState = true;
+      self.showError = false;
+      self.errorMsg = '';
+      if (self.playState) {
+        self.realTimeSpeed = self.realTimeSpeed + 1;
+        console.log(self.realTimeSpeed);
+        if (self.playBack) {
+          self.getProcess();
+        }
+      }
+
+      setTimeout(() => {
+        self.showModelContent = true;
+        // self.showInfoContent=false;
+        self.isLoading = false;
+        if (self.ifOpenSound) {
+          self.fullDecoder.openSound();
+        }
+        // self.ifOpenSound = false
+      }, 2000);
+    },
+
+    handleExitFullScreenSuccess() {
+      const self = this;
+      self.showError = false;
+      self.errorMsg = '';
+      if (self.clickSnapshot) {
+        // self.stopRealTime()
+        self.isLoading = false;
+        self.showModelContent = false;
+      }
+      if (self.playState) {
+        self.realTimeSpeed = self.realTimeSpeed + 1;
+        console.log(self.realTimeSpeed);
+        if (self.playBack) {
+          self.getProcess();
+        }
+      }
+
+      setTimeout(() => {
+        self.isLoading = false;
+        self.showModelContent = true;
+        // self.showInfoContent=false;
+        if (self.ifOpenSound) {
+          self.decoder.openSound();
+        }
+      }, 2000);
+    },
+
+    controlScreen() {
+      const self = this;
+      if (!self.fullWindow) {
+        self.fullWindowScreen();
+        setTimeout(() => {
+          self.showModelContent = false;
+          // self.showInfoContent=false;
+        }, 3000);
+      } else {
+        self.exitFullscreen();
+        self.fullWindow = false;
+      }
+    },
+
+    fullWindowScreen(...val) {
+      console.log(val);
+      const self = this;
+      self.fullWindow = true;
+      var ele = document.getElementById('videoContent');
+      ele.style.width = '100%';
+      ele.style.height = '100%';
+      const width = self.varyWindowWidth;
+      const height = self.varyWindowHeight;
+
+      if (ele.requestFullscreen) {
+        ele.requestFullscreen();
+      } else if (ele.mozRequestFullScreen) {
+        ele.mozRequestFullScreen();
+      } else if (ele.webkitRequestFullScreen) {
+        ele.webkitRequestFullScreen();
+      } else if (ele.msRequestFullscreen) {
+        ele.msRequestFullscreen();
+      }
+      self.resetVideoSize('fullin');
+    },
+
+    exitFullscreen() {
+      const self = this;
+      var de = document;
+      self.fullWindow = false;
+      var ele = document.getElementById('videoContent');
+      var playerEle = self.$refs.myPlayer;
+      playerEle.style.width = self.initPlayerWidth + 'px'; // 动态设置HTML元素高度
+      playerEle.style.height = self.initPlayerHeight + 'px';
+      self.$nextTick(() => {
+        ele.style.width = self.initPlayerWidth + 'px';
+        ele.style.height = self.initPlayerHeight + 'px';
+        // playerEle.style.width = self.initPlayerWidth + 'px';
+        // playerEle.style.height = self.initPlayerHeight + 'px';
+      });
+      const width = ele.offsetWidth;
+      const height = ele.offsetHeight;
+
+      if (de.exitFullscreen) {
+        de.exitFullscreen();
+      } else if (de.mozCancelFullScreen) {
+        de.mozCancelFullScreen();
+      } else if (de.webkitCancelFullScreen) {
+        de.webkitCancelFullScreen();
+      }
+      self.exitFullScreenPlayer();
+    },
+
+    exitFullScreenPlayer() {
+      const self = this;
+      if (self.playState) {
+        if (self.ifOpenSound) {
+          self.fullDecoder.closeSound();
+        }
+        self.fullDecoder.stop();
+        self.fullDecoder = null;
+        self.isLoading = true;
+        let width = 0;
+        switch (self.proportion) {
+          case '4:3':
+            width = 560;
+            break;
+          case '16:9':
+            width = 746;
+            break;
+          default:
+            width = 560;
+            break;
+        }
+        console.log(self.initPlayerWidth);
+        console.log(self.initPlayerHeight);
+        self.getVideoUrl();
+        const isGlobalWebsite = Environment.isGlobalWebsite;
+        const decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China';
+        if (isGlobalWebsite) {
+          self.decoder = new EZUIKit_Global.EZUIPlayer({
+            id: 'myPlayer',
+            autoplay: self.playState,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: self.initPlayerHeight,
+            splitBasis: 1,
+            env: self.areaDomain,
+            handleError: self.handleError,
+            handleSuccess: self.handleExitFullScreenSuccess
+          });
+        } else {
+          self.decoder = new EZUIKit_China.EZUIPlayer({
+            id: 'myPlayer',
+            autoplay: self.playState,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: self.initPlayerHeight,
+            handleError: self.handleError,
+            handleSuccess: self.handleExitFullScreenSuccess
+          });
+        }
+      } else {
+        // do nothing
+      }
+    },
+
+    resetVideoSize(e) {
+      const self = this;
+      if (self.channelInfo == null) {
+        return;
+      } else if (self.playState) {
+        if (e === 'fullin') {
+          self.decoder.closeSound();
+          self.decoder.stop();
+          self.decorder = null;
+        }
+        self.isLoading = true;
+        const height = screen.height;
+        let width = 0;
+        switch (self.proportion) {
+          case '4:3':
+            width = height * 4 / 3;
+            break;
+          case '16:9':
+            width = height * 16 / 9;
+            break;
+          default:
+            width = height * 4 / 3;
+            break;
+        }
+        const playerEle = self.$refs.myPlayer;
+        playerEle.style.width = screen.width + 'px';
+        playerEle.style.height = screen.height + 'px';
+        console.log(width);
+        console.log(height);
+        console.log(playerEle);
+        console.log(self.playState);
+        self.getVideoUrl();
+        const isGlobalWebsite = Environment.isGlobalWebsite;
+        const decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China';
+        if (isGlobalWebsite) {
+          self.fullDecoder = new EZUIKit_Global.EZUIPlayer({
+            id: 'fullPlayer',
+            autoplay: self.playState,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: height,
+            splitBasis: 1,
+            env: self.areaDomain,
+            handleError: self.handleError,
+            handleSuccess: self.handleFullWindowSuccess
+          });
+        } else {
+          self.fullDecoder = new EZUIKit_China.EZUIPlayer({
+            id: 'fullPlayer',
+            autoplay: self.playState,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: height,
+            handleError: self.handleError,
+            handleSuccess: self.handleFullWindowSuccess
+          });
+        }
+      } else {
+        // do nothing
+      }
+    },
+
+    showModel() {
+      const self = this;
+      if (self.playState) {
+        self.showModelContent = true;
+      }
+    },
+
+    hiddenModel() {
+      const self = this;
+      self.showModelContent = false;
+    },
+
+    async realTime() {
+      const self = this;
+      self.times = 0;
+      if (self.isStoreMonitor && !self.isLoaded) {
+        self.checkIfEncry();
+        self.isLoaded = true;
+      } else {
+        if (self.fullWindow) {
+          self.initFullWindowVideo();
+        } else {
+          self.initVideo();
+        }
+      }
+    },
+
+    initFullWindowVideo() {
+      const self = this;
+      if (self.channelInfo == null) {
+        return;
+      } else {
+        const o = document.getElementById('videoContent');
+        // o.style.width= width + 'px'
+        // o.style.height= height + 'px'
+        const width = screen.width;
+        const height = screen.height;
+        const playerEle = self.$refs.myPlayer;
+        playerEle.style.width = screen.width + 'px'; // 动态设置HTML元素高度
+        playerEle.style.height = screen.height + 'px';
+        console.log(width);
+        console.log(height);
+        self.isLoading = true;
+        self.getVideoUrl();
+        const isGlobalWebsite = Environment.isGlobalWebsite;
+        const decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China';
+        if (isGlobalWebsite) {
+          self.fullDecoder = new EZUIKit_Global.EZUIPlayer({
+            id: 'fullPlayer',
+            autoplay: true,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: height,
+            splitBasis: 1,
+            env: self.areaDomain,
+            handleError: self.handleError,
+            handleSuccess: self.handleSuccess
+          });
+        } else {
+          self.fullDecoder = new EZUIKit_China.EZUIPlayer({
+            id: 'fullPlayer',
+            autoplay: true,
+            url: self.videoUrl,
+            accessToken: self.accessToken,
+            decoderPath: decoderPath,
+            width: width,
+            height: height,
+            handleError: self.handleError,
+            handleSuccess: self.handleSuccess
+          });
+        }
+      }
+    },
+
+    stopRealTime() {
+      const self = this;
+      if (self.playState) {
+        if (self.fullWindow) {
+          self.fullDecoder.closeSound();
+          self.fullDecoder.stop();
+          self.fullDecoder = null;
+        } else {
+          self.decoder.closeSound();
+          self.decoder.stop();
+          self.decoder = null;
+        }
+
+        window.clearInterval(self.timerPlayReal);
+        self.realTimeSpeed = 0;
+        self.stopVideoTime = false;
+        self.timerPlayReal = null;
+      }
+      self.ifOpenSound = false;
+      self.showModelContent = false;
+      // self.showInfoContent=false;
+      self.playState = false;
+      self.curBack = '';
+      self.currentTimeValue = 0;
+    },
+
+    openSound() {
+      const self = this;
+      self.ifOpenSound = true;
+      if (self.fullWindow) {
+        self.fullDecoder.openSound();
+      } else {
+        self.decoder.openSound();
+      }
+    },
+
+    closeSound() {
+      const self = this;
+      self.ifOpenSound = false;
+      if (self.fullWindow) {
+        self.fullDecoder.closeSound();
+      } else {
+        self.decoder.closeSound();
+      }
+    },
+
+    stopVideo() {
+      const self = this;
+      if (self.playState) {
+        if (self.fullWindow) {
+          self.fullDecoder.closeSound();
+          self.fullDecoder.stop();
+          self.fullDecoder = null;
+        } else {
+          self.decoder.closeSound();
+          self.decoder.stop();
+          self.decoder = null;
+        }
+      }
+    },
+
+    cutPicture() {
+      const self = this;
+      if (self.fullWindow) {
+        self.fullDecoder.capturePicture(0, 'default');
+      } else {
+        self.decoder.capturePicture(0, 'default');
+      }
+      self.imageCanvasList = [];
+      if (self.showFeedBack) {
+        self.showSnapshotFeedbackDialog = true;
+        self.eventName = '';
+        self.eventDes = '';
+        self.showEventNameInfo = false;
+        this.$nextTick(() => {
+          self.canvasEl = document.getElementById('icanvas');
+          var ctx = self.canvasEl.getContext('2d');
+          const img = new Image();
+          setTimeout(() => {
+            self.imgSrc = sessionStorage.getItem('fileUrl');
+            const img = document.getElementById('imgTest');
+            // self.stopRealTime();
+            if (self.fullWindow) {
+              self.exitFullscreen();
+              self.fullWindow = false;
+              self.clickSnapshot = true;
+            }
+            html2canvas(img).then(function(canvas) {
+              ctx.drawImage(img, 0, 0, 520 * self.percentHeight, 340 * self.percentHeight);
+              var oGrayImg = icanvas.toDataURL('image/jpeg');
+              self.imageCanvas.src = oGrayImg;
+              const imgObj = new Image();
+              imgObj.src = oGrayImg;
+              self.imageCanvasList.push(imgObj);
+            });
+          }, 100);
+        });
+      } else {
+        self.showCancelContent = false;
+        if (self.sourceListLength >= 10) {
+          const msg = self.isStoreMonitor ? self.$t('remotePatrol.storeMaxAttach') : self.$t('remotePatrol.maximumAttach');
+          self.notify(msg, 'warning', 3000);
+          return false;
+        }
+        self.showCutDialog = true;
+        this.$nextTick(() => {
+          self.canvasEl = document.getElementById('icanvas');
+          var ctx = self.canvasEl.getContext('2d');
+          const img = new Image();
+          setTimeout(() => {
+            self.imgSrc = sessionStorage.getItem('fileUrl');
+            // self.stopRealTime();
+            const img = document.getElementById('imgTest');
+            if (self.fullWindow) {
+              self.exitFullscreen();
+              self.fullWindow = false;
+              self.clickSnapshot = true;
+            }
+            html2canvas(img).then(function(canvas) {
+              ctx.drawImage(img, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
+              var oGrayImg = icanvas.toDataURL('image/jpeg');
+              self.imageCanvas.src = oGrayImg;
+              const imgObj = new Image();
+              imgObj.src = oGrayImg;
+              self.imageCanvasList.push(imgObj);
+            });
+          }, 100);
+        });
+      }
+    },
+
+    showPenList() {
+      const self = this;
+      self.showPen = !self.showPen;
+      self.showCancelContent = false;
+    },
+
+    checkPen(item, index) {
+      const self = this;
+      item.showContent = true;
+      self.penList.forEach((_item, _index) => {
+        if (index != _index) {
+          _item.showContent = false;
+        }
+      });
+      self.penChecked = item.id;
+    },
+
+    cancelEditCanvas() {
+      const self = this;
+      self.showCancelContent = false;
+      self.canvasEl = document.getElementById('icanvas');
+      var ctx = self.canvasEl.getContext('2d');
+      let vcanvas = null;
+      if (self.showFeedBack) {
+        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
+      } else {
+        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
+      }
+      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
+      ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
+      self.imageCanvasList = [];
+    },
+    confirmEditCanvas() {
+      const self = this;
+      self.showCancelContent = false;
+      self.imageCanvasList.pop();
+      self.canvasEl = document.getElementById('icanvas');
+      var ctx = self.canvasEl.getContext('2d');
+      let vcanvas = null;
+      if (self.showFeedBack) {
+        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
+      } else {
+        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
+      }
+      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
+      if (self.imageCanvasList.length === 0) {
+        ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
+      } else {
+        ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length - 1], 0, 0, vcanvas.width, vcanvas.height);
+      }
+    },
+
+    confirmEdit() {
+      const self = this;
+      const obj = {};
+      obj.mediaType = 2;
+      const src = self.canvasEl.toDataURL('image/jpeg');
+      self.$emit('confirmEzvizCanvas', src);
+      self.showCutDialog = false;
+    },
+
+    mouseDownAction(e) {
+      const self = this;
+      self.isMouseDown = true;
+      self.X = e.offsetX;
+      self.Y = e.offsetY;
+      self.showCutModel = false;
+      self.showPenBtn = false;
+      self.showCancelContent = false;
+    },
+
+    mouseMoveAction(e) {
+      const self = this;
+      if (self.isMouseDown) {
+        self.X1 = e.offsetX;
+        self.Y1 = e.offsetY;
+        self.drawLine(self.X, self.Y, self.X1, self.Y1);
+        self.showPenBtn = false;
+        self.flag++;
+      }
+    },
+
+    mouseUpHandler(e) {
+      const self = this;
+      self.isMouseDown = false;
+      self.showCutModel = true;
+      self.showPenBtn = true;
+      self.showCancelContent = true;
+      if (self.flag != 0 && self.canvasEl != '') {
+        const imgObj = new Image();
+        imgObj.src = self.canvasEl.toDataURL('image/jpeg');
+        self.imageCanvasList.push(imgObj);
+      }
+      self.flag = 0;
+    },
+
+    mouseLeaveAction(e) {
+      console.log(e);
+      const self = this;
+      self.isMouseDown = false;
+    },
+
+    drawLine(x, y, x1, y1) {
+      const self = this;
+      var ctx = self.canvasEl.getContext('2d');
+      if (self.flag) {
+        ctx.beginPath();
+      }
+      ctx.moveTo(x, y);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = self.penChecked;
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+      if (self.flag != 0) {
+        self.X = self.X1;
+        self.Y = self.Y1;
+      }
+    },
+
+    showCancel() {
+      const self = this;
+      self.showCancelContent = true;
+      self.showPenBtn = true;
+    },
+
+    hiddenCancel() {
+      const self = this;
+      self.showCancelContent = false;
+      self.showPenBtn = false;
+    },
+
+    confirmFeedBackOnSnapshot() {
+      const self = this;
+      const src = self.canvasEl.toDataURL('image/jpeg');
+      const obj = {
+        eventName: self.eventName,
+        eventDes: self.eventDes,
+        src: src
+      };
+      if (self.eventName.trim().length === 0) {
+        self.showEventNameInfo = true;
+        return false;
+      }
+      self.$emit('ezvizCutPictureFeedback', obj);
+      self.showSnapshotFeedbackDialog = false;
+    },
+
+    checkFull() {
+      var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+      if (isFull === undefined) {
+        isFull = false;
+      }
+      return isFull;
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    },
+
+    stopAndRealTime() {
+      const self = this;
+      self.showError = false;
+      if (self.playState) {
+        self.decoder.stop();
+      }
+      self.$nextTick(() => {
+        self.decoder = null;
+        console.log(self.$refs.myPlayer);
+        self.initVideo();
+      });
+    },
+
+    async getProcess() {
+      const self = this;
+      self.times += 1;
+      const duration = 300;
+      self.durationTimeValue = duration;
+      self.currentTimeValue = self.times;
+      var callback = function(iTime) {
+        self.startTs = iTime;
+        console.log('iTime', iTime);
+        console.log('self.startTs', self.startTs);
+      };
+      if (!self.fullWindow) {
+        self.decoder.getOSDTime(callback);
+      } else {
+        self.fullDecoder.getOSDTime(callback);
+      }
+      if (self.times >= duration) {
+        self.decoder.stop();
+        self.currentTimeValue = 0;
+        self.times = 0;
+        self.playState = false;
+        window.clearInterval(self.timerPlayReal);
+        self.timerPlayReal = null;
+      }
+    },
+
+    adjustProcess(val, label) {
+      console.log(val);
+      const self = this;
+      self.curBack = label;
+      var callback = function(iTime) {
+        console.log('iTime', iTime);
+        switch (val) {
+          case 0: self.startTs = iTime - 10 * 1000; break;
+          case 1: self.startTs = iTime - 30 * 1000; break;
+          case 2: self.startTs = iTime - 60 * 1000; break;
+          default: break;
+        }
+        self.times = 0;
+        if (self.fullWindow) {
+          if (self.playState) {
+            if (self.ifOpenSound) {
+              self.fullDecoder.closeSound();
+            }
+            self.fullDecoder.stop();
+            self.fullDecoder = null;
+          }
+          self.initFullWindowVideo();
+          console.log('self.startTs', self.startTs);
+        } else {
+          if (self.playState) {
+            if (self.ifOpenSound) {
+              self.decoder.closeSound();
+            }
+            self.decoder.stop();
+            self.decoder = null;
+          }
+          self.initVideo();
+          console.log('self.startTs', self.startTs);
+        }
+      };
+      if (self.fullWindow) {
+        self.fullDecoder.getOSDTime(callback);
+      } else {
+        self.decoder.getOSDTime(callback);
+      }
+    },
+
+    changeInfoContent(val) {
+      const self = this;
+      self.showInfoContent = val;
+    },
+
+    async verifyEnterPassword() {
+      const self = this;
+      const obj = {};
+      obj.accessToken = self.accessToken;
+      obj.deviceSerial = self.channelInfo.ivsId;
+      obj.oldPassword = self.videoPassword;
+      obj.newPassword = self.videoPassword;
+      const params = qs.stringify(obj);
+      const result = await updateDevicePassword(params);
+      if (result) {
+        self.showInputPassword = false;
+        self.showError = false;
+        self.times = 0;
+        self.startTs = self.curTime;
+        const deviceObj = {};
+        deviceObj.deviceSerial = self.channelInfo.ivsId;
+        deviceObj.channelId = self.channelInfo.channelId;
+        deviceObj.validateCode = self.videoPassword;
+        self.saveDeviceValidateCode(deviceObj);
+        self.$nextTick(() => {
+          self.decoder = null;
+          console.log(self.$refs.myPlayer);
+          self.initVideo();
+        });
+      } else {
+        self.videoPassword = '';
+        self.showInputPassword = true;
+      }
+    },
+
+    closeDialog() {
+      const self = this;
+      self.videoPassword = '';
+      self.isLoading = false;
+    },
+
+    cancelEnterPassword() {
+      const self = this;
+      self.videoPassword = '';
+      self.showInputPassword = false;
+    },
+
+    /**
+     * cache validate code
+     */
+    saveDeviceValidateCode(deviceObj) {
+      const self = this;
+      const key = 'ezviz' + '_' + self.userId;
+      let temp = [];
+      if (localStorage.getItem(key) != null || localStorage.getItem(key) != undefined) {
+        temp = JSON.parse(localStorage.getItem(key));
+      }
       /**
-       * 根据deviceSerial和channelId 获取对应的验证码
+       * update code
+       */
+      temp.forEach((item, index) => {
+        if (item.deviceSerial === deviceObj.deviceSerial && item.channelId === deviceObj.channelId) {
+          temp.splice(index, 1);
+        }
+      });
+      temp.push(deviceObj);
+      console.log(temp);
+      localStorage.setItem(key, JSON.stringify(temp));
+    },
+
+    /**
+       * get validate code base on deviceSerial and channelId
        * @returns {Array}
        */
-      getDeviceValidateCode(deviceObj){
-        let self=this;
-        let userId = getCookie('UserId');
-        self.userId=userId;
-        let key= 'ezviz'+'_'+ self.userId;
-        let temp=[];
-        let validateCode = '';
-        if(localStorage.getItem(key) != null||localStorage.getItem(key) != undefined){
-          temp = JSON.parse(localStorage.getItem(key));
+    getDeviceValidateCode(deviceObj) {
+      const self = this;
+      const userId = getCookie('UserId');
+      self.userId = userId;
+      const key = 'ezviz' + '_' + self.userId;
+      let temp = [];
+      let validateCode = '';
+      if (localStorage.getItem(key) != null || localStorage.getItem(key) != undefined) {
+        temp = JSON.parse(localStorage.getItem(key));
+      }
+      temp.forEach((item, index) => {
+        if (item.deviceSerial === deviceObj.deviceSerial && item.channelId === deviceObj.channelId) {
+          validateCode = item.validateCode;
+        } else {
+          // do nothing
         }
-        temp.forEach((item, index)=>{
-          if(item.deviceSerial == deviceObj.deviceSerial && item.channelId == deviceObj.channelId){
-            validateCode = item.validateCode;
+      });
+      console.log(validateCode);
+      return validateCode;
+    },
+
+    eventNameChanged(val) {
+      const self = this;
+      const content = filterString.standard(val, 50);
+      console.log(content);
+      self.eventName = content;
+      self.showEventNameInfo = false;
+      const length = filterString.getContentLength(val);
+      if (length > 50) {
+        this.eventNameRuletip = true;
+      } else {
+        this.eventNameRuletip = false;
+      }
+    },
+
+    eventDesChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 200);
+      console.log(content);
+      self.eventDes = content;
+      const length = filterString.getContentLength(val);
+      if (length > 200) {
+        this.eventDesRuletip = true;
+      } else {
+        this.eventDesRuletip = false;
+      }
+    },
+
+    notShowInputRuleTips(e) {
+      if (e === 'eventName') {
+        this.eventNameRuletip = false;
+      } else if (e === 'eventDes') {
+        this.eventDesRuletip = false;
+      }
+    },
+
+    getVideoUrl() {
+      const self = this;
+      const isGlobalWebsite = Environment.isGlobalWebsite;
+      if (self.playBack) {
+        self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
+        self.endTime = Number(self.$moment(self.startTs).add(5, 'm').format('YYYYMMDDHHmmss'));
+        if (self.videoPassword.length > 0) {
+          if (isGlobalWebsite) {
+            self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ezviz.com/' + self.channelInfo.ivsId
+              + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
+          } else {
+            self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId
+              + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           }
-          else{
-            // do nothing
+        } else {
+          if (isGlobalWebsite) {
+            self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/'
+              + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
+          } else {
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/'
+              + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           }
-        })
-        console.log(validateCode)
-        return validateCode;
-      },
-      eventNameChanged(val){
-        let self = this;
-        let content = filterString.standard(val,50);
-        console.log(content);
-        self.eventName = content;
-        self.showEventNameInfo = false;
-        let length = filterString.getContentLength(val);
-        if(length>50){
-              this.eventNameRuletip=true
-          }else{
-              this.eventNameRuletip=false
-          }
-      },
-      eventDesChanged(val){
-        let self = this;
-        let content = filterString.all(val,200);
-        console.log(content);
-        self.eventDes = content;
-        let length = filterString.getContentLength(val);
-        if(length>200){
-              this.eventDesRuletip=true
-          }else{
-              this.eventDesRuletip=false
-          }
-      },
-      notShowInputRuleTips(e){
-        if(e=='eventName'){
-            this.eventNameRuletip=false
-        }else if(e=='eventDes'){
-            this.eventDesRuletip=false
         }
-      },
-      getVideoUrl(){
-        let self = this;
-        let isGlobalWebsite = Environment.isGlobalWebsite
-        if(self.playBack){
-          self.startTime = Number(self.$moment(self.startTs).format('YYYYMMDDHHmmss'));
-          self.endTime = Number(self.$moment(self.startTs).add(5,'m').format('YYYYMMDDHHmmss')); //五分钟视频
-          if(self.videoPassword.length > 0){
-            if(isGlobalWebsite){
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            }else{
-              self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            }
+      } else {
+        if (self.videoPassword.length > 0) {
+          self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId
+            + '/' + self.channelInfo.channelId + '.live';
+        } else {
+          if (isGlobalWebsite) {
+            self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/'
+              + self.channelInfo.channelId + '.live';
+          } else {
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/'
+              + self.channelInfo.channelId + '.live';
           }
-          else {
-            if(isGlobalWebsite){
-              self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            }else{
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end='+ self.endTime;
-            }
-          }
-        }
-        else{
-          if(self.videoPassword.length > 0){
-            self.videoUrl = 'ezopen://'+ self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
-          }
-          else{
-            if(isGlobalWebsite){
-              self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
-            }else{
-              self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' + self.channelInfo.channelId + '.live';
-            }
-          }
-          //self.videoUrl = 'ezopen://open.ys7.com/' + self.ivsId + '/' + self.channelId + '.live';
         }
       }
     }
   }
+};
 </script>
 
 <style lang="scss" scoped>

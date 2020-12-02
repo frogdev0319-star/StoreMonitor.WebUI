@@ -1,7 +1,6 @@
+const version = 'v1.0';
 
-let version = 'v1.0';
-
-let _Environments = {
+const _Environments = {
   Debug_XA: {
     CHINA_WEBSITE: 'http://172.21.81.63:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://172.21.81.63:8081/storemonitor/api/',
@@ -16,41 +15,40 @@ let _Environments = {
     VERSION: version
   },
   Preview: {
-    //BASE_URL: 'http://13.76.227.211:8081/storemonitor/api/',
+    // BASE_URL: 'http://13.76.227.211:8081/storemonitor/api/',
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://20.184.3.197/storemonitor/api/',
     USHOP_URL: 'https://preview.ushop-plus.com/',
     POST_URL: 'http://preview-pos.ushop-plus.com/',
-    VERSION: version,
+    VERSION: version
   },
   Stable: {
-    //CHINA_WEBSITE: 'http://52.187.122.98:8081/storemonitor/api/',
-    //CHINA_WEBSITE: 'http://47.103.41.236:8081/storemonitor/api/',
+    // CHINA_WEBSITE: 'http://52.187.122.98:8081/storemonitor/api/',
+    // CHINA_WEBSITE: 'http://47.103.41.236:8081/storemonitor/api/',
     CHINA_WEBSITE: 'http://mgmt.storevue.com.cn:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://mgmt.storevue.com/storemonitor/api/',
     USHOP_URL: 'https://portals.ushop-plus.com/',
     POST_URL: 'http://pos.ushop-plus.com/',
-    VERSION: version,
+    VERSION: version
   },
   QA: {
-    //BASE_URL: 'http://172.21.81.176:19085/storemonitor/api/',
-    // 部署到QA环境使用外网IP
+    // BASE_URL: 'http://172.21.81.176:19085/storemonitor/api/',
     CHINA_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
   }
-}
+};
 
-let environJSON = _Environments.Preview;
-let isGlobalWebsite = false;
+const environJSON = _Environments.Stable;
+const isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {
   USHOP_URL: environJSON.USHOP_URL,
   POST_URL: environJSON.POST_URL,
   VERSION: environJSON.VERSION,
-  isGlobalWebsite:isGlobalWebsite,
+  isGlobalWebsite: isGlobalWebsite,
   BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
-}
+};

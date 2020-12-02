@@ -3,13 +3,14 @@ import * as inpectRESTful from './inspect';
 import * as deviceRESTful from './device';
 import * as eventRESTful from './event';
 import * as ezvizRESTful from './ezviz';
-import * as titleRESTful from './title'
-import * as apiMock from './apiMock';
+import * as titleRESTful from './title';
+
 export default api;
+
 export {
-    inpectRESTful,
-    deviceRESTful,
-    eventRESTful,
-    ezvizRESTful,
-    titleRESTful
+  inpectRESTful,
+  deviceRESTful,
+  eventRESTful,
+  ezvizRESTful,
+  titleRESTful
 };
