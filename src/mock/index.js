@@ -1,7 +1,7 @@
-//引入mock文件
-require('@/mock/napemock')
+// 引入mock文件
+require('@/mock/napemock');
 
-const Mock=require('mockjs');
+const Mock = require('mockjs');
 Mock.setup({
-    timeout:0-300
-})
+  timeout: 0 - 300
+});

@@ -1,70 +1,73 @@
-
-import Vue from 'vue'
-import App from './App'
-import './assets/font/iconfont.css'
-import '../static/Roboto/css.css'
+import Vue from 'vue';
+import App from './App';
+import './assets/font/iconfont.css';
+import '../static/Roboto/css.css';
 import ElementUI from 'element-ui';
-// import locale from 'element-ui/lib/locale/lang/en' // lang i18n
-import '../theme/index.css'
-import Cookies from 'js-cookie'
-import 'video.js/dist/video-js.css'
-import 'vue-video-player/src/custom-theme.css'
-import 'videojs-flash'
-import router from './router'
-
-//import rem from '@/common/rem'
-//const ElementUI=require('element-ui');
-import axios from 'axios'
-// import BootstrapVue from 'bootstrap-vue'
-// Vue.use(BootstrapVue)
-import Print from '@/plugins/print'
-Vue.use(Print)
-
-import { ProgressPlugin } from 'bootstrap-vue'
-Vue.use(ProgressPlugin)
-
+import '../theme/index.css';
+import 'video.js/dist/video-js.css';
+import 'vue-video-player/src/custom-theme.css';
+import 'videojs-flash';
+import router from './router';
+import axios from 'axios';
+import { getToken } from '@/common/auth';
+import { message } from '@/common/singleton-message';
+import Print from '@/plugins/print';
+import { ProgressPlugin } from 'bootstrap-vue';
 import store from './store/index.js';
-import i18n from './lang'
-// import './permission' // permission control
-import $ from 'jquery';
-import jquery from 'jquery';
+import i18n from './lang';
 import moment from 'moment';
 import elCascaderMulti from 'el-cascader-multi';
-Vue.use(elCascaderMulti)
-import htmlToPdf from '@/plugins/htmlToPdf'
-Vue.use(htmlToPdf)
-Vue.prototype.$moment = moment;//赋值使用
-Vue.config.productionTip = false
+import htmlToPdf from '@/plugins/htmlToPdf';
 
-// import i18n from 'vue-i18n'
-// Vue.use(VueI18n)
-// Vue.use(ElementUI, { locale })
-
+Vue.use(ProgressPlugin);
+Vue.use(elCascaderMulti);
+Vue.use(htmlToPdf);
+Vue.use(Print);
 Vue.use(ElementUI, {
   size: 'medium', // set element-ui default size
   i18n: (key, value) => i18n.t(key, value)
-})
-Vue.prototype.appName = '看门店管理系统'; //定义一个VUE内全局用到的名称（标题）
-process.env.MOCK && require('@/mock')
+});
 
-function getLoginURL(){
-  return new Promise((resolve,reject)=>{
-    axios.get('serverconfig.json?r=' + (new Date().getTime())).then(res=>{
+Vue.prototype.$moment = moment;
+Vue.config.productionTip = false;
+Vue.prototype.appName = '看门店管理系统';
+Vue.prototype.$message = message;
+
+process.env.MOCK && require('@/mock');
+
+function getLoginURL() {
+  return new Promise((resolve, reject) => {
+    axios.get('serverconfig.json?r=' + (new Date().getTime())).then(res => {
       console.log(res.data.loginURL);
-      let url=res.data.loginURL;
+      const url = res.data.loginURL;
       resolve(url);
-    })
-  })
+    }).catch(err =>{
+      reject(err)
+    });
+  });
 }
-async function setURL(){
-  let url=await getLoginURL();
-  if(url!=undefined&&url.length!=0){
-    sessionStorage.setItem('LoginURL',url);
+
+async function setURL() {
+  const url = await getLoginURL();
+  if (url != undefined && url.length != 0) {
+    sessionStorage.setItem('LoginURL', url);
   }
 }
 setURL();
 
-Vue.use(ElementUI);
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(r => r.meta.requireAuth)) {
+    if (getToken()) {
+      next();
+    } else {
+      const url = sessionStorage.getItem('LoginURL');
+      window.location.href = url;
+    }
+  } else {
+    next();
+  }
+});
+
 new Vue({
   el: '#app',
   router,
@@ -72,40 +75,4 @@ new Vue({
   i18n,
   components: { App },
   template: '<App/>'
-})
-import {getToken} from '@/common/auth'
-import { resolve } from 'url';
-import {message} from '@/common/singleton-message'
-
-Vue.prototype.$message = message;
-
-router.beforeEach((to,from,next)=>{
-  if(to.matched.some(r => r.meta.requireAuth)){ //要跳转的页面需要登陆权限
-    if(getToken()){  //通过vuex state 获取当前的token信息
-      next();
-    }
-    else{
-      let url=sessionStorage.getItem('LoginURL');
-      window.location.href=url;
-    }
-  }
-  else{
-    next();
-  }
-})
-
-// Vue.mixin({
-//   beforeRouteLeave (to, from, next) {
-//     if(from.name=='事件管理'&&to.name=='事件详情'){ //从事件管理页面进入详情页面
-//       this.$store.commit('newCachePath',from.path.split('/'));
-//     }
-//     else if(from.name=='事件详情'&&to.name=='事件管理'){
-//       this.$store.commit('newCachePath',to.path.split('/'));
-//     }
-//     else if(from.name=='事件管理'&&to.name!='事件详情'){
-//       this.$destroy();
-//       //this.$store.commit('newCachePath',from.path.split('/'));
-//     }
-//     next();
-//   }
-// })
+});

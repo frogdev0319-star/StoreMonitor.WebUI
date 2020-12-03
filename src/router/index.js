@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Login from '@/views/login/Login';
 import LoginForm from '@/views/login/LoginForm';
 import AuthRedirect from '@/views/login/AuthRedirect';
 

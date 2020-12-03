@@ -2,111 +2,146 @@
   <div>
     <el-row class="container">
       <div class="header">
-        <div class="logo-content" :class="logoClass">
-          <img :src="imgSrc" alt="logo" id="imgLogo" @click="routerHome">
-          <!--<span class="sys-name" v-if="!collapsed" @click="routerHome">{{generateRoute('title')}}</span>-->
+        <div :class="logoClass" class="logo-content">
+          <img id="imgLogo" :src="imgSrc" alt="logo" @click="routerHome">
         </div>
         <div class="el-traggle-content">
-          <i class="iconfont icon-indent" @click="clickCollapse" v-if="collapsed"></i>
-          <i class="iconfont icon-outdent" @click="clickCollapse" v-else></i>
+          <i v-if="collapsed" class="iconfont icon-indent" @click="clickCollapse"/>
+          <i v-else class="iconfont icon-outdent" @click="clickCollapse"/>
         </div>
         <div>
           <el-breadcrumb separator="|" class="breadcrumb-inner" >
             <el-breadcrumb-item
               v-for="(item,index) in breadList"
-              :key="item.path" class="breadcrumb-item" :to="{ path:item.path}"
-              v-if="index!=0" >
-              <span  :style="breadList.length>2&&index==1?{'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">{{ generateRoute(item.name) }}</span>
+              v-if="index !== 0"
+              :key="item.path"
+              :to="{ path:item.path}"
+              class="breadcrumb-item" >
+              <span :style="breadList.length > 2 && index === 1 ? {'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">
+                {{ $t(`route.${item.name}`) }}</span>
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="headUrl-content">
-          <div class="system-name">{{$t('route.mgt')}}</div>
-          <!-- <div class="bell-content">
-            <i class="el-icon-bell"></i>
-            <el-badge is-dot class="item"></el-badge>
-          </div> -->
+          <div class="system-name">{{ $t('route.mgt') }}</div>
           <el-dropdown class="el-user-drop" >
-                        <span class="username" style="cursor:pointer;">{{userName}}<i class="el-icon-arrow-down el-icon--right"
-                                                                                      style="margin-left:6px;cursor:pointer;"></i></span>
+            <span class="username" style="cursor:pointer;">{{ userName }}
+              <i class="el-icon-arrow-down el-icon--right" style="margin-left:6px;cursor:pointer;"/></span>
             <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
             <el-dropdown-menu slot="dropdown" class="dropdown" style="margin-top:0px;">
-              <el-dropdown-item style="width:120px;padding-left:20px" :disabeled=true>{{generateRoute('my')}}</el-dropdown-item>
-              <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">{{generateRoute('logOut')}}</el-dropdown-item>
+              <el-dropdown-item :disabeled="true" style="width:120px;padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
+              <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
       </div>
-      <el-col class="main" :span="24"
-              :style="($route.path=='/device'||$route.path=='/storemanage'||$route.path=='/event'||$route.path=='/reinspection'||$route.path=='/storemonitor/submit'||$route.path=='/datacenter')?
-            {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}">
-        <div v-if="isMobile&&!collapsed" class="drawer-bg" @click="handleClickOutside" />
+      <el-col
+        :span="24"
+        :style="($route.path === '/device' || $route.path === '/storemanage' || $route.path === '/event'
+              || $route.path === '/reinspection' || $route.path === '/storemonitor/submit' || $route.path === '/datacenter')?
+        {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}"
+        class="main">
+        <div v-if="isMobile && !collapsed" class="drawer-bg" @click="handleClickOutside" />
         <aside :class="classObj" class="aside-menu">
-          <div class="brand-panel" v-if="!collapsed">
-            <span class="brand-label">{{generateRoute('brand')}}</span>
-            <el-select v-model="accountId" placeholder=""   popper-class='brandSelect' class="brand-list" @change='changeAccount' :disabled="brandDisabled" ref="fieldSelect">
+          <div v-if="!collapsed" class="brand-panel">
+            <span class="brand-label">{{ $t('route.brand') }}</span>
+            <el-select ref="fieldSelect" v-model="accountId" :disabled="brandDisabled"
+                       placeholder="" popper-class="brandSelect" class="brand-list" @change="changeAccount">
               <el-option
-                class="options"
-                v-for="(item,index) in brandList" :key="index"
+                v-for="(item,index) in brandList"
+                :key="index"
                 :label="item.name"
-                :value="item.accountId">
-              </el-option>
+                :value="item.accountId"
+                class="options"/>
             </el-select>
           </div>
-          <div v-else class="collapsed-brand-panel"></div>
+          <div v-else class="collapsed-brand-panel"/>
           <el-scrollbar id="el-menuscrollbar">
-            <el-menu :default-active="activePath"
-                     class="el-menu-vertical-demo"
-                     text-color="#eee"
-                     background-color="#222538"
-                     @open="handleopen" @close="handleclose" @select="handleselect"
-                     router :collapse="collapsed" :unique-opened="true"
-                     id="nav-menu"
-                     :collapse-transition="false" style="border:0px;">
+            <el-menu
+              id="nav-menu"
+              :default-active="activePath"
+              :collapse="collapsed"
+              :unique-opened="true"
+              :collapse-transition="false"
+              class="el-menu-vertical-demo"
+              text-color="#eee"
+              background-color="#222538"
+              router
+              style="border:0px;"
+              @open="handleopen"
+              @select="handleselect">
               <template v-for="(item,index) in routerList">
                 <template v-if="!item.hidden">
-                  <!--只有一个节点-->
-                  <el-menu-item  v-if="item.leaf&&item.children.length>0" :id="lang=='en'? 'en-groupSubItem': 'groupSubItem'" class="submenu-item"
-                                 :key="index"  :index="item.children[0].path"
-                                 :disabled="item.isReadOnly"
-                                 style="text-align:left;">
-                    <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                    <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                    <span>{{collapsed?'': generateRoute(item.children[0].name)}}</span>
+                  <!--one node-->
+                  <el-menu-item
+                    v-if="item.leaf && item.children.length > 0"
+                    :id="lang === 'en'? 'en-groupSubItem': 'groupSubItem'"
+                    :key="index"
+                    :index="item.children[0].path"
+                    :disabled="item.isReadOnly"
+                    class="submenu-item"
+                    style="text-align:left;">
+                    <i v-if="lang === 'en'" :class="item.iconCls" :style="collapsed ? {'margin-left':'0'}:{}"
+                       class="en-navIcon"/>
+                    <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left' : '0'}:{}" class="navIcon"/>
+                    <span>{{ collapsed ? '': $t(`route.${item.children[0].name}`) }}</span>
                   </el-menu-item>
-                  <!--多级节点 :disabled="item.name=='巡店管理'"-->
-                  <el-submenu class="el-submenu-content" :key="index" :index="index+''"
-                              v-if="!item.leaf" style="text-align:left;" :style="groupHeight+'px'">
+                  <!--multi nodes -->
+                  <el-submenu
+                    v-if="!item.leaf"
+                    :key="index"
+                    :index="index+''"
+                    :style="groupHeight+'px'"
+                    class="el-submenu-content"
+                    style="text-align:left;">
                     <template slot="title">
-                      <i v-if="lang=='en'" :class="item.iconCls" class="en-navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                      <i v-else :class="item.iconCls" class="navIcon" :style="collapsed?{'margin-left':'0'}:{}"></i>
-                      <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'">{{generateRoute(item.name)}}</span>
+                      <i v-if="lang === 'en'" :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}"
+                         class="en-navIcon"/>
+                      <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}" class="navIcon"/>
+                      <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'">{{ $t(`route.${item.name}`) }}</span>
                     </template>
-                    <el-menu-item :id="lang=='en'?'en-childSubItem':'childSubItem'" class="submenu-item" :style="groupHeight+'px'"
-                                  v-for="child in item.children" :index="child.path"  :disabled="child.isReadOnly"
-                                  :key="child.path" v-if="!child.hidden && !child.threeChild" style="padding-left: 30px;color:#a0a4ad;">
+                    <el-menu-item
+                      v-for="child in item.children"
+                      v-if="!child.hidden && !child.threeChild"
+                      :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'"
+                      :style="groupHeight+'px'"
+                      :index="child.path"
+                      :disabled="child.isReadOnly"
+                      :key="child.path"
+                      class="submenu-item"
+                      style="padding-left: 30px;color:#a0a4ad;">
                       <template slot="title">
-                        <!--<div :class="lang=='en' ? 'en-icon-content': 'icon-content'">-->
-                        <!--<div class="tag-icon"></div>-->
-                        <!--</div>-->
-                        <i class="iconfont icon-yuandian icon-content"></i>
-                        <span >{{generateRoute(child.name)}}</span>
-                        <div v-if="child.name=='storeManage'&&showTag"
-                             style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"></div>
+                        <i class="iconfont icon-yuandian icon-content"/>
+                        <span >{{ $t(`route.${child.name}`) }}</span>
+                        <div
+                          v-if="child.name === 'storeManage' && showTag"
+                          style="display:inline-block; width:8px;height:8px;background-color:#f31d65;border-radius:50%;margin-left:10px;"/>
                       </template>
                     </el-menu-item>
-                    <el-submenu  :class="lang== 'en' ? 'three-child el-submenu-group' : 'zh-three-child'" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                                 :index="child.path"  :disabled="child.isReadOnly"
-                                 :key="child.path" v-else-if="!child.hidden && child.threeChild" style="padding-left: 0px">
+                    <el-submenu
+                      v-else-if="!child.hidden && child.threeChild"
+                      :class="lang === 'en' ? 'three-child el-submenu-group' : 'zh-three-child'"
+                      :style="varyWindowWidth < 1366 ? {'padding-right':'0px'} : {}"
+                      :index="child.path"
+                      :disabled="child.isReadOnly"
+                      :key="child.path"
+                      style="padding-left: 0px">
                       <template slot="title">
-                        <i class="iconfont icon-yuandian icon-content"></i>
-                        <span :class="lang=='en'? 'en-el-submenu-group':'el-submenu-group'" :id="lang=='en'?'en-childSubItem':'childSubItem'" class="third-title">{{generateRoute(child.name)}}</span>
+                        <i class="iconfont icon-yuandian icon-content"/>
+                        <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'"
+                              :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'" class="third-title">
+                          {{ $t(`route.${child.name}`) }}</span>
                       </template>
-                      <el-menu-item class="submenu-item" :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                                    v-for="grandChild in child.children" :index="grandChild.path"  :disabled="grandChild.isReadOnly"
-                                    :key="grandChild.path" >
+                      <el-menu-item
+                        v-for="grandChild in child.children"
+                        :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                        :index="grandChild.path"
+                        :disabled="grandChild.isReadOnly"
+                        :key="grandChild.path"
+                        class="submenu-item" >
                         <template>
-                          <span :class="lang=='en' ? 'third-child-span' : 'zh-third-child-span'">{{generateRoute(grandChild.name)}}</span>
+                          <span :class="lang === 'en' ? 'third-child-span' : 'zh-third-child-span'">
+                            {{ $t(`route.${grandChild.name}`) }}</span>
                         </template>
                       </el-menu-item>
                     </el-submenu>
@@ -118,29 +153,24 @@
           </el-scrollbar>
         </aside>
         <section :class="secClass">
-          <el-col :class="wrapperAll
-                    ?'content-wrapper-all':'content-wrapper'" :style="showBorder?{'border-width':'0.5px'}:{}" v-if="!showHeader">
-            <keep-alive :max="1">
-              <router-view v-if="$route.meta.keepAlive"></router-view>
+          <el-col
+            v-if="!showHeader"
+            :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
+            :style="showBorder ? {'border-width':'0.5px'} : {}">
+            <keep-alive :max = "1">
+              <router-view v-if="$route.meta.keepAlive"/>
             </keep-alive>
-            <router-view v-if="!$route.meta.keepAlive"></router-view>
-            <!-- <keep-alive :include="cachePath">
-                <router-view></router-view>
-            </keep-alive>
-            <router-view></router-view> -->
+            <router-view v-if="!$route.meta.keepAlive"/>
           </el-col>
-          <el-col class='wrapper-header' v-else>
-            <keep-alive  :max="1">
-              <router-view v-if="$route.meta.keepAlive"></router-view>
+          <el-col v-else class="wrapper-header">
+            <keep-alive :max = "1">
+              <router-view v-if="$route.meta.keepAlive"/>
             </keep-alive>
-            <router-view v-if="!$route.meta.keepAlive"></router-view>
-            <!-- <keep-alive :include="cachePath">
-                <router-view></router-view>
-            </keep-alive> -->
+            <router-view v-if="!$route.meta.keepAlive"/>
           </el-col>
-          <el-col :sapn='24' class="footercontent">
+          <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.4.0 &copy; {{getFullYear}} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.5.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -150,399 +180,388 @@
   </div>
 </template>
 <script>
-  import {mapGetters,mapMutations,mapActions} from 'vuex';
-  import {getUserInfo,getAccountList} from '@/api/login'
-  import PubSub from 'pubsub-js';
-  import {getCookie} from '@/common/auth';
-  import { generateRoute } from '@/api/i18n'
-  import PermissionHelper from "../../api/PermissionHelper";
-  export default {
+import { mapGetters} from 'vuex';
+import { getUserInfo, getAccountList } from '@/api/login';
+import PubSub from 'pubsub-js';
+import { getCookie } from '@/common/auth';
 
-    name:"Home",
-    data(){
-      return{
-        showTag:false,
-        imgSrc:require('../../../static/img/title_logo.png'),
-        userName:'Admin',
-        headUrl:'',
-        breadList:[],
-        collapsed:false,
-        varyWindowWidth:window.innerWidth,
-        varyWindowHeight:window.innerHeight,
-        // routerList:this.$router.options.routes.slice(1,this.$router.options.routes.length),
-        //wrapperAll:true,
-        route:this.$route,
-        path:['/routeinspection','/storedetail','/rate','/storemonitor','/schedule','/reinspection','/bindroute'],
-        wapper:false,
-        curBrand:'',
-        brandList:[],
-        accountId:'',
-        roleId:0,
-        lang: this.$i18n.locale,
-        title: '',
-        isMobile: false
-      }
-    },
-    computed:{
-      getFullYear(){
-        let date = new Date
-        let y = date.getFullYear()
-        return y
-      },
-      classObj(){
-        return{
-          'aside-collapse-width': this.collapsed,
-          'aside-width' : !this.collapsed,
-          'mobile' : this.isMobile
-        }
-      },
-      secClass(){
-        return{
-          'sec-collapsed': this.collapsed,
-          'sec-uncoll' :!this.collapsed,
-          'mobile-sec' : this.isMobile
-        }
-      },
-      logoClass(){
-        return{
-          'logo-collapse-width': this.collapsed,
-          'logo-width': !this.collapsed,
-          'logo-mobile': this.isMobile
-        }
-      },
-      routerList(){
-        console.log(this.$store.state.user.routes)
-        return this.$store.state.user.routes.slice(2,this.$store.state.user.routes.length);
-      },
-      groupHeight(){
-        return (this.varyWindowWidth*70)/1920;
-      },
-      wrapperAll(){
-        let flag=true;
-        this.path.forEach(item=>{
-          flag=flag&&(this.$route.path!=item);
-        })
-        if((this.$route.path=='/storemonitor/submit')&&this.wapper==true){
-          flag=true;
-        }
-        return flag;
-      },
-      showBorder(){
-        if((this.$route.path!='/reinspection'&&this.$route.path!='/storemonitor'&&this.$route.path!='/rate'&&this.$route.path!='/reinspect/confirmrein')){
-          return true;
-        }
-      },
-      showHeader(){
-        let flag=false;
-        switch(this.$route.path){
-          case '/report':
-          case '/patrolOverview':
-          case '/eventOverview':
-          case '/patrolEvaluation':
-          case '/patrolItem':
-          case '/supervisorStat':
-          case '/eventStat':
-          case '/storedetail':
-          case '/storemanage':
-          case '/bindroute':
-          {
-            flag= true;
-            break
-          }
-          default:{
-            break
-          }
-        }
-        return flag;
-      },
-      curPath(){
-        return this.route.path
-      },
-      activePath(){
-        console.log(this.$route.path)
-        let path = this.$route.path;
-        switch (path) {
-          case '/reinspect/confirmrein':
-          case '/reinspect/submit':{
-            path = '/reinspection';
-            break;
-          }
-          case '/storemonitor/submit':{
-            path = '/storemonitor';
-            break;
-          }
-          case '/reportdetails':{
-            path = '/report';
-            break;
-          }
-          case '/rate':{
-            path = '/event';
-            break;
-          }
-          case '/bindroute' :
-          case '/addroute':
-          {
-            path = '/routeinspection';
-            break;
-          }
-          case '/storedetail':{
-            path = '/storemanage';
-            break;
-          }
-          case '/titleSetting': {
-            path = '/title';
-            break;
-          }
-          default:{
-            break;
-          }
-        }
-        return path;
-      },
-      cachePath(el){
-        return this.$store.state.cachePath;
-      },
-      ...mapGetters([
-        'token',
-        'name'
-      ]),
-      brandDisabled(){
-        console.log(this.$route.matched);
-        let disabled = true;
-        if(this.$route.matched.length == 2){
-          disabled = false
-        }
-        else if(this.$route.matched.length == 3){
-          if(this.$route.matched[1].path == '/schedule'){
-            disabled = false;
-          }
-        }
-        return disabled;
-      }
-    },
-    watch:{
-      curBrand(val,oldval){
-        if(val.length==0){
-          this.curBrand=this.accountId;
-        }
-      },
-      curPath(val){
-        console.log(val);
-        if(this.path.indexOf(val)){
-          this.wrapperAll=false;
-        }
-      },
-      $route(){
-        this.getBread();
-      }
-    },
-    methods:{
-      generateRoute,
-      handleClickOutside(){
-        this.collapsed = true;
-      },
-      clickCollapse(){
-        this.collapsed=!this.collapsed;
-      },
-      handleopen(index) {
-        console.log('handleopen');
-        switch(Number(index)){
-          case 1:
-            document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#f31d65';
-            document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#222538';break;
-          case 5:
-            document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor='#f31d65';
-            document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor='#222538';break;
-          default: console.log('this is not a group');break;
-        }
-      },
-      routerHome(){
-        let self=this;
-        let url=sessionStorage.getItem('LoginURL');
-        window.location.href=url+'/homepage';
-      },
-      handleclose(index) {
-        console.log('handleclose');
-      },
-      handleselect(key, keyPath){
-        console.log(key);
-        if(this.isMobile){
-          this.collapsed = true
-        }
-      },
-      selectItem(item,index){
-        console.log(item);
-        console.log(index);
-      },
-      CheckDOC(){
-        let url="../../../static/webapp/index.html";
-        window.open(url, '_blank');
-      },
-      getBread(){
-        this.breadList=[];
-        //this.breadList=this.$route.matched;
-        let currentRoute = this.$route.fullPath; //当前路由
-        let matched = this.$route.matched.filter(x=>x.name);
-        console.log(matched)
-        if(matched.length > 2 && matched[1].name == 'scheduleManage'){
-          //巡检设置
-          if(matched[2].tempName == undefined){
-            matched[2].tempName = `${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.'+ matched[2].name)}${this.$t('route.rightBracket')}`
-            matched[2].name = matched[2].tempName
-          }
-          else{
-            matched[2].name = matched[2].tempName
-          }
-          matched.splice(1,1);
-        }
-        else{
+export default {
+  name: 'Home',
 
-        }
-        // if(currentRoute == '/pointCheck'){
-        //   //point check
-        //   matched.unshift(`${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.pointCheck')}${this.$t('route.rightBracket')}`)
-        //   matched.unshift('schedule')
-        // }
-        // else if(currentRoute == '/lpsSechedule'){
-        //   //lps schedule
-        //   matched.unshift(`${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.lpsSechedule')}${this.$t('route.rightBracket')}`)
-        //   matched.unshift('schedule')
-        // }
-        // else if(currentRoute == '/patrolSechedule'){
-        //   // patrol schedule
-        //   matched.unshift(`${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}${this.$t('route.patrolSechedule')}${this.$t('route.rightBracket')}`)
-        //   matched.unshift('schedule')
-        // }
-        // else{
-        //
-        // }
-        //matched=this.$route.matched.filter(x=>x.name);
-        const first=matched[1];
-        this.breadList=matched;
-      },
-      getWindowSize(){
-        let docEl=document.documentElement,
-          resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
-          recalc = function() {
-            //设置根字体大小
-            if(docEl.clientWidth>1450){
-              docEl.style.fontSize =16;
-            }
-            else{
-              docEl.style.fontSize = (docEl.clientWidth/90)+'px';
-            }
-          };
-        //绑定浏览器缩放与加载时间
-        window.addEventListener(resizeEvt, recalc, false);
-        document.addEventListener('DOMContentLoaded', recalc, false);
-      },
-      fedlogout(){
-        let self=this;
-        //self.$router.push('/login');
-        //window.location.href='https://portals.storeviu.com';
-        let url=sessionStorage.getItem('LoginURL');
-        window.location.href=url;
-      },
-      logOut(){
-        let self=this;
-        self.$store.dispatch('logout').then(()=>{
-        })
-      },
-      getAccountList(){
-        let self=this;
-        getAccountList().then(res=>{
-          let data=res.data;
-          if(res.errCode==0){
-            self.brandList=data;
-            self.getUserName();
-            //self.curBrand=self.accountId;
-          }
-        })
-      },
-      changeAccount(accountId){   //改account后存储
-        let self=this;
-        let params={
-          accountId:accountId
-        };
-        self.$store.dispatch('changeAccount',params).then((res)=>{
-          console.log(res);
-          if(res.errCode==0){
-            self.changeRoutes();
-            self.$route.meta.keepAlive=false;
-            self.getUserName();
-          }
-        });
-      },
-      changeRoutes(){
-        let self = this;
-        self.$store.dispatch('GetUserAuthorities').then((result)=>{
-          if(result.errCode==0){
-            self.$store.dispatch('generateRoutes')
-          }
-        })
-      },
-      getUserName(){
-        let self=this;
-        let userId=getCookie('UserId');
-        getUserInfo().then(res=>{
-          console.log(res);
-          self.personList=res.data;
-          res.data.forEach(item=>{
-            if(item.userId==userId){
-              self.userName=item.userName.length>10?item.userName.substr(0,10)+'...':item.userName;
-              self.accountId=item.accountId;
-              let accountId=item.accountId.toLowerCase();
-              localStorage.setItem('oss_bucket',accountId);  //初始进来存储
-              self.roleId=item.roleId;
-            }
-          })
-        })
-      },
-      updateTitle(){
-        document.title = this.$t('route.meta')
-      },
-      $_isMobile(){
-        let { body } = document
-        const rect = body.getBoundingClientRect()
-        console.log(rect.width - 1 < 1280)
-        if(rect.width - 1 < 1280){
-          this.collapsed = true;
-        }
-        return this.isMobile = rect.width - 1 < 1280
-      },
+  data() {
+    return {
+      showTag: false,
+      imgSrc: require('../../../static/img/logo_title.png'),
+      userName: 'Admin',
+      headUrl: '',
+      breadList: [],
+      collapsed: false,
+      varyWindowWidth: window.innerWidth,
+      varyWindowHeight: window.innerHeight,
+      route: this.$route,
+      path: ['/routeinspection', '/storedetail', '/rate', '/storemonitor', '/schedule', '/reinspection', '/bindroute'],
+      wapper: false,
+      curBrand: '',
+      brandList: [],
+      accountId: '',
+      roleId: 0,
+      lang: this.$i18n.locale,
+      title: '',
+      isMobile: false
+    };
+  },
+
+  computed: {
+    getFullYear() {
+      let date = new Date();
+      let y = date.getFullYear();
+      return y;
     },
-    created(){
-      let self=this;
-      this.headUrl='./static/img/admin.png';
+
+    classObj() {
+      return {
+        'aside-collapse-width': this.collapsed,
+        'aside-width': !this.collapsed,
+        'mobile': this.isMobile
+      };
+    },
+
+    secClass() {
+      return {
+        'sec-collapsed': this.collapsed,
+        'sec-uncoll': !this.collapsed,
+        'mobile-sec': this.isMobile
+      };
+    },
+
+    logoClass() {
+      return {
+        'logo-collapse-width': this.collapsed,
+        'logo-width': !this.collapsed,
+        'logo-mobile': this.isMobile
+      };
+    },
+
+    routerList() {
+      console.log(this.$store.state.user.routes);
+      return this.$store.state.user.routes.slice(2, this.$store.state.user.routes.length);
+    },
+
+    groupHeight() {
+      return (this.varyWindowWidth * 70) / 1920;
+    },
+
+    wrapperAll() {
+      let flag = true;
+      this.path.forEach(item => {
+        flag = flag && (this.$route.path !== item);
+      });
+      if ((this.$route.path === '/storemonitor/submit') && this.wapper === true) {
+        flag = true;
+      }
+      return flag;
+    },
+
+    showBorder() {
+      if ( (this.$route.path !== '/reinspection' && this.$route.path !== '/storemonitor'
+          && this.$route.path !== '/rate' && this.$route.path !== '/reinspect/confirmrein') ) {
+        return true;
+      }
+    },
+
+    showHeader() {
+      let flag = false;
+      switch (this.$route.path) {
+        case '/report':
+        case '/patrolOverview':
+        case '/eventOverview':
+        case '/patrolEvaluation':
+        case '/patrolItem':
+        case '/supervisorStat':
+        case '/eventStat':
+        case '/storedetail':
+        case '/storemanage':
+        case '/bindroute':
+        {
+          flag = true;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      return flag;
+    },
+
+    curPath() {
+      return this.route.path;
+    },
+
+    activePath() {
+      console.log(this.$route.path);
+      let path = this.$route.path;
+      switch (path) {
+        case '/reinspect/confirmrein':
+        case '/reinspect/submit': {
+          path = '/reinspection';
+          break;
+        }
+        case '/storemonitor/submit': {
+          path = '/storemonitor';
+          break;
+        }
+        case '/reportdetails': {
+          path = '/report';
+          break;
+        }
+        case '/rate': {
+          path = '/event';
+          break;
+        }
+        case '/bindroute' :
+        case '/addroute':
+        {
+          path = '/routeinspection';
+          break;
+        }
+        case '/storedetail': {
+          path = '/storemanage';
+          break;
+        }
+        case '/titleSetting': {
+          path = '/title';
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      return path;
+    },
+
+    cachePath(el) {
+      return this.$store.state.cachePath;
+    },
+
+    ...mapGetters([
+      'token',
+      'name'
+    ]),
+
+    brandDisabled() {
       console.log(this.$route.matched);
-      this.getBread();
-      console.log(this.$route.query);
-      let params=self.$route.query;
-      PubSub.subscribe('change-color',(event,data)=>{
-        self.showTag=data.showTag;
-      })
-      PubSub.subscribe('success-page',(event,data)=>{
-        if(data.changeStyle){ //当前为提交失败页面
-          self.wapper=true;
+      let disabled = true;
+      if (this.$route.matched.length === 2) {
+        disabled = false;
+      } else if (this.$route.matched.length === 3) {
+        if (this.$route.matched[1].path === '/schedule') {
+          disabled = false;
         }
-      }),
-        window.addEventListener('resize', this.$_isMobile);
-      self.isMobile = self.$_isMobile();
-    },
-    mounted(){
-      // this.getUserName();
-      this.getAccountList();
-      this.updateTitle();
-      console.log(this.$router.options.routes)
-      if(this.$refs.fieldSelect!=undefined){
-        this.$nextTick(function() {
-          this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
-            "scroll-opacity"
-          );
-        });
+      }
+      return disabled;
+    }
+
+  },
+
+  watch: {
+    curBrand(val) {
+      if (val.length === 0) {
+        this.curBrand = this.accountId;
       }
     },
+
+    curPath(val) {
+      console.log(val);
+      if (this.path.indexOf(val)) {
+        this.wrapperAll = false;
+      }
+    },
+
+    $route() {
+      this.getBread();
+    }
+  },
+  created() {
+    let self = this;
+    this.headUrl = './static/img/admin.png';
+    console.log(this.$route.matched);
+    this.getBread();
+    console.log(this.$route.query);
+    let params = self.$route.query;
+    PubSub.subscribe('change-color', (event, data) => {
+      self.showTag = data.showTag;
+    });
+    PubSub.subscribe('success-page', (event, data) => {
+      if (data.changeStyle) {
+        self.wapper = true;
+      }
+    }),
+    window.addEventListener('resize', this.$_isMobile);
+    self.isMobile = self.$_isMobile();
+  },
+
+  mounted() {
+    this.getAccountList();
+    this.updateTitle();
+    console.log(this.$router.options.routes);
+    if (this.$refs.fieldSelect != undefined) {
+      this.$nextTick(function() {
+        this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
+          'scroll-opacity'
+        );
+      });
+    }
+  },
+
+  methods: {
+    handleClickOutside() {
+      this.collapsed = true;
+    },
+
+    clickCollapse() {
+      this.collapsed = !this.collapsed;
+    },
+
+    handleopen(index) {
+      console.log('handleopen');
+      switch (Number(index)) {
+        case 1:
+          document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#f31d65';
+          document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#222538'; break;
+        case 5:
+          document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#f31d65';
+          document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#222538'; break;
+        default: console.log('this is not a group'); break;
+      }
+    },
+
+    routerHome() {
+      let self = this;
+      let url = sessionStorage.getItem('LoginURL');
+      window.location.href = url + '/homepage';
+    },
+
+    handleselect(key, keyPath) {
+      console.log(key);
+      if (this.isMobile) {
+        this.collapsed = true;
+      }
+    },
+
+    getBread() {
+      this.breadList = [];
+      let currentRoute = this.$route.fullPath;
+      let matched = this.$route.matched.filter(x => x.name);
+      console.log(matched);
+      if (matched.length > 2 && matched[1].name === 'scheduleManage') {
+        // patrol setting
+        if (matched[2].tempName == undefined) {
+          matched[2].tempName = `${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}
+                              ${this.$t('route.' + matched[2].name)}${this.$t('route.rightBracket')}`;
+          matched[2].name = matched[2].tempName;
+        } else {
+          matched[2].name = matched[2].tempName;
+        }
+        matched.splice(1, 1);
+      }
+      let first = matched[1];
+      this.breadList = matched;
+    },
+    getWindowSize() {
+      let docEl = document.documentElement,
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+        recalc = function() {
+          if (docEl.clientWidth > 1450) {
+            docEl.style.fontSize = 16;
+          } else {
+            docEl.style.fontSize = (docEl.clientWidth / 90) + 'px';
+          }
+        };
+      window.addEventListener(resizeEvt, recalc, false);
+      document.addEventListener('DOMContentLoaded', recalc, false);
+    },
+
+    fedlogout() {
+      let self = this;
+      let url = sessionStorage.getItem('LoginURL');
+      window.location.href = url;
+    },
+
+    logOut() {
+      let self = this;
+      self.$store.dispatch('logout').then(() => {
+      });
+    },
+
+    getAccountList() {
+      let self = this;
+      getAccountList().then(res => {
+        let data = res.data;
+        if (res.errCode === 0) {
+          self.brandList = data;
+          self.getUserName();
+        }
+      });
+    },
+
+    changeAccount(accountId) {
+      let self = this;
+      let params = {
+        accountId: accountId
+      };
+      self.$store.dispatch('changeAccount', params).then((res) => {
+        console.log(res);
+        if (res.errCode === 0) {
+          self.changeRoutes();
+          self.$route.meta.keepAlive = false;
+          self.getUserName();
+        }
+      });
+    },
+
+    changeRoutes() {
+      let self = this;
+      self.$store.dispatch('GetUserAuthorities').then((result) => {
+        if (result.errCode === 0) {
+          self.$store.dispatch('generateRoutes');
+        }
+      });
+    },
+
+    getUserName() {
+      let self = this;
+      let userId = getCookie('UserId');
+      getUserInfo().then(res => {
+        console.log(res);
+        self.personList = res.data;
+        res.data.forEach(item => {
+          if (item.userId === userId) {
+            self.userName = item.userName.length > 10 ? item.userName.substr(0, 10) + '...' : item.userName;
+            self.accountId = item.accountId;
+            let accountId = item.accountId.toLowerCase();
+            localStorage.setItem('oss_bucket', accountId); // 初始进来存储
+            self.roleId = item.roleId;
+          }
+        });
+      });
+    },
+
+    updateTitle() {
+      document.title = this.$t('route.meta');
+    },
+
+    $_isMobile() {
+      let { body } = document;
+      let rect = body.getBoundingClientRect();
+      console.log(rect.width - 1 < 1280);
+      if (rect.width - 1 < 1280) {
+        this.collapsed = true;
+      }
+      return this.isMobile = rect.width - 1 < 1280;
+    }
+
   }
+};
 </script>
 <style lang="scss" scoped>
   $border: #393b4c;
@@ -1643,7 +1662,7 @@
 </style>
 <style  lang="scss">
   .el-select-dropdown .scroll-opacity.el-scrollbar .el-scrollbar__bar.is-vertical {
-    opacity: 1;//改为0不显示滚动条
+    opacity: 1;
   }
   .el-form-item.is-success .el-input__inner, .el-form-item.is-success .el-input__inner:focus, .el-form-item.is-success .el-textarea__inner, .el-form-item.is-success .el-textarea__inner:focus {
     border-color: #e3e9f4;

@@ -327,7 +327,6 @@ import { getEzvizAccessToken, getIsEncrypt, updateDevicePassword, getDeviceCapac
 import { mapGetters } from 'vuex';
 import qs from 'qs';
 import { getCookie } from '../common/auth';
-import RecordRTC from '../../static/RecordRTC.js';
 import filterString from '../common/filterString';
 import Environment from '../common/environment';
 
@@ -653,7 +652,7 @@ export default {
       if (!self.checkFull() && self.fullWindow) {
         self.fullWindow = false;
         var playerEle = self.$refs.myPlayer;
-        playerEle.style.width = self.initPlayerWidth + 'px'; // 动态设置HTML元素高度
+        playerEle.style.width = self.initPlayerWidth + 'px';
         playerEle.style.height = self.initPlayerHeight + 'px';
         self.exitFullscreen();
       }
@@ -728,7 +727,7 @@ export default {
         self.videoPassword = '';
         self.times = 0;
         self.ifIsEncrypt = false;
-        self.changeId && (self.startTs = self.curTime); // 切换通道，仍然从最初的时间播放视频
+        self.changeId && (self.startTs = self.curTime);
         if (self.playState) {
           self.decoder.stop();
           self.playState = false;
@@ -1036,7 +1035,7 @@ export default {
       self.fullWindow = false;
       var ele = document.getElementById('videoContent');
       var playerEle = self.$refs.myPlayer;
-      playerEle.style.width = self.initPlayerWidth + 'px'; // 动态设置HTML元素高度
+      playerEle.style.width = self.initPlayerWidth + 'px';
       playerEle.style.height = self.initPlayerHeight + 'px';
       self.$nextTick(() => {
         ele.style.width = self.initPlayerWidth + 'px';
@@ -1219,7 +1218,7 @@ export default {
         const width = screen.width;
         const height = screen.height;
         const playerEle = self.$refs.myPlayer;
-        playerEle.style.width = screen.width + 'px'; // 动态设置HTML元素高度
+        playerEle.style.width = screen.width + 'px';
         playerEle.style.height = screen.height + 'px';
         console.log(width);
         console.log(height);
@@ -1995,16 +1994,6 @@ export default {
           float: left;
         }
       }
-      // @media screen and(min-width:1366px){
-      //   .iconrside{
-      //     width: 40%;
-      //   }
-      // }
-      // @media screen and(min-width:1366px){
-      //   .iconrside{
-      //     width: 40%;
-      //   }
-      // }
       .footer-right{
         float:right;
       }
