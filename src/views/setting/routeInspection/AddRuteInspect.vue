@@ -140,10 +140,10 @@
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="nape-items-title" v-if="napeList.length!=0">
-                       <div class="nape-name-title" :style="activeSheetName=='1'?'flex:1.8;':'flex:3'">
+                       <div class="nape-name-title" :style="activeSheetName=='1'?'flex:2;':'flex:3'">
                            <span>{{generateInsSettingLang('inspectName')}}</span>
                        </div>
-                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:2.6;':'flex:4;'">
+                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:2.5;':'flex:4;'">
                            <span :style="activeSheetName=='1'?'left:5%;':'left:2%;'">{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
                        <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;">
@@ -165,7 +165,7 @@
                    <div class="nape-items-data"
                    v-for="(item,index) in napeList"
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
-                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:1.9;':'flex:3.4;'">
+                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:2.0;':'flex:3.4;'">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
                             <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
@@ -181,7 +181,10 @@
                             </el-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" :style="item.isClick?'max-width:110px;':'flex:1;margin-left:35px;'">
-                           <span style="max-width:110px;word-wrap:break-word;" v-if="!item.isClick">{{item.availableScoreStr}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
+                           <el-tooltip class="item" effect="dark" placement="top">
+                               <div slot="content" style="width:120px;">{{item.availableScoreStr}}</div>
+                               <span style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" v-if="!item.isClick">{{item.availableScoreStr}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
+                           </el-tooltip>
                            <region-multi-select v-if="item.isClick" :options="availableScores" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
                                 :inputSize="`mini`" :selected="item.Score_4" :all="$t('reportView.all')" @changeInput="changeScore4($event,item)"></region-multi-select>
                        </div>
@@ -250,7 +253,7 @@
                         </div>
                     </el-dialog>
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
-                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:1.8;':'flex:3;'">
+                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:2;':'flex:3;'">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
                             <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
                             <span class="rules" v-if="enterListNameRuletip">{{generateInsSettingLang('enterListNameRuletip')}}</span>
