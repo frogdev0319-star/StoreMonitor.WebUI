@@ -2724,7 +2724,7 @@ export default {
             }
             else{
               if(self.$refs.beseyeVideo.playState){
-                self.$refs.beseyeVideo.beseyeVideo2 && (self.$refs.beseyeVideo.beseyeVideo2.style.display = 'none')
+                self.$refs.beseyeVideo.video2 && (self.$refs.beseyeVideo.video2.style.display = 'none')
                 self.$refs.beseyeVideo.stopPlay();
               }
             }

@@ -191,7 +191,7 @@
                   <span>{{errorText}}</span>
                 </div>
                 <div class="video-content"  id="videoContent"
-                     @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
+                     @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else v-loading="isLoading">
                   <div class="getvideo-content" v-if="showGetVideo">
                     <div class="btn-graph">
                       <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>

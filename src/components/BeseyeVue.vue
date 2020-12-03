@@ -68,11 +68,15 @@
             <span>{{$t('remotePatrol.snapshot')}}</span>
           </div>
         </transition>
-        <video height=83% width=90% id="beseyeVideo" prload autoplay :controls="showControls" style="margin: auto" v-if="showVideo"
+        <video height=83% width=90% id="beseyeVideo" prload autoplay :controls="showControls" style="margin: auto" v-show="showVideo && !playBack"
                @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)"
                @loadstart="onPlayerWaiting($event)" @error="onPlayerWaiting($event)" @canplay="onPlayerCanPlay()">
         </video>
-        <video height=83% width=90% id="beseyeVideo2" prload autoplay :controls="showControls" style="margin: auto" v-if="playBack"
+        <video height=83% width=90% id="video1" prload autoplay :controls="showControls" style="margin: auto" v-show="playBack"
+               @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)"
+               @loadstart="onPlayerWaiting($event)" @error="onPlayerWaiting($event)" @canplay="onPlayerCanPlay()">
+        </video>
+        <video height=83% width=90% id="video2" prload autoplay :controls="showControls" style="margin: auto" v-show="playBack"
                @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)"
                @loadstart="onPlayerWaiting($event)" @error="onPlayerWaiting($event)" @canplay="onPlayerCanPlay()"></video>
       </div>
@@ -294,7 +298,8 @@
         dd: "{Web}_{YH-EXTERNAL}_{97557807-1149-4004-8e92-91c344539ded}",
 
         playingPlayer: null,
-        beseyeVideo2: null,
+        video1: null,
+        video2: null,
         player1: null,
         player2: null,
         players: null,
@@ -339,7 +344,8 @@
         ],
         curBack:'',
         popperClass:'select-popClass',
-        timeid: null
+        timeid: null,
+        startTs: 0
       }
     },
     methods: {
@@ -533,7 +539,6 @@
         this.showModelContent = false
         this.isLoading = true;
         if(this.playBack){
-          this.playBackState = false;
           window.clearInterval(this.timeId);
           this.currentTimeValue = 0
         }
@@ -545,9 +550,7 @@
         this.editCount++
         this.showModelContent = true
         this.isLoading = false
-        this.startTs = 0
         if(this.playBack){
-          this.playBackState = true
           window.clearInterval(self.timeId);
           self.timeId = window.setInterval(() => {
             self.getProcess();
@@ -671,12 +674,10 @@
         }
       },
       visibleChange() {
-        console.log('子组件退出')
         let self = this;
         if (document.hidden) {
           if (self.playState) {
             self.stopPlay(); //停止视频
-            //window.clearInterval(self.timerPlayReal);
           }
         }
         else {
@@ -692,11 +693,17 @@
         self.showError = false
         self.errorText = ''
         if(!self.playBack){
-          self.getBeseyeStreamInfo()
-          //self.getStreamInfofromTW()
+          //self.getBeseyeStreamInfo()
+          self.getStreamInfofromTW()
         }
         else{
-          self.initApp()
+          if(self.playBackState){
+            //paused
+            self.players.mainPlayer.video.play()
+          }
+          else{
+            self.initApp()
+          }
         }
       },
       wsConnect(url) {
@@ -844,9 +851,11 @@
           self.showModelContent = false
         }
         else{
-          if(self.playBackState){
-            self.players.mainPlayer.pause();
-            self.players = null;
+          if(self.playState){
+            self.players.mainPlayer.video.pause();
+            //self.players = null;
+            self.playBackState = true
+            self.playState = false
             window.clearInterval(self.timeId);
             self.timeId = null
           }
@@ -971,16 +980,14 @@
           // This browser does not have the minimum set of APIs we need.
           console.error('Browser not supported!')
         }
-        self.beseyeVideo2 && (self.beseyeVideo2.style.display = 'none')
+        //self.video2 && (self.video2.style.display = 'none')
         self.currentTimeValue = 0
         self.times = 0
         self.showError = false
         self.errorText = ''
         let duration = 5 * 60 * 1000;
         let d = new Date();
-        let start_time = self.startTs - duration;
-        //let start_time = d.getTime() - duration;
-        //let start_time = 1605679676000
+        let start_time = self.startTs;
 
         var url = `http://104.199.172.143/api/beseye/playlist?vci=${self.vcamerId}&dd=${self.dd}&start_time=${start_time}&duration=${duration}`
         var result = await self.doAjax(url)
@@ -991,7 +998,7 @@
           "duration": duration
         }
 
-        //let result = await self.getBeseyePlaylistInfo(params);
+        // let result = await self.getBeseyePlaylistInfo(params);
         console.log(result)
         if (result.playList) {
           self.updatePlaylist(result.playList)
@@ -1026,11 +1033,12 @@
       initPlayer() {
         let self = this;
         // Create a Player instance.
-        self.beseyeVideo2.style.display = 'none';
-        self.player1 = new shaka.Player(beseyeVideo);
-        self.player2 = new shaka.Player(beseyeVideo2);
-        self.player1.video = beseyeVideo
-        self.player2.video = beseyeVideo2
+        self.video1.style.display = 'block';
+        self.video2.style.display = 'none';
+        self.player1 = new shaka.Player(self.video1);
+        self.player2 = new shaka.Player(self.video2);
+        self.player1.video = self.video1
+        self.player2.video = self.video2
         self.player1.shouldPlay = false
         self.player2.shouldPlay = false
         self.player1.firstPlay = false
@@ -1061,7 +1069,7 @@
       //  --------------------------------------------
       //  Shaka player event
       //  --------------------------------------------
-      onPlayerError() {
+      onPlayerError(event) {
         // Extract the shaka.util.Error object from the event.
         this.onError(event.detail)
       },
@@ -1109,7 +1117,7 @@
           return
         }
         if (player == self.players.preloadPlayer) {
-          console.log('onVideoTimeUpdate preload player', player.video)
+          console.log('onVideoTimeUpdate')
           player.video.pause()
           player.ready = true
         } else {
@@ -1135,7 +1143,7 @@
           console.error('Got empty playlist')
           self.showError = true
           self.errorText = self.$t('storeMonitor.noVideoSource')
-          self.beseyeVideo2.style.display = 'none';
+          self.video2.style.display = 'none';
           self.isLoading = false
           return
         }
@@ -1181,8 +1189,9 @@
           console.warn('Out of playlist')
           window.clearInterval(self.timeId)
           self.playState = false
-          self.playBackState = false
+          // self.playBackState = false
           self.isLoading = false
+          self.showModelContent = false
         } else {
           var preloadPlayer = self.players.preloadPlayer
           preloadPlayer.media = self.playlist[0]
@@ -1218,6 +1227,7 @@
 
       showHideVideo() {
         let self = this;
+        console.log('change--------------')
         self.players.mainPlayer.video.style.display = 'block'
         self.players.preloadPlayer.video.style.display = 'none'
       },
@@ -1297,6 +1307,7 @@
         console.log("curTime")
         let self = this;
         self.showError = false;
+        self.currentTimeValue = 0
         if(!self.channelInfo.id || !self.channelInfo.ivsId){
           self.showError = true;
           self.errorText = self.$t('storeMonitor.lackParams')
@@ -1307,7 +1318,9 @@
         console.log(self.curTime)
         self.startTs = newValue;
         if(newValue == 0){
-          self.stopPlay()
+          if(self.playState){
+            self.stopPlay()
+          }
           self.startPlay()
         }
         else{
@@ -1316,7 +1329,7 @@
             self.playState = false
           }
           self.$nextTick(()=> {
-            self.beseyeVideo2 = document.getElementById('beseyeVideo2')
+            self.video2 = document.getElementById('video2')
             self.initApp()
           })
         }
@@ -1398,7 +1411,7 @@
       console.log(self.playState)
       window.clearInterval(self.timerPlayReal);
       self.realTimeSpeed = 0;
-      if (self.peerConnection) {
+      if (self.playState) {
         self.stopPlay();
       }
       window.removeEventListener("visibilitychange", self.visibleChange)
@@ -1407,7 +1420,8 @@
     mounted() {
       let self = this;
       self.beseyeVideo = document.getElementById('beseyeVideo')
-      self.beseyeVideo2 = document.getElementById('beseyeVideo2')
+      self.video1 = document.getElementById('video1')
+      self.video2 = document.getElementById('video2')
       window.addEventListener("visibilitychange", self.visibleChange, false)
     }
   }
