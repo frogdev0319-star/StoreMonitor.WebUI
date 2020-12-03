@@ -642,10 +642,10 @@ export default {
           textStyle: {
             align: 'left'
           },
-          backgroundColor: self.echartBackground
+          backgroundColor: this.echartBackground
         },
         textStyle: {
-          fontFamily: self.fontFamily
+          fontFamily: this.fontFamily
         },
         legend: {
           data: ['inspect radar']
@@ -675,7 +675,7 @@ export default {
           indicator: [],
           axisLine: {
             lineStyle: {
-              color: self.echartAxiasColor
+              color: this.echartAxiasColor
             }
           },
           splitArea: {
@@ -685,7 +685,7 @@ export default {
             show: true,
             lineStyle: {
               width: 1,
-              color: self.echartAxiasColor
+              color: this.echartAxiasColor
             }
           }
         },
@@ -706,14 +706,14 @@ export default {
             },
             axisLine: {
               lineStyle: {
-                color: self.echartAxiasColor
+                color: this.echartAxiasColor
               }
             },
             splitLine: {
               show: true,
               lineStyle: {
                 width: 1,
-                color: self.echartAxiasColor
+                color: this.echartAxiasColor
               }
             }
           }
@@ -726,7 +726,7 @@ export default {
           {
             type: 'radar',
             data: [],
-            name: self.$t('remotePatrol.inspectionItems'),
+            name: this.$t('remotePatrol.inspectionItems'),
             radarIndex: 1,
             itemStyle: {
               normal: {
@@ -1235,6 +1235,7 @@ export default {
     },
 
     getPassRateAndCycleOption() {
+      let self = this;
       let schema = [
         { name: 'inspectCycle', index: 0, text: this.$t('overview.cycle') },
         { name: 'passRate', index: 1, text: this.$t('overview.passRate') },
@@ -1333,11 +1334,11 @@ export default {
             if (value[0] > 50) {
               htmlF = `${htmlRegion}<br>
                           ${passStr}<br>
-                          ${schema[0].text}: ${value[1]}${this.$t('overview.day')}<br>`;
+                          ${schema[0].text}: ${value[1]}${self.$t('overview.day')}<br>`;
             } else {
               htmlF = `${htmlRegion}<br>
                           ${dangerousStr}<br>
-                          ${schema[0].text}: ${value[1]}${this.$t('overview.day')}<br>`;
+                          ${schema[0].text}: ${value[1]}${self.$t('overview.day')}<br>`;
             }
 
             return htmlF;

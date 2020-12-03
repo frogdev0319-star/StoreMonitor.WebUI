@@ -47,7 +47,8 @@
             style="display: inline;"
             @changeInput="changeStoreTag"/>
           <span>{{ $t('overview.patrolLists') }}</span>
-          <el-select v-model="inspectList" :placeholder="$t('insSettingView.selectPost')" size="mini" class="el-province">
+          <el-select v-model="inspectList" :placeholder="$t('insSettingView.selectPost')" size="mini"
+                     class="el-province">
             <el-option
               v-for="item in inspectTypeList"
               :key="item.id"
@@ -1395,7 +1396,7 @@ export default {
               },
               normal: {
                 color: function(params) {
-                  letcolorList = ['#72a1f3', '#ffd035', '#cad1db'];
+                  let colorList = ['#72a1f3', '#ffd035', '#cad1db'];
                   return colorList[params.dataIndex];
                 }
               }
@@ -1609,8 +1610,7 @@ export default {
     },
 
     getCatergyByMerge(arr) {
-      letmap = {},
-        dest = [];
+      let map = {}, dest = [];
       for (let i = 0; i < arr.length; i++) {
         let ai = arr[i];
         if (!map[ai.inspectGroupName]) {
