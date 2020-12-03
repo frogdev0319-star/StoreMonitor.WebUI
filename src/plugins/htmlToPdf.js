@@ -1,19 +1,16 @@
-// 导出页面为PDF格式
-import html2Canvas from 'html2canvas';
+import html2canvas from 'html2canvas';
 import JsPDF from 'jspdf';
 export default{
   install(Vue, options) {
     Vue.prototype.getPdf = function() {
       sessionStorage.setItem('startPDF', 'start');
-      var title = this.htmlTitle; // DPF标题
-      html2Canvas(document.querySelector('#pdfDom'), {
+      var title = this.htmlTitle;
+      html2canvas(document.querySelector('#pdfDom'), {
         allowTaint: true,
-		        taintTest: false,
-		        useCORS: true,
-		        // width:960,
-		        // height:5072,
-		        dpi: window.devicePixelRatio * 4, // 将分辨率提高到特定的DPI 提高四倍
-		        scale: 4 // 按比例增加分辨率
+        taintTest: false,
+        useCORS: true,
+        dpi: window.devicePixelRatio * 4,
+        scale: 4
       }).then(function(canvas) {
         const contentWidth = canvas.width;
         const contentHeight = canvas.height;

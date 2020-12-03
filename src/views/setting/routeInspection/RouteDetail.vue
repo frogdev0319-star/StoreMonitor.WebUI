@@ -3,14 +3,16 @@
     <el-row>
       <el-col :span="24" class="detail-title">
         <div class="table-right-post" @click="setItem">
+          <!-- <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{$t('insSettingView.contains')}}{{typeNum}} {{$t('insSettingView.group')}},
+                        {{itemNum}} {{$t('insSettingView.item')}}</span> -->
           <i class="iconfont icon-quxiaolianjie"/>
           <span class="post-label">{{ $t('insSettingView.relationDuty') }}:</span>
           <span class="post-concent">{{ routeData[0].ModelPost }}</span>
         </div>
         <div class="route-btns">
           <el-button
-            :class=" lang === 'en' ? 'en-el-delete-btn':'el-delete-btn'"
-            :disabled="routeData.length === 0"
+            :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
+            :disabled="routeData.length==0"
             class="btn-class"
             size="mini"
             @click="deleteNapes">
@@ -18,13 +20,23 @@
             <span>{{ $t('insSettingView.deleteItem') }}</span>
           </el-button>
           <el-button
-            :class="lang === 'en' ? 'en-el-set-btn' : 'el-set-btn'"
-            :disabled="routeData.length === 0"
+            :class="lang=='en'? 'en-el-set-btn':'el-set-btn'"
+            :disabled="routeData.length==0"
+            class="btn-class"
+            type="primary"
+            size="mini"
+            @click="setRule">
+            <i class="iconfont icon-guize1"/>
+            <span>{{ $t('insSettingView.ruleInspect') }}</span>
+          </el-button>
+          <el-button
+            :class="lang=='en'? 'en-el-set-btn':'el-set-btn'"
+            :disabled="routeData.length==0"
             class="btn-class"
             type="primary"
             size="mini"
             @click="setItem">
-            <i class="iconfont icon-button"></i>
+            <i class="iconfont icon-button"/>
             <span>{{ $t('insSettingView.setItem') }}</span>
           </el-button>
         </div>
@@ -45,10 +57,8 @@
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" @click="showDeleteContent = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">
-              {{ $t('insSettingView.confirm') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" @click="showDeleteContent = false">{{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">{{ $t('insSettingView.confirm') }}</el-button>
           </div>
         </el-dialog>
 
@@ -64,7 +74,9 @@
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;
+              <i
+                class="el-icon-warning"
+                style="font-size:26px;margin-right:20px;color:#FF9803;
               display: inline-block; vertical-align: middle;"/>
               <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmCurDel') }}</span>
             </p>
@@ -81,28 +93,22 @@
       <el-col :span="24">
         <div class="data-box">
           <div v-for="item in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id)">
-            <p :style="item.isClick ? 'background-color: #f31b65;color:#fff;' : ''" class="item_title">
-              {{ item.label }}
-            </p>
+            <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{ item.label }}</p>
           </div>
         </div>
         <el-scrollbar id="el-menuscrollbar">
-          <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
+          <div v-if="routeData.length!=0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
             <div v-for="(item,index) in routeData" :key="index" class="data-content">
-              <div v-if="index === 0" class="header-content tabTitle">
+              <div v-if="index==0" class="header-content tabTitle">
                 <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
                 <span class="name-title">{{ $t('insSettingView.inspectName') }}</span>
-                <span :style="sheetName.some(x => x.id === 0 && x.isClick) ? 'width: calc((100% - 405px) * 25/29);' : ''"
-                      class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
-                <span v-if="sheetName.some(x => x.id === 1 && x.isClick)"
-                      :style="'width: calc((100% - 405px) * 2.5/29);'"
-                      class="score-title">{{ $t('insSettingView.sheetscore0') }}</span>
-                <span v-if="sheetName.some(x => x.id === 1 && x.isClick)" class="score-title" style="width: calc((100% - 405px) * 6/29);">
-                  {{ $t('insSettingView.sheetscore1') }}</span>
-                <span v-if="sheetName.some(x => x.id === 2 && x.isClick)" class="score-title">
-                  {{ $t('insSettingView.sheetscore2') }}</span>
-                <span :class="lang === 'en' ? 'en-handle-title':'handle-title'">
-                  {{ $t('insSettingView.operation') }}</span>
+                <span :style="sheetName.some(x=>x.id==1&&x.isClick)?'width: calc((100% - 405px) * 12.5/29)':'width: calc((100% - 405px) * 15.3/29)'" class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
+                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" :style="'width: calc((100% - 405px) * 2.5/29);'" class="score-title">{{ $t('insSettingView.sheetscore0') }}</span>
+                <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{$t('insSettingView.sheetscore0')}}</span> -->
+                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 3/29);">{{ $t('insSettingView.sheetscore3') }}</span>
+                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 6/29);">{{ $t('insSettingView.sheetscore1') }}</span>
+                <span v-if="sheetName.some(x=>x.id!==1&&x.isClick)" class="score-title">{{ $t('insSettingView.score') }}</span>
+                <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{ $t('insSettingView.operation') }}</span>
               </div>
 
               <div class="table-header-title">
@@ -118,24 +124,22 @@
                   <el-table-column prop="checked" width="70px" align="center">
                     <template slot-scope="scope">
                       <span v-if="scope.row.isNew" class="showNewContent">new</span>
-                      <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;"
-                                   @change="selectRow(index,item,scope.$index,scope.row)"/>
+                      <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"/>
                     </template>
                   </el-table-column>
                   <el-table-column prop="name" width="300px"/>
-                  <el-table-column :min-width="sheetName.some(x => x.id === 0 && x.isClick)?'40%':'23%'"
-                                   prop="description"/>
-                  <el-table-column v-if="sheetName.some(x => x.id === 1 && x.isClick)
-                   || sheetName.some(x => x.id === 2 && x.isClick)"
-                                   :min-width="sheetName.some(x => x.id === 1 && x.isClick) ? '4%' : '15%'"
-                                   prop="score" align="center">
+                  <el-table-column :min-width="'23%'" prop="description"/>
+                  <el-table-column :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'" prop="score" align="center">
                     <template slot-scope="scope">
-                      <span>{{ scope.row.score }}
-                        <span v-if="lang !== 'en'">{{ $t('insSettingView.scores') }}</span></span>
+                      <span>{{ scope.row.score }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>
                     </template>
                   </el-table-column>
-                  <el-table-column v-if="sheetName.some(x => x.id ===1 && x.isClick)" prop="qualifiedScore"
-                                   align="center" min-width="11%">
+                  <el-table-column v-if="sheetName.some(x=>x.id==1&&x.isClick)" :min-width="'8%'" prop="score" show-overflow-tooltip align="center">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.availableScores }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column v-if="sheetName.some(x=>x.id==1&&x.isClick)" prop="qualifiedScore" align="center" min-width="11%">
                     <template slot-scope="scope">
                       <span>{{ scope.row.qualifiedScore }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>
                     </template>
@@ -163,7 +167,7 @@
             <hr style="border: 0.5px solid #dfe2e9;">
             <p style="margin-left:26px;margin-bottom:0px;">{{ $t('insSettingView.selectImprtLoc') }}</p>
             <div style="margin-left:20px;">
-              <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;">
+              <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
                 <el-radio-button
                   v-for="(item,key) in radioList"
                   :key="key"
@@ -174,7 +178,7 @@
             </div>
             <div class="tabName-input-content">
               <input
-                v-if="checkValue === addPatrol"
+                v-if="checkValue == addPatrol"
                 v-model="tabNameInput"
                 :placeholder="$t('insSettingView.enterListName')"
                 type="text"
@@ -187,9 +191,11 @@
               {{ $t('insSettingView.cancel') }}</el-button>
 
             <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('insSettingView.select') }}
-              <input id="upload" type="file"
-                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                     @change="importfxx(this)" >
+              <input
+                id="upload"
+                type="file"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                @change="importfxx(this)" >
             </a>
           </div>
         </el-dialog>
@@ -293,7 +299,7 @@ export default {
       addPatrol: '自定义巡检表',
       tabNameLang: '',
       tabNameInput: '',
-      varyWindowWidth : window.innerHeight,
+      varyWindowWidth: window.innerHeight,
       allchecked: false,
       curDeleteId: '',
       curDelGroupId: [],
@@ -310,13 +316,13 @@ export default {
   },
 
   mounted() {
-    let self = this;
+    const self = this;
     self.getNum();
   },
 
   methods: {
     getNum() {
-      let self = this;
+      const self = this;
       self.typeNum = self.routeData.length;
       let allcount = 0;
       self.routeData.forEach(item => {
@@ -327,7 +333,7 @@ export default {
 
     changeAllData(val) {
       console.log(val);
-      let self = this;
+      const self = this;
       self.routeData.forEach(item => {
         item.checked = val;
         item.itemData.forEach(_item => {
@@ -336,8 +342,8 @@ export default {
       });
     },
 
-    changeSheet: function (e) {
-      let self = this;
+    changeSheet: function(e) {
+      const self = this;
       self.curSheet = e;
       self.allchecked = false;
       self.routeData.forEach(item => {
@@ -357,8 +363,8 @@ export default {
     },
 
     change(item) {
-      let self = this;
-      let arr = [];
+      const self = this;
+      const arr = [];
       console.log(item);
       item.itemData.forEach(_item => {
         _item.checked = item.checked;
@@ -372,8 +378,8 @@ export default {
     },
 
     selectRow(tableIndex, item) {
-      let arr = [];
-      let self = this;
+      const arr = [];
+      const self = this;
       item.itemData.forEach(_item => {
         if (_item.checked) {
           arr.push(_item);
@@ -381,7 +387,7 @@ export default {
       });
       console.log(arr.length);
       item.checked = item.itemData.length === arr.length;
-      let arrCheckedItem = [];
+      const arrCheckedItem = [];
       let count = 0;
       self.routeData.forEach(_item => {
         count += _item.itemData.length;
@@ -395,37 +401,37 @@ export default {
     },
 
     getNapeList() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.getInspectItemList().then(res => {
-          let code = res.errMsg;
-          let data = res.data;
+          const code = res.errMsg;
+          const data = res.data;
           if (code != null && code === 'Success') {
             self.allData = data;
           }
           resolve(data);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     async refreshData() {
-      let self = this;
+      const self = this;
       console.log(self.tabName);
-      let data = await self.getNapeList();
+      const data = await self.getNapeList();
       if (data.length !== 0) {
-        let temp = [];
+        const temp = [];
         data.forEach(item => {
           if (item.tag === self.tabName) {
-            let _obj = {};
+            const _obj = {};
             _obj.id = item.id;
             _obj.groupName = item.name;
             _obj.itemCount = item.items.length;
             _obj.checked = false;
-            let tempChild = [];
+            const tempChild = [];
             item.items.forEach(itemChild => {
-              let objChild = {};
+              const objChild = {};
               objChild.id = itemChild.id;
               objChild.checked = false;
               objChild.name = itemChild.subject;
@@ -443,9 +449,9 @@ export default {
     },
 
     async deleteNapes() {
-      let self = this;
-      let arr = [];
-      let countGroup = [];
+      const self = this;
+      const arr = [];
+      const countGroup = [];
       self.routeData.forEach(item => {
         if (item.checked) {
           countGroup.push(item.id);
@@ -460,22 +466,22 @@ export default {
         self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
-      let typeTemp = [];
+      const typeTemp = [];
       self.allRoutedata.forEach(item => {
         item.forEach(_item => {
           typeTemp.push(_item.type);
         });
       });
-      let delData = self.routeData.filter(x => x.itemData.length !== 0);
+      const delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1 || self.allchecked) {
         if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) || self.allRoutedata.length === 3) && delData[0].type === 1) {
           self.showFaildig = true;
           return false;
         } else if (self.allRoutedata.length === 1) {
-          let params = {};
+          const params = {};
           params.category = parseInt(self.routeData[0].mode);
-          let bindSchedule = await self.getScheduleFromDB(params);
-          let arrtemp = [];
+          const bindSchedule = await self.getScheduleFromDB(params);
+          const arrtemp = [];
           bindSchedule.forEach(item => {
             if (item.extra != null) {
               arrtemp.push(item.extra.inspectId);
@@ -493,26 +499,26 @@ export default {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
-          let data = res.data;
+          const data = res.data;
           resolve(data);
-        }).catch(err =>{
-          reject(err)
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     afterDeleteNape() {
-      let self = this;
+      const self = this;
       self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
       self.showDeleteContent = false;
-      let val = 'del';
+      const val = 'del';
       self.$emit('refreshList', val, self.curSheet);
     },
 
     confirmDelete() {
-      let self = this;
-      let arrGroup = [];
-      let arrItem = [];
+      const self = this;
+      const arrGroup = [];
+      const arrItem = [];
       self.routeData.forEach(item => {
         if (item.checked) {
           arrGroup.push(item.id);
@@ -523,16 +529,16 @@ export default {
           }
         });
       });
-      let params = {
+      const params = {
         'itemIds': arrItem
       };
-      let paramsGroup = {
+      const paramsGroup = {
         'groupIds': arrGroup
       };
       if (arrItem.length !== 0) {
         inpectRESTful.deleteInspectItem(params).then(res => {
           console.log(res.data);
-          let code = res.errMsg;
+          const code = res.errMsg;
           if (code != undefined && code === 'Success') {
             if (arrGroup.length !== 0) {
               inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
@@ -563,37 +569,37 @@ export default {
     },
 
     getDownLoadURL() {
-      let self = this;
+      const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
         console.log(res);
-        let blob = new Blob([res], {
+        const blob = new Blob([res], {
           type: 'application/vnd.ms-excel'
         });
-        let objectUrl = URL.createObjectURL(blob);
+        const objectUrl = URL.createObjectURL(blob);
         self.downLoadSrc = objectUrl;
       });
     },
 
     async handleDelete(index, row) {
       console.log(index);
-      let self = this;
-      let typeTemp = [];
+      const self = this;
+      const typeTemp = [];
       self.allRoutedata.forEach(item => {
         item.forEach(_item => {
           typeTemp.push(_item.type);
         });
       });
-      let delData = self.routeData.filter(x => x.itemData.length !== 0);
+      const delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1) {
-        if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0)
-          || self.allRoutedata.length === 3) && delData[0].type === 1) {
+        if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) ||
+          self.allRoutedata.length === 3) && delData[0].type === 1) {
           self.showFaildig = true;
           return false;
         } else if (self.allRoutedata.length === 1) {
-          let params = {};
+          const params = {};
           params.category = parseInt(self.routeData[0].mode);
-          let bindSchedule = await self.getScheduleFromDB();
-          let arrtemp = [];
+          const bindSchedule = await self.getScheduleFromDB();
+          const arrtemp = [];
           bindSchedule.forEach(item => {
             if (item.extra != null) {
               arrtemp.push(item.extra.inspectId);
@@ -606,33 +612,33 @@ export default {
         }
       }
       self.showSingleDeleteContent = true;
-      let id = row.id;
-      let arr = [];
+      const id = row.id;
+      const arr = [];
       arr.push(id);
       self.curDeleteId = arr;
     },
 
     async confirmDeleteSingle() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         'itemIds': self.curDeleteId
       };
       inpectRESTful.deleteInspectItem(params).then(res => {
         console.log(res.data);
-        let code = res.errMsg;
+        const code = res.errMsg;
         if (code != undefined && code === 'Success') {
           self.routeData.forEach((r_item, r_index) => {
             if (self.routeData[r_index].itemData.length === 1) {
               r_item.itemData.forEach((d_item, d_index) => {
                 if (self.curDeleteId[0] === d_item.id) {
                   self.curDelGroupId = r_item.id;
-                  let paramsGroup = {
+                  const paramsGroup = {
                     'groupIds': [self.curDelGroupId]
                   };
                   inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
                     self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
                     self.showSingleDeleteContent = false;
-                    let val = 'del';
+                    const val = 'del';
                     self.$emit('refreshList', val, self.curSheet);
                   });
                 }
@@ -640,7 +646,7 @@ export default {
             } else {
               self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
               self.showSingleDeleteContent = false;
-              let val = 'del';
+              const val = 'del';
               self.$emit('refreshList', val, self.curSheet);
             }
           });
@@ -653,25 +659,30 @@ export default {
     },
 
     setItem() {
-      let self = this;
+      const self = this;
       sessionStorage.setItem('NapeItem', JSON.stringify(self.routeData));
       sessionStorage.setItem('GroupName', self.tabName);
       self.$router.push({ name: 'itemSetting', params: { routeData: self.routeData,
-          tabNameLang: self.tabNameLang, routeName: self.routeName }});
+        tabNameLang: self.tabNameLang, routeName: self.routeName }});
+    },
+
+    setRule() {
+      const self = this;
+      self.$router.push({ name: 'setRule', params: { routeData: self.routeData, routeName: self.routeName }});
     },
 
     downLoadModel() {
-      let url = 'http://' + window.location.host + '/storemonitor/api/v1.0/inspect/template';
+      const url = 'http://' + window.location.host + '/storemonitor/api/v1.0/inspect/template';
       window.open(url);
     },
 
     emptyImport() {
-      let self = this;
+      const self = this;
       document.getElementById('uploadFile').click();
     },
 
     checkBeforeImport() {
-      let self = this;
+      const self = this;
       if (self.checkValue === self.addPatrol && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
         self.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
         return false;
@@ -777,22 +788,18 @@ export default {
                 opacity: 0.6;
             }
             .el-delete-btn{
-                //background-color: #fff;
                 border-color:  $mainColor;
                 color: $mainColor;
                 border-radius: 0px;
-                margin-right:calc(10/1920*100vw);
                 font-size: 12px;
                 &:disabled{
                     opacity: 0.5;
                 }
             }
             .en-el-delete-btn{
-              //background-color: #fff;
               border-color:  $mainColor;
               color: $mainColor;
               border-radius: 0px;
-              margin-right:calc(10/1920*100vw);
               font-size: calc(14/1920*100vw);
               padding: 0 0;
               width: calc(130/1920*100vw);
@@ -804,7 +811,6 @@ export default {
               }
             }
             .el-set-btn{
-                //background-color: $mainColor;
                 border-color:  $mainColor;
                 color: #fff;
                 border-radius: 0px;
@@ -814,7 +820,6 @@ export default {
                 }
             }
             .en-el-set-btn{
-              //background-color: $mainColor;
               border-color:  $mainColor;
               color: #fff;
               border-radius: 0px;
@@ -824,10 +829,6 @@ export default {
               width: calc(130/1920*100vw);
               &:disabled{
                 opacity: .5;
-              }
-              span{
-              }
-              .iconfont{
               }
               @media screen and (min-width: 1440px) {
                   width: calc(130/1920*100vw);

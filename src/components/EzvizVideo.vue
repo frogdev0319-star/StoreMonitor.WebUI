@@ -329,6 +329,7 @@ import qs from 'qs';
 import { getCookie } from '../common/auth';
 import filterString from '../common/filterString';
 import Environment from '../common/environment';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'EzvizVideo',

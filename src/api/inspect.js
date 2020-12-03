@@ -14,7 +14,6 @@ export const getInspectGroupList = params => {
     params
   });
 };
-
 export const getInspectItemList = params => {
   return request({
     url: `${version}/inspect/item/list`,
@@ -22,7 +21,6 @@ export const getInspectItemList = params => {
     params
   });
 };
-
 export const getInspectBindList = data => {
   return request({
     url: `${version}/inspect/item/bind/list`,
@@ -30,7 +28,6 @@ export const getInspectBindList = data => {
     data
   });
 };
-
 export const addInspectGroup = data => {
   return request({
     url: `${version}/inspect/group/add`,
@@ -38,7 +35,6 @@ export const addInspectGroup = data => {
     data
   });
 };
-
 export const addInspectItem = data => {
   return request({
     url: `${version}/inspect/item/add`,
@@ -46,7 +42,6 @@ export const addInspectItem = data => {
     data
   });
 };
-
 export const applyItemInspectItem = data => {
   return request({
     url: `${version}/inspect/item/apply`,
@@ -54,7 +49,6 @@ export const applyItemInspectItem = data => {
     data
   });
 };
-
 export const UnapplyInspectItem = data => {
   return request({
     url: `${version}/inspect/item/unapply`,
@@ -70,7 +64,6 @@ export const bindInspectItem = data => {
     data
   });
 };
-
 export const bindInspectItemV2 = data => {
   return request({
     url: `v2.0/inspect/item/bind`,
@@ -78,7 +71,6 @@ export const bindInspectItemV2 = data => {
     data
   });
 };
-
 export const checkOutInspectItem = params => {
   return request({
     url: `${version}/inspect/checkout`,
@@ -94,7 +86,6 @@ export const checkOutInspectItemV3 = params => {
     params
   });
 };
-
 export const unbindInspectItemV2 = data => {
   return request({
     url: `v2.0/inspect/item/unbind`,
@@ -102,7 +93,6 @@ export const unbindInspectItemV2 = data => {
     data
   });
 };
-
 export const deleteInspectGroup = data => {
   return request({
     url: `${version}/inspect/group/delete`,
@@ -110,7 +100,6 @@ export const deleteInspectGroup = data => {
     data
   });
 };
-
 export const deleteInspectItem = data => {
   return request({
     url: `${version}/inspect/item/delete`,
@@ -132,7 +121,6 @@ export const submitInspectItem = data => {
     data
   });
 };
-
 export const unbindInspectItem = data => {
   return request({
     url: `${version}/inspect/item/ubind`,
@@ -140,7 +128,6 @@ export const unbindInspectItem = data => {
     data
   });
 };
-
 export const updateInspectGroup = data => {
   return request({
     url: `${version}/inspect/group/update`,
@@ -148,7 +135,6 @@ export const updateInspectGroup = data => {
     data
   });
 };
-
 export const updateInspectItem = data => {
   return request({
     url: `${version}/inspect/item/update`,
@@ -156,14 +142,12 @@ export const updateInspectItem = data => {
     data
   });
 };
-
 export const downLoadTemplate = () => {
   return serviceAxios({
     url: `${version}/inspect/template`,
     method: 'get'
   });
 };
-
 export const getInspectBindCount = data => {
   return request({
     url: `${version}/inspect/item/unbind/count`,
@@ -171,7 +155,6 @@ export const getInspectBindCount = data => {
     data
   });
 };
-
 export const getInspectReportList = data => {
   return request({
     url: `${version}/inspect/report/list`,
@@ -187,7 +170,6 @@ export const getInspectReportInfo = data => {
     data
   });
 };
-
 export const submitInspectItem1 = data => {
   return request({
     url: `${version2}/inspect/submit`,
@@ -195,7 +177,6 @@ export const submitInspectItem1 = data => {
     data
   });
 };
-
 export const getInspectReportDetail = params => {
   return request({
     url: `${version}/inspect/report/detail`,
@@ -203,7 +184,6 @@ export const getInspectReportDetail = params => {
     params
   });
 };
-
 export const BindInspectGroup = data => {
   return request({
     url: `${version}/inspect/group/bind`,
@@ -211,7 +191,6 @@ export const BindInspectGroup = data => {
     data
   });
 };
-
 export const UnbindInspectGroupAndTitle = data => {
   return request({
     url: `${version}/inspect/group/unbind`,
@@ -219,7 +198,6 @@ export const UnbindInspectGroupAndTitle = data => {
     data
   });
 };
-
 export const GetInspectTagList = params => {
   return request({
     url: `${version}/inspect/tag/list`,
@@ -227,7 +205,6 @@ export const GetInspectTagList = params => {
     params
   });
 };
-
 export const GetInspectGroupBindList = data => {
   return request({
     url: `${version}/inspect/group/bind/list`,
@@ -235,11 +212,24 @@ export const GetInspectGroupBindList = data => {
     data
   });
 };
-
 export const UpdateInspectGroupTag = params => {
   return request({
     url: `${version}/inspect/tag/update`,
     method: 'post',
+    params
+  });
+};
+export const UpdateInspectRuleSettings = data => {
+  return request({
+    url: `${version}/inspect/rule/update`,
+    method: 'post',
+    data
+  });
+};
+export const GetInspectRuleSettings = params => {
+  return request({
+    url: `${version}/inspect/rules`,
+    method: 'get',
     params
   });
 };

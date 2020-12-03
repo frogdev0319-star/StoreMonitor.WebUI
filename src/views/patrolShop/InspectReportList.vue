@@ -3,11 +3,18 @@
     <el-col :span="24" class="report-header">
       <el-col :span="24" class="header-details">
         <span>{{ $t('remotePatrol.storeSelect') }}</span>
-        <el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" size="mini"
-                   class="el-province" @change="changeCountry">
+        <el-select
+          v-model="curCountry"
+          :placeholder="$t('remotePatrol.country')"
+          size="mini"
+          class="el-province"
+          @change="changeCountry">
           <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
-            <el-option v-for="item in group.countryList" :key="item.value" :label="item.label"
-                       :value="item.value"/>
+            <el-option
+              v-for="item in group.countryList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
           </el-option-group>
         </el-select>
         <region-multi-select
@@ -28,8 +35,12 @@
           :all="$t('overview.allZoneII')"
           style="display: inline"
           @changeInput="handleCityChange"/>
-        <multi-select ref="multiSelect" :selected="curStore" :options="storeDataList"
-                      style="display: inline" @changeInput="handleStoreChange"/>
+        <multi-select
+          ref="multiSelect"
+          :selected="curStore"
+          :options="storeDataList"
+          style="display: inline"
+          @changeInput="handleStoreChange"/>
         <span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>
         <multi-select
           ref="TagMultiSelect"
@@ -97,31 +108,50 @@
           <span>{{ $t('remotePatrol.keywords') }}</span>
           <el-input v-model="searchInput" size="mini" class="search-input" clearable/>
         </div>
-        <el-button :class="lang==='en'? 'en-search-btn':'search-btn' " size="mini" type="primary"
-                   @click="searchData">{{ $t('remotePatrol.search') }}</el-button>
+        <el-button
+          :class="lang==='en'? 'en-search-btn':'search-btn' "
+          size="mini"
+          type="primary"
+          @click="searchData">{{ $t('remotePatrol.search') }}</el-button>
       </el-col>
     </el-col>
     <el-col :span="24" class="report-content">
       <el-row v-if="reportList.length!=0" class="card-content">
         <el-col v-if="reportList.length!=0" :span="24" class="card-header">
-          <el-radio v-for="(item,index) in sortTypeList" v-model="curSortType" :key="index" :label="item.id"
-                    style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;" @change="checkSortType">
+          <el-radio
+            v-for="(item,index) in sortTypeList"
+            v-model="curSortType"
+            :key="index"
+            :label="item.id"
+            style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;"
+            @change="checkSortType">
             <span>{{ item.name }}</span>
           </el-radio>
           <div class="list_card">
-            <div :style="isHoverCard || ShowCard ? 'color:#f31d65':''" class="pattern_btn" @click="ShowCard=true"
-                 @mouseover="isHoverCard=true" @mouseout="isHoverCard=false">
+            <div
+              :style="isHoverCard || ShowCard ? 'color:#f31d65':''"
+              class="pattern_btn"
+              @click="ShowCard=true"
+              @mouseover="isHoverCard=true"
+              @mouseout="isHoverCard=false">
               <i class="iconfont icon-suolvetu iconCard"/>
               <span class="text-pattern">{{ $t('remotePatrol.cardStyle') }}</span>
             </div>
             <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
-            <div :style="isHoverList || !ShowCard ? 'color:#f31d65':''" class="pattern_btn"
-                 @click="ShowCard=false" @mouseover="isHoverList=true" @mouseout="isHoverList=false">
+            <div
+              :style="isHoverList || !ShowCard ? 'color:#f31d65':''"
+              class="pattern_btn"
+              @click="ShowCard=false"
+              @mouseover="isHoverList=true"
+              @mouseout="isHoverList=false">
               <i class="iconfont icon-liebiao iconCard"/>
               <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
             </div>
-            <el-button :class="lang === 'en' ? 'en-export-btn':'export-btn'" type="primary" size="mini"
-                       @click="export2Excel" >
+            <el-button
+              :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+              type="primary"
+              size="mini"
+              @click="export2Excel" >
               <div class="btn-area">
                 <img :src="exportPng" class="icon-excel">
                 <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
@@ -142,8 +172,9 @@
                     </div>
                   </div>
                   <div class="item-icon">
-                    <i :class="item.mode === 0 ? 'icon-yuanchengxunjian' : 'icon-xianchangxunjian'"
-                       class="iconfont inspectIcon"/>
+                    <i
+                      :class="item.mode === 0 ? 'icon-yuanchengxunjian' : 'icon-xianchangxunjian'"
+                      class="iconfont inspectIcon"/>
                   </div>
                   <div class="item-content">
                     <span class="assigner">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</span>
@@ -307,7 +338,7 @@ export default {
         {
           prop: 'totalScore',
           label: this.$t('remotePatrol.patrolScore'),
-          sortable: false,
+          sortable: true,
           width: '150'
         },
         {
@@ -331,7 +362,7 @@ export default {
       exportList: [],
       sizeNum: 12,
       defaultTime: [],
-      dateValue: [new Date().setTime(new Date().getTime() - 3600 * 1000 * 24), new Date()],
+      dateValue: [],
       dateOpt: {
         disabledDate: (time) => {
           return time.getTime() > Date.now();
@@ -440,7 +471,7 @@ export default {
       self.getTagListData();
       self.defaultTime = [];
       self.storeStr = '';
-      self.dateValue = [new Date().setTime(new Date().getTime() - 3600 * 1000 * 24), new Date()];
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date()];
       self.reportList = [];
       self.curSortType = 0;
       self.storeName = '';
@@ -702,8 +733,8 @@ export default {
           if (item.storeId === _item) {
             self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
               item.tagIds.forEach(t_item => {
-                if ( (t_item === v_item && self.curCountry === item.country)
-                  || (t_item === v_item && self.curCountry === '-1') ) {
+                if ((t_item === v_item && self.curCountry === item.country) ||
+                  (t_item === v_item && self.curCountry === '-1')) {
                   str += _item + '，';
                 }
               });
@@ -1003,17 +1034,16 @@ export default {
     dateChange(val) {
       const self = this;
       console.log(val);
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-
-      if ((end - start) / (3600 * 24 * 30 * 1000) > 1) { // 当前选择的时间范围超过了30天
+      const threeMonthAgo = util.getThreeMonths(end);
+      if (end - start > end - threeMonthAgo) {
         self.$message({
           message: this.$t('eventView.changeTimeRange'),
           type: 'warning',
           duration: 3 * 1000
         });
-        start = end - 3600 * 24 * 30 * 1000;
-        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+        self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
       }
     },
 

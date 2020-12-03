@@ -156,7 +156,7 @@ const webpackConfig = merge(baseWebpackConfig, {
 //         ')$'
 //       ),
 //       threshold: 10240,
-//       deleteOriginalAssets:true, 
+//       deleteOriginalAssets:false, 
 //       minRatio: 0.8
 //     })
 //   )

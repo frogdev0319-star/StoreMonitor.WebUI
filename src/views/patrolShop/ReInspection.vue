@@ -1,3890 +1,3582 @@
 <template>
-  <el-row :class="isREC?'noeventClass':''" class="el-container">
-    <el-col :span="16" :class="{liseAnmiClass:showSpread}" class="lside">
-      <div class="el-header-title">
-        <span v-if="showStoreUp" class="lside-title">
-          {{ store.storeTitle }}
-        </span>
-        <div v-if="showStoreUp" :class="store.storeUp?'coll':'nocoll'" class="storeUp-content" @click="addStoreUp">
-          <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
-          <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
-        </div>
-        <el-button v-if="sheetName.length!=0" :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="submit1">
-          {{ $t('remotePatrol.confirmSum') }}
-        </el-button>
-      </div>
-      <el-dialog
-        v-if="showCutDialog"
-        :title="$t('remotePatrol.edit')"
-        :visible.sync="showCutDialog"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-          <hr class="dialog-hr">
-          <div v-if="showPenBtn" id="iconR" class="icon-right">
-            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-            <transition name="fadepen">
-              <div v-if="showPen" class="pen-content">
-                <div v-for="(item,index) in penList" :key="index" class="content">
-                  <div :class="{colorActive:item.showContent}"/>
-                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+    <el-row class="el-container" :class="isREC?'noeventClass':''">
+        <el-col :span="16" class="lside" :class="{liseAnmiClass:showSpread}">
+            <div class="el-header-title">
+                <span class="lside-title" v-if='showStoreUp'>
+                    {{store.storeTitle}}
+                </span>
+                <div class="storeUp-content" :class="store.storeUp?'coll':'nocoll'" @click="addStoreUp" v-if='showStoreUp'>
+                    <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
+                    <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-              </div>
-            </transition>
-          </div>
-          <canvas
-            id="icanvas"
-            :width="767*percentHeight"
-            :height="431*percentHeight"
-            @mousedown="mouseDownAction($event)"
-            @mousemove="mouseMoveAction($event)"/>
-          <div
-            v-if="showCancelContent"
-            :style="{'width':767*percentHeight+'px',
-                     'margin-left':47*percentHeight+'px'}"
-            class="cancel-content">
-            <div class="content" @click="cancelEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.clear') }}</span>
+                <el-button :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" @click="confirmSummary"  type="primary" v-if="sheetName.length!=0">
+                  {{$t('remotePatrol.confirmSum')}}
+                </el-button>
             </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.cancel') }}</span>
-            </div>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="dialogCommentVideo"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="dialogCommentVideo"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content">
-          <hr class="dialog-hr">
-          <video id="previewCutVideo" :width="580*percentHeight" :height="420*percentHeight" :src="curVideoSrc"
-                 prload controls autoplay/>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-img-content">
-            <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight">
-          </div>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showFeedDialog1"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog1"
-        :close-on-click-modal="false"
-        :width="480*percentHeight+'px'"
-        top="12%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-event-content">
-            <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
-            <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
-            <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 2, maxRows: 7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              @input="eventDesChanged"
-              @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog1 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack1">
-            {{ $t('remotePatrol.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showFeedDialog2"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog2"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-            <div v-if="showPenBtn" id="iconR" class="icon-right">
-              <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-              <transition name="fadepen">
-                <div v-if="showPen" class="pen-content">
-                  <div v-for="(item,index) in penList" :key="index" class="content">
-                    <div :class="{colorActive:item.showContent}"/>
-                    <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                  </div>
+            <el-dialog :title="$t('remotePatrol.edit')"
+            :visible.sync="showCutDialog" :close-on-click-modal="false" v-if="showCutDialog" :width="860*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+                    <hr class="dialog-hr"/>
+                        <div class='icon-right' v-if="showPenBtn" id="iconR">
+                            <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
+                            <transition name='fadepen'>
+                            <div class="pen-content" v-if="showPen">
+                                <div class="content" v-for="(item,index) in penList" :key="index">
+                                    <div :class="{colorActive:item.showContent}"></div>
+                                    <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                                </div>
+                            </div>
+                            </transition>
+                        </div>
+                     <canvas id="icanvas"  :width="767*percentHeight" :height="431*percentHeight" @mousedown="mouseDownAction($event)"
+                    @mousemove="mouseMoveAction($event)"></canvas>
+                    <div class="cancel-content" v-if="showCancelContent" :style="{'width':767*percentHeight+'px',
+                    'margin-left':47*percentHeight+'px'}">
+                        <div class="content" @click="cancelEditCanvas">
+                            <img :src="clearIconSrc" class="icon-clear" height="22px"/>
+                            <span>{{$t('remotePatrol.clear')}}</span>
+                        </div>
+                        <div class="content" @click="confirmEditCanvas">
+                            <img :src="removeIconSrc" class="icon-clear" height="22px"/>
+                            <span>{{$t('remotePatrol.cancel')}}</span>
+                        </div>
+                    </div>
                 </div>
-              </transition>
-            </div>
-            <canvas
-              id="icanvas"
-              :width="520*percentHeight"
-              :height="340*percentHeight"
-              @mousedown="mouseDownAction($event)"
-              @mousemove="mouseMoveAction($event)"/>
-            <div
-              v-if="showCancelContent"
-              :style="{'width':520*percentHeight+'px',
-                       'margin-left':47*percentHeight+'px'}"
-              class="cancel-content">
-              <div class="content" @click="cancelEditCanvas">
-                <img :src="clearIconSrc" class="icon-clear" height="22px">
-                <span>{{ $t('remotePatrol.clear') }}</span>
-              </div>
-              <div class="content" @click="confirmEditCanvas">
-                <img :src="removeIconSrc" class="icon-clear" height="22px">
-                <span>{{ $t('remotePatrol.cancel') }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="event-content">
-            <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
-            <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
-            <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows: 7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              @input="eventDesChanged"
-              @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
-            {{ $t('remotePatrol.confirm') }}</el-button>
-        </div>
-      </el-dialog>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showCutDialog = false" size="mini">{{$t('remotePatrol.cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmEdit" size="mini" type="primary">{{$t('remotePatrol.confirm')}}</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog  :title="$t('remotePatrol.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
+            v-if="dialogCommentVideo" :width="680*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content">
+                    <hr class="dialog-hr"/>
+                    <video  :width="580*percentHeight" :height="420*percentHeight" id="previewCutVideo" prload controls autoplay :src="curVideoSrc">
+                    </video>
+                </div>
+            </el-dialog>
+            <el-dialog :title="$t('remotePatrol.view')"
+                :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" :width="680*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="dialog-img-content">
+                        <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight"/>
+                    </div>
+                </div>
+            </el-dialog>
+            <el-dialog :title="$t('remotePatrol.feedbacks')"
+                :visible.sync="showFeedDialog1" :close-on-click-modal="false" v-if="showFeedDialog1" :width="480*percentHeight+'px'" top=12%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="dialog-event-content">
+                        <span class="event-title"><span class="is-required">*</span>{{$t('remotePatrol.name')}}</span>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName" @blur="notShowInputRuleTips('eventName')"></el-input>
+                        <span class="rules" v-if="eventNameRuletip">{{$t('remotePatrol.eventNameRuletip')}}</span>
+                        <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
+                        <span class="event-title">{{$t('remotePatrol.description')}}</span>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows: 7}"
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="$t('remotePatrol.descPlaceholder')" @blur="notShowInputRuleTips('eventDes')"></el-input>
+                        <span class="rules" v-if="eventDesRuletip">{{$t('remotePatrol.comentRuletip')}}</span>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showFeedDialog1 = false" size="mini">{{$t('remotePatrol.cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack1" size="mini" type="primary">{{$t('remotePatrol.confirm')}}</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog :title="$t('remotePatrol.feedbacks')"
+            :visible.sync="showFeedDialog2" :close-on-click-modal="false" v-if="showFeedDialog2" :width="860*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+                        <div class='icon-right' v-if="showPenBtn" id="iconR">
+                            <img :src="penBtnSrc" class="pen-btn" @click="showPenList"/>
+                            <transition name='fadepen'>
+                            <div class="pen-content" v-if="showPen">
+                                <div class="content" v-for="(item,index) in penList" :key="index">
+                                    <div :class="{colorActive:item.showContent}"></div>
+                                    <div class="color" :id="item.id" @click="checkPen(item,index)"></div>
+                                </div>
+                            </div>
+                            </transition>
+                        </div>
+                        <canvas id="icanvas"  :width="520*percentHeight" :height="340*percentHeight" @mousedown="mouseDownAction($event)"
+                        @mousemove="mouseMoveAction($event)"></canvas>
+                        <div class="cancel-content" v-if="showCancelContent" :style="{'width':520*percentHeight+'px',
+                        'margin-left':47*percentHeight+'px'}">
+                            <div class="content" @click="cancelEditCanvas">
+                                <img :src="clearIconSrc" class="icon-clear" height="22px"/>
+                                <span>{{$t('remotePatrol.clear')}}</span>
+                            </div>
+                            <div class="content" @click="confirmEditCanvas">
+                                <img :src="removeIconSrc" class="icon-clear" height="22px"/>
+                                <span>{{$t('remotePatrol.cancel')}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <span class="event-title"><span class="is-required">*</span>{{$t('remotePatrol.name')}}</span>
+                        <el-input size="mini" class="name-input" @input="eventNameChanged" v-model="eventName" @blur="notShowInputRuleTips('eventName')"></el-input>
+                        <span class="rules" style="margin-left:0;" v-if="eventNameRuletip">{{$t('remotePatrol.eventNameRuletip')}}</span>
+                        <span class="error-class" v-if="showEventNameInfo">{{$t('storeMonitor.emptyTitle')}}</span>
+                        <span class="event-title">{{$t('remotePatrol.description')}}</span>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows: 7}"
+                                  @input="eventDesChanged" v-model="eventDes" :placeholder="$t('remotePatrol.descPlaceholder')" @blur="notShowInputRuleTips('eventDes')"></el-input>
+                        <span class="rules" style="margin-left:0;"  v-if="eventDesRuletip">{{$t('remotePatrol.comentRuletip')}}</span>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showFeedDialog2 = false" size="mini">{{$t('remotePatrol.cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack2" size="mini" type="primary">{{$t('remotePatrol.confirm')}}</el-button>
+                </div>
+            </el-dialog>
 
-      <el-dialog
-        v-if="showFeedDialog3"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog3"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" style="text-align:center">
-            <video id="previewCutVideo" :width="520*percentHeight" :height="340*percentHeight" :src="feedBackVideoFileObj.src" prload controls autoplay/>
-          </div>
-          <div class="event-content">
-            <span class="event-title">{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" maxlength="10"/>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows:7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              maxlength="300"/>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog3 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack3">
-            {{ $t('remotePatrol.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
+            <el-dialog :title="$t('remotePatrol.feedbacks')"
+            :visible.sync="showFeedDialog3" :close-on-click-modal="false" v-if="showFeedDialog3" :width="860*percentHeight+'px'" height=300px top=5%>
+                <div class="canvas-content" style="overflow:hidden;">
+                    <hr class="dialog-hr"/>
+                    <div class="feed-canvas-content" style="text-align:center">
+                        <video  :width="520*percentHeight" :height="340*percentHeight" id="previewCutVideo" prload controls autoplay :src="feedBackVideoFileObj.src"></video>
+                    </div>
+                    <div class="event-content">
+                        <span class="event-title">{{$t('remotePatrol.name')}}</span>
+                        <el-input size="mini" class="name-input" maxlength="10" v-model="eventName"></el-input>
+                        <span class="event-title">{{$t('remotePatrol.description')}}</span>
+                        <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 4, maxRows:7}"
+                        maxlength="300" v-model="eventDes" :placeholder="$t('remotePatrol.descPlaceholder')"></el-input>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button id="cancelBtn" @click="showFeedDialog3 = false" size="mini">{{$t('remotePatrol.cancel')}}</el-button>
+                    <el-button id="confirmBtn" @click="confirmAddFeedBack3" siz;e="mini" type="primary">{{$t('remotePatrol.confirm')}}</el-button>
+                </div>
+            </el-dialog>
 
-      <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
-      <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
-      <dialog-vue :dialog-title="changeInspectObj.title" :show-info="changeInspectObj.showInfo" :is-warning="changeInspectObj.isWarning" :dialog-closed="changeInspectObj.dialogCosed" @confirmed="changeInspectDialog" @canceled="canceldChangeInspect"/>
-      <dialog-vue :dialog-title="noBindDeviceObj.title" :show-info="noBindDeviceObj.showInfo" :is-warning="noBindDeviceObj.isWarning" :dialog-closed="noBindDeviceObj.dialogCosed" @confirmed="noBindDeviceDialog" @canceled="canceldNoBind"/>
-      <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
-      <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
-      <dialog-vue :dialog-title="noStoreUser.title" :show-info="noStoreUser.showInfo" :is-warning="noStoreUser.isWarning" :dialog-closed="noStoreUser.dialogCosed" @confirmed="noStoreUserDialog" @canceled="cancelNoUser"/>
-      <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
-      <dialog-vue :dialog-title="videoLoadingObj.title" :show-info="videoLoadingObj.showInfo" :is-warning="videoLoadingObj.isWarning" :dialog-closed="videoLoadingObj.dialogCosed" @confirmed="videoLoadingDialog" @canceled="cancelVideoLoading">></dialog-vue>
-      <div v-if="showGuide && inspectList.length > 0" class="guide-content">
-        <div class="guide-rside">
-          <div class="num-content">
-            <span class="guide-num">2</span>
-            <span class="guide-title">
-              {{ $t('remotePatrol.takeSnapshot') }}
-            </span>
-          </div>
-          <img :src="arrows2Src" alt="arrow2">
-          <div class="iconright-content">
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
-              <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-              <span>{{ $t('remotePatrol.snapshot') }}</span>
+            <dialog-vue :dialog-title='changeBrandObj.title' :show-info='changeBrandObj.showInfo' :is-warning='changeBrandObj.isWarning' :dialog-closed='changeBrandObj.dialogCosed' @confirmed='changeBrandDialog' @canceled='canceldChangeBrand'></dialog-vue>
+            <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
+            <dialog-vue :dialog-title='changeInspectObj.title' :show-info='changeInspectObj.showInfo' :is-warning='changeInspectObj.isWarning' :dialog-closed='changeInspectObj.dialogCosed' @confirmed='changeInspectDialog' @canceled='canceldChangeInspect'></dialog-vue>
+            <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
+            <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
+            <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
+            <dialog-vue :dialog-title='noStoreUser.title' :show-info='noStoreUser.showInfo' :is-warning='noStoreUser.isWarning' :dialog-closed='noStoreUser.dialogCosed' @confirmed='noStoreUserDialog' @canceled='cancelNoUser'></dialog-vue>
+            <dialog-vue :dialog-title='leaveObj.title' :show-info='leaveObj.showInfo' :is-warning='leaveObj.isWarning' :dialog-closed='leaveObj.dialogCosed' @confirmed='leaveDialog' @canceled='cancelLeave'></dialog-vue>
+            <dialog-vue :dialog-title="videoLoadingObj.title" :show-info='videoLoadingObj.showInfo' :is-warning='videoLoadingObj.isWarning' :dialog-closed='videoLoadingObj.dialogCosed' @confirmed='videoLoadingDialog' @canceled='cancelVideoLoading'>></dialog-vue>
+            <div class="guide-content" v-if="showGuide && inspectList.length > 0">
+                <div class="guide-rside">
+                    <div class="num-content">
+                        <span class="guide-num">2</span>
+                        <span class="guide-title">
+                            {{$t('remotePatrol.takeSnapshot')}}
+                        </span>
+                    </div>
+                    <img :src="arrows2Src" alt="arrow2"/>
+                    <div class="iconright-content">
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+                            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                            <span>{{$t('remotePatrol.snapshot')}}</span>
+                        </div>
+                        <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
+                            <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;"></i>
+                            <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+                          <span>{{$t('remotePatrol.record')}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
-              <i v-if="lang =='en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
-              <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
-              <span>{{ $t('remotePatrol.record') }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-else>
-        <div v-if="!isEzviz">
-          <div v-if="showError" class="errorVideo-model">
-            <span>{{ errorText }}</span>
-          </div>
-          <div
-            v-loading="isLoading"
-            element-loading-background="rgba(0, 0, 0, 0.8)"
-            v-else
-            id="videoContent"
-            class="video-content"
-            @mouseleave="hiddenModel"
-            @mouseenter="showModel"
-            @mousemove="showModel">
-            <div v-if="showGetVideo" class="getvideo-content">
-              <div class="btn-graph">
-                <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"/>
-              </div>
-              <canvas id="vcanvas" :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"/>
-            </div>
-            <span v-if="showInfoContent" id="channelName">{{ channel!=null?channel.channelName:'' }}</span>
-            <div v-if="showInfoContent" class="icon-footer" >
-              <div class="iconlside">
-                <!--<i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>-->
-                <!--<i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>-->
-                <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"class= "iconfont iconplay" @click="onPlay"/>
-              </div>
-              <div class="screen-content">
-                <i
-                  :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                  class="iconfont iconscreen"
-                  @click="controlScreen"/>
-                <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
-              </div>
-            </div>
-            <transition name="fade">
-              <div v-if="showModelContent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-                <span>{{ $t('remotePatrol.snapshot') }}</span>
-              </div>
-            </transition>
-            <video
-              v-if="showVideo"
-              id="previewVideo"
-              :controls="showControls"
-              :paused="paused"
-              :muted = "muted"
-              :src="uri"
-              height="83%"
-              width="90%"
-              prload
-              autoplay
-              class="video-js vjs-fill"
-              @ended="onEnd"
-              @progress="onProgress"
-              @waiting="onPlayerWaiting($event)"
-              @playing="onPlayerPlaying($event)"/>
-          </div>
-        </div>
-        <ezviz-video
-          v-else
-          ref="ezvizVideo"
-          :channel-info="channel"
-          :source-list-length= "sourceListLength"
-          :show-feed-back="showFeedBack"
-          :show-feed-dialog2="showFeedDialog2"
-          :store-id="store.storeId"
-          @confirmEzvizCanvas="editEzvizCanvas"
-          @ezvizCutPictureFeedback="ezvizPictureFeedback"
-          @confirmEzvizVideoFeedback="ezvizVideoFeedback"
-          @emitEzvizVideo="confirmEzvizVideo" />
-      </div>
-      <div class="el-inspect">
-        <div v-if="showGuide && sheetName.length > 0" class="guide-lside">
-          <div class="num-content">
-            <span class="guide-num">1</span>
-            <span class="guide-title">
-              {{ $t('remotePatrol.startPatrol') }}
-            </span>
-          </div>
-          <img :src="arrows1Src" alt="arrow1">
-        </div>
-        <el-row v-if="sheetName.length!=0" class="inspect-title">
-          <el-col v-if="!notShowAlert" :span="24">
-            <el-alert v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3" :title="$t('remotePatrol.alertContent')" :closable="false" type="warning"/>
-            <el-alert v-if="hasSheet3&&!showIgnoreItem&&!isShowWarn" :title="$t('remotePatrol.alertTips1')" :closable="false" type="warning"/>
-            <el-alert v-if="isShowWarn" :closable="false" type="warning" show-icon><span style="cursor: pointer;font-weight:bold;" @click="hasIgnoreItem">{{ $t('remotePatrol.clickToContent') }}</span></el-alert>
-            <el-alert v-if="showIgnoreItem" :closable="false" type="info" class="info-alert">
-              <div class="info-left">{{ $t('remotePatrol.hasIgnoreContent') }}</div>
-              <div class="info-right" @click="backToPatrol"><img :src="backicon"><span>{{ $t('remotePatrol.backToallsheet') }}</span></div>
-            </el-alert>
-          </el-col>
-        </el-row>
-        <el-row v-if="sheetName.length!=0&&!showIgnoreItem" class="inspect-content">
-          <el-col :span="8">
-            <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-              <div style="background-color:#f4f5f9;height:316.06px;">
-                <div v-for="(_item,_index) in sheetName" :key="_index" class="Group-content">
-                  <div :class="_item.isClick?'noraml-color':'noraml-groupColor'" class="Group-content-title" @click="changeSheet(_item,_index)">
-                    <!-- <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span> -->
-                    <span>{{ _item.label }}</span>
-                    <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
-                    <i v-if="_item.groupId==undefined&&!_item.isClick" class="el-icon-arrow-right icon"/>
-                    <i v-if="_item.groupId==undefined&&_item.isClick" class="el-icon-arrow-down icon"/>
+            <div v-else>
+              <div v-if="!isEzviz">
+                <div class="errorVideo-model" v-if="showError">
+                  <span>{{errorText}}</span>
+                </div>
+                <div class="video-content"  id="videoContent"
+                     @mouseleave="hiddenModel" @mouseenter="showModel" @mousemove="showModel" v-else>
+                  <div class="getvideo-content" v-if="showGetVideo">
+                    <div class="btn-graph">
+                      <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"></canvas>
+                    </div>
+                    <canvas id="vcanvas"  :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"></canvas>
                   </div>
-                  <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
-                    <div
-                      v-for="(item,index) in inspectList"
-                      :key="index"
-                      :style="item.isHover||item.isClick?'color:#f31b65;background-color:#fddde8;':''"
-                      class="inspect-details"
-                      @click="getItemByGroup(item,index)"
-                      @mouseover="mouseoverGroup(item,index)"
-                      @mouseout="mouseoutGroup(item,index)">
-                      <span>{{ item.groupName }}</span>
+                  <span id="channelName" v-if="showInfoContent">{{channel!=null?channel.channelName:''}}</span>
+                  <div class="icon-footer" v-if="showInfoContent">
+                    <div class="iconlside">
+                      <i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>
+                      <i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>
+                    </div>
+                    <div class="screen-content">
+                      <i class="iconfont iconscreen"
+                         :class="fullScreen?'icon-tuichuquanping':'icon-quanping'" @click="controlScreen"></i>
+                      <i class="iconfont icon-gongge iconscreen" @click="gonggeScreen" v-if="false"></i>
                     </div>
                   </div>
-                </div>
-              </div>
-            </el-scrollbar>
-          </el-col>
-          <el-col id="inspectContent" :span="16">
-            <el-scrollbar ref="myScrollbar" style="height:100%;" class="el-menuscrollbar">
-              <div v-if="!showFeedBack" style="height:299.84px;">
-                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
-                  <span
-                    :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                    :style="item.checked?{'font-weight':'bold'}:{}"
-                    :title="`${index+1}. ${item.subject}`"
-                    class="titles"
-                    @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
-                  <div v-if="item.disabled" class="dropdown-model"/>
-                  <div v-if="inspectList[0].type!=1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                    <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">{{ itemDS.scoreTitle }}</p>
-                  </div>
-                  <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'" trigger="click" class="item-score" size="small">
-                    <span class="el-dropdown-link">
-                      {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                      <i class="el-icon-arrow-down el-icon--right"/>
-                    </span>
-                    <el-dropdown-menu slot="dropdown" class="score-menu">
-                      <el-dropdown-item
-                        v-for="itemDS in item.itemScoreLength"
-                        :key="itemDS"
-                        style="width:70px;text-align:center;"
-                        @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                  <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"/>
-                  <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
-                  <div v-if="item.checked" class="icon-clicked"/>
-                  <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
-                    <span>{{ item.description }}</span>
-                  </div>
-                  <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
-                    <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                      <div v-if="_item.mediaType==2" class="img-content">
-                        <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
-                      </div>
-                      <div v-if="_item.mediaType==1" class="img-content">
-                        <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
-                        <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                      </div>
+                  <transition name='fade'>
+                    <div :class="lang== 'en'? 'en-iconright' : 'iconright'" v-if="showModelContent" @click="cutPicture">
+                      <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"></i>
+                      <span>{{$t('remotePatrol.snapshot')}}</span>
                     </div>
-                  </div>
-                  <el-input
-                    :autosize="{ minRows: 2, maxRows:7}"
-                    v-model="item.inspectInput"
-                    :placeholder="$t('remotePatrol.coment')"
-                    :disabled="item.disabled"
-                    size="mini"
-                    class="des-input"
-                    type="textarea"
-                    resize="none"
-                    @input="(val)=>itemDescriptionChanged(val,item)"
-                    @blur="notShowInputRuleTips('item',item)"/>
-                  <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                </div>
-              </div>
-              <div v-else-if="showFeedBackInfo" class="item-content" style="height:299.84px;">
-                <div id="feedback-content">
-                  <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
-                  <span class="feedback-info">{{ $t('remotePatrol.methodII') }}</span>
-                </div>
-                <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70">
-                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
-              </div>
-              <div v-else class="item-content" style="height:299.84px;">
-                <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-                  <div class="feedbacks-content">
-                    <div v-for="(item,index) in eventList" :key="index" class="feedbacks-details">
-                      <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" />
-                      <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
-                      <span class="feedback-eventdes">{{ item.eventDes }}</span>
-                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                        <img
-                          :src="item.sourceObj.src"
-                          :width="item.sourceObj.width"
-                          :height="item.sourceObj.height"
-                          class="feedback-pic"
-                          @click="openOuter(item.sourceObj)">
-                      </div>
-                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
-                        <img :src="videoImgSrc" class="imgLittle" height="100">
-                      </div>
-                      <hr class="feedbacks-hr">
+                  </transition>
+                  <transition name="fade">
+                    <div :class="lang== 'en'? 'en-iconright1' : 'iconright1'" v-if="showModelContent" @click="getVideo" style="display: none">
+                      <i class="iconfont icon-luxiang iconpaizhao" v-if="lang =='en' " style="font-size:21px;margin-left: -15px;"></i>
+                      <i class="iconfont icon-luxiang iconpaizhao" v-else style="font-size:21px"></i>
+                      <span>{{$t('remotePatrol.record')}}</span>
                     </div>
-                  </div>
-                </el-scrollbar>
-                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
-              </div>
-            </el-scrollbar>
-          </el-col>
-        </el-row>
-        <el-row v-if="showIgnoreItem" class="inspect-content" style="padding-left: calc(15/1920*100vw);">
-          <el-col id="inspectContent" :span="24">
-            <el-scrollbar ref="myScrollbar" style="height:100%;" class="el-menuscrollbar">
-              <div style="height:299.84px;">
-                <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details">
-                  <span
-                    :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                    :style="item.checked?{'font-weight':'bold'}:{}"
-                    :title="`${index+1}. ${item.subject}`"
-                    class="titles"
-                    @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
-                  <div v-if="item.disabled" class="dropdown-model"/>
-                  <div v-if="item.type!=1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                    <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkIgnoreScore(item,itemDS,0,index)">{{ itemDS.scoreTitle }}</p>
-                  </div>
-                  <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'" trigger="click" class="item-score" size="small">
-                    <span class="el-dropdown-link">
-                      {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                      <i class="el-icon-arrow-down el-icon--right"/>
-                    </span>
-                    <el-dropdown-menu slot="dropdown" class="score-menu">
-                      <el-dropdown-item
-                        v-for="itemDS in item.itemScoreLength"
-                        :key="itemDS"
-                        style="width:70px;text-align:center;"
-                        @click.native="checkIgnoreScore(item,itemDS,1,index)">{{ itemDS }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                  <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,1)"/>
-                  <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
-                  <div v-if="item.checked" class="icon-clicked"/>
-                  <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
-                    <span>{{ item.description }}</span>
-                  </div>
-                  <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
-                    <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                      <div v-if="_item.mediaType==2" class="img-content">
-                        <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
-                      </div>
-                      <div v-if="_item.mediaType==1" class="img-content">
-                        <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
-                        <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                      </div>
-                    </div>
-                  </div>
-                  <el-input
-                    :autosize="{ minRows: 2, maxRows:7}"
-                    v-model="item.inspectInput"
-                    :placeholder="$t('remotePatrol.coment')"
-                    :disabled="item.disabled"
-                    size="mini"
-                    class="des-input"
-                    type="textarea"
-                    resize="none"
-                    @input="(val)=>itemDescriptionChanged(val,item)"
-                    @blur="notShowInputRuleTips('item',item)"/>
-                  <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                  </transition>
+                  <video  height=83% width=90% id="previewVideo" prload autoplay :controls="showControls" v-if="showVideo"
+                          class="video-js vjs-fill" @waiting='onPlayerWaiting($event)' @playing="onPlayerPlaying($event)">
+                  </video >
                 </div>
               </div>
-            </el-scrollbar>
-          </el-col>
-        </el-row>
-        <el-row v-if="sheetName.length==0" class="inspect-content">
-          <div class="inspect-empty">
-            <span>{{ $t('remotePatrol.noItems') }}</span>
-          </div>
-        </el-row>
-      </div>
-    </el-col>
-    <el-col v-if="!showSpread" :span="8" class="rside">
-      <div class="el-header-title">
-        <span>{{ $t('remotePatrol.selectStrore') }}</span>
-      </div>
-      <el-tabs v-model="activeIndex" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%" @tab-click="handleClick">
-        <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
-          <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-            <div v-if="index!=2" class="storeList-content">
-              <span v-if="item.storeList.length!=0" class="icon-info">* {{ $t('remotePatrol.cannotSwitch') }}</span>
-              <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
+              <ezviz-video v-else :channel-info="channel" :source-list-length= "sourceListLength" :show-feed-back="showFeedBack"
+                           :show-feed-dialog2="showFeedDialog2" :store-id="store.storeId"
+                           @confirmEzvizCanvas="editEzvizCanvas" @ezvizCutPictureFeedback="ezvizPictureFeedback"  @confirmEzvizVideoFeedback="ezvizVideoFeedback"
+                           ref="ezvizVideo"
+                           @emitEzvizVideo="confirmEzvizVideo" >
+
+              </ezviz-video>
+            </div>
+            <div class="el-inspect">
+                <div class="guide-lside" v-if="showGuide && sheetName.length > 0">
+                    <div class="num-content">
+                        <span class="guide-num">1</span>
+                        <span class="guide-title">
+                            {{$t('remotePatrol.startPatrol')}}
+                        </span>
+                    </div>
+                    <img :src="arrows1Src" alt="arrow1"/>
+                </div>
+                <el-row v-if="sheetName.length!=0" class="inspect-title">
+                    <el-col :span="24" v-if="!notShowAlert">
+                        <el-alert :title="$t('remotePatrol.alertContent')" type="warning" :closable="false" v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3"></el-alert>
+                        <el-alert :title="$t('remotePatrol.alertTips1')" type="warning" :closable="false" v-if="hasSheet3&&!showIgnoreItem&&!isShowWarn"></el-alert>
+                        <el-alert type="warning" :closable="false" v-if="isShowWarn" show-icon><span @click="hasIgnoreItem" style="cursor: pointer;font-weight:bold;">{{$t('remotePatrol.clickToContent')}}</span></el-alert>
+                        <el-alert type="info" :closable="false" v-if="showIgnoreItem" class="info-alert">
+                            <div class="info-left">{{$t('remotePatrol.hasIgnoreContent')}}</div>
+                            <div class="info-right" @click="backToPatrol"><img :src="backicon"><span>{{$t('remotePatrol.backToallsheet')}}</span></div>
+                        </el-alert>
+                    </el-col>
+                </el-row>
+                <el-row class="inspect-content" v-if="sheetName.length!=0&&!showIgnoreItem">
+                    <el-col :span="8">
+                        <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                            <div style="background-color:#f4f5f9;height:316.06px;">
+                                <div v-for="(_item,_index) in sheetName" :key="_index" class="Group-content">
+                                    <div @click="changeSheet(_item,_index)" class="Group-content-title" :class="_item.isClick?'noraml-color':'noraml-groupColor'">
+                                        <!-- <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span> -->
+                                        <span>{{_item.label}}</span>
+                                        <span v-if="_item.groupId==undefined">（{{_item.dealCount+'/'+_item.count}}）</span>
+                                        <i class="el-icon-arrow-right icon" v-if="_item.groupId==undefined&&!_item.isClick"></i>
+                                        <i class="el-icon-arrow-down icon" v-if="_item.groupId==undefined&&_item.isClick"></i>
+                                    </div>
+                                    <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
+                                        <div v-for="(item,index) in inspectList" :key="index" class="inspect-details" 
+                                        @click="getItemByGroup(item,index)" @mouseover="mouseoverGroup(item,index)" @mouseout="mouseoutGroup(item,index)" :style="item.isHover||item.isClick?'color:#f31b65;background-color:#fddde8;':''">
+                                            <span>{{item.groupName}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         </el-scrollbar>
+                    </el-col>
+                    <el-col :span="16" id="inspectContent">
+                        <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
+                            <div style="height:299.84px;" v-if="!showFeedBack">
+                                <div v-for="(item,index) in inspectItemList" :key="index" class="item-details">
+                                    <span class="titles" @click="clickItem(item,index)" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                                          :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
+                                    <div class="dropdown-model" v-if="item.disabled"></div>
+                                    <div v-if="inspectList[0].type!=1" class="check_scoring" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" @click="checkScore(item,itemDS,0)" :class="itemDS.isClick?'check_isClick':'check_normal'">{{itemDS.scoreTitle}}</p>
+                                    </div>
+                                    <el-dropdown v-else trigger="click" class="item-score" size="small" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <span class="el-dropdown-link">
+                                            {{`${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}`}}
+                                            <i class="el-icon-arrow-down el-icon--right"></i>
+                                        </span>
+                                        <el-dropdown-menu slot="dropdown" class="score-menu">
+                                            <el-dropdown-item style="width:70px;text-align:center;"
+                                            v-for="itemDS in item.itemScoreLength"
+                                            :key="itemDS" @click.native="checkScore(item,itemDS,1)">{{itemDS}}</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
+                                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"></i>
+                                    <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
+                                    <div class="icon-clicked" v-if="item.checked"></div>
+                                    <div class="details-content" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <span>{{item.description}}</span>
+                                    </div>
+                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
+                                            <div class="img-content" v-if="_item.mediaType==2">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img :src="_item.src" :width="_item.width" :height="_item.height" @click="openOuter(_item)" style="cursor: pointer"/>
+                                            </div>
+                                            <div class="img-content" v-if="_item.mediaType==1">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
+                                                <img class="imgLittle" :src="videoImgSrc" :height="_item.height"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
+                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="$t('remotePatrol.coment')" :disabled="item.disabled" @blur="notShowInputRuleTips('item',item)"></el-input>
+                                    <span class="rules" v-if="item.Ruletip">{{$t('remotePatrol.comentRuletip')}}</span>
+                                </div>
+                            </div>
+                            <div class="item-content" style="height:299.84px;" v-else-if="showFeedBackInfo">
+                                <div id="feedback-content">
+                                    <span class="feedback-info">{{$t('remotePatrol.methodI')}}</span>
+                                    <span class="feedback-info">{{$t('remotePatrol.methodII')}}</span>
+                                </div>
+                                <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70"/>
+                                <img :src="plusSrc" alt="plusSrc"  class="plus-icon" @click="addFeedBack"/>
+                            </div>
+                            <div class="item-content" style="height:299.84px;" v-else>
+                                <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                                    <div class="feedbacks-content">
+                                        <div class="feedbacks-details" v-for="(item,index) in eventList" :key="index">
+                                            <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" ></i>
+                                            <span class="feedback-eventname">{{`${index+1}. ${item.eventName}`}}</span>
+                                            <span class="feedback-eventdes">{{item.eventDes}}</span>
+                                            <div class="img-content" v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
+                                                <img :src="item.sourceObj.src"
+                                            :width="item.sourceObj.width" :height="item.sourceObj.height" class="feedback-pic" @click="openOuter(item.sourceObj)"/>
+                                            </div>
+                                            <div class="img-content" v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1">
+                                                <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(item,index)"/>
+                                                <img class="imgLittle" :src="videoImgSrc" height="100"/>
+                                            </div>
+                                            <hr class="feedbacks-hr"/>
+                                        </div>
+                                    </div>
+                                </el-scrollbar>
+                                <img :src="plusSrc" alt="plusSrc"  class="plus-icon" @click="addFeedBack"/>
+                            </div>
+                        </el-scrollbar>
+                    </el-col>
+                </el-row>
+                <el-row class="inspect-content" style="padding-left: calc(15/1920*100vw);" v-if="showIgnoreItem">
+                    <el-col :span="24" id="inspectContent">
+                        <el-scrollbar style="height:100%;" class="el-menuscrollbar" ref="myScrollbar">
+                            <div style="height:299.84px;">
+                                <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details">
+                                    <span class="titles" @click="clickItem(item,index)"  :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                                          :style="item.checked?{'font-weight':'bold'}:{}" :title="`${index+1}. ${item.subject}`">{{`${index+1}. ${item.subject}`}}</span>
+                                    <div class="dropdown-model" v-if="item.disabled"></div>
+                                    <div v-if="item.type!=1" class="check_scoring" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" @click="checkIgnoreScore(item,itemDS,0,index)" :class="itemDS.isClick?'check_isClick':'check_normal'">{{itemDS.scoreTitle}}</p>
+                                    </div>
+                                    <el-dropdown trigger="click" class="item-score" size="small" v-else  :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <span class="el-dropdown-link">
+                                            {{`${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}`}}
+                                            <i class="el-icon-arrow-down el-icon--right"></i>
+                                        </span>
+                                        <el-dropdown-menu slot="dropdown" class="score-menu">
+                                            <el-dropdown-item style="width:70px;text-align:center;"
+                                            v-for="itemDS in item.itemScoreLength"
+                                            :key="itemDS" @click.native="checkIgnoreScore(item,itemDS,1,index)">{{itemDS}}</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </el-dropdown>
+                                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,1)"></i>
+                                    <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
+                                    <div class="icon-clicked" v-if="item.checked"></div>
+                                    <div class="details-content" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <span>{{item.description}}</span>
+                                    </div>
+                                    <div class="source-content" v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'">
+                                        <div class="source-details" v-for="(_item,_index) in item.sourceList" :key="_index">
+                                            <div class="img-content" v-if="_item.mediaType==2">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img :src="_item.src" :width="_item.width" :height="_item.height" @click="openOuter(_item)" style="cursor: pointer"/>
+                                            </div>
+                                            <div class="img-content" v-if="_item.mediaType==1">
+                                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" ></i>
+                                                <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
+                                                <img class="imgLittle" :src="videoImgSrc" :height="_item.height"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <el-input size="mini" class="des-input" type="textarea"  resize='none' :autosize="{ minRows: 2, maxRows:7}"
+                              v-model="item.inspectInput" @input="(val)=>itemDescriptionChanged(val,item)" :placeholder="$t('remotePatrol.coment')" :disabled="item.disabled" @blur="notShowInputRuleTips('item',item)"></el-input>
+                                    <span class="rules" v-if="item.Ruletip">{{$t('remotePatrol.comentRuletip')}}</span>
+                                </div>
+                            </div>
+                        </el-scrollbar>
+                    </el-col>
+                </el-row>
+                <el-row class="inspect-content" v-if="sheetName.length==0">
+                    <div class="inspect-empty">
+                        <span>{{$t('remotePatrol.noItems')}}</span>
+                    </div>
+                </el-row>
+            </div>
+        </el-col>
+        <el-col :span="8" class="rside" v-if="!showSpread">
+            <div class="el-header-title">
+                <span>{{$t('remotePatrol.selectStrore')}}</span>
+            </div>
+            <el-tabs v-model="activeIndex" @tab-click="handleClick" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%">
+                <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
+                    <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+                        <div class="storeList-content" v-if="index!=2">
+                            <span class="icon-info" v-if="item.storeList.length!=0">* {{$t('remotePatrol.cannotSwitch')}}</span>
+                            <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
                             :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
                                 {{_item.name}}
                             </span> -->
-              <div
-                v-for="(_item,_index) in item.storeList"
-                :key="_index"
-                :class="_item.isActive?'activeClass':''"
-                :style="!_item.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
-                class="storename"
-                @click="clickStore(item,index,_item,_index)">
-                <el-tooltip
-                  :content="_item.name"
-                  class="item"
-                  effect="dark"
-                  placement="bottom">
-                  <span>{{ _item.name }}</span>
-                </el-tooltip>
-              </div>
-            </div>
-            <div v-else class="storeList-content">
-              <el-input
-                :placeholder="$t('remotePatrol.enterKeywords')"
-                v-model="serachVale"
-                size="small"
-                class="el-search-input"
-                style="width:240px"
-                @keyup.enter.native="searchStore">
-                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"/>
-              </el-input>
-              <span v-if="item.storeList.length!=0" class="icon-info" style="margin-bottom:15px">* {{ $t('remotePatrol.cannotSwitch') }}</span>
-              <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
-                <span class="citys">{{ _item.cityName }}</span>
-                <div
-                  v-for="(itemDs,indexDs) in _item.storeList"
-                  :key="indexDs"
-                  :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
-                  :class="itemDs.isActive?'activeClass':''"
-                  class="store-name"
-                  @click="clickStore(item,index,itemDs,indexDs)">
-                  <el-tooltip
-                    :content="itemDs.name"
-                    class="item"
-                    effect="dark"
-                    placement="bottom">
-                    <span>{{ itemDs.name }}</span>
-                  </el-tooltip>
-                </div>
-              </div>
-            </div>
-          </el-scrollbar>
-        </el-tab-pane>
-      </el-tabs>
-      <div class="patrol-select">
-        <div class="patrol-content">
-          <p v-if="lang!= 'en'" class="patrol-title">{{ $t('storeView.selectPlaceholder') }}，<span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span>{{ $t('storeView.bindInspectList') }}</p>
-          <p v-if="lang== 'en'" class="patrol-title">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span></p>
-          <el-dropdown trigger="click" placement="bottom" class="patrol-dropdown" @command="changeInspect">
-            <span class="el-dropdown-link">
-              <p v-if="patrolstore!=''" class="link-span">{{ patrolstore }}</p>
-              <p v-else class="link-span">{{ $t('storeView.selectPlaceholder') }}</p>
-              <i class="el-icon-arrow-down el-icon--right"/>
-            </span>
-            <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-              <el-dropdown-item v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="storename" :class="_item.isActive?'activeClass':''"
+                            :style="!_item.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}" @click="clickStore(item,index,_item,_index)">
+                                <el-tooltip class="item" effect="dark" :content="_item.name"
+                                    placement="bottom">
+                                    <span>{{_item.name}}</span>
+                                </el-tooltip>
+                            </div>
+                        </div>
+                        <div class="storeList-content" v-else>
+                            <el-input
+                                size="small"
+                                class="el-search-input"
+                                :placeholder="$t('remotePatrol.keywords')"
+                                style="width:240px"
+                                v-model="serachVale" @keyup.enter.native="searchStore">
+                                <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"></i>
+                            </el-input>
+                            <span class="icon-info" v-if="item.storeList.length!=0" style="margin-bottom:15px">* {{$t('remotePatrol.cannotSwitch')}}</span>
+                            <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
+                                <span class="citys">{{_item.cityName}}</span>
+                                <div v-for="(itemDs,indexDs) in _item.storeList" :key="indexDs" class="store-name" :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
+                                :class="itemDs.isActive?'activeClass':''" @click="clickStore(item,index,itemDs,indexDs)">
+                                    <el-tooltip class="item" effect="dark" :content="itemDs.name"
+                                    placement="bottom">
+                                    <span>{{itemDs.name}}</span>
+                                    </el-tooltip>
+                                </div>
+                            </div>
+                        </div>
+                    </el-scrollbar>
+                </el-tab-pane>
+            </el-tabs>
+            <div class="patrol-select">
+               <div class="patrol-content">
+                    <p class="patrol-title" v-if="lang!= 'en'">{{$t('storeView.selectPlaceholder')}}，<span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span>{{$t('storeView.bindInspectList')}}</p>
+                    <p class="patrol-title" v-if="lang== 'en'">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{patrolStoreName}}</span><span v-else>{{$t('reportView.stores')}}</span></p>
+                    <el-dropdown trigger="click" placement="bottom" @command="changeInspect" class="patrol-dropdown">
+                        <span class="el-dropdown-link">
+                            <p class="link-span" v-if="patrolstore!=''">{{patrolstore}}</p>
+                            <p class="link-span" v-else>{{$t('storeView.selectPlaceholder')}}</p>
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
+                            <el-dropdown-item  v-for="item in PatrolList" :key="item.id" :command="item.id">{{item.name}}</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
 
-        </div>
-      </div>
-      <div class="channelbar-content">
-        <hr class="rside-hr">
-        <div class="channel-content">
-          <span>{{ $t('remotePatrol.zoneList') }}</span>
-          <div class="channels-srollbar">
-            <div class="arrow-content">
-              <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
+               </div>
             </div>
-            <div class="btn-content">
-              <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
-                <channel-icon-btn
-                  :channel-name="item.name"
-                  :is-online="item.isonline"
-                  :is-click="item.isClick"
-                  class="channelBtn"
-                  @click.native="clickBtn(item,index)"/>
-              </div>
+            <div class="channelbar-content">
+                <hr class="rside-hr"/>
+                <div class="channel-content">
+                    <span>{{$t('remotePatrol.zoneList')}}</span>
+                    <div class="channels-srollbar">
+                        <div class="arrow-content">
+                            <i @click="lastBar" class="el-icon-arrow-left icon-arrow" v-if="hideLast"></i>
+                        </div>
+                        <div class="btn-content">
+                            <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
+                                <channel-icon-btn :channel-name="item.name" :is-online="item.isonline" :is-click="item.isClick"
+                                class="channelBtn" @click.native="clickBtn(item,index)"></channel-icon-btn>
+                            </div>
+                        </div>
+                        <div class="arrow-content">
+                            <i @click="nextBar" class="el-icon-arrow-right icon-arrow" v-if="hideNext"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="arrow-content">
-              <i v-if="hideNext" class="el-icon-arrow-right icon-arrow" @click="nextBar"/>
-            </div>
-          </div>
-        </div>
-      </div>
-    </el-col>
-  </el-row>
+        </el-col>
+    </el-row>
 </template>
 <script>
-import { checkOutInspectItem, submitInspectItem, checkOutInspectItemV3 } from '@/api/inspect';
+import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
-import { getStoreList, getFavoriteList, addFavoriteStore, deleteFavoriteStore, getVideoAuthority } from '@/api/store';
-import { getUserInfo } from '@/api/login';
-import { mapGetters } from 'vuex';
-import { getStorageInfo } from '@/api/event';
-import { getDeviceList } from '@/api/device';
+import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore, getVideoAuthority} from '@/api/store';
+import {getUserInfo} from '@/api/login';
+import {mapGetters} from 'vuex';
+import {getDeviceList} from '@/api/device';
 import dashAPI from '@/api/dash';
 import videojs from '../../../static/video.js';
-import DialogVue from '@/components/DialogVue.vue';
-import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
-import { getCookie } from '@/common/auth';
-import { validateInput } from '@/common/validate';
+import DialogVue from '@/components/DialogVue.vue'
+import ChannelIconBtn  from '@/components/ChannelIconBtn.vue';
+import {getCookie} from '@/common/auth';
 import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
-import { getDashServerInfo } from '@/api/device.js';
-import DashHttp from '@/common/DashHttp.js';
+import html2canvas from 'html2canvas';
 
 export default {
-  name: 'ReInspection',
-  components: {
-    DialogVue,
-    ChannelIconBtn,
-    EzvizVideo
-  },
-  data() {
-    return {
-      sheetName: [],
-      isShowWarn: false,
-      notShowAlert: false,
-      hasSheet3: false,
-      patrolstore: '',
-      PatrolList: [],
-      showControls: false,
-      showGuide: true,
-      sourceList: [],
-      isDisabled: false,
-      penBtnSrc: require('../../../static/img/edit_btn.png'),
-      showPenBtn: true,
-      showPen: false,
-      showStoreUp: false,
-      store: {
-        storeName: '西安5店',
-        storeTitle: '西安5店远程巡检',
-        storeUp: false,
-        storeUptitle: this.$t('remotePatrol.clickToStar')
-      },
-      showFeedDialog1: false,
-      showFeedDialog2: false,
-      showFeedDialog3: false,
-      arrows1Src: require('../../../static/img/arrows_left.png'),
-      arrows2Src: require('../../../static/img/arrows_right.png'),
-      plusSrc: require('../../../static/img/add_icon.png'),
-      clearIconSrc: require('../../../static/img/clear.png'),
-      removeIconSrc: require('../../../static/img/cancel.png'),
-      backicon: require('../../../static/img/back.png'),
-      checkImgSrc: '',
-      showOuter: false,
-      showModelContent: false,
-      showInfoContent: true,
-      activeIndex: '0',
-      serachVale: '',
-      varyWindowHeight: window.innerHeight,
-      varyWindowWidth: window.innerWidth,
-      showDate: true,
-      tempArr: [],
-      playDate: new Date(),
-      channel: null,
-      penList: [
-        {
-          id: 'white',
-          showContent: false
-        },
-        {
-          id: 'red',
-          showContent: true
-        },
-        {
-          id: 'yellow',
-          showContent: false
-        }
-      ],
-      penChecked: 'red',
-      showCutModel: false,
-      errorText: '',
-      showError: false,
-      showVideo: true,
-      showCancelContent: false,
-      speedList: [
-        {
-          value: 0,
-          label: '0.5 X'
-        },
-        {
-          value: 1,
-          label: '1 X'
-        },
-        {
-          value: 2,
-          label: '1.5 X'
-        },
-        {
-          value: 3,
-          label: '2 X'
-        }
-      ],
-      testSpeed: '1 X',
-      backList: [
-        {
-          value: 0,
-          label: '10s'
-        },
-        {
-          value: 1,
-          label: '20s'
-        },
-        {
-          value: 2,
-          label: '30s'
-        },
-        {
-          value: 3,
-          label: '40s'
-        }
-      ],
-      testBack: '10s',
-      showSpread: false,
-      tabList: [
-        {
-          label: this.$t('remotePatrol.star'),
-          storeList: []
-        },
-        {
-          label: this.$t('remotePatrol.visited'),
-          storeList: []
-        },
-        {
-          label: this.$t('remotePatrol.allStores'),
-          storeList: []
-        }
-      ],
-      store: {},
-
-      oss: null,
-      bucketVideo: '',
-      bucketImage: '',
-      percentage: 0,
-      accountId: '',
-      userId: '',
-      tempStoreList: [],
-      allInitStoreList: [],
-      sessionId: '',
-      inspectList: [],
-      showFeedBack: false,
-      curGroup: null,
-      curGroupIndex: 0, // 当前选中的group index
-      curItemIndex: 0, // 当前点击的 item index
-      curSheetIndex: 0, // 当前点击的 sheet index
-      curItem: null,
-      curItemId: 0, // 当前点击的巡检项id
-      curhasIgnoreItem: 0, // 当前选中的忽略项index
-
-      curTabIndex: 0,
-      curTabItem: null,
-      curStoreIndex: 0,
-      curStoreItem: null, // 当前点击的门店对象
-      patrolStoreName: null,
-
-      inspectItemList: [],
-      allInspectItemList: [], // 当前全部没有忽略的巡检项
-      deviceList: [],
-      protocal: 'DASH',
-      curDeviceId: -1,
-      videoEl: '',
-      canvasEl: '',
-      showCutDialog: false,
-      imageCanvas: new Image(),
-      imageCanvasList: [],
-      playState: false,
-      editCount: 0,
-      ignoreTemp: [],
-      fullScreen: false,
-      appliedInspectList: [],
-
-      changeBrandObj: {
-        title: this.$t('remotePatrol.confirm'),
-        showInfo: this.$t('remotePatrol.confirmSwitchBrand'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      changeStoreObj: {
-        title: this.$t('remotePatrol.confirm'),
-        showInfo: this.$t('remotePatrol.confirmSwitch'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      changeInspectObj: {
-        title: this.$t('remotePatrol.confirm'),
-        showInfo: this.$t('remotePatrol.confirmSwitchInspect'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      // ignoreInspectObj:{
-      //     title: this.$t('remotePatrol.confirm'),
-      //     showInfo: this.$t('remotePatrol.confirmIgnore'),
-      //     isWarning:true,
-      //     dialogCosed:false
-      // },
-      // CancleIgnoreInspectObj:{
-      //     title: this.$t('remotePatrol.confirm'),
-      //     showInfo: this.$t('remotePatrol.cancleIgnore'),
-      //     isWarning:true,
-      //     dialogCosed:false
-      // },
-      noBindDeviceObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notBindCamera'),
-        isWarning: false,
-        dialogCosed: false
-      },
-      noAllInspectObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.incompleteInfo'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      noStoreUser: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notSolver'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      allIgnoreObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.allIgnored'),
-        isWarning: false,
-        dialogCosed: false
-      },
-      leaveObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.changPageInfo'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      videoLoadingObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.videoLoading'),
-        isWarning: false,
-        dialogCosed: false
-      },
-      recorder: null,
-      videoCanvasSrc: '',
-      isRecordingStarted: false,
-      isStoppedRecording: false,
-      dialogCommentVideo: false,
-      curVideoSrc: '',
-      curFeedBackVideoSrc: '',
-
-      feedBackVideoFileObj: {},
-      videoSpeed: 0,
-      videoSpeedId: 0,
-      showGetVideo: false,
-      timeVideo: 0,
-      startTimeCutVideo: 0,
-      endTImeCutVideo: 0,
-      isREC: false,
-      startIcon: require('../../../static/img/play_icon.png'),
-      videoImgSrc: require('../../../static/img/video_thumbnail.png'),
-
-      eventList: [],
-      channelBtns: [],
-      showChannelBtns: [],
-      allChannelBtns: [],
-      hideLast: false,
-      hideNext: false,
-      eventName: '',
-      eventDes: '',
-      showFeedBackInfo: true,
-      showAddFeedBackBtn: true,
-      timerPlayReal: null,
-      isPlayingFlag: -1,
-      lang: this.$i18n.locale,
-      initEzviz: false,
-      sourceListLength: 0,
-      realTimeSpeed: 0,
-      videoAuthority: false,
-      isLoading: false,
-      showEventNameInfo: false,
-      fromName: '',
-      eventNameRuletip: false,
-      eventDesRuletip: false,
-      oldVal: '',
-      historyObj: null,
-      beforepatrolstore: '',
-      showIgnoreItem: false,
-      hasIgnoretemp: [],
-
-      uri: null,
-      height: 220,
-      play: true,
-      fullScreen: false,
-      paused: true,
-      muted: false,
-      currentState: 'blank', // 'blank','loading','play','inline'
-      error: '',
-      streamProtocol: 'DASH',
-      sessionId: null,
-      userName: null,
-      password: null,
-      IVSID: null,
-      channelId: null,
-      realType: true,
-      lastTime: null,
-      currentTime: null,
-      onEndflag: false
-    };
-  },
-  computed: {
-    graphBtnWidth: function() {
-      return this.varyWindowHeight * 0.185;
+    name:'ReInspection',
+    components:{
+        DialogVue,
+        ChannelIconBtn,
+        EzvizVideo
     },
-    btnFontSize: function() {
-      return this.varyWindowHeight * 0.022;
-    },
-    percentHeight: function() {
-      return this.varyWindowHeight / 758;
-    },
-    ...mapGetters({
-      accountChanged: 'accountChanged'
-    }),
-    ...mapGetters(
-      ['isEzviz']
-    )
-  },
-  watch: {
-    accountChanged(val, oldVal) {
-      console.log(val);
-      const self = this;
-      if (val != 0) {
-        self.changeBrand();
-      }
-    },
-
-    realTimeSpeed(val) {
-      console.log(val);
-      if (val >= 300) {
-        this.paused = false;
-        this.onPlay();
-        this.stopTimer();
-      }
-    }
-  },
-
-  beforeRouteLeave(to, from, next) {
-    const self = this;
-    const canLeave = (((!self.isEzviz) && self.editCount != 0))
-              || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0);
-    if (canLeave && to.name != 'confirmSum') {
-      self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
-        confirmButtonText: self.$t('remotePatrol.confirm'),
-        cancelButtonText: self.$t('remotePatrol.cancel'),
-        type: 'warning',
-        customClass: 'confirmClass',
-        cancelButtonClass: 'cancelBtn',
-        confirmButtonClass: 'confirmBtn'
-      }).then(() => {
-        console.log('confirm');
-        if (to.name != 'confirmSum') {
-          //   from.meta.keepAlive=false;
-          self.previewplayer && self.previewplayer.dispose();
-          self.$store.dispatch('setPatrolHistory', null);
-          self.$store.dispatch('setPatrolComment', null);
-        } else {
-          //   from.meta.keepAlive = true;
-          self.$store.dispatch('setPatrolHistory', self.historyObj);
-        }
-        if (self.playState) {
-          self.stopRealTime();
-          window.clearInterval(self.timerPlayReal);
-          self.timerPlayReal = null;
-        }
-        if (self.isEzviz && !self.showGuide) {
-          self.$refs.ezvizVideo.stopRealTime();
-        }
-        next();
-      }).catch(() => {
-        console.log('cancel');
-        next(false);
-      });
-    } else {
-      if (to.name != 'confirmSum') {
-        // from.meta.keepAlive=false;
-        self.$store.dispatch('setPatrolHistory', null);
-        self.$store.dispatch('setPatrolComment', null);
-      } else {
-        // from.meta.keepAlive=true;
-        self.$store.dispatch('setPatrolHistory', self.historyObj);
-      }
-      if (self.playState) {
-        self.stopRealTime();
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null;
-      }
-      if (self.isEzviz && !self.showGuide) {
-        self.$refs.ezvizVideo.stopRealTime();
-      }
-      next();
-    }
-    // if(self.editCount!=0){
-    //     let confirm=window.confirm('当前巡检尚未完成，确认是否离开页面？');
-    //     if(confirm==true){
-    //         if(to.name!='巡检提交事件'){
-    //             from.meta.keepAlive=false;
-    //             if(self.playState){
-    //                 self.stopRealTime();
-    //             }
-    //         }
-    //         next();
-    //     }
-    //     else{
-    //         next(false);
-    //     }
-    // }
-    // self.isPlayingFlag=-1;
-    // if(to.name!='confirmSum'){
-    //     from.meta.keepAlive=false;
-    // }
-    // if(self.playState){
-    //     self.stopRealTime();
-    //     window.clearInterval(self.timerPlayReal);
-    //     self.timerPlayReal=null;
-    // }
-    // next();
-  },
-  async mounted() {
-    const self = this;
-    const PatrolHistory = self.$store.getters.PatrolHistory;
-    if (PatrolHistory != null) {
-      self.activeIndex = PatrolHistory.activeIndex;
-      self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
-
-      const indexFeed = PatrolHistory.sheetName.map(x => x.groupId).indexOf('feedBack');
-      let getdealnum = 0;
-      const sheetName = PatrolHistory.sheetName.slice(0, indexFeed);
-      sheetName.forEach(s_item => {
-        s_item.count != s_item.Effective ? getdealnum++ : '';
-        s_item.inspectList.forEach(n_item => {
-          n_item.items.forEach(item => {
-            item.isIgnore = false;
-          });
-        });
-      });
-      self.isShowWarn = getdealnum != 0;
-      self.sheetName = PatrolHistory.sheetName;
-      self.PatrolList = PatrolHistory.PatrolList;
-      self.patrolstore = PatrolHistory.patrolstore;
-      self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList;
-      self.showChannelBtns = PatrolHistory.showChannelBtns;
-      self.allChannelBtns = PatrolHistory.allChannelBtns;
-      self.curSheetIndex = PatrolHistory.curSheetIndex;
-      self.curGroupIndex = PatrolHistory.curGroupIndex;
-      self.curItemIndex = PatrolHistory.curItemIndex;
-
-      self.isDisabled = true;
-      const isClick = self.sheetName[self.sheetName.length - 1].isClick;
-      if (isClick) {
-        if (PatrolHistory.eventList.length > 0) {
-          self.eventList = PatrolHistory.eventList;
-          self.showFeedBackInfo = false;
-          self.showFeedBack = true;
-        } else {
-          self.showFeedBackInfo = true;
-          self.showFeedBack = true;
-        }
-      } else {
-        self.inspectItemList = PatrolHistory.inspectItemList;
-      }
-      self.store = PatrolHistory.store;
-      self.patrolStoreName = PatrolHistory.store.storeName;
-      self.showGuide = false;
-      self.showStoreUp = true;
-      if (PatrolHistory.hasIgnoretemp.length === 0) {
-        self.notShowAlert = true;
-      }
-    } else {
-      self.getFaStoreData();
-      self.getDashUrlInfo();
-    }
-    document.onmouseup = self.mouseUpAction;
-    self.isREC = false;
-    self.getUpLoadBucketInfo();
-    self.getOssInfo();
-    self.getDeviceList();
-    window.onresize = function() {
-      if (!self.checkFull()) {
-        self.fullScreen = false;
-        var ele = document.getElementById('videoContent');
-        ele.style.width = 'auto';
-        ele.style.height = 'auto';
-      }
-    };
-    window.addEventListener('visibilitychange', self.visibilityChange, false);
-  },
-
-  beforeDestroy() {
-    const self = this;
-    window.removeEventListener('visibilitychange', self.visibilityChange);
-    window.onresize = null;
-    self.visibilityChange = null;
-  },
-
-  methods: {
-    async onEnd() {
-      this.onEndflag = true;
-      this.paused = true;
-    },
-
-    onProgress(data) {
-      console.log(data);
-      this.currentTime = data.currentTime;
-    },
-
-    getDashUrlInfo() {
-      getDashServerInfo().then(result => {
-        const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
-        this.userName = result.data.loginId;
-        this.password = result.data.password;
-        const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-        console.log(url);
-        DashHttp.setDashHost(url);
-      }).catch(error => {
-        if (error.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-        }
-      });
-    },
-
-    visibilityChange() {
-      const self = this;
-      console.log(self.isEzviz);
-      if (!self.isEzviz) {
-        if (document.hidden) {
-          self.paused = false;
-          self.onPlay();
-          self.stopTimer()
-        } else {
-          console.log(self.isPlayingFlag);
-          if(self.currentState = 'inline'){
-            self.onPlay();
-          }
-        }
-      }
-    },
-    changeBrand() {
-      const self = this;
-      self.paused = false;
-      self.onPlay();
-      if (self.isEzviz && !self.showGuide) {
-        self.$refs.ezvizVideo.stopRealTime();
-      }
-      self.patrolStoreName = null;
-      self.activeIndex = '0';
-      self.PatrolList = [];
-      self.patrolstore = '';
-      self.inspectList = [];
-      self.inspectItemList = [];
-      self.store = '';
-      self.showStoreUp = false;
-      self.showGuide = true;
-      self.eventList = [];
-      self.sheetName = [];
-      self.tempArr = [];
-      self.hasIgnoretemp = null;
-      self.showIgnoreItem = false;
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      self.hasSheet3 = false;
-      self.showFeedBackInfo = true;
-      self.accountId = localStorage.getItem('oss_bucket');
-      self.showChannelBtns = [];
-      self.showError = false;
-      self.errorText = '';
-      // self.getInitStoreData();
-      self.getFaStoreData();
-      // self.videoEl=document.getElementById('previewVideo').children[0];
-      self.getDeviceList();
-      // self.getVideoAuthority();
-    },
-    anchorLinkTo() {
-      const self = this;
-      if (document.getElementById('inspectContent') != null) {
-        if (self.$refs['myScrollbar'] != undefined) {
-          self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
-        }
-      }
-    },
-    getAccountId() {
-      const self = this;
-      const userId = getCookie('UserId');
-      self.userId = userId;
-      return new Promise((resolve, reject) => {
-        getUserInfo().then(res => {
-          console.log(res);
-          res.data.forEach(item => {
-            if (item.userId == userId) {
-              const accountId = item.accountId.toLowerCase();
-              self.accountId = accountId;
-              localStorage.setItem('oss_bucket', accountId);
-              resolve(accountId);
-            }
-          });
-        });
-      });
-    },
-    async getOssInfo() {
-      const self = this;
-      const accountId = await self.getAccountId();
-      console.log(accountId);
-      self.accountId = localStorage.getItem('oss_bucket');
-      // getStorageInfo().then(res=>{
-      //     console.log(res);
-      //     if(res.errCode==0){
-      //         self.oss=res.data;
-      //     }
-      // })
-    },
-    getUpLoadBucketInfo() {
-      const self = this;
-      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
-      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
-    },
-    getFileUrl(fileName) {
-      const self = this;
-      // let bucketName='viumo-'+self.accountId;
-      // let bucketName='viumo-aaoompqqpjy4';
-      // let bucketName = self.oss.ossBucketName;
-      const bucketName = 'viumo-n3azju2aknpw';
-      const endpoint = self.oss.ossEndPoint;
-      const key = fileName;
-      const url = `http://${bucketName}.${endpoint}/${fileName}`;
-      return url;
-    },
-    deleteEvent(item, index) {
-      const self = this;
-      console.log(item);
-      console.log(index);
-      self.eventList.splice(index, 1);
-      self.showFeedBackInfo = self.eventList.length == 0;
-    },
-    addFeedBack() {
-      const self = this;
-      self.showFeedDialog1 = true;
-      self.eventName = '';
-      self.eventDes = '';
-      self.showEventNameInfo = false;
-    },
-    confirmAddFeedBack3() {
-      const self = this;
-      let srcObj = null;
-      srcObj = self.feedBackVideoFileObj;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        self.notify(self.$t('remotePatrol.emptyTitle'), 'warning', 3000);
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog3 = false;
-      self.showFeedBackInfo = false;
-    },
-    confirmAddFeedBack2() {
-      const self = this;
-      let srcObj = null;
-      const src = self.canvasEl.toDataURL('image/jpeg');
-      srcObj = {
-        mediaType: 2,
-        src: src,
-        height: '100px',
-        width: '140px',
-        fileName: self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg',
-        file: util.base64ToBlob(src),
-        deviceId: self.channel.id
-      };
-
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-        self.showEventNameInfo = true;
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog2 = false;
-      self.showFeedBackInfo = false;
-    },
-    confirmAddFeedBack1() {
-      const self = this;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: null
-      };
-      if (self.eventName.trim().length == 0) {
-        self.showEventNameInfo = true;
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog1 = false;
-      self.showFeedBackInfo = false;
-    },
-    getIndexById(id) {
-      const self = this;
-      let tempId = null;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
-      if (self.showIgnoreItem) {
-        self.hasIgnoretemp.forEach((item, index) => {
-          if (item.id == id) {
-            tempId = {
-              itemIndex: index
-            };
-          }
-        });
-      } else {
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach((item, index) => {
-            item.items.forEach((_item, _index) => {
-              if (_item.id == id) {
-                tempId = {
-                  groupIndex: index,
-                  itemIndex: _index
-                };
-              }
-            });
-          });
-        });
-      }
-      return tempId;
-    },
-    getChannelIndexById(id) {
-      const self = this;
-      let curIndex = 0;
-      self.channelBtns.forEach((item, index) => {
-        if (item.id == id) {
-          curIndex = index;
-        }
-      });
-      return curIndex;
-    },
-    upLoadFile(fileItem) {
-      const self = this;
-      self.percentage = 0;
-      const OSS = require('ali-oss');
-      // let bucketName = 'viumo-'+self.accountId
-      // let bucketName='viumo-aaoompqqpjy4';
-      // let bucketName = self.oss.ossBucketName;
-      const bucketName = 'viumo-n3azju2aknpw';
-      const client = new OSS({
-        region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-        accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
-        accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
-        // bucket: 'viumo-'+self.accountId
-        bucket: bucketName
-      });
-      const name = fileItem.fileName;
-      return new Promise((resolve, reject) => {
-        client.put(name, fileItem.file, {
-          progress: function * (percentage, cpt) {
-            self.percentage = percentage;
-          }
-        })
-          .then((results) => {
-            const url = self.getFileUrl(results.name);
-            console.log(url);
-            resolve(url);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
-    },
-    getDeviceList() {
-      const self = this;
-      getDeviceList().then(res => {
-        if (res.errCode == 0) {
-          const data = res.data;
-          self.deviceList = data;
-        }
-      });
-    },
-
-    playCutVideo(item, index) {
-      const self = this;
-      self.dialogCommentVideo = true;
-      if (self.showFeedBack) {
-        self.curVideoSrc = item.sourceObj.src;
-      } else {
-        self.curVideoSrc = item.src;
-      }
-    },
-
-    cutPicture() {
-      const self = this;
-      console.log(self.curGroupIndex);
-      self.videoEl = document.getElementById('previewVideo').children[0];
-      self.imageCanvasList = [];
-      if (self.fullScreen) {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-      if (self.showFeedBack) {
-        self.showFeedDialog2 = true;
-        self.eventName = '';
-        self.eventDes = '';
-        self.showEventNameInfo = false;
-        this.$nextTick(() => {
-          self.canvasEl = document.getElementById('icanvas');
-          var ctx = self.canvasEl.getContext('2d');
-          ctx.drawImage(self.videoEl, 0, 0, 520 * self.percentHeight, 340 * self.percentHeight);
-          var oGrayImg = icanvas.toDataURL('image/jpeg');
-          self.imageCanvas.src = oGrayImg;
-          const imgObj = new Image();
-          imgObj.src = oGrayImg;
-          self.imageCanvasList.push(imgObj);
-        });
-      } else {
-        self.showCancelContent = false;
-        if (self.sourceListLength >= 10) {
-          self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
-          return false;
-        }
-        self.showCutDialog = true;
-        this.$nextTick(() => {
-          self.canvasEl = document.getElementById('icanvas');
-          var ctx = self.canvasEl.getContext('2d');
-          ctx.drawImage(self.videoEl, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
-          var oGrayImg = icanvas.toDataURL('image/jpeg');
-          self.imageCanvas.src = oGrayImg;
-          const imgObj = new Image();
-          imgObj.src = oGrayImg;
-          self.imageCanvasList.push(imgObj);
-        });
-      }
-    },
-    showPenList() {
-      const self = this;
-      self.showPen = !self.showPen;
-      self.showCancelContent = false;
-    },
-    checkPen(item, index) {
-      const self = this;
-      item.showContent = true;
-      self.penList.forEach((_item, _index) => {
-        if (index != _index) {
-          _item.showContent = false;
-        }
-      });
-      self.penChecked = item.id;
-    },
-    cancelEditCanvas() {
-      const self = this;
-      self.showCancelContent = false;
-      self.canvasEl = document.getElementById('icanvas');
-      var ctx = self.canvasEl.getContext('2d');
-      let vcanvas = null;
-      if (self.showFeedBack) {
-        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
-      } else {
-        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
-      }
-      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
-      ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
-      self.imageCanvasList = [];
-    },
-    confirmEditCanvas() {
-      const self = this;
-      self.showCancelContent = false;
-      self.imageCanvasList.pop();
-      self.canvasEl = document.getElementById('icanvas');
-      var ctx = self.canvasEl.getContext('2d');
-      let vcanvas = null;
-      if (self.showFeedBack) {
-        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
-      } else {
-        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
-      }
-      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
-      if (self.imageCanvasList.length == 0) {
-        ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
-      } else {
-        ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length - 1], 0, 0, vcanvas.width, vcanvas.height);
-      }
-    },
-    confirmEdit() {
-      const self = this;
-      self.sourceList = [];
-      const obj = {};
-      obj.mediaType = 2;
-      obj.src = self.canvasEl.toDataURL('image/jpeg');
-      obj.height = '100px';
-      obj.width = '140px';
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg';
-      obj.file = util.base64ToBlob(obj.src);
-      obj.deviceId = self.channel.id;
-      self.sourceList.push(obj);
-      self.showCutDialog = false;
-      console.log(self.curItemId);
-      const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
-      if (tempId != null) {
-        if (!self.showIgnoreItem) {
-          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-        } else {
-          self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
-        }
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-      if (!self.showIgnoreItem) {
-        self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-      } else {
-        self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
-      }
-      // if(tempId!=null){
-      //   self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-      // }
-      // else{
-      //     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
-      // }
-      // self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-    },
-    mouseDownAction(e) {
-      const self = this;
-      self.isMouseDown = true;
-      self.X = e.offsetX;
-      self.Y = e.offsetY;
-      self.showCutModel = false;
-      self.showPenBtn = false;
-      self.showCancelContent = false;
-    },
-    mouseMoveAction(e) {
-      const self = this;
-      if (self.isMouseDown) {
-        self.X1 = e.offsetX;
-        self.Y1 = e.offsetY;
-        self.drawLine(self.X, self.Y, self.X1, self.Y1);
-        self.showPenBtn = false;
-        self.flag++;
-      }
-    },
-    mouseUpAction(e) {
-      const self = this;
-      self.isMouseDown = false;
-      self.showCutModel = true;
-      self.showPenBtn = true;
-      self.showCancelContent = true; // 每次鼠标弹起后显示可以取消的框
-      if (self.flag != 0 && self.canvasEl != '') {
-        const imgObj = new Image();
-        imgObj.src = self.canvasEl.toDataURL('image/jpeg');
-        self.imageCanvasList.push(imgObj);
-      }
-      self.flag = 0;
-    },
-    drawLine(x, y, x1, y1) {
-      const self = this;
-      var ctx = self.canvasEl.getContext('2d');
-      if (self.flag) {
-        ctx.beginPath();
-      }
-      ctx.moveTo(x, y);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = self.penChecked;
-      ctx.lineTo(x1, y1);
-      ctx.stroke();
-      if (self.flag != 0) {
-        self.X = self.X1;
-        self.Y = self.Y1;
-      }
-    },
-    showCancel() {
-      const self = this;
-      self.showCancelContent = true;
-      self.showPenBtn = true;
-    },
-    hiddenCancel() {
-      const self = this;
-      self.showCancelContent = false;
-      self.showPenBtn = false;
-    },
-    getFaStoreList() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        getFavoriteList().then(res => {
-          console.log(res);
-          resolve(res);
-        });
-      });
-    },
-    checkIgnoreScore(item, itemDS, e, index) {
-      const self = this;
-      item.manualIgnore = false;
-      self.curhasIgnoreItem = index;
-      item.scoreList.forEach(s_item => {
-        s_item.val == itemDS.val ? s_item.isClick = true : s_item.isClick = false;
-      });
-      if (e == 0) {
-        if (item.type == 2) {
-          if (item.itemScore < 0) {
-            item.itemgetScore = itemDS.val == 0 ? item.itemScore : 0;
-          } else {
-            item.itemgetScore = itemDS.val == 10 ? item.itemScore : 0;
-          }
-        } else {
-          item.itemgetScore = itemDS.val;
-        }
-        item.isQualified = itemDS.val != 0;
-        item.itemScoreTitle = itemDS.scoreTitle;
-      } else {
-        item.itemgetScore = itemDS;
-        item.itemScoreTitle = itemDS;
-      }
-      item.dealCount = item.Effective = item.inputCount = 1;
-      self.getDisabled(1);
-    },
-    checkScore(item, itemDS, e) {
-      const self = this;
-      console.log(item, itemDS);
-      item.scoreList.forEach(s_item => {
-        s_item.val == itemDS.val ? s_item.isClick = true : s_item.isClick = false;
-      });
-      self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
-      if (e == 0) {
-        if (item.type == 2) {
-          if (item.itemScore < 0) {
-            item.itemgetScore = itemDS.val == 0 ? item.itemScore : 0;
-          } else {
-            item.itemgetScore = itemDS.val == 10 ? item.itemScore : 0;
-          }
-        } else {
-          item.itemgetScore = itemDS.val;
-        }
-        item.isQualified = itemDS.val != 0;
-        item.itemScoreTitle = itemDS.scoreTitle;
-      } else {
-        item.itemgetScore = itemDS;
-        item.itemScoreTitle = itemDS;
-      }
-      // 按照五种情况逐一测试
-      if (item.itemScoreTitle != '--') {
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
-          self.sheetName[self.curSheetIndex].dealCount++;
-          self.sheetName[self.curSheetIndex].Effective++;
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].Effective++;
-        }
-        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
-      }
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
-      self.getDisabled(0);
-      self.isShowWarn = !!(self.isDisabled && sheetName.some(item => item.Effective != item.count));
-      const hasIgnoretemp = [];
-      sheetName.forEach(s_item => {
-        s_item.inspectList.forEach(item => {
-          item.items.forEach((_item, _index) => {
-            if (_item.inputCount == 0 && !_item.manualIgnore) {
-              hasIgnoretemp.push(_item);
-            }
-          });
-        });
-      });
-      hasIgnoretemp.length == 0 ? self.notShowAlert = true : null; // 没有忽略项时，隐藏提示条
-    },
-    getDisabled(e) {
-      const self = this;
-      // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
-      let isSheet1 = false, isSheet2 = false;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
-      if (e == 0) {
-        if (sheetName.length == 1) {
-          isSheet1 = sheetName[0].type == 0 ? (sheetName[0].Effective >= 1) : false;
-          isSheet2 = sheetName[0].type == 1 ? (sheetName[0].Effective >= 1) : false;
-        } else if (sheetName.some(item => item.type == 0) && sheetName.some(item => item.type == 1)) {
-          if (sheetName.some(item => item.type == 2)) {
-            if (sheetName[2].Effective == 0) {
-              isSheet1 = isSheet2 = !!(sheetName[1].Effective >= 1 || sheetName[0].Effective >= 1);
-            } else {
-              isSheet1 = isSheet2 = sheetName[1].Effective >= 1;
-              self.hasSheet3 = !(sheetName[1].Effective >= 1);
-            }
-          } else {
-            isSheet1 = isSheet2 = !!(sheetName[0].Effective >= 1 || sheetName[1].Effective >= 1);
-          }
-        } else {
-          isSheet2 = sheetName[0].Effective >= 1;
-          self.hasSheet3 = !!(sheetName[0].Effective == 0 && sheetName[1].Effective >= 1);
-        }
-        self.isDisabled = isSheet1 || isSheet2;
-      } else {
-        if (sheetName.length == 1) {
-          isSheet1 = isSheet2 = true;
-        } else if (sheetName.some(item => item.type == 0) && sheetName.some(item => item.type == 1)) {
-          if (sheetName.some(item => item.type == 2)) {
-            if (sheetName[2].Effective == 0 && self.tempArr.every(x => x == 0)) {
-              isSheet1 = isSheet2 = !!(self.hasIgnoretemp[self.curhasIgnoreItem].type != 2 || (self.hasIgnoretemp[self.curhasIgnoreItem].type == 2 && self.hasIgnoretemp[self.curhasIgnoreItem].manualIgnore));
-              self.hasSheet3 = self.hasIgnoretemp[self.curhasIgnoreItem].type == 2;
-            } else {
-              isSheet1 = isSheet2 = true;
-            }
-          } else {
-            isSheet1 = isSheet2 = true;
-          }
-        } else {
-          isSheet2 = true;
-        }
-        self.isDisabled = isSheet1 || isSheet2;
-      }
-    },
-    getAllStoreList() {
-      const self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          console.log(res);
-          resolve(res);
-        });
-      });
-    },
-    saveStoreObj(storeObj) {
-      const self = this;
-      const key = 'recentStore_reinspect' + '_' + self.accountId + '_' + self.userId;
-      let temp = [];
-      if (localStorage.getItem(key) != null || localStorage.getItem(key) != undefined) {
-        temp = JSON.parse(localStorage.getItem(key));
-      }
-      temp.forEach((item, index) => {
-        if (item.userId == storeObj.userId && item.storeId == storeObj.storeId) {
-          temp.splice(index, 1);
-        }
-      });
-      temp.unshift(storeObj);
-      temp = temp.slice(0, 3);
-      localStorage.setItem(key, JSON.stringify(temp));
-    },
-    getStoreObj() {
-      const self = this;
-      const key = 'recentStore_reinspect' + '_' + self.accountId + '_' + self.userId;
-      let temp = [];
-      const tempArray = [];
-      if (localStorage.getItem(key) != null || localStorage.getItem(key) != undefined) {
-        temp = JSON.parse(localStorage.getItem(key));
-      }
-      let indexArray = [];
-      temp.forEach((item, index) => {
-        indexArray.push(self.allInitStoreList.map(x => x.storeId).indexOf(item.storeId));
-      });
-      console.log(indexArray);
-      indexArray = indexArray.filter(function(x) {
-        return x != -1;
-      });
-      indexArray.forEach(item => {
-        tempArray.push(self.allInitStoreList[item]);
-      });
-      return tempArray;
-    },
-    async getStoreList() {
-      const self = this;
-      console.log(self.activeIndex);
-      console.log(self.store);
-      const getStoreTemp = data => {
-        const temp = [];
-        data.forEach((item, index) => {
-          const obj = {};
-          if (self.store.storeId == item.storeId) {
-            obj.isActive = true;
-          } else {
-            obj.isActive = false;
-          }
-          obj.storeId = item.storeId;
-          obj.name = item.name;
-          obj.userId = item.userId;
-          obj.favorite = item.favorite == undefined ? true : item.favorite;
-          obj.device = item.device;
-          // if(self.appliedInspectList.indexOf(item.storeId)!=-1){
-          if (item.authorizedInspect.length != 0) {
-            obj.authorizedInspect = item.authorizedInspect;
-            obj.hasInspect = true;
-          } else {
-            obj.hasInspect = false;
-          }
-          temp.push(obj);
-        });
-        return temp;
-      };
-      let data;
-      switch (Number(self.activeIndex)) {
-        case 0: data = await self.getFaStoreList();
-          console.log(data);
-          if (data.errCode == 0) {
-            const storeData = data.data;
-            self.tabList[0].storeList = getStoreTemp(storeData);
-          }
-          if (data.errCode == 500) {
-            self.tabList[0].storeList = [];
-          }
-          break;
-        case 1:
-          data = self.getStoreObj();
-          console.log(data);
-          self.tabList[1].storeList = getStoreTemp(data);
-          break;
-        case 2:
-          self.tabList[2].storeList.forEach((item, index) => {
-            item.storeList.forEach(_item => {
-              if (_item.storeId == self.store.storeId) {
-                _item.isActive = true;
-              } else {
-                _item.isActive = false;
-              }
-            });
-          });
-          break;
-      }
-    },
-    async getFaStoreData() {
-      const self = this;
-      const getStoreTemp = data => {
-        const temp = [];
-        data.forEach((item, index) => {
-          const obj = {};
-          obj.storeId = item.storeId;
-          obj.name = item.name;
-          obj.userId = item.userId;
-          obj.favorite = item.favorite == undefined ? true : item.favorite;
-          obj.device = item.device;
-          obj.isActive = false;
-          // if(self.appliedInspectList.indexOf(item.storeId)!=-1){
-          if (item.authorizedInspect.length != 0) {
-            obj.authorizedInspect = item.authorizedInspect;
-            obj.hasInspect = true;
-            if (index == 0) {
-              obj.isActive = true;
-            }
-          } else {
-            obj.hasInspect = false;
-          }
-          temp.push(obj);
-        });
-        return temp;
-      };
-      const data = await self.getFaStoreList();
-      const allStoreData = await self.getAllStoreList();
-      self.getInitStoreData(allStoreData);
-      if (data.errCode == 0) {
-        const storeData = data.data;
-        self.tabList[0].storeList = getStoreTemp(storeData);
-        if (storeData.length == 0) {
-          self.showStoreUp = false;
-          self.inspectList = [];
-        } else {
-          if (storeData[0].authorizedInspect.length != 0) {
-            const obj = {};
-            obj.storeId = storeData[0].storeId;
-            obj.storeName = storeData[0].name;
-            obj.storeTitle = storeData[0].name;
-            obj.storeUp = true;
-            obj.storeUpTitle = this.$t('remotePatrol.stared');
-            self.store = obj;
-            self.showStoreUp = true;
-            const curStoreId = storeData[0].storeId;
-            const storeObj = {
-              storeId: curStoreId
-            };
-            self.patrolStoreName = storeData[0].name;
-            storeData[0].authorizedInspect.forEach(au_item => {
-              if (au_item.mode == 0) {
-                self.PatrolList.push(au_item); // 门店对应巡检表
-              }
-            });
-            self.saveStoreObj(storeObj);
-            self.getChannelByStore(self.tabList[0].storeList[0]);
-          } else {
-            self.showStoreUp = false;
-          }
-        }
-      }
-    },
-    async getInitStoreData(data) {
-      const self = this;
-      const getStore2Temp = data => {
-        const cityList = [];
-        data.forEach(item => {
-          if (cityList.map(x => x.city).indexOf(item.city) == -1) {
-            const obj = {
-              city: item.city,
-              province: item.province
-            };
-            cityList.push(obj);
-          }
-        });
-        const storeListTemp = [];
-        for (let i = 0; i < cityList.length; i++) {
-          const temp = [];
-          const obj = {};
-          for (let j = 0; j < data.length; j++) {
-            if (cityList[i].city == data[j].city) {
-              const obj = {};
-              obj.isActive = false;
-              obj.storeId = data[j].storeId;
-              obj.name = data[j].name;
-              obj.userId = data[j].userId;
-              obj.city = data[j].city;
-              obj.province = data[j].province;
-              obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
-              obj.device = data[j].device;
-              // if(data[j].appliedInspect.length!=0&&data[j].appliedInspect.indexOf('远程巡检')!=-1){
-              if (data[j].authorizedInspect.length != 0) {
-                // self.appliedInspectList.push(data[j].storeId);
-                obj.authorizedInspect = data[j].authorizedInspect;
-                obj.hasInspect = true;
-              } else {
-                obj.hasInspect = false;
-              }
-              temp.push(obj);
-            }
-          }
-          obj.cityName = cityList[i].province + ' ' + cityList[i].city;
-          obj.storeList = temp;
-          storeListTemp.push(obj);
-        }
-        return storeListTemp;
-      };
-      // let data=await self.getAllStoreList();
-      if (data.errCode == 0) {
-        const storeData = data.data.content;
-        self.allInitStoreList = storeData;
-        if (storeData.length == 0) {
-          self.tabList[2].storeList = [];
-          self.tempStoreList = [];
-        } else {
-          self.tabList[2].storeList = getStore2Temp(storeData);
-          self.tempStoreList = getStore2Temp(storeData);
-        }
-      }
-    },
-    async handleClick(tab) {
-      console.log(tab);
-      const self = this;
-      const allStoreData = await self.getAllStoreList();
-      self.getInitStoreData(allStoreData);
-      self.getStoreList();
-    },
-    addStoreUp() {
-      const self = this;
-      const temp = [];
-      temp.push(self.store.storeId);
-      const params = {
-        storeIds: temp
-      };
-      if (!self.store.storeUp) {
-        addFavoriteStore(params).then(res => {
-          console.log(res);
-          if (res.errCode == 0) {
-            self.store.storeUp = true;
-            self.store.storeUpTitle = this.$t('remotePatrol.stared');
-            self.getStoreList();
-            self.tabList[2].storeList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId == _item.storeId) {
-                  _item.favorite = true;
+    data(){
+        return{
+            sheetName:[],
+            isShowWarn:false,
+            notShowAlert:false,
+            hasSheet3:false,
+            patrolstore:'',
+            PatrolList:[],
+            showControls:false,
+            showGuide:true,
+            sourceList:[],
+            isDisabled:false,
+            penBtnSrc: require('../../../static/img/edit_btn.png'),
+            showPenBtn: true,
+            showPen: false,
+            showStoreUp: false,
+            showFeedDialog1: false,
+            showFeedDialog2: false,
+            showFeedDialog3: false,
+            arrows1Src: require('../../../static/img/arrows_left.png'),
+            arrows2Src: require('../../../static/img/arrows_right.png'),
+            plusSrc: require('../../../static/img/add_icon.png'),
+            clearIconSrc: require('../../../static/img/clear.png'),
+            removeIconSrc: require('../../../static/img/cancel.png'),
+            backicon: require('../../../static/img/back.png'),
+            checkImgSrc:'',
+            showOuter:false,
+            showModelContent:false,
+            showInfoContent:true,
+            activeIndex:'0',
+            serachVale:'',
+            varyWindowHeight:window.innerHeight,
+            varyWindowWidth:window.innerWidth,
+            showDate:true,
+            tempArr:[],
+            playDate:new Date(),
+            channel:null,
+            penList:[
+                {
+                    id:'white',
+                    showContent:false
+                },
+                {
+                    id:'red',
+                    showContent:true
+                },
+                {
+                    id:'yellow',
+                    showContent:false
                 }
-              });
-            });
-            self.tempStoreList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId == _item.storeId) {
-                  _item.favorite = true;
+            ],
+            penChecked:'red',
+            showCutModel:false,
+            errorText:'',
+            showError:false,
+            showVideo:true,
+            showCancelContent:false,
+            speedList:[
+                {
+                    value:0,
+                    label:'0.5 X'
+                },
+                {
+                    value:1,
+                    label:'1 X'
+                },
+                {
+                    value:2,
+                    label:'1.5 X'
+                },
+                {
+                    value:3,
+                    label:'2 X'
                 }
-              });
-            });
-            self.allInitStoreList.forEach((item, index) => {
-              if (self.store.storeId == item.storeId) {
-                item.favorite = true;
-              }
-            });
-          }
-        });
-      } else {
-        deleteFavoriteStore(params).then(res => {
-          if (res.errCode == 0) {
-            self.store.storeUp = false;
-            self.store.storeUpTitle = this.$t('remotePatrol.clickToStar');
-            self.getStoreList();
-            self.tabList[2].storeList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId == _item.storeId) {
-                  _item.favorite = false;
+            ],
+            testSpeed:'1 X',
+            backList:[
+                {
+                    value:0,
+                    label:'10s'
+                },
+                {
+                    value:1,
+                    label:'20s'
+                },
+                {
+                    value:2,
+                    label:'30s'
+                },
+                {
+                    value:3,
+                    label:'40s'
                 }
-              });
-            });
-            self.tempStoreList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId == _item.storeId) {
-                  _item.favorite = false;
+            ],
+            testBack:'10s',
+            showSpread:false,
+            tabList:[
+                {
+                    label: this.$t('remotePatrol.star'),
+                    storeList:[]
+                },
+                {
+                    label: this.$t('remotePatrol.visited'),
+                    storeList:[]
+                },
+                {
+                    label: this.$t('remotePatrol.allStores'),
+                    storeList:[]
                 }
-              });
-            });
-            self.allInitStoreList.forEach((item, index) => {
-              if (self.store.storeId == item.storeId) {
-                item.favorite = false;
-              }
-            });
-          }
-        });
-      }
-    },
-    mouseoverGroup(item, index) {
-      item.isHover = true;
-    },
-    mouseoutGroup(item, index) {
-      item.isHover = false;
-    },
-    getItemByGroup(item, index) {
-      console.log(item);
-      const self = this;
+            ],
+            store:{},
 
-      // else{
-      self.curGroupIndex = index;
-      self.curGroup = item;
-      self.curItemIndex = 0;
-      self.inspectItemList = item.items;
-      self.showFeedBack = false;
-      self.hideNext = false;
-      self.hideLast = false;
-      self.channelBtns = [];
-      // self.showChannelBtns = [];
-      item.isClick = true;
-      this.$nextTick(() => {
-        self.anchorLinkTo();
-      });
-      // }
-      self.inspectList.forEach((_item, _index) => {
-        if (index != _index) {
-          _item.isClick = false;
-        }
-      });
-    },
-    getDeviceById(deviceId) {
-      const self = this;
-      const device = [];
-      self.deviceList.forEach(item => {
-        // if(deviceId==item.id){
-        //     device=item;
-        // }
-        deviceId.forEach(_item => {
-          if (_item == item.id) {
-            device.push(item);
-          }
-        });
-      });
-      return device;
-    },
-    openOuter(item) {
-      const self = this;
-      console.log(item);
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
-      }
-    },
-    deleteImg(item, index) {
-      const self = this;
-      item.sourceList.splice(index, 1);
-      self.sourceListLength--;
-    },
-    handleIgnore() {
-      const self = this;
-      self.curItem.manualIgnore = true;
-      self.curItem.disabled = true;
-      if (self.showIgnoreItem) {
-        if (self.hasIgnoretemp[self.curItemIndex].dealCount == 0) {
-          self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
-        }
-        if (self.hasIgnoretemp[self.curItemIndex].manualIgnore) {
-          self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
-          self.hasIgnoretemp[self.curItemIndex].sourceList = [];
-          self.hasIgnoretemp[self.curItemIndex].itemScoreTitle = '--';
-          self.hasIgnoretemp[self.curItemIndex].inputCount = 0;
-          self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x => {
-            x.isClick = false;
-          });
-        }
-        self.getDisabled(1);
-      } else {
-        self.showGuide = false;
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount != 0 && self.sheetName[self.curSheetIndex].Effective != 0) {
-          self.sheetName[self.curSheetIndex].Effective--;
-        }
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
-          self.sheetName[self.curSheetIndex].dealCount++;
-        }
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle = '--';
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount = 0;
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
-            x.isClick = false;
-          });
-        }
-        const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-        const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
-        const hasIgnoretemp = [];
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              if (_item.inputCount == 0 && !_item.manualIgnore) {
-                hasIgnoretemp.push(_item);
-              }
-            });
-          });
-        });
-        hasIgnoretemp.length == 0 ? self.notShowAlert = true : null; // 没有忽略项时，隐藏提示条
-        // self.notShowAlert ? self.notShowAlert=false : null
-        self.getDisabled(0);
-        self.isDisabled ? self.isShowWarn = true : self.isShowWarn = false;
-      }
-    },
-    cancleIgnore() {
-      const self = this;
-      self.curItem.manualIgnore = false;
-      self.curItem.disabled = false;
-      if (self.showIgnoreItem) {
-        self.hasIgnoretemp[self.curItemIndex].dealCount != 0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
-      } else {
-        self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
-      }
-    },
-    cancelIgnoreInspect(val) {
-      const self = this;
-      self.ignoreInspectObj.dialogCosed = false;
-    },
-    IgnoreInspect() {
-      const self = this;
-      self.CancleIgnoreInspectObj.dialogCosed = false;
-    },
-    ignoreItem(item, index, e) {
-      const self = this;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
-      if (e == 0) {
-        // 判断是否全部忽略了，若是，弹框提示不可全部忽略
-        let count = 0, manualCount = 1;
-        sheetName.forEach(s_item => {
-          count += s_item.count;
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              _item.manualIgnore ? manualCount++ : null;
-            });
-          });
-        });
-        if (count == manualCount) {
-          self.allIgnoreObj.dialogCosed = true;
-          return false;
-        }
-      }
-      sheetName.forEach(s_item => {
-        s_item.inspectList.forEach(item => {
-          item.items.forEach((_item, _index) => {
-            _item.checked = false;
-            _item.disabled = true;
-          });
-        });
-      });
-      self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
-      self.curItemIndex = index;
-      self.curItem = item;
-      if (item.deviceId == -1) {
-        self.noBindDeviceObj.dialogCosed = true;
-        return false;
-      }
-      self.handleIgnore();
-    },
-    CancleIgnoreItem(item, index) {
-      const self = this;
-      self.isEzviz ? self.$refs.ezvizVideo.editCount-- : self.editCount--;
-      self.curItemIndex = index;
-      self.curItem = item;
-      self.cancleIgnore();
-    },
-    noBindDeviceDialog(val) {
-      const self = this;
-      self.noBindDeviceObj.dialogCosed = false;
-    },
-    canceldNoBind(val) {
-      const self = this;
-      self.noBindDeviceObj.dialogCosed = false;
-    },
-    clickBtn(item, index) {
-      const self = this;
-      console.log(item);
-      if ((self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
-      const obj = {
-        id: item.id,
-        channelId: item.channelId,
-        ivsId: item.ivsId,
-        channelName: item.name
-      };
-      self.channel = obj;
-      item.isClick = true;
-      if (self.showFeedBack) {
-        self.inspectItemList.forEach(_item => {
-          _item.checked = false;
-          _item.disabled = true;
-        });
-      }
-      self.showChannelBtns.forEach((_item, _index) => {
-        if (_index != index) {
-          _item.isClick = false;
-        }
-      });
-      if (!self.isEzviz) {
-        // 非萤石平台
-        self.curDeviceId = item.id;
-        self.paused = true;
-        self.onPlay();
-      } else {
-        // 萤石云平台，切换摄像头
-        self.curDeviceId = item.id;
-        if (self.$refs.ezvizVideo.playState) { // 切换前处于播放状态
-          self.$refs.ezvizVideo.stopRealTime();
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
-          });
-        } else {
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
-          });
-        }
-      }
-    },
-    clickItem(item, index) {
-      console.log(item);
-      const self = this;
-      if (item.isIgnore) {
-        return false;
-      }
-      if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
-      self.sourceList = [];
-      self.sourceListLength = item.sourceList.length; // 获取总共的媒体文件数目
-      const obj = {};
-      if (item.deviceId.length > 0) { // 当前选择的巡检项已绑定设备
-        const device = self.getDeviceById(item.deviceId);
-        if (device.length > 0) {
-          obj.id = device[0].id;
-          obj.ivsId = device[0].ivsId;
-          obj.channelName = device[0].name;
-          obj.channelId = device[0].channelId;
-          self.channel = obj; // 当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
-          self.channelBtns = [];
-          device.forEach(item => {
-            self.allChannelBtns.forEach(_item => {
-              if (item.id == _item.id) {
-                self.channelBtns.push(_item);
-              }
-            });
-          });
-          self.$nextTick(() => {
-            self.getshowBtns(self.channelBtns);
-          });
-          self.channelBtns.forEach((_item, _index) => {
-            if (self.channel != null) {
-              if (_item.id == self.channel.id) {
-                _item.isClick = true;
-              } else {
-                _item.isClick = false;
-              }
-            }
-          });
-          if (!self.isEzviz) {
-            self.paused = true;
-            self.onPlay();
-          } else {
-            // Ezviz
-            if (self.$refs.ezvizVideo != undefined) {
-              if (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState) { // 切换前处于播放状态
-                self.$refs.ezvizVideo.stopRealTime();
-                self.$nextTick(() => {
-                  self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
-                });
-              } else {
-                self.$nextTick(() => {
-                  self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
-                });
-              }
-            }
-          }
-          self.curDeviceId = item.deviceId[0];
-          item.checked = true;
-          self.curItem = item;
-          self.curItemIndex = index;
-          self.curItemId = item.id;
-          item.disabled = false;
-          self.showError = false;
-          self.showGuide = false;
+            oss:null,
+            bucketVideo:'',
+            bucketImage:'',
+            percentage:0,
+            accountId:'',
+            userId:'',
+            tempStoreList:[],
+            allInitStoreList:[],
+            sessionId:'',
+            inspectList:[],
+            showFeedBack:false,
+            curGroup:null,
+            curGroupIndex:0,  //当前选中的group index
+            curItemIndex:0,   //当前点击的 item index
+            curSheetIndex:0,  //当前点击的 sheet index
+            curItem:null,
+            curItemId:0,      //当前点击的巡检项id
+            curhasIgnoreItem:0,//当前选中的忽略项index
 
-          // else{
-          //   if(!self.videoAuthority){
-          //     self.showError = true;
-          //     self.errorText = self.$t('remotePatrol.videoLicense');
-          //   }
-          // }
-        }
-      } else if (item.deviceId.length == 0) {
-        self.noBindDeviceObj.dialogCosed = true;
-        return false;
-      }
-      self.inspectItemList.forEach((_item, _index) => {
-        if (index != _index) {
-          _item.checked = false;
-          _item.disabled = true;
-        }
-      });
-      if (self.hasIgnoretemp.length != 0 && self.showIgnoreItem) {
-        self.hasIgnoretemp.forEach((_item, _index) => {
-          if (index != _index) {
-            _item.checked = false;
-            _item.disabled = true;
-          } else {
-            _item.checked = true;
-            _item.disabled = false;
-          }
-        });
-      }
-      self.sheetName.slice(0, self.sheetName.length - 1).forEach((_item, _index) => {
-        _item.inspectList.forEach((p_item, p_index) => {
-          p_item.items.forEach((itemDS, indexDS) => {
-            if (itemDS.id != item.id) {
-              itemDS.checked = false;
-              itemDS.disabled = true;
-            }
-          });
-        });
-      });
-    },
-    getInspectByStore(storeId) {
-      const self = this;
-      // self.inspectItemList=[];
-      //   checkOutInspectItemV3(params).then(res=>{
-      //
-      //     })
-    },
-    leaveDialog() {
-      const self = this;
-      self.leaveObj.dialogCosed = false;
-      self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
-    },
-    cancelLeave() {
-      const self = this;
-      self.leaveObj.dialogCosed = false;
-    },
-    noAllInspectDialog() {
-      const self = this;
-      self.noAllInspectObj.dialogCosed = false;
-      const temp = [];
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
-      if (self.hasIgnoretemp.length == 0) {
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach(item => {
-            temp.push(item);
-            item.items.forEach((_item, _index) => {
-              if (_item.inputCount == 0) {
-                _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
-              }
-            });
-          });
-        });
-      } else {
-        sheetName.forEach(s_item => {
-          const dealtemp = [];
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              self.hasIgnoretemp.forEach((h_item, h_index) => {
-                if (self.hasIgnoretemp[h_index].inputCount == 0) {
-                  self.hasIgnoretemp[h_index].isIgnore = true;
-                  self.hasIgnoretemp[h_index].inspectInput = '';
-                  self.hasIgnoretemp[h_index].sourceList = [];
-                }
-                if (self.hasIgnoretemp[h_index].id == item.items[_index].id) {
-                  item.items[_index] = self.hasIgnoretemp[h_index];
-                }
-              });
-              if (_item.inputCount != 0 || _item.manualIgnore) {
-                const obj = {};
-                obj.dealCount = 1;
-                dealtemp.push(obj);
-              }
-            });
-            temp.push(item);
-          });
-          s_item.dealCount = dealtemp.length;
-        });
-      }
-      const obj = {
-        inspect: sheetName,
-        event: self.eventList,
-        store: self.store,
-        channel: self.channel
-      };
-      const hasIgnoretemp = [];
-      temp.forEach(item => {
-        item.items.forEach(_item => {
-          if (_item.inputCount == 0 && !_item.manualIgnore) {
-            _item['type'] = item.type;
-            hasIgnoretemp.push(_item);
-          }
-        });
-      });
-      self.historyObj = {
-        storeList: self.tabList[Number(self.activeIndex)].storeList,
-        patrolstore: self.patrolstore,
-        sheetName: self.sheetName,
-        PatrolList: self.PatrolList,
-        activeIndex: self.activeIndex,
-        store: self.store,
-        // inspect:self.inspectList,
-        hasIgnoretemp: hasIgnoretemp,
-        inspectItemList: self.inspectItemList,
-        eventList: self.eventList,
-        showChannelBtns: self.showChannelBtns,
-        allChannelBtns: self.allChannelBtns,
-        curSheetIndex: self.curSheetIndex,
-        curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex
-      };
-      self.hasIgnoretemp = [];
-      // sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
-      self.$router.push({ name: 'confirmSum', params: { data: obj }});
-    },
-    canceldNoAllInspect() {
-      const self = this;
-      self.noAllInspectObj.dialogCosed = false;
-    },
-    allIgnoreDialog() {
-      const self = this;
-      self.allIgnoreObj.dialogCosed = false;
-    },
-    cancelAllIgnore() {
-      const self = this;
-      self.allIgnoreObj.dialogCosed = false;
-    },
-    videoLoadingDialog() {
-      const self = this;
-      self.videoLoadingObj.dialogCosed = false;
-    },
-    cancelVideoLoading() {
-      const self = this;
-      self.videoLoadingObj.dialogCosed = false;
-    },
-    async submit1() {
-      const self = this;
-      const temp = [];
-      let count = 0;
-      let dealCount = 0;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
-      if (self.hasIgnoretemp.length == 0) {
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach(item => {
-            temp.push(item);
-            item.items.forEach((_item, _index) => {
-              if (_item.inputCount == 0) {
-                _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
-              }
-            });
-          });
-          dealCount = dealCount + s_item.dealCount;
-          count = count + s_item.count;
-        });
-      } else {
-        sheetName.forEach(s_item => {
-          const dealtemp = [];
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              self.hasIgnoretemp.forEach((h_item, h_index) => {
-                if (self.hasIgnoretemp[h_index].inputCount == 0) {
-                  self.hasIgnoretemp[h_index].isIgnore = true;
-                  self.hasIgnoretemp[h_index].inspectInput = '';
-                  self.hasIgnoretemp[h_index].sourceList = [];
-                }
-                if (self.hasIgnoretemp[h_index].id == item.items[_index].id) {
-                  item.items[_index] = self.hasIgnoretemp[h_index];
-                }
-              });
-              if (_item.inputCount != 0 || _item.manualIgnore) {
-                const obj = {};
-                obj.dealCount = 1;
-                dealtemp.push(obj);
-              }
-            });
-            temp.push(item);
-          });
-          s_item.dealCount = dealtemp.length;
-          dealCount = dealCount + s_item.dealCount;
-          count = count + s_item.count;
-        });
-      }
-      if (dealCount < count) {
-        self.noAllInspectObj.dialogCosed = true;
-        return false;
-      }
-      const hasIgnoretemp = [];
-      temp.forEach(item => {
-        item.items.forEach(_item => {
-          if (_item.inputCount == 0 && !_item.manualIgnore) {
-            _item['type'] = item.type;
-            hasIgnoretemp.push(_item);
-          }
-        });
-      });
-      const obj = {
-        inspect: sheetName,
-        event: self.eventList,
-        store: self.store,
-        channel: self.channel
-      };
-      self.historyObj = {
-        storeList: self.tabList[Number(self.activeIndex)].storeList,
-        patrolstore: self.patrolstore,
-        sheetName: self.sheetName,
-        PatrolList: self.PatrolList,
-        activeIndex: self.activeIndex,
-        store: self.store,
-        // inspect:self.inspectList,
-        hasIgnoretemp: hasIgnoretemp,
-        inspectItemList: self.inspectItemList,
-        eventList: self.eventList,
-        showChannelBtns: self.showChannelBtns,
-        allChannelBtns: self.allChannelBtns,
-        curSheetIndex: self.curSheetIndex,
-        curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex
-      };
-      self.hasIgnoretemp = [];
-      // sessionStorage.setItem('routeData_confirm',JSON.stringify(obj));
-      self.$router.push({ name: 'confirmSum', params: { data: obj }});
-    },
-    spreadContent() {
-      const self = this;
-      self.showSpread = true;
-    },
-    closeContent() {
-      const self = this;
-      self.showSpread = false;
-    },
-    async playVideo(url) {
-      const self = this;
-      console.log('playvideo enter!');
-      self.showModelContent = true;
-      // self.showInfoContent=true;
-      self.playState = true;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      this.previewplayer.src({ src: url, type: this.protocal == 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
-      this.previewplayer.play();
-      // setTimeout(() => {
-      //     self.showModelContent=true;
-      //     //self.showInfoContent=false;
-      // }, 3000);
-    },
-    destroyVideo() {
-      const self = this;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      self.previewplayer.dispose();
-    },
-    hiddenModel() {
-      const self = this;
-      // self.showModelContent=false;
-      // self.showInfoContent=false;
-    },
-    showModel() {
-      const self = this;
-      // self.showInfoContent=true;
-      // if(self.playState){
-      //     self.showModelContent=true;
-      // }
-    },
+            curTabIndex:0,
+            curTabItem:null,
+            curStoreIndex:0,
+            curStoreItem:null, //当前点击的门店对象
+            patrolStoreName:null,
 
-    async onPlay() {
-      const paused = !this.paused;
-      this.showError = false;
-      this.errorText = '';
-      if (this.realType === true) {
-        if (paused) {
-          await this.stopVideo();
-          await this.disconnectVideo();
-          await this.offline();
-          this.currentState = 'inline';
-          this.paused = true;
-        } else {
-          if (this.channel === null) {
-            this.paused = true;
+            inspectItemList:[],
+            allInspectItemList:[], //当前全部没有忽略的巡检项
+            deviceList:[],
+            protocal:'DASH',
+            curDeviceId:-1,
+            videoEl:'',
+            canvasEl:'',
+            showCutDialog:false,
+            imageCanvas:new Image(),
+            imageCanvasList:[],
+            playState:false,
+            editCount:0,
+            ignoreTemp:[],
+            fullScreen:false,
+            appliedInspectList:[],
+
+            changeBrandObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmSwitchBrand'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            changeStoreObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmSwitch'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            changeInspectObj:{
+                title: this.$t('remotePatrol.confirm'),
+                showInfo: this.$t('remotePatrol.confirmSwitchInspect'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            noBindDeviceObj:{
+                title: this.$t('remotePatrol.prompt'),
+                showInfo: this.$t('remotePatrol.notBindCamera'),
+                isWarning:false,
+                dialogCosed:false
+            },
+            noAllInspectObj:{
+                title: this.$t('remotePatrol.prompt'),
+                showInfo: this.$t('remotePatrol.incompleteInfo'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            noStoreUser:{
+                title: this.$t('remotePatrol.prompt'),
+                showInfo: this.$t('remotePatrol.notSolver'),
+                isWarning:true,
+                dialogCosed:false
+            },
+            allIgnoreObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.allIgnored'),
+              isWarning:false,
+              dialogCosed:false
+            },
+            leaveObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.changPageInfo'),
+              isWarning:true,
+              dialogCosed:false
+            },
+          videoLoadingObj:{
+              title: this.$t('remotePatrol.prompt'),
+              showInfo: this.$t('remotePatrol.videoLoading'),
+              isWarning:false,
+              dialogCosed:false
+            },
+            recorder:null,
+            videoCanvasSrc:'',
+            isRecordingStarted : false,
+            isStoppedRecording : false,
+            dialogCommentVideo : false,
+            curVideoSrc:'',
+            curFeedBackVideoSrc:'',
+
+            feedBackVideoFileObj:{},
+            videoSpeed:0,
+            videoSpeedId:0,
+            showGetVideo:false,
+            timeVideo:0,
+            startTimeCutVideo:0,
+            endTImeCutVideo:0,
+            isREC:false,
+            startIcon: require('../../../static/img/play_icon.png'),
+            videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+
+            eventList:[],
+            channelBtns:[],
+            showChannelBtns:[],
+            allChannelBtns: [],
+            hideLast:false,
+            hideNext:false,
+            eventName:'',
+            eventDes:'',
+            showFeedBackInfo:true,
+            showAddFeedBackBtn:true,
+            timerPlayReal:null,
+            isPlayingFlag:-1,
+            lang: this.$i18n.locale,
+            initEzviz: false,
+            sourceListLength: 0,
+            realTimeSpeed: 0,
+            videoAuthority: false,
+            isLoading: false,
+            showEventNameInfo: false,
+            fromName: '',
+            eventNameRuletip:false,
+            eventDesRuletip:false,
+            oldVal:'',
+            historyObj:null,
+            beforepatrolstore:'',
+            showIgnoreItem:false,
+            hasIgnoretemp:[]
+        };
+    },
+    computed:{
+        graphBtnWidth:function(){
+            return this.varyWindowHeight*0.185;
+        },
+        btnFontSize:function(){
+            return this.varyWindowHeight*0.022;
+        },
+        percentHeight:function(){
+            return this.varyWindowHeight/758;
+        },
+        ...mapGetters({
+            accountChanged:'accountChanged',
+        }),
+        ...mapGetters(
+          ['isEzviz']
+        ),
+    },
+    watch:{
+        accountChanged(val,oldVal){
+            console.log(val);
+            let self=this;
+            if(val!==0){
+                self.changeBrand();
+            }
+        },
+        realTimeSpeed(val,oldVal){
+            let self=this;
+            console.log(val);
+            if(val>=300){
+                self.stopRealTime();
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal=null;
+            }
+        },
+    },
+    beforeRouteLeave(to, from, next){
+        let self=this;
+        let canLeave = (((!self.isEzviz) && self.editCount!==0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !==0 );
+        if(canLeave && to.name !=='confirmSum'){
+          self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
+            confirmButtonText: self.$t('remotePatrol.confirm'),
+            cancelButtonText: self.$t('remotePatrol.cancel'),
+            type: 'warning',
+            customClass: 'confirmClass',
+            cancelButtonClass: 'cancelBtn',
+            confirmButtonClass: 'confirmBtn'
+          }).then(() => {
+            console.log('confirm');
+            if(to.name !=='confirmSum' ){
+              self.previewplayer && self.previewplayer.dispose();
+              self.$store.dispatch('setPatrolHistory',null);
+              self.$store.dispatch('setPatrolComment',null);
+            }
+            else{
+            self.$store.dispatch('setPatrolHistory',self.historyObj );
+            }
+            if(self.playState){
+              self.stopRealTime();
+              window.clearInterval(self.timerPlayReal);
+              self.timerPlayReal=null;
+            }
+            if(self.isEzviz && !self.showGuide){
+              self.$refs.ezvizVideo.stopRealTime();
+            }
+            next();
+          }).catch(() => {
+            console.log('cancel');
+            next(false);
+          });
+        }
+        else{
+          if(to.name !=='confirmSum'){
+            self.$store.dispatch('setPatrolHistory',null);
+            self.$store.dispatch('setPatrolComment',null);
           }
           else{
-            await this.startVideo(this.channel.ivsId, this.channel.channelId, null);
+            self.$store.dispatch('setPatrolHistory',self.historyObj);
           }
-        }
-      } else {
-        if (paused) {
-          this.paused = true;
-        } else {
-          if (this.onEndflag) {
-            this.startVideo(this.channel.ivsId, this.channel.channelId, this.lastTime);
-          } else {
-            this.paused = false;
+          if(self.playState){
+            self.stopRealTime();
+            window.clearInterval(self.timerPlayReal);
+            self.timerPlayReal=null;
           }
+          if(self.isEzviz && !self.showGuide){
+            self.$refs.ezvizVideo.stopRealTime();
+          }
+          next();
         }
-      }
     },
+    async mounted(){
+        let self=this;
+        let PatrolHistory = self.$store.getters.PatrolHistory;
+        if(PatrolHistory!=null){
+            self.activeIndex = PatrolHistory.activeIndex;
+            self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
 
-    async startVideo(IVSID, channelId, startTs) {
-      try {
-        if (IVSID === null || channelId === null) {
-          const error = this.$t('remotePatrol.dashServerError') + '5';
-          this.currentState = 'blank';
-          this.errorText = error;
-        } else {
-          this.isLoading = true;
-          if (!await this.stopVideoPlay()) {
-            return;
-          }
-          if (!await this.online()) {
-            return;
-          }
-          this.IVSID = IVSID;
-          this.channelId = channelId.toString();
-          if (startTs) {
-            await this.history(startTs);
-          } else {
-            if(await this.connectVideo()){
-              this.startTimer();
+            let indexFeed=PatrolHistory.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let getdealnum=0;
+            let sheetName=PatrolHistory.sheetName.slice(0,indexFeed);
+            sheetName.forEach(s_item=>{
+                s_item.count!==s_item.Effective ? getdealnum++ : '';
+                s_item.inspectList.forEach(n_item=>{
+                    n_item.items.forEach(item=>{
+                        item.isIgnore=false;
+                    });
+                });
+            });
+            self.isShowWarn = !getdealnum===0;
+            self.sheetName = PatrolHistory.sheetName;
+            self.PatrolList = PatrolHistory.PatrolList;
+            self.patrolstore = PatrolHistory.patrolstore;
+            self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList;
+            self.showChannelBtns = PatrolHistory.showChannelBtns;
+            self.allChannelBtns = PatrolHistory.allChannelBtns;
+            self.curSheetIndex=PatrolHistory.curSheetIndex;
+            self.curGroupIndex=PatrolHistory.curGroupIndex;
+            self.curItemIndex=PatrolHistory.curItemIndex;
+            self.isDisabled=true;
+            let isClick = self.sheetName[self.sheetName.length-1].isClick;
+            if(isClick){
+                if(PatrolHistory.eventList.length>0){
+                    self.eventList = PatrolHistory.eventList;
+                    self.showFeedBackInfo = false;
+                    self.showFeedBack = true;
+                }else{
+                    self.showFeedBackInfo = true;
+                    self.showFeedBack = true;
+                }
+            }else{
+                self.inspectItemList = PatrolHistory.inspectItemList;
             }
-          }
-        }
-      } catch (e) {
-        if (e.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = e.message;
-        }
-      }
-    },
-
-    startTimer(){
-      this.realTimeSpeed = 0;
-      this.isLoading = false;
-      this.timerPlayReal = window.setInterval(() => {
-        console.log(this.realTimeSpeed);
-        this.realTimeSpeed = this.realTimeSpeed + 1;
-      }, 1000);
-    },
-
-    stopTimer(){
-      window.clearInterval(this.timerPlayReal);
-      this.realTimeSpeed = 0;
-    },
-
-    // async stopVideo(){
-    //   if(this.sessionId){
-    //     let state = this.currentState;
-    //     this.currentState = 'blank'
-    //     this.errorText = ''
-    //     if (state === 'play'){
-    //       await this.disconnectVideo();
-    //     }
-    //     return await this.offline();
-    //   }
-    //   else {
-    //     this.currentState = 'blank'
-    //     this.errorText = ''
-    //     this.showError = false
-    //     return true;
-    //   }
-    // },
-
-    async stopVideoPlay() {
-      if (this.sessionId) {
-        const state = this.currentState;
-        this.currentState = 'loading';
-        if (state === 'play') {
-          this.stopVideo();
-          await this.disconnectVideo();
-        }
-        return await this.offline();
-      } else {
-        return true;
-      }
-    },
-
-    async online() {
-      const data = {};
-      const request = {};
-      request.username = this.userName;
-      request.password = this.password;
-      data.request = request;
-      this.currentState = 'loading';
-      if (await DashHttp.putDash('Authority/Online', data)) {
-        this.sessionId = DashHttp.getResult().SessionID;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank';
-        this.errorText = error;
-        this.showError = true;
-        return false;
-      }
-    },
-
-    async offline() {
-      if (this.sessionId != null) {
-        const data = {};
-        const request = {};
-        request.sessionID = this.sessionId;
-        data.request = request;
-        if (await DashHttp.putDash('Authority/Offline', data)) {
-          this.sessionId = null;
-          return true;
-        } else {
-          if (DashHttp.getResult() != null) {
-            const errorCode = DashHttp.getResult().ErrorCode;
-            if (errorCode === 3) {
-              this.sessionId = null;
-              return true;
-            } else {
-              const error = this.$t('remotePatrol.dashServerError') + errorCode;
-              return false;
+            self.store = PatrolHistory.store;
+            self.patrolStoreName=PatrolHistory.store.storeName;
+            self.showGuide = false;
+            self.showStoreUp = true;
+            if(PatrolHistory.hasIgnoretemp.length===0){
+                self.notShowAlert=true;
             }
-          } else {
-            return false;
-          }
+        }else{
+            self.getFaStoreData();
         }
-      } else {
-        return true;
-      }
-    },
-
-    async connectVideo() {
-      console.log('Connect Video--');
-      const data = {};
-      const request = {};
-      request.method = 'connection';
-      request.sessionID = this.sessionId;
-      request.streamingProtocol = this.streamProtocol;
-      request.withAudio = true;
-      request.streamType = 'SubStream';
-      request.IVSID = this.IVSID;
-      request.channel = this.channelId;
-      data.request = request;
-      this.realType = true;
-      if (await DashHttp.putDash('LiveStream', data)) {
-        const url = DashHttp.getResult().mpd;
-        this.uri = url;
-        console.log(this.uri);
-        this.playVideo(url);
-        this.currentState = 'play';
-        this.paused = false;
-        this.errorText = '';
-        this.isLoading = false;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-          this.isLoading = false;
-          return false;
+        document.onmouseup=self.mouseUpAction;
+        self.isREC=false;
+        self.getUpLoadBucketInfo();
+        self.getOssInfo();
+        self.getDeviceList();
+      if(!self.isEzviz){
+          self.looper();
         }
-      }
-    },
-
-    async history(startTs) {
-      const data = {};
-      const request = {};
-      request.method = 'connection';
-      request.sessionID = this.sessionId;
-      request.streamingProtocol = this.streamProtocol;
-      request.withAudio = true;
-      request.transcodeResolution = 'D1';
-      request.IVSID = this.IVSID;
-      request.channel = this.channelId;
-      request.beginTime = startTs.toString();
-      request.endTime = (startTs + 300).toString();
-
-      data.request = request;
-      this.realType = false;
-      if (await DashHttp.putDash('PlaybackStream', data)) {
-        const url = DashHttp.getResult().mpd;
-        this.uri = url;
-        this.currentState = 'play';
-        this.paused = false;
-        this.errorText = '';
-        this.onEndflag = false;
-        this.lastTime = startTs + 300;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank',
-        this.paused = false,
-        this.errorText = error;
-        return false;
-      }
-    },
-
-    async disconnectVideo() {
-      if (this.sessionId != null) {
-        const data = {};
-        const request = {};
-        request.method = 'disconnection';
-        request.sessionID = this.sessionId;
-        request.IVSID = this.IVSID;
-        request.channel = this.channelId;
-        request.streamType = 'SubStream';
-        data.request = request;
-        const url = this.realType ? 'LiveStream' : 'PlaybackStream';
-        if (await DashHttp.putDash(url, data)) {
-          return true;
-        } else {
-          if (DashHttp.getResult() != null) {
-            const errorCode = DashHttp.getResult().ErrorCode;
-            if (errorCode === 3) {
-              return true;
-            } else {
-              if (errorCode !== 24) {
-                const error = this.$t('remotePatrol.dashServerError') + errorCode;
-              }
-              return false;
+        window.onresize=function(){
+            if(!self.checkFull()){
+                console.log('退出全屏');
+                self.fullScreen=false;
+                var ele = document.getElementById('videoContent');
+                ele.style.width = 'auto';
+                ele.style.height = 'auto';
             }
-          } else {
-            return false;
-          }
-        }
-      } else {
-        return true;
-      }
-    },
-    async realTime() {
-      const self = this;
-      self.showError = false;
-      // if(!self.videoAuthority){
-      //   self.showError = true;
-      //   self.errorText = self.$t('remotePatrol.videoLicense');
-      //   return false;
-      // }
-      if (self.channel == null) {
-        return false;
-      }
-      window.clearInterval(self.timerPlayReal);
-      self.realTimeSpeed = 0;
-      // self.isLoading = true;
-      self.stopRealTime();
-      const sessionId = await dashAPI.Online();
-      console.log(sessionId);
-      // if(!self.showVideo){
-      //     self.showVideo=true;
-      // }
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      self.sessionId = sessionId;
-      const data = {
-        request: {
-          method: 'connection',
-          sessionID: self.sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      self.mpdurl = await dashAPI.RealTime(1, data); // 1 is start, 0 is stop
-      console.log(self.mpdurl);
-      if (self.mpdurl == null) {
-        self.isLoading = false;
-        return;
-      }
-      if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length != 0) {
-        console.log(self.mpdurl);
-        self.playVideo(self.mpdurl);
-        self.editCount = self.editCount + 1;
-        self.isPlayingFlag = 1;
-        self.isLoading = false;
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = window.setInterval(() => {
-          console.log(self.realTimeSpeed);
-          self.realTimeSpeed = self.realTimeSpeed + 1;
-        }, 1000);
-      } else {
-        self.showGuide = false;
-        self.showError = true;
-        self.isLoading = false;
-        const errorCode = self.mpdurl.ErrorCode; // 错误码
-        const errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-        self.destroyVideo();
-      }
-    },
-
-    stopVideo() {
-      const self = this;
-      console.log('stop video')
-      self.showModelContent = false;
-      self.playState = false;
-      var video = document.getElementById('previewVideo');
-      self.previewplayer = videojs(video);
-      self.previewplayer.pause();
-      self.stopTimer();
-    },
-
-    async stopRealTimeVisPage() {
-      const self = this;
-      // if(!self.videoAuthority){
-      //   self.showError = true;
-      //   self.errorText = self.$t('remotePatrol.videoLicense');
-      //   return false;
-      // }
-      self.stopVideo();
-      const data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      const ret = await dashAPI.RealTime(0, data);
-      await dashAPI.Offline(self.sessionId);
-    },
-    async stopRealTime() {
-      const self = this;
-      if (self.sessionId) {
-        self.stopVideo();
-        const data = {
-          request: {
-            method: 'disconnection',
-            sessionID: self.sessionId,
-            IVSID: self.channel.ivsId,
-            channel: JSON.stringify(self.channel.channelId),
-            streamType: 'SubStream'
-          }
         };
-        self.isPlayingFlag = -1;
-        const ret = await dashAPI.RealTime(0, data);
-        await dashAPI.Offline(self.sessionId);
-        window.clearInterval(self.timerPlayReal);
-        self.realTimeSpeed = 0;
-        self.isLoading = false;
-      } else {
-        return true;
-      }
-      // self.showVideo=false;
-      // self.destroyVideo();
-      // self.showGuide=true;
-    },
-    async stopAndRealTime() {
-      const self = this;
-      // if(!self.videoAuthority){
-      //   self.showError = true;
-      //   self.errorText = self.$t('remotePatrol.videoLicense');
-      //   return false;
-      // }
-      //  self.isLoading = true;
-      self.stopVideo();
-      const dataDis = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      window.clearInterval(self.timerPlayReal);
-      self.realTimeSpeed = 0;
-      let url = '';
-      const ret = await dashAPI.RealTime(0, dataDis);
-      await dashAPI.Offline(self.sessionId);
-      const sessionId = await dashAPI.Online();
-      self.sessionId = sessionId;
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      let data = null;
-      data = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      url = await dashAPI.RealTime(1, data);
+         window.addEventListener('visibilitychange', self.visibilityChange, false);
+         },
+    methods:{
+        visibilityChange(){
+          let self = this;
+          if(!self.isEzviz){
+            if(document.hidden){
+              if(self.playState){
+                self.stopRealTimeVisPage();
+                window.clearInterval(self.timerPlayReal);
+              }
+            }else{
+              console.log(self.isPlayingFlag);
+              if(self.isPlayingFlag===1){
+                self.realTime();
+              }
+            }
+          }
+        },
+        changeBrand(){
+            let self=this;
+            if(self.playState){
+                self.stopRealTime();
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal = null;
+            }
+            if(self.isEzviz && !self.showGuide){
+                self.$refs.ezvizVideo.stopRealTime();
+            }
+            self.patrolStoreName=null;
+            self.activeIndex = '0';
+            self.PatrolList = [];
+            self.patrolstore = '';
+            self.inspectList = [];
+            self.inspectItemList = [];
+            self.store = '';
+            self.showStoreUp = false;
+            self.showGuide=true;
+            self.eventList = [];
+            self.sheetName=[];
+            self.tempArr=[];
+            self.hasIgnoretemp=null;
+            self.showIgnoreItem=false;
+            self.isShowWarn=false;
+            self.notShowAlert=false;
+            self.hasSheet3=false;
+            self.showFeedBackInfo = true;
+            self.accountId=localStorage.getItem('oss_bucket');
+            self.showChannelBtns = [];
+            self.getFaStoreData();
+            self.getDeviceList();
+        },
+        anchorLinkTo () {
+            let self=this;
+            if(document.getElementById('inspectContent')!==null){
+                if(self.$refs['myScrollbar']!==undefined){
+                    self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
+                }
+            }
+        },
+        getAccountId(){
+            let self=this;
+            let userId=getCookie('UserId');
+            self.userId=userId;
+            return new Promise((resolve,reject)=>{
+                getUserInfo().then(res=>{
+                    console.log(res);
+                    res.data.forEach(item=>{
+                        if(item.userId===userId){
+                            let accountId=item.accountId.toLowerCase();
+                            self.accountId=accountId;
+                            localStorage.setItem('oss_bucket',accountId);
+                            resolve(accountId);
+                        }
+                    });
+                });
+            });
 
-      self.mpdurl = url;
-      console.log(self.mpdurl);
-      if (self.mpdurl == null) {
-        self.isLoading = false;
-        return;
-      }
-      if (url.ErrorCode == undefined && url.length != 0) {
-        self.isPlayingFlag = 1;
-        self.playVideo(self.mpdurl);
-        self.realTimeSpeed = 0;
-        self.isLoading = false;
-        self.timerPlayReal = window.setInterval(() => {
-          console.log(self.realTimeSpeed);
-          self.realTimeSpeed = self.realTimeSpeed + 1;
-        }, 1000);
-      } else { // 当前视频如果返回失败，需处于暂停状态
-        self.showGuide = false;
-        self.showError = true;
-        self.isLoading = false;
-        const errorCode = self.mpdurl.ErrorCode; // 错误码
-        const errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-        self.destroyVideo();
-      }
-    },
-    controlScreen() {
-      const self = this;
-      if (!self.fullScreen) {
-        self.fullWindowScreen();
-        self.fullScreen = true;
-      } else {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-    },
-    fullWindowScreen(...val) {
-      console.log(val);
-      const self = this;
-      // self.showControls=true;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
-      if (ele.requestFullscreen) {
-        ele.requestFullscreen();
-      } else if (ele.mozRequestFullScreen) {
-        ele.mozRequestFullScreen();
-      } else if (ele.webkitRequestFullScreen) {
-        ele.webkitRequestFullScreen();
-      } else if (ele.msRequestFullscreen) {
-        ele.msRequestFullscreen();
-      }
-    },
-    exitFullscreen() {
-      var de = document;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = 'auto';
-      ele.style.height = 'auto';
-      if (de.exitFullscreen) {
-        de.exitFullscreen();
-      } else if (de.mozCancelFullScreen) {
-        de.mozCancelFullScreen();
-      } else if (de.webkitCancelFullScreen) {
-        de.webkitCancelFullScreen();
-      }
-    },
-    gonggeScreen() {
-      const self = this;
-      self.showgongge = true;
-    },
-    recoverScreen() {
-      const self = this;
-      self.showgongge = false;
-    },
-    searchStore() {
-      const self = this;
-      console.log(self.tabList);
-      console.log(self.serachVale.trim());
-      const tempStoreList = self.tempStoreList;
-      const getStore2Temp = data => {
-        const cityList = [];
-        data.forEach(item => {
-          if (cityList.map(x => x.city).indexOf(item.city) == -1) {
-            const obj = {
-              city: item.city,
-              province: item.province
+        },
+        async getOssInfo(){
+            let self=this;
+            let accountId=await self.getAccountId();
+            console.log(accountId);
+            self.accountId=localStorage.getItem('oss_bucket');
+        },
+        getUpLoadBucketInfo(){
+            let self=this;
+            self.bucketVideo='video'+'/'+util.getCurDate2Str();
+            self.bucketImage='image'+'/'+util.getCurDate2Str();
+        },
+        getFileUrl(fileName){
+            let self=this;
+            //let bucketName='viumo-'+self.accountId;
+            //let bucketName='viumo-aaoompqqpjy4';
+            //let bucketName = self.oss.ossBucketName;
+            let bucketName = 'viumo-n3azju2aknpw';
+            let endpoint=self.oss.ossEndPoint;
+            let url=`http://${bucketName}.${endpoint}/${fileName}`;
+            return url;
+        },
+        deleteEvent(item,index){
+            let self=this;
+            console.log(item);
+            console.log(index);
+            self.eventList.splice(index,1);
+            self.showFeedBackInfo = self.eventList.length===0;
+        },
+        addFeedBack(){
+            let self=this;
+            self.showFeedDialog1=true;
+            self.eventName='';
+            self.eventDes='';
+            self.showEventNameInfo = false;
+        },
+        confirmAddFeedBack3(){
+            let self=this;
+            let srcObj=null;
+            srcObj=self.feedBackVideoFileObj;
+            let obj={
+                eventName:self.eventName,
+                eventDes:self.eventDes,
+                sourceObj:srcObj
             };
-            cityList.push(obj);
-          }
-        });
-        const storeListTemp = [];
-        for (let i = 0; i < cityList.length; i++) {
-          const temp = [];
-          const obj = {};
-          for (let j = 0; j < data.length; j++) {
-            if (cityList[i].city == data[j].city) {
-              const obj = {};
-              if (self.store.storeId == data[j].storeId) {
-                obj.isActive = true;
-              } else {
-                obj.isActive = false;
-              }
-              obj.storeId = data[j].storeId;
-              obj.name = data[j].name;
-              obj.userId = data[j].userId;
-              obj.city = data[j].city;
-              obj.province = data[j].province;
-              obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
-              obj.device = data[j].device;
-              obj.hasInspect = data[j].hasInspect;
-              if (data[j].authorizedInspect != undefined && data[j].authorizedInspect.length != 0) {
-                obj.authorizedInspect = data[j].authorizedInspect;
-                obj.hasInspect = true;
-              } else {
-                obj.hasInspect = false;
-              }
-              temp.push(obj);
+            if(self.eventName.trim().length===0){
+                self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+                return false;
             }
-          }
-          obj.cityName = cityList[i].province + ' ' + cityList[i].city;
-          obj.storeList = temp;
-          storeListTemp.push(obj);
-        }
-        return storeListTemp;
-      };
-      const temp = [];
-      const tempArray = [];
-      const tempStore = [];
-      tempStoreList.forEach((_item, _index) => {
-        _item.storeList.forEach((itemDs, indexDs) => {
-          temp.push(util.getPinyinList(itemDs.name));
-          tempStore.push(itemDs);
-        });
-      });
-      console.log(temp);
-      for (var i = 0; i < temp.length; i++) {
-        if (temp[i][0].indexOf(self.serachVale.trim()) != -1 ||
-                    temp[i][1].indexOf(self.serachVale.trim()) != -1) {
-          tempArray.push(tempStore[i]);
-        }
-      }
-      self.tabList[2].storeList = getStore2Temp(tempArray);
-    },
+            self.eventList.push(obj);
+            self.showFeedDialog3=false;
+            self.showFeedBackInfo=false;
+        },
+        confirmAddFeedBack2(){
+            let self=this;
+            let srcObj=null;
+            let src=self.canvasEl.toDataURL("image/jpeg");
+            srcObj={
+                mediaType:2,
+                src:src,
+                height:'100px',
+                width:'140px',
+                fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
+                file:util.base64ToBlob(src),
+                deviceId: self.channel.id
+            };
 
-    // 切换门店
-    changeStore(item, index, _item, _index) {
-      const self = this;
-      self.patrolstore = '';
-      self.curSheetIndex = 0;
-      self.inspectItemList = [];
-      self.inspectList = [];
-      self.sheetName = [];
-      self.tempArr = [];
-      self.showChannelBtns = [];
-      self.patrolStoreName = _item.name;
-      self.PatrolList = [];
-      self.hasIgnoretemp = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      self.showIgnoreItem = false;
-      self.hasSheet3 = false;
-      _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode == 0) {
-          self.PatrolList.push(au_item);
-        }
-      });
-      _item.isActive = true;
-      self.showStoreUp = true;
-      if (!self.isEzviz) {
-        self.editCount = 0;
-        self.paused = false;
-        self.onPlay();
-      } else {
-        !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
-        if (self.$refs.ezvizVideo != undefined) {
-          self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
-        }
-      }
-      // self.editCount=0;
-      self.showError = false;
-      self.curDeviceId = -1;
-      self.showFeedBack = false;
-      self.eventList = [];
-      self.showGuide = true;
-      const obj = {};
-      obj.storeId = _item.storeId;
-      obj.storeName = _item.name;
-      obj.storeTitle = _item.name;
-      obj.storeUp = _item.favorite;
-      self.channel = null;
-      self.getChannelByStore(_item);
-      if (_item.favorite) {
-        obj.storeUpTitle = this.$t('remotePatrol.stared');
-      } else {
-        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
-      }
-      self.store = obj;
-      let curStoreId = '';
-      // self.getInspectByStore(self.store.storeId); //以前 获取门店对应的巡检表
-      const tabIndex = Number(self.activeIndex);
-      if (tabIndex != 2) {
-        item.storeList.forEach((itemS, indexS) => {
-          if (_index != indexS) {
-            itemS.isActive = false;
-          }
-        });
-        curStoreId = _item.storeId;
-      } else {
-        item.storeList.forEach((itemS, indexS) => {
-          itemS.storeList.forEach((itemChild, indexChild) => {
-            if (itemChild.storeId != _item.storeId) {
-              itemChild.isActive = false;
-            } else {
-              curStoreId = itemChild.storeId;
+            let obj={
+                eventName:self.eventName,
+                eventDes:self.eventDes,
+                sourceObj:srcObj
+            };
+            if(self.eventName.trim().length===0){
+                self.showEventNameInfo = true;
+                return false;
             }
-          });
-        });
-      }
-      const storeObj = {
-        storeId: curStoreId
-      };
-      self.saveStoreObj(storeObj);
-    },
-    changeBrandDialog() {
-      const self = this;
-    },
-    changeStoreDialog(val) {
-      const self = this;
-      self.changeStoreObj.dialogCosed = false;
-      // self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
-      if (self.curStoreItem.userId == null) {
-        self.noStoreUser.dialogCosed = true;
-      } else {
-        self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
-      }
-    },
-    changeInspectDialog() {
-      const self = this;
-      self.changeInspectObj.dialogCosed = false;
-      self.changeInspectList(self.beforepatrolstore);
-      self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
-    },
-    canceldChangeInspect() {
-      const self = this;
-      self.changeInspectObj.dialogCosed = false;
-    },
-    canceldChangeStore() {
-      const self = this;
-      self.changeStoreObj.dialogCosed = false;
-    },
-    canceldChangeBrand() {
-      const self = this;
-      self.changeBrandObj.dialogCosed = false;
-    },
-
-    lastBar() {
-      const self = this;
-      const width = document.getElementsByClassName('btn-content')[0].offsetWidth;
-      const detailsWidth = window.innerWidth / 1440 * 15 + 60;
-      const count = parseInt(width / detailsWidth);
-      if (count >= self.channelBtns.length) {
-        return false;
-      } else {
-        const index = self.getChannelIndexById(self.showChannelBtns[0].id);
-        self.showChannelBtns.unshift(self.channelBtns[index - 1]);
-        self.showChannelBtns.pop();
-        self.showChannelBtns.forEach((item, index) => {
-          if (item.id == self.channel.id) {
-            item.isClick = true;
-          } else {
-            item.isClick = false;
-          }
-        });
-        if (self.showChannelBtns[0].id == self.channelBtns[0].id) {
-          self.hideLast = false;
-        }
-        if (self.showChannelBtns[count - 1].id != self.channelBtns[self.channelBtns.length - 1].id) {
-          self.hideNext = true;
-        }
-      }
-    },
-    nextBar() {
-      const self = this;
-      const width = document.getElementsByClassName('btn-content')[0].offsetWidth;
-      const detailsWidth = window.innerWidth / 1440 * 15 + 60;
-      const count = parseInt(width / detailsWidth);
-      if (count >= self.channelBtns.length) {
-        return false;
-      } else {
-        const index = self.getChannelIndexById(self.showChannelBtns[count - 1].id);
-        self.showChannelBtns.push(self.channelBtns[index + 1]);
-        self.showChannelBtns.shift();
-        self.showChannelBtns.forEach((item, index) => {
-          if (item.id == self.channel.id) {
-            item.isClick = true;
-          } else {
-            item.isClick = false;
-          }
-        });
-        if (self.showChannelBtns[0].id != self.channelBtns[0].id) {
-          self.hideLast = true;
-        }
-        if (self.showChannelBtns[count - 1].id == self.channelBtns[self.channelBtns.length - 1].id) {
-          self.hideNext = false;
-        }
-      }
-    },
-    getshowBtns(list) {
-      const self = this;
-      const width = document.getElementsByClassName('btn-content')[0].offsetWidth;
-      const detailsWidth = window.innerWidth / 1440 * 15 + 60;
-      const count = parseInt(width / detailsWidth); // 当前容器最大可显示数量
-      if (count >= list.length) {
-        self.showChannelBtns = list;
-      } else {
-        self.showChannelBtns = list.slice(0, count);
-      }
-      if (count < self.channelBtns.length) {
-        self.hideNext = true;
-      }
-    },
-    getChannelByStore(storeItem) {
-      const self = this;
-      const temp = [];
-      self.hideLast = false;
-      self.hideNext = false;
-      storeItem.device.forEach((item, index) => {
-        const obj = {};
-        obj.id = item.id;
-        obj.name = item.name;
-        obj.ivsId = item.ivsId;
-        obj.channelId = item.channelId;
-        obj.isonline = true;
-        obj.isClick = false;
-        temp.push(obj);
-      });
-      self.channelBtns = temp;
-      self.allChannelBtns = temp;
-    },
-    cancelNoUser() {
-      const self = this;
-      self.noStoreUser.dialogCosed = false;
-    },
-    noStoreUserDialog() {
-      const self = this;
-      self.noStoreUser.dialogCosed = false;
-      self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
-    },
-    changeInspect(val) {
-      const self = this;
-      if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
-      // 确认总结后，切换巡检表
-      if ((!self.isEzviz && self.editCount != 0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory != null)) {
-        self.changeInspectObj.dialogCosed = true;
-        self.beforepatrolstore = val;
-      } else {
-        self.changeInspectList(val);
-      }
-    },
-    changeInspectList(val) {
-      const self = this;
-      if (!self.isEzviz) {
-        self.editCount = 0;
-        self.playState ? self.stopRealTime() : '';
-      } else {
-        !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
-        if (self.$refs.ezvizVideo != undefined) {
-          self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
-        }
-      }
-      self.isDisabled = false;
-      self.hasIgnoretemp = [];
-      self.tempArr = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.$store.dispatch('setPatrolComment', null);
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      self.showIgnoreItem = false;
-      self.hasSheet3 = false;
-      self.eventList = [];
-      self.showChannelBtns = [];
-      self.curSheetIndex = 0;
-      self.PatrolList.forEach(item => {
-        if (item.id == val) {
-          self.patrolstore = item.name;
-        }
-      });
-      const params = {
-        storeId: self.store.storeId,
-        mode: 0,
-        authorizedOnly: 1,
-        tagName: self.patrolstore,
-        inspectId: val
-      };
-      self.inspectItemList = [];
-      checkOutInspectItemV3(params).then(res => {
-        if (res.errCode == 0) {
-          const data = res.data.groups;
-          const temp = [];
-          data.forEach((item, index) => {
-            const obj = {};
-            obj.groupId = item.groupId;
-            obj.mode = item.mode;
-            obj.type = item.type;
-            obj.groupName = item.groupName;
-            obj.dealCount = 0;
-            obj.Effective = 0;
-            obj.isHover = false;
-            if (index == 0) {
-              obj.isClick = true;
-            } else {
-              obj.isClick = false;
+            self.eventList.push(obj);
+            self.showFeedDialog2=false;
+            self.showFeedBackInfo=false;
+        },
+        confirmAddFeedBack1(){
+            let self=this;
+            let obj={
+                eventName:self.eventName,
+                eventDes:self.eventDes,
+                sourceObj:null
+            };
+            if(self.eventName.trim().length===0){
+                self.showEventNameInfo = true;
+                return false;
             }
-            const tempItems = [];
-            item.items.forEach((_item, _index) => {
-              const itemObj = {};
-              const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-              itemObj.id = _item.id;
-              itemObj.groupId = item.groupId;
-              itemObj.subject = _item.subject;
-              itemObj.description = _item.description;
-              itemObj.itemScore = _item.itemScore;
-              itemObj.itemScoreLength = arr.slice(0, _item.itemScore + 1);
-              itemObj.itemgetScore = '--';
-              itemObj.isQualified = false;
-              itemObj.qualifiedScore = _item.qualifiedScore;
-              itemObj.type = item.type;
-              itemObj.itemScoreTitle = '--';
-              // itemObj.deviceId=_item.deviceId;
-              itemObj.deviceId = _item.deviceIds;
-              itemObj.inspectInput = '';
-              itemObj.inputCount = 0;
-              itemObj.disabled = true;
-              itemObj.checked = false; // 是否选中状态
-              itemObj.isIgnore = false; // 是否被忽略
-              itemObj.Ruletip = false; // 是否显示提示语
-              itemObj.manualIgnore = false; // 是否手动忽略巡检项
-              itemObj.sourceList = [];
-              itemObj.scoreList = [{ val: 10, scoreTitle: this.$t('remotePatrol.pass'), isClick: false },
-                { val: 0, scoreTitle: this.$t('remotePatrol.failed'), isClick: false }];
-              tempItems.push(itemObj);
+            self.eventList.push(obj);
+            self.showFeedDialog1=false;
+            self.showFeedBackInfo=false;
+        },
+        getIndexById(id){
+            let self=this;
+            let tempId=null;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            if(self.showIgnoreItem){
+                self.hasIgnoretemp.forEach((item,index)=>{
+                    if(item.id===id){
+                        tempId={
+                            itemIndex:index
+                        };
+                    }
+                });
+            }else{
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach((item,index)=>{
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.id===id){
+                                tempId={
+                                    groupIndex:index,
+                                    itemIndex:_index
+                                };
+                            }
+                        });
+                    });
+                });
+            }
+            return tempId;
+        },
+        getChannelIndexById(id){
+            let self=this;
+            let curIndex=0;
+            self.channelBtns.forEach((item,index)=>{
+                if(item.id===id){
+                    curIndex=index;
+                }
             });
-            obj.items = tempItems;
-            temp.push(obj);
-          });
-          const te_temp = [];
-          for (let i = 0; i < 3; i++) {
-            const Typeindex = temp.filter(x => x.type == i);
-            const obj = {};
-            if (Typeindex.length != 0) {
-              // te_temp[i]['dealCount']=0
-              let count = 0, label = '';
-              Typeindex.forEach(item => {
-                count += item.items.length;
+            return curIndex;
+        },
+        upLoadFile(fileItem){
+            let self=this;
+            self.percentage=0;
+            let OSS = require('ali-oss');
+            let bucketName = 'viumo-n3azju2aknpw';
+            const client = new OSS({
+                region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
+                accessKeyId: self.oss.ossAccessKeyId,
+                accessKeySecret: self.oss.ossAccessKeySecret,
+                bucket:bucketName
+            });
+            let name=fileItem.fileName;
+            return new Promise((resolve,reject)=>{
+                client.put(name,fileItem.file,{
+                progress: function* (percentage, cpt) {
+                   self.percentage = percentage;
+                    }
+                })
+                .then((results) => {
+                    const url = self.getFileUrl(results.name);
+                    console.log(url);
+                    resolve(url);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            });
+        },
+        getDeviceList(){
+            let self=this;
+            getDeviceList().then(res=>{
+                if(res.errCode===0){
+                    let data=res.data;
+                    self.deviceList=data;
+                }
+            });
+        },
+        addVideoToList(){
+            let self=this;
+            self.recorder.stopRecording(function(){
+                self.isRecordingStarted=false;
+                self.isStoppedRecording=true;
+                var blob =self.recorder.getBlob();
+                let url=URL.createObjectURL(blob);
+                let obj={};
+                obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+                obj.file=blob;
+                obj.mediaType=1;
+                obj.src=url;
+                obj.height='100px';
+                self.sourceList.push(obj);
+                console.log(self.curItemId);
+                let tempId=self.getIndexById(self.curItemId);
+                console.log(tempId);
+                if(tempId!=null){
+                    self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj) ;
+                }
+                else{
+                    self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+                }
+                self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+            });
+        },
+        playCutVideo(item,index){
+            let self=this;
+            self.dialogCommentVideo=true;
+            if(self.showFeedBack){
+                self.curVideoSrc=item.sourceObj.src;
+            }
+            else{
+                self.curVideoSrc=item.src;
+            }
+        },
+        looper(){
+            let self=this;
+            if(!self.isRecordingStarted){
+                self.timeVideo=setTimeout(self.looper, 0);
+            }
+            else{
+                self.endTImeCutVideo=new Date().getTime();
+                console.log((self.endTImeCutVideo-self.startTimeCutVideo)/1000);
+                if((self.endTImeCutVideo-self.startTimeCutVideo)/1000>11){
+                    clearTimeout(self.timeVideo);
+                    self.showGetVideo=false;
+                    self.isRecordingStarted=false;
+                    self.isREC=false;
+                    setTimeout(()=>{
+                        if(self.showFeedBack){
+                            self.showFeedDialog3=true;
+                            self.eventName='';
+                            self.eventDes='';
+                            this.$nextTick(()=>{
+                                self.recorder.stopRecording(function(){
+                                    self.isRecordingStarted=false;
+                                    self.isStoppedRecording=true;
+                                    var blob =self.recorder.getBlob();
+                                    let url=URL.createObjectURL(blob);
+                                    let obj={};
+                                    obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+                                    obj.file=blob;
+                                    obj.mediaType=1;
+                                    obj.src=url;
+                                    self.feedBackVideoFileObj=obj;
+                                });
+                            });
+                        }
+                        else{
+                            self.addVideoToList();
+                        }
+                    },100);
+                }
+                else{
+                    self.isREC=true;
+                    html2canvas(self.videoEl).then(function(canvas){
+                        var ctx = self.canvasEl.getContext('2d');
+                        let width=self.varyWindowWidth*0.418;
+                        let height=self.varyWindowWidth*0.288;
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(self.videoEl,0,0,width,height);
+                        if(self.isStoppedRecording) {
+                            return;
+                        }
+                        requestAnimationFrame(self.looper);
+                    });
+                }
+            }
+        },
+        computeFrame(){
+            let self=this;
+            self.canvasEl=document.getElementById('vcanvas');
+            // var ctx = self.canvasEl.getContext('2d');
+            self.recorder = RecordRTC(self.canvasEl, {
+                type: 'canvas'
+            });
+            self.isStoppedRecording =false;
+            self.isRecordingStarted = true;
+            self.recorder.startRecording();
+        },
+        drawMain(drawing_elem, percent, forecolor, bgcolor) {
+            /*
+                @drawing_elem: Drawing objects
+                @percent：Draw circle percentage, range [0, 100]
+                @forecolor: Draw the foreground color of the circle, color code
+                @bgcolor: Draw the background color of the ring, color code
+            */
+            let self=this;
+            var context = drawing_elem.getContext('2d');
+            var center_x = drawing_elem.width / 2;
+            var center_y = drawing_elem.height / 2;
+            var rad = Math.PI*2/100;
+            // Draw background circle
+            function backgroundCircle(){
+                context.beginPath();
+                context.lineWidth = 14; //设置线宽
+                var radius = center_x - context.lineWidth;
+                context.arc(center_x, center_y, radius, 0, Math.PI*2, false);
+                context.fillStyle=bgcolor;
+                context.globalAlpha = 0.5;
+                context.fill();
+            }
+
+            //Draw a motion ring
+            function foregroundCircle(n){
+                context.save();
+                context.strokeStyle = forecolor;
+                context.globalAlpha = 1;
+                context.lineWidth = 6;
+                context.lineCap = 'round';
+                var radius = center_x - context.lineWidth;
+                context.beginPath();
+                context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
+                context.stroke();
+                context.closePath();
+                context.restore();
+            }
+
+            //Draw text
+            function text(n){
+                context.save();
+                context.fillStyle='white';
+                context.globalAlpha = 1;
+                var font_size=self.btnFontSize;
+                context.font='bold '+font_size+'px Helvetica';
+                var textStr='';
+                if(n==100){
+                  if(self.lang === 'en'){
+                    textStr= self.$t('storeMonitor.recordSucc').substring(0, 9) + '...' ;
+                  }
+                  else{
+                    textStr= self.$t('storeMonitor.recordSucc');
+                  }
+                }
+                else{
+                    textStr= self.$t('remotePatrol.recording');
+                }
+                var text_width = context.measureText(textStr).width;
+                context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
+                context.restore();
+            }
+            //Perform animation
+            function drawFrame(speed){
+                context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
+                backgroundCircle();
+                text(speed);
+                foregroundCircle(speed);
+                if(speed>=percent){
+                    clearInterval(self.videoSpeedId);
+                }
+            }
+            self.videoSpeedId=setInterval(() => {
+                if(self.videoSpeed >= percent){
+                    return;
+                }
+                else{
+                    self.videoSpeed += 2;
+                    drawFrame(self.videoSpeed);
+                }
+            }, 100);
+        },
+        getVideo(){
+            let self=this;
+            console.log(self.curGroupIndex);
+            if(self.sourceListLength >=10){
+                self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
+                return false;
+            }
+            if(self.fullScreen){
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
+            self.showGetVideo=true;
+            self.videoSpeed=0;
+            self.videoEl=document.getElementById('previewVideo').children[0];
+            self.$nextTick(()=>{
+                self.startTimeCutVideo=new Date().getTime();
+                self.computeFrame();
+                self.looper();
+                setTimeout(()=>{
+                    var btn_canvas = document.getElementById('btn-graph-canvas');
+                    self.drawMain(btn_canvas, 100, '#f31d65', '#f31d65');
+                },1000);
+            });
+        },
+        cutPicture(){
+            let self=this;
+            console.log(self.curGroupIndex);
+            self.videoEl=document.getElementById('previewVideo').children[0];
+            self.imageCanvasList=[];
+            if(self.fullScreen){
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
+            if(self.showFeedBack){
+                self.showFeedDialog2=true;
+                self.eventName='';
+                self.eventDes='';
+                self.showEventNameInfo = false;
+                this.$nextTick(()=>{
+                    self.canvasEl=document.getElementById('icanvas');
+                    var ctx = self.canvasEl.getContext('2d');
+                    ctx.drawImage(self.videoEl,0,0,520*self.percentHeight,340*self.percentHeight);
+                    var oGrayImg=icanvas.toDataURL('image/jpeg');
+                    self.imageCanvas.src=oGrayImg;
+                    let imgObj=new Image();
+                    imgObj.src=oGrayImg;
+                    self.imageCanvasList.push(imgObj);
+                });
+            }
+            else{
+                self.showCancelContent=false;
+                if(self.sourceListLength >= 10){
+                    self.notify(self.$t('remotePatrol.maximumAttach'),'warning',3000);
+                    return false;
+                }
+                self.showCutDialog=true;
+                this.$nextTick(()=>{
+                    self.canvasEl=document.getElementById('icanvas');
+                    var ctx = self.canvasEl.getContext('2d');
+                    ctx.drawImage(self.videoEl,0,0,767*self.percentHeight,431*self.percentHeight);
+                    var oGrayImg=icanvas.toDataURL('image/jpeg');
+                    self.imageCanvas.src=oGrayImg;
+                    let imgObj=new Image();
+                    imgObj.src=oGrayImg;
+                    self.imageCanvasList.push(imgObj);
+                });
+            }
+        },
+        showPenList(){
+            let self=this;
+            self.showPen=!self.showPen;
+            self.showCancelContent=false;
+        },
+        checkPen(item,index){
+            let self=this;
+            item.showContent=true;
+            self.penList.forEach((_item,_index)=>{
+                if(index!==_index){
+                    _item.showContent=false;
+                }
+            });
+            self.penChecked=item.id;
+        },
+        cancelEditCanvas(){
+            let self=this;
+            self.showCancelContent=false;
+            self.canvasEl=document.getElementById('icanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            let vcanvas=null;
+            if(self.showFeedBack){
+                vcanvas={width:520*self.percentHeight,height:340*self.percentHeight};
+            }
+            else{
+                vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
+            }
+            ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
+            ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
+            self.imageCanvasList=[];
+        },
+        confirmEditCanvas(){
+            let self=this;
+            self.showCancelContent=false;
+            self.imageCanvasList.pop();
+            self.canvasEl=document.getElementById('icanvas');
+            var ctx = self.canvasEl.getContext('2d');
+            let vcanvas=null;
+            if(self.showFeedBack){
+                vcanvas={width:520*self.percentHeight,height:340*self.percentHeight};
+            }
+            else{
+                vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
+            }
+            ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
+            if(self.imageCanvasList.length===0){
+                ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
+            }
+            else{
+                ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length-1],0,0,vcanvas.width,vcanvas.height);
+            }
+        },
+        confirmEdit(){
+            let self=this;
+            self.sourceList = [];
+            let obj={};
+            obj.mediaType=2;
+            obj.src=self.canvasEl.toDataURL("image/jpeg");
+            obj.height='100px';
+            obj.width='140px';
+            obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
+            obj.file=util.base64ToBlob(obj.src);
+            obj.deviceId = self.channel.id;
+            self.sourceList.push(obj);
+            self.showCutDialog=false;
+            console.log(self.curItemId);
+            let tempId=self.getIndexById(self.curItemId);
+            console.log(tempId);
+            if(tempId!=null){
+              if(!self.showIgnoreItem){
+                  self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+              }else{
+                  self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
+              }
+            }
+            else{
+                self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+            }
+            if(!self.showIgnoreItem){
+                self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+            }else{
+                self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
+            }
+
+        },
+        mouseDownAction(e){
+           let self=this;
+           self.isMouseDown=true;
+           self.X=e.offsetX;
+           self.Y=e.offsetY;
+           self.showCutModel=false;
+           self.showPenBtn=false;
+           self.showCancelContent=false;
+        },
+        mouseMoveAction(e){
+            let self=this;
+            if(self.isMouseDown){
+                self.X1=e.offsetX;
+                self.Y1=e.offsetY;
+                self.drawLine(self.X,self.Y,self.X1,self.Y1);
+                self.showPenBtn=false;
+                self.flag++;
+            }
+        },
+        mouseUpAction(e){
+            let self=this;
+            self.isMouseDown=false;
+            self.showCutModel=true;
+            self.showPenBtn=true;
+            self.showCancelContent=true;
+            if(self.flag!==0&&self.canvasEl!==''){
+                let imgObj=new Image();
+                imgObj.src=self.canvasEl.toDataURL('image/jpeg');
+                self.imageCanvasList.push(imgObj);
+            }
+            self.flag=0;
+        },
+        drawLine(x,y,x1,y1){
+            let self=this;
+            var ctx=self.canvasEl.getContext('2d');
+            if(self.flag){
+                ctx.beginPath();
+            }
+            ctx.moveTo(x,y);
+            ctx.lineWidth=4;
+            ctx.strokeStyle=self.penChecked;
+            ctx.lineTo(x1,y1);
+            ctx.stroke();
+            if(self.flag!==0){
+                self.X=self.X1;
+                self.Y=self.Y1;
+            }
+        },
+        showCancel(){
+            let self=this;
+            self.showCancelContent=true;
+            self.showPenBtn=true;
+        },
+        hiddenCancel(){
+            let self=this;
+            self.showCancelContent=false;
+            self.showPenBtn=false;
+        },
+        getFaStoreList(){
+            return new Promise((resolve,reject)=>{
+                getFavoriteList().then(res=>{
+                    console.log(res);
+                    resolve(res);
+                });
+            });
+        },
+        checkIgnoreScore(item,itemDS,e,index){
+            let self=this;
+            item.manualIgnore=false;
+            self.curhasIgnoreItem=index;
+            item.scoreList.forEach(s_item=>{
+                s_item.val===itemDS.val ? s_item.isClick=true : s_item.isClick=false;
+            });
+            if(e===0){
+                if(item.type===2){
+                    if(item.itemScore<0){
+                        item.itemgetScore = itemDS.val===-1 ? item.itemScore : 0;
+                    }else{
+                        item.itemgetScore = itemDS.val===item.itemScore ? item.itemScore : 0;
+                    }
+                }else{
+                    item.itemgetScore = itemDS.val===-1 ? 0 : item.itemScore;
+                }
+                item.isQualified = !(itemDS.val === -1);
+                item.itemScoreTitle=itemDS.scoreTitle;
+            }else{
+                item.itemgetScore=itemDS;
+                item.itemScoreTitle=itemDS;
+            }
+            item.dealCount=item.Effective=item.inputCount=1;
+            self.getDisabled(1);
+        },
+        checkScore(item,itemDS,e){
+            let self=this;
+            console.log(item,itemDS);
+            item.scoreList.forEach(s_item=>{
+                s_item.val===itemDS.val ? s_item.isClick=true : s_item.isClick=false;
+            });
+            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            if(e===0){
+                if(item.type===2){
+                    if(item.itemScore<0){
+                        item.itemgetScore = itemDS.val===-1 ? item.itemScore : 0;
+                    }else{
+                        item.itemgetScore = itemDS.val===item.itemScore ? item.itemScore : 0;
+                    }
+                }else{
+                    item.itemgetScore = itemDS.val===-1 ? 0 : item.itemScore;
+                }
+                item.isQualified = !(itemDS.val === -1);
+                item.itemScoreTitle=itemDS.scoreTitle;
+            }else{
+                item.itemgetScore=itemDS;
+                item.itemScoreTitle=itemDS;
+            }
+            if(item.itemScoreTitle!=='--'){
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount===0){
+                    self.sheetName[self.curSheetIndex].dealCount++;
+                    self.sheetName[self.curSheetIndex].Effective++;
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].Effective++;
+                }
+                self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
+            }
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)));
+            self.getDisabled(0);
+            self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.Effective!==item.count);
+            let hasIgnoretemp=[];
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        if(_item.inputCount===0&&!_item.manualIgnore){
+                            hasIgnoretemp.push(_item);
+                        }
+                    });
+                });
+            });
+            hasIgnoretemp.length===0 ? self.notShowAlert=true : null;
+        },
+        getDisabled(e){
+            let self=this;
+            let isSheet1=false,isSheet2=false;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)));
+            if(e===0){
+                if(sheetName.length===1){
+                    isSheet1 = sheetName[0].type===0 ? sheetName[0].Effective>=1 : false;
+                    isSheet2 = sheetName[0].type===1 ? sheetName[0].Effective>=1 : false;
+                }else if(sheetName.some(item=>item.type===0)&&sheetName.some(item=>item.type===1)){
+                    if(sheetName.some(item=>item.type===2)){
+                        if(sheetName[2].Effective===0){
+                            isSheet1 = isSheet2 = sheetName[1].Effective>=1||sheetName[0].Effective>=1;
+                        }else{
+                            isSheet1 = isSheet2 = sheetName[1].Effective>=1;
+                            self.hasSheet3 = sheetName[1].Effective>=1;
+                        }
+                    }else{
+                        isSheet1 = isSheet2 = sheetName[0].Effective>=1||sheetName[1].Effective>=1;
+                    }
+                }else{
+                    isSheet2 = sheetName[0].Effective>=1;
+                    self.hasSheet3 = sheetName[0].Effective===0&&sheetName[1].Effective>=1;
+                }
+                self.isDisabled = isSheet1 || isSheet2;
+            }else{
+                if(sheetName.length===1){
+                    isSheet1 = isSheet2 = true;
+                }else if(sheetName.some(item=>item.type===0)&&sheetName.some(item=>item.type===1)){
+                    if(sheetName.some(item=>item.type===2)){
+                        if(sheetName[2].Effective===0&&self.tempArr.every(x=>x===0)){
+                            isSheet1 = isSheet2 = self.hasIgnoretemp[self.curhasIgnoreItem].type!==2 || (self.hasIgnoretemp[self.curhasIgnoreItem].type===2&&self.hasIgnoretemp[self.curhasIgnoreItem].manualIgnore);
+                            self.hasSheet3 = !self.hasIgnoretemp[self.curhasIgnoreItem].type!==2;
+                        }else{
+                            isSheet1 = isSheet2 = true;
+                        }
+                    }else{
+                        isSheet1 = isSheet2 = true;
+                    }
+                }else{
+                    isSheet2 = true;
+                }
+                self.isDisabled = isSheet1 || isSheet2;
+            }
+        },
+        getAllStoreList(){
+            let params={
+                'filter': {
+                    'page': 0,
+                    'size': 2000
+                }
+            };
+            return new Promise((resolve,reject)=>{
+                getStoreList(params).then(res=>{
+                    console.log(res);
+                    resolve(res);
+                });
+            });
+        },
+        saveStoreObj(storeObj){
+            let self=this;
+            let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
+            let temp=[];
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!==undefined){
+                temp=JSON.parse(localStorage.getItem(key));
+            }
+            temp.forEach((item,index)=>{
+                if(item.userId===storeObj.userId&&item.storeId===storeObj.storeId){
+                    temp.splice(index,1);
+                }
+            });
+            temp.unshift(storeObj);
+            temp=temp.slice(0,3);
+            localStorage.setItem(key,JSON.stringify(temp));
+        },
+        getStoreObj(){
+            let self=this;
+            let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
+            let temp=[];
+            let tempArray=[];
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!==undefined){
+                temp=JSON.parse(localStorage.getItem(key));
+            }
+            let indexArray=[];
+            temp.forEach((item,index)=>{
+                indexArray.push(self.allInitStoreList.map(x=>x.storeId).indexOf(item.storeId));
+            });
+            console.log(indexArray);
+            indexArray=indexArray.filter(function(x){
+                return x!==-1;
+            });
+            indexArray.forEach(item=>{
+                tempArray.push(self.allInitStoreList[item]);
+            });
+            return tempArray;
+        },
+        async getStoreList(){
+            let self=this;
+            console.log(self.activeIndex);
+            console.log(self.store);
+            let getStoreTemp=data=>{
+                let temp=[];
+                data.forEach((item,index)=>{
+                    let obj={};
+                    if(self.store.storeId===item.storeId){
+                        obj.isActive=true;
+                    }
+                    else{
+                        obj.isActive=false;
+                    }
+                    obj.storeId=item.storeId;
+                    obj.name=item.name;
+                    obj.userId=item.userId;
+                    obj.favorite=item.favorite===undefined?true:item.favorite;
+                    obj.device=item.device;
+                    if(item.authorizedInspect.length!==0){
+                        obj.authorizedInspect=item.authorizedInspect;
+                        obj.hasInspect=true;
+                    }
+                    else{
+                        obj.hasInspect=false;
+                    }
+                    temp.push(obj);
+                });
+                return temp;
+            };
+            let data;
+            switch(Number(self.activeIndex)){
+                case 0: data=await self.getFaStoreList();
+                    console.log(data);
+                    if(data.errCode===0){
+                        let storeData=data.data;
+                        self.tabList[0].storeList=getStoreTemp(storeData);
+                    }
+                    if(data.errCode===500){
+                        self.tabList[0].storeList=[];
+                    }
+                    break;
+                case 1:
+                    data=self.getStoreObj();
+                    console.log(data);
+                    self.tabList[1].storeList=getStoreTemp(data);
+                    break;
+                case 2:
+                    self.tabList[2].storeList.forEach((item,index)=>{
+                        item.storeList.forEach(_item=>{
+                            if(_item.storeId===self.store.storeId){
+                                _item.isActive=true;
+                            }
+                            else{
+                                _item.isActive=false;
+                            }
+                        });
+                    });
+                    break;
+            }
+        },
+        async getFaStoreData(){
+            let self=this;
+            let getStoreTemp=data=>{
+                let temp=[];
+                data.forEach((item,index)=>{
+                    let obj={};
+                    obj.storeId=item.storeId;
+                    obj.name=item.name;
+                    obj.userId=item.userId;
+                    obj.favorite=item.favorite===undefined?true:item.favorite;
+                    obj.device=item.device;
+                    obj.isActive=false;
+                    if(item.authorizedInspect.length!==0){
+                        obj.authorizedInspect=item.authorizedInspect;
+                        obj.hasInspect=true;
+                        if(index===0){
+                            obj.isActive=true;
+                        }
+                    }
+                    else{
+                        obj.hasInspect=false;
+                    }
+                    temp.push(obj);
+                });
+                return temp;
+            };
+            let data=await self.getFaStoreList();
+            let allStoreData=await self.getAllStoreList();
+            self.getInitStoreData(allStoreData);
+            if(data.errCode===0){
+                let storeData=data.data;
+                self.tabList[0].storeList=getStoreTemp(storeData);
+                if(storeData.length===0){
+                    self.showStoreUp=false;
+                    self.inspectList=[];
+                }
+                else{
+                    if(storeData[0].authorizedInspect.length!==0){
+                        let obj={};
+                        obj.storeId=storeData[0].storeId;
+                        obj.storeName=storeData[0].name;
+                        obj.storeTitle=storeData[0].name;
+                        obj.storeUp=true;
+                        obj.storeUpTitle= this.$t('remotePatrol.stared');
+                        self.store=obj;
+                        self.showStoreUp=true;
+                        let curStoreId=storeData[0].storeId;
+                        let storeObj={
+                            storeId:curStoreId
+                        };
+                        self.patrolStoreName = storeData[0].name;
+                        storeData[0].authorizedInspect.forEach(au_item=>{
+                            if(au_item.mode===0){
+                               self.PatrolList.push(au_item);
+                            }
+                        });
+                        self.saveStoreObj(storeObj);
+                        self.getChannelByStore(self.tabList[0].storeList[0]);
+                    }
+                    else{
+                        self.showStoreUp=false;
+                    }
+                }
+            }
+        },
+         async getInitStoreData(data){
+            let self=this;
+            let getStore2Temp=data=>{
+                let cityList=[];
+                data.forEach(item=>{
+                    if(cityList.map(x=>x.city).indexOf(item.city)===-1){
+                        let obj={
+                            city:item.city,
+                            province:item.province
+                        };
+                        cityList.push(obj);
+                    }
+                });
+                let storeListTemp=[];
+                for(let i=0;i<cityList.length;i++){
+                    let temp=[];
+                    let obj={};
+                    for(let j=0;j<data.length;j++){
+                        if(cityList[i].city===data[j].city){
+                           let obj={};
+                            obj.isActive=false;
+                            obj.storeId=data[j].storeId;
+                            obj.name=data[j].name;
+                            obj.userId=data[j].userId;
+                            obj.city=data[j].city;
+                            obj.province=data[j].province;
+                            obj.favorite=data[j].favorite===undefined?true:data[j].favorite;
+                            obj.device=data[j].device;
+                            if(data[j].authorizedInspect.length!==0){
+                                obj.authorizedInspect=data[j].authorizedInspect;
+                                obj.hasInspect=true;
+                            }
+                            else{
+                                obj.hasInspect=false;
+                            }
+                            temp.push(obj);
+                        }
+                    }
+                    obj.cityName=cityList[i].province+' '+cityList[i].city;
+                    obj.storeList=temp;
+                    storeListTemp.push(obj);
+                }
+                return storeListTemp;
+            };
+             if(data.errCode===0){
+                let storeData=data.data.content;
+                self.allInitStoreList=storeData;
+                if(storeData.length===0){
+                    self.tabList[2].storeList=[];
+                    self.tempStoreList=[];
+                }
+                else{
+                    self.tabList[2].storeList=getStore2Temp(storeData);
+                    self.tempStoreList=getStore2Temp(storeData);
+                }
+            }
+        },
+        async handleClick(tab){
+            console.log(tab);
+            let self=this;
+            let allStoreData=await self.getAllStoreList();
+            self.getInitStoreData(allStoreData);
+            self.getStoreList();
+        },
+        addStoreUp(){
+            let self=this;
+            let temp=[];
+            temp.push(self.store.storeId);
+            let params={
+                storeIds:temp
+            };
+            if(!self.store.storeUp){
+                addFavoriteStore(params).then(res=>{
+                    console.log(res);
+                    if(res.errCode===0){
+                        self.store.storeUp=true;
+                        self.store.storeUpTitle= this.$t('remotePatrol.stared');
+                        self.getStoreList();
+                        self.tabList[2].storeList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId===_item.storeId){
+                                    _item.favorite=true;
+                                }
+                            });
+                        });
+                        self.tempStoreList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId===_item.storeId){
+                                    _item.favorite=true;
+                                }
+                            });
+                        });
+                        self.allInitStoreList.forEach((item,index)=>{
+                            if(self.store.storeId===item.storeId){
+                                item.favorite=true;
+                            }
+                        });
+                    }
+                });
+            }
+            else{
+                deleteFavoriteStore(params).then(res=>{
+                    if(res.errCode===0){
+                        self.store.storeUp=false;
+                        self.store.storeUpTitle=this.$t('remotePatrol.clickToStar');
+                        self.getStoreList();
+                        self.tabList[2].storeList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId===_item.storeId){
+                                    _item.favorite=false;
+                                }
+                            });
+                        });
+                        self.tempStoreList.forEach((item,index)=>{
+                            item.storeList.forEach((_item,_index)=>{
+                                if(self.store.storeId===_item.storeId){
+                                    _item.favorite=false;
+                                }
+                            });
+                        });
+                        self.allInitStoreList.forEach((item,index)=>{
+                            if(self.store.storeId===item.storeId){
+                                item.favorite=false;
+                            }
+                        });
+                    }
+                });
+            }
+        },
+        mouseoverGroup(item,index){
+            item.isHover=true;
+        },
+        mouseoutGroup(item,index){
+            item.isHover=false;
+        },
+        getItemByGroup(item,index){
+            console.log(item);
+            let self=this;
+            self.curGroupIndex=index;
+            self.curGroup=item;
+            self.curItemIndex=0;
+            self.inspectItemList=item.items;
+            self.showFeedBack=false;
+            self.hideNext = false;
+            self.hideLast = false;
+            self.channelBtns = [];
+            item.isClick=true;
+            this.$nextTick(()=>{
+                self.anchorLinkTo();
+            });
+            self.inspectList.forEach((_item,_index)=>{
+                if(index!==_index){
+                    _item.isClick=false;
+                }
+            });
+        },
+        getDeviceById(deviceId){
+            let self=this;
+            let device= [];
+            self.deviceList.forEach(item=>{
+              deviceId.forEach(_item=>{
+                if(_item===item.id){
+                  device.push(item);
+                }
               });
-              if (Typeindex[0].type == 0) {
-                label = self.$t('insSettingView.sheetpassfail');
-              }
-              if (Typeindex[0].type == 1) {
-                label = self.$t('insSettingView.sheetscore');
-              }
-              if (Typeindex[0].type == 2) {
-                label = self.$t('insSettingView.sheetother');
-              }
-              te_temp.push({ inspectList: Typeindex, dealCount: 0, Effective: 0, count: count, isClick: false, label: label, type: Typeindex[0].type });
-            }
-          }
-          self.sheetName = te_temp;
-          self.sheetName[0].isClick = true;
-          self.inspectList = self.sheetName[0].inspectList;
-          const feedobj = { groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false };
-          if (self.sheetName.length != 0) {
-            self.sheetName.push(feedobj);
-            self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
-          }
-        }
-      });
-    },
-    hasIgnoreItem() {
-      const self = this;
-      self.showIgnoreItem = true;
-      self.showFeedBack = false;
-      self.isShowWarn = false;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
-      const hasIgnoretemp = [];
-      sheetName.forEach(s_item => {
-        s_item.inspectList.forEach(item => {
-          item.items.forEach((_item, _index) => {
-            if (_item.inputCount == 0 && !_item.manualIgnore) {
-              hasIgnoretemp.push(_item);
-            } else if (_item.inputCount != 0) {
-              self.tempArr.push(_item.type);
-            }
-          });
-        });
-      });
-      self.hasIgnoretemp = hasIgnoretemp;
-    },
-    backToPatrol() {
-      const self = this;
-      self.showIgnoreItem = false;
-      self.showFeedBack = !!self.sheetName[Number(self.sheetName.length - 1)].isClick;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
-      sheetName.forEach(s_item => {
-        let dealtemp = [], notIgnoretemp = [];
-        s_item.inspectList.forEach(item => {
-          item.items.forEach((_item, _index) => {
-            self.hasIgnoretemp.forEach((h_item, h_index) => {
-              if (h_item.id == _item.id) {
-                item.items[_index] = self.hasIgnoretemp[h_index];
-              }
             });
-            if (item.items[_index].inputCount == 1 || item.items[_index].manualIgnore) {
-              const obj = {};
-              obj.dealCount = 1;
-              dealtemp.push(obj);
+            return device;
+        },
+        openOuter(item){
+            let self=this;
+            console.log(item);
+            if(item!=null){
+                self.showOuter=true;
+                self.checkImgSrc=item.src;
             }
-            if (item.items[_index].inputCount == 1) {
-              const obj = {};
-              obj.manualCount = 1;
-              notIgnoretemp.push(obj);
+        },
+        deleteImg(item,index){
+            let self=this;
+            item.sourceList.splice(index,1);
+            self.sourceListLength--;
+        },
+        handleIgnore(){
+            let self=this;
+            self.curItem.manualIgnore=true;
+            self.curItem.disabled=true;
+            if(self.showIgnoreItem){
+                if(self.hasIgnoretemp[self.curItemIndex].dealCount===0){
+                    self.hasIgnoretemp[self.curItemIndex].dealCount=1;
+                }
+                if(self.hasIgnoretemp[self.curItemIndex].manualIgnore){
+                    self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
+                    self.hasIgnoretemp[self.curItemIndex].sourceList = [];
+                    self.hasIgnoretemp[self.curItemIndex].itemScoreTitle='--';
+                    self.hasIgnoretemp[self.curItemIndex].inputCount=0;
+                    self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x=>{
+                        x.isClick=false;
+                    });
+                }
+                self.getDisabled(1);
+            }else{
+                self.showGuide=false;
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!==0&&self.sheetName[self.curSheetIndex].Effective!==0){
+                    self.sheetName[self.curSheetIndex].Effective--;
+                }
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount===0){
+                    self.sheetName[self.curSheetIndex].dealCount++;
+                }
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore){
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle='--';
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x=>{
+                        x.isClick=false;
+                    });
+                }
+                let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+                let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)));
+                let hasIgnoretemp=[];
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount===0&&!_item.manualIgnore){
+                                hasIgnoretemp.push(_item);
+                            }
+                        });
+                    });
+                });
+                hasIgnoretemp.length===0 ? self.notShowAlert=true : null;
+                self.getDisabled(0);
+                self.isDisabled ? self.isShowWarn=true : self.isShowWarn=false;
             }
-          });
-        });
-        s_item.dealCount = dealtemp.length;
-        s_item.Effective = notIgnoretemp.length;
-        if (s_item.isClick && !self.showFeedBack) {
-          self.inspectItemList = s_item.inspectList[self.curGroupIndex].items;
-        }
-      });
-      self.isShowWarn = !!(!self.hasSheet3 && self.hasIgnoretemp.some(x => x.inputCount == 0));
-      self.notShowAlert = self.sheetName.every(x => x.count == x.dealCount);
-    },
-    changeSheet(item, index) {
-      const self = this;
-      if (item.groupId == 'feedBack') {
-        const PatrolHistory = self.$store.getters.PatrolHistory;
-        if (PatrolHistory != null) {
-          self.eventList = PatrolHistory.eventList;
-          self.showFeedBackInfo = self.eventList.length == 0;
-          self.showFeedBack = true;
-        } else {
-          self.showFeedBack = true;
-          self.showFeedBackInfo = self.eventList.length == 0;
-          self.showGuide = false;
-          console.log(self.channel);
-          self.channelBtns = self.allChannelBtns.concat();
-          self.channelBtns.forEach((_item, _index) => {
-            if (self.channel != null) {
-              if (_item.id == self.channel.id) {
-                _item.isClick = true;
-              } else {
-                _item.isClick = false;
+        },
+        cancleIgnore(){
+            let self = this;
+            self.curItem.manualIgnore=false;
+            self.curItem.disabled=false;
+            if(self.showIgnoreItem){
+                self.hasIgnoretemp[self.curItemIndex].dealCount!==0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
+            }else{
+                self.sheetName[self.curSheetIndex].dealCount!==0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
+            }
+        },
+        cancelIgnoreInspect(val){
+            let self=this;
+            self.ignoreInspectObj.dialogCosed=false;
+        },
+        IgnoreInspect(){
+            let self = this;
+            self.CancleIgnoreInspectObj.dialogCosed=false;
+        },
+        ignoreItem(item,index,e){
+            let self=this;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            if(e===0){
+                let count=0,manualCount=1;
+                sheetName.forEach(s_item=>{
+                    count+=s_item.count;
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            _item.manualIgnore ? manualCount++ : null;
+                        });
+                    });
+                });
+                if(count===manualCount){
+                    self.allIgnoreObj.dialogCosed=true;
+                    return false;
+                }
+            }
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        _item.checked=false;
+                        _item.disabled=true;
+                    });
+                });
+            });
+            self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
+            self.curItemIndex=index;
+            self.curItem=item;
+            if(item.deviceId===-1){
+                self.noBindDeviceObj.dialogCosed=true;
+                return false;
+            }
+            self.handleIgnore();
+        },
+        CancleIgnoreItem(item,index){
+            let self=this;
+            self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
+            self.curItemIndex=index;
+            self.curItem=item;
+            self.cancleIgnore();
+        },
+        noBindDeviceDialog(val){
+            let self=this;
+            self.noBindDeviceObj.dialogCosed=false;
+        },
+        canceldNoBind(val){
+            let self=this;
+            self.noBindDeviceObj.dialogCosed=false;
+        },
+        clickBtn(item,index){
+            let self=this;
+            console.log(item);
+            if(self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
+            let obj={
+                id:item.id,
+                channelId:item.channelId,
+                ivsId:item.ivsId,
+                channelName:item.name
+            };
+            self.channel=obj;
+            item.isClick=true;
+            if(self.showFeedBack){
+              self.inspectItemList.forEach(_item=>{
+                _item.checked=false;
+                _item.disabled=true;
+              });
+            }
+            self.showChannelBtns.forEach((_item,_index)=>{
+                if(_index!==index){
+                    _item.isClick=false;
+                }
+            });
+            if(!self.isEzviz){
+              self.curDeviceId=item.id;
+              if(self.playState){
+                self.stopAndRealTime();
+              }
+              else{
+                self.realTime();
               }
             }
-          });
-          self.$nextTick(() => {
-            self.getshowBtns(self.channelBtns);
-          });
-        }
-      } else {
-        self.inspectList = item.inspectList;
-        self.curSheetIndex = index;
-        self.getItemByGroup(item.inspectList[0], 0);
-      }
-      self.sheetName.forEach((_item, _index) => {
-        if (index == _index) {
-          _item.isClick = _item.isClick == false;
-        } else {
-          _item.isClick = false;
-        }
-      });
-    },
-    clickStore(item, index, _item, _index) {
-      const self = this;
-      if (!_item.hasInspect && _item.hasInspect != undefined) {
-        return false;
-      }
-      self.curTabIndex = index;
-      self.curTabItem = item;
-      self.curStoreIndex = _index;
-      self.curStoreItem = _item;
-      if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
-      if ((!self.isEzviz && self.editCount != 0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory != null)) {
-        self.changeStoreObj.dialogCosed = true;
-      } else {
-        if (_item.userId == null) {
-          self.noStoreUser.dialogCosed = true;
-        } else {
-          self.changeStore(item, index, _item, _index);
-        }
-      }
-    },
-    checkFull() {
-      var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
-      if (isFull === undefined) {
-        isFull = false;
-      }
-      return isFull;
-    },
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
-    },
-    /**
+            else{
+              self.curDeviceId=item.id;
+              if(self.$refs.ezvizVideo.playState){
+                self.$refs.ezvizVideo.stopRealTime();
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime();
+                })
+              }
+              else{
+                self.$nextTick(()=>{
+                  self.$refs.ezvizVideo.realTime();
+                });
+              }
+            }
+        },
+        clickItem(item,index){
+            console.log(item);
+            let self=this;
+            if(item.isIgnore){
+                return false;
+            }
+            if(self.isLoading || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed = true;
+              return false;
+            }
+            if(item.deviceId[0] !== self.curDeviceId){
+                    //Dash
+                if(!self.isEzviz){
+                    if(self.playState){
+                        self.stopAndRealTime();
+                    }
+                    else{
+                        self.realTime();
+                    }
+                }
+                else{
+                    //Ezviz
+                    if(self.$refs.ezvizVideo!==undefined){
+                        if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){
+                            self.$refs.ezvizVideo.stopRealTime();
+                            self.$nextTick(()=>{
+                            self.$refs.ezvizVideo.realTime();
+                            });
+                        }
+                        else{
+                            self.$nextTick(()=>{
+                            self.$refs.ezvizVideo.realTime();
+                            });
+                        }
+                    }
+                }
+                self.curDeviceId=item.deviceId[0];
+            }
+            self.sourceList=[];
+            self.sourceListLength = item.sourceList.length;
+            let obj={};
+            if(item.deviceId.length > 0){
+                let device=self.getDeviceById(item.deviceId);
+                if(device.length > 0){
+                    obj.id=device[0].id;
+                    obj.ivsId=device[0].ivsId;
+                    obj.channelName=device[0].name;
+                    obj.channelId=device[0].channelId;
+                    self.channel=obj;
+                    self.channelBtns = [];
+                    device.forEach(item=>{
+                      self.allChannelBtns.forEach(_item=>{
+                        if(item.id === _item.id){
+                          self.channelBtns.push(_item);
+                        }
+                      });
+                    });
+                    self.$nextTick(()=>{
+                      self.getshowBtns(self.channelBtns);
+                    });
+                    self.channelBtns.forEach((_item,_index)=>{
+                      if(self.channel!=null){
+                        if(_item.id === self.channel.id){
+                          _item.isClick=true;
+                        }
+                        else{
+                          _item.isClick=false;
+                        }
+                      }
+                    });
+                    item.checked=true;
+                    self.curItem=item;
+                    self.curItemIndex=index;
+                    self.curItemId=item.id;
+                    item.disabled=false;
+                    self.showError=false;
+                    self.showGuide=false;
+                }
+            }
+            else if(item.deviceId.length === 0){
+                self.noBindDeviceObj.dialogCosed=true;
+                return false;
+            }
+            self.inspectItemList.forEach((_item,_index)=>{
+                if(index!==_index){
+                    _item.checked=false;
+                    _item.disabled=true;
+                }
+            });
+            if(self.hasIgnoretemp.length!==0&&self.showIgnoreItem){
+                self.hasIgnoretemp.forEach((_item,_index)=>{
+                    if(index!==_index){
+                        _item.checked=false;
+                        _item.disabled=true;
+                    }else{
+                        _item.checked=true;
+                        _item.disabled=false; 
+                    }
+                });
+            }
+            self.sheetName.slice(0,self.sheetName.length-1).forEach((_item,_index)=>{
+                _item.inspectList.forEach((p_item,p_index)=>{
+                    p_item.items.forEach((itemDS,indexDS)=>{
+                        if(itemDS.id!==item.id){
+                            itemDS.checked=false;
+                            itemDS.disabled=true;
+                        }
+                    });
+                });
+            });
+        },
+        leaveDialog(){
+          let self=this;
+          self.leaveObj.dialogCosed=false;
+          self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+        },
+        cancelLeave(){
+          let self=this;
+          self.leaveObj.dialogCosed = false;
+        },
+        noAllInspectDialog(){
+            let self=this;
+            self.noAllInspectObj.dialogCosed=false;
+            let temp=[];
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            let inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
+            if(self.hasIgnoretemp.length===0){
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        temp.push(item);
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount===0){
+                                _item.isIgnore=true;
+                                _item.inspectInput = '';
+                                _item.sourceList = [];
+                                if(inspectSettings.checkItem2&&_item.type===0||inspectSettings.checkItem3&&_item.type===1){
+                                    _item.itemgetScore = _item.itemScore;
+                                }
+                            }
+                        });
+                    });
+                });
+            }else{
+                sheetName.forEach(s_item=>{
+                    let dealtemp=[];
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            self.hasIgnoretemp.forEach((h_item,h_index)=>{
+                                if(self.hasIgnoretemp[h_index].inputCount===0){
+                                    self.hasIgnoretemp[h_index].isIgnore=true;
+                                    self.hasIgnoretemp[h_index].inspectInput = '';
+                                    self.hasIgnoretemp[h_index].sourceList = [];
+                                    if(inspectSettings.checkItem2&&h_item.type===0||inspectSettings.checkItem3&&h_item.type===1){
+                                        h_item.itemgetScore = h_item.itemScore;
+                                    }
+                                }
+                                if(self.hasIgnoretemp[h_index].id===item.items[_index].id){
+                                    item.items[_index]=self.hasIgnoretemp[h_index];
+                                }
+                            });
+                            if(_item.inputCount!==0||_item.manualIgnore){
+                                let obj={};
+                                obj.dealCount=1;
+                                dealtemp.push(obj);
+                            }
+                        });
+                        temp.push(item);
+                    });
+                    s_item.dealCount=dealtemp.length;
+                });
+            }
+            let obj={
+                inspect:sheetName,
+                event:self.eventList,
+                store:self.store,
+                channel:self.channel
+            };
+            let hasIgnoretemp=[];
+            temp.forEach(item=>{
+                item.items.forEach(_item=>{
+                    if(_item.inputCount===0&&!_item.manualIgnore){
+                        _item['type']=item.type;
+                        hasIgnoretemp.push(_item);
+                    }
+                });
+            });
+            self.historyObj = {
+                storeList:self.tabList[Number(self.activeIndex)].storeList,
+                patrolstore:self.patrolstore,
+                sheetName:self.sheetName,
+                PatrolList:self.PatrolList,
+                activeIndex:self.activeIndex,
+                store:self.store,
+                hasIgnoretemp:hasIgnoretemp,
+                inspectItemList:self.inspectItemList,
+                eventList:self.eventList,
+                showChannelBtns:self.showChannelBtns,
+                allChannelBtns:self.allChannelBtns,
+                curSheetIndex:self.curSheetIndex,
+                curGroupIndex:self.curGroupIndex,
+                curItemIndex:self.curItemIndex
+            };
+            self.hasIgnoretemp=[];
+            self.$router.push({name:'confirmSum',params:{data:obj,rule:inspectSettings}});
+        },
+        canceldNoAllInspect(){
+            let self=this;
+            self.noAllInspectObj.dialogCosed=false;
+        },
+        allIgnoreDialog(){
+          let self=this;
+          self.allIgnoreObj.dialogCosed=false;
+        },
+        cancelAllIgnore(){
+          let self=this;
+          self.allIgnoreObj.dialogCosed=false;
+        },
+        videoLoadingDialog(){
+          let self=this;
+          self.videoLoadingObj.dialogCosed=false;
+        },
+        cancelVideoLoading(){
+          let self=this;
+          self.videoLoadingObj.dialogCosed=false;
+        },
+        async confirmSummary(){
+            let self=this;
+            let temp=[];
+            let count=0;
+            let dealCount=0;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            let inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
+            if(self.hasIgnoretemp.length===0){
+                sheetName.forEach(s_item=>{
+                    s_item.inspectList.forEach(item=>{
+                        temp.push(item);
+                        item.items.forEach((_item,_index)=>{
+                            if(_item.inputCount===0){
+                                _item.isIgnore=true;
+                                _item.inspectInput = '';
+                                _item.sourceList = [];
+                                if(inspectSettings.checkItem2&&_item.type===0||inspectSettings.checkItem3&&_item.type===1){
+                                    _item.itemgetScore = _item.itemScore;
+                                }
+                            }
+                        });
+                    });
+                    dealCount=dealCount+s_item.dealCount;
+                    count=count+s_item.count;
+                });
+            }else{
+                sheetName.forEach(s_item=>{
+                    let dealtemp=[];
+                    s_item.inspectList.forEach(item=>{
+                        item.items.forEach((_item,_index)=>{
+                            self.hasIgnoretemp.forEach((h_item,h_index)=>{
+                                if(self.hasIgnoretemp[h_index].inputCount===0){
+                                    self.hasIgnoretemp[h_index].isIgnore=true;
+                                    self.hasIgnoretemp[h_index].inspectInput = '';
+                                    self.hasIgnoretemp[h_index].sourceList = [];
+                                    if(inspectSettings.checkItem2&&h_item.type===0||inspectSettings.checkItem3&&h_item.type===1){
+                                        h_item.itemgetScore = h_item.itemScore;
+                                    }
+                                }
+                                if(self.hasIgnoretemp[h_index].id===item.items[_index].id){
+                                    item.items[_index]=self.hasIgnoretemp[h_index];
+                                }
+                            });
+                            if(_item.inputCount!==0||_item.manualIgnore){
+                                let obj={};
+                                obj.dealCount=1;
+                                dealtemp.push(obj);
+                            }
+                        });
+                        temp.push(item);
+                    });
+                    s_item.dealCount=dealtemp.length;
+                    dealCount=dealCount+s_item.dealCount;
+                    count=count+s_item.count;
+                });
+            }
+            if(dealCount<count){
+                self.noAllInspectObj.dialogCosed=true;
+                return false;
+            }
+            let hasIgnoretemp=[];
+            temp.forEach(item=>{
+                item.items.forEach(_item=>{
+                    if(_item.inputCount===0&&!_item.manualIgnore){
+                        _item['type']=item.type;
+                        hasIgnoretemp.push(_item);
+                    }
+                });
+            });
+            let obj={
+                inspect:sheetName,
+                event:self.eventList,
+                store:self.store,
+                channel:self.channel
+            };
+            self.historyObj = {
+                storeList:self.tabList[Number(self.activeIndex)].storeList,
+                patrolstore:self.patrolstore,
+                sheetName:self.sheetName,
+                PatrolList:self.PatrolList,
+                activeIndex:self.activeIndex,
+                store:self.store,
+                hasIgnoretemp:hasIgnoretemp,
+                inspectItemList:self.inspectItemList,
+                eventList:self.eventList,
+                showChannelBtns:self.showChannelBtns,
+                allChannelBtns:self.allChannelBtns,
+                curSheetIndex:self.curSheetIndex,
+                curGroupIndex:self.curGroupIndex,
+                curItemIndex:self.curItemIndex
+            };
+            self.hasIgnoretemp=[];
+            self.$router.push({name:'confirmSum',params:{data:obj,rule:inspectSettings}});
+        },
+        spreadContent(){
+            let self=this;
+            self.showSpread=true;
+        },
+        closeContent(){
+            let self=this;
+            self.showSpread=false;
+        },
+        async playVideo(url) {
+            let self=this;
+            console.log('playvideo enter!');
+            self.showModelContent=true;
+            self.playState=true;
+            var video = document.getElementById('previewVideo');
+            this.previewplayer = videojs(video);
+            this.previewplayer.src({src:url,type:this.protocal === 'HLS'? 'application/x-mpegURL' : 'application/dash+xml'});
+            this.previewplayer.play();
+        },
+        destroyVideo(){
+            let self=this;
+            var video = document.getElementById('previewVideo');
+            this.previewplayer = videojs(video);
+            self.previewplayer.dispose();
+        },
+        hiddenModel(){
+            //self.showModelContent=false;
+            //self.showInfoContent=false;
+        },
+        showModel(){
+            //self.showInfoContent=true;
+            // if(self.playState){
+            //     self.showModelContent=true;
+            // }
+        },
+        async realTime(){
+            let self=this;
+            self.showError = false;
+            // if(!self.videoAuthority){
+            //   self.showError = true;
+            //   self.errorText = self.$t('remotePatrol.videoLicense');
+            //   return false;
+            // }
+            if(self.channel==null){
+                return false;
+            }
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
+            self.isLoading = true;
+            let sessionId= await dashAPI.Online();
+            console.log(sessionId);
+            // if(!self.showVideo){
+            //     self.showVideo=true;
+            // }
+            if(sessionId == null){
+              self.isLoading = false;
+              return;
+            }
+            self.sessionId=sessionId;
+            const data = {
+                request: {
+                  method: 'connection',
+                  sessionID:self.sessionId,
+                  streamingProtocol:this.protocal,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            self.mpdurl = await dashAPI.RealTime(1,data); // 1 is start, 0 is stop
+            console.log(self.mpdurl);
+            if(self.mpdurl == null){
+              self.isLoading = false;
+              return;
+            }
+            if (self.mpdurl.ErrorCode===undefined&&self.mpdurl.length!==0) {
+                console.log(self.mpdurl);
+                self.playVideo(self.mpdurl);
+                self.editCount=self.editCount+1;
+                self.isPlayingFlag=1;
+                self.isLoading = false;
+                window.clearInterval(self.timerPlayReal);
+                self.timerPlayReal=window.setInterval(()=>{
+                  console.log(self.realTimeSpeed);
+                    self.realTimeSpeed=self.realTimeSpeed+1;
+                },1000);
+            }
+            else{
+                self.showGuide=false;
+                self.showError=true;
+                self.isLoading = false;
+                let errorCode=self.mpdurl.ErrorCode;
+                let errorText= util.getErrorText(errorCode);
+                self.errorText=errorText;
+                self.destroyVideo();
+            }
+        },
+        stopVideo(){
+            let self=this;
+            self.showModelContent=false;
+            self.playState=false;
+            var video = document.getElementById('previewVideo');
+            self.previewplayer = videojs(video);
+            self.previewplayer.pause();
+        },
+        async stopRealTimeVisPage(){
+            let self=this;
+            // if(!self.videoAuthority){
+            //   self.showError = true;
+            //   self.errorText = self.$t('remotePatrol.videoLicense');
+            //   return false;
+            // }
+            self.stopVideo();
+            const data = {
+                request: {
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            let ret=await dashAPI.RealTime(0,data);
+            await dashAPI.Offline(self.sessionId);
+        },
+        async stopRealTime(){
+            let self=this;
+            self.stopVideo();
+            const data = {
+                request: {
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            self.isPlayingFlag=-1;
+            let ret=await dashAPI.RealTime(0,data);
+            await dashAPI.Offline(self.sessionId);
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
+            //self.showVideo=false;
+            //self.destroyVideo();
+            //self.showGuide=true;
+        },
+       async stopAndRealTime(){
+            let self=this;
+           // if(!self.videoAuthority){
+           //   self.showError = true;
+           //   self.errorText = self.$t('remotePatrol.videoLicense');
+           //   return false;
+           // }
+            self.isLoading = true;
+            self.stopVideo();
+            const dataDis = {
+                request: {
+                  method: 'disconnection',
+                  sessionID: self.sessionId,
+                  IVSID:self.channel.ivsId,
+                  channel:JSON.stringify(self.channel.channelId),
+                  streamType:'SubStream'
+                }
+            };
+            window.clearInterval(self.timerPlayReal);
+            self.realTimeSpeed=0;
+            let url='';
+            let ret=await dashAPI.RealTime(0,dataDis);
+            await dashAPI.Offline(self.sessionId);
+            let sessionId= await dashAPI.Online();
+            self.sessionId=sessionId;
+           if(sessionId == null){
+             self.isLoading = false;
+             return;
+           }
+            let data=null;
+            data = {
+                request: {
+                    method: 'connection',
+                    sessionID: sessionId,
+                    streamingProtocol:this.protocal,
+                    IVSID:self.channel.ivsId,
+                    channel:JSON.stringify(self.channel.channelId),
+                    streamType:'SubStream'
+                }
+            };
+            url=await dashAPI.RealTime(1,data);
+
+            self.mpdurl = url;
+            console.log(self.mpdurl);
+             if(self.mpdurl == null){
+               self.isLoading = false;
+               return;
+             }
+            if (url.ErrorCode===undefined&&url.length!==0) {
+                self.isPlayingFlag=1;
+                self.playVideo(self.mpdurl);
+                self.realTimeSpeed=0;
+                self.isLoading = false;
+                self.timerPlayReal=window.setInterval(()=>{
+                    console.log(self.realTimeSpeed)
+                    self.realTimeSpeed=self.realTimeSpeed+1;
+                },1000);
+            }
+            else{
+                self.showGuide=false;
+                self.showError=true;
+                self.isLoading = false;
+                let errorCode=self.mpdurl.ErrorCode;
+                let errorText= util.getErrorText(errorCode);
+                self.errorText=errorText;
+                self.destroyVideo();
+            }
+        },
+        controlScreen(){
+            let self=this;
+            if(!self.fullScreen){
+                self.fullWindowScreen();
+                self.fullScreen=true;
+            }
+            else{
+                self.exitFullscreen();
+                self.fullScreen=false;
+            }
+        },
+        //Enter full screen
+        fullWindowScreen(...val) {
+            console.log(val);
+            var ele = document.getElementById('videoContent');
+            ele.style.width = '100%';
+            ele.style.height = '100%';
+            if (ele.requestFullscreen) {
+                ele.requestFullscreen();
+            }
+            else if (ele .mozRequestFullScreen) {
+                ele.mozRequestFullScreen();
+            }
+            else if (ele .webkitRequestFullScreen) {
+                ele.webkitRequestFullScreen();
+            }
+            else if(ele.msRequestFullscreen) {
+                ele.msRequestFullscreen();
+            }
+        },
+        //Exit full screen
+        exitFullscreen() {
+            var de = document;
+            var ele = document.getElementById('videoContent');
+            ele.style.width = 'auto';
+            ele.style.height = 'auto';
+            if (de.exitFullscreen) {
+                de.exitFullscreen();
+            }
+            else if (de.mozCancelFullScreen) {
+                de.mozCancelFullScreen();
+            }
+            else if (de.webkitCancelFullScreen) {
+                de.webkitCancelFullScreen();
+            }
+        },
+        gonggeScreen(){
+            let self=this;
+            self.showgongge=true;
+        },
+        recoverScreen(){
+            let self=this;
+            self.showgongge=false;
+        },
+        searchStore(){
+            let self=this;
+            console.log(self.tabList);
+            console.log(self.serachVale.trim());
+            let tempStoreList=self.tempStoreList;
+            let getStore2Temp=data=>{
+                let cityList=[];
+                data.forEach(item=>{
+                    if(cityList.map(x=>x.city).indexOf(item.city)===-1){
+                        let obj={
+                            city:item.city,
+                            province:item.province
+                        };
+                        cityList.push(obj);
+                    }
+                });
+                let storeListTemp=[];
+                for(let i=0;i<cityList.length;i++){
+                    let temp=[];
+                    let obj={};
+                    for(let j=0;j<data.length;j++){
+                        if(cityList[i].city===data[j].city){
+                            let obj={};
+                            if(self.store.storeId===data[j].storeId){
+                                obj.isActive=true;
+                            }
+                            else{
+                                obj.isActive=false;
+                            }
+                            obj.storeId=data[j].storeId;
+                            obj.name=data[j].name;
+                            obj.userId=data[j].userId;
+                            obj.city=data[j].city;
+                            obj.province=data[j].province;
+                            obj.favorite=data[j].favorite===undefined?true:data[j].favorite;
+                            obj.device=data[j].device;
+                            obj.hasInspect=data[j].hasInspect;
+                            if(data[j].authorizedInspect!==undefined&&data[j].authorizedInspect.length!==0){
+                                obj.authorizedInspect=data[j].authorizedInspect;
+                                obj.hasInspect=true;
+                            }
+                            else{
+                                obj.hasInspect=false;
+                            }
+                            temp.push(obj);
+                        }
+                    }
+                    obj.cityName=cityList[i].province+' '+cityList[i].city;
+                    obj.storeList=temp;
+                    storeListTemp.push(obj);
+                }
+                return storeListTemp;
+            };
+            let temp=[];
+            let tempArray=[];
+            let tempStore=[];
+            tempStoreList.forEach((_item,_index)=>{
+                _item.storeList.forEach((itemDs,indexDs)=>{
+                    temp.push(util.getPinyinList(itemDs.name));
+                    tempStore.push(itemDs);
+                });
+            });
+            console.log(temp);
+            for(var i=0;i<temp.length;i++){
+                if(temp[i][0].indexOf(self.serachVale.trim())!=-1||
+                    temp[i][1].indexOf(self.serachVale.trim())!=-1){
+                    tempArray.push(tempStore[i]);
+                }
+            }
+            self.tabList[2].storeList=getStore2Temp(tempArray);
+        },
+        changeStore(item,index,_item,_index){
+            let self=this;
+            self.patrolstore='';
+            self.curSheetIndex=0;
+            self.inspectItemList=[];
+            self.inspectList=[];
+            self.sheetName=[];
+            self.tempArr=[];
+            self.showChannelBtns=[];
+            self.patrolStoreName = _item.name;
+            self.PatrolList=[];
+            self.hasIgnoretemp=[];
+            self.$store.dispatch('setPatrolHistory',null);
+            self.isShowWarn=false;
+            self.notShowAlert=false;
+            self.showIgnoreItem=false;
+            self.hasSheet3=false;
+            _item.authorizedInspect.forEach(au_item=>{
+                if(au_item.mode===0){
+                    self.PatrolList.push(au_item);
+                }
+            });
+            _item.isActive=true;
+            self.showStoreUp=true;
+            if(!self.isEzviz){
+              self.editCount=0;
+              self.playState ? self.stopRealTime() : '';
+            }
+            else{
+              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : '';
+              if(self.$refs.ezvizVideo!==undefined){
+                 self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
+              }
+            }
+            self.showError=false;
+            self.curDeviceId=-1;
+            self.showFeedBack=false;
+            self.eventList=[];
+            self.showGuide=true;
+            let obj={};
+            obj.storeId=_item.storeId;
+            obj.storeName=_item.name;
+            obj.storeTitle=_item.name;
+            obj.storeUp=_item.favorite;
+            self.channel=null;
+            self.getChannelByStore(_item);
+            if(_item.favorite){
+                obj.storeUpTitle= this.$t('remotePatrol.stared');
+            }
+            else{
+                obj.storeUpTitle= this.$t('remotePatrol.clickToStar');
+            }
+            self.store=obj;
+            let curStoreId='';
+            let tabIndex=Number(self.activeIndex);
+            if(tabIndex!==2){
+                item.storeList.forEach((itemS,indexS)=>{
+                    if(_index!==indexS){
+                        itemS.isActive=false;
+                    }
+                });
+                curStoreId=_item.storeId;
+            }
+            else{
+                item.storeList.forEach((itemS,indexS)=>{
+                    itemS.storeList.forEach((itemChild,indexChild)=>{
+                        if(itemChild.storeId!==_item.storeId){
+                            itemChild.isActive=false;
+                        }
+                        else{
+                            curStoreId=itemChild.storeId;
+                        }
+                    });
+                });
+            }
+            let storeObj={
+                storeId:curStoreId
+            };
+            self.saveStoreObj(storeObj);
+        },
+        changeBrandDialog(){
+        },
+        changeStoreDialog(val){
+            let self=this;
+            self.changeStoreObj.dialogCosed=false;
+            if(self.curStoreItem.userId==null){
+                self.noStoreUser.dialogCosed=true;
+            }
+            else{
+                self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+            }
+        },
+        changeInspectDialog(){
+            let self = this;
+            self.changeInspectObj.dialogCosed=false;
+            self.changeInspectList(self.beforepatrolstore);
+            self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+        },
+        canceldChangeInspect(){
+            let self = this;
+            self.changeInspectObj.dialogCosed=false;
+        },
+        canceldChangeStore(){
+            let self=this;
+            self.changeStoreObj.dialogCosed=false;
+        },
+        canceldChangeBrand(){
+            let self=this;
+            self.changeBrandObj.dialogCosed=false;
+        },
+
+        lastBar(){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=self.channelBtns.length){
+                return false;
+            }
+            else{
+                let index=self.getChannelIndexById(self.showChannelBtns[0].id);
+                self.showChannelBtns.unshift(self.channelBtns[index-1]);
+                self.showChannelBtns.pop();
+                self.showChannelBtns.forEach((item,index)=>{
+                    if(item.id===self.channel.id){
+                        item.isClick=true;
+                    }
+                    else{
+                        item.isClick=false;
+                    }
+                })
+                if(self.showChannelBtns[0].id===self.channelBtns[0].id){
+                    self.hideLast=false;
+                }
+                if(self.showChannelBtns[count-1].id!==self.channelBtns[self.channelBtns.length-1].id){
+                    self.hideNext=true;
+                }
+            }
+        },
+        nextBar(){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=self.channelBtns.length){
+                return false;
+            }
+            else{
+                let index=self.getChannelIndexById(self.showChannelBtns[count-1].id);
+                self.showChannelBtns.push(self.channelBtns[index+1]);
+                self.showChannelBtns.shift();
+                self.showChannelBtns.forEach((item,index)=>{
+                    if(item.id===self.channel.id){
+                        item.isClick=true;
+                    }
+                    else{
+                        item.isClick=false;
+                    }
+                })
+                if(self.showChannelBtns[0].id!==self.channelBtns[0].id){
+                    self.hideLast=true;
+                }
+                if(self.showChannelBtns[count-1].id===self.channelBtns[self.channelBtns.length-1].id){
+                    self.hideNext=false;
+                }
+            }
+        },
+        getshowBtns(list){
+            let self=this;
+            let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
+            let detailsWidth=window.innerWidth/1440*15+60;
+            let count=parseInt(width/detailsWidth);
+            if(count>=list.length){
+                self.showChannelBtns=list;
+            }
+            else{
+                self.showChannelBtns=list.slice(0,count);
+            }
+            if(count<self.channelBtns.length){
+                self.hideNext=true;
+            }
+        },
+        getChannelByStore(storeItem){
+            let self=this;
+            let temp=[];
+            self.hideLast=false;
+            self.hideNext=false;
+            storeItem.device.forEach((item,index)=>{
+                let obj={};
+                obj.id=item.id;
+                obj.name=item.name;
+                obj.ivsId=item.ivsId;
+                obj.channelId=item.channelId;
+                obj.isonline=true;
+                obj.isClick=false;
+                temp.push(obj);
+            });
+            self.channelBtns=temp;
+            self.allChannelBtns = temp;
+        },
+        cancelNoUser(){
+            let self=this;
+            self.noStoreUser.dialogCosed=false;
+        },
+        noStoreUserDialog(){
+            let self=this;
+            self.noStoreUser.dialogCosed=false;
+            self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
+        },
+        changeInspect(val){
+            let self = this;
+            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
+            if( (!self.isEzviz && self.editCount!==0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) || (self.$store.getters.PatrolHistory!=null)){
+                self.changeInspectObj.dialogCosed=true;
+                self.beforepatrolstore=val;
+            }else{
+                self.changeInspectList(val);
+            }
+        },
+        changeInspectList(val){
+            let self = this;
+            if(!self.isEzviz){
+              self.editCount=0;
+              self.playState ? self.stopRealTime() : '';
+            }
+            else{
+              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : '';
+              if(self.$refs.ezvizVideo!==undefined){
+                 self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
+              }
+            }
+            self.isDisabled=false;
+            self.hasIgnoretemp=[];
+            self.tempArr=[];
+            self.$store.dispatch('setPatrolHistory',null);
+            self.$store.dispatch('setPatrolComment',null);
+            self.isShowWarn=false;
+            self.notShowAlert=false;
+            self.showIgnoreItem=false;
+            self.hasSheet3=false;
+            self.eventList=[];
+            self.showChannelBtns = [];
+            self.curSheetIndex=0;
+            self.PatrolList.forEach(item=>{
+                if(item.id===val){
+                    self.patrolstore=item.name;
+                }
+            });
+            let params={
+                storeId:self.store.storeId,
+                mode:0,
+                authorizedOnly:1,
+                tagName:self.patrolstore,
+                inspectId:val
+            };
+            self.inspectItemList=[];
+            checkOutInspectItemV3(params).then(res=>{
+                if(res.errCode===0){
+                    let data=res.data.groups;
+                    let inspectSettings = {};
+                    res.data.inspectSettings.forEach(item=>{
+                        switch(item.name){
+                            case 'includedInTotalScoreWithType1':
+                                inspectSettings.checkItem1 = item.value;
+                                break;
+                            case 'qualifiedForIgnoredWithType1':
+                                inspectSettings.checkItem2 = item.value;
+                                break;
+                            case 'qualifiedForIgnoredWithType2':
+                                inspectSettings.checkItem3 = item.value;
+                                break;
+                            case 'hundredMarkType':
+                                inspectSettings.radio = item.value.toString();
+                                break;
+                            case 'minScore':
+                                inspectSettings.minScore = item.value;
+                                break;
+                            case 'maxScore':
+                                inspectSettings.maxScore = item.value;
+                                break;
+                            case 'dangerousOnFailedItem':
+                                inspectSettings.checkItem4 = item.value;
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                    sessionStorage.setItem('inspectSettings',JSON.stringify(inspectSettings));
+                    let temp=[];
+                    data.forEach((item,index)=>{
+                        let obj={};
+                        obj.groupId=item.groupId;
+                        obj.mode=item.mode;
+                        obj.type=item.type;
+                        obj.groupName=item.groupName;
+                        obj.dealCount=0;
+                        obj.Effective=0;
+                        obj.isHover=false;
+                        if(index===0){
+                            obj.isClick=true;
+                        }
+                        else{
+                            obj.isClick=false;
+                        }
+                        let tempItems=[];
+                        item.items.forEach((_item,_index)=>{
+                            let itemObj={};
+                            itemObj.id=_item.id;
+                            itemObj.groupId=item.groupId;
+                            itemObj.subject=_item.subject;
+                            itemObj.description=_item.description;
+                            itemObj.itemScore=_item.itemScore;
+                            itemObj.itemScoreLength=_item.availableScores;
+                            itemObj.itemgetScore='--';
+                            itemObj.isQualified=false;
+                            itemObj.qualifiedScore=_item.qualifiedScore;
+                            itemObj.type=item.type;
+                            itemObj.itemScoreTitle='--';
+                            itemObj.deviceId=_item.deviceIds;
+                            itemObj.inspectInput='';
+                            itemObj.inputCount=0;
+                            itemObj.disabled=true;
+                            itemObj.checked=false;
+                            itemObj.isIgnore=false;
+                            itemObj.Ruletip=false;
+                            itemObj.manualIgnore=false;
+                            itemObj.sourceList=[];
+                            itemObj.scoreList=[{val:_item.itemScore,scoreTitle: this.$t('remotePatrol.pass'),isClick:false},
+                                                {val:-1,scoreTitle: this.$t('remotePatrol.failed'),isClick:false}];
+                            tempItems.push(itemObj);
+                        });
+                        obj.items=tempItems;
+                        temp.push(obj);
+                    });
+                    let te_temp=[];
+                    for(let i=0;i<3;i++){
+                        let Typeindex=temp.filter(x=>x.type===i);
+                        if(Typeindex.length!==0){
+                            let count=0,label='';
+                            Typeindex.forEach(item=>{
+                                count+=item.items.length;
+                            });
+                            if(Typeindex[0].type===0){
+                                label=self.$t('insSettingView.sheetpassfail');
+                            }
+                            if(Typeindex[0].type===1){
+                                label=self.$t('insSettingView.sheetscore');
+                            }
+                            if(Typeindex[0].type===2){
+                                label=self.$t('insSettingView.sheetother');
+                            }
+                            te_temp.push({inspectList:Typeindex,dealCount:0,Effective:0,count:count,isClick:false,label:label,type:Typeindex[0].type});
+                        }
+                    }
+                    self.sheetName=te_temp;
+                    self.sheetName[0].isClick=true;
+                    self.inspectList=self.sheetName[0].inspectList;
+                    let feedobj={ groupId:'feedBack',label: self.$t('remotePatrol.feedbacks'),isClick:false,};
+                    if(self.sheetName.length!==0){
+                        self.sheetName.push(feedobj);
+                        self.getItemByGroup(self.sheetName[0].inspectList[0],0);
+                    }
+                }
+            });
+        },
+        hasIgnoreItem(){
+            let self=this;
+            self.showIgnoreItem=true;
+            self.showFeedBack=false;
+            self.isShowWarn=false;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            let hasIgnoretemp=[];
+            sheetName.forEach(s_item=>{
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        if(_item.inputCount===0&&!_item.manualIgnore){
+                            hasIgnoretemp.push(_item);
+                        }else if(_item.inputCount!==0){
+                            self.tempArr.push(_item.type);
+                        }
+                    });
+                });
+            });
+            self.hasIgnoretemp=hasIgnoretemp;
+        },
+        backToPatrol(){
+            let self=this;
+            self.showIgnoreItem=false;
+            self.showFeedBack = self.sheetName[Number(self.sheetName.length-1)].isClick;
+            let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
+            let sheetName=self.sheetName.slice(0,indexFeed);
+            sheetName.forEach(s_item=>{
+                let dealtemp=[],notIgnoretemp=[];
+                s_item.inspectList.forEach(item=>{
+                    item.items.forEach((_item,_index)=>{
+                        self.hasIgnoretemp.forEach((h_item,h_index)=>{
+                            if(h_item.id===_item.id){
+                                item.items[_index]=self.hasIgnoretemp[h_index];
+                            }
+                        });
+                        if(item.items[_index].inputCount===1||item.items[_index].manualIgnore){
+                            let obj={};
+                            obj.dealCount=1;
+                            dealtemp.push(obj);
+                        }
+                        if(item.items[_index].inputCount===1){
+                            let obj={};
+                            obj.manualCount=1;
+                            notIgnoretemp.push(obj);
+                        }
+                        
+                    });
+                });
+                s_item.dealCount=dealtemp.length;
+                s_item.Effective=notIgnoretemp.length;
+                if(s_item.isClick&&!self.showFeedBack){
+                    self.inspectItemList=s_item.inspectList[self.curGroupIndex].items;
+                }
+            });
+            self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount===0);
+            self.notShowAlert = self.sheetName.every(x=>x.count===x.dealCount);
+        },
+        changeSheet(item,index){
+            let self=this;
+            if(item.groupId==='feedBack'){
+                let PatrolHistory = self.$store.getters.PatrolHistory;
+                if(PatrolHistory!=null){
+                    self.eventList = PatrolHistory.eventList;
+                    self.showFeedBackInfo = self.eventList.length===0;
+                    self.showFeedBack = true;
+                }else{
+                    self.showFeedBack=true;
+                    self.showFeedBackInfo = self.eventList.length===0;
+                    self.showGuide=false;
+                    console.log(self.channel);
+                    self.channelBtns = self.allChannelBtns.concat();
+                    self.channelBtns.forEach((_item,_index)=>{
+                        if(self.channel!=null){
+                            if(_item.id===self.channel.id){
+                                _item.isClick=true;
+                            }
+                            else{
+                                _item.isClick=false;
+                            }
+                        }
+                    });
+                    self.$nextTick(()=>{
+                        self.getshowBtns(self.channelBtns);
+                    });
+                }
+            }else{
+                self.inspectList=item.inspectList;
+                self.curSheetIndex=index;
+                self.getItemByGroup(item.inspectList[0],0);
+            }
+            self.sheetName.forEach((_item,_index)=>{
+                if(index===_index){
+                    _item.isClick= _item.isClick===false;
+                }else{
+                    _item.isClick=false;
+                }
+            });
+
+        },
+        clickStore(item,index,_item,_index){
+            let self=this;
+            if(!_item.hasInspect&&_item.hasInspect!==undefined){
+                return false;
+            }
+            self.curTabIndex=index;
+            self.curTabItem=item;
+            self.curStoreIndex=_index;
+            self.curStoreItem=_item;
+            if(self.isLoading || (self.isEzviz &&!self.showGuide && self.$refs.ezvizVideo.isLoading)){
+              self.videoLoadingObj.dialogCosed=true;
+              return false;
+            }
+            if( (!self.isEzviz && self.editCount!==0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) || (self.$store.getters.PatrolHistory!==null)){
+                self.changeStoreObj.dialogCosed=true;
+            }
+            else{
+                if(_item.userId==null){
+                    self.noStoreUser.dialogCosed=true;
+                }
+                else{
+                    self.changeStore(item,index,_item,_index);
+                }
+            }
+        },
+        checkFull(){
+          var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+          if(isFull === undefined)
+          {
+            isFull = false;
+          }
+          return isFull;
+        },
+        notify(msg,type,time) {
+            this.$message({
+                message: msg,
+                type: type,
+                duration:time
+            });
+        },
+      /**
        * handle ezviz video snapshot
        */
-    editEzvizCanvas(src) {
-      console.log(src);
-      const self = this;
-      self.sourceList = [];
-      const obj = {};
-      obj.mediaType = 2;
-      obj.src = src;
-      obj.height = '100px';
-      obj.width = '140px';
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg';
-      obj.file = util.base64ToBlob(obj.src);
-      obj.deviceId = self.channel.id;
-      self.sourceList.push(obj);
-      console.log(self.curItemId);
-      const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
-      if (tempId != null) {
-        if (!self.showIgnoreItem) {
-          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-        } else {
-          self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
-        }
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-      if (!self.showIgnoreItem) {
-        self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-      } else {
-        self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
-      }
-    },
-    /**
+      editEzvizCanvas(src){
+          console.log(src);
+          let self=this;
+          self.sourceList = [];
+          let obj={};
+          obj.mediaType=2;
+          obj.src= src;
+          obj.height='100px';
+          obj.width='140px';
+          obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg';
+          obj.file=util.base64ToBlob(obj.src);
+          obj.deviceId = self.channel.id;
+          self.sourceList.push(obj);
+          console.log(self.curItemId);
+          let tempId=self.getIndexById(self.curItemId);
+          console.log(tempId);
+          if(tempId!=null){
+              if(!self.showIgnoreItem){
+                  self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+              }else{
+                  self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
+              }
+          }
+          else{
+            self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+          }
+          if(!self.showIgnoreItem){
+              self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
+          }else{
+              self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
+          }
+        },
+      /**
        * handle ezviz video picture feedback
        * @param obj
        */
-    ezvizPictureFeedback(obj) {
-      console.log(obj);
-      const self = this;
-      let srcObj = null;
-      const src = obj.src;
-      srcObj = {
-        mediaType: 2,
-        src: src,
-        height: '100px',
-        width: '140px',
-        fileName: self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg',
-        file: util.base64ToBlob(src),
-        deviceId: self.channel.id
-      };
+      ezvizPictureFeedback(obj){
+        console.log(obj);
+        let self = this;
+        let srcObj=null;
+        let src = obj.src;
+        srcObj={
+          mediaType:2,
+          src:src,
+          height:'100px',
+          width:'140px',
+          fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
+          file:util.base64ToBlob(src),
+          deviceId: self.channel.id
+        };
 
-      const picObj = {
-        eventName: obj.eventName,
-        eventDes: obj.eventDes,
-        sourceObj: srcObj
-      };
-      self.eventList.push(picObj);
-      self.showFeedBackInfo = false;
-    },
-    /**
+        let picObj={
+          eventName:obj.eventName,
+          eventDes:obj.eventDes,
+          sourceObj:srcObj,
+        };
+        self.eventList.push(picObj);
+        self.showFeedBackInfo=false;
+      },
+      /**
        * handle ezviz video feedback
        * @param obj
        */
-    ezvizVideoFeedback(ezvizObj) {
-      console.log(ezvizObj);
-      const self = this;
-      const srcObj = {};
-      const tempSrcObj = ezvizObj.sourceObj;
-      srcObj.src = tempSrcObj.src;
-      srcObj.file = tempSrcObj.blob;
-      srcObj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      srcObj.mediaType = 1;
-      const videoObj = {
-        eventName: ezvizObj.eventName,
-        eventDes: ezvizObj.eventDes,
-        sourceObj: srcObj
-      };
-      self.eventList.push(videoObj);
-      self.showFeedBackInfo = false;
-    },
-    /**
+      ezvizVideoFeedback(ezvizObj){
+        console.log(ezvizObj);
+        let self = this;
+        let srcObj = {};
+        let tempSrcObj = ezvizObj.sourceObj;
+        srcObj.src = tempSrcObj.src;
+        srcObj.file = tempSrcObj.blob;
+        srcObj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+        srcObj.mediaType=1;
+        let videoObj={
+          eventName: ezvizObj.eventName,
+          eventDes: ezvizObj.eventDes,
+          sourceObj: srcObj,
+        };
+        self.eventList.push(videoObj);
+        self.showFeedBackInfo=false;
+      },
+      /**
        * handle ezviz record video
        */
-    confirmEzvizVideo(blob) {
-      const self = this;
-      const url = URL.createObjectURL(blob);
-      self.sourceList = [];
-      const obj = {};
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      obj.file = blob;
-      obj.mediaType = 1;
-      obj.src = url;
-      obj.height = '100px';
-      self.sourceList.push(obj);
-      console.log(self.curItemId);
-      const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
-      if (tempId != null) {
-        self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-    },
-    getVideoAuthority() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        getVideoAuthority().then(res => {
-          console.log(res);
-          resolve(res);
-        }).then(result => {
-          self.videoAuthority = result.data.authorized;
-        })
-          .catch(error => {
+      confirmEzvizVideo(blob){
+        let self = this;
+        let url=URL.createObjectURL(blob);
+        self.sourceList = [];
+        let obj={};
+        obj.fileName=self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.channel.channelId+'.webm';
+        obj.file=blob;
+        obj.mediaType=1;
+        obj.src=url;
+        obj.height='100px';
+        self.sourceList.push(obj);
+        console.log(self.curItemId);
+        let tempId=self.getIndexById(self.curItemId);
+        console.log(tempId);
+        if(tempId!=null){
+          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+        }
+        else{
+          self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
+        }
+      },
+      getVideoAuthority(){
+        let self = this;
+        return new Promise((resolve, reject)=>{
+          getVideoAuthority().then(res=>{
+            console.log(res);
+            resolve(res);
+          }).then(result=>{
+            self.videoAuthority = result.data.authorized;
+          })
+            .catch(error=>{
             console.log(error);
           });
-      });
-    },
-    itemDescriptionChanged(val, item) {
-      const self = this;
-      const content = filterString.all(val, 200);
-      console.log(content);
-      item.inspectInput = content;
-      const length = filterString.getContentLength(val);
-      if (length > 200) {
-        item.Ruletip = true;
-      } else {
-        item.Ruletip = false;
+        });
+      },
+      itemDescriptionChanged(val, item){
+        let content = filterString.all(val,200);
+        console.log(content);
+        item.inspectInput = content;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              item.Ruletip=true;
+          }else{
+              item.Ruletip=false;
+          }
+      },
+      eventNameChanged(val){
+        let self = this;
+        let content = filterString.standard(val,50);
+        console.log(content);
+        self.eventName = content;
+        self.showEventNameInfo = false;
+        let length = filterString.getContentLength(val);
+        if(length>50){
+              this.eventNameRuletip=true;
+          }else{
+              this.eventNameRuletip=false;
+          }
+      },
+      eventDesChanged(val){
+        let self = this;
+        let content = filterString.all(val,200);
+        console.log(content);
+        self.eventDes = content;
+        let length = filterString.getContentLength(val);
+        if(length>200){
+              this.eventDesRuletip=true;
+          }else{
+              this.eventDesRuletip=false;
+          }
+      },
+      notShowInputRuleTips(e,item){
+        if(e==='item'){
+            item.Ruletip=false;
+        }else if(e==='eventName'){
+            this.eventNameRuletip=false;
+        }else if(e==='eventDes'){
+            this.eventDesRuletip=false;
+        }
+      },
+      onPlayerWaiting(e){
+        console.log('video is loading');
+        this.showModelContent = false;
+      },
+      onPlayerPlaying(e){
+        console.log('video is playing');
+        this.showModelContent = true;
       }
     },
-    eventNameChanged(val) {
-      const self = this;
-      const content = filterString.standard(val, 50);
-      console.log(content);
-      self.eventName = content;
-      self.showEventNameInfo = false;
-      const length = filterString.getContentLength(val);
-      if (length > 50) {
-        this.eventNameRuletip = true;
-      } else {
-        this.eventNameRuletip = false;
-      }
-    },
-    eventDesChanged(val) {
-      const self = this;
-      const content = filterString.all(val, 200);
-      console.log(content);
-      self.eventDes = content;
-      const length = filterString.getContentLength(val);
-      if (length > 200) {
-        this.eventDesRuletip = true;
-      } else {
-        this.eventDesRuletip = false;
-      }
-    },
-    notShowInputRuleTips(e, item) {
-      if (e == 'item') {
-        item.Ruletip = false;
-      } else if (e == 'eventName') {
-        this.eventNameRuletip = false;
-      } else if (e == 'eventDes') {
-        this.eventDesRuletip = false;
-      }
-    },
-    onPlayerWaiting(e) {
-      console.log('video is loading');
-      this.showModelContent = false;
-    },
-    onPlayerPlaying(e) {
-      console.log('video is playing');
-      this.showModelContent = true;
+    beforeDestroy() {
+      let self = this;
+      window.removeEventListener('visibilitychange', self.visibilityChange);
+      window.onresize = null;
+      self.visibilityChange = null;
     }
-  }
 };
 </script>
 <style lang="scss" scoped>
@@ -4759,9 +4451,6 @@ export default {
                                 line-height: 50px;
                             }
                         }
-                        .Group-content-details{
-
-                        }
                     }
                     .item-content{
                         .feedbacks-content{
@@ -5059,9 +4748,6 @@ export default {
                             color: #fff;
                             border-radius: 13px;
                             cursor: pointer;
-                            .iconscore{
-                                //margin-left: 10px;
-                            }
                           .el-dropdown-link{
                             display: inline-block;
                             font-size: 12px;
@@ -5292,6 +4978,7 @@ export default {
 #storetab-content .el-tabs__nav-scroll{
     width: 100%;
 }
+
 
 #storetab-content.el-tabs__item{
     color:#7d8cad !important;
