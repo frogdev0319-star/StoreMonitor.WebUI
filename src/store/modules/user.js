@@ -492,6 +492,22 @@ const user={
             {
               path:'/routeinspection',
               name:'inspectSetting',
+              component:resolve=>require(['@/views/setting/routeInspection/SetRuleInspect'],resolve),
+              hidden:true,
+              meta:{
+                requireAuth: true,
+              },
+              children:[
+                {
+                  path:'/setroute',
+                  name:'setRule',
+                  component:resolve=>require(['@/views/setting/routeInspection/SetRuleInspect'],resolve)
+                }
+              ]
+            },
+            {
+              path:'/routeinspection',
+              name:'inspectSetting',
               component:resolve=>require(['@/views/setting/routeInspection/BindRuteInspect'],resolve),
               hidden:true,
               meta:{

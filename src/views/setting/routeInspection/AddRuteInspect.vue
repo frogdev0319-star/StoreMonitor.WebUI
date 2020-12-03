@@ -140,52 +140,60 @@
                <el-scrollbar style="height:100%;" id="el-menuscrollbar">
                <div class="nape-items" :style="{'max-height':varyDivHeight+'px'}">
                    <div class="nape-items-title" v-if="napeList.length!=0">
-                       <div class="nape-name-title" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
+                       <div class="nape-name-title" :style="activeSheetName=='1'?'flex:1.8;':'flex:3'">
                            <span>{{generateInsSettingLang('inspectName')}}</span>
                        </div>
-                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:3;':(activeSheetName=='2'?'flex:4;':'flex:3.3;')">
-                           <span :style="activeSheetName=='1'?'left:5%;':(activeSheetName=='2'?'left:2%;':'')">{{generateInsSettingLang('inspectionDescp')}}</span>
+                       <div class="nape-dep-title" :style="activeSheetName=='1'?'flex:2.6;':'flex:4;'">
+                           <span :style="activeSheetName=='1'?'left:5%;':'left:2%;'">{{generateInsSettingLang('inspectionDescp')}}</span>
                        </div>
                        <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;">
                            <span style="position:relative;;left:8%;">{{generateInsSettingLang('sheetscore0')}}</span>
                        </div>
+                       <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;">
+                           <span>{{generateInsSettingLang('sheetscore3')}}</span>
+                       </div>
                        <div class="nape-score0-title" v-if="activeSheetName=='1'" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
                            <span>{{generateInsSettingLang('sheetscore1')}}</span>
                        </div>
-                       <div class="nape-score1-title" v-if="activeSheetName=='2'" style="flex:1;">
-                           <span>{{generateInsSettingLang('sheetscore2')}}</span>
+                       <div class="nape-score1-title" v-if="activeSheetName!='1'" style="flex:1;">
+                           <span style="margin-left:20px;">{{generateInsSettingLang('score')}}</span>
                        </div>
                        <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
-                           <span>{{generateInsSettingLang('operation')}}</span>
+                           <span :style="activeSheetName=='1'?'margin-left:-20px;':'margin-left:10px;'">{{generateInsSettingLang('operation')}}</span>
                        </div>
                    </div>
                    <div class="nape-items-data"
                    v-for="(item,index) in napeList"
                    :key="index" @click="clickItem(index,item)" :class="!item.isClick?'noraml-color':'active-color'">
-                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
+                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:1.9;':'flex:3.4;'">
                             <el-checkbox v-model="item.checked" class="item-checkbox"></el-checkbox>
                             <span class="nape-name" v-if="!item.isClick">{{item.napeNameShow}}</span>
                             <el-input size="mini" v-model="item.napeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" v-if="item.isClick" @input="(val)=>napeNameChange(val, item)"></el-input>
                        </div>
-                       <div class="nape-dep-data" :style="activeSheetName=='1'?'flex:2.7;':(activeSheetName=='2'?'flex:4;':'flex:3;margin-right:40px;')">
+                       <div class="nape-dep-data" :style="activeSheetName=='1'?'flex:2;':'flex:4;'">
                            <span class="nape-dep" v-if="!item.isClick">{{item.napeDep}}</span>
                            <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="item.napeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" v-if="item.isClick" @input="(val)=>napeDepChange(val, item)"></el-input>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_1}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
-                           <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="item.Score_1" @change="selectFullScore">
-                                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+                           <span style="margin-left:55px;" v-if="!item.isClick">{{item.Score_1}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
+                           <el-select size="mini" class="FullScore-input" v-if="item.isClick" v-model="item.Score_1" @change="selectFullScore($event,item)">
+                                <el-option v-for="item in fullScoreTemp" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
+                       <div class="nape-scores-handle" v-if="activeSheetName=='1'" :style="item.isClick?'max-width:110px;':'flex:1;margin-left:35px;'">
+                           <span style="max-width:110px;word-wrap:break-word;" v-if="!item.isClick">{{item.availableScoreStr}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
+                           <region-multi-select v-if="item.isClick" :options="availableScores" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
+                                :inputSize="`mini`" :selected="item.Score_4" :all="$t('reportView.all')" @changeInput="changeScore4($event,item)"></region-multi-select>
+                       </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <span style="margin-left:40px;" v-if="!item.isClick">{{item.Score_2}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
+                           <span style="margin-left:35px;" v-if="!item.isClick">{{item.Score_2}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
                            <el-select size="mini" class="critical-input" v-if="item.isClick" v-model="item.Score_2">
                                 <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
-                       <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:1;">
+                       <div class="nape-scores-handle" v-if="activeSheetName!='1'" style="flex:1;margin-left:60px;">
                            <span v-if="!item.isClick">{{item.Score_3}}{{lang!='en'?$t('remotePatrol.scorecount'):''}}</span>
-                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3" @input="editinputChange(item,index)"></el-input>
+                           <el-input size="mini" class="Itemscores-input" v-if="item.isClick" v-model="item.Score_3" @input="editinputChange(item,index,activeSheetName)"></el-input>
                        </div>
                        <div class="nape-items-handle" v-if="!item.isClick" style="flex:1;">
                            <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"  @click="handleEdit(index,item)"></i>
@@ -242,27 +250,31 @@
                         </div>
                     </el-dialog>
                     <div class="nape-items-data" v-if="showAddNape"  :class="'active-color'">
-                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:2;':(activeSheetName=='2'?'flex:3;':'flex:2;')">
+                       <div class="nape-name-data" :style="activeSheetName=='1'?'flex:1.8;':'flex:3;'">
                             <el-checkbox v-model="newNapeChecked" class="item-checkbox"></el-checkbox>
                             <el-input size="mini" v-model="newNapeName" class="nape-input" :placeholder="generateInsSettingLang('enterItemName')" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"></el-input>
                             <span class="rules" v-if="enterListNameRuletip">{{generateInsSettingLang('enterListNameRuletip')}}</span>
                        </div>
-                       <div class="nape-dep-data" :style="activeSheetName=='1'?'flex:2.7;':(activeSheetName=='2'?'flex:4;':'flex:3;margin-right:40px;')">
+                       <div class="nape-dep-data" :style="activeSheetName=='1'?'flex:2.3;':'flex:4;'">
                            <el-input type="textarea"  resize='none' :autosize="{ minRows: 1}" size="mini" v-model="newNapeDep" class="nape-input" :placeholder="generateInsSettingLang('description')" @input="(val)=>napeDepChange(val, {})" @blur="notShowInputRuleTips('description')"></el-input>
                            <span class="rules" v-if="descriptionRuletip">{{generateInsSettingLang('descriptionRuletip')}}</span>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
-                           <el-select size="mini" class="FullScore-input" v-model="newScore" @change="selectFullScore">
-                                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+                           <el-select size="mini" class="FullScore-input" v-model="newScore" @change="selectFullScore($event)">
+                                <el-option v-for="item in 50" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
+                       </div>
+                       <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;max-width:110px;">
+                           <region-multi-select :options="availableScores" :placeholder="generateInsSettingLang('selectPost')" :disabled="false"
+                                :inputSize="`mini`" :selected="selectAvailable" :all="$t('reportView.all')" @changeInput="changeAvailable(arguments)"></region-multi-select>
                        </div>
                        <div class="nape-scores-handle" v-if="activeSheetName=='1'" style="flex:1;">
                            <el-select size="mini" class="critical-input" v-model="newCritical">
                                 <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                        </div>
-                       <div class="nape-scores-handle" v-if="activeSheetName=='2'" style="flex:2;">
-                           <el-input size="mini" class="Itemscores-input" v-model="newAddScore" @input="inputChange"></el-input>
+                       <div class="nape-scores-handle" v-if="activeSheetName!='1'" style="flex:1;">
+                           <el-input size="mini" class="Itemscores-input" v-model="newAddScore" @input="inputChange($event,activeSheetName)"></el-input>
                        </div>
                        <div class="iconcontent" style="flex:1;">
                             <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
@@ -300,6 +312,9 @@ export default {
             newScore:10,
             newCritical:1,
             newAddScore:0,
+            fullScoreTemp:[],
+            availableScores:[],
+            selectAvailable:[],
             firstLoad:true,
             groupTitle: this.$t('insSettingView.category'),
             showFailInfo:false,
@@ -341,7 +356,7 @@ export default {
             tableData:[],
             noData:'',
             groupIds:[],
-            ScoreList:[1,2,3,4,5,6,7,8,9,10],
+            ScoreList:[],
             Score_1:'',
             Score_2:'',
             Score_3:'',
@@ -659,6 +674,21 @@ export default {
             let self = this;
             self.ModelPost = Array.from(val)[0]; // 选中的职务
         },
+        changeScore4(val,item){
+            if(val[0]==='-1'){
+                item.Score_4 = val.slice(1);
+            }else{
+                item.Score_4 = val;
+            }
+        },
+        changeAvailable(val){
+            let self = this;
+            if(val[0]==='-1'){
+                self.selectAvailable = val.slice(1);
+            }else{
+                self.selectAvailable = val;
+            }
+        },
         changeAddSelect(val){
             let self = this;
             self.ModelAddPost = Array.from(val)[0]; // 选中的职务
@@ -874,13 +904,29 @@ export default {
         addNape(){
             let self=this;
             self.showAddNape=!self.showAddNape;
-            self.newAddScore=0
+            self.newAddScore=0;
             self.napeList.forEach((_item,_index)=>{
                 _item.isClick=false;
-            })
-            self.newScore=10
-            self.newCritical=1
-            self.ScoreList=[1,2,3,4,5,6,7,8,9,10]
+            });
+            self.newScore=50;
+            self.newCritical=1;
+            let arr=[];
+            for(var i=0;i<=50;i++){
+                arr.push(i);
+            }
+            self.ScoreList=arr.slice(0,i+1);
+            self.selectAvailable = arr.slice(0,i+1);
+            let available = arr.slice(0,i+1);
+            let availableScores=[];
+            available.forEach(item=>{
+                let obj={
+                    label:item,
+                    value:item,
+                    disabled:false
+                };
+                availableScores.push(obj);
+            });
+            self.availableScores = availableScores;
         },
         deleteNape(item){
             let self=this;
@@ -909,12 +955,13 @@ export default {
             switch(self.deleteItemFlag){
                 case 'S': idArr.push(self.curItemId);break;
                 case 'G':
-                self.napeList.forEach(item=>{
-                    if(item.checked){
-                        idArr.push(item.id);
-                    }
-                });break;
-                deafult:
+                    self.napeList.forEach(item=>{
+                        if(item.checked){
+                            idArr.push(item.id);
+                        }
+                    });
+                    break;
+                default:
                 console.log("error Flag!");break;
             }
             let errMsg=await self.deleteItemData(idArr);
@@ -945,20 +992,41 @@ export default {
             //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
             //     return false;
             // }
-            let itemScore=0,qualifiedScore=0
+            let itemScore=0,qualifiedScore=0,selectAvailable=[];
             if(self.activeSheetName=='0'){
-                itemScore=10
-                qualifiedScore=null
+                if(item.Score_3>50||item.Score_3<1){
+                    self.notify(self.$t('insSettingView.sheetscoreA'),'warning',3000);
+                    return false;
+                }else{
+                    itemScore=item.Score_3;
+                    qualifiedScore=null;
+                }
             }else if(self.activeSheetName=='1'){
-                itemScore=item.Score_1
-                qualifiedScore=item.Score_2
+                itemScore=item.Score_1;
+                qualifiedScore=item.Score_2;
+                selectAvailable = item.Score_4[0]==='-1' ? item.Score_4.slice(1) : item.Score_4;
+                let availableScores=[];
+                for(let i=0;i<item.Score_1+1;i++){
+                    availableScores.push(i);
+                }
+                selectAvailable.length===0 ? selectAvailable = availableScores : null;
+                selectAvailable.sort(function(a,b){
+                    return a - b;
+                });
+                if(qualifiedScore>itemScore){
+                    self.notify(self.$t('insSettingView.excelMinScoreType'),'warning',3000);
+                    return false;
+                }else if(selectAvailable[selectAvailable.length-1]>itemScore){
+                    self.notify(self.$t('insSettingView.excelScoreItemType'),'warning',3000);
+                    return false;
+                }
             }else if(self.activeSheetName=='2'){
                 if(item.Score_3>100||item.Score_3<-100){
                     self.notify(self.$t('insSettingView.sheetscore2'),'warning',3000);
                     return false;
                 }else{
-                    itemScore=item.Score_3
-                    qualifiedScore=null
+                    itemScore=item.Score_3;
+                    qualifiedScore=null;
                 }
             }
             let obj={
@@ -966,8 +1034,9 @@ export default {
                 subject:item.napeName,
                 description:item.napeDep,
                 itemScore:itemScore,
-                qualifiedScore:qualifiedScore
-            }
+                qualifiedScore:qualifiedScore,
+                availableScores:selectAvailable
+            };
             temp.push(obj);
             let params={
                 "items":temp
@@ -1007,32 +1076,54 @@ export default {
             //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
             //     return false;
             // }
-            let itemScore=0,qualifiedScore=0
+            let itemScore=0,qualifiedScore=0,selectAvailable=[];
             if(self.activeSheetName=='0'){
-                itemScore=10
-                qualifiedScore=null
+                if(self.newAddScore>50||self.newAddScore<1){
+                    self.notify(self.$t('insSettingView.sheetscoreA'),'warning',3000);
+                    return false;
+                }else{
+                    itemScore=self.newAddScore;
+                    qualifiedScore=null;
+                }
             }else if(self.activeSheetName=='1'){
                 if(self.newCritical>self.newScore){
                     self.notify(self.$t('insSettingView.excelMinScoreType'),'warning',3000);
                     return false;
                 }else{
-                    itemScore=self.newScore
-                    qualifiedScore=self.newCritical
+                    itemScore=self.newScore;
+                    qualifiedScore=self.newCritical;
+                    selectAvailable = self.selectAvailable[0]==='-1' ? self.selectAvailable.slice(1) : self.selectAvailable;
+                    let availableScores=[];
+                    for(let i=0;i<self.newScore+1;i++){
+                        availableScores.push(i);
+                    }
+                    selectAvailable[0].length===0 ? selectAvailable = availableScores : null;
+                    selectAvailable.sort(function(a,b){
+                        return a - b;
+                    });
+                    if(qualifiedScore>itemScore){
+                        self.notify(self.$t('insSettingView.excelMinScoreType'),'warning',3000);
+                        return false;
+                    }else if(selectAvailable[selectAvailable.length-1]>itemScore){
+                        self.notify(self.$t('insSettingView.excelScoreItemType'),'warning',3000);
+                        return false;
+                    }
                 }
             }else if(self.activeSheetName=='2'){
                 if(self.newAddScore>100||self.newAddScore<-100){
                     self.notify(self.$t('insSettingView.sheetscore2'),'warning',3000);
                     return false;
                 }else{
-                    itemScore=self.newAddScore
-                    qualifiedScore=null
+                    itemScore=self.newAddScore;
+                    qualifiedScore=null;
                 }
             }
             let objItem={
                 subject:self.newNapeName.trim(),
                 description:self.newNapeDep.trim(),
                 itemScore:itemScore,
-                qualifiedScore:qualifiedScore
+                qualifiedScore:qualifiedScore,
+                availableScores:selectAvailable
             };
             temp.push(objItem);
             let obj={
@@ -1077,13 +1168,15 @@ export default {
                         }
                         tempParams.push(obj);
                     })
-                    let paramsApply={
-                        storeList:tempParams
-                    };
-                    inpectRESTful.applyItemInspectItem(paramsApply).then(resApply=>{
-                        let res=resApply;
-                        console.log(res);
-                    })
+                    if(tempParams.length!==0){
+                        let paramsApply={
+                            storeList:tempParams
+                        };
+                        inpectRESTful.applyItemInspectItem(paramsApply).then(resApply=>{
+                            let res=resApply;
+                            console.log(res);
+                        })
+                    }
                     self.notify(self.$t('insSettingView.addSuss'),'success',3000);
                     setTimeout(function(){
                         console.log(self.tabName);
@@ -1106,9 +1199,23 @@ export default {
             self.napeDepTemp=item.napeDep;
             item.isClick=true;
             self.showAddNape=false;
-            self.ScoreList=[1,2,3,4,5,6,7,8,9,10]
-            // self.ScoreList=arr.slice(0,item.Score_2)
-            //item.napeName=item.napeNameShow.slice(indexOf(',')+1);
+            let arr=[];
+            for(var i=0;i<=50;i++){
+                arr.push(i);
+            }
+            self.fullScoreTemp=arr.slice(1,i+1);
+            self.ScoreList=arr.slice(0,item.Score_1+1);
+            let available = arr.slice(0,item.Score_1+1);
+            let availableScores=[];
+            available.forEach(item=>{
+                let obj={
+                    label:item,
+                    value:item,
+                    disabled:false
+                };
+                availableScores.push(obj);
+            });
+            self.availableScores = availableScores;
             self.napeList.forEach((_item,_index)=>{
                 if(index!=_index){
                     _item.isClick=false;
@@ -1272,6 +1379,16 @@ export default {
             let self=this;
             let temp=[];
             item.itemData.forEach((_item,index)=>{
+                let availableScores = [];
+                for(let i=0;i<=_item.itemScore;i++){
+                    let scoreObj={
+                        label:i,
+                        value:i,
+                        disabled:false
+                    };
+                    availableScores.push(scoreObj);
+                }
+                self.availableScores = availableScores;
                 let obj={
                     id:_item.id,
                     napeName:_item.subject,
@@ -1280,16 +1397,34 @@ export default {
                     Score_1:_item.itemScore,
                     Score_2:_item.qualifiedScore,
                     Score_3:_item.itemScore,
+                    Score_4:_item.availableScores,
+                    availableScoreStr:_item.availableScores.toString(),
                     isClick:false,
                     checked: false
-                }
+                };
                 temp.push(obj);
-            })
+            });
             self.napeList=temp;
         },
 
         initData(){
             let self=this;
+            let arr=[];
+            for(var i=0;i<=50;i++){
+                arr.push(i);
+            }
+            self.ScoreList=arr.slice(0,i+1);
+            let available = arr.slice(0,i+1);
+            let availableScores=[];
+            available.forEach(item=>{
+                let obj={
+                    label:item,
+                    value:item,
+                    disabled:false
+                };
+                availableScores.push(obj);
+            });
+            self.availableScores = availableScores;
             self.tabName=sessionStorage.getItem('GroupName');
             self.refreshData(0);
             self.getBindStoreList();
@@ -1318,25 +1453,44 @@ export default {
               this.enterNameRuletip=false
           }
         },
-        inputChange(val){
-            let self=this
-            if(val.indexOf('-')!=-1){
-                self.newAddScore = '-'+val.replace(/[^\d]/g, '')
+        inputChange(val,TabIndex){
+            let self=this;
+            if(val.indexOf('-')!=-1&&TabIndex==='2'){
+                self.newAddScore = '-'+val.replace(/[^\d]/g, '');
             }else{
-                self.newAddScore = val.replace(/[^\d]/g, '')
+                self.newAddScore = val.replace(/[^\d]/g, '');
             }
         },
-        editinputChange(item,index){
-            if(item.Score_3.indexOf('-')!=-1){
+        editinputChange(item,index,TabIndex){
+            if(item.Score_3.indexOf('-')!=-1&&TabIndex==='2'){
                 item.Score_3 = '-'+item.Score_3.replace(/[^\d]/g, '')
             }else{
                 item.Score_3 = item.Score_3.replace(/[^\d]/g, '')
             }
         },
-        selectFullScore(val){
-            let self = this
-            let arr=[1,2,3,4,5,6,7,8,9,10]
-            self.ScoreList = arr.slice(0,val)
+        selectFullScore(val,item){
+            let self = this;
+            let arr=[];
+            for(var i=0;i<=50;i++){
+                arr.push(i);
+            }
+            self.ScoreList = arr.slice(0,val+1);
+            let available = arr.slice(0,val+1);
+                let availableScores=[];
+                available.forEach(item=>{
+                    let obj={
+                        label:item,
+                        value:item,
+                        disabled:false
+                    };
+                    availableScores.push(obj);
+                });
+                self.availableScores = availableScores;
+            if(item!==undefined){
+                item.Score_4 = arr.slice(0,val+1);
+            }else{
+                self.selectAvailable = arr.slice(0,val+1);
+            }
         },
         napeNameChange(val, item){
           let self = this;
@@ -1848,7 +2002,7 @@ export default {
                         margin-right: 0px;
                     }
                     .nape-input{
-                        width:calc(220/1920*100vw);
+                        width:calc(200/1920*100vw);
                         min-width:136px;
                         float: left;
                         @include point(margin-left,10);
@@ -1883,7 +2037,7 @@ export default {
                         text-align: left;
                     }
                     .nape-input{
-                        width:calc(250/1920*100vw);
+                        width:calc(200/1920*100vw);
                         min-width:215px;
                         float: left;
                         @include point(margin-left,10);
@@ -1912,15 +2066,15 @@ export default {
                         text-align: left;
                     }
                     .FullScore-input /deep/ .el-input{
-                        width:68px;
+                        width:65px;
                         margin: 0 auto;
                     }
                     .critical-input /deep/ .el-input{
-                        width:68px;
+                        width:65px;
                         margin: 0 auto;
                     }
                     .Itemscores-input{
-                        width:68px;
+                        width:65px;
                         margin: 0 auto;
                     }
                 }
@@ -1933,6 +2087,15 @@ export default {
                       font-size: calc(24/1920*100vw);
                       color: #7d8cad;
                     }
+                }
+                .nape-scores-handle /deep/ .el-select.el-select--mini{
+                    width:110px !important;
+                    height:45px !important;
+                    background-color: #fee4e7 !important;
+                    color:#424151 !important;
+                }
+                .nape-scores-handle /deep/ .el-province .el-input--mini .el-input__icon{
+                    line-height: 0;
                 }
                 .iconcontent{
                     @include point(margin-left,25);
@@ -1989,6 +2152,9 @@ export default {
     width:190px !important;
     height:45px !important;
     color:#424151 !important;
+}
+.nape-scores-handle .content{
+    width:110px !important;
 }
 .el-dialog__body{
     padding: 0px !important;

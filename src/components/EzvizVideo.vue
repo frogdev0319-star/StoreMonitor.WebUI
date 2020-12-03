@@ -298,7 +298,8 @@
   import {getCookie} from "../common/auth";
   import RecordRTC from '../../static/RecordRTC.js'
   import filterString from "../common/filterString";
-  import Environment from '../common/environment'
+  import Environment from '../common/environment';
+  import html2canvas from 'html2canvas';
 
   export default {
     name: "EzvizVideo",

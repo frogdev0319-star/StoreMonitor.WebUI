@@ -1,12 +1,12 @@
 // 导出页面为PDF格式
-import html2Canvas from 'html2canvas'
+import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 export default{
   install (Vue, options) {
     Vue.prototype.getPdf = function () {
       sessionStorage.setItem('startPDF','start');
       var title = this.htmlTitle  //DPF标题
-      html2Canvas(document.querySelector('#pdfDom'), {
+      html2canvas(document.querySelector('#pdfDom'), {
                 allowTaint: true,
 		        taintTest: false,
 		        useCORS: true,

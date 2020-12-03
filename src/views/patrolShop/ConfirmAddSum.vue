@@ -158,7 +158,7 @@
         </el-col>
         <el-dialog :visible.sync="uploadProgress" width="510px" top="35vh" left="40vh" class="AddSumupLoad" :close-on-click-modal="false">
             <div class="body-content">
-                <p>正在上传中</p>
+                <p>{{$t('remotePatrol.uploading')}}</p>
                 <p style="margin-bottom:15px;">共<span>{{totalnumOfPic}}</span>个附件，已上传<span>{{uploadingnumOfPic}}</span>个</p>
                 <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"></el-progress>
             </div>
@@ -534,111 +534,166 @@ export default {
             let self=this;
             let PatrolComment = self.$store.getters.PatrolComment;
             if(PatrolComment!=null){
-                self.suggest=PatrolComment
+                self.suggest=PatrolComment;
             }
             let routeData=self.$route.params.data;
+            let inspectSettings = self.$route.params.rule;
             let inspect=routeData.inspect;
             let eventList=routeData.event;
             let store=routeData.store;
-            let channel=routeData.channel;
             self.store=store;
             self.inspectList=routeData.inspect;
             self.eventList=routeData.event;
-            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[],dealType=[]
-            let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,allpassfailCount=0
+            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[],dealType=[];
+            let getscoreTotal=0,CurAddIgnoreItemScore=0,allscoreTotal=0,allAddIgnoreScore=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,getpassfailIgnoreTotal=0,allpassfailCount=0,PassFileTotalScore=0,PassFileTotalScoreX=0,PassFileXS=0,PassFileTotalScoreSystem=0,ScoreTotalScoreSystem=0,OtherTotalScoreSystem=0;
             inspect.forEach(p_item=>{
                 if(p_item.dealCount!=0){
-                    dealType.push(p_item.type)
+                    dealType.push(p_item.type);
                 }
-            })
-            let Tab0Status=false
-            let inspectPic = 0
+            });
+            let Tab0Status=false;
+            let inspectPic = 0;
             inspect.forEach(p_item=>{
-                var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
+                var CurItemgetScore=0,totalScore0=0,totalScoreX=0,CurSc=0,CurNotIgnoreTotalscore=0,CurAddIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0,CurPassfailIgnore=0,PassFileX=0,PassFileTS=0,ScoreTS=0,OtherTS=0;
                 p_item.inspectList.forEach(item=>{
-                    let QualifiedArr=[],UnqualifiedArr=[],IgnoredArr=[]
-                    let totalScore=0,totalGetscore=0,notIgnoreTotalscore=0
+                    let QualifiedArr=[],UnqualifiedArr=[],IgnoredArr=[];
+                    let totalScore=0,totalGetscore=0,notIgnoreTotalscore=0,addNotIgnoreTotalscoreA=0,addIgnoreScoreA=0;
                     item.items.forEach(s_item=>{
                         if(s_item.isIgnore){
-                            IgnoredArr.push(s_item)
-                            ignoreTemp.push(s_item)
+                            IgnoredArr.push(s_item);
+                            ignoreTemp.push(s_item);
                         }else{
                             if((p_item.type==0||p_item.type==2)&&!s_item.isQualified){
-                                UnqualifiedArr.push(s_item)
-                                UnqualifiedTemp.push(s_item)
+                                UnqualifiedArr.push(s_item);
+                                UnqualifiedTemp.push(s_item);
                             }else if((p_item.type==0||p_item.type==2)&&s_item.isQualified){
-                                QualifiedArr.push(s_item)
+                                QualifiedArr.push(s_item);
                             }else if(p_item.type==1&&(s_item.itemgetScore<s_item.qualifiedScore)){
-                                UnqualifiedTemp.push(s_item)
+                                UnqualifiedTemp.push(s_item);
                             }
-                            if((p_item.type==1||p_item.type==2)&&s_item.itemgetScore!='--'){
-                                totalGetscore+=s_item.itemgetScore
-                                notIgnoreTotalscore+=s_item.itemScore
+                            if((p_item.type===1||p_item.type==2)&&s_item.itemgetScore!=='--'){
+                                totalGetscore+=s_item.itemgetScore;
+                                notIgnoreTotalscore+=s_item.itemScore;
                             }
                         }
-                        if(p_item.type==1){
-                            totalScore+=s_item.itemScore
+                        if(p_item.type===1||p_item.type==2&&s_item.itemgetScore!=='--'){//1的所有与2的非忽略项
+                            addIgnoreScoreA+=s_item.itemgetScore;
+                            addNotIgnoreTotalscoreA+=s_item.itemScore;
                         }
-                        inspectPic+=s_item.sourceList.length
-                    })
-                    item['numOfQualified']=QualifiedArr.length
-                    item['numOfUnqualified']=UnqualifiedArr.length
-                    item['numIgnore']=IgnoredArr.length
-                    item['itemScore']=totalScore
-                    item['itemgetScore']=totalGetscore
-                    item['notIgnoreTotalscore']=notIgnoreTotalscore
+                        s_item.itemgetScore==='--' ? s_item.itemgetScore=0 : null;
+                        if(p_item.type===0){
+                            PassFileTS+=s_item.itemgetScore;
+                            totalScore0+=s_item.itemScore;
+                            if(!s_item.isIgnore){
+                                PassFileX+=s_item.itemgetScore;
+                                totalScoreX+=s_item.itemScore;
+                            }
+                        }else if(p_item.type===1){
+                            totalScore+=s_item.itemScore;
+                            ScoreTS+=s_item.itemgetScore;
+                        }else if(p_item.type===2&&!s_item.isIgnore){
+                            OtherTS+=s_item.itemgetScore;
+                        }
+                        inspectPic+=s_item.sourceList.length;
+                    });
+                    item['numOfQualified']=QualifiedArr.length;
+                    item['numOfUnqualified']=UnqualifiedArr.length;
+                    item['numIgnore']=IgnoredArr.length;
+                    item['itemScore']=totalScore;
+                    item['itemgetScore']=totalGetscore;
+                    item['notIgnoreTotalscore']=notIgnoreTotalscore;
                     if(p_item.type==0){
-                        CurPassfailQualified += item.numOfQualified
-                        CurpassfailCount += item.numOfUnqualified
-                        getpassfailQualifiedTotal=CurPassfailQualified
-                        allpassfailCount=Number(CurpassfailCount+CurPassfailQualified)
+                        CurPassfailQualified += item.numOfQualified;
+                        CurpassfailCount += item.numOfUnqualified;
+                        CurPassfailIgnore += item.numIgnore;
+                        getpassfailQualifiedTotal=CurPassfailQualified;
+                        getpassfailIgnoreTotal=CurPassfailIgnore;
+                        allpassfailCount=Number(CurpassfailCount+CurPassfailQualified);
+                        PassFileTotalScoreSystem = PassFileTS;
+                        PassFileXS = PassFileX;
+                        PassFileTotalScore = totalScore0;
+                        PassFileTotalScoreX = totalScoreX;
                     }
                     if(p_item.type==1){
-                        CurItemgetScore += totalGetscore
-                        CurNotIgnoreTotalscore += notIgnoreTotalscore
-                        getscoreTotal=CurItemgetScore
-                        allscoreTotal=CurNotIgnoreTotalscore
+                        CurItemgetScore += totalGetscore;
+                        CurNotIgnoreTotalscore += notIgnoreTotalscore;
+                        CurSc += addIgnoreScoreA;
+                        CurAddIgnoreItemScore=CurSc;
+                        CurAddIgnoreTotalscore+=addNotIgnoreTotalscoreA;
+                        getscoreTotal=CurItemgetScore;
+                        allscoreTotal=CurNotIgnoreTotalscore;
+                        allAddIgnoreScore=CurAddIgnoreTotalscore;
+                        ScoreTotalScoreSystem =ScoreTS;
                     }
                     if(p_item.type==2){
-                        CurOtherTotalScore += totalGetscore
-                        otherGetscoreTotal=CurOtherTotalScore
+                        CurOtherTotalScore += totalGetscore;
+                        otherGetscoreTotal=CurOtherTotalScore;
+                        OtherTotalScoreSystem = OtherTS;
                     }
-                })
+                });
                 if(p_item.type==0){
-                    p_item['tHeader']=self.theaderPassFail
-                    // if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
-                    //     self.resultList[0].isShow=false
-                    //     self.resultList[1].isShow=false
-                    //     self.resultList[2].isActive=true
-                    //     Tab0Status=true
-                    // }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
-                    //     self.resultList[1].isShow=false
-                    //     self.resultList[2].isShow=false
-                    //     self.resultList[0].isActive=true
-                    //     Tab0Status=true
-                    // }
+                    p_item['tHeader']=self.theaderPassFail;
+                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)&&inspectSettings.checkItem4){
+                        self.resultList[0].isShow=false;
+                        self.resultList[1].isShow=false;
+                        self.resultList[2].isActive=true;
+                        Tab0Status=true;
+                    }
                 }else if(p_item.type==1){
-                    p_item['tHeader']=self.theaderScore
+                    p_item['tHeader']=self.theaderScore;
                 }else if(p_item.type==2){
-                    p_item['tHeader']=self.theaderOther
+                    p_item['tHeader']=self.theaderOther;
                 }
-            })
-            let s_count=0
+            });
+            // 考评总分计算方式
+            let s_count=0;
             if(dealType.length==1&&dealType[0]==0){
-                s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100)
+                if(inspectSettings.radio=='-1'){
+                    s_count = Math.round(PassFileTotalScoreSystem);
+                }else{
+                    if(inspectSettings.checkItem2){
+                        s_count = Math.round((getpassfailQualifiedTotal+getpassfailIgnoreTotal)/allpassfailCount*100);
+                    }else{
+                        s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100);
+                    }
+                }
             }else{
-                s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
+                if(inspectSettings.checkItem1){
+                    if(inspectSettings.radio=='-1'){
+                         //总分制
+                        s_count = Math.round(PassFileTotalScoreSystem+ScoreTotalScoreSystem+OtherTotalScoreSystem);
+                    }else{
+                        //比例制+Tab1忽略项参与运算/Tab2忽略项参与运算
+                        if(inspectSettings.checkItem2&&!inspectSettings.checkItem3){//0参与运算，0的忽略项参与运算，1的忽略项不参与运算
+                            s_count = Math.round(((PassFileTotalScoreSystem+getscoreTotal)/(allscoreTotal+PassFileTotalScore)*100)+otherGetscoreTotal);
+                        }else if(!inspectSettings.checkItem2&&inspectSettings.checkItem3){//0参与运算，0的忽略项不参与运算，1的忽略项参与运算
+                            s_count = Math.round(((PassFileXS+ScoreTotalScoreSystem)/(PassFileTotalScoreX+ScoreTotalScoreSystem)*100)+otherGetscoreTotal);
+                        }else if(inspectSettings.checkItem2&&inspectSettings.checkItem3){//0参与运算，0的忽略项参与运算，1的忽略项参与运算
+                            s_count = Math.round(((PassFileTotalScoreSystem+ScoreTotalScoreSystem)/(PassFileTotalScore+ScoreTotalScoreSystem)*100)+otherGetscoreTotal);
+                        }else{//0参与运算，0的忽略项不参与运算，1的忽略项不参与运算
+                            s_count = Math.round(((PassFileXS+getscoreTotal)/(PassFileTotalScoreX+allscoreTotal)*100)+otherGetscoreTotal);
+                        }
+                    }
+                }else{
+                    if(inspectSettings.radio=='-1'){
+                        s_count = Math.round(ScoreTotalScoreSystem+OtherTotalScoreSystem);
+                    }else{
+                        if(inspectSettings.checkItem3){
+                            s_count = Math.round((CurAddIgnoreItemScore/allAddIgnoreScore*100)+otherGetscoreTotal);
+                        }else{
+                            s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal);
+                        }
+                    }
+                }
             }
-            // if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
-            //     self.resultList[0].isShow=true
-            //     self.resultList[1].isShow=true
-            //     self.resultList[2].isShow=true
-            //     self.resultList[0].isActive=false
-            //     self.resultList[1].isActive=false
-            //     self.resultList[2].isActive=false
-            // }
-            self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
-            self.summary=inspect
+            if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+                self.resultList.forEach(item=>{
+                    item.isShow=true;
+                    item.isActive=false;
+                });
+            }
+            self.scorecount= s_count>inspectSettings.maxScore ? inspectSettings.maxScore : (s_count<inspectSettings.minScore ? inspectSettings.minScore : s_count);
+            self.summary=inspect;
             eventList.forEach((item,index)=>{
                 let objFeedBack={};
                 objFeedBack.subject=item.eventName;

@@ -409,7 +409,8 @@ import {getCookie} from '@/common/auth';
 import {indexedDB} from '@/common/util'
 import RecordRTC from '../../../static/RecordRTC.js'
 import { clearTimeout, setInterval, setTimeout, clearInterval } from 'timers';
-import EzvizVideo from '@/components/EzvizVideo.vue'
+import EzvizVideo from '@/components/EzvizVideo.vue';
+import html2canvas from 'html2canvas';
 
 export default {
     name:'StoreMoinitor',

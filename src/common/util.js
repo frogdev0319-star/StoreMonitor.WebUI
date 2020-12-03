@@ -29,6 +29,30 @@ export default {
         para.endTs=new Date(+new Date(et)).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'')
         return para;
     },
+    getThreeMonths (e) {
+      let timeOne = new Date(e)
+      let year = timeOne.getFullYear()
+      let month = timeOne.getMonth() + 1
+      let day = timeOne.getDate()
+      let hours = timeOne.getHours()
+      let minutes = timeOne.getMinutes()
+      let seconds = timeOne.getSeconds()
+      console.log(`now:${year}-${month}-${day} ${hours}:${minutes}:${seconds}`)
+      // three month ago
+      let ThreeMonths = month - 3
+      if (ThreeMonths <= 0) { year = year - 1}
+      if (ThreeMonths === -2) {ThreeMonths = 10}
+      if (ThreeMonths === -1) {ThreeMonths = 11}
+      if (ThreeMonths === 0) {ThreeMonths = 12}
+      let timeTow = new Date(year, ThreeMonths, 0, hours, minutes, seconds)
+      let ThreeMonthsDay = timeTow.getDate()
+      if (day > ThreeMonthsDay) {day = ThreeMonthsDay}
+      day = day < 10 ? '0' + day : day
+      console.log(`three month ago:${year}-${ThreeMonths}-${day} 00:00:00`)
+      const THREE_MONTHS_AGO = `${year}/${ThreeMonths}/${day} 00:00:00`
+      const THREE_STAMP = new Date(THREE_MONTHS_AGO).getTime()
+      return THREE_STAMP
+    },
 
     //时间格式化为两位数
     formatterTime(src){

@@ -19,6 +19,14 @@
                     </el-button>
                      <el-button
                         :class="lang=='en'? 'en-el-set-btn':'el-set-btn'" class="btn-class"
+                        @click="setRule"
+                        type="primary"
+                        size="mini" :disabled="routeData.length==0">
+                        <i class="iconfont icon-guize1"></i>
+                        <span>{{$t('insSettingView.ruleInspect')}}</span>
+                    </el-button>
+                    <el-button
+                        :class="lang=='en'? 'en-el-set-btn':'el-set-btn'" class="btn-class"
                         @click="setItem"
                         type="primary"
                         size="mini" :disabled="routeData.length==0">
@@ -79,11 +87,12 @@
                             <div class="header-content tabTitle" v-if="index==0">
                                 <el-checkbox class="allcheckBox" @change="changeAllData" v-model="allchecked"></el-checkbox>
                                 <span class="name-title">{{generateInsSettingLang('inspectName')}}</span>
-                                <span class="description-title" :style="sheetName.some(x=>x.id==0&&x.isClick)?'width: calc((100% - 405px) * 25/29);':''">{{generateInsSettingLang('inspectionDescp')}}</span>
+                                <span class="description-title" :style="sheetName.some(x=>x.id==1&&x.isClick)?'width: calc((100% - 405px) * 12.5/29)':'width: calc((100% - 405px) * 15.3/29)'">{{generateInsSettingLang('inspectionDescp')}}</span>
                                 <span class="score-title" :style="'width: calc((100% - 405px) * 2.5/29);'" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore0')}}</span>
                                 <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{generateInsSettingLang('sheetscore0')}}</span> -->
+                                <span class="score-title" style="width: calc((100% - 405px) * 3/29);" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore3')}}</span>
                                 <span class="score-title" style="width: calc((100% - 405px) * 6/29);" v-if="sheetName.some(x=>x.id==1&&x.isClick)">{{generateInsSettingLang('sheetscore1')}}</span>
-                                <span class="score-title" v-if="sheetName.some(x=>x.id==2&&x.isClick)">{{generateInsSettingLang('sheetscore2')}}</span>
+                                <span class="score-title" v-if="sheetName.some(x=>x.id!==1&&x.isClick)">{{generateInsSettingLang('score')}}</span>
                                 <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{generateInsSettingLang('operation')}}</span>
                             </div>
 
@@ -104,10 +113,15 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="name" width="300px"></el-table-column>
-                                    <el-table-column prop="description" :min-width="sheetName.some(x=>x.id==0&&x.isClick)?'40%':'23%'"></el-table-column>
-                                    <el-table-column prop="score" align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)||sheetName.some(x=>x.id==2&&x.isClick)" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'">
+                                    <el-table-column prop="description" :min-width="'23%'"></el-table-column>
+                                    <el-table-column prop="score" align="center" :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'">
                                          <template slot-scope="scope">
                                             <span>{{scope.row.score}}<span v-if="lang!='en'">{{$t('insSettingView.scores')}}</span></span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="score" show-overflow-tooltip align="center" v-if="sheetName.some(x=>x.id==1&&x.isClick)" :min-width="'8%'">
+                                         <template slot-scope="scope">
+                                            <span>{{scope.row.availableScores}}</span>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="qualifiedScore" align="center" min-width="11%" v-if="sheetName.some(x=>x.id==1&&x.isClick)">
@@ -660,6 +674,10 @@ export default {
             sessionStorage.setItem('GroupName',self.tabName);
             self.$router.push({name:"itemSetting",params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}});
         },
+        setRule(){
+            let self=this;
+            self.$router.push({name:'setRule',params:{routeData:self.routeData,routeName:self.routeName}})
+        },
         // bindPatrol(index,item){
         //     let self=this;
         //     self.$router.push({name:'itemSetting',params:{routeData:self.routeData, tabNameLang: self.tabNameLang,routeName:self.routeName}}); 
@@ -781,22 +799,18 @@ export default {
                 opacity: 0.6;
             }
             .el-delete-btn{
-                //background-color: #fff;
                 border-color:  $mainColor;
                 color: $mainColor;
                 border-radius: 0px;
-                margin-right:calc(10/1920*100vw);
                 font-size: 12px;
                 &:disabled{
                     opacity: 0.5;
                 }
             }
             .en-el-delete-btn{
-              //background-color: #fff;
               border-color:  $mainColor;
               color: $mainColor;
               border-radius: 0px;
-              margin-right:calc(10/1920*100vw);
               font-size: calc(14/1920*100vw);
               padding: 0 0;
               width: calc(130/1920*100vw);
@@ -808,7 +822,6 @@ export default {
               }
             }
             .el-set-btn{
-                //background-color: $mainColor;
                 border-color:  $mainColor;
                 color: #fff;
                 border-radius: 0px;
@@ -818,7 +831,6 @@ export default {
                 }
             }
             .en-el-set-btn{
-              //background-color: $mainColor;
               border-color:  $mainColor;
               color: #fff;
               border-radius: 0px;
@@ -828,10 +840,6 @@ export default {
               width: calc(130/1920*100vw);
               &:disabled{
                 opacity: .5;
-              }
-              span{
-              }
-              .iconfont{
               }
               @media screen and (min-width: 1440px) {
                   width: calc(130/1920*100vw);

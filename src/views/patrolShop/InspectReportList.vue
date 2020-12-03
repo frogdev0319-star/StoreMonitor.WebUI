@@ -280,7 +280,7 @@ export default {
               {
                 prop: "totalScore",
                 label: this.$t('remotePatrol.patrolScore'),
-                sortable:false,
+                sortable:true,
                 width: '150',
               },
               {
@@ -304,7 +304,7 @@ export default {
             exportList:[],
             sizeNum:12,
             defaultTime:[],
-            dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
+            dateValue:[],
             dateOpt: {
                 disabledDate:(time)=>{
                     return time.getTime() > Date.now();
@@ -401,7 +401,7 @@ export default {
           self.getTagListData()
           self.defaultTime=[];
           self.storeStr = '';
-          self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
+          self.dateValue = [new Date(new Date().toLocaleDateString()).getTime()-3600 * 1000 * 24,new Date()];
           self.reportList=[];
           self.curSortType=0;
           self.storeName =  '';
@@ -957,7 +957,7 @@ export default {
             let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
             let dateStr=hour+':'+minutes+':'+second;
             let timeTemp=[];
-            timeTemp[0]=dateStr;
+            timeTemp[0]='00:00:00';
             timeTemp[1]=dateStr;
             self.defaultTime=timeTemp;
         },
@@ -966,15 +966,14 @@ export default {
             console.log(val);
             let start=typeof(val[0])==='object'?val[0].getTime():val[0];
             let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-
-            if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
+            let threeMonthAgo = util.getThreeMonths(end)
+            if(end-start>end-threeMonthAgo){  //当前选择的时间范围超过了30天
                 self.$message({
                     message: this.$t('eventView.changeTimeRange'),
                     type:'warning',
                     duration:3*1000
                 })
-                start=end-3600*24*30*1000;
-                self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+                self.dateValue=[new Date().setTime(threeMonthAgo),new Date().setTime(end)];
             }
             // self.params.beginTs=start;
             // self.params.endTs=end;

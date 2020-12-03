@@ -325,7 +325,7 @@ export default {
     },
     beforeRouteLeave(to, from, next) {
         let self=this;
-        if(to.name=='itemSetting'||to.name=='bindStore'){
+        if(to.name==='itemSetting'||to.name==='bindStore'||to.name==='setRule'){
             let historyObj = {
                 activeName:self.activeName,
                 patrolActive:self.patrolActive
@@ -510,10 +510,15 @@ export default {
                                 objChild.name=itemChild.subject;
                                 objChild.description=(itemChild.description==undefined||itemChild.length==0)?'--':itemChild.description;
                                 objChild.score=itemChild.itemScore ;
-                                objChild.qualifiedScore=itemChild.qualifiedScore
-
+                                objChild.qualifiedScore=itemChild.qualifiedScore;
+                                let availableScores = '';
+                                itemChild.availableScores.forEach((x_item,x_index)=>{
+                                    let isuu = x_index===itemChild.availableScores.length-1 ? '' : '/';
+                                    availableScores+=x_item+isuu;
+                                });
+                                objChild.availableScores=availableScores;
                                 tempChild.push(objChild);
-                            })
+                            });
                             _obj.itemData=tempChild;
                             _obj.inspectId=TagData[tagIndex].id; //巡检表
                             _obj.mode=TagData[Number(self.patrolActive)].mode; //巡检类别
@@ -713,26 +718,30 @@ export default {
                             let temp=[];
                             item.forEach((_item,_index)=>{
                                 let _obj={};
-                                let itemScore=0,qualifiedScore=0,description=''
+                                let itemScore=0,qualifiedScore=0,description='',availableScores=[]
                                 if(arr[i][0]=='PassFail'){
-                                    itemScore = 10
+                                    itemScore = _item.d
                                     qualifiedScore = null
                                     description = _item.c
+                                    availableScores = null
                                 }
                                 else if(arr[i][0]=='Score'){
-                                    itemScore = _item.c
-                                    qualifiedScore = _item.d
-                                    description = _item.e
+                                    itemScore = _item.d
+                                    qualifiedScore = _item.e
+                                    description = _item.c
+                                    availableScores = _item.f
                                 }
                                 else if(arr[i][0]=='Others'){
                                     itemScore = _item.c
                                     qualifiedScore = null
                                     description = _item.d
+                                    availableScores = null
                                 }
                                 _obj.subject=_item.b;
                                 _obj.description=description;
                                 _obj.itemScore=itemScore;
                                 _obj.qualifiedScore=qualifiedScore
+                                _obj.availableScores=availableScores
                                 temp.push(_obj);
                             })
                             objItem.groupId=dataGroup[groupindex];
@@ -1081,9 +1090,6 @@ export default {
                 self.export2Excel();
             }
             else{
-                // self.$store.dispatch('LogOut').then(()=>{
-                //     self.$router.push('/login');
-                // })
                 window.location.href='https://portals.storeviu.com';
             }
         },
@@ -1091,16 +1097,15 @@ export default {
             let _this = this;
             let inputDOM = this.$refs.inputer;
             _this.FileInfo=[]
-            // 通过DOM取文件数据
             this.file = event.currentTarget.files[0];
-            var rABS = false; //是否将文件读取为二进制字符串
+            var rABS = false;
             var f = this.file;
             var reader = new FileReader();
             FileReader.prototype.readAsBinaryString = function(f) {
                 var binary = "";
-                var rABS = false; //是否将文件读取为二进制字符串
+                var rABS = false;
                 var pt = this;
-                var wb; //读取完成的数据
+                var wb;
                 var outdata = {};
                 var reader = new FileReader();
                 reader.onload = function(e) {
@@ -1111,7 +1116,7 @@ export default {
                     }
                     var XLSX = require('xlsx');
                     if(rABS) {
-                        wb = XLSX.read(btoa(fixdata(binary)), { //手动转化
+                        wb = XLSX.read(btoa(fixdata(binary)), {
                             type: 'base64'
                         });
                     } else {
@@ -1119,7 +1124,6 @@ export default {
                             type: 'binary'
                         });
                     }
-                    // 动态解析表头
                     var sheet1,sheet2,sheet3
                     let PassFail = wb.Sheets['Pass&Fail']
                     let Score = wb.Sheets['Score']
@@ -1133,13 +1137,13 @@ export default {
                             obj.a = _item.__EMPTY
                             obj.b = _item.__EMPTY_1
                             obj.c = _item.__EMPTY_2
-                            // obj.d = _item.__EMPTY_3
+                            obj.d = _item.__EMPTY_3
                             temp_sheet1.push(obj)
                         })
                         outdata.PassFail=temp_sheet1
                     }
                     if(Score!=undefined){
-                        delete Score.A1;delete Score.B1;delete Score.C1;delete Score.D1;delete Score.E1
+                        delete Score.A1;delete Score.B1;delete Score.C1;delete Score.D1;delete Score.E1;delete Score.F1;
                         sheet2 = XLSX.utils.sheet_to_json(wb.Sheets['Score']);
                         sheet2.forEach((_item,_index)=>{
                             let obj={}
@@ -1148,6 +1152,7 @@ export default {
                             obj.c = _item.__EMPTY_2
                             obj.d = _item.__EMPTY_3
                             obj.e = _item.__EMPTY_4
+                            obj.f = _item.__EMPTY_5
                             temp_sheet2.push(obj)
                         })
                         outdata.Score=temp_sheet2
@@ -1174,7 +1179,7 @@ export default {
                     let flagItemLengthPassFail=false,flagItemLengthScore=false,flagItemLengthOthers=false
                     // let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
                     let flagDesLengthPassFail=false,flagDesLengthScore=false,flagDesLengthOthers=false;
-                    let flagFullScoreType=false,flagMinScoreType=false,flagOtherScoreType=false
+                    let flagFullScoreType=false,flagMinScoreType=false,flagOtherScoreType=false,flagPassFailScoreType=false
                     let flagTempError=false
                     //sheet整合好的巡检表:outdata
                     if((outdata.PassFail==undefined&&outdata.Score==undefined&&outdata.Others!=undefined)||(outdata.PassFail!=undefined&&outdata.Score==undefined&&outdata.Others!=undefined)){
@@ -1203,6 +1208,11 @@ export default {
                                     if(item.c!=undefined){
                                         if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthPassFail=true;}
                                     }
+                                    if(item.d!=undefined){//项目满分值选填，字符类型为1~50整数
+                                       flagPassFailScoreType = !Number.isInteger(item.d)||parseInt(item.d)<1||parseInt(item.d)>50
+                                    }else{
+                                        item.d=10
+                                    }
                             }else if(arr[i][0]=='Score'){
                                     if(item.a!=undefined&&item.a.length!=0){
                                         indexArryScore.push(index);
@@ -1210,18 +1220,44 @@ export default {
                                     }
                                     if(item.b==undefined||item.b.length==0){flagItemNameScore=true;}
                                     else if(filterString.getContentLength(item.b.toString().trim()) > 100){flagItemLengthScore=true;}
-                                    if(item.c==undefined||item.c.length==0||!Number.isInteger(item.c)||parseInt(item.c)<1||parseInt(item.c)>10){//项目满分值必填，字符类型为1~10整数
+                                    if(item.c!=undefined){
+                                        if(filterString.getContentLength(item.c.toString().trim()) > 1200){flagDesLengthScore=true;}
+                                    }
+                                    if(item.d==undefined||item.d.length==0||!Number.isInteger(item.d)||parseInt(item.d)<0||parseInt(item.d)>50){//项目满分值必填，字符类型为1~10整数
                                         flagFullScoreType=true
                                     }
-                                    if(item.d!=undefined){
-                                        if(!Number.isInteger(item.d)||parseInt(item.d)<1||parseInt(item.d)>parseInt(item.c)){//最低分值必填，字符类型为1~item.c整数
+                                    if(item.e!=undefined){
+                                        if(!Number.isInteger(item.e)||parseInt(item.e)<1||parseInt(item.e)>parseInt(item.d)){//最低分值选填，字符类型为1~item.c整数
                                             flagMinScoreType=true
                                         }
                                     }else{
-                                        item.d=item.c
+                                        item.e=item.d
                                     }
-                                    if(item.e!=undefined){
-                                        if(filterString.getContentLength(item.e.toString().trim()) > 1200){flagDesLengthScore=true;}
+                                    if(item.f!=undefined){
+                                        if(item.f.indexOf('/') !== -1){
+                                            let f_Score = item.f.split('/');
+                                            let scoreArr = [];
+                                            f_Score.forEach(f_item=>{
+                                                if(!isNaN(Number(f_item))){
+                                                    if(parseInt(f_item)>=0&&parseInt(f_item)<=item.d){
+                                                        scoreArr.push(parseInt(f_item))
+                                                    }
+                                                }
+                                            });
+                                            item.f = scoreArr
+                                        }else{
+                                            if(!isNaN(Number(item.f))){
+                                                item.f = parseInt(item.f)
+                                            }else{
+                                                let a=[]
+                                                for(var n = 0; n < item.d+1; n++) { a[n] = n}
+                                                item.f=a
+                                            }
+                                        }
+                                    }else{
+                                        let a=[]
+                                        for(var n = 0; n < item.d+1; n++) { a[n] = n}
+                                        item.f=a
                                     }
                             }else if(arr[i][0]=='Others'){
                                     if(item.a!=undefined&&item.a.length!=0){
@@ -1242,7 +1278,7 @@ export default {
                     let showWarningIfo = flaggroupLengthPassFail||flaggroupRexPassFail||flagItemNamePassFail||flagItemLengthPassFail||flagItemRexPassFail||flagDesLengthPassFail||
                                          flaggroupLengthScore||flaggroupRexScore||flagItemNameScore||flagItemLengthScore||flagItemRexScore||flagDesLengthScore||
                                          flaggroupLengthOthers||flaggroupRexOthers||flagItemNameOthers||flagItemLengthOthers||flagItemRexOthers||flagDesLengthOthers||
-                                         flagFullScoreType||flagMinScoreType||flagOtherScoreType||flagTempError
+                                         flagFullScoreType||flagMinScoreType||flagOtherScoreType||flagPassFailScoreType||flagTempError
                     if(showWarningIfo){
                         _this.showFailInfo=true
                         _this.$refs.loadFile.value = ''
@@ -1295,6 +1331,9 @@ export default {
                             if(flagDesLengthOthers){flagArr.push('Others')}
                             let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalDes')
                             _this.FileInfo.push(flag)
+                        }
+                        if(flagPassFailScoreType){
+                            _this.FileInfo.push('PassFail' + ' ' +_this.$t('insSettingView.excelPassFailScoreType'))
                         }
                         if(flagFullScoreType){
                             _this.FileInfo.push('Score' + ' ' +_this.$t('insSettingView.excelFullScoreType'))
