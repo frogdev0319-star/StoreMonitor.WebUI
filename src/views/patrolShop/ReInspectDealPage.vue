@@ -1,171 +1,165 @@
 <template>
-    <div class="el-sucPage-content">
-        <div class="page-icon">
-            <div class="icon-content">
-                <img class='suc-icon' :src='isSuccess?sucSrc:errSrc'/>
-                <p :class="isSuccess?'sucInfo':'errInfo'">{{retInfo}}</p>
-                <p class="sucret-info" v-if="isSuccess && lang != 'en'">{{curSecond}}s{{generatePatrolLang('return')}}</p>
-                <p class="sucret-info" v-if="isSuccess && lang == 'en'">{{generatePatrolLang('return')}} {{curSecond}}s !</p>
-            </div>
-        </div>
-        <div class="page-content" v-if="false" :style="{'min-height':varyWindowHeight-460+'px'}">
-             <div class="details">
-                <span class="event-label">门店名称：</span>
-                <span>{{storeName}}</span>
-            </div>
-            <div class="table-content" v-if="tableData.length!=0">
-                <div class="table-header">
-                    <div class="table-details" v-for="(item,index) in headerList" :key="index" :style="{'width':item.width+'%'}">
-                        <span>{{item.label}}</span>
-                    </div>
-                </div>
-                <div class="data-rows" v-for="(item,index) in tableData" :key="index" :style="index%2!=0?{'background-color':'#F4F5F9'}:{'background-color':'#fff'}">
-                    <div class="item-cols" style="width:20%;">
-                        <span>{{item.groupName}}</span>
-                    </div>
-                    <div class="item-cols" style="width:20%;">
-                        <span class="icon-span" :style="item.result==0?{'background-color':'#FDBA40'}:{'background-color':'#6097F3'}">{{item.result==0?'不合格':'合格'}}</span>
-                    </div>
-                    <div class="item-cols" style="width:20%;">
-                        <span>{{item.score}}</span>
-                    </div>
-                    <div class="item-cols" style="">
-                        <span>{{item.totalScore}}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="details">
-                <span class="event-label">本次忽略{{ignoreCount}}个问题</span>
-                <div class="ignore-content">
-                    <div class="ignore-details" v-for="(item,index) in ignoreList" :key="index">
-                        <div class="icon-point"></div>
-                        <span class="ignore-info">{{item.subject}}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="page-err-btn" v-if="!isSuccess">
-            <el-button size="mini" type="primary" @click="reTry" class="retry-btn">{{curSecond}}s{{generatePatrolLang('tryAgain')}}</el-button>
-        </div>
+  <div class="el-sucPage-content">
+    <div class="page-icon">
+      <div class="icon-content">
+        <img :src="isSuccess?sucSrc:errSrc" class="suc-icon">
+        <p :class="isSuccess?'sucInfo':'errInfo'">{{ retInfo }}</p>
+        <p v-if="isSuccess && lang !== 'en'" class="sucret-info">{{ curSecond }}s{{ $t('remotePatrol.return') }}</p>
+        <p v-if="isSuccess && lang === 'en'" class="sucret-info">{{ $t('remotePatrol.return') }} {{ curSecond }}s !</p>
+      </div>
     </div>
+    <div v-if="false" :style="{'min-height':varyWindowHeight-460+'px'}" class="page-content">
+      <div class="details">
+        <span class="event-label">门店名称：</span>
+        <span>{{ storeName }}</span>
+      </div>
+      <div v-if="tableData.length!=0" class="table-content">
+        <div class="table-header">
+          <div v-for="(item,index) in headerList" :key="index" :style="{'width':item.width+'%'}" class="table-details">
+            <span>{{ item.label }}</span>
+          </div>
+        </div>
+        <div v-for="(item,index) in tableData" :key="index" :style="index%2!=0?{'background-color':'#F4F5F9'}:{'background-color':'#fff'}" class="data-rows">
+          <div class="item-cols" style="width:20%;">
+            <span>{{ item.groupName }}</span>
+          </div>
+          <div class="item-cols" style="width:20%;">
+            <span :style="item.result==0?{'background-color':'#FDBA40'}:{'background-color':'#6097F3'}" class="icon-span">{{ item.result==0?'不合格':'合格' }}</span>
+          </div>
+          <div class="item-cols" style="width:20%;">
+            <span>{{ item.score }}</span>
+          </div>
+          <div class="item-cols" style="">
+            <span>{{ item.totalScore }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="details">
+        <span class="event-label">本次忽略{{ ignoreCount }}个问题</span>
+        <div class="ignore-content">
+          <div v-for="(item,index) in ignoreList" :key="index" class="ignore-details">
+            <div class="icon-point"/>
+            <span class="ignore-info">{{ item.subject }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="!isSuccess" class="page-err-btn">
+      <el-button size="mini" type="primary" class="retry-btn" @click="reTry">
+        {{ curSecond }}s{{ $t('remotePatrol.tryAgain') }}
+      </el-button>
+    </div>
+  </div>
 </template>
 <script>
-  import {generatePatrolLang} from '@/api/i18n'
 
-  export default {
-    name:'ReInspectDealPage',
-    data(){
-        return{
-            isSuccess:false,
-            sucSrc:require('../../../static/img/succeed_icon.png'),
-            errSrc:require('../../../static/img/failed_icon.png'),
-            curSecond:10,
-            leader:'',
-            storeName:'',
-            ignoreCount:0,
-            headerList:[
-                {
-                    'name':'groupName',
-                    'label':'项目',
-                    'width':20
-                },
-                {
-                    'name':'result',
-                    'label':'是否合格',
-                    'width':20
-                },
-                {
-                    'name':'score',
-                    'label':'得分',
-                    'width':20
-                },
-                {
-                    'name':'totalScore',
-                    'label':'单项总分值',
-                    'width':40
-                }
-            ],
-            tableData:[],
-            ignoreList:[],
-            timeid:0,
-            inspectItemList:[],
-            varyWindowHeight:window.innerHeight,
-            lang: this.$i18n.locale
-        }
-    },
-    computed:{
-        retInfo(){
-            let msg='';
-            if(this.isSuccess){
-                if(this.leader!=undefined&&this.leader.length!=0){
-                    msg=`${this.$t('remotePatrol.copyFail')}${this.leader}！`;
-                }
-            }
-            else{
-                msg= `${this.$t('remotePatrol.sentFail')}`;
-            }
-            return msg;
-        }
-    },
-    beforeRouteLeave(to, from, next) {
-        let self=this;
-        clearInterval(self.timeid);
-        next();
-    },
-    mounted(){
-        let self=this;
-        self.getRouterData();
-        if(self.isSuccess){
-            self.timeid=setInterval(function(){
-                self.getBackSecond();
-            },1000)
-        }
-    },
-    methods:{
-        generatePatrolLang,
-        getRouterData(){
-            let self=this;
-            let routeData=self.$route.params.data;
-            console.log(routeData);
-            if(self.$route.params.data==undefined){
-                routeData=JSON.parse(sessionStorage.getItem('reinspect_submit'));
-            }
-            if(routeData!=null){
-                self.isSuccess=routeData.isSuccess;
-            }
-            if(self.isSuccess){
-                //self.$route.matched[2].name='提交成功';
-                self.$route.matched[2].name= self.$t('storeView.successSubmit');
-                //self.storeName=routeData.store.storeName;
-                if(routeData!=null&&routeData.user.length!=0){
-                    self.leader=routeData.user[0].userName;
-                }
-                //self.tableData=routeData.submitResult;
-                //self.ignoreList=routeData.ignoreTemp;
-                //self.ignoreCount=routeData.ignoredItems.length;
-            }
-            else{
-                //self.$route.matched[2].name='提交失败';
-                self.$route.matched[2].name=self.$t('storeView.failSubmit');
-                if(self.isSuccess==false){
-                    PubSub.publish('success-page',{changeStyle:true});
-                }
-            }
+export default {
+  name: 'ReInspectDealPage',
+  data() {
+    return {
+      isSuccess: false,
+      sucSrc: require('../../../static/img/submit_succeed.png'),
+      errSrc: require('../../../static/img/submit_failed.png'),
+      curSecond: 10,
+      leader: '',
+      storeName: '',
+      ignoreCount: 0,
+      headerList: [
+        {
+          'name': 'groupName',
+          'label': '项目',
+          'width': 20
         },
-        getBackSecond(){
-            let self=this;
-            self.curSecond--;
-            if(self.curSecond==0){
-                clearInterval(self.timeid);
-                self.$router.push({name:'remotePatrol'});
-            }
+        {
+          'name': 'result',
+          'label': '是否合格',
+          'width': 20
         },
-        reTry(){
-            let self=this;
-            self.$router.push({name:"confirmSum"});
+        {
+          'name': 'score',
+          'label': '得分',
+          'width': 20
         },
+        {
+          'name': 'totalScore',
+          'label': '单项总分值',
+          'width': 40
+        }
+      ],
+      tableData: [],
+      ignoreList: [],
+      timeid: 0,
+      inspectItemList: [],
+      varyWindowHeight: window.innerHeight,
+      lang: this.$i18n.locale
+    };
+  },
+  computed: {
+    retInfo() {
+      let msg = '';
+      if (this.isSuccess) {
+        if (this.leader != undefined && this.leader.length != 0) {
+          msg = `${this.$t('remotePatrol.copyFail')}${this.leader}！`;
+        }
+      } else {
+        msg = `${this.$t('remotePatrol.sentFail')}`;
+      }
+      return msg;
     }
-}
+  },
+  beforeRouteLeave(to, from, next) {
+    const self = this;
+    clearInterval(self.timeid);
+    next();
+  },
+  mounted() {
+    const self = this;
+    self.getRouterData();
+    if (self.isSuccess) {
+      self.timeid = setInterval(function() {
+        self.getBackSecond();
+      }, 1000);
+    }
+  },
+  methods: {
+    getRouterData() {
+      const self = this;
+      let routeData = self.$route.params.data;
+      console.log(routeData);
+      if (self.$route.params.data == undefined) {
+        routeData = JSON.parse(sessionStorage.getItem('reinspect_submit'));
+      }
+      if (routeData != null) {
+        self.isSuccess = routeData.isSuccess;
+      }
+      if (self.isSuccess) {
+        self.$route.matched[2].name = self.$t('storeView.successSubmit');
+        if (routeData != null && routeData.user.length != 0) {
+          self.leader = routeData.user[0].userName;
+        }
+      } else {
+        self.$route.matched[2].name = self.$t('storeView.failSubmit');
+        if (self.isSuccess == false) {
+          PubSub.publish('success-page', { changeStyle: true });
+        }
+      }
+    },
+
+    getBackSecond() {
+      const self = this;
+      self.curSecond--;
+      if (self.curSecond == 0) {
+        clearInterval(self.timeid);
+        self.$router.push({ name: 'remotePatrol' });
+      }
+    },
+
+    reTry() {
+      const self = this;
+      self.$router.push({ name: 'confirmSum' });
+    }
+  }
+};
 </script>
 <style lang="scss" scoped>
   @import '../../assets/css/pagination.css';

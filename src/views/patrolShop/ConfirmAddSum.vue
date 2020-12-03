@@ -1,741 +1,781 @@
 <template>
-    <el-row class="sum-content">
-        <el-col :span="24" class="sum-submit">
-            <div class="submit-header">
-                <span>{{generatePatrolLang('summary')}}</span>
-                <el-button :size="varyWindowWidth>1680?'small':'mini'" class="sum-btn" type="primary" @click="submit">{{generatePatrolLang('submit')}}</el-button>
-            </div>
-            <div class="submit-content">
-                <div class="submit-radio">
-                    <span v-for="(item,index) in resultList" :key="index">
-                        <span class="el-radio-details" v-if="item.isShow"
-                          @click="clickSum(item,index)" :class="item.isActive?'activeClass':''">{{item.name}}</span>
+  <el-row class="sum-content">
+    <el-col :span="24" class="sum-submit">
+      <div class="submit-header">
+        <span>{{ $t('remotePatrol.summary') }}</span>
+        <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="sum-btn" type="primary" @click="submit">
+          {{ $t('remotePatrol.submit') }}
+        </el-button>
+      </div>
+      <div class="submit-content">
+        <div class="submit-radio">
+          <span v-for="(item,index) in resultList" :key="index">
+            <span
+              v-if="item.isShow"
+              :class="item.isActive?'activeClass':''"
+              class="el-radio-details"
+              @click="clickSum(item,index)">{{ item.name }}</span>
+          </span>
+        </div>
+        <span class="sug-label"><span>*</span>{{ $t('remotePatrol.inspectionAdvice') }}</span>
+        <el-input
+          :autosize="{ minRows: 2, maxRows: 7}"
+          v-model="suggest"
+          :placeholder="$t('remotePatrol.adviceInfo')"
+          type="textarea"
+          resize="none"
+          class="sug-input"
+          @input="adviceChanged"
+          @blur="notShowInputRuleTips"/>
+        <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
+      </div>
+    </el-col>
+    <el-col :span="24" class="sum-data">
+      <el-row class="divider-content">
+        <el-col :span="11">
+          <hr class="divider-hr">
+        </el-col>
+        <el-col :span="2">
+          <span class="divider-text">{{ $t('remotePatrol.preview') }}</span>
+        </el-col>
+        <el-col :span="11">
+          <hr class="divider-hr">
+        </el-col>
+      </el-row>
+      <div class="table-content">
+        <div class="table-header">
+          <div class="header-store-name">
+            <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}: </span>
+            <span v-else class="store-name">{{ $t('remotePatrol.storeName') }}：</span>
+            {{ store.storeName }}
+          </div>
+          <div class="header-score">
+            <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
+            <span class="span-2">{{ scorecount }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
+            <span class="span-3">({{ $t('remotePatrol.scorerule') }})</span>
+          </div>
+        </div>
+        <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
+          <thead>
+            <tr>
+              <th v-for="(t_item ,t_index) in s_item.tHeader" :key="t_index" :style="t_item.width" scope="col">
+                {{ t_item.name }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="vertical-align:middle;">
+              <td :rowspan="s_item.inspectList.length+1" style="vertical-align:middle;">
+                <span class="sheet_title">{{ s_item.label }}</span>
+              </td>
+            </tr>
+            <tr v-for="(item,index) in s_item.inspectList" :key="index" :style=" index%2 != 0?{'background-color':'#F7F8FC'}:{}">
+              <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
+                {{ item.items.length }}</span>
+              </td>
+              <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfQualified }}</span></td>
+              <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfUnqualified }}</span></td>
+              <td v-if="s_item.type==1"><span>{{ item.itemScore }}</span></td>
+              <td><span>{{ item.numIgnore }}</span></td>
+              <td v-if="s_item.type==1||s_item.type==2"><span>{{ item.itemgetScore }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
+        <el-col v-if="item.itemList.length!=0">
+          <div class="item-header">
+            <i :class="item.iconSrc" class="iconfont icontemp"/>
+            <span class="title-lable">{{ item.itemTitleName }}</span>
+            <span style="float:right;" class="count-content"><span class="count">{{ item.itemCount }}</span>
+              <span class="blag">{{ $t('remotePatrol.unit') }}</span></span>
+          </div>
+          <div class="item-content">
+            <div style="margin-bottom:20px;">
+              <div v-for="(_item,_index) in item.itemList" :key="_index" class="content-detail">
+                <div v-if="index !== 2" class="content-detail-title">
+                  <div class="detail-title">
+                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
+                    <p class="title2">{{ _item.description }}</p>
+                  </div>
+                  <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                  <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
+                    {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                  </div>
+                  <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
+                    <span>
+                      <span>{{ _item.itemgetScore }}</span>
+                      <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
                     </span>
+                  </div>
                 </div>
-                <span class="sug-label"><span>*</span>{{generatePatrolLang('advice')}}</span>
-                <el-input type="textarea" resize='none' :autosize="{ minRows: 2, maxRows: 7}" v-model="suggest" class="sug-input"  @input="adviceChanged"
-                          :placeholder="generatePatrolLang('adviceInfo')" @blur="notShowInputRuleTips"></el-input>
-                <span class="rules" v-if="adviceInfoRuletip">{{generatePatrolLang('comentRuletip_suggest')}}</span>
-            </div>
-        </el-col>
-        <el-col :span="24" class="sum-data">
-            <el-row class="divider-content">
-                <el-col :span="11">
-                    <hr class="divider-hr"/>
-                </el-col>
-                <el-col :span="2">
-                    <span class="divider-text">{{generatePatrolLang('preview')}}</span>
-                </el-col>
-                 <el-col :span="11">
-                     <hr class="divider-hr"/>
-                </el-col>
-            </el-row>
-            <div class="table-content">
-                <div class="table-header">
-                    <div class="header-store-name">
-                      <span v-if="lang=='en' " class="en-store-name">{{generatePatrolLang('storeName')}}: </span>
-                      <span v-else class="store-name">{{generatePatrolLang('storeName')}}：</span>
-                      {{store.storeName}}
-                    </div>
-                    <div class="header-score">
-                        <span class="span-1">{{generatePatrolLang('getscore')}}：</span>
-                        <span class="span-2">{{scorecount}} <span>{{generatePatrolLang('scorecount')}}</span></span>
-                        <span class="span-3">({{generatePatrolLang('scorerule')}})</span>
-                    </div>
+                <div v-if="index === 2" class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                  <div class="detail-title">
+                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
+                  </div>
                 </div>
-                <table class="table table-bordered" v-for="(s_item,s_index) in summary" :key="s_index">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="(t_item ,t_index) in s_item.tHeader" :key="t_index" :style="t_item.width">{{t_item.name}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr style="vertical-align:middle;">
-                            <td :rowspan="s_item.inspectList.length+1" style="vertical-align:middle;">
-                                <span class="sheet_title">{{s_item.label}}</span>
-                            </td>
-                        </tr>
-                        <tr v-for="(item,index) in s_item.inspectList" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                            <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{item.groupName}}</span><span class="count-blag">{{item.items.length}}</span></td>
-                            <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfQualified}}</span></td>
-                            <td v-if="s_item.type==0||s_item.type==2"><span>{{item.numOfUnqualified}}</span></td>
-                            <td v-if="s_item.type==1"><span>{{item.itemScore}}</span></td>
-                            <td><span>{{item.numIgnore}}</span></td>
-                            <td v-if="s_item.type==1||s_item.type==2"><span>{{item.itemgetScore}}</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div v-if="index !== 2 && _item.sourceList!= null && _item.sourceList.length !== 0
+                || _item.inspectInput != null&&_item.inspectInput !== ''" class="content-detail-main" style="padding-bottom: 20px;">
+                  <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                  <div v-if="_item.inspectInput!=null&&_item.inspectInput!=''" class="cdm-word">
+                    <span>{{ _item.inspectInput }}</span>
+                  </div>
+                  <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
+                    <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex"
+                         :height="imgHeight+'px'" class="source-details">
+                      <div v-if="sourceitem.mediaType==2" class="img-content">
+                        <img
+                          :title="imgTitle"
+                          :src="sourceitem.src"
+                          :height="imgHeight+'px'"
+                          :onerror="deafultImg"
+                          class="imgLittle imgInner"
+                          @click="openOuter(sourceitem,$event)">
+                      </div>
+                      <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="index==2&&_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
+                  <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
+                  <div v-if="_item.description!=null&&_item.description!=''" class="cdm-word">
+                    <span>{{ _item.description }}</span>
+                  </div>
+                  <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
+                    <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
+                      <div v-if="sourceitem.mediaType==2" class="img-content">
+                        <img
+                          :title="imgTitle"
+                          :src="sourceitem.src"
+                          :height="imgHeight+'px'"
+                          :onerror="deafultImg"
+                          class="imgLittle imgInner"
+                          @click="openOuter(sourceitem,$event)">
+                      </div>
+                      <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
+                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <el-row class="row-detail" v-for="(item,index) in tempList" :key="index">
-                <el-col v-if="item.itemList.length!=0">
-                    <div class="item-header">
-                        <i class="iconfont icontemp" :class="item.iconSrc"></i>
-                        <span class="title-lable">{{item.itemTitleName}}</span>
-                        <span style="float:right;" class="count-content"><span class="count">{{item.itemCount}}</span><span class="blag">{{$t('remotePatrol.unit')}}</span></span>
-                    </div>
-                    <div class="item-content">
-                        <div style="margin-bottom:20px;">
-                            <div class="content-detail" v-for="(_item,_index) in item.itemList" :key="_index">
-                                <div class="content-detail-title" v-if="index!=2">
-                                    <div class="detail-title">
-                                        <p class="title1">{{_index+1}}.{{_item.subject}}</p>
-                                        <p class="title2">{{_item.description}}</p>
-                                    </div>
-                                    <div class="ignore-btn" v-if="item.detailType==1">{{$t('remotePatrol.ignored')}}</div>
-                                    <div class="title-btn" v-if="(_item.type==0||_item.type==2)&&item.detailType!=1">{{$t('remotePatrol.scoreUnit')}}<span>{{$t('remotePatrol.failed')}}</span></div>
-                                    <div class="title-btn" v-if="_item.type==1&&item.detailType!=1">{{$t('remotePatrol.scoreUnit')}}<span><span>{{_item.itemgetScore}}</span><span v-if="lang!='en'">{{$t('remotePatrol.scorecount')}}</span></span></div>
-                                </div>
-                                <div class="content-detail-title" style="background-color:#fff;min-height:30px;" v-if="index==2">
-                                    <div class="detail-title">
-                                    <p class="title1">{{_index+1}}.{{_item.subject}}</p>
-                                    </div>
-                                </div>
-                                <div class="content-detail-main" style="padding-bottom: 20px;"  v-if="index!=2&&_item.sourceList!=null&&_item.sourceList.length!=0||_item.inspectInput!=null&&_item.inspectInput!=''">
-                                    <p class="cdm-title">{{$t('remotePatrol.commentDetail')}}</p>
-                                    <div class="cdm-word" v-if="_item.inspectInput!=null&&_item.inspectInput!=''">
-                                        <span>{{_item.inspectInput}}</span>
-                                    </div>
-                                    <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
-                                        <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex" class="source-details" :height="imgHeight+'px'">
-                                            <div v-if="sourceitem.mediaType==2" class="img-content">
-                                                <img class="imgLittle imgInner" :title="imgTitle"
-                                                :src="sourceitem.src" :height="imgHeight+'px'" :onerror='deafultImg'
-                                                @click="openOuter(sourceitem,$event)"/>
-                                            </div>
-                                            <div  v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
-                                                <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="content-detail-main" v-if="index==2&&_item.sourceList!=null||item.description!=null&&item.description!=''">
-                                    <p class="cdm-title">{{$t('remotePatrol.description')}}：</p>
-                                    <div class="cdm-word" v-if="_item.description!=null&&_item.description!=''">
-                                        <span>{{_item.description}}</span>
-                                    </div>
-                                    <div class="cdm-pic" v-if="_item.sourceList!=null&&_item.sourceList.length!=0">
-                                        <div v-for="(sourceitem,index) in _item.sourceList" :key="index" class="source-details" :height="imgHeight+'px'">
-                                            <div v-if="sourceitem.mediaType==2" class="img-content">
-                                                <img class="imgLittle imgInner" :title="imgTitle"
-                                                :src="sourceitem.src" :height="imgHeight+'px'" :onerror='deafultImg'
-                                                @click="openOuter(sourceitem,$event)"/>
-                                            </div>
-                                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
-                                                <img class="start-icon" :src="startIcon" :height="imgHeight*0.4+'px'"/>
-                                                <img class="imgLittle" :src="videoImgSrc" :height="imgHeight+'px'"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <el-dialog  :title="$t('eventView.view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
-                        v-if="dialogCommentVideo" width="850px" top="12%" @close="stopCommentVideo" class='rate-video-dialog'>
-                            <div class="video-dialog-content" style="overflow:hidden;">
-                                <hr class="dialog-hr"/>
-                                <div class="video-content" >
-                                    <video  height=83% width=90% id="previewVideo" prload  controls
-                                        class="video-js vjs-fill">
-                                    </video>
-                                </div>
-                            </div>
-                        </el-dialog>
-                        <transition name="fade">
-                            <el-dialog :title="$t('eventView.view')"
-                            :visible.sync="showOuter" :close-on-click-modal="false" v-if="showOuter" width="850px" top="12%">
-                            <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                                <hr class="dialog-hr"/>
-                                <div class="dialog-source-content">
-                                    <img v-if="showImg" :src="checkImgSrc"/>
-                                </div>
-                            </div>
-                            </el-dialog>
-                        </transition>
-                    </div>
-                </el-col>
-            </el-row>
+            <el-dialog
+              v-if="dialogCommentVideo"
+              :title="$t('eventView.view')"
+              :visible.sync="dialogCommentVideo"
+              :close-on-click-modal="false"
+              width="850px"
+              top="12%"
+              class="rate-video-dialog"
+              @close="stopCommentVideo">
+              <div class="video-dialog-content" style="overflow:hidden;">
+                <hr class="dialog-hr">
+                <div class="video-content" >
+                  <video
+                    id="previewVideo"
+                    height="83%"
+                    width="90%"
+                    prload
+                    controls
+                    class="video-js vjs-fill"/>
+                </div>
+              </div>
+            </el-dialog>
+            <transition name="fade">
+              <el-dialog
+                v-if="showOuter"
+                :title="$t('eventView.view')"
+                :visible.sync="showOuter"
+                :close-on-click-modal="false"
+                width="850px"
+                top="12%">
+                <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                  <hr class="dialog-hr">
+                  <div class="dialog-source-content">
+                    <img v-if="showImg" :src="checkImgSrc">
+                  </div>
+                </div>
+              </el-dialog>
+            </transition>
+          </div>
         </el-col>
-        <el-dialog :visible.sync="uploadProgress" width="510px" top="35vh" left="40vh" class="AddSumupLoad" :close-on-click-modal="false">
-            <div class="body-content">
-                <p>正在上传中</p>
-                <p style="margin-bottom:15px;">共<span>{{totalnumOfPic}}</span>个附件，已上传<span>{{uploadingnumOfPic}}</span>个</p>
-                <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"></el-progress>
-            </div>
-        </el-dialog>
-    </el-row>
+      </el-row>
+    </el-col>
+    <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+      <div class="body-content">
+        <p>正在上传中</p>
+        <p style="margin-bottom:15px;">共<span>{{ totalnumOfPic }}</span>个附件，已上传<span>{{ uploadingnumOfPic }}</span>个</p>
+        <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
+      </div>
+    </el-dialog>
+  </el-row>
 </template>
 <script>
-import {getStorageInfo} from '@/api/event'
-import {submitInspectItem1} from '@/api/inspect'
-import util from '@/common/util'
-import {getCookie} from '@/common/auth'
-import {getUserInfo} from '@/api/login'
-import {generatePatrolLang} from '@/api/i18n'
-import filterString from '@/common/filterString.js'
+import { getStorageInfo } from '@/api/event';
+import { submitInspectItem1 } from '@/api/inspect';
+import util from '@/common/util';
+import { getCookie } from '@/common/auth';
+import { getUserInfo } from '@/api/login';
+import filterString from '@/common/filterString.js';
 
 export default {
-    name:'ConfirmAddSum',
-    data(){
-        return{
-            dialogCommentVideo:false,
-            uploadProgress:false,
-            totalnumOfPic:0,
-            uploadingnumOfPic:0,
-            showOuter:false,
-            showImg:false,
-            checkImgSrc:'',
-            scorecount:0,
-            radioList:[],
-            imgTitle:'',
-            resultList: [
-              {
-                'label': 2,
-                'name':this.$t('overview.echartGood'),
-                'isActive':false,
-                'isShow':true
-              },
-              {
-                'label': 1,
-                'name':this.$t('remotePatrol.improve'),
-                'isActive':false,
-                'isShow':true
-              },
-              {
-                'label': 0,
-                'name':this.$t('remotePatrol.dangerous'),
-                'isActive':false,
-                'isShow':true
-              },
-            ],
-            startIcon:require('../../../static/img/pic_play_icon.png'),
-            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
-            deafultImg:'this.src="' + require('../../../static/img/pic2.png') + '"',
-            theaderPassFail:[
-                {name: '',width:'width:11%;'},
-                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.pass'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.failed'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'}
-            ],
-            theaderScore:[
-                {name: '',width:'width:11%;'},
-                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.TableTotal'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.TableIgnore'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.TableGet'),width:'width:20%;'}
-            ],
-            theaderOther:[
-                {name: '',width:'width:11%;'},
-                {name: this.$t('remotePatrol.item'),width:'width:20%;'},
-                {name: this.$t('remotePatrol.pass'),width:'width:15%;'},
-                {name: this.$t('remotePatrol.failed'),width:'width:15%;'},
-                {name: this.$t('remotePatrol.TableIgnore'),width:'width:15%;'},
-                {name: this.$t('remotePatrol.TableGet'),width:'width:15%;'}
-            ],
-            suggest:'',
-            store:{},
-            channel:{},
-            summary:[],
-            tempList:[],
-            inspectList:[],
-            eventList:[],
-            oss:null,
-            bucketVideo:'',
-            bucketImage:'',
-            percentage:0,
-            accountId:'',
-            curSumIndex:0,
-            varyWindowWidth:window.innerWidth,
-            pass: this.$t('remotePatrol.pass'),
-            fail: this.$t('remotePatrol.failed'),
-            lang: this.$i18n.locale,
-            adviceInfoRuletip:false
+  name: 'ConfirmAddSum',
+  data() {
+    return {
+      dialogCommentVideo: false,
+      uploadProgress: false,
+      totalnumOfPic: 0,
+      uploadingnumOfPic: 0,
+      showOuter: false,
+      showImg: false,
+      checkImgSrc: '',
+      scorecount: 0,
+      radioList: [],
+      imgTitle: '',
+      resultList: [
+        {
+          'label': 2,
+          'name': this.$t('overview.echartGood'),
+          'isActive': false,
+          'isShow': true
+        },
+        {
+          'label': 1,
+          'name': this.$t('remotePatrol.improve'),
+          'isActive': false,
+          'isShow': true
+        },
+        {
+          'label': 0,
+          'name': this.$t('remotePatrol.dangerous'),
+          'isActive': false,
+          'isShow': true
         }
+      ],
+      startIcon: require('../../../static/img/play_icon.png'),
+      videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+      deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
+      theaderPassFail: [
+        { name: '', width: 'width:11%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' }
+      ],
+      theaderScore: [
+        { name: '', width: 'width:11%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+      ],
+      theaderOther: [
+        { name: '', width: 'width:11%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:15%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;' }
+      ],
+      suggest: '',
+      store: {},
+      channel: {},
+      summary: [],
+      tempList: [],
+      inspectList: [],
+      eventList: [],
+      oss: null,
+      bucketVideo: '',
+      bucketImage: '',
+      percentage: 0,
+      accountId: '',
+      curSumIndex: 0,
+      varyWindowWidth: window.innerWidth,
+      pass: this.$t('remotePatrol.pass'),
+      fail: this.$t('remotePatrol.failed'),
+      lang: this.$i18n.locale,
+      adviceInfoRuletip: false
+    };
+  },
+  computed: {
+    imgHeight() {
+      let height = 0;
+      if (this.varyWindowWidth > 1800) {
+        height = this.varyWindowWidth * 0.039;
+      } else if (this.varyWindowWidth > 1400) {
+        height = this.varyWindowWidth * 0.035;
+      } else {
+        height = 75;
+      }
+      return height;
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    const self = this;
+    if (to.name != 'remotePatrol') {
+      self.$store.dispatch('setPatrolHistory', null);
+      self.$store.dispatch('setPatrolComment', null);
+      next();
+    } else {
+      self.$store.dispatch('setPatrolComment', self.suggest);
+      next();
+    }
+  },
+  mounted() {
+    const self = this;
+    self.getRouteData();
+    self.getUpLoadBucketInfo();
+    self.getOssInfo();
+  },
+  methods: {
+    stopCommentVideo() {
+      var video = document.getElementById('previewVideo');
+      this.previewplayer = videojs(video);
+      this.previewplayer.pause();
     },
-    computed: {
-      imgHeight(){
-            let height=0;
-            if(this.varyWindowWidth>1800){
-                height= this.varyWindowWidth*0.039;
-            }
-            else if(this.varyWindowWidth>1400){
-                height= this.varyWindowWidth*0.035;
-            }
-            else{
-                height=75;
-            }
-            return height;
-        }
+    playCommentVideo(item, index) {
+      const self = this;
+      self.dialogCommentVideo = true;
+      self.$nextTick(function() {
+        var video = document.getElementById('previewVideo');
+        this.previewplayer = videojs(video);
+        this.previewplayer.src({ src: item.url });
+        this.previewplayer.play();
+      });
     },
-    beforeRouteLeave(to, from, next){
-        let self = this
-        if(to.name !='remotePatrol' ){
-            self.$store.dispatch('setPatrolHistory',null);
-            self.$store.dispatch('setPatrolComment',null);
-            next();
-        }else{
-            self.$store.dispatch('setPatrolComment',self.suggest);
-            next();
-        }
-    },
-    methods:{
-        generatePatrolLang,
-        stopCommentVideo(){
-            var video = document.getElementById("previewVideo");
-            this.previewplayer = videojs(video);
-            this.previewplayer.pause();
-        },
-        playCommentVideo(item,index){
-            let self=this;
-            self.dialogCommentVideo=true;
-            self.$nextTick(function(){
-                var video = document.getElementById("previewVideo");
-                this.previewplayer = videojs(video);
-                this.previewplayer.src({src:item.url});
-                this.previewplayer.play();
-            })
-
-        },
-        openOuter(item,$ev){
-            let self=this;
-            console.log(item);
-            console.log($ev.target.onerror);
-            if(item!=null){
-                self.showOuter=true;
-                self.checkImgSrc=item.src;
-                self.showImg=true;
-            }
-        },
-        getFileUrl(fileName){
-            let self=this;
-            let bucketName = self.oss.ossBucketName;
-            let endpoint=self.oss.ossEndPoint;
-            let key=fileName;
-            if (self.oss.ossVendor == 2){
-              return `https://${endpoint}/${bucketName}/${fileName}`;
-            }
-            else {
-              return `http://${bucketName}.${endpoint}/${fileName}`;
-            }
-        },
-        upLoadFile(fileItem){
-            let self=this;
-            self.percentage=0;
-            if(self.oss.ossVendor == null){
-              self.oss.ossVendor = 1; //1 -aliyun  2-azure
-            }
-            if(self.oss.ossVendor == 1){
-              let OSS = require('ali-oss');
-              const client = new OSS({
-                region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
-                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
-                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                //bucket: 'viumo-'+self.accountId,
-                bucket: self.oss.ossBucketName
-              })
-              let name=fileItem.fileName;
-              return new Promise((resolve,reject)=>{
-                client.put(name,fileItem.file,{
-                  progress: function* (percentage, cpt) {
-                    self.percentage = percentage
-                  }
-                })
-                  .then((results) => {
-                    // 上传完成
-                    const url = self.getFileUrl(results.name);
-                    console.log(url);
-                    resolve(url);
-                  })
-                  .catch((err) => {
-                      reject(err)
-                    console.log(err)
-                  })
-              })
-            }
-            else{
-              let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-              let containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential));
-              let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
-              return new Promise((resolve,reject)=>{
-                azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-                  .then((results) => {
-                    //上传完成
-                    const url = self.getFileUrl(fileItem.fileName);
-                    console.log(url);
-                    resolve(url);
-                  })
-                  .catch((error) => {
-                      reject(error)
-                    console.log(error)
-                  })
-              })
-            }
-        },
-        clickSum(item,index){
-            let self=this;
-            item.isActive=true;
-            self.resultList.forEach((_item,_index)=>{
-                if(index!=_index){
-                    _item.isActive=false;
-                }
-            })
-            self.curSumIndex=item.label;
-        },
-        async submit(){
-            let self=this;
-            let upload=0
-            let inspect=self.inspectList;
-            let eventList=self.eventList;
-            let status=0;
-            let flag=false;
-            self.uploadingnumOfPic=0
-            self.resultList.forEach(item=>{
-                if(item.isActive){
-                    flag=true;
-                }
-            })
-            if(!flag){
-                self.notify(self.$t('remotePatrol.summaryInfo'),'warning',3000);
-                return false;
-            }
-            if(self.suggest.length == 0){
-              self.notify(self.$t('remotePatrol.suggestEmpty'),'warning',3000);
-              return false;
-            }
-            self.totalnumOfPic>0 ? self.uploadProgress=true : self.uploadProgress=false
-            let storageParams = {};
-            storageParams.storeId = self.store.storeId;
-            //上传文件时获取门店对应的BucketName
-            await getStorageInfo(storageParams).then(res=>{
-              if(res.errCode==0){
-                self.oss = res.data;
-                console.log(self.oss)
-              }
-            })
-            let temp=[];
-            for(let i in inspect){
-                for(let  g in inspect[i].inspectList){
-                    for(let  j in inspect[i].inspectList[g].items){
-                        let objItem={};
-                        objItem.ts=new Date().getTime();
-                        objItem.description=inspect[i].inspectList[g].items[j].inspectInput.trim();
-                        if(inspect[i].type==0||inspect[i].type==2){
-                            objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:(inspect[i].inspectList[g].items[j].isQualified ? 1 :0);
-                        }else{
-                            objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:inspect[i].inspectList[g].items[j].itemgetScore;
-                        }
-                        
-                        objItem.storeId=self.store.storeId;
-                        objItem.inspectItemId=inspect[i].inspectList[g].items[j].id;
-                        let tempFileUrl=[];
-                        if(!inspect[i].inspectList[g].items[j].isIgnore){
-                            for(let k in inspect[i].inspectList[g].items[j].sourceList){
-                                let obj={};
-                                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url)=>{
-                                    self.uploadingnumOfPic++
-                                    if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
-                                        obj.mediaType=2;
-                                        obj.url=url;
-                                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                                    }
-                                    else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
-                                        obj.mediaType=1;
-                                        obj.url=url;
-                                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                                    }
-                                }).catch((err)=>{
-                                    upload++
-                                })
-                                if(upload!=0){
-                                    self.uploadProgress=false
-                                    self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
-                                    return false
-                                }
-                                
-                                tempFileUrl.push(obj);
-                            }
-                        }
-                        objItem.attachment=tempFileUrl;
-                        temp.push(objItem);
-                    }
-                }
-            }
-            let feedEventList=[];
-            console.log(self.eventList);
-
-            for(let i in self.eventList){
-                let obj={};
-                obj.ts=new Date().getTime();
-                obj.storeId=self.store.storeId,
-
-                obj.subject=self.eventList[i].eventName;
-                obj.description=self.eventList[i].eventDes;
-
-                let commentTemp=[];
-                if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
-                    await self.upLoadFile(self.eventList[i].sourceObj).then((url)=>{
-                        self.uploadingnumOfPic++
-                        let commentObj={
-                            mediaType:self.eventList[i].sourceObj.mediaType,
-                            url:url,
-                            deviceId: self.eventList[i].sourceObj.deviceId
-                        }
-                        commentTemp.push(commentObj);
-                    }).catch((err)=>{
-                        upload++
-                    })
-                    if(upload!=0){
-                        self.uploadProgress=false
-                        self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
-                        return false
-                    }
-                    
-                    obj.deviceId = self.eventList[i].sourceObj.deviceId;
-                }
-                else{                        //通过加号创建的问题反馈
-                    //obj.diviceId=-1;
-                }
-                obj.attachment=commentTemp;
-                feedEventList.push(obj);
-            }
-            let curSumIndex=[]
-            curSumIndex = self.resultList.filter(x=>x.isActive)
-            status = curSumIndex[0].label
-            let params={
-                status:status,
-                comment:self.suggest.trim(),
-                items:temp,
-                feedback:feedEventList
-            };
-            let routeData=null;
-            upload==0 && submitInspectItem1(params).then(res=>{
-                if(res.errCode==0){
-                    let data=res.data;
-                    self.editFlag=true;
-                    routeData={
-                        isSuccess:true,
-                        user:data.notifiedTo
-                    };
-                }
-                else{
-                    routeData={
-                        isSuccess:false
-                    };
-                }
-                self.$router.push({name:"submitEvent",params:{data:routeData}});
-            }).catch(err=>{
-                self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
-                return false;
-            })
-            self.uploadProgress=false
-        },
-        getRouteData(){
-            let self=this;
-            let PatrolComment = self.$store.getters.PatrolComment;
-            if(PatrolComment!=null){
-                self.suggest=PatrolComment
-            }
-            let routeData=self.$route.params.data;
-            let inspect=routeData.inspect;
-            let eventList=routeData.event;
-            let store=routeData.store;
-            let channel=routeData.channel;
-            self.store=store;
-            self.inspectList=routeData.inspect;
-            self.eventList=routeData.event;
-            let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[],dealType=[]
-            let getscoreTotal=0,allscoreTotal=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,allpassfailCount=0
-            inspect.forEach(p_item=>{
-                if(p_item.dealCount!=0){
-                    dealType.push(p_item.type)
-                }
-            })
-            let Tab0Status=false
-            let inspectPic = 0
-            inspect.forEach(p_item=>{
-                var CurItemgetScore=0,CurNotIgnoreTotalscore=0,CurOtherTotalScore=0,CurPassfailQualified=0,CurpassfailCount=0
-                p_item.inspectList.forEach(item=>{
-                    let QualifiedArr=[],UnqualifiedArr=[],IgnoredArr=[]
-                    let totalScore=0,totalGetscore=0,notIgnoreTotalscore=0
-                    item.items.forEach(s_item=>{
-                        if(s_item.isIgnore){
-                            IgnoredArr.push(s_item)
-                            ignoreTemp.push(s_item)
-                        }else{
-                            if((p_item.type==0||p_item.type==2)&&!s_item.isQualified){
-                                UnqualifiedArr.push(s_item)
-                                UnqualifiedTemp.push(s_item)
-                            }else if((p_item.type==0||p_item.type==2)&&s_item.isQualified){
-                                QualifiedArr.push(s_item)
-                            }else if(p_item.type==1&&(s_item.itemgetScore<s_item.qualifiedScore)){
-                                UnqualifiedTemp.push(s_item)
-                            }
-                            if((p_item.type==1||p_item.type==2)&&s_item.itemgetScore!='--'){
-                                totalGetscore+=s_item.itemgetScore
-                                notIgnoreTotalscore+=s_item.itemScore
-                            }
-                        }
-                        if(p_item.type==1){
-                            totalScore+=s_item.itemScore
-                        }
-                        inspectPic+=s_item.sourceList.length
-                    })
-                    item['numOfQualified']=QualifiedArr.length
-                    item['numOfUnqualified']=UnqualifiedArr.length
-                    item['numIgnore']=IgnoredArr.length
-                    item['itemScore']=totalScore
-                    item['itemgetScore']=totalGetscore
-                    item['notIgnoreTotalscore']=notIgnoreTotalscore
-                    if(p_item.type==0){
-                        CurPassfailQualified += item.numOfQualified
-                        CurpassfailCount += item.numOfUnqualified
-                        getpassfailQualifiedTotal=CurPassfailQualified
-                        allpassfailCount=Number(CurpassfailCount+CurPassfailQualified)
-                    }
-                    if(p_item.type==1){
-                        CurItemgetScore += totalGetscore
-                        CurNotIgnoreTotalscore += notIgnoreTotalscore
-                        getscoreTotal=CurItemgetScore
-                        allscoreTotal=CurNotIgnoreTotalscore
-                    }
-                    if(p_item.type==2){
-                        CurOtherTotalScore += totalGetscore
-                        otherGetscoreTotal=CurOtherTotalScore
-                    }
-                })
-                if(p_item.type==0){
-                    p_item['tHeader']=self.theaderPassFail
-                    // if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
-                    //     self.resultList[0].isShow=false
-                    //     self.resultList[1].isShow=false
-                    //     self.resultList[2].isActive=true
-                    //     Tab0Status=true
-                    // }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
-                    //     self.resultList[1].isShow=false
-                    //     self.resultList[2].isShow=false
-                    //     self.resultList[0].isActive=true
-                    //     Tab0Status=true
-                    // }
-                }else if(p_item.type==1){
-                    p_item['tHeader']=self.theaderScore
-                }else if(p_item.type==2){
-                    p_item['tHeader']=self.theaderOther
-                }
-            })
-            let s_count=0
-            if(dealType.length==1&&dealType[0]==0){
-                s_count = Math.round(getpassfailQualifiedTotal/allpassfailCount*100)
-            }else{
-                s_count = Math.round((getscoreTotal/allscoreTotal*100)+otherGetscoreTotal)
-            }
-            // if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
-            //     self.resultList[0].isShow=true
-            //     self.resultList[1].isShow=true
-            //     self.resultList[2].isShow=true
-            //     self.resultList[0].isActive=false
-            //     self.resultList[1].isActive=false
-            //     self.resultList[2].isActive=false
-            // }
-            self.scorecount= s_count>100 ? 100 : (s_count<0 ? 0 : s_count)
-            self.summary=inspect
-            eventList.forEach((item,index)=>{
-                let objFeedBack={};
-                objFeedBack.subject=item.eventName;
-                objFeedBack.description=item.eventDes;
-                objFeedBack.sourceList=[]
-                item.sourceObj!=null ? objFeedBack.sourceList.push(item.sourceObj) : ''
-                feedBackTemp.push(objFeedBack);
-            })
-            let eventpic = eventList.filter(x=>x.sourceObj!=null)
-            self.totalnumOfPic = Number(inspectPic)+Number(eventpic.length)
-            tempList[0]={
-                itemTitleName: self.$t('reportView.notableItem'),
-                iconSrc:'icon-zhongxindingwei',
-                itemCount:UnqualifiedTemp.length,
-                itemList:UnqualifiedTemp,
-                detailType:0
-            }
-            tempList[1]={
-                itemTitleName: self.$t('remotePatrol.ignoreds'),
-                iconSrc:'icon-hulve',
-                itemCount:ignoreTemp.length,
-                itemList:ignoreTemp,
-                detailType:1
-            }
-            tempList[2]={
-                itemTitleName:self.$t('remotePatrol.feedbacks'),
-                iconSrc:'icon-fankui',
-                itemCount:feedBackTemp.length,
-                itemList:feedBackTemp,
-                detailType:2
-            }
-            self.tempList=tempList;
-        },
-        getAccountId(){
-            let self=this;
-            let userId=getCookie('UserId');
-            return new Promise((resolve,reject)=>{
-                getUserInfo().then(res=>{
-                    console.log(res);
-                    res.data.forEach(item=>{
-                        if(item.userId==userId){
-                            let accountId=item.accountId.toLowerCase();
-                            self.accountId=accountId;
-                            localStorage.setItem('oss_bucket',accountId);
-                            resolve(accountId);
-                        }
-                    })
-                })
-            })
-        },
-        async getOssInfo(){
-            let self=this;
-            let accountId=await self.getAccountId();
-            console.log(accountId);
-            self.accountId=localStorage.getItem('oss_bucket');
-            // getStorageInfo().then(res=>{
-            //     console.log(res);
-            //     if(res.errCode==0){
-            //         self.oss=res.data;
-            //     }
-            // })
-        },
-        getUpLoadBucketInfo(){
-            let self=this;
-            self.bucketVideo='video'+'/'+util.getCurDate2Str();
-            self.bucketImage='image'+'/'+util.getCurDate2Str();
-        },
-        notify(msg,type,time) {
-            this.$message({
-                message: msg,
-                type: type,
-                duration:time
-            });
-        },
-        notShowInputRuleTips(){
-            this.adviceInfoRuletip=false
-        },
-      adviceChanged(val){
-        let self = this;
-        let content = filterString.all(val,600);
-        let length = filterString.getContentLength(val);
-        console.log(content);
-        self.suggest = content;
-        if(length>600){
-              this.adviceInfoRuletip=true
-          }else{
-              this.adviceInfoRuletip=false
-          }
+    openOuter(item, $ev) {
+      const self = this;
+      console.log(item);
+      console.log($ev.target.onerror);
+      if (item != null) {
+        self.showOuter = true;
+        self.checkImgSrc = item.src;
+        self.showImg = true;
       }
     },
-    mounted(){
-        let self=this;
-        self.getRouteData();
-        self.getUpLoadBucketInfo();
-        self.getOssInfo();
+    getFileUrl(fileName) {
+      const self = this;
+      const bucketName = self.oss.ossBucketName;
+      const endpoint = self.oss.ossEndPoint;
+      const key = fileName;
+      if (self.oss.ossVendor == 2) {
+        return `https://${endpoint}/${bucketName}/${fileName}`;
+      } else {
+        return `http://${bucketName}.${endpoint}/${fileName}`;
+      }
+    },
+    upLoadFile(fileItem) {
+      const self = this;
+      self.percentage = 0;
+      if (self.oss.ossVendor == null) {
+        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
+      }
+      if (self.oss.ossVendor == 1) {
+        const OSS = require('ali-oss');
+        const client = new OSS({
+          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
+          accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
+          accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
+          // bucket: 'viumo-'+self.accountId,
+          bucket: self.oss.ossBucketName
+        });
+        const name = fileItem.fileName;
+        return new Promise((resolve, reject) => {
+          client.put(name, fileItem.file, {
+            progress: function * (percentage, cpt) {
+              self.percentage = percentage;
+            }
+          })
+            .then((results) => {
+              // 上传完成
+              const url = self.getFileUrl(results.name);
+              console.log(url);
+              resolve(url);
+            })
+            .catch((err) => {
+              reject(err);
+              console.log(err);
+            });
+        });
+      } else {
+        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+        return new Promise((resolve, reject) => {
+          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+            .then((results) => {
+              // 上传完成
+              const url = self.getFileUrl(fileItem.fileName);
+              console.log(url);
+              resolve(url);
+            })
+            .catch((error) => {
+              reject(error);
+              console.log(error);
+            });
+        });
+      }
+    },
+    clickSum(item, index) {
+      const self = this;
+      item.isActive = true;
+      self.resultList.forEach((_item, _index) => {
+        if (index != _index) {
+          _item.isActive = false;
+        }
+      });
+      self.curSumIndex = item.label;
+    },
+    async submit() {
+      const self = this;
+      let upload = 0;
+      const inspect = self.inspectList;
+      const eventList = self.eventList;
+      let status = 0;
+      let flag = false;
+      self.uploadingnumOfPic = 0;
+      self.resultList.forEach(item => {
+        if (item.isActive) {
+          flag = true;
+        }
+      });
+      if (!flag) {
+        self.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
+        return false;
+      }
+      if (self.suggest.length == 0) {
+        self.notify(self.$t('remotePatrol.suggestEmpty'), 'warning', 3000);
+        return false;
+      }
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+      const storageParams = {};
+      storageParams.storeId = self.store.storeId;
+      // 上传文件时获取门店对应的BucketName
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode == 0) {
+          self.oss = res.data;
+          console.log(self.oss);
+        }
+      });
+      const temp = [];
+      for (const i in inspect) {
+        for (const g in inspect[i].inspectList) {
+          for (const j in inspect[i].inspectList[g].items) {
+            const objItem = {};
+            objItem.ts = new Date().getTime();
+            objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
+            if (inspect[i].type == 0 || inspect[i].type == 2) {
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? -1 : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+            } else {
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? -1 : inspect[i].inspectList[g].items[j].itemgetScore;
+            }
+
+            objItem.storeId = self.store.storeId;
+            objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
+            const tempFileUrl = [];
+            if (!inspect[i].inspectList[g].items[j].isIgnore) {
+              for (const k in inspect[i].inspectList[g].items[j].sourceList) {
+                const obj = {};
+                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
+                  self.uploadingnumOfPic++;
+                  if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType == 2) {
+                    obj.mediaType = 2;
+                    obj.url = url;
+                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType == 1) {
+                    obj.mediaType = 1;
+                    obj.url = url;
+                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  }
+                }).catch((err) => {
+                  upload++;
+                });
+                if (upload != 0) {
+                  self.uploadProgress = false;
+                  self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                  return false;
+                }
+
+                tempFileUrl.push(obj);
+              }
+            }
+            objItem.attachment = tempFileUrl;
+            temp.push(objItem);
+          }
+        }
+      }
+      const feedEventList = [];
+      console.log(self.eventList);
+
+      for (const i in self.eventList) {
+        const obj = {};
+        obj.ts = new Date().getTime();
+        obj.storeId = self.store.storeId,
+
+        obj.subject = self.eventList[i].eventName;
+        obj.description = self.eventList[i].eventDes;
+
+        const commentTemp = [];
+        if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
+          await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+            self.uploadingnumOfPic++;
+            const commentObj = {
+              mediaType: self.eventList[i].sourceObj.mediaType,
+              url: url,
+              deviceId: self.eventList[i].sourceObj.deviceId
+            };
+            commentTemp.push(commentObj);
+          }).catch((err) => {
+            upload++;
+          });
+          if (upload != 0) {
+            self.uploadProgress = false;
+            self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;
+          }
+
+          obj.deviceId = self.eventList[i].sourceObj.deviceId;
+        } else { // 通过加号创建的问题反馈
+          // obj.diviceId=-1;
+        }
+        obj.attachment = commentTemp;
+        feedEventList.push(obj);
+      }
+      let curSumIndex = [];
+      curSumIndex = self.resultList.filter(x => x.isActive);
+      status = curSumIndex[0].label;
+      const params = {
+        status: status,
+        comment: self.suggest.trim(),
+        items: temp,
+        feedback: feedEventList
+      };
+      let routeData = null;
+      upload == 0 && submitInspectItem1(params).then(res => {
+        if (res.errCode == 0) {
+          const data = res.data;
+          self.editFlag = true;
+          routeData = {
+            isSuccess: true,
+            user: data.notifiedTo
+          };
+        } else {
+          routeData = {
+            isSuccess: false
+          };
+        }
+        self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+      }).catch(err => {
+        self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+        return false;
+      });
+      self.uploadProgress = false;
+    },
+    getRouteData() {
+      const self = this;
+      const PatrolComment = self.$store.getters.PatrolComment;
+      if (PatrolComment != null) {
+        self.suggest = PatrolComment;
+      }
+      const routeData = self.$route.params.data;
+      const inspect = routeData.inspect;
+      const eventList = routeData.event;
+      const store = routeData.store;
+      const channel = routeData.channel;
+      self.store = store;
+      self.inspectList = routeData.inspect;
+      self.eventList = routeData.event;
+      let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
+      let getscoreTotal = 0, allscoreTotal = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, allpassfailCount = 0;
+      inspect.forEach(p_item => {
+        if (p_item.dealCount != 0) {
+          dealType.push(p_item.type);
+        }
+      });
+      const Tab0Status = false;
+      let inspectPic = 0;
+      inspect.forEach(p_item => {
+        var CurItemgetScore = 0, CurNotIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0;
+        p_item.inspectList.forEach(item => {
+          let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
+          let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0;
+          item.items.forEach(s_item => {
+            if (s_item.isIgnore) {
+              IgnoredArr.push(s_item);
+              ignoreTemp.push(s_item);
+            } else {
+              if ((p_item.type == 0 || p_item.type == 2) && !s_item.isQualified) {
+                UnqualifiedArr.push(s_item);
+                UnqualifiedTemp.push(s_item);
+              } else if ((p_item.type == 0 || p_item.type == 2) && s_item.isQualified) {
+                QualifiedArr.push(s_item);
+              } else if (p_item.type == 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
+                UnqualifiedTemp.push(s_item);
+              }
+              if ((p_item.type == 1 || p_item.type == 2) && s_item.itemgetScore != '--') {
+                totalGetscore += s_item.itemgetScore;
+                notIgnoreTotalscore += s_item.itemScore;
+              }
+            }
+            if (p_item.type == 1) {
+              totalScore += s_item.itemScore;
+            }
+            inspectPic += s_item.sourceList.length;
+          });
+          item['numOfQualified'] = QualifiedArr.length;
+          item['numOfUnqualified'] = UnqualifiedArr.length;
+          item['numIgnore'] = IgnoredArr.length;
+          item['itemScore'] = totalScore;
+          item['itemgetScore'] = totalGetscore;
+          item['notIgnoreTotalscore'] = notIgnoreTotalscore;
+          if (p_item.type == 0) {
+            CurPassfailQualified += item.numOfQualified;
+            CurpassfailCount += item.numOfUnqualified;
+            getpassfailQualifiedTotal = CurPassfailQualified;
+            allpassfailCount = Number(CurpassfailCount + CurPassfailQualified);
+          }
+          if (p_item.type == 1) {
+            CurItemgetScore += totalGetscore;
+            CurNotIgnoreTotalscore += notIgnoreTotalscore;
+            getscoreTotal = CurItemgetScore;
+            allscoreTotal = CurNotIgnoreTotalscore;
+          }
+          if (p_item.type == 2) {
+            CurOtherTotalScore += totalGetscore;
+            otherGetscoreTotal = CurOtherTotalScore;
+          }
+        });
+        if (p_item.type == 0) {
+          p_item['tHeader'] = self.theaderPassFail;
+          // if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
+          //     self.resultList[0].isShow=false
+          //     self.resultList[1].isShow=false
+          //     self.resultList[2].isActive=true
+          //     Tab0Status=true
+          // }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
+          //     self.resultList[1].isShow=false
+          //     self.resultList[2].isShow=false
+          //     self.resultList[0].isActive=true
+          //     Tab0Status=true
+          // }
+        } else if (p_item.type == 1) {
+          p_item['tHeader'] = self.theaderScore;
+        } else if (p_item.type == 2) {
+          p_item['tHeader'] = self.theaderOther;
+        }
+      });
+      let s_count = 0;
+      if (dealType.length == 1 && dealType[0] == 0) {
+        s_count = Math.round(getpassfailQualifiedTotal / allpassfailCount * 100);
+      } else {
+        s_count = Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
+      }
+      // if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+      //     self.resultList[0].isShow=true
+      //     self.resultList[1].isShow=true
+      //     self.resultList[2].isShow=true
+      //     self.resultList[0].isActive=false
+      //     self.resultList[1].isActive=false
+      //     self.resultList[2].isActive=false
+      // }
+      self.scorecount = s_count > 100 ? 100 : (s_count < 0 ? 0 : s_count);
+      self.summary = inspect;
+      eventList.forEach((item, index) => {
+        const objFeedBack = {};
+        objFeedBack.subject = item.eventName;
+        objFeedBack.description = item.eventDes;
+        objFeedBack.sourceList = [];
+        item.sourceObj != null ? objFeedBack.sourceList.push(item.sourceObj) : '';
+        feedBackTemp.push(objFeedBack);
+      });
+      const eventpic = eventList.filter(x => x.sourceObj != null);
+      self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
+      tempList[0] = {
+        itemTitleName: self.$t('remotePatrol.notableItem'),
+        iconSrc: 'icon-zhongxindingwei',
+        itemCount: UnqualifiedTemp.length,
+        itemList: UnqualifiedTemp,
+        detailType: 0
+      };
+      tempList[1] = {
+        itemTitleName: self.$t('remotePatrol.ignoreds'),
+        iconSrc: 'icon-hulve',
+        itemCount: ignoreTemp.length,
+        itemList: ignoreTemp,
+        detailType: 1
+      };
+      tempList[2] = {
+        itemTitleName: self.$t('remotePatrol.feedbacks'),
+        iconSrc: 'icon-fankui',
+        itemCount: feedBackTemp.length,
+        itemList: feedBackTemp,
+        detailType: 2
+      };
+      self.tempList = tempList;
+    },
+    getAccountId() {
+      const self = this;
+      const userId = getCookie('UserId');
+      return new Promise((resolve, reject) => {
+        getUserInfo().then(res => {
+          console.log(res);
+          res.data.forEach(item => {
+            if (item.userId == userId) {
+              const accountId = item.accountId.toLowerCase();
+              self.accountId = accountId;
+              localStorage.setItem('oss_bucket', accountId);
+              resolve(accountId);
+            }
+          });
+        });
+      });
+    },
+    async getOssInfo() {
+      const self = this;
+      const accountId = await self.getAccountId();
+      console.log(accountId);
+      self.accountId = localStorage.getItem('oss_bucket');
+      // getStorageInfo().then(res=>{
+      //     console.log(res);
+      //     if(res.errCode==0){
+      //         self.oss=res.data;
+      //     }
+      // })
+    },
+    getUpLoadBucketInfo() {
+      const self = this;
+      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+    },
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    },
+    notShowInputRuleTips() {
+      this.adviceInfoRuletip = false;
+    },
+    adviceChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 600);
+      const length = filterString.getContentLength(val);
+      console.log(content);
+      self.suggest = content;
+      if (length > 600) {
+        this.adviceInfoRuletip = true;
+      } else {
+        this.adviceInfoRuletip = false;
+      }
     }
-}
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import 'node_modules/bootstrap/scss/bootstrap';

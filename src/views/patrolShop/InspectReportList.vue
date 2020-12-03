@@ -1,1121 +1,1128 @@
 <template>
-    <el-row id="el-containter">
-        <el-col :span="24" class="report-header">
-            <el-col :span="24" class="header-details">
-                <span>{{generateReportLang('selectStores')}}</span>
-                <el-select v-model="curCountry"  :placeholder="generateReportLang('country')" size="mini" class="el-province" @change="changeCountry">
-                  <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
-                    <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                  </el-option-group>
-                </el-select>
-                <region-multi-select :selected="curProvince" :placeholder="$t('reportView.regionI')" :options="provinceList" @changeInput="handleProChange"
-                                     style="display: inline" ref="proviceSelect" :disabled="curCountry.length==0||curCountry=='-1'" :all="$t('overview.allZoneI')"></region-multi-select>
-                <region-multi-select :selected="curCity" :placeholder="$t('reportView.regionII')" :options="cityList" @changeInput="handleCityChange"
-                                     style="display: inline" ref="citySelect" :disabled="curProvince.length==0||curCountry=='-1'" :all="$t('overview.allZoneII')"></region-multi-select>
-                <multi-select :selected="curStore" :options="storeDataList" @changeInput="handleStoreChange" style="display: inline" ref="multiSelect">
-                </multi-select>
-                <span class="select-title">{{$t('reportView.selectStoreTag')}}</span>
-                <multi-select :selected="curStoreTag" :placeholder="$t('reportView.selectStoreTag')" :allSelect="0" :alltype="0" :options="StoreTagList" @changeInput="changeStoreTag"
-                                style="display: inline;margin-left: calc(20/1920*100vw);" ref="TagMultiSelect"></multi-select>
-            </el-col>
-            <el-col :span="24" class="header-details">
-                <span :class="lang== 'en'? 'en-span-class' : ''">{{generateReportLang('time')}}</span>
-                <el-date-picker
-                    ref="datePicker"
-                    v-model="dateValue"
-                    type="datetimerange"
-                    range-separator="~"
-                    size="mini"
-                    :clearable=false
-                    :editable=false
-                    format="yyyy/MM/dd HH:mm:ss"
-                    class="date-range"
-                    :picker-options='dateOpt'
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    @change="dateChange"
-                    @focus="dateFocus"
-                    :popper-class="poperClass"
-                    :default-time="defaultTime">
-                </el-date-picker>
-                <el-tooltip class="item" effect="dark"
-                    placement="bottom-end">
-                    <div slot="content">*{{generateReportLang('timePlaceholder')}}</div>
-                    <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"></i>
-                </el-tooltip>
-                <span>{{generateReportLang('reportType')}}</span>
-                <el-select v-model="curReportType"  :placeholder="generateReportLang('all')" size="mini"
-                    class="el-province" @change="changeReportType" @clear="clearReportType">
-                    <el-option
-                    v-for="item in reportTypeList"
-                    :key="item.mode"
-                    :label="item.label"
-                    :value="item.mode">
-                    </el-option>
-                </el-select>
-                <span>{{generateReportLang('resultType')}}</span>
-                <el-select v-model="curAppraise"  :placeholder="generateReportLang('all')" size="mini"
-                    class="el-province " @change="changeAppraise" @clear="clearAppraise">
-                    <el-option
-                    v-for="item in appraiseList"
-                    :key="item.status"
-                    :label="item.label"
-                    :value="item.status">
-                    </el-option>
-                </el-select>
-                 <div class="search-content">
-                    <span>{{generateReportLang('keywords')}}</span>
-                    <el-input size="mini" v-model="searchInput" class="search-input" clearable></el-input>
-                </div>
-                <el-button size="mini" :class="lang==='en'? 'en-search-btn':'search-btn' " @click="searchData" type="primary">{{generateReportLang('search')}}</el-button>
-            </el-col>
-            <!-- <el-col :span="24" class="header-details1">
-                <span class="choice-store">
-                  <i class="iconfont icon-tishi1" @mouseover="showStoreInfo=true" @mouseleave="showStoreInfo=false"></i>
-                  {{generateReportLang('selected')}}
-                  <span class="storename-str" style="margin-left:20px;">{{storeStr}}</span>
-                </span>
-                <div class="store-selected" v-if="showStoreInfo">
-                  <h1>{{generateReportLang('selected')}}</h1>
-                  <ul class="store-list" v-show="storeStr.length > 0">
-                     <li class="store-item">{{storeStr}}</li>
-                  </ul>
-                </div>
-            </el-col> -->
+  <el-row id="el-containter">
+    <el-col :span="24" class="report-header">
+      <el-col :span="24" class="header-details">
+        <span>{{ $t('remotePatrol.storeSelect') }}</span>
+        <el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" size="mini"
+                   class="el-province" @change="changeCountry">
+          <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
+            <el-option v-for="item in group.countryList" :key="item.value" :label="item.label"
+                       :value="item.value"/>
+          </el-option-group>
+        </el-select>
+        <region-multi-select
+          ref="proviceSelect"
+          :selected="curProvince"
+          :placeholder="$t('remotePatrol.regionI')"
+          :options="provinceList"
+          :disabled="curCountry.length === 0 || curCountry === '-1'"
+          :all="$t('overview.allZoneI')"
+          style="display: inline"
+          @changeInput="handleProChange"/>
+        <region-multi-select
+          ref="citySelect"
+          :selected="curCity"
+          :placeholder="$t('remotePatrol.regionII')"
+          :options="cityList"
+          :disabled="curProvince.length === 0 || curCountry === '-1'"
+          :all="$t('overview.allZoneII')"
+          style="display: inline"
+          @changeInput="handleCityChange"/>
+        <multi-select ref="multiSelect" :selected="curStore" :options="storeDataList"
+                      style="display: inline" @changeInput="handleStoreChange"/>
+        <span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>
+        <multi-select
+          ref="TagMultiSelect"
+          :selected="curStoreTag"
+          :placeholder="$t('remotePatrol.selectStoreTag')"
+          :all-select="0"
+          :alltype="0"
+          :options="StoreTagList"
+          style="display: inline;margin-left: calc(20/1920*100vw);"
+          @changeInput="changeStoreTag"/>
+      </el-col>
+      <el-col :span="24" class="header-details">
+        <span :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
+        <el-date-picker
+          ref="datePicker"
+          v-model="dateValue"
+          :clearable="false"
+          :editable="false"
+          :picker-options="dateOpt"
+          :popper-class="poperClass"
+          :default-time="defaultTime"
+          type="datetimerange"
+          range-separator="~"
+          size="mini"
+          format="yyyy/MM/dd HH:mm:ss"
+          class="date-range"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          @change="dateChange"
+          @focus="dateFocus"/>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          placement="bottom-end">
+          <div slot="content">*{{ $t('remotePatrol.timePlaceholder') }}</div>
+          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
+        </el-tooltip>
+        <span>{{ $t('remotePatrol.reportType') }}</span>
+        <el-select
+          v-model="curReportType"
+          :placeholder="$t('remotePatrol.all')"
+          size="mini"
+          class="el-province"
+        >
+          <el-option
+            v-for="item in reportTypeList"
+            :key="item.mode"
+            :label="item.label"
+            :value="item.mode"/>
+        </el-select>
+        <span>{{ $t('remotePatrol.resultType') }}</span>
+        <el-select
+          v-model="curAppraise"
+          :placeholder="$t('remotePatrol.all')"
+          size="mini"
+          class="el-province "
+        >
+          <el-option
+            v-for="item in appraiseList"
+            :key="item.status"
+            :label="item.label"
+            :value="item.status"/>
+        </el-select>
+        <div class="search-content">
+          <span>{{ $t('remotePatrol.keywords') }}</span>
+          <el-input v-model="searchInput" size="mini" class="search-input" clearable/>
+        </div>
+        <el-button :class="lang==='en'? 'en-search-btn':'search-btn' " size="mini" type="primary"
+                   @click="searchData">{{ $t('remotePatrol.search') }}</el-button>
+      </el-col>
+    </el-col>
+    <el-col :span="24" class="report-content">
+      <el-row v-if="reportList.length!=0" class="card-content">
+        <el-col v-if="reportList.length!=0" :span="24" class="card-header">
+          <el-radio v-for="(item,index) in sortTypeList" v-model="curSortType" :key="index" :label="item.id"
+                    style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;" @change="checkSortType">
+            <span>{{ item.name }}</span>
+          </el-radio>
+          <div class="list_card">
+            <div :style="isHoverCard || ShowCard ? 'color:#f31d65':''" class="pattern_btn" @click="ShowCard=true"
+                 @mouseover="isHoverCard=true" @mouseout="isHoverCard=false">
+              <i class="iconfont icon-suolvetu iconCard"/>
+              <span class="text-pattern">{{ $t('remotePatrol.cardStyle') }}</span>
+            </div>
+            <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
+            <div :style="isHoverList || !ShowCard ? 'color:#f31d65':''" class="pattern_btn"
+                 @click="ShowCard=false" @mouseover="isHoverList=true" @mouseout="isHoverList=false">
+              <i class="iconfont icon-liebiao iconCard"/>
+              <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
+            </div>
+            <el-button :class="lang === 'en' ? 'en-export-btn':'export-btn'" type="primary" size="mini"
+                       @click="export2Excel" >
+              <div class="btn-area">
+                <img :src="exportPng" class="icon-excel">
+                <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+              </div>
+            </el-button>
+          </div>
         </el-col>
-        <el-col :span="24" class="report-content">
-            <el-row class="card-content" v-if="reportList.length!=0">
-                <el-col :span="24" class="card-header" v-if="reportList.length!=0">
-                    <el-radio style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;" v-model="curSortType" v-for="(item,index) in sortTypeList" :key="index" :label="item.id" @change="checkSortType">
-                      <span>{{item.name}}</span>
-                    </el-radio>
-                    <div class="list_card">
-                      <div class="pattern_btn" @click="ShowCard=true" @mouseover="isHoverCard=true" @mouseout="isHoverCard=false" :style="isHoverCard||ShowCard?'color:#f31d65':''">
-                        <i class="iconfont icon-suolvetu iconCard"/>
-                        <span class="text-pattern">{{$t('remotePatrol.cardStyle')}}</span>
-                      </div>
-                      <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
-                      <div class="pattern_btn" @click="ShowCard=false" @mouseover="isHoverList=true" @mouseout="isHoverList=false" :style="isHoverList||!ShowCard?'color:#f31d65':''">
-                        <i class="iconfont icon-liebiao iconCard"/>
-                        <span class="text-pattern">{{$t('remotePatrol.listStyle')}}</span>
-                      </div>
-                      <el-button type="primary" size="mini" :class="lang=='en' ? 'en-export-btn':'export-btn'" @click="export2Excel" >
-                        <div class="btn-area">
-                          <img :src="exportPng" class="icon-excel">
-                          <span class="spanClass">{{$t('eventView.exportReport')}}</span>
-                        </div>
-                      </el-button>
+        <div v-if="ShowCard" :style="{'height':varyWindowHeight*0.54+'px'}" class="showCardHeight">
+          <el-scrollbar id="el-menuscrollbar" style="height:100%;width:100%">
+            <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
+              <div class="cards" @click="clickReport(item,index)">
+                <img :src="item.iconSrc" :height="iconSrcHeight" alt="" class="item-img">
+                <div class="item-flex">
+                  <div class="item-header">
+                    <div class="store-name">
+                      <span class="name">{{ item.storeName }}</span>
+                      <span class="inspect">{{ item.tagName }}</span>
                     </div>
-                </el-col>
-                <div v-if="ShowCard" :style="{'height':varyWindowHeight*0.54+'px'}" class="showCardHeight">
-                  <el-scrollbar style="height:100%;width:100%" id="el-menuscrollbar">
-                  <el-col :span="4" class="report-card" v-for="(item,index) in reportList" :key="index">
-                    <div class="cards" @click="clickReport(item,index)">
-                        <img :src="item.iconSrc" alt="" :height="iconSrcHeight" class="item-img"/>
-                        <div class="item-flex">
-                          <div class="item-header">
-                            <!-- <img :src="item.inspectSrc" alt="" :height="iconSrcHeight*3/5" class="inspect-img"/> -->
-                            <div class="store-name">
-                              <span class="name">{{item.storeName}}</span>
-                              <span class="inspect">{{item.tagName}}</span>
-                            </div>
-                          </div>
-                          <div class="item-icon">
-                            <i class="iconfont inspectIcon" :class="item.mode==0?'icon-yuanchengxunjian':'icon-xianchangxunjian'"></i>
-                          </div>
-                          <div class="item-content">
-                            <span class="assigner">{{generateReportLang('submitter')}} {{item.submitterName}}</span>
-                            <span class="datestr">{{item.datestr}}</span>
-                          </div>
-                        </div>
-                    </div>
-                  </el-col>
-                  </el-scrollbar>
+                  </div>
+                  <div class="item-icon">
+                    <i :class="item.mode === 0 ? 'icon-yuanchengxunjian' : 'icon-xianchangxunjian'"
+                       class="iconfont inspectIcon"/>
+                  </div>
+                  <div class="item-content">
+                    <span class="assigner">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</span>
+                    <span class="datestr">{{ item.datestr }}</span>
+                  </div>
                 </div>
-                <div v-if="!ShowCard" class="list-table">
-                  <el-table
-                            :data="reportList"
-                            :highlight-current-row="true"
-                            align='left'
-                            stripe
-                            height="calc(500/1920*100vw)"
-                            @sort-change='sortChange'
-                            @row-click='clickReport'
-                            style=""
-                            class="table-content"
-                            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-                            :cell-style="cellStyle"
-                            :cell-class-name="cellClass"
-                            :header-cell-class-name="headerClass"
-                        >
-                            <el-table-column v-for="(_item,_index) in reportInfoTable" :key="_index" align="left"
-                                      :prop="_item.prop" :label="_item.label" :sortable="_item.sortable" :min-width="_item.width">
-                            </el-table-column>
-                            <el-table-column
-                                prop="option"
-                                :label="$t('eventView.operation')"
-                                min-width="150"
-                                align="left">
-                                <template slot-scope="scope">
-                                    <i class="iconfont icon-gengduo" @click="toReportDetail(scope.row)"></i>
-                                </template>
-                            </el-table-column>
-                            <div slot="empty">
-                                <div>
-                                    <i class="iconfont icon-zhengque empty-data-icon"></i>
-                                    <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{$t('eventView.noEvents')}}</span>
-                                </div>
-                            </div>
-                        </el-table>
-                </div>
-                <el-col :span="24" class="el-pat">
-                    <el-pagination background small
-                        @current-change="currentChange"
-                        layout="jumper,total, prev, pager, next,sizes"
-                        :page-size="sizeNum" :total="total"
-                        :current-page="page"
-                        :page-sizes="[12,24,50,100]"
-                        @size-change="sizeChange"
-                        class="el-pag">
-                    </el-pagination>
-                </el-col>
-            </el-row>
-            <el-row class="card-content" v-else>
-              <div class="empty-content">{{noData}}</div>
-            </el-row>
+              </div>
+            </el-col>
+          </el-scrollbar>
+        </div>
+        <div v-if="!ShowCard" class="list-table">
+          <el-table
+            :data="reportList"
+            :highlight-current-row="true"
+            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+            :cell-style="cellStyle"
+            :cell-class-name="cellClass"
+            :header-cell-class-name="headerClass"
+            align="left"
+            stripe
+            height="calc(500/1920*100vw)"
+            style=""
+            class="table-content"
+            @sort-change="sortChange"
+            @row-click="clickReport"
+          >
+            <el-table-column
+              v-for="(_item,_index) in reportInfoTable"
+              :key="_index"
+              :prop="_item.prop"
+              :label="_item.label"
+              :sortable="_item.sortable"
+              :min-width="_item.width"
+              align="left"/>
+            <el-table-column
+              :label="$t('eventView.operation')"
+              prop="option"
+              min-width="150"
+              align="left">
+              <template slot-scope="scope">
+                <i class="iconfont icon-gengduo"/>
+              </template>
+            </el-table-column>
+            <div slot="empty">
+              <div>
+                <i class="iconfont icon-zhengque empty-data-icon"/>
+                <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
+              </div>
+            </div>
+          </el-table>
+        </div>
+        <el-col :span="24" class="el-pat">
+          <el-pagination
+            :page-size="sizeNum"
+            :total="total"
+            :current-page="page"
+            :page-sizes="[12,24,50,100]"
+            background
+            small
+            layout="jumper,total, prev, pager, next,sizes"
+            class="el-pag"
+            @current-change="currentChange"
+            @size-change="sizeChange"/>
         </el-col>
-    </el-row>
+      </el-row>
+      <el-row v-else class="card-content">
+        <div class="empty-content">{{ noData }}</div>
+      </el-row>
+    </el-col>
+  </el-row>
 </template>
 <script>
-import {getInspectReportList} from '@/api/inspect'
-import {getStoreList,getBriefStoreList,GetTagList} from '@/api/store'
-import util from '@/common/util'
-import {Message} from 'element-ui'
-import {generateReportLang} from '@/api/i18n'
-import {mapGetters} from 'vuex'
-import MultiSelect from '@/components/MultiSelect'
-import RegionMultiSelect from '@/components/RegionMultiSelect'
+import { getInspectReportList } from '@/api/inspect';
+import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
+import util from '@/common/util';
+import { mapGetters } from 'vuex';
+import MultiSelect from '@/components/MultiSelect';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
 
 export default {
-    name:'InspectReportList',
-    components: {
-      MultiSelect,
-      RegionMultiSelect
-    },
-    data(){
-        return{
-            varyWindowWidth:window.innerWidth,
-            varyWindowHeight:window.innerHeight,
-            videoSrc:require('../../../static/img/监控icon.png'),
-            inspectSrc:require('../../../static/img/远程icon.png'),
-            insiteInspectSrc:require('../../../static/img/现场icon.png'),
-            searchContent:false,
-            inspectSrc1:require('../../../static/img/总评icon1.png'),
-            inspectSrc2:require('../../../static/img/总评icon2.png'),
-            inspectSrc3:require('../../../static/img/总评icon3.png'),
-            inspectSrc4:require('../../../static/img/总评icon4.png'),
-            inspectSrc5:require('../../../static/img/总评icon5.png'),
-            inspectSrc6:require('../../../static/img/总评icon6.png'),
-            inspectSrc7:require('../../../static/img/总评icon7.png'),
-            inspectSrc8:require('../../../static/img/总评icon8.png'),
-            inspectSrc9:require('../../../static/img/总评icon9.png'),
-            inspectSrc10:require('../../../static/img/总评icon10.png'),
-            exportPng: require('../../../static/img/icon_excel.png'),
-            reportList:[],
-            curSortType:0,
-            ShowCard:true,
-            isHoverList:false,
-            isHoverCard:false,
-            sortTypeList:[
-                {
-                    id:0,
-                    name: this.$t('reportView.rankTime')
-                },
-                {
-                    id:1,
-                    name: this.$t('reportView.rankScore')
-                },
-                {
-                    id:2,
-                    name: this.$t('reportView.rankStore')
-                }
-            ],
-            reportInfoTable:[
-              {
-                prop: "storeName",
-                label: this.$t('remotePatrol.patrolStore'),
-                sortable:false,
-                width: '220',
-              },
-              {
-                prop: "storeTag",
-                label: this.$t('remotePatrol.storeTag'),
-                sortable:false,
-                width: '180',
-              },
-              {
-                prop: "submitterName",
-                label: this.$t('scheduleView.InspectPerson'),
-                sortable:false,
-                width: '160',
-              },
-              {
-                prop: "tagName",
-                label: this.$t('overview.patrolLists'),
-                sortable:false,
-                width: '150',
-              },
-              {
-                prop: "modeText",
-                label: this.$t('remotePatrol.patrolWay'),
-                sortable:false,
-                width: '150',
-              },
-              {
-                prop: "status",
-                label: this.$t('remotePatrol.patrolResult'),
-                sortable:false,
-                width: '150',
-              },
-              {
-                prop: "totalScore",
-                label: this.$t('remotePatrol.patrolScore'),
-                sortable:false,
-                width: '150',
-              },
-              {
-                prop: "datestr",
-                label: this.$t('remotePatrol.patrolDate'),
-                sortable:true,
-                width: '184',
-              },
-            ],
-            curCountry:'',
-            countryList:[],
-            curProvince: [],
-            curStoreTag:[],
-            StoreTagList:[],
-            provinceList:[],
-            curCity:[],
-            cityList:[],
-            curStore:[],
-            storeList:[],
-            searchInput:'',
-            exportList:[],
-            sizeNum:12,
-            defaultTime:[],
-            dateValue:[new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()],
-            dateOpt: {
-                disabledDate:(time)=>{
-                    return time.getTime() > Date.now();
-                }
-            },
-            curReportType: -1,
-            reportTypeList:[
-              {'mode':-1,'label':this.$t('reportView.all')},{'mode':0,'label':this.$t('reportView.remotePatrol')},{'mode':1,'label':this.$t('reportView.onsitePatrol')}
-            ],
-            curAppraise: -1,
-            appraiseList:[
-                {'status':-1,'label':this.$t('reportView.all')},
-                {'status':0,'label':this.$t('reportView.dangerous')},
-                {'status':1,'label':this.$t('reportView.improve')},
-                {'status':2,'label':this.$t('overview.echartGood')},
-                // {'status':3,'label':this.$t('reportView.excellent')},
-            ],
-            storeStr:'',
-            total: 0,
-            page:0,
-            params:{},
-            storeDataList:[],
-            storeIdList:[],  //存放当前选中的门店id
-            poperClass:'date-picker-poper',
-            lang: this.$i18n.locale,
-            isFirstLoad: false,
-            storeName: '',
-            showMonthDrap: false,
-            showStoreContent: false,
-            checkAllStore: false,
-            noData: '',
-            showStoreInfo: false,
-            cellClass: 'report-cell-class',
-            headerClass:'report-header-class',
-            exportReportHeader:[this.$t('reportView.regionI'),
-                                this.$t('reportView.regionII'),
-                                this.$t('remotePatrol.patrolStore'),
-                                this.$t('remotePatrol.storeTag'),
-                                this.$t('scheduleView.InspectPerson'),
-                                this.$t('overview.patrolLists'),
-                                this.$t('remotePatrol.patrolWay'),
-                                this.$t('remotePatrol.patrolResult'),
-                                this.$t('remotePatrol.patrolScore'),
-                                this.$t('remotePatrol.patrolDate'),]
-        }
-    },
-    created(){
-      let self=this
-      self.isFirstLoad = true
-    },
-    computed:{
-        iconSrcHeight(){
-            return (this.varyWindowWidth/1920)*50;
+  name: 'InspectReportList',
+  components: {
+    MultiSelect,
+    RegionMultiSelect
+  },
+  data() {
+    return {
+      varyWindowWidth: window.innerWidth,
+      varyWindowHeight: window.innerHeight,
+      videoSrc: require('../../../static/img/monitor.png'),
+      inspectSrc: require('../../../static/img/remote_patrol.png'),
+      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      searchContent: false,
+      inspectSrc1: require('../../../static/img/dangerous_cn.png'),
+      inspectSrc2: require('../../../static/img/good_cn.png'),
+      inspectSrc3: require('../../../static/img/improved_cn.png'),
+      inspectSrc4: require('../../../static/img/dangerous_en.png'),
+      inspectSrc5: require('../../../static/img/good_en.png'),
+      inspectSrc6: require('../../../static/img/improved_en.png'),
+      inspectSrc7: require('../../../static/img/dangerout_tw.png'),
+      inspectSrc8: require('../../../static/img/excellent_cn.png'),
+      inspectSrc9: require('../../../static/img/excellent_en.png'),
+      inspectSrc10: require('../../../static/img/excellent_tw.png'),
+      exportPng: require('../../../static/img/excel.png'),
+      reportList: [],
+      curSortType: 0,
+      ShowCard: true,
+      isHoverList: false,
+      isHoverCard: false,
+      sortTypeList: [
+        {
+          id: 0,
+          name: this.$t('remotePatrol.rankTime')
         },
-        ...mapGetters({accountChanged:'accountChanged'})
-    },
-    watch:{
-      accountChanged(val,oldVal){
-        console.log(val);
-        let self=this;
-        if(val!=0){
-          self.storeDataList = [];
-          self.$refs.multiSelect.selectedArray = [];
-          self.$refs.multiSelect.input=''
-          self.initData();
-          window.setTimeout(function(){
-              self.$route.meta.keepAlive = true;
-              console.log(self.$route.meta.keepAlive);
-            },
-            300);
+        {
+          id: 1,
+          name: this.$t('remotePatrol.rankScore')
+        },
+        {
+          id: 2,
+          name: this.$t('remotePatrol.rankStore')
         }
+      ],
+      reportInfoTable: [
+        {
+          prop: 'storeName',
+          label: this.$t('remotePatrol.patrolStore'),
+          sortable: false,
+          width: '220'
+        },
+        {
+          prop: 'storeTag',
+          label: this.$t('remotePatrol.storeTag'),
+          sortable: false,
+          width: '180'
+        },
+        {
+          prop: 'submitterName',
+          label: this.$t('scheduleView.InspectPerson'),
+          sortable: false,
+          width: '160'
+        },
+        {
+          prop: 'tagName',
+          label: this.$t('overview.patrolLists'),
+          sortable: false,
+          width: '150'
+        },
+        {
+          prop: 'modeText',
+          label: this.$t('remotePatrol.patrolWay'),
+          sortable: false,
+          width: '150'
+        },
+        {
+          prop: 'status',
+          label: this.$t('remotePatrol.patrolResult'),
+          sortable: false,
+          width: '150'
+        },
+        {
+          prop: 'totalScore',
+          label: this.$t('remotePatrol.patrolScore'),
+          sortable: false,
+          width: '150'
+        },
+        {
+          prop: 'datestr',
+          label: this.$t('remotePatrol.patrolDate'),
+          sortable: true,
+          width: '184'
+        }
+      ],
+      curCountry: '',
+      countryList: [],
+      curProvince: [],
+      curStoreTag: [],
+      StoreTagList: [],
+      provinceList: [],
+      curCity: [],
+      cityList: [],
+      curStore: [],
+      storeList: [],
+      searchInput: '',
+      exportList: [],
+      sizeNum: 12,
+      defaultTime: [],
+      dateValue: [new Date().setTime(new Date().getTime() - 3600 * 1000 * 24), new Date()],
+      dateOpt: {
+        disabledDate: (time) => {
+          return time.getTime() > Date.now();
+        }
+      },
+      curReportType: -1,
+      reportTypeList: [
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+      ],
+      curAppraise: -1,
+      appraiseList: [
+        { 'status': -1, 'label': this.$t('remotePatrol.all') },
+        { 'status': 0, 'label': this.$t('remotePatrol.dangerous') },
+        { 'status': 1, 'label': this.$t('remotePatrol.improve') },
+        { 'status': 2, 'label': this.$t('overview.echartGood') }
+      ],
+      storeStr: '',
+      total: 0,
+      page: 0,
+      params: {},
+      storeDataList: [],
+      storeIdList: [],
+      poperClass: 'date-picker-poper',
+      lang: this.$i18n.locale,
+      isFirstLoad: false,
+      storeName: '',
+      showMonthDrap: false,
+      showStoreContent: false,
+      checkAllStore: false,
+      noData: '',
+      showStoreInfo: false,
+      cellClass: 'report-cell-class',
+      headerClass: 'report-header-class',
+      exportReportHeader: [this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('remotePatrol.patrolStore'),
+        this.$t('remotePatrol.storeTag'),
+        this.$t('scheduleView.InspectPerson'),
+        this.$t('overview.patrolLists'),
+        this.$t('remotePatrol.patrolWay'),
+        this.$t('remotePatrol.patrolResult'),
+        this.$t('remotePatrol.patrolScore'),
+        this.$t('remotePatrol.patrolDate')]
+    };
+  },
+  created() {
+    const self = this;
+    self.isFirstLoad = true;
+  },
+  computed: {
+    iconSrcHeight() {
+      return (this.varyWindowWidth / 1920) * 50;
+    },
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
+  watch: {
+    accountChanged(val, oldVal) {
+      console.log(val);
+      const self = this;
+      if (val !== 0) {
+        self.storeDataList = [];
+        self.$refs.multiSelect.selectedArray = [];
+        self.$refs.multiSelect.input = '';
+        self.initData();
+        window.setTimeout(function() {
+          self.$route.meta.keepAlive = true;
+          console.log(self.$route.meta.keepAlive);
+        },
+        300);
+      }
+    }
+  },
+
+  activated() {
+    const self = this;
+    if (!self.$route.meta.isBack || self.isFirstLoad) {
+      self.initData();
+    } else {
+      //
+    }
+    self.$route.meta.isBack = false;
+    self.isFirstLoad = false;
+  },
+
+  methods: {
+    changeBrand() {
+      const self = this;
+      self.curCountry = '';
+      self.countryList = [];
+      self.curProvince = [];
+      self.provinceList = [];
+      self.curCity = [];
+      self.cityList = [];
+      self.curStore = [];
+      self.storeList = [];
+      self.searchInput = '';
+      self.curStoreTag = [];
+    },
+
+    initData() {
+      const self = this;
+      self.changeBrand();
+      self.getCountryStore();
+      self.getTagListData();
+      self.defaultTime = [];
+      self.storeStr = '';
+      self.dateValue = [new Date().setTime(new Date().getTime() - 3600 * 1000 * 24), new Date()];
+      self.reportList = [];
+      self.curSortType = 0;
+      self.storeName = '';
+      self.showMonthDrap = false;
+      self.showStoreContent = false;
+      self.checkAllStore = false;
+      self.curStore = [];
+      self.StoreTagList = [];
+    },
+
+    async export2Excel() {
+      const that = this;
+      if (that.reportList.length === 0) {
+        that.$message({
+          message: that.$t('remotePatrol.emptyReportList'),
+          type: 'warning'
+        });
+        return false;
+      }
+      const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
+      const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
+      that.params.beginTs = start;
+      that.params.endTs = end;
+      that.params.filter = { page: 0, size: that.total };
+      const storeIds = that.storeStr.split('，');
+      that.params.clause = { storeId: storeIds };
+      require.ensure([], async() => {
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = that.exportReportHeader;
+        const filterVal = ['regionI', 'regionII', 'storeName', 'storeTag', 'submitterName', 'tagName',
+          'modeText', 'status', 'totalScore', 'datestr'];
+        let curData = [];
+        curData = await that.getReportList(that.params, 1);
+        const data = that.formatJson(filterVal, curData);
+        const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
+        export_json_to_excel(tHeader, data, fileName);
+      });
+    },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+
+    cellStyle({ row, column, rowIndex, columnIndex }) {
+      console.log(row);
+      console.log(columnIndex);
+      let obj = {};
+      if (columnIndex === 0) {
+        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      } else {
+        obj = { 'border-right': '1px solid #e3e9f4' };
+      }
+      return obj;
+    },
+
+    getReportList(params, e) {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        getInspectReportList(params).then(res => {
+          const errCode = res.errCode;
+          let data = [];
+          if (errCode === 0) {
+            data = res.data.content;
+          }
+          const temp = [];
+          data.forEach(item => {
+            const obj = {};
+            obj.id = item.id;
+            obj.datestr = util.getDateStr(item.ts);
+            obj.storeName = item.storeName;
+            obj.tagName = item.tagName;
+            obj.submitterName = item.submitterName;
+            obj.submitter = item.submitter;
+            obj.routeObj = item;
+            obj.mode = item.mode;
+            obj.totalScore = item.totalScore;
+            obj.regionI = '区域一';
+            obj.regionII = '区域二';
+            if (item.mode === 0) {
+              obj.modeText = self.$t('overview.remotePatrol');
+            } else if (item.mode === 1) {
+              obj.modeText = self.$t('overview.onsitePatrol');
+            }
+            let storeTag = '';
+            item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
+              const isuu = _index === item.tags.length - 1 ? '' : ',';
+              storeTag += _item + isuu;
+            }) : storeTag = '--';
+            obj.storeTag = storeTag;
+            self.storeList.forEach(_item => {
+              if (item.storeId === _item.storeId) {
+                obj.regionI = _item.province;
+                obj.regionII = _item.city;
+              }
+            });
+            switch (item.status) {
+              case 0: {
+                // dangerous
+                obj.status = self.$t('overview.danger');
+                if (self.lang === 'zh') {
+                  obj.iconSrc = self.inspectSrc1;
+                } else if (self.lang === 'en') {
+                  obj.iconSrc = self.inspectSrc4;
+                } else if (self.lang === 'zhtw') {
+                  obj.iconSrc = self.inspectSrc7;
+                } else {
+                  obj.iconSrc = self.inspectSrc1;
+                }
+                break;
+              }
+              case 1: {
+                // improved
+                obj.status = self.$t('overview.improve');
+                if (self.lang === 'zh') {
+                  obj.iconSrc = self.inspectSrc3;
+                } else if (self.lang === 'en') {
+                  obj.iconSrc = self.inspectSrc6;
+                } else if (self.lang === 'zhtw') {
+                  obj.iconSrc = self.inspectSrc3;
+                } else {
+                  obj.iconSrc = self.inspectSrc3;
+                }
+                break;
+              }
+
+              case 2: {
+                // pass
+                obj.status = self.$t('overview.pass');
+                if (self.lang === 'zh') {
+                  obj.iconSrc = self.inspectSrc2;
+                } else if (self.lang === 'en') {
+                  obj.iconSrc = self.inspectSrc5;
+                } else if (self.lang === 'zhtw') {
+                  obj.iconSrc = self.inspectSrc2;
+                } else {
+                  obj.iconSrc = self.inspectSrc2;
+                }
+                break;
+              }
+              default : {
+                // good
+                if (self.lang === 'zh') {
+                  obj.iconSrc = self.inspectSrc8;
+                } else if (self.lang === 'en') {
+                  obj.iconSrc = self.inspectSrc9;
+                } else if (self.lang === 'zhtw') {
+                  obj.iconSrc = self.inspectSrc10;
+                } else {
+                  obj.iconSrc = self.inspectSrc8;
+                }
+                break;
+              }
+            }
+            temp.push(obj);
+          });
+          e === 0 ? self.reportList = temp : self.exportList = temp;
+          self.total = res.data.totalElements;
+          if (self.reportList.length === 0) {
+            self.noData = self.$t('deviceView.noData');
+          }
+          resolve(temp);
+        });
+      });
+    },
+
+    getStoreData(params) {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        getStoreList(params).then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            const data = res.data;
+            resolve(res);
+          }
+        }).catch(res => {
+          resolve(res);
+        });
+      });
+    },
+
+    getInitReportList() {
+      const self = this;
+      const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+      const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+      self.params.beginTs = start;
+      self.params.endTs = end;
+      self.params.filter = { page: 0, size: self.sizeNum };
+      const storeIds = self.storeStr.split('，');
+      self.params.clause = { storeId: storeIds };
+      self.getReportList(self.params, 0);
+    },
+
+    async getCountryStore() {
+      const self = this;
+      const data = await self.getBriefStoreData();
+      const temp = [];
+      if (data.errCode === 0 && data.errMsg === 'Success') {
+        self.storeList = data.data;
+        if (self.storeList.length !== 0) {
+          self.storeList.forEach(item => {
+            const country = item.country;
+            if (temp.map(x => x.label).indexOf(country) === -1) {
+              const obj = {
+                value: country,
+                label: country
+              };
+              temp.push(obj);
+            }
+          });
+        }
+        const countryList = temp;
+        self.countryList[0] = {};
+        self.countryList[0].label = self.$t('remotePatrol.country');
+        self.countryList[0].countryList = countryList;
+        self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+        self.curCountry = countryList[0].value;
+        self.selectAllProAndCity(self.curCountry);
       }
     },
-    methods:{
-        generateReportLang,
-        changeBrand(){
-            let self=this;
-            self.curCountry='';
-            self.countryList=[];
-            self.curProvince= [];
-            self.provinceList=[];
-            self.curCity= [];
-            self.cityList=[];
-            self.curStore=[];
-            self.storeList=[];
-            self.searchInput='';
-            self.curStoreTag=[]
 
-        },
-        initData(){
-          let self=this;
-          self.changeBrand();
-          self.getCountryStore()
-          self.getTagListData()
-          self.defaultTime=[];
-          self.storeStr = '';
-          self.dateValue = [new Date().setTime(new Date().getTime()-3600 * 1000 * 24),new Date()];
-          self.reportList=[];
-          self.curSortType=0;
-          self.storeName =  '';
-          self.showMonthDrap = false;
-          self.showStoreContent =  false;
-          self.checkAllStore =  false;
-          self.curStore=[];
-          self.StoreTagList=[]
-        },
-        async export2Excel(){
-          let that = this;
-          if(that.reportList.length==0){
-            that.$message({
-              message: that.$t('remotePatrol.emptyReportList'),
-              type:'warning',
-            })
-            return false;
+    getBriefStoreData() {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            const data = res.data;
+            resolve(res);
           }
-          let start=typeof(that.dateValue[0])==='object'?that.dateValue[0].getTime():that.dateValue[0];
-          let end=typeof(that.dateValue[1])==='object'?that.dateValue[1].getTime():that.dateValue[1];
-          that.params.beginTs=start;
-          that.params.endTs=end;
-          that.params.filter={page:0,size:that.total};
-          let storeIds = that.storeStr.split('，')
-          that.params.clause = {storeId: storeIds}
-          require.ensure([], async() => {
-            const { export_json_to_excel } = require('@/excel/Export2Excel');
-            const tHeader = that.exportReportHeader; // 导出的表头名
-            const filterVal = ['regionI','regionII','storeName','storeTag','submitterName','tagName','modeText','status','totalScore','datestr']; // 导出的表头字段名
-            let curData = [];
-            curData = await that.getReportList(that.params,1);
-            const data = that.formatJson(filterVal, curData);
-            let fileName = that.$t('remotePatrol.reportExcelList') +'-'+util.getCurDateStr();
-            export_json_to_excel(tHeader, data, fileName);// 导出的表格名称，根据需要自己命名
-          })
-        },
-        formatJson(filterVal, jsonData) {
-          return jsonData.map(v => filterVal.map(j => v[j]))
-        },
-        toReportDetail(){
+        }).catch(res => {
+          resolve(res);
+        });
+      });
+    },
 
-        },
-        cellStyle({ row, column, rowIndex, columnIndex}){
-          console.log(row);
-          console.log(columnIndex);
-          let obj = {};
-          if(columnIndex == 0){
-            obj = {'border-left': '1px solid #e3e9f4','border-right':'1px solid #e3e9f4'};
-          }
-          else{
-            obj = {'border-right':'1px solid #e3e9f4'}
-          }
-          return obj;
-        },
-        getReportList(params,e){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-              getInspectReportList(params).then(res=>{
-                  let errCode=res.errCode;
-                  let data=[];
-                  if(errCode==0){
-                      data=res.data.content;
-                  }
-                  let temp=[];
-                  data.forEach(item => {
-                      let obj={};
-                      obj.id=item.id;
-                      obj.datestr=util.getDateStr(item.ts);
-                      obj.storeName=item.storeName;
-                      obj.tagName=item.tagName;
-                      obj.submitterName=item.submitterName;
-                      obj.submitter=item.submitter;
-                      obj.routeObj=item;
-                      obj.mode=item.mode;
-                      obj.totalScore=item.totalScore;
-                      obj.regionI='区域一';
-                      obj.regionII='区域二';
-                      if(item.mode==0){
-                        obj.modeText=self.$t('overview.remotePatrol')
-                      }else if(item.mode==1){
-                        obj.modeText=self.$t('overview.onsitePatrol')
-                      }
-                      let storeTag=''
-                      item.tags.length!=0 ? item.tags.forEach((_item,_index)=>{
-                        let isuu= _index==item.tags.length-1?'':',';
-                        storeTag+=_item+isuu
-                      }) : storeTag='--'
-                      obj.storeTag=storeTag
-                      self.storeList.forEach(_item=>{
-                        if(item.storeId==_item.storeId){
-                          obj.regionI=_item.province
-                          obj.regionII=_item.city
-                        }
-                      })
-                      switch(item.status){
+    handleStoreChange(arr) {
+      console.log(arr);
+      this.curStore = arr;
+      this.changeStore(arr);
+    },
 
-                        /**
-                         * 根据语言和类型返回图片形式
-                         */
-                        case 0: {
-                            // 立即督导
-                            obj.status = self.$t('overview.danger')
-                            if(self.lang == 'zh'){
-                              obj.iconSrc=self.inspectSrc1;
-                            }
-                            else if(self.lang == 'en'){
-                              obj.iconSrc=self.inspectSrc4;
-                            }
-                            else if(self.lang == 'zhtw'){
-                              obj.iconSrc=self.inspectSrc7;
-                            }
-                            else {
-                              obj.iconSrc=self.inspectSrc1;
-                            }
-                            break;
-                          }
-                          case 1: {
-                            // 待改善
-                            obj.status = self.$t('overview.improve')
-                            if(self.lang == 'zh'){
-                              obj.iconSrc=self.inspectSrc3;
-                            }
-                            else if(self.lang == 'en'){
-                              obj.iconSrc=self.inspectSrc6;
-                            }
-                            else if(self.lang == 'zhtw'){
-                              obj.iconSrc=self.inspectSrc3;
-                            }
-                            else {
-                              obj.iconSrc=self.inspectSrc3;
-                            }
-                            break;
-                          }
+    handleProChange(arr) {
+      console.log(arr);
+      this.curProvince = arr;
+      this.changePro(arr);
+    },
 
-                        case 2:{
-                            //合格
-                            obj.status = self.$t('overview.pass')
-                            if(self.lang == 'zh'){
-                              obj.iconSrc=self.inspectSrc2;
-                            }
-                            else if(self.lang == 'en'){
-                              obj.iconSrc=self.inspectSrc5;
-                            }
-                            else if(self.lang == 'zhtw'){
-                              obj.iconSrc=self.inspectSrc2;
-                            }
-                            else {
-                              obj.iconSrc=self.inspectSrc2;
-                            }
-                            break;
-                          }
-                        default :{
-                          //good
-                          if(self.lang == 'zh'){
-                            obj.iconSrc=self.inspectSrc8;
-                          }
-                          else if(self.lang == 'en'){
-                            obj.iconSrc=self.inspectSrc9;
-                          }
-                          else if(self.lang == 'zhtw'){
-                            obj.iconSrc=self.inspectSrc10;
-                          }
-                          else {
-                            obj.iconSrc=self.inspectSrc8;
-                          }
-                          break;
-                        }
-                      }
-                      temp.push(obj);
-                  });
-                  e==0 ? self.reportList=temp : self.exportList=temp
-                  self.total=res.data.totalElements;
-                  if(self.reportList.length == 0){
-                    self.noData = self.$t('deviceView.noData')
-                  }
-                  resolve(temp)
-              })
-            })
-        },
-        getStoreData(params){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-                getStoreList(params).then(res=>{
-                    let errMsg=res.errMsg;
-                    if(errMsg!=undefined&&errMsg=='Success'){
-                        let data=res.data;
-                        resolve(res);
-                    }
-                }).catch(res => {
-                    resolve(res);
-                })
-            })
-        },
-        getInitReportList(){
-            let self=this;
-            let start=typeof(self.dateValue[0])==='object'?self.dateValue[0].getTime():self.dateValue[0];
-            let end=typeof(self.dateValue[1])==='object'?self.dateValue[1].getTime():self.dateValue[1];
-            self.params.beginTs=start;
-            self.params.endTs=end;
-            self.params.filter={page:0,size:self.sizeNum};
-            let storeIds = self.storeStr.split('，')
-            self.params.clause = {storeId: storeIds}
-            self.getReportList(self.params,0);
-        },
-        async getCountryStore(){
-                let self=this;
-                let data=await self.getBriefStoreData();
-                let temp=[]
-                if(data.errCode==0&&data.errMsg=='Success'){
-                    self.storeList=data.data;
-                    if(self.storeList.length!=0){
-                        self.storeList.forEach(item=>{
-                            let country=item.country;
-                            if(temp.map(x=>x.label).indexOf(country)==-1){
-                                let obj={
-                                    value:country,
-                                    label:country
-                                }
-                                temp.push(obj);
-                            }
-                        })
-                    }
-                    let countryList=temp;
-                    self.countryList[0] = {}
-                    self.countryList[0].label= self.$t('reportView.country');
-                    self.countryList[0].countryList = countryList
-                    self.countryList[0].countryList.unshift({value:'-1', label:self.$t('reportView.all')})
-                    self.curCountry = countryList[0].value;
-                    self.selectAllProAndCity(self.curCountry);
+    handleCityChange(arr) {
+      console.log(arr);
+      this.curCity = arr;
+      this.changeCity(arr);
+    },
+
+    changeStore(val) {
+      const self = this;
+      let str = '';
+      self.storeList.forEach((item, index) => {
+        val.forEach(_item => {
+          if (item.storeId === _item) {
+            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
+              item.tagIds.forEach(t_item => {
+                if ( (t_item === v_item && self.curCountry === item.country)
+                  || (t_item === v_item && self.curCountry === '-1') ) {
+                  str += _item + '，';
                 }
-            },
-            getBriefStoreData(){
-                let self=this;
-                return new Promise((resolve,reject)=>{
-                    getBriefStoreList().then(res=>{
-                        let errMsg=res.errMsg;
-                        if(errMsg!=undefined&&errMsg=='Success'){
-                            let data=res.data;
-                            resolve(res);
-                        }
-                    }).catch(res => {
-                        resolve(res);
-                    })
-                })
-            },
-        handleStoreChange (arr) {
-          console.log(arr)
-          this.curStore = arr
-          this.changeStore(arr)
-        },
-        handleProChange(arr){
-          console.log(arr)
-          this.curProvince = arr
-          this.changePro(arr)
-        },
-        handleCityChange(arr){
-          console.log(arr)
-          this.curCity = arr
-          this.changeCity(arr)
-        },
-        changeStore(val){
-          let self=this;
-          let str='';
-          self.storeList.forEach((item,index)=>{
-              val.forEach(_item=>{
-                  if(item.storeId==_item){
-                      self.curStoreTag.length!=0 ? self.curStoreTag.forEach(v_item=>{
-                          item.tagIds.forEach(t_item=>{
-                              if((t_item==v_item&&self.curCountry==item.country)||(t_item==v_item&&self.curCountry=='-1')){
-                                  str+=_item+'，'
-                              }
-                          })
-                      }) : (item.storeId==_item ? str+=_item+'，' : null)
-                  }
-              })
-          })
-          str=str.substr(0,str.length-1)
-          self.storeStr=str;
-        },
-        changePro(val){
-          let self=this;
-          self.curCity= [];
-          self.clearCityInfo();
-          self.clearStoreInfo();
-          let storeList=self.storeList;
-          let temp=[];
-          let tempStore=[];
-          if(val == ''){
-            storeList.forEach(item=>{
-              if(item.country==self.curCountry){
-                let obj={
-                  storeId:item.storeId,
-                  label:item.name,
-                  value:item.name,
-                  userId:item.userId,
-                  tagIds:item.tagIds
+              });
+            }) : (item.storeId === _item ? str += _item + '，' : null);
+          }
+        });
+      });
+      str = str.substr(0, str.length - 1);
+      self.storeStr = str;
+    },
+
+    changePro(val) {
+      const self = this;
+      self.curCity = [];
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      const storeList = self.storeList;
+      const temp = [];
+      const tempStore = [];
+      if (val === '') {
+        storeList.forEach(item => {
+          if (item.country === self.curCountry) {
+            const obj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              tagIds: item.tagIds
+            };
+            tempStore.push(obj);
+          }
+        });
+      } else {
+        val.forEach(_item => {
+          storeList.forEach(item => {
+            if (item.province === _item) {
+              if (temp.map(x => x.value).indexOf(item.city) === -1) {
+                const obj = {
+                  label: item.city,
+                  value: item.city
                 };
-                tempStore.push(obj);
-              }
-            })
-          }
-          else{
-            val.forEach(_item=>{
-              storeList.forEach(item=>{
-                if(item.province==_item){
-                  if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                    let obj={
-                      label:item.city,
-                      value:item.city
-                    }
-                    temp.push(obj);
-                  }
-                  let obj={
-                    storeId:item.storeId,
-                    label:item.name,
-                    value:item.name,
-                    userId:item.userId,
-                    tagIds:item.tagIds
-                  };
-                  tempStore.push(obj);
-                }
-              })
-            })
-            self.cityList=temp;
-            let cityArr=[]
-            if(self.cityList.length!=0){
-                self.cityList.forEach(item=>{
-                    cityArr.push(item.value)
-                })
-                self.curCity=cityArr
-            }
-          }
-          self.storeDataList=tempStore;
-          let storeArr=[],arr=[]
-          self.storeDataList.forEach(item=>{
-              storeArr.push(item.storeId)
-              arr.push(item.value)
-          })
-          
-          self.curStore=storeArr
-          self.changeStore(self.curStore)
-        },
-        changeCountry(val){
-            let self=this;
-            let temp=[]
-            self.clearProviceInfo()
-            self.clearCityInfo();
-            self.clearStoreInfo();
-            self.selectAllProAndCity(val);
-        },
-        changeCountryss(val){
-          let self=this;
-          console.log(val);
-          self.curProvince= [];
-          self.curCity=[];
-          self.curStoreTag=[]
-          let storeList=self.storeList;
-          let tempStore=[];
-          let temp=[];
-          self.clearProviceInfo();
-          self.clearCityInfo();
-          self.clearStoreInfo();
-          if(val== ''){
-            storeList.forEach(item=>{
-              let obj={
-                storeId:item.storeId,
-                label:item.name,
-                value:item.name,
-                userId:item.userId,
-                userName:item.userName
-              }
-              tempStore.push(obj);
-            })
-            //self.storeDataList=tempStore;
-            self.checkAllStore = false;
-          }
-          else{
-            storeList.forEach(item=>{
-              if(item.country==val){
-                if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                  let obj={
-                    label:item.province,
-                    value:item.province
-                  }
-                  temp.push(obj);
-                }
-                let obj={
-                  storeId:item.storeId,
-                  label:item.name,
-                  value:item.name,
-                  userId:item.userId,
-                  userName:item.userName
-                };
-                tempStore.push(obj);
-              }
-            })
-          }
-          self.provinceList=temp;
-          self.storeDataList=tempStore;
-
-        },
-        changeStoreTag(val){
-          let self=this
-          let temp=[]
-          self.curStoreTag=val
-          self.changeStore(self.curStore)
-        },
-        getTagListData(){
-            let self=this;
-            return new Promise((resolve,reject)=>{
-                GetTagList().then(res=>{
-                    let errMsg=res.errMsg;
-                    if(errMsg!=undefined&&errMsg=='Success'){
-                        res.data.forEach(item=>{
-                            let obj={}
-                            obj.value=item.tagId
-                            obj.label=item.tagName
-                            obj.disabled=false
-                            self.StoreTagList.push(obj)
-                        })
-                        resolve(res);
-                    }
-                }).catch(res => {
-                    resolve(res);
-                })
-            })
-        },
-        changeCity(val){
-          let self=this;
-          self.clearStoreInfo();
-          let storeList=self.storeList;
-          let temp=[];
-          if(val.length != 0){
-            val.forEach(_item=>{
-              storeList.forEach(item=>{
-                if(item.city==_item){
-                  if(temp.map(x=>x.value).indexOf(item.city)==-1){
-                    let obj={
-                      storeId:item.storeId,
-                      label:item.name,
-                      value:item.name,
-                      userId:item.userId,
-                      userName:item.userName
-                    }
-                    temp.push(obj);
-                  }
-                }
-              })
-            })
-          }
-          self.storeDataList=temp;
-          let str = '',storeArr=[],arr=[]
-          self.storeDataList.forEach(item=>{
-              storeArr.push(item.storeId)
-              arr.push(item.value)
-          })
-          self.curStore=storeArr
-          self.changeStore(self.curStore)
-        },
-        clearStoreInfo(){
-          let self=this;
-          self.curStore=[];
-          self.storeStr='';
-          self.$refs.multiSelect.selectedArray = [];
-          self.$refs.multiSelect.input=''
-        },
-        clearProviceInfo(){
-          let self=this;
-          self.curProvince=[];
-          self.$refs.proviceSelect.selectedArray = [];
-          self.$refs.proviceSelect.input=''
-        },
-        clearCityInfo(){
-          let self=this;
-          self.curCity=[];
-          self.$refs.citySelect.selectedArray = [];
-          self.$refs.citySelect.input=''
-        },
-        selectAllProAndCity(val){
-          let self = this;
-          let storeList = self.storeList;
-          let temp = [];
-          let tempStore = [];
-          storeList.forEach(item=>{
-            if(item.country==val||val=='-1'){
-              if(temp.map(x=>x.value).indexOf(item.province)==-1){
-                let obj={
-                  label:item.province,
-                  value:item.province
-                }
                 temp.push(obj);
               }
-              let obj={
-                storeId:item.storeId,
-                label:item.name,
-                value:item.name,
-                userId:item.userId,
-                userName:item.userName
+              const obj = {
+                storeId: item.storeId,
+                label: item.name,
+                value: item.name,
+                userId: item.userId,
+                tagIds: item.tagIds
               };
               tempStore.push(obj);
             }
-          })
-          self.provinceList = temp;
-          console.log(self.provinceList)
-          let cityTemp = [];
-          self.provinceList.forEach(_item=>{
-            storeList.forEach(item=>{
-              if(item.province==_item.value){
-                if(cityTemp.map(x=>x.value).indexOf(item.city)==-1){
-                  let obj={
-                    label:item.city,
-                    value:item.city
-                  }
-                  cityTemp.push(obj);
-                }
-              }
-            })
-          })
-          self.cityList = cityTemp;
-          let provinceArr = [];
-          self.provinceList.forEach(item=>{
-            provinceArr.push(item.value)
-          })
-          self.curProvince = provinceArr;
-
-          let cityArr = [];
-          self.cityList.forEach(item=>{
-            cityArr.push(item.value)
-          })
+          });
+        });
+        self.cityList = temp;
+        const cityArr = [];
+        if (self.cityList.length !== 0) {
+          self.cityList.forEach(item => {
+            cityArr.push(item.value);
+          });
           self.curCity = cityArr;
-          self.storeDataList = tempStore;
-          let storeArr = [];
-          self.storeDataList.forEach(item=>{
-            storeArr.push(item.storeId)
-          })
-          self.curStore = storeArr;
-          self.changeStore(self.curStore)
-          self.getInitReportList(0)
-        },
-        clearStore(){
-            let self=this;
+        }
+      }
+      self.storeDataList = tempStore;
+      let storeArr = [], arr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+        arr.push(item.value);
+      });
 
-        },
-        dateFocus(){
-            let self=this;
-            self.getDeafultTime();
-        },
-        getDeafultTime(){
-            let self=this;
-            let date=new Date();
-            let hour=date.getHours()<10?'0'+date.getHours():date.getHours();
-            let minutes=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
-            let second=date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds();
-            let dateStr=hour+':'+minutes+':'+second;
-            let timeTemp=[];
-            timeTemp[0]=dateStr;
-            timeTemp[1]=dateStr;
-            self.defaultTime=timeTemp;
-        },
-        dateChange(val){
-            let self=this;
-            console.log(val);
-            let start=typeof(val[0])==='object'?val[0].getTime():val[0];
-            let end=typeof(val[1])==='object'?val[1].getTime():val[1];
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
 
-            if((end-start)/(3600*24*30*1000)>1){  //当前选择的时间范围超过了30天
-                self.$message({
-                    message: this.$t('eventView.changeTimeRange'),
-                    type:'warning',
-                    duration:3*1000
-                })
-                start=end-3600*24*30*1000;
-                self.dateValue=[new Date().setTime(start),new Date().setTime(end)];
+    changeCountry(val) {
+      const self = this;
+      const temp = [];
+      self.clearProviceInfo();
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      self.selectAllProAndCity(val);
+    },
+
+    changeCountryss(val) {
+      const self = this;
+      console.log(val);
+      self.curProvince = [];
+      self.curCity = [];
+      self.curStoreTag = [];
+      const storeList = self.storeList;
+      const tempStore = [];
+      const temp = [];
+      self.clearProviceInfo();
+      self.clearCityInfo();
+      self.clearStoreInfo();
+      if (val === '') {
+        storeList.forEach(item => {
+          const obj = {
+            storeId: item.storeId,
+            label: item.name,
+            value: item.name,
+            userId: item.userId,
+            userName: item.userName
+          };
+          tempStore.push(obj);
+        });
+        // self.storeDataList=tempStore;
+        self.checkAllStore = false;
+      } else {
+        storeList.forEach(item => {
+          if (item.country === val) {
+            if (temp.map(x => x.value).indexOf(item.province) === -1) {
+              const obj = {
+                label: item.province,
+                value: item.province
+              };
+              temp.push(obj);
             }
-            // self.params.beginTs=start;
-            // self.params.endTs=end;
-            // self.getReportList(self.params);
-        },
-        changeReportType(val){
+            const obj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              userName: item.userName
+            };
+            tempStore.push(obj);
+          }
+        });
+      }
+      self.provinceList = temp;
+      self.storeDataList = tempStore;
+    },
 
-        },
-        clearReportType(){
+    changeStoreTag(val) {
+      const self = this;
+      const temp = [];
+      self.curStoreTag = val;
+      self.changeStore(self.curStore);
+    },
 
-        },
-        changeAppraise(val){
-
-        },
-        clearAppraise(){
-
-        },
-
-        currentChange(val){
-            let self=this;
-            self.page=val;
-            self.params.filter={page:val-1,size:self.sizeNum};
-            self.getReportList(self.params,0);
-        },
-        sizeChange(val){
-          let self=this;
-          self.sizeNum=val;
-          self.params.filter={page:0,size:val};
-          self.getReportList(self.params,0);
-        },
-        searchData(){
-            let self=this;
-
-            console.log(self.params);
-            let val = self.dateValue;
-            console.log(val);
-            let start=typeof(val[0])==='object'?val[0].getTime():val[0];
-            let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-            self.params.beginTs=start;
-            self.params.endTs=end;
-
-            console.log(self.storeDataList);
-            self.page=1;
-            let clause={};
-            // if(self.curStore.length!=0){
-              clause.storeId= self.storeStr.split('，')
-            // }
-            // else{
-            //   clause.storeId=self.storeDataList.map(x=>x.storeId);
-            //   self.curStore = (clause.storeId).concat();
-            //   self.changeStore(clause.storeId)
-            // }
-            console.log(self.curReportType);
-            if(self.curReportType!== null && self.curReportType!== -1){
-                clause.mode=self.curReportType;
-            }
-            if(self.curAppraise!== null && self.curAppraise!== -1){
-                clause.status=self.curAppraise;
-            }
-            self.params.clause=clause;
-            let search=self.searchInput.trim();
-            if(search.length!=0){
-                self.params.like={
-                    tagName:search,
-                    submitterName:search,
-                    storeName:search
-                }
-            }
-            else{
-                self.params.like={};
-            }
-
-            self.params.filter={page:0,size:self.sizeNum};
-            self.getReportList(self.params,0);
-        },
-        checkSortType(typeId){
-            console.log(typeId);
-            let self=this;
-            switch(typeId){
-                case 0: self.params.order={direction:'desc',property:'ts'}; break;
-                case 1: self.params.order={direction:'asc',property:'status'}; break;
-                case 2: self.params.order={direction:'asc',property:'storeName'}; break;
-            }
-            self.getReportList(self.params,0);
-        },
-
-        clickReport(item,index){
-            let self=this;
-            console.log(item.routeObj);
-            sessionStorage.setItem('report_data',JSON.stringify(item.routeObj));
-            self.$router.push({name:"reportDetails",params:{data:item.routeObj}});
-        },
-        sortChange(){
-
-        },
-        notify(msg,type,time) {
-            this.$message({
-                message: msg,
-                type: type,
-                duration:time
+    getTagListData() {
+      const self = this;
+      return new Promise((resolve, reject) => {
+        GetTagList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            res.data.forEach(item => {
+              const obj = {};
+              obj.value = item.tagId;
+              obj.label = item.tagName;
+              obj.disabled = false;
+              self.StoreTagList.push(obj);
             });
-        },
+            resolve(res);
+          }
+        }).catch(res => {
+          resolve(res);
+        });
+      });
     },
-    beforeRouteEnter (to, from, next) {
-      to.meta.keepAlive = true
-      if(from.name=='reportDetails'&& to.name == 'reports'){
-        to.meta.isBack = true;
-        next();
-      }
-      else{
-        to.meta.isBack = false;
-        next();
-      }
-    },
-    beforeRouteLeave (to, from, next) {
-      console.log(this.params);
-      if(to.name != 'reportDetails'){
-        from.meta.keepAlive = false;
-        next(vm=>{
-          console.log(vm)
+
+    changeCity(val) {
+      const self = this;
+      self.clearStoreInfo();
+      const storeList = self.storeList;
+      const temp = [];
+      if (val.length !== 0) {
+        val.forEach(_item => {
+          storeList.forEach(item => {
+            if (item.city === _item) {
+              if (temp.map(x => x.value).indexOf(item.city) === -1) {
+                const obj = {
+                  storeId: item.storeId,
+                  label: item.name,
+                  value: item.name,
+                  userId: item.userId,
+                  userName: item.userName
+                };
+                temp.push(obj);
+              }
+            }
+          });
         });
       }
-      else{
-        from.meta.keepAlive = true;
-        next(vm=>{
-          console.log(vm)
+      self.storeDataList = temp;
+      let str = '', storeArr = [], arr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+        arr.push(item.value);
+      });
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+    },
+
+    clearStoreInfo() {
+      const self = this;
+      self.curStore = [];
+      self.storeStr = '';
+      self.$refs.multiSelect.selectedArray = [];
+      self.$refs.multiSelect.input = '';
+    },
+
+    clearProviceInfo() {
+      const self = this;
+      self.curProvince = [];
+      self.$refs.proviceSelect.selectedArray = [];
+      self.$refs.proviceSelect.input = '';
+    },
+
+    clearCityInfo() {
+      const self = this;
+      self.curCity = [];
+      self.$refs.citySelect.selectedArray = [];
+      self.$refs.citySelect.input = '';
+    },
+
+    selectAllProAndCity(val) {
+      const self = this;
+      const storeList = self.storeList;
+      const temp = [];
+      const tempStore = [];
+      storeList.forEach(item => {
+        if (item.country === val || val === '-1') {
+          if (temp.map(x => x.value).indexOf(item.province) === -1) {
+            const obj = {
+              label: item.province,
+              value: item.province
+            };
+            temp.push(obj);
+          }
+          const obj = {
+            storeId: item.storeId,
+            label: item.name,
+            value: item.name,
+            userId: item.userId,
+            userName: item.userName
+          };
+          tempStore.push(obj);
+        }
+      });
+      self.provinceList = temp;
+      console.log(self.provinceList);
+      const cityTemp = [];
+      self.provinceList.forEach(_item => {
+        storeList.forEach(item => {
+          if (item.province === _item.value) {
+            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+              const obj = {
+                label: item.city,
+                value: item.city
+              };
+              cityTemp.push(obj);
+            }
+          }
         });
+      });
+      self.cityList = cityTemp;
+      const provinceArr = [];
+      self.provinceList.forEach(item => {
+        provinceArr.push(item.value);
+      });
+      self.curProvince = provinceArr;
+
+      const cityArr = [];
+      self.cityList.forEach(item => {
+        cityArr.push(item.value);
+      });
+      self.curCity = cityArr;
+      self.storeDataList = tempStore;
+      const storeArr = [];
+      self.storeDataList.forEach(item => {
+        storeArr.push(item.storeId);
+      });
+      self.curStore = storeArr;
+      self.changeStore(self.curStore);
+      self.getInitReportList(0);
+    },
+
+    dateFocus() {
+      const self = this;
+      self.getDeafultTime();
+    },
+
+    getDeafultTime() {
+      const self = this;
+      const date = new Date();
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+      const dateStr = hour + ':' + minutes + ':' + second;
+      const timeTemp = [];
+      timeTemp[0] = dateStr;
+      timeTemp[1] = dateStr;
+      self.defaultTime = timeTemp;
+    },
+
+    dateChange(val) {
+      const self = this;
+      console.log(val);
+      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+
+      if ((end - start) / (3600 * 24 * 30 * 1000) > 1) { // 当前选择的时间范围超过了30天
+        self.$message({
+          message: this.$t('eventView.changeTimeRange'),
+          type: 'warning',
+          duration: 3 * 1000
+        });
+        start = end - 3600 * 24 * 30 * 1000;
+        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       }
     },
-    activated(){
-      let self=this;
-      if(!self.$route.meta.isBack || self.isFirstLoad){
-        self.initData();
-      }
-      else{
-        //
-      }
-      self.$route.meta.isBack = false;
-      self.isFirstLoad = false;
+
+    currentChange(val) {
+      const self = this;
+      self.page = val;
+      self.params.filter = { page: val - 1, size: self.sizeNum };
+      self.getReportList(self.params, 0);
     },
-}
+
+    sizeChange(val) {
+      const self = this;
+      self.sizeNum = val;
+      self.params.filter = { page: 0, size: val };
+      self.getReportList(self.params, 0);
+    },
+
+    searchData() {
+      const self = this;
+
+      console.log(self.params);
+      const val = self.dateValue;
+      console.log(val);
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      self.params.beginTs = start;
+      self.params.endTs = end;
+
+      console.log(self.storeDataList);
+      self.page = 1;
+      const clause = {};
+      clause.storeId = self.storeStr.split('，');
+      console.log(self.curReportType);
+      if (self.curReportType != null && self.curReportType !== -1) {
+        clause.mode = self.curReportType;
+      }
+      if (self.curAppraise != null && self.curAppraise !== -1) {
+        clause.status = self.curAppraise;
+      }
+      self.params.clause = clause;
+      const search = self.searchInput.trim();
+      if (search.length !== 0) {
+        self.params.like = {
+          tagName: search,
+          submitterName: search,
+          storeName: search
+        };
+      } else {
+        self.params.like = {};
+      }
+
+      self.params.filter = { page: 0, size: self.sizeNum };
+      self.getReportList(self.params, 0);
+    },
+
+    checkSortType(typeId) {
+      console.log(typeId);
+      const self = this;
+      switch (typeId) {
+        case 0: self.params.order = { direction: 'desc', property: 'ts' }; break;
+        case 1: self.params.order = { direction: 'asc', property: 'status' }; break;
+        case 2: self.params.order = { direction: 'asc', property: 'storeName' }; break;
+      }
+      self.getReportList(self.params, 0);
+    },
+
+    clickReport(item, index) {
+      const self = this;
+      console.log(item.routeObj);
+      sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
+      self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    }
+  },
+
+  beforeRouteEnter(to, from, next) {
+    to.meta.keepAlive = true;
+    if (from.name === 'reportDetails' && to.name === 'reports') {
+      to.meta.isBack = true;
+      next();
+    } else {
+      to.meta.isBack = false;
+      next();
+    }
+  },
+
+  beforeRouteLeave(to, from, next) {
+    console.log(this.params);
+    if (to.name !== 'reportDetails') {
+      from.meta.keepAlive = false;
+      next(vm => {
+        console.log(vm);
+      });
+    } else {
+      from.meta.keepAlive = true;
+      next(vm => {
+        console.log(vm);
+      });
+    }
+  }
+
+};
 </script>
 <style lang="scss" scoped>
 $red:#f31d65;
