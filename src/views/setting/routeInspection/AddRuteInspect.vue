@@ -1059,10 +1059,15 @@ export default {
             })
         },
         cancelEditNape(index,item){
-            let self=this;
-            item.isClick=false;
-            item.napeDep=self.napeDepTemp;
-            item.napeName=item.napeNameShow.slice(item.napeNameShow.indexOf('，')+1);
+            let curEditItem = JSON.parse(sessionStorage.getItem('curEditItem'));
+            item.isClick=curEditItem.isClick;
+            item.napeDep=curEditItem.napeDep;
+            item.Score_1=curEditItem.Score_1;
+            item.Score_2=curEditItem.Score_2;
+            item.Score_3=curEditItem.Score_3;
+            item.Score_4=curEditItem.Score_4;
+            item.availableScoreStr=curEditItem.availableScoreStr;
+            item.napeName=curEditItem.napeNameShow;
         },
         confirmaddNape(){
             let self=this;
@@ -1200,6 +1205,7 @@ export default {
         handleEdit(index,item){
             let self=this;
             self.napeDepTemp=item.napeDep;
+            sessionStorage.setItem('curEditItem',JSON.stringify(item));
             item.isClick=true;
             self.showAddNape=false;
             let arr=[];
