@@ -1,218 +1,216 @@
 <template>
-    <div class="el-sucPage-content">
-        <div class="page-icon">
-            <div class="icon-content">
-                <img class='suc-icon' :src='isSuccess?sucSrc:errSrc'/>
-                <p :class="isSuccess?'sucInfo':'errInfo'">{{retInfo}}</p>
-                <p class="sucret-info" v-if="isSuccess && lang !== 'en'">{{curSecond}}{{generateStoreMonitorLang('return')}}</p>
-                 <p class="sucret-info" v-if="isSuccess && lang == 'en'">{{generateStoreMonitorLang('return')}} {{curSecond}}s!</p>
-            </div>
-        </div>
-        <el-dialog  :title="generateStoreMonitorLang('view')" :visible.sync="dialogCommentVideo" :close-on-click-modal="false"
-            v-if="dialogCommentVideo" :width="720*percentHeight+'px'" height=300px top=5%>
-            <div class="canvas-content">
-                <hr class="dialog-hr"/>
-                <video  :width="667*percentHeight" :height="431*percentHeight" id="previewCutVideo" prload controls :src="curVideoSrc">
-                </video>
-            </div>
-        </el-dialog>
-        <div class="page-content" v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}">
-            <div class="details">
-                <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 25px;">{{generateStoreMonitorLang('storeName')}}:</span>
-                <span class="event-label" v-else >{{generateStoreMonitorLang('storeName')}}</span>
-                <span>{{storeName}}</span>
-            </div>
-            <div class="details">
-                <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 75px;">{{generateStoreMonitorLang('eventTitle')}}:</span>
-                <span class="event-label" v-else >{{generateStoreMonitorLang('eventTitle')}}：</span>
-                <span>{{eventName}}</span>
-            </div>
-            <div class="details">
-              <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 60px;">{{generateStoreMonitorLang('eventStatus')}}:</span>
-              <span class="event-label" v-else >{{generateStoreMonitorLang('eventStatus')}}：</span>
-              <span class="icon-span">{{generateStoreMonitorLang('untreated')}}</span>
-            </div>
-            <div class="details">
-                <span :class="lang==='en'? 'en-event-label':'event-label'">{{generateStoreMonitorLang('description')}}:</span>
-                  <div v-for="(item,index) in commentList" :key="index" class="comment-details" v-show="item.eventDes.length > 0">
-                    <div class="circle-content" :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}">
-                      <div class="circle"></div>
-                    </div>
-                    <div class="lside">
-
-                    </div>
-                    <div class="rside">
-                      <div class="event-name">
-                        <span>{{item.eventDes}}</span>
-                      </div>
-                      <div class="source-content">
-                        <div class="source-details" v-for="(_item,_index) in sourceList" :key="_index">
-                          <div class="img-content" v-if="_item.mediaType==2">
-                            <img :src="_item.url"  height="100" width="140"/>
-                          </div>
-                          <div class="img-content" v-if="_item.mediaType==1">
-                            <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(_item,_index)"/>
-                            <img :src="videoImgSrc" height="100"/>
-                          </div>
-                        </div>
-                      </div>
-                      <span class="event-ts">{{item.ts}}</span>
-                    </div>
-                  </div>
-            </div>
-             <div class="details" v-if="showLeader">
-               <span class="en-event-label" v-if="lang ==='en'" style="margin-right: 70px;">{{generateStoreMonitorLang('copy')}}:</span>
-               <span class="event-label" v-else  style="margin-right:38px;">{{generateStoreMonitorLang('copy')}}：</span>
-                <span>{{leader}}</span>
-            </div>
-        </div>
-        <div class="page-err-btn" v-else>
-            <el-button size="mini" type="primary" @click="reTry" class="retry-btn">{{generateStoreMonitorLang('tryAgain')}}</el-button>
-        </div>
+  <div class="el-sucPage-content">
+    <div class="page-icon">
+      <div class="icon-content">
+        <img :src="isSuccess ? sucSrc:errSrc" class="suc-icon">
+        <p :class="isSuccess ? 'sucInfo':'errInfo'">{{ retInfo }}</p>
+        <p v-if="isSuccess && lang !== 'en'" class="sucret-info">{{ curSecond }}{{ $t('remotePatrol.return') }}</p>
+        <p v-if="isSuccess && lang === 'en'" class="sucret-info">{{ $t('remotePatrol.return') }} {{ curSecond }}s!</p>
+      </div>
     </div>
+    <el-dialog
+      v-if="dialogCommentVideo"
+      :title="$t('remotePatrol.view')"
+      :visible.sync="dialogCommentVideo"
+      :close-on-click-modal="false"
+      :width="720*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content">
+        <hr class="dialog-hr">
+        <video id="previewCutVideo" :width="667*percentHeight" :height="431*percentHeight" :src="curVideoSrc" prload controls/>
+      </div>
+    </el-dialog>
+    <div v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}" class="page-content">
+      <div class="details">
+        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 25px;">{{ $t('remotePatrol.storeName') }}:</span>
+        <span v-else class="event-label" >{{ $t('remotePatrol.storeName') }}</span>
+        <span>{{ storeName }}</span>
+      </div>
+      <div class="details">
+        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 75px;">{{ $t('remotePatrol.eventTitle') }}:</span>
+        <span v-else class="event-label" >{{ $t('remotePatrol.eventTitle') }}：</span>
+        <span>{{ eventName }}</span>
+      </div>
+      <div class="details">
+        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.eventStatus') }}:</span>
+        <span v-else class="event-label" >{{ $t('remotePatrol.eventStatus') }}：</span>
+        <span class="icon-span">{{ $t('remotePatrol.untreated') }}</span>
+      </div>
+      <div class="details">
+        <span :class="lang === 'en' ? 'en-event-label' : 'event-label'">{{ $t('remotePatrol.description') }}:</span>
+        <div v-for="(item,index) in commentList" v-show="item.eventDes.length > 0" :key="index"
+             class="comment-details">
+          <div :style="item.showContent ? {'background-color':'#FBC7CC'} : {'background-color':'#FAFAFA'}"
+               class="circle-content">
+            <div class="circle"/>
+          </div>
+          <div class="lside"/>
+          <div class="rside">
+            <div class="event-name">
+              <span>{{ item.eventDes }}</span>
+            </div>
+            <div class="source-content">
+              <div v-for="(_item,_index) in sourceList" :key="_index" class="source-details">
+                <div v-if="_item.mediaType === 2" class="img-content">
+                  <img :src="_item.url" height="100" width="140">
+                </div>
+                <div v-if="_item.mediaType === 1" class="img-content">
+                  <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
+                  <img :src="videoImgSrc" height="100">
+                </div>
+              </div>
+            </div>
+            <span class="event-ts">{{ item.ts }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="showLeader" class="details">
+        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 70px;">{{ $t('remotePatrol.copy') }}:</span>
+        <span v-else class="event-label" style="margin-right:38px;">{{ $t('remotePatrol.copy') }}：</span>
+        <span>{{ leader }}</span>
+      </div>
+    </div>
+    <div v-else class="page-err-btn">
+      <el-button size="mini" type="primary" class="retry-btn" @click="reTry">
+        {{ $t('remotePatrol.tryAgain') }}
+      </el-button>
+    </div>
+  </div>
 </template>
 <script>
-import {addEvent,addComment} from '@/api/event'
+import { addEvent, addComment } from '@/api/event';
 import PubSub from 'pubsub-js';
-import {generateStoreMonitorLang} from '@/api/i18n'
-export default {
-    name:'StoreSuccessPage',
-    data(){
-        return{
-            isSuccess:false,
-            sucSrc:require('../../../static/img/succeed_icon.png'),
-            errSrc:require('../../../static/img/failed_icon.png'),
-            sucInfo: this.$t('storeMonitor.submitSucc'),
-            errInfo: this.$t('storeMonitor.submitFail'),
-            curSecond:10,
-            storeName:'西安6店',
-            eventName:'水吧问题2',
-            leader:'小明',
-            showLeader:true,
-            commentList:[],
-            sourceList:[],
-            routeData:null,
-            timeid:0,
-            varyWindowHeight:window.innerHeight,
-            startIcon:require('../../../static/img/pic_play_icon.png'),
-            videoImgSrc:require('../../../static/img/image_videoThumbnail.png'),
-            dialogCommentVideo:false,
-            curVideoSrc:'',
-            lang: this.$i18n.locale
-        }
-    },
-    computed:{
-        retInfo:function(){
-            if(this.isSuccess){
-                return this.sucInfo;
-            }
-            else{
-                return this.errInfo;
-            }
-        },
-        percentHeight:function(){
-            return this.varyWindowHeight/758;
-        },
-    },
-    methods:{
-        generateStoreMonitorLang,
-        getRouterData(){
-            let self=this;
-            let routeData=self.$route.params.data;
-            console.log(routeData);
-            if(self.$route.params.data==undefined){
-                routeData=JSON.parse(sessionStorage.getItem('store_submit'));
-            }
-            self.routeData=routeData;
-            self.isSuccess=routeData.flag.isSuccess;
-            //self.isSuccess=false;
-            if(self.isSuccess==false){
-                PubSub.publish('success-page',{changeStyle:true});
-            }
-            self.storeName=routeData.store.storeName;
-            self.eventName=routeData.event.eventName;
-            self.sourceList=routeData.event.fileList;
-            if(routeData.flag.addEventType=='add'){
-                self.showLeader=true;
-                self.leader=routeData.user.length!=0?routeData.user[0].userName:'';
-            }
-            else{
-                self.showLeader=false;
-            }
-            if(self.isSuccess){
-                //self.$route.matched[2].name='提交成功';
-                self.$route.matched[2].name= self.$t('storeView.successSubmit');
-            }
-            else{
-                //self.$route.matched[2].name='提交失败';
-                self.$route.matched[2].name= self.$t('storeView.failSubmit');
-            }
-        },
-        getBackSecond(){
-            let self=this;
-            self.curSecond--;
-            if(self.curSecond==0){
-                clearInterval(self.timeid);
-                self.$router.push({name:'storeMonitor',params:{flag:self.isSuccess}});
-            }
-        },
-        playCutVideo(item,index){
-            let self=this;
-            self.dialogCommentVideo=true;
-            self.curVideoSrc=item.url;
-        },
-        getCommentList(){
-            let self=this;
-            let temp=[];
-            let obj={
-                showContent:true,
-                eventDes:self.routeData.event.description,
-                ts:self.routeData.curTs
-            };
-            temp.push(obj);
-            self.commentList=temp;
 
-        },
-        reTry(){
-            let self=this;
-            self.$router.push({name:"storeMonitor",params:{flag:self.isSuccess}});
-        },
-        notify(msg,type,time) {
-            this.$message({
-                message: msg,
-                type: type,
-                duration:time
-            });
-        },
+export default {
+  name: 'StoreSuccessPage',
+  data() {
+    return {
+      isSuccess: false,
+      sucSrc: require('../../../static/img/submit_succeed.png'),
+      errSrc: require('../../../static/img/submit_failed.png'),
+      sucInfo: this.$t('remotePatrol.submitSucc'),
+      errInfo: this.$t('remotePatrol.submitFail'),
+      curSecond: 10,
+      storeName: '西安6店',
+      eventName: '水吧问题2',
+      leader: '小明',
+      showLeader: true,
+      commentList: [],
+      sourceList: [],
+      routeData: null,
+      timeid: 0,
+      varyWindowHeight: window.innerHeight,
+      startIcon: require('../../../static/img/play_icon.png'),
+      videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+      dialogCommentVideo: false,
+      curVideoSrc: '',
+      lang: this.$i18n.locale
+    };
+  },
+
+  computed: {
+    retInfo: function() {
+      if (this.isSuccess) {
+        return this.sucInfo;
+      } else {
+        return this.errInfo;
+      }
     },
-    created(){
-        let self=this;
-    },
-    mounted(){
-        let self=this;
-        self.isSuccess=false;
-        self.getRouterData();
-        self.getCommentList();
-        if(self.isSuccess){
-            self.timeid=setInterval(function(){
-                self.getBackSecond();
-            },1000)
-        }
-    },
-    beforeRouteLeave(to, from, next) {
-        let self=this;
-        clearInterval(self.timeid);
-        // if(to.name=='门店监控'){
-        //     if(this.isSuccess==true){
-        //         to.meta.keepAlive = true;
-        //     }
-        //     else{
-        //         to.meta.keepAlive=true;
-        //     }
-        // }
-        next();
+    percentHeight: function() {
+      return this.varyWindowHeight / 758;
     }
-}
+  },
+
+  mounted() {
+    const self = this;
+    self.isSuccess = false;
+    self.getRouterData();
+    self.getCommentList();
+    if (self.isSuccess) {
+      self.timeid = setInterval(function() {
+        self.getBackSecond();
+      }, 1000);
+    }
+  },
+
+  methods: {
+    getRouterData() {
+      const self = this;
+      let routeData = self.$route.params.data;
+      console.log(routeData);
+      if (self.$route.params.data == undefined) {
+        routeData = JSON.parse(sessionStorage.getItem('store_submit'));
+      }
+      self.routeData = routeData;
+      self.isSuccess = routeData.flag.isSuccess;
+      // self.isSuccess=false;
+      if (self.isSuccess === false) {
+        PubSub.publish('success-page', { changeStyle: true });
+      }
+      self.storeName = routeData.store.storeName;
+      self.eventName = routeData.event.eventName;
+      self.sourceList = routeData.event.fileList;
+      if (routeData.flag.addEventType === 'add') {
+        self.showLeader = true;
+        self.leader = routeData.user.length != 0 ? routeData.user[0].userName : '';
+      } else {
+        self.showLeader = false;
+      }
+      if (self.isSuccess) {
+        self.$route.matched[2].name = self.$t('storeView.successSubmit');
+      } else {
+        self.$route.matched[2].name = self.$t('storeView.failSubmit');
+      }
+    },
+
+    getBackSecond() {
+      const self = this;
+      self.curSecond--;
+      if (self.curSecond === 0) {
+        clearInterval(self.timeid);
+        self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
+      }
+    },
+
+    playCutVideo(item) {
+      const self = this;
+      self.dialogCommentVideo = true;
+      self.curVideoSrc = item.url;
+    },
+
+    getCommentList() {
+      const self = this;
+      const temp = [];
+      const obj = {
+        showContent: true,
+        eventDes: self.routeData.event.description,
+        ts: self.routeData.curTs
+      };
+      temp.push(obj);
+      self.commentList = temp;
+    },
+
+    reTry() {
+      const self = this;
+      self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
+    },
+
+    notify(msg, type, time) {
+      this.$message({
+        message: msg,
+        type: type,
+        duration: time
+      });
+    }
+  },
+
+  beforeRouteLeave(to, from, next) {
+    const self = this;
+    clearInterval(self.timeid);
+    next();
+  }
+};
 </script>
 <style lang="scss" scoped>
     @function rem($val){
