@@ -1,6 +1,6 @@
-import {getCookie} from '@/common/auth'
+import { getCookie } from '@/common/auth';
 
-const getters= {
+const getters = {
   token: state => state.user.token,
   name: state => state.user.name,
   avatar: state => state.user.avatar,
@@ -9,11 +9,11 @@ const getters= {
   roles: state => state.user.roles,
   setting: state => state.user.setting,
   accountChanged: state => state.user.accountChanged,
-  isEzviz:state=> state.user.isEzviz,
-  authorities:state=>state.user.authorities,
+  isEzviz: state => state.user.isEzviz,
+  authorities: state => state.user.authorities,
   permission_routes: state => state.user.routes,
   PatrolHistory: state => state.user.PatrolHistory,
-  InspectHistory:state=> state.user.InspectHistory,
-  PatrolComment:state=> state.user.PatrolComment
-}
-export default getters
+  InspectHistory: state => state.user.InspectHistory,
+  PatrolComment: state => state.user.PatrolComment
+};
+export default getters;
