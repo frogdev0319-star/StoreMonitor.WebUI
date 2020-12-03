@@ -166,13 +166,13 @@
     </el-row>
 </template>
 <script>
-import {getStorageInfo} from '@/api/event'
-import {submitInspectItem1} from '@/api/inspect'
-import util from '@/common/util'
-import {getCookie} from '@/common/auth'
-import {getUserInfo} from '@/api/login'
-import {generatePatrolLang} from '@/api/i18n'
-import filterString from '@/common/filterString.js'
+import {getStorageInfo} from '@/api/event';
+import {submitInspectItem1} from '@/api/inspect';
+import util from '@/common/util';
+import {getCookie} from '@/common/auth';
+import {getUserInfo} from '@/api/login';
+import {generatePatrolLang} from '@/api/i18n';
+import filterString from '@/common/filterString.js';
 
 export default {
     name:'ConfirmAddSum',
@@ -251,7 +251,7 @@ export default {
             fail: this.$t('remotePatrol.failed'),
             lang: this.$i18n.locale,
             adviceInfoRuletip:false
-        }
+        };
     },
     computed: {
       imgHeight(){
@@ -269,8 +269,8 @@ export default {
         }
     },
     beforeRouteLeave(to, from, next){
-        let self = this
-        if(to.name !='remotePatrol' ){
+        let self = this;
+        if(to.name !=='remotePatrol' ){
             self.$store.dispatch('setPatrolHistory',null);
             self.$store.dispatch('setPatrolComment',null);
             next();
@@ -282,7 +282,7 @@ export default {
     methods:{
         generatePatrolLang,
         stopCommentVideo(){
-            var video = document.getElementById("previewVideo");
+            var video = document.getElementById('previewVideo');
             this.previewplayer = videojs(video);
             this.previewplayer.pause();
         },
@@ -290,11 +290,11 @@ export default {
             let self=this;
             self.dialogCommentVideo=true;
             self.$nextTick(function(){
-                var video = document.getElementById("previewVideo");
+                var video = document.getElementById('previewVideo');
                 this.previewplayer = videojs(video);
                 this.previewplayer.src({src:item.url});
                 this.previewplayer.play();
-            })
+            });
 
         },
         openOuter(item,$ev){
@@ -311,8 +311,7 @@ export default {
             let self=this;
             let bucketName = self.oss.ossBucketName;
             let endpoint=self.oss.ossEndPoint;
-            let key=fileName;
-            if (self.oss.ossVendor == 2){
+            if (self.oss.ossVendor === 2){
               return `https://${endpoint}/${bucketName}/${fileName}`;
             }
             else {
@@ -325,33 +324,31 @@ export default {
             if(self.oss.ossVendor == null){
               self.oss.ossVendor = 1; //1 -aliyun  2-azure
             }
-            if(self.oss.ossVendor == 1){
+            if(self.oss.ossVendor === 1){
               let OSS = require('ali-oss');
               const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
-                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
-                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                //bucket: 'viumo-'+self.accountId,
+                accessKeyId: self.oss.ossAccessKeyId,
+                accessKeySecret: self.oss.ossAccessKeySecret,
                 bucket: self.oss.ossBucketName
-              })
+              });
               let name=fileItem.fileName;
               return new Promise((resolve,reject)=>{
                 client.put(name,fileItem.file,{
                   progress: function* (percentage, cpt) {
-                    self.percentage = percentage
+                    self.percentage = percentage;
                   }
                 })
                   .then((results) => {
-                    // 上传完成
                     const url = self.getFileUrl(results.name);
                     console.log(url);
                     resolve(url);
                   })
                   .catch((err) => {
-                      reject(err)
-                    console.log(err)
-                  })
-              })
+                      reject(err);
+                    console.log(err);
+                  });
+              });
             }
             else{
               let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
@@ -366,66 +363,64 @@ export default {
                     resolve(url);
                   })
                   .catch((error) => {
-                      reject(error)
-                    console.log(error)
-                  })
-              })
+                      reject(error);
+                    console.log(error);
+                  });
+              });
             }
         },
         clickSum(item,index){
             let self=this;
             item.isActive=true;
             self.resultList.forEach((_item,_index)=>{
-                if(index!=_index){
+                if(index!==_index){
                     _item.isActive=false;
                 }
-            })
+            });
             self.curSumIndex=item.label;
         },
         async submit(){
             let self=this;
-            let upload=0
+            let upload=0;
             let inspect=self.inspectList;
             let eventList=self.eventList;
             let status=0;
             let flag=false;
-            self.uploadingnumOfPic=0
+            self.uploadingnumOfPic=0;
             self.resultList.forEach(item=>{
                 if(item.isActive){
                     flag=true;
                 }
-            })
+            });
             if(!flag){
                 self.notify(self.$t('remotePatrol.summaryInfo'),'warning',3000);
                 return false;
             }
-            if(self.suggest.length == 0){
+            if(self.suggest.length === 0){
               self.notify(self.$t('remotePatrol.suggestEmpty'),'warning',3000);
               return false;
             }
-            self.totalnumOfPic>0 ? self.uploadProgress=true : self.uploadProgress=false
+            self.totalnumOfPic>0 ? self.uploadProgress=true : self.uploadProgress=false;
             let storageParams = {};
             storageParams.storeId = self.store.storeId;
-            //上传文件时获取门店对应的BucketName
             await getStorageInfo(storageParams).then(res=>{
-              if(res.errCode==0){
+              if(res.errCode===0){
                 self.oss = res.data;
-                console.log(self.oss)
+                console.log(self.oss);
               }
-            })
+            });
             let temp=[];
             for(let i in inspect){
-                for(let  g in inspect[i].inspectList){
-                    for(let  j in inspect[i].inspectList[g].items){
+                for(let g in inspect[i].inspectList){
+                    for(let j in inspect[i].inspectList[g].items){
                         let objItem={};
                         objItem.ts=new Date().getTime();
                         objItem.description=inspect[i].inspectList[g].items[j].inspectInput.trim();
-                        if(inspect[i].type==0||inspect[i].type==2){
+                        if(inspect[i].type===0||inspect[i].type===2){
                             objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:(inspect[i].inspectList[g].items[j].isQualified ? 1 :0);
                         }else{
                             objItem.grade=inspect[i].inspectList[g].items[j].isIgnore?-1:inspect[i].inspectList[g].items[j].itemgetScore;
                         }
-                        
                         objItem.storeId=self.store.storeId;
                         objItem.inspectItemId=inspect[i].inspectList[g].items[j].id;
                         let tempFileUrl=[];
@@ -433,26 +428,25 @@ export default {
                             for(let k in inspect[i].inspectList[g].items[j].sourceList){
                                 let obj={};
                                 await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url)=>{
-                                    self.uploadingnumOfPic++
-                                    if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==2){
+                                    self.uploadingnumOfPic++;
+                                    if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType===2){
                                         obj.mediaType=2;
                                         obj.url=url;
                                         obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
                                     }
-                                    else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType==1){
+                                    else if(inspect[i].inspectList[g].items[j].sourceList[k].mediaType===1){
                                         obj.mediaType=1;
                                         obj.url=url;
                                         obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
                                     }
                                 }).catch((err)=>{
-                                    upload++
-                                })
-                                if(upload!=0){
-                                    self.uploadProgress=false
+                                    upload++;
+                                });
+                                if(upload!==0){
+                                    self.uploadProgress=false;
                                     self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
-                                    return false
+                                    return false;
                                 }
-                                
                                 tempFileUrl.push(obj);
                             }
                         }
@@ -467,41 +461,37 @@ export default {
             for(let i in self.eventList){
                 let obj={};
                 obj.ts=new Date().getTime();
-                obj.storeId=self.store.storeId,
+                obj.storeId=self.store.storeId;
 
                 obj.subject=self.eventList[i].eventName;
                 obj.description=self.eventList[i].eventDes;
 
                 let commentTemp=[];
-                if(self.eventList[i].sourceObj!=null){ //通过通道创建的反馈问题
+                if(self.eventList[i].sourceObj!=null){
                     await self.upLoadFile(self.eventList[i].sourceObj).then((url)=>{
-                        self.uploadingnumOfPic++
+                        self.uploadingnumOfPic++;
                         let commentObj={
                             mediaType:self.eventList[i].sourceObj.mediaType,
                             url:url,
                             deviceId: self.eventList[i].sourceObj.deviceId
-                        }
+                        };
                         commentTemp.push(commentObj);
                     }).catch((err)=>{
-                        upload++
-                    })
-                    if(upload!=0){
-                        self.uploadProgress=false
+                        upload++;
+                    });
+                    if(upload!==0){
+                        self.uploadProgress=false;
                         self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
-                        return false
+                        return false;
                     }
-                    
                     obj.deviceId = self.eventList[i].sourceObj.deviceId;
-                }
-                else{                        //通过加号创建的问题反馈
-                    //obj.diviceId=-1;
                 }
                 obj.attachment=commentTemp;
                 feedEventList.push(obj);
             }
-            let curSumIndex=[]
-            curSumIndex = self.resultList.filter(x=>x.isActive)
-            status = curSumIndex[0].label
+            let curSumIndex=[];
+            curSumIndex = self.resultList.filter(x=>x.isActive);
+            status = curSumIndex[0].label;
             let params={
                 status:status,
                 comment:self.suggest.trim(),
@@ -509,8 +499,8 @@ export default {
                 feedback:feedEventList
             };
             let routeData=null;
-            upload==0 && submitInspectItem1(params).then(res=>{
-                if(res.errCode==0){
+            upload===0 && submitInspectItem1(params).then(res=>{
+                if(res.errCode===0){
                     let data=res.data;
                     self.editFlag=true;
                     routeData={
@@ -523,12 +513,12 @@ export default {
                         isSuccess:false
                     };
                 }
-                self.$router.push({name:"submitEvent",params:{data:routeData}});
+                self.$router.push({name:'submitEvent',params:{data:routeData}});
             }).catch(err=>{
                 self.notify(self.$t('remotePatrol.sentFail'),'error',3000);
                 return false;
-            })
-            self.uploadProgress=false
+            });
+            self.uploadProgress=false;
         },
         getRouteData(){
             let self=this;
@@ -547,7 +537,7 @@ export default {
             let tempList=[],feedBackTemp=[],ignoreTemp=[],UnqualifiedTemp=[],dealType=[];
             let getscoreTotal=0,CurAddIgnoreItemScore=0,allscoreTotal=0,allAddIgnoreScore=0,otherGetscoreTotal=0,getpassfailQualifiedTotal=0,getpassfailIgnoreTotal=0,allpassfailCount=0,PassFileTotalScore=0,PassFileTotalScoreX=0,PassFileXS=0,PassFileTotalScoreSystem=0,ScoreTotalScoreSystem=0,OtherTotalScoreSystem=0;
             inspect.forEach(p_item=>{
-                if(p_item.dealCount!=0){
+                if(p_item.dealCount!==0){
                     dealType.push(p_item.type);
                 }
             });
@@ -563,20 +553,20 @@ export default {
                             IgnoredArr.push(s_item);
                             ignoreTemp.push(s_item);
                         }else{
-                            if((p_item.type==0||p_item.type==2)&&!s_item.isQualified){
+                            if((p_item.type===0||p_item.type===2)&&!s_item.isQualified){
                                 UnqualifiedArr.push(s_item);
                                 UnqualifiedTemp.push(s_item);
-                            }else if((p_item.type==0||p_item.type==2)&&s_item.isQualified){
+                            }else if((p_item.type===0||p_item.type===2)&&s_item.isQualified){
                                 QualifiedArr.push(s_item);
-                            }else if(p_item.type==1&&(s_item.itemgetScore<s_item.qualifiedScore)){
+                            }else if(p_item.type===1&&(s_item.itemgetScore<s_item.qualifiedScore)){
                                 UnqualifiedTemp.push(s_item);
                             }
-                            if((p_item.type===1||p_item.type==2)&&s_item.itemgetScore!=='--'){
+                            if((p_item.type===1||p_item.type===2)&&s_item.itemgetScore!=='--'){
                                 totalGetscore+=s_item.itemgetScore;
                                 notIgnoreTotalscore+=s_item.itemScore;
                             }
                         }
-                        if(p_item.type===1||p_item.type==2&&s_item.itemgetScore!=='--'){//1的所有与2的非忽略项
+                        if(p_item.type===1||p_item.type===2&&s_item.itemgetScore!=='--'){//1的所有与2的非忽略项
                             addIgnoreScoreA+=s_item.itemgetScore;
                             addNotIgnoreTotalscoreA+=s_item.itemScore;
                         }
@@ -602,7 +592,7 @@ export default {
                     item['itemScore']=totalScore;
                     item['itemgetScore']=totalGetscore;
                     item['notIgnoreTotalscore']=notIgnoreTotalscore;
-                    if(p_item.type==0){
+                    if(p_item.type===0){
                         CurPassfailQualified += item.numOfQualified;
                         CurpassfailCount += item.numOfUnqualified;
                         CurPassfailIgnore += item.numIgnore;
@@ -614,7 +604,7 @@ export default {
                         PassFileTotalScore = totalScore0;
                         PassFileTotalScoreX = totalScoreX;
                     }
-                    if(p_item.type==1){
+                    if(p_item.type===1){
                         CurItemgetScore += totalGetscore;
                         CurNotIgnoreTotalscore += notIgnoreTotalscore;
                         CurSc += addIgnoreScoreA;
@@ -625,30 +615,29 @@ export default {
                         allAddIgnoreScore=CurAddIgnoreTotalscore;
                         ScoreTotalScoreSystem =ScoreTS;
                     }
-                    if(p_item.type==2){
+                    if(p_item.type===2){
                         CurOtherTotalScore += totalGetscore;
                         otherGetscoreTotal=CurOtherTotalScore;
                         OtherTotalScoreSystem = OtherTS;
                     }
                 });
-                if(p_item.type==0){
+                if(p_item.type===0){
                     p_item['tHeader']=self.theaderPassFail;
-                    if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)&&inspectSettings.checkItem4){
+                    if(p_item.inspectList.some(x=>x.numOfUnqualified!==0)&&dealType.some(x=>x===0)&&inspectSettings.checkItem4){
                         self.resultList[0].isShow=false;
                         self.resultList[1].isShow=false;
                         self.resultList[2].isActive=true;
                         Tab0Status=true;
                     }
-                }else if(p_item.type==1){
+                }else if(p_item.type===1){
                     p_item['tHeader']=self.theaderScore;
-                }else if(p_item.type==2){
+                }else if(p_item.type===2){
                     p_item['tHeader']=self.theaderOther;
                 }
             });
-            // 考评总分计算方式
             let s_count=0;
-            if(dealType.length==1&&dealType[0]==0){
-                if(inspectSettings.radio=='-1'){
+            if(dealType.length===1&&dealType[0]===0){
+                if(inspectSettings.radio==='-1'){
                     s_count = Math.round(PassFileTotalScoreSystem);
                 }else{
                     if(inspectSettings.checkItem2){
@@ -659,23 +648,21 @@ export default {
                 }
             }else{
                 if(inspectSettings.checkItem1){
-                    if(inspectSettings.radio=='-1'){
-                         //总分制
+                    if(inspectSettings.radio==='-1'){
                         s_count = Math.round(PassFileTotalScoreSystem+ScoreTotalScoreSystem+OtherTotalScoreSystem);
                     }else{
-                        //比例制+Tab1忽略项参与运算/Tab2忽略项参与运算
-                        if(inspectSettings.checkItem2&&!inspectSettings.checkItem3){//0参与运算，0的忽略项参与运算，1的忽略项不参与运算
+                        if(inspectSettings.checkItem2&&!inspectSettings.checkItem3){
                             s_count = Math.round(((PassFileTotalScoreSystem+getscoreTotal)/(allscoreTotal+PassFileTotalScore)*100)+otherGetscoreTotal);
-                        }else if(!inspectSettings.checkItem2&&inspectSettings.checkItem3){//0参与运算，0的忽略项不参与运算，1的忽略项参与运算
+                        }else if(!inspectSettings.checkItem2&&inspectSettings.checkItem3){
                             s_count = Math.round(((PassFileXS+ScoreTotalScoreSystem)/(PassFileTotalScoreX+ScoreTotalScoreSystem)*100)+otherGetscoreTotal);
-                        }else if(inspectSettings.checkItem2&&inspectSettings.checkItem3){//0参与运算，0的忽略项参与运算，1的忽略项参与运算
+                        }else if(inspectSettings.checkItem2&&inspectSettings.checkItem3){
                             s_count = Math.round(((PassFileTotalScoreSystem+ScoreTotalScoreSystem)/(PassFileTotalScore+ScoreTotalScoreSystem)*100)+otherGetscoreTotal);
-                        }else{//0参与运算，0的忽略项不参与运算，1的忽略项不参与运算
+                        }else{
                             s_count = Math.round(((PassFileXS+getscoreTotal)/(PassFileTotalScoreX+allscoreTotal)*100)+otherGetscoreTotal);
                         }
                     }
                 }else{
-                    if(inspectSettings.radio=='-1'){
+                    if(inspectSettings.radio==='-1'){
                         s_count = Math.round(ScoreTotalScoreSystem+OtherTotalScoreSystem);
                     }else{
                         if(inspectSettings.checkItem3){
@@ -686,7 +673,7 @@ export default {
                     }
                 }
             }
-            if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
+            if(!Tab0Status&&dealType.length!==1&&inspect[0].type===0||inspect[0].type!==0){
                 self.resultList.forEach(item=>{
                     item.isShow=true;
                     item.isActive=false;
@@ -698,33 +685,33 @@ export default {
                 let objFeedBack={};
                 objFeedBack.subject=item.eventName;
                 objFeedBack.description=item.eventDes;
-                objFeedBack.sourceList=[]
-                item.sourceObj!=null ? objFeedBack.sourceList.push(item.sourceObj) : ''
+                objFeedBack.sourceList=[];
+                item.sourceObj!=null ? objFeedBack.sourceList.push(item.sourceObj) : '';
                 feedBackTemp.push(objFeedBack);
-            })
-            let eventpic = eventList.filter(x=>x.sourceObj!=null)
-            self.totalnumOfPic = Number(inspectPic)+Number(eventpic.length)
+            });
+            let eventpic = eventList.filter(x=>x.sourceObj!=null);
+            self.totalnumOfPic = Number(inspectPic)+Number(eventpic.length);
             tempList[0]={
                 itemTitleName: self.$t('reportView.notableItem'),
                 iconSrc:'icon-zhongxindingwei',
                 itemCount:UnqualifiedTemp.length,
                 itemList:UnqualifiedTemp,
                 detailType:0
-            }
+            };
             tempList[1]={
                 itemTitleName: self.$t('remotePatrol.ignoreds'),
                 iconSrc:'icon-hulve',
                 itemCount:ignoreTemp.length,
                 itemList:ignoreTemp,
                 detailType:1
-            }
+            };
             tempList[2]={
                 itemTitleName:self.$t('remotePatrol.feedbacks'),
                 iconSrc:'icon-fankui',
                 itemCount:feedBackTemp.length,
                 itemList:feedBackTemp,
                 detailType:2
-            }
+            };
             self.tempList=tempList;
         },
         getAccountId(){
@@ -734,27 +721,21 @@ export default {
                 getUserInfo().then(res=>{
                     console.log(res);
                     res.data.forEach(item=>{
-                        if(item.userId==userId){
+                        if(item.userId===userId){
                             let accountId=item.accountId.toLowerCase();
                             self.accountId=accountId;
                             localStorage.setItem('oss_bucket',accountId);
                             resolve(accountId);
                         }
-                    })
-                })
-            })
+                    });
+                });
+            });
         },
         async getOssInfo(){
             let self=this;
             let accountId=await self.getAccountId();
             console.log(accountId);
             self.accountId=localStorage.getItem('oss_bucket');
-            // getStorageInfo().then(res=>{
-            //     console.log(res);
-            //     if(res.errCode==0){
-            //         self.oss=res.data;
-            //     }
-            // })
         },
         getUpLoadBucketInfo(){
             let self=this;
@@ -769,7 +750,7 @@ export default {
             });
         },
         notShowInputRuleTips(){
-            this.adviceInfoRuletip=false
+            this.adviceInfoRuletip=false;
         },
       adviceChanged(val){
         let self = this;
@@ -778,9 +759,9 @@ export default {
         console.log(content);
         self.suggest = content;
         if(length>600){
-              this.adviceInfoRuletip=true
+              this.adviceInfoRuletip=true;
           }else{
-              this.adviceInfoRuletip=false
+              this.adviceInfoRuletip=false;
           }
       }
     },
@@ -790,7 +771,7 @@ export default {
         self.getUpLoadBucketInfo();
         self.getOssInfo();
     }
-}
+};
 </script>
 <style lang="scss" scoped>
 @import 'node_modules/bootstrap/scss/bootstrap';

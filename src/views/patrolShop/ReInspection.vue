@@ -9,7 +9,7 @@
                     <i class="iconfont icon-iconfontstart" :class="store.storeUp?'coll-icon':'nocoll-icon'" style="vertical-align: middle;"></i>
                     <span :class="store.storeUp?'coll-font':'nocoll-font'">{{store.storeUpTitle}}</span>
                 </div>
-                <el-button :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" @click="submit1"  type="primary" v-if="sheetName.length!=0">
+                <el-button :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" @click="confirmSummary"  type="primary" v-if="sheetName.length!=0">
                   {{generatePatrolLang('confirmSum')}}
                 </el-button>
             </div>
@@ -155,8 +155,6 @@
             <dialog-vue :dialog-title='changeBrandObj.title' :show-info='changeBrandObj.showInfo' :is-warning='changeBrandObj.isWarning' :dialog-closed='changeBrandObj.dialogCosed' @confirmed='changeBrandDialog' @canceled='canceldChangeBrand'></dialog-vue>
             <dialog-vue :dialog-title='changeStoreObj.title' :show-info='changeStoreObj.showInfo' :is-warning='changeStoreObj.isWarning' :dialog-closed='changeStoreObj.dialogCosed' @confirmed='changeStoreDialog' @canceled='canceldChangeStore'></dialog-vue>
             <dialog-vue :dialog-title='changeInspectObj.title' :show-info='changeInspectObj.showInfo' :is-warning='changeInspectObj.isWarning' :dialog-closed='changeInspectObj.dialogCosed' @confirmed='changeInspectDialog' @canceled='canceldChangeInspect'></dialog-vue>
-            <!-- <dialog-vue :dialog-title='ignoreInspectObj.title' :show-info='ignoreInspectObj.showInfo' :is-warning='ignoreInspectObj.isWarning' :dialog-closed='ignoreInspectObj.dialogCosed' @confirmed='ignoreInspectDialog' @canceled='cancelIgnoreInspect'></dialog-vue> -->
-            <!-- <dialog-vue :dialog-title='CancleIgnoreInspectObj.title' :show-info='CancleIgnoreInspectObj.showInfo' :is-warning='CancleIgnoreInspectObj.isWarning' :dialog-closed='CancleIgnoreInspectObj.dialogCosed' @confirmed='CancleIgnoreDialog' @canceled='IgnoreInspect'></dialog-vue> -->
             <dialog-vue :dialog-title='noBindDeviceObj.title' :show-info='noBindDeviceObj.showInfo' :is-warning='noBindDeviceObj.isWarning' :dialog-closed='noBindDeviceObj.dialogCosed' @confirmed='noBindDeviceDialog' @canceled='canceldNoBind'></dialog-vue>
             <dialog-vue :dialog-title='noAllInspectObj.title' :show-info='noAllInspectObj.showInfo' :is-warning='noAllInspectObj.isWarning' :dialog-closed='noAllInspectObj.dialogCosed' @confirmed='noAllInspectDialog' @canceled='canceldNoAllInspect'></dialog-vue>
             <dialog-vue :dialog-title='allIgnoreObj.title' :show-info='allIgnoreObj.showInfo' :is-warning='allIgnoreObj.isWarning' :dialog-closed='allIgnoreObj.dialogCosed' @confirmed='allIgnoreDialog' @canceled='cancelAllIgnore'></dialog-vue>
@@ -507,21 +505,19 @@
 </template>
 <script>
 import { checkOutInspectItemV3 } from '@/api/inspect';
-import util from '@/common/util'
-import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore, getVideoAuthority} from '@/api/store'
-import {getUserInfo} from '@/api/login'
-import {mapGetters} from 'vuex'
-import {getStorageInfo} from '@/api/event'
-import {getDeviceList} from '@/api/device'
-import dashAPI from '@/api/dash'
-import videojs from '../../../static/video.js'
+import util from '@/common/util';
+import {getStoreList,getFavoriteList,addFavoriteStore,deleteFavoriteStore, getVideoAuthority} from '@/api/store';
+import {getUserInfo} from '@/api/login';
+import {mapGetters} from 'vuex';
+import {getDeviceList} from '@/api/device';
+import dashAPI from '@/api/dash';
+import videojs from '../../../static/video.js';
 import DialogVue from '@/components/DialogVue.vue'
-import ChannelIconBtn  from '@/components/ChannelIconBtn.vue'
+import ChannelIconBtn  from '@/components/ChannelIconBtn.vue';
 import {getCookie} from '@/common/auth';
-import RecordRTC from '../../../static/RecordRTC.js'
-import {validateInput} from '@/common/validate'
-import {generatePatrolLang} from '@/api/i18n'
-import EzvizVideo from '@/components/EzvizVideo.vue'
+import RecordRTC from '../../../static/RecordRTC.js';
+import {generatePatrolLang} from '@/api/i18n';
+import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
 import html2canvas from 'html2canvas';
 
@@ -548,12 +544,6 @@ export default {
             showPenBtn:true,
             showPen:false,
             showStoreUp:false,
-            store:{
-                storeName:'西安5店',
-                storeTitle:'西安5店远程巡检',
-                storeUp:false,
-                storeUptitle: this.$t('remotePatrol.clickToStar')
-            },
             showFeedDialog1:false,
             showFeedDialog2:false,
             showFeedDialog3:false,
@@ -709,18 +699,6 @@ export default {
                 isWarning:true,
                 dialogCosed:false
             },
-            // ignoreInspectObj:{
-            //     title: this.$t('remotePatrol.confirm'),
-            //     showInfo: this.$t('remotePatrol.confirmIgnore'),
-            //     isWarning:true,
-            //     dialogCosed:false
-            // },
-            // CancleIgnoreInspectObj:{
-            //     title: this.$t('remotePatrol.confirm'),
-            //     showInfo: this.$t('remotePatrol.cancleIgnore'),
-            //     isWarning:true,
-            //     dialogCosed:false
-            // },
             noBindDeviceObj:{
                 title: this.$t('remotePatrol.prompt'),
                 showInfo: this.$t('remotePatrol.notBindCamera'),
@@ -803,7 +781,7 @@ export default {
             beforepatrolstore:'',
             showIgnoreItem:false,
             hasIgnoretemp:[]
-        }
+        };
     },
     computed:{
         graphBtnWidth:function(){
@@ -826,7 +804,7 @@ export default {
         accountChanged(val,oldVal){
             console.log(val);
             let self=this;
-            if(val!=0){
+            if(val!==0){
                 self.changeBrand();
             }
         },
@@ -842,8 +820,8 @@ export default {
     },
     beforeRouteLeave(to, from, next){
         let self=this;
-        let canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !=0 )
-        if(canLeave && to.name !='confirmSum'){
+        let canLeave = (((!self.isEzviz) && self.editCount!==0 )) || ( self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !==0 );
+        if(canLeave && to.name !=='confirmSum'){
           self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
             confirmButtonText: self.$t('remotePatrol.confirm'),
             cancelButtonText: self.$t('remotePatrol.cancel'),
@@ -852,15 +830,13 @@ export default {
             cancelButtonClass: 'cancelBtn',
             confirmButtonClass: 'confirmBtn'
           }).then(() => {
-            console.log('confirm')
-            if(to.name !='confirmSum' ){
-            //   from.meta.keepAlive=false;
-              self.previewplayer && self.previewplayer.dispose()
+            console.log('confirm');
+            if(to.name !=='confirmSum' ){
+              self.previewplayer && self.previewplayer.dispose();
               self.$store.dispatch('setPatrolHistory',null);
               self.$store.dispatch('setPatrolComment',null);
             }
             else{
-            //   from.meta.keepAlive = true;
             self.$store.dispatch('setPatrolHistory',self.historyObj );
             }
             if(self.playState){
@@ -871,21 +847,18 @@ export default {
             if(self.isEzviz && !self.showGuide){
               self.$refs.ezvizVideo.stopRealTime();
             }
-            next()
+            next();
           }).catch(() => {
-            // 如果取消跳转地址栏会变化，这时保持地址栏不变
-            console.log('cancel')
-            next(false)
-          })
+            console.log('cancel');
+            next(false);
+          });
         }
         else{
-          if(to.name !='confirmSum'){
-            // from.meta.keepAlive=false;
+          if(to.name !=='confirmSum'){
             self.$store.dispatch('setPatrolHistory',null);
             self.$store.dispatch('setPatrolComment',null);
           }
           else{
-            // from.meta.keepAlive=true;
             self.$store.dispatch('setPatrolHistory',self.historyObj);
           }
           if(self.playState){
@@ -898,81 +871,55 @@ export default {
           }
           next();
         }
-        // if(self.editCount!=0){
-        //     let confirm=window.confirm('当前巡检尚未完成，确认是否离开页面？');
-        //     if(confirm==true){
-        //         if(to.name!='巡检提交事件'){
-        //             from.meta.keepAlive=false;
-        //             if(self.playState){
-        //                 self.stopRealTime();
-        //             }
-        //         }
-        //         next();
-        //     }
-        //     else{
-        //         next(false);
-        //     }
-        // }
-        // self.isPlayingFlag=-1;
-        // if(to.name!='confirmSum'){
-        //     from.meta.keepAlive=false;
-        // }
-        // if(self.playState){
-        //     self.stopRealTime();
-        //     window.clearInterval(self.timerPlayReal);
-        //     self.timerPlayReal=null;
-        // }
-        // next();
     },
     async mounted(){
         let self=this;
         let PatrolHistory = self.$store.getters.PatrolHistory;
         if(PatrolHistory!=null){
-            self.activeIndex = PatrolHistory.activeIndex
-            self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList
+            self.activeIndex = PatrolHistory.activeIndex;
+            self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
 
             let indexFeed=PatrolHistory.sheetName.map(x=>x.groupId).indexOf('feedBack');
-            let getdealnum=0
+            let getdealnum=0;
             let sheetName=PatrolHistory.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
-                s_item.count!=s_item.Effective ? getdealnum++ : ''
+                s_item.count!==s_item.Effective ? getdealnum++ : '';
                 s_item.inspectList.forEach(n_item=>{
                     n_item.items.forEach(item=>{
-                        item.isIgnore=false
-                    })
-                })
-            })
-            self.isShowWarn = getdealnum==0 ? false : true
-            self.sheetName = PatrolHistory.sheetName
-            self.PatrolList = PatrolHistory.PatrolList
-            self.patrolstore = PatrolHistory.patrolstore
-            self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList
-            self.showChannelBtns = PatrolHistory.showChannelBtns
-            self.allChannelBtns = PatrolHistory.allChannelBtns
-            self.curSheetIndex=PatrolHistory.curSheetIndex
-            self.curGroupIndex=PatrolHistory.curGroupIndex
-            self.curItemIndex=PatrolHistory.curItemIndex
-            
-            self.isDisabled=true
-            let isClick = self.sheetName[self.sheetName.length-1].isClick
+                        item.isIgnore=false;
+                    });
+                });
+            });
+            self.isShowWarn = !getdealnum===0;
+            self.sheetName = PatrolHistory.sheetName;
+            self.PatrolList = PatrolHistory.PatrolList;
+            self.patrolstore = PatrolHistory.patrolstore;
+            self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList;
+            self.showChannelBtns = PatrolHistory.showChannelBtns;
+            self.allChannelBtns = PatrolHistory.allChannelBtns;
+            self.curSheetIndex=PatrolHistory.curSheetIndex;
+            self.curGroupIndex=PatrolHistory.curGroupIndex;
+            self.curItemIndex=PatrolHistory.curItemIndex;
+            self.isDisabled=true;
+            let isClick = self.sheetName[self.sheetName.length-1].isClick;
             if(isClick){
                 if(PatrolHistory.eventList.length>0){
-                    self.eventList = PatrolHistory.eventList
-                    self.showFeedBackInfo = false
-                    self.showFeedBack = true
+                    self.eventList = PatrolHistory.eventList;
+                    self.showFeedBackInfo = false;
+                    self.showFeedBack = true;
                 }else{
-                    self.showFeedBackInfo = true
-                    self.showFeedBack = true
+                    self.showFeedBackInfo = true;
+                    self.showFeedBack = true;
                 }
             }else{
-                self.inspectItemList = PatrolHistory.inspectItemList
+                self.inspectItemList = PatrolHistory.inspectItemList;
             }
-            self.store = PatrolHistory.store
-            self.patrolStoreName=PatrolHistory.store.storeName
-            self.showGuide = false
-            self.showStoreUp = true
-            if(PatrolHistory.hasIgnoretemp.length==0){
-                self.notShowAlert=true
+            self.store = PatrolHistory.store;
+            self.patrolStoreName=PatrolHistory.store.storeName;
+            self.showGuide = false;
+            self.showStoreUp = true;
+            if(PatrolHistory.hasIgnoretemp.length===0){
+                self.notShowAlert=true;
             }
         }else{
             self.getFaStoreData();
@@ -985,58 +932,30 @@ export default {
       if(!self.isEzviz){
           self.looper();
         }
-        else{
-          //
-        }
         window.onresize=function(){
             if(!self.checkFull()){
                 console.log('退出全屏');
                 self.fullScreen=false;
                 var ele = document.getElementById('videoContent');
-                ele.style.width = "auto";
-                ele.style.height = "auto";
+                ele.style.width = 'auto';
+                ele.style.height = 'auto';
             }
-        }
-         /**
-         * 远程巡检，门店监控页面在页面离开的时候需暂停实时视频的播放，进入的时候重新调用api.
-         */
-         window.addEventListener("visibilitychange", self.visibilityChange, false)
-           // window.addEventListener("visibilitychange",()=>{
-           //   console.log(self.isEzviz)
-           //   if(!self.isEzviz){
-           //     if(document.hidden){
-           //       console.log("我暂时离开页面了");
-           //       if(self.playState){  //当前播放的是实时视频
-           //         self.stopRealTimeVisPage();
-           //         window.clearInterval(self.timerPlayReal);
-           //       }
-           //     }else{
-           //       console.log("我进入页面了");
-           //       console.log(self.isPlayingFlag);
-           //       if(self.isPlayingFlag==1){
-           //         self.realTime();
-           //       }
-           //     }
-           //   }
-           //
-           // })
+        };
+         window.addEventListener('visibilitychange', self.visibilityChange, false);
          },
     methods:{
         generatePatrolLang,
         visibilityChange(){
           let self = this;
-          console.log(self.isEzviz)
           if(!self.isEzviz){
             if(document.hidden){
-              console.log("我暂时离开页面了");
-              if(self.playState){  //当前播放的是实时视频
+              if(self.playState){
                 self.stopRealTimeVisPage();
                 window.clearInterval(self.timerPlayReal);
               }
             }else{
-              console.log("我进入页面了");
               console.log(self.isPlayingFlag);
-              if(self.isPlayingFlag==1){
+              if(self.isPlayingFlag===1){
                 self.realTime();
               }
             }
@@ -1047,41 +966,38 @@ export default {
             if(self.playState){
                 self.stopRealTime();
                 window.clearInterval(self.timerPlayReal);
-                self.timerPlayReal = null
+                self.timerPlayReal = null;
             }
             if(self.isEzviz && !self.showGuide){
                 self.$refs.ezvizVideo.stopRealTime();
             }
-            self.patrolStoreName=null
-            self.activeIndex = '0'
-            self.PatrolList = []
-            self.patrolstore = ''
-            self.inspectList = []
-            self.inspectItemList = []
-            self.store = ''
-            self.showStoreUp = false
+            self.patrolStoreName=null;
+            self.activeIndex = '0';
+            self.PatrolList = [];
+            self.patrolstore = '';
+            self.inspectList = [];
+            self.inspectItemList = [];
+            self.store = '';
+            self.showStoreUp = false;
             self.showGuide=true;
-            self.eventList = []
-            self.sheetName=[]
-            self.tempArr=[]
-            self.hasIgnoretemp=null
-            self.showIgnoreItem=false
-            self.isShowWarn=false
-            self.notShowAlert=false
-            self.hasSheet3=false
-            self.showFeedBackInfo = true
+            self.eventList = [];
+            self.sheetName=[];
+            self.tempArr=[];
+            self.hasIgnoretemp=null;
+            self.showIgnoreItem=false;
+            self.isShowWarn=false;
+            self.notShowAlert=false;
+            self.hasSheet3=false;
+            self.showFeedBackInfo = true;
             self.accountId=localStorage.getItem('oss_bucket');
             self.showChannelBtns = [];
-            //self.getInitStoreData();
             self.getFaStoreData();
-            //self.videoEl=document.getElementById('previewVideo').children[0];
             self.getDeviceList();
-            //self.getVideoAuthority();
         },
         anchorLinkTo () {
             let self=this;
-            if(document.getElementById('inspectContent')!=null){
-                if(self.$refs['myScrollbar']!=undefined){
+            if(document.getElementById('inspectContent')!==null){
+                if(self.$refs['myScrollbar']!==undefined){
                     self.$refs['myScrollbar'].wrap.scrollTop = document.getElementById('inspectContent').offsetTop;
                 }
             }
@@ -1094,15 +1010,15 @@ export default {
                 getUserInfo().then(res=>{
                     console.log(res);
                     res.data.forEach(item=>{
-                        if(item.userId==userId){
+                        if(item.userId===userId){
                             let accountId=item.accountId.toLowerCase();
                             self.accountId=accountId;
                             localStorage.setItem('oss_bucket',accountId);
                             resolve(accountId);
                         }
-                    })
-                })
-            })
+                    });
+                });
+            });
 
         },
         async getOssInfo(){
@@ -1110,12 +1026,6 @@ export default {
             let accountId=await self.getAccountId();
             console.log(accountId);
             self.accountId=localStorage.getItem('oss_bucket');
-            // getStorageInfo().then(res=>{
-            //     console.log(res);
-            //     if(res.errCode==0){
-            //         self.oss=res.data;
-            //     }
-            // })
         },
         getUpLoadBucketInfo(){
             let self=this;
@@ -1129,7 +1039,6 @@ export default {
             //let bucketName = self.oss.ossBucketName;
             let bucketName = 'viumo-n3azju2aknpw';
             let endpoint=self.oss.ossEndPoint;
-            let key=fileName;
             let url=`http://${bucketName}.${endpoint}/${fileName}`;
             return url;
         },
@@ -1138,7 +1047,7 @@ export default {
             console.log(item);
             console.log(index);
             self.eventList.splice(index,1);
-            self.showFeedBackInfo = self.eventList.length==0 ? true : false
+            self.showFeedBackInfo = self.eventList.length===0;
         },
         addFeedBack(){
             let self=this;
@@ -1155,8 +1064,8 @@ export default {
                 eventName:self.eventName,
                 eventDes:self.eventDes,
                 sourceObj:srcObj
-            }
-            if(self.eventName.trim().length==0){
+            };
+            if(self.eventName.trim().length===0){
                 self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
@@ -1176,15 +1085,14 @@ export default {
                 fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
                 file:util.base64ToBlob(src),
                 deviceId: self.channel.id
-            }
+            };
 
             let obj={
                 eventName:self.eventName,
                 eventDes:self.eventDes,
                 sourceObj:srcObj
-            }
-            if(self.eventName.trim().length==0){
-                //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+            };
+            if(self.eventName.trim().length===0){
                 self.showEventNameInfo = true;
                 return false;
             }
@@ -1198,10 +1106,9 @@ export default {
                 eventName:self.eventName,
                 eventDes:self.eventDes,
                 sourceObj:null
-            }
-            if(self.eventName.trim().length==0){
+            };
+            if(self.eventName.trim().length===0){
                 self.showEventNameInfo = true;
-                //self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
                 return false;
             }
             self.eventList.push(obj);
@@ -1215,25 +1122,25 @@ export default {
             let sheetName=self.sheetName.slice(0,indexFeed);
             if(self.showIgnoreItem){
                 self.hasIgnoretemp.forEach((item,index)=>{
-                    if(item.id==id){
+                    if(item.id===id){
                         tempId={
                             itemIndex:index
                         };
                     }
-                })
+                });
             }else{
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach((item,index)=>{
                         item.items.forEach((_item,_index)=>{
-                            if(_item.id==id){
+                            if(_item.id===id){
                                 tempId={
                                     groupIndex:index,
                                     itemIndex:_index
                                 };
                             }
-                        })
-                    })
-                })
+                        });
+                    });
+                });
             }
             return tempId;
         },
@@ -1241,53 +1148,48 @@ export default {
             let self=this;
             let curIndex=0;
             self.channelBtns.forEach((item,index)=>{
-                if(item.id==id){
+                if(item.id===id){
                     curIndex=index;
                 }
-            })
+            });
             return curIndex;
         },
         upLoadFile(fileItem){
             let self=this;
             self.percentage=0;
             let OSS = require('ali-oss');
-            //let bucketName = 'viumo-'+self.accountId
-            //let bucketName='viumo-aaoompqqpjy4';
-            //let bucketName = self.oss.ossBucketName;
             let bucketName = 'viumo-n3azju2aknpw';
             const client = new OSS({
                 region: self.oss.ossEndPoint.slice(0,self.oss.ossEndPoint.indexOf('.')),
-                accessKeyId: self.oss.ossAccessKeyId,//填入自己的id
-                accessKeySecret: self.oss.ossAccessKeySecret,//填入自己的id
-                //bucket: 'viumo-'+self.accountId
+                accessKeyId: self.oss.ossAccessKeyId,
+                accessKeySecret: self.oss.ossAccessKeySecret,
                 bucket:bucketName
-            })
+            });
             let name=fileItem.fileName;
             return new Promise((resolve,reject)=>{
                 client.put(name,fileItem.file,{
                 progress: function* (percentage, cpt) {
-                   self.percentage = percentage
+                   self.percentage = percentage;
                     }
                 })
                 .then((results) => {
-                    // 上传完成
                     const url = self.getFileUrl(results.name);
                     console.log(url);
                     resolve(url);
                 })
                 .catch((err) => {
-                    console.log(err)
-                })
-            })
+                    console.log(err);
+                });
+            });
         },
         getDeviceList(){
             let self=this;
             getDeviceList().then(res=>{
-                if(res.errCode==0){
+                if(res.errCode===0){
                     let data=res.data;
                     self.deviceList=data;
                 }
-            })
+            });
         },
         addVideoToList(){
             let self=this;
@@ -1313,7 +1215,7 @@ export default {
                     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
                 }
                 self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-            })
+            });
         },
         playCutVideo(item,index){
             let self=this;
@@ -1355,13 +1257,13 @@ export default {
                                     obj.mediaType=1;
                                     obj.src=url;
                                     self.feedBackVideoFileObj=obj;
-                                })
-                            })
+                                });
+                            });
                         }
                         else{
                             self.addVideoToList();
                         }
-                    },100)
+                    },100);
                 }
                 else{
                     self.isREC=true;
@@ -1375,14 +1277,14 @@ export default {
                             return;
                         }
                         requestAnimationFrame(self.looper);
-                    })
+                    });
                 }
             }
         },
         computeFrame(){
             let self=this;
             self.canvasEl=document.getElementById('vcanvas');
-            var ctx = self.canvasEl.getContext('2d');
+            // var ctx = self.canvasEl.getContext('2d');
             self.recorder = RecordRTC(self.canvasEl, {
                 type: 'canvas'
             });
@@ -1392,19 +1294,17 @@ export default {
         },
         drawMain(drawing_elem, percent, forecolor, bgcolor) {
             /*
-                @drawing_elem: 绘制对象
-                @percent：绘制圆环百分比, 范围[0, 100]
-                @forecolor: 绘制圆环的前景色，颜色代码
-                @bgcolor: 绘制圆环的背景色，颜色代码
+                @drawing_elem: Drawing objects
+                @percent：Draw circle percentage, range [0, 100]
+                @forecolor: Draw the foreground color of the circle, color code
+                @bgcolor: Draw the background color of the ring, color code
             */
             let self=this;
-            var context = drawing_elem.getContext("2d");
+            var context = drawing_elem.getContext('2d');
             var center_x = drawing_elem.width / 2;
             var center_y = drawing_elem.height / 2;
             var rad = Math.PI*2/100;
-
-
-            // 绘制背景圆圈
+            // Draw background circle
             function backgroundCircle(){
                 context.beginPath();
                 context.lineWidth = 14; //设置线宽
@@ -1415,13 +1315,13 @@ export default {
                 context.fill();
             }
 
-            //绘制运动圆环
+            //Draw a motion ring
             function foregroundCircle(n){
                 context.save();
                 context.strokeStyle = forecolor;
                 context.globalAlpha = 1;
                 context.lineWidth = 6;
-                context.lineCap = "round";
+                context.lineCap = 'round';
                 var radius = center_x - context.lineWidth;
                 context.beginPath();
                 context.arc(center_x, center_y, radius , -Math.PI/2, -Math.PI/2 +n*rad, false); //用于绘制圆弧context.arc(x坐标，y坐标，半径，起始角度，终止角度，顺时针/逆时针)
@@ -1430,7 +1330,7 @@ export default {
                 context.restore();
             }
 
-            //绘制文字
+            //Draw text
             function text(n){
                 context.save();
                 context.fillStyle='white';
@@ -1439,7 +1339,7 @@ export default {
                 context.font='bold '+font_size+'px Helvetica';
                 var textStr='';
                 if(n==100){
-                  if(self.lang == 'en'){
+                  if(self.lang === 'en'){
                     textStr= self.$t('storeMonitor.recordSucc').substring(0, 9) + '...' ;
                   }
                   else{
@@ -1453,7 +1353,7 @@ export default {
                 context.fillText(textStr,center_x-text_width/2,center_y+font_size/2);
                 context.restore();
             }
-            //执行动画
+            //Perform animation
             function drawFrame(speed){
                 context.clearRect(0, 0, drawing_elem.width, drawing_elem.height);
                 backgroundCircle();
@@ -1492,10 +1392,10 @@ export default {
                 self.computeFrame();
                 self.looper();
                 setTimeout(()=>{
-                    var btn_canvas = document.getElementById("btn-graph-canvas");
-                    self.drawMain(btn_canvas, 100, "#f31d65", "#f31d65");
-                },1000)
-            })
+                    var btn_canvas = document.getElementById('btn-graph-canvas');
+                    self.drawMain(btn_canvas, 100, '#f31d65', '#f31d65');
+                },1000);
+            });
         },
         cutPicture(){
             let self=this;
@@ -1520,7 +1420,7 @@ export default {
                     let imgObj=new Image();
                     imgObj.src=oGrayImg;
                     self.imageCanvasList.push(imgObj);
-                })
+                });
             }
             else{
                 self.showCancelContent=false;
@@ -1538,7 +1438,7 @@ export default {
                     let imgObj=new Image();
                     imgObj.src=oGrayImg;
                     self.imageCanvasList.push(imgObj);
-                })
+                });
             }
         },
         showPenList(){
@@ -1550,10 +1450,10 @@ export default {
             let self=this;
             item.showContent=true;
             self.penList.forEach((_item,_index)=>{
-                if(index!=_index){
+                if(index!==_index){
                     _item.showContent=false;
                 }
-            })
+            });
             self.penChecked=item.id;
         },
         cancelEditCanvas(){
@@ -1586,7 +1486,7 @@ export default {
                 vcanvas={width:767*self.percentHeight,height:431*self.percentHeight};
             }
             ctx.clearRect(0,0,vcanvas.width,vcanvas.height);
-            if(self.imageCanvasList.length==0){
+            if(self.imageCanvasList.length===0){
                 ctx.drawImage(self.imageCanvas,0,0,vcanvas.width,vcanvas.height);
             }
             else{
@@ -1624,13 +1524,6 @@ export default {
             }else{
                 self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
             }
-            // if(tempId!=null){
-            //   self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-            // }
-            // else{
-            //     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
-            // }
-            // self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
 
         },
         mouseDownAction(e){
@@ -1657,10 +1550,10 @@ export default {
             self.isMouseDown=false;
             self.showCutModel=true;
             self.showPenBtn=true;
-            self.showCancelContent=true;  //每次鼠标弹起后显示可以取消的框
-            if(self.flag!=0&&self.canvasEl!=''){
+            self.showCancelContent=true;
+            if(self.flag!==0&&self.canvasEl!==''){
                 let imgObj=new Image();
-                imgObj.src=self.canvasEl.toDataURL("image/jpeg");
+                imgObj.src=self.canvasEl.toDataURL('image/jpeg');
                 self.imageCanvasList.push(imgObj);
             }
             self.flag=0;
@@ -1676,7 +1569,7 @@ export default {
             ctx.strokeStyle=self.penChecked;
             ctx.lineTo(x1,y1);
             ctx.stroke();
-            if(self.flag!=0){
+            if(self.flag!==0){
                 self.X=self.X1;
                 self.Y=self.Y1;
             }
@@ -1704,17 +1597,17 @@ export default {
             item.manualIgnore=false;
             self.curhasIgnoreItem=index;
             item.scoreList.forEach(s_item=>{
-                s_item.val==itemDS.val ? s_item.isClick=true : s_item.isClick=false;
-            })
-            if(e==0){
-                if(item.type==2){
+                s_item.val===itemDS.val ? s_item.isClick=true : s_item.isClick=false;
+            });
+            if(e===0){
+                if(item.type===2){
                     if(item.itemScore<0){
-                        item.itemgetScore = itemDS.val==-1 ? item.itemScore : 0;
+                        item.itemgetScore = itemDS.val===-1 ? item.itemScore : 0;
                     }else{
-                        item.itemgetScore = itemDS.val==item.itemScore ? item.itemScore : 0;
+                        item.itemgetScore = itemDS.val===item.itemScore ? item.itemScore : 0;
                     }
                 }else{
-                    item.itemgetScore = itemDS.val==-1 ? 0 : item.itemScore;
+                    item.itemgetScore = itemDS.val===-1 ? 0 : item.itemScore;
                 }
                 item.isQualified = !(itemDS.val === -1);
                 item.itemScoreTitle=itemDS.scoreTitle;
@@ -1729,18 +1622,18 @@ export default {
             let self=this;
             console.log(item,itemDS);
             item.scoreList.forEach(s_item=>{
-                s_item.val==itemDS.val ? s_item.isClick=true : s_item.isClick=false;
-            })
+                s_item.val===itemDS.val ? s_item.isClick=true : s_item.isClick=false;
+            });
             self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
-            if(e==0){
-                if(item.type==2){
+            if(e===0){
+                if(item.type===2){
                     if(item.itemScore<0){
-                        item.itemgetScore = itemDS.val==-1 ? item.itemScore : 0;
+                        item.itemgetScore = itemDS.val===-1 ? item.itemScore : 0;
                     }else{
-                        item.itemgetScore = itemDS.val==item.itemScore ? item.itemScore : 0;
+                        item.itemgetScore = itemDS.val===item.itemScore ? item.itemScore : 0;
                     }
                 }else{
-                    item.itemgetScore = itemDS.val==-1 ? 0 : item.itemScore;
+                    item.itemgetScore = itemDS.val===-1 ? 0 : item.itemScore;
                 }
                 item.isQualified = !(itemDS.val === -1);
                 item.itemScoreTitle=itemDS.scoreTitle;
@@ -1748,8 +1641,8 @@ export default {
                 item.itemgetScore=itemDS;
                 item.itemScoreTitle=itemDS;
             }
-            if(item.itemScoreTitle!='--'){
-                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
+            if(item.itemScoreTitle!=='--'){
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount===0){
                     self.sheetName[self.curSheetIndex].dealCount++;
                     self.sheetName[self.curSheetIndex].Effective++;
                     self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
@@ -1760,92 +1653,90 @@ export default {
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)));
             self.getDisabled(0);
-            self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.Effective!=item.count);
+            self.isShowWarn = self.isDisabled&&sheetName.some(item=>item.Effective!==item.count);
             let hasIgnoretemp=[];
             sheetName.forEach(s_item=>{
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        if(_item.inputCount==0&&!_item.manualIgnore){
+                        if(_item.inputCount===0&&!_item.manualIgnore){
                             hasIgnoretemp.push(_item);
                         }
                     });
                 });
             });
-            hasIgnoretemp.length==0 ? self.notShowAlert=true : null;
+            hasIgnoretemp.length===0 ? self.notShowAlert=true : null;
         },
         getDisabled(e){
             let self=this;
-            // 判断条件：巡检项不可全部忽略；巡检评分项至少巡检一项。
             let isSheet1=false,isSheet2=false;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)));
-            if(e==0){
-                if(sheetName.length==1){
-                    isSheet1 = sheetName[0].type==0 ? (sheetName[0].Effective>=1 ? true : false) : false;
-                    isSheet2 = sheetName[0].type==1 ? (sheetName[0].Effective>=1 ? true : false) : false;
-                }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
-                    if(sheetName.some(item=>item.type==2)){
-                        if(sheetName[2].Effective==0){
-                            isSheet1 = isSheet2 = sheetName[1].Effective>=1||sheetName[0].Effective>=1 ? true : false
+            if(e===0){
+                if(sheetName.length===1){
+                    isSheet1 = sheetName[0].type===0 ? sheetName[0].Effective>=1 : false;
+                    isSheet2 = sheetName[0].type===1 ? sheetName[0].Effective>=1 : false;
+                }else if(sheetName.some(item=>item.type===0)&&sheetName.some(item=>item.type===1)){
+                    if(sheetName.some(item=>item.type===2)){
+                        if(sheetName[2].Effective===0){
+                            isSheet1 = isSheet2 = sheetName[1].Effective>=1||sheetName[0].Effective>=1;
                         }else{
-                            isSheet1 = isSheet2 = sheetName[1].Effective>=1 ? true : false
-                            self.hasSheet3 = sheetName[1].Effective>=1 ? false : true
+                            isSheet1 = isSheet2 = sheetName[1].Effective>=1;
+                            self.hasSheet3 = sheetName[1].Effective>=1;
                         }
                     }else{
-                        isSheet1 = isSheet2 = sheetName[0].Effective>=1||sheetName[1].Effective>=1 ? true : false
+                        isSheet1 = isSheet2 = sheetName[0].Effective>=1||sheetName[1].Effective>=1;
                     }
                 }else{
-                    isSheet2 = sheetName[0].Effective>=1 ? true : false
-                    self.hasSheet3 = sheetName[0].Effective==0&&sheetName[1].Effective>=1 ? true : false
+                    isSheet2 = sheetName[0].Effective>=1;
+                    self.hasSheet3 = sheetName[0].Effective===0&&sheetName[1].Effective>=1;
                 }
-                self.isDisabled = isSheet1 || isSheet2
+                self.isDisabled = isSheet1 || isSheet2;
             }else{
-                if(sheetName.length==1){
-                    isSheet1 = isSheet2 = true
-                }else if(sheetName.some(item=>item.type==0)&&sheetName.some(item=>item.type==1)){
-                    if(sheetName.some(item=>item.type==2)){
-                        if(sheetName[2].Effective==0&&self.tempArr.every(x=>x==0)){
-                            isSheet1 = isSheet2 = self.hasIgnoretemp[self.curhasIgnoreItem].type!=2 || (self.hasIgnoretemp[self.curhasIgnoreItem].type==2&&self.hasIgnoretemp[self.curhasIgnoreItem].manualIgnore) ? true : false
-                            self.hasSheet3 = self.hasIgnoretemp[self.curhasIgnoreItem].type!=2 ? false : true
+                if(sheetName.length===1){
+                    isSheet1 = isSheet2 = true;
+                }else if(sheetName.some(item=>item.type===0)&&sheetName.some(item=>item.type===1)){
+                    if(sheetName.some(item=>item.type===2)){
+                        if(sheetName[2].Effective===0&&self.tempArr.every(x=>x===0)){
+                            isSheet1 = isSheet2 = self.hasIgnoretemp[self.curhasIgnoreItem].type!==2 || (self.hasIgnoretemp[self.curhasIgnoreItem].type===2&&self.hasIgnoretemp[self.curhasIgnoreItem].manualIgnore);
+                            self.hasSheet3 = !self.hasIgnoretemp[self.curhasIgnoreItem].type!==2;
                         }else{
-                            isSheet1 = isSheet2 =  true
+                            isSheet1 = isSheet2 = true;
                         }
                     }else{
-                        isSheet1 = isSheet2 = true
+                        isSheet1 = isSheet2 = true;
                     }
                 }else{
-                    isSheet2 = true
+                    isSheet2 = true;
                 }
-                self.isDisabled = isSheet1 || isSheet2
+                self.isDisabled = isSheet1 || isSheet2;
             }
         },
         getAllStoreList(){
-            let self=this;
             let params={
-                "filter": {
-                    "page": 0,
-                    "size": 2000
+                'filter': {
+                    'page': 0,
+                    'size': 2000
                 }
             };
             return new Promise((resolve,reject)=>{
                 getStoreList(params).then(res=>{
                     console.log(res);
                     resolve(res);
-                })
-            })
+                });
+            });
         },
         saveStoreObj(storeObj){
             let self=this;
             let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
             let temp=[];
-            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!=undefined){
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!==undefined){
                 temp=JSON.parse(localStorage.getItem(key));
             }
             temp.forEach((item,index)=>{
-                if(item.userId==storeObj.userId&&item.storeId==storeObj.storeId){
+                if(item.userId===storeObj.userId&&item.storeId===storeObj.storeId){
                     temp.splice(index,1);
                 }
-            })
+            });
             temp.unshift(storeObj);
             temp=temp.slice(0,3);
             localStorage.setItem(key,JSON.stringify(temp));
@@ -1855,20 +1746,20 @@ export default {
             let key='recentStore_reinspect'+'_'+self.accountId+'_'+self.userId;
             let temp=[];
             let tempArray=[];
-            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!=undefined){
+            if(localStorage.getItem(key)!=null||localStorage.getItem(key)!==undefined){
                 temp=JSON.parse(localStorage.getItem(key));
             }
             let indexArray=[];
             temp.forEach((item,index)=>{
                 indexArray.push(self.allInitStoreList.map(x=>x.storeId).indexOf(item.storeId));
-            })
+            });
             console.log(indexArray);
             indexArray=indexArray.filter(function(x){
-                return x!=-1
-            })
+                return x!==-1;
+            });
             indexArray.forEach(item=>{
                 tempArray.push(self.allInitStoreList[item]);
-            })
+            });
             return tempArray;
         },
         async getStoreList(){
@@ -1879,7 +1770,7 @@ export default {
                 let temp=[];
                 data.forEach((item,index)=>{
                     let obj={};
-                    if(self.store.storeId==item.storeId){
+                    if(self.store.storeId===item.storeId){
                         obj.isActive=true;
                     }
                     else{
@@ -1888,29 +1779,28 @@ export default {
                     obj.storeId=item.storeId;
                     obj.name=item.name;
                     obj.userId=item.userId;
-                    obj.favorite=item.favorite==undefined?true:item.favorite;
+                    obj.favorite=item.favorite===undefined?true:item.favorite;
                     obj.device=item.device;
-                    // if(self.appliedInspectList.indexOf(item.storeId)!=-1){
-                    if(item.authorizedInspect.length!=0){
-                        obj.authorizedInspect=item.authorizedInspect
+                    if(item.authorizedInspect.length!==0){
+                        obj.authorizedInspect=item.authorizedInspect;
                         obj.hasInspect=true;
                     }
                     else{
                         obj.hasInspect=false;
                     }
                     temp.push(obj);
-                })
+                });
                 return temp;
-            }
+            };
             let data;
             switch(Number(self.activeIndex)){
                 case 0: data=await self.getFaStoreList();
                     console.log(data);
-                    if(data.errCode==0){
+                    if(data.errCode===0){
                         let storeData=data.data;
                         self.tabList[0].storeList=getStoreTemp(storeData);
                     }
-                    if(data.errCode==500){
+                    if(data.errCode===500){
                         self.tabList[0].storeList=[];
                     }
                     break;
@@ -1922,14 +1812,14 @@ export default {
                 case 2:
                     self.tabList[2].storeList.forEach((item,index)=>{
                         item.storeList.forEach(_item=>{
-                            if(_item.storeId==self.store.storeId){
+                            if(_item.storeId===self.store.storeId){
                                 _item.isActive=true;
                             }
                             else{
                                 _item.isActive=false;
                             }
-                        })
-                    })
+                        });
+                    });
                     break;
             }
         },
@@ -1942,14 +1832,13 @@ export default {
                     obj.storeId=item.storeId;
                     obj.name=item.name;
                     obj.userId=item.userId;
-                    obj.favorite=item.favorite==undefined?true:item.favorite;
+                    obj.favorite=item.favorite===undefined?true:item.favorite;
                     obj.device=item.device;
                     obj.isActive=false;
-                    // if(self.appliedInspectList.indexOf(item.storeId)!=-1){
-                    if(item.authorizedInspect.length!=0){
-                        obj.authorizedInspect=item.authorizedInspect
+                    if(item.authorizedInspect.length!==0){
+                        obj.authorizedInspect=item.authorizedInspect;
                         obj.hasInspect=true;
-                        if(index==0){
+                        if(index===0){
                             obj.isActive=true;
                         }
                     }
@@ -1957,21 +1846,21 @@ export default {
                         obj.hasInspect=false;
                     }
                     temp.push(obj);
-                })
+                });
                 return temp;
-            }
+            };
             let data=await self.getFaStoreList();
             let allStoreData=await self.getAllStoreList();
             self.getInitStoreData(allStoreData);
-            if(data.errCode==0){
+            if(data.errCode===0){
                 let storeData=data.data;
                 self.tabList[0].storeList=getStoreTemp(storeData);
-                if(storeData.length==0){
+                if(storeData.length===0){
                     self.showStoreUp=false;
                     self.inspectList=[];
                 }
                 else{
-                    if(storeData[0].authorizedInspect.length!=0){
+                    if(storeData[0].authorizedInspect.length!==0){
                         let obj={};
                         obj.storeId=storeData[0].storeId;
                         obj.storeName=storeData[0].name;
@@ -1984,12 +1873,12 @@ export default {
                         let storeObj={
                             storeId:curStoreId
                         };
-                        self.patrolStoreName = storeData[0].name
+                        self.patrolStoreName = storeData[0].name;
                         storeData[0].authorizedInspect.forEach(au_item=>{
-                            if(au_item.mode==0){
-                               self.PatrolList.push(au_item) //门店对应巡检表
+                            if(au_item.mode===0){
+                               self.PatrolList.push(au_item);
                             }
-                        })
+                        });
                         self.saveStoreObj(storeObj);
                         self.getChannelByStore(self.tabList[0].storeList[0]);
                     }
@@ -2004,20 +1893,20 @@ export default {
             let getStore2Temp=data=>{
                 let cityList=[];
                 data.forEach(item=>{
-                    if(cityList.map(x=>x.city).indexOf(item.city)==-1){
+                    if(cityList.map(x=>x.city).indexOf(item.city)===-1){
                         let obj={
                             city:item.city,
                             province:item.province
-                        }
+                        };
                         cityList.push(obj);
                     }
-                })
+                });
                 let storeListTemp=[];
                 for(let i=0;i<cityList.length;i++){
                     let temp=[];
                     let obj={};
                     for(let j=0;j<data.length;j++){
-                        if(cityList[i].city==data[j].city){
+                        if(cityList[i].city===data[j].city){
                            let obj={};
                             obj.isActive=false;
                             obj.storeId=data[j].storeId;
@@ -2025,12 +1914,10 @@ export default {
                             obj.userId=data[j].userId;
                             obj.city=data[j].city;
                             obj.province=data[j].province;
-                            obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
+                            obj.favorite=data[j].favorite===undefined?true:data[j].favorite;
                             obj.device=data[j].device;
-                            // if(data[j].appliedInspect.length!=0&&data[j].appliedInspect.indexOf('远程巡检')!=-1){
-                            if(data[j].authorizedInspect.length!=0){
-                                // self.appliedInspectList.push(data[j].storeId);
-                                obj.authorizedInspect=data[j].authorizedInspect
+                            if(data[j].authorizedInspect.length!==0){
+                                obj.authorizedInspect=data[j].authorizedInspect;
                                 obj.hasInspect=true;
                             }
                             else{
@@ -2044,12 +1931,11 @@ export default {
                     storeListTemp.push(obj);
                 }
                 return storeListTemp;
-            }
-            // let data=await self.getAllStoreList();
-             if(data.errCode==0){
+            };
+             if(data.errCode===0){
                 let storeData=data.data.content;
                 self.allInitStoreList=storeData;
-                if(storeData.length==0){
+                if(storeData.length===0){
                     self.tabList[2].storeList=[];
                     self.tempStoreList=[];
                 }
@@ -2072,109 +1958,102 @@ export default {
             temp.push(self.store.storeId);
             let params={
                 storeIds:temp
-            }
+            };
             if(!self.store.storeUp){
                 addFavoriteStore(params).then(res=>{
                     console.log(res);
-                    if(res.errCode==0){
+                    if(res.errCode===0){
                         self.store.storeUp=true;
                         self.store.storeUpTitle= this.$t('remotePatrol.stared');
                         self.getStoreList();
                         self.tabList[2].storeList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
-                                if(self.store.storeId==_item.storeId){
+                                if(self.store.storeId===_item.storeId){
                                     _item.favorite=true;
                                 }
-                            })
-                        })
+                            });
+                        });
                         self.tempStoreList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
-                                if(self.store.storeId==_item.storeId){
+                                if(self.store.storeId===_item.storeId){
                                     _item.favorite=true;
                                 }
-                            })
-                        })
+                            });
+                        });
                         self.allInitStoreList.forEach((item,index)=>{
-                            if(self.store.storeId==item.storeId){
+                            if(self.store.storeId===item.storeId){
                                 item.favorite=true;
                             }
-                        })
+                        });
                     }
-                })
+                });
             }
             else{
                 deleteFavoriteStore(params).then(res=>{
-                    if(res.errCode==0){
+                    if(res.errCode===0){
                         self.store.storeUp=false;
                         self.store.storeUpTitle=this.$t('remotePatrol.clickToStar');
                         self.getStoreList();
                         self.tabList[2].storeList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
-                                if(self.store.storeId==_item.storeId){
+                                if(self.store.storeId===_item.storeId){
                                     _item.favorite=false;
                                 }
-                            })
-                        })
+                            });
+                        });
                         self.tempStoreList.forEach((item,index)=>{
                             item.storeList.forEach((_item,_index)=>{
-                                if(self.store.storeId==_item.storeId){
+                                if(self.store.storeId===_item.storeId){
                                     _item.favorite=false;
                                 }
-                            })
-                        })
+                            });
+                        });
                         self.allInitStoreList.forEach((item,index)=>{
-                            if(self.store.storeId==item.storeId){
+                            if(self.store.storeId===item.storeId){
                                 item.favorite=false;
                             }
-                        })
+                        });
                     }
-                })
+                });
             }
         },
         mouseoverGroup(item,index){
-            item.isHover=true
+            item.isHover=true;
         },
         mouseoutGroup(item,index){
-            item.isHover=false
+            item.isHover=false;
         },
         getItemByGroup(item,index){
             console.log(item);
             let self=this;
-            
-            // else{
-                self.curGroupIndex=index;
-                self.curGroup=item;
-                self.curItemIndex=0;
-                self.inspectItemList=item.items;
-                self.showFeedBack=false;
-                self.hideNext = false;
-                self.hideLast = false;
-                self.channelBtns = [];
-                // self.showChannelBtns = [];
-                item.isClick=true;
-                this.$nextTick(()=>{
-                    self.anchorLinkTo();
-                })
-            // }
+            self.curGroupIndex=index;
+            self.curGroup=item;
+            self.curItemIndex=0;
+            self.inspectItemList=item.items;
+            self.showFeedBack=false;
+            self.hideNext = false;
+            self.hideLast = false;
+            self.channelBtns = [];
+            item.isClick=true;
+            this.$nextTick(()=>{
+                self.anchorLinkTo();
+            });
             self.inspectList.forEach((_item,_index)=>{
-                if(index!=_index){
+                if(index!==_index){
                     _item.isClick=false;
                 }
-            })
+            });
         },
         getDeviceById(deviceId){
             let self=this;
             let device= [];
             self.deviceList.forEach(item=>{
-                // if(deviceId==item.id){
-                //     device=item;
-                // }
               deviceId.forEach(_item=>{
-                if(_item==item.id){
+                if(_item===item.id){
                   device.push(item);
                 }
-              })
-            })
+              });
+            });
             return device;
         },
         openOuter(item){
@@ -2192,65 +2071,64 @@ export default {
         },
         handleIgnore(){
             let self=this;
-            self.curItem.manualIgnore=true
+            self.curItem.manualIgnore=true;
             self.curItem.disabled=true;
             if(self.showIgnoreItem){
-                if(self.hasIgnoretemp[self.curItemIndex].dealCount==0){
-                    self.hasIgnoretemp[self.curItemIndex].dealCount=1
+                if(self.hasIgnoretemp[self.curItemIndex].dealCount===0){
+                    self.hasIgnoretemp[self.curItemIndex].dealCount=1;
                 }
                 if(self.hasIgnoretemp[self.curItemIndex].manualIgnore){
-                    self.hasIgnoretemp[self.curItemIndex].inspectInput = ''
-                    self.hasIgnoretemp[self.curItemIndex].sourceList = []
-                    self.hasIgnoretemp[self.curItemIndex].itemScoreTitle='--'
-                    self.hasIgnoretemp[self.curItemIndex].inputCount=0
+                    self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
+                    self.hasIgnoretemp[self.curItemIndex].sourceList = [];
+                    self.hasIgnoretemp[self.curItemIndex].itemScoreTitle='--';
+                    self.hasIgnoretemp[self.curItemIndex].inputCount=0;
                     self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x=>{
-                        x.isClick=false
-                    })
+                        x.isClick=false;
+                    });
                 }
-                self.getDisabled(1)
+                self.getDisabled(1);
             }else{
                 self.showGuide=false;
-                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!=0&&self.sheetName[self.curSheetIndex].Effective!=0){
-                    self.sheetName[self.curSheetIndex].Effective--
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount!==0&&self.sheetName[self.curSheetIndex].Effective!==0){
+                    self.sheetName[self.curSheetIndex].Effective--;
                 }
-                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount==0){
-                    self.sheetName[self.curSheetIndex].dealCount++
+                if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount===0){
+                    self.sheetName[self.curSheetIndex].dealCount++;
                 }
                 if(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore){
-                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = ''
-                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = []
-                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle='--'
-                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle='--';
+                    self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount=0;
                     self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x=>{
-                        x.isClick=false
-                    })
+                        x.isClick=false;
+                    });
                 }
                 let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
-                let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)))
-                let hasIgnoretemp=[]
+                let sheetName=JSON.parse(JSON.stringify(self.sheetName.slice(0,indexFeed)));
+                let hasIgnoretemp=[];
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach(item=>{
                         item.items.forEach((_item,_index)=>{
-                            if(_item.inputCount==0&&!_item.manualIgnore){
-                                hasIgnoretemp.push(_item)
+                            if(_item.inputCount===0&&!_item.manualIgnore){
+                                hasIgnoretemp.push(_item);
                             }
-                        })
-                    })
-                })
-                hasIgnoretemp.length==0 ? self.notShowAlert=true : null //没有忽略项时，隐藏提示条
-                // self.notShowAlert ? self.notShowAlert=false : null
-                self.getDisabled(0)
-                self.isDisabled ? self.isShowWarn=true : self.isShowWarn=false
+                        });
+                    });
+                });
+                hasIgnoretemp.length===0 ? self.notShowAlert=true : null;
+                self.getDisabled(0);
+                self.isDisabled ? self.isShowWarn=true : self.isShowWarn=false;
             }
         },
         cancleIgnore(){
-            let self = this
+            let self = this;
             self.curItem.manualIgnore=false;
             self.curItem.disabled=false;
             if(self.showIgnoreItem){
-                self.hasIgnoretemp[self.curItemIndex].dealCount!=0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
+                self.hasIgnoretemp[self.curItemIndex].dealCount!==0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
             }else{
-                self.sheetName[self.curSheetIndex].dealCount!=0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
+                self.sheetName[self.curSheetIndex].dealCount!==0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
             }
         },
         cancelIgnoreInspect(val){
@@ -2258,25 +2136,24 @@ export default {
             self.ignoreInspectObj.dialogCosed=false;
         },
         IgnoreInspect(){
-            let self = this
-            self.CancleIgnoreInspectObj.dialogCosed=false
+            let self = this;
+            self.CancleIgnoreInspectObj.dialogCosed=false;
         },
         ignoreItem(item,index,e){
             let self=this;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
-            if(e==0){
-                //判断是否全部忽略了，若是，弹框提示不可全部忽略
-                let count=0,manualCount=1
+            if(e===0){
+                let count=0,manualCount=1;
                 sheetName.forEach(s_item=>{
-                    count+=s_item.count
+                    count+=s_item.count;
                     s_item.inspectList.forEach(item=>{
                         item.items.forEach((_item,_index)=>{
-                            _item.manualIgnore ? manualCount++ : null
-                        })
-                    })
-                })
-                if(count==manualCount){
+                            _item.manualIgnore ? manualCount++ : null;
+                        });
+                    });
+                });
+                if(count===manualCount){
                     self.allIgnoreObj.dialogCosed=true;
                     return false;
                 }
@@ -2284,26 +2161,26 @@ export default {
             sheetName.forEach(s_item=>{
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        _item.checked=false
-                        _item.disabled=true
-                    })
-                })
-            })
+                        _item.checked=false;
+                        _item.disabled=true;
+                    });
+                });
+            });
             self.isEzviz ? self.$refs.ezvizVideo.editCount++: self.editCount++;
             self.curItemIndex=index;
             self.curItem=item;
-            if(item.deviceId==-1){
+            if(item.deviceId===-1){
                 self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
-            self.handleIgnore()
+            self.handleIgnore();
         },
         CancleIgnoreItem(item,index){
             let self=this;
             self.isEzviz ? self.$refs.ezvizVideo.editCount--: self.editCount--;
             self.curItemIndex=index;
             self.curItem=item;
-            self.cancleIgnore()
+            self.cancleIgnore();
         },
         noBindDeviceDialog(val){
             let self=this;
@@ -2332,15 +2209,14 @@ export default {
               self.inspectItemList.forEach(_item=>{
                 _item.checked=false;
                 _item.disabled=true;
-              })
+              });
             }
             self.showChannelBtns.forEach((_item,_index)=>{
-                if(_index!=index){
+                if(_index!==index){
                     _item.isClick=false;
                 }
-            })
+            });
             if(!self.isEzviz){
-              //非萤石平台
               self.curDeviceId=item.id;
               if(self.playState){
                 self.stopAndRealTime();
@@ -2350,23 +2226,22 @@ export default {
               }
             }
             else{
-              //萤石云平台，切换摄像头
               self.curDeviceId=item.id;
-              if(self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+              if(self.$refs.ezvizVideo.playState){
                 self.$refs.ezvizVideo.stopRealTime();
                 self.$nextTick(()=>{
-                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
+                  self.$refs.ezvizVideo.realTime();
                 })
               }
               else{
                 self.$nextTick(()=>{
-                  self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                })
+                  self.$refs.ezvizVideo.realTime();
+                });
               }
             }
         },
         clickItem(item,index){
-            console.log(item)
+            console.log(item);
             let self=this;
             if(item.isIgnore){
                 return false;
@@ -2375,7 +2250,7 @@ export default {
               self.videoLoadingObj.dialogCosed = true;
               return false;
             }
-            if(item.deviceId[0] != self.curDeviceId){
+            if(item.deviceId[0] !== self.curDeviceId){
                     //Dash
                 if(!self.isEzviz){
                     if(self.playState){
@@ -2387,54 +2262,54 @@ export default {
                 }
                 else{
                     //Ezviz
-                    if(self.$refs.ezvizVideo!=undefined){
-                        if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){ //切换前处于播放状态
+                    if(self.$refs.ezvizVideo!==undefined){
+                        if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){
                             self.$refs.ezvizVideo.stopRealTime();
                             self.$nextTick(()=>{
-                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                            })
+                            self.$refs.ezvizVideo.realTime();
+                            });
                         }
                         else{
                             self.$nextTick(()=>{
-                            self.$refs.ezvizVideo.realTime(); //播放当前通道对应的视频(ivsId,channelId)
-                            })
+                            self.$refs.ezvizVideo.realTime();
+                            });
                         }
                     }
                 }
                 self.curDeviceId=item.deviceId[0];
             }
             self.sourceList=[];
-            self.sourceListLength = item.sourceList.length; //获取总共的媒体文件数目
+            self.sourceListLength = item.sourceList.length;
             let obj={};
-            if(item.deviceId.length > 0){  //当前选择的巡检项已绑定设备
+            if(item.deviceId.length > 0){
                 let device=self.getDeviceById(item.deviceId);
                 if(device.length > 0){
                     obj.id=device[0].id;
                     obj.ivsId=device[0].ivsId;
                     obj.channelName=device[0].name;
                     obj.channelId=device[0].channelId;
-                    self.channel=obj;   //当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
-                    self.channelBtns = []
+                    self.channel=obj;
+                    self.channelBtns = [];
                     device.forEach(item=>{
                       self.allChannelBtns.forEach(_item=>{
-                        if(item.id == _item.id){
-                          self.channelBtns.push(_item)
+                        if(item.id === _item.id){
+                          self.channelBtns.push(_item);
                         }
-                      })
-                    })
+                      });
+                    });
                     self.$nextTick(()=>{
                       self.getshowBtns(self.channelBtns);
-                    })
+                    });
                     self.channelBtns.forEach((_item,_index)=>{
                       if(self.channel!=null){
-                        if(_item.id == self.channel.id){
+                        if(_item.id === self.channel.id){
                           _item.isClick=true;
                         }
                         else{
                           _item.isClick=false;
                         }
                       }
-                    })
+                    });
                     item.checked=true;
                     self.curItem=item;
                     self.curItemIndex=index;
@@ -2442,53 +2317,39 @@ export default {
                     item.disabled=false;
                     self.showError=false;
                     self.showGuide=false;
-                    
-                    // else{
-                    //   if(!self.videoAuthority){
-                    //     self.showError = true;
-                    //     self.errorText = self.$t('remotePatrol.videoLicense');
-                    //   }
-                    // }
                 }
             }
-            else if(item.deviceId.length == 0){
+            else if(item.deviceId.length === 0){
                 self.noBindDeviceObj.dialogCosed=true;
                 return false;
             }
             self.inspectItemList.forEach((_item,_index)=>{
-                if(index!=_index){
+                if(index!==_index){
                     _item.checked=false;
                     _item.disabled=true;
                 }
-            })
-            if(self.hasIgnoretemp.length!=0&&self.showIgnoreItem){
+            });
+            if(self.hasIgnoretemp.length!==0&&self.showIgnoreItem){
                 self.hasIgnoretemp.forEach((_item,_index)=>{
-                    if(index!=_index){
+                    if(index!==_index){
                         _item.checked=false;
                         _item.disabled=true;
                     }else{
                         _item.checked=true;
                         _item.disabled=false; 
                     }
-                })
+                });
             }
             self.sheetName.slice(0,self.sheetName.length-1).forEach((_item,_index)=>{
                 _item.inspectList.forEach((p_item,p_index)=>{
                     p_item.items.forEach((itemDS,indexDS)=>{
-                        if(itemDS.id!=item.id){
+                        if(itemDS.id!==item.id){
                             itemDS.checked=false;
                             itemDS.disabled=true;
                         }
-                    })
-                })
-            })
-        },
-        getInspectByStore(storeId){
-            let self=this;
-            // self.inspectItemList=[];
-        //   checkOutInspectItemV3(params).then(res=>{
-        //         
-        //     })
+                    });
+                });
+            });
         },
         leaveDialog(){
           let self=this;
@@ -2506,12 +2367,12 @@ export default {
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
             let inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
-            if(self.hasIgnoretemp.length==0){
+            if(self.hasIgnoretemp.length===0){
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach(item=>{
                         temp.push(item);
                         item.items.forEach((_item,_index)=>{
-                            if(_item.inputCount==0){
+                            if(_item.inputCount===0){
                                 _item.isIgnore=true;
                                 _item.inspectInput = '';
                                 _item.sourceList = [];
@@ -2528,7 +2389,7 @@ export default {
                     s_item.inspectList.forEach(item=>{
                         item.items.forEach((_item,_index)=>{
                             self.hasIgnoretemp.forEach((h_item,h_index)=>{
-                                if(self.hasIgnoretemp[h_index].inputCount==0){
+                                if(self.hasIgnoretemp[h_index].inputCount===0){
                                     self.hasIgnoretemp[h_index].isIgnore=true;
                                     self.hasIgnoretemp[h_index].inspectInput = '';
                                     self.hasIgnoretemp[h_index].sourceList = [];
@@ -2536,11 +2397,11 @@ export default {
                                         h_item.itemgetScore = h_item.itemScore;
                                     }
                                 }
-                                if(self.hasIgnoretemp[h_index].id==item.items[_index].id){
+                                if(self.hasIgnoretemp[h_index].id===item.items[_index].id){
                                     item.items[_index]=self.hasIgnoretemp[h_index];
                                 }
-                            })
-                            if(_item.inputCount!=0||_item.manualIgnore){
+                            });
+                            if(_item.inputCount!==0||_item.manualIgnore){
                                 let obj={};
                                 obj.dealCount=1;
                                 dealtemp.push(obj);
@@ -2560,7 +2421,7 @@ export default {
             let hasIgnoretemp=[];
             temp.forEach(item=>{
                 item.items.forEach(_item=>{
-                    if(_item.inputCount==0&&!_item.manualIgnore){
+                    if(_item.inputCount===0&&!_item.manualIgnore){
                         _item['type']=item.type;
                         hasIgnoretemp.push(_item);
                     }
@@ -2573,7 +2434,6 @@ export default {
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                // inspect:self.inspectList,
                 hasIgnoretemp:hasIgnoretemp,
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList,
@@ -2606,7 +2466,7 @@ export default {
           let self=this;
           self.videoLoadingObj.dialogCosed=false;
         },
-        async submit1(){
+        async confirmSummary(){
             let self=this;
             let temp=[];
             let count=0;
@@ -2614,12 +2474,12 @@ export default {
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
             let inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
-            if(self.hasIgnoretemp.length==0){
+            if(self.hasIgnoretemp.length===0){
                 sheetName.forEach(s_item=>{
                     s_item.inspectList.forEach(item=>{
-                        temp.push(item)
+                        temp.push(item);
                         item.items.forEach((_item,_index)=>{
-                            if(_item.inputCount==0){
+                            if(_item.inputCount===0){
                                 _item.isIgnore=true;
                                 _item.inspectInput = '';
                                 _item.sourceList = [];
@@ -2631,14 +2491,14 @@ export default {
                     });
                     dealCount=dealCount+s_item.dealCount;
                     count=count+s_item.count;
-                })
+                });
             }else{
                 sheetName.forEach(s_item=>{
-                    let dealtemp=[]
+                    let dealtemp=[];
                     s_item.inspectList.forEach(item=>{
                         item.items.forEach((_item,_index)=>{
                             self.hasIgnoretemp.forEach((h_item,h_index)=>{
-                                if(self.hasIgnoretemp[h_index].inputCount==0){
+                                if(self.hasIgnoretemp[h_index].inputCount===0){
                                     self.hasIgnoretemp[h_index].isIgnore=true;
                                     self.hasIgnoretemp[h_index].inspectInput = '';
                                     self.hasIgnoretemp[h_index].sourceList = [];
@@ -2646,11 +2506,11 @@ export default {
                                         h_item.itemgetScore = h_item.itemScore;
                                     }
                                 }
-                                if(self.hasIgnoretemp[h_index].id==item.items[_index].id){
+                                if(self.hasIgnoretemp[h_index].id===item.items[_index].id){
                                     item.items[_index]=self.hasIgnoretemp[h_index];
                                 }
-                            })
-                            if(_item.inputCount!=0||_item.manualIgnore){
+                            });
+                            if(_item.inputCount!==0||_item.manualIgnore){
                                 let obj={};
                                 obj.dealCount=1;
                                 dealtemp.push(obj);
@@ -2670,7 +2530,7 @@ export default {
             let hasIgnoretemp=[];
             temp.forEach(item=>{
                 item.items.forEach(_item=>{
-                    if(_item.inputCount==0&&!_item.manualIgnore){
+                    if(_item.inputCount===0&&!_item.manualIgnore){
                         _item['type']=item.type;
                         hasIgnoretemp.push(_item);
                     }
@@ -2681,7 +2541,7 @@ export default {
                 event:self.eventList,
                 store:self.store,
                 channel:self.channel
-            }
+            };
             self.historyObj = {
                 storeList:self.tabList[Number(self.activeIndex)].storeList,
                 patrolstore:self.patrolstore,
@@ -2689,7 +2549,6 @@ export default {
                 PatrolList:self.PatrolList,
                 activeIndex:self.activeIndex,
                 store:self.store,
-                // inspect:self.inspectList,
                 hasIgnoretemp:hasIgnoretemp,
                 inspectItemList:self.inspectItemList,
                 eventList:self.eventList,
@@ -2714,30 +2573,23 @@ export default {
             let self=this;
             console.log('playvideo enter!');
             self.showModelContent=true;
-            //self.showInfoContent=true;
             self.playState=true;
-            var video = document.getElementById("previewVideo");
+            var video = document.getElementById('previewVideo');
             this.previewplayer = videojs(video);
-            this.previewplayer.src({src:url,type:this.protocal == "HLS"? "application/x-mpegURL" : "application/dash+xml"});
+            this.previewplayer.src({src:url,type:this.protocal === 'HLS'? 'application/x-mpegURL' : 'application/dash+xml'});
             this.previewplayer.play();
-            // setTimeout(() => {
-            //     self.showModelContent=true;
-            //     //self.showInfoContent=false;
-            // }, 3000);
         },
         destroyVideo(){
             let self=this;
-            var video = document.getElementById("previewVideo");
+            var video = document.getElementById('previewVideo');
             this.previewplayer = videojs(video);
             self.previewplayer.dispose();
         },
         hiddenModel(){
-            let self=this;
             //self.showModelContent=false;
             //self.showInfoContent=false;
         },
         showModel(){
-            let self=this;
             //self.showInfoContent=true;
             // if(self.playState){
             //     self.showModelContent=true;
@@ -2783,7 +2635,7 @@ export default {
               self.isLoading = false;
               return;
             }
-            if (self.mpdurl.ErrorCode==undefined&&self.mpdurl.length!=0) {
+            if (self.mpdurl.ErrorCode===undefined&&self.mpdurl.length!==0) {
                 console.log(self.mpdurl);
                 self.playVideo(self.mpdurl);
                 self.editCount=self.editCount+1;
@@ -2791,7 +2643,7 @@ export default {
                 self.isLoading = false;
                 window.clearInterval(self.timerPlayReal);
                 self.timerPlayReal=window.setInterval(()=>{
-                  console.log(self.realTimeSpeed)
+                  console.log(self.realTimeSpeed);
                     self.realTimeSpeed=self.realTimeSpeed+1;
                 },1000);
             }
@@ -2799,7 +2651,7 @@ export default {
                 self.showGuide=false;
                 self.showError=true;
                 self.isLoading = false;
-                let errorCode=self.mpdurl.ErrorCode; //错误码
+                let errorCode=self.mpdurl.ErrorCode;
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
                 self.destroyVideo();
@@ -2809,7 +2661,7 @@ export default {
             let self=this;
             self.showModelContent=false;
             self.playState=false;
-            var video = document.getElementById("previewVideo");
+            var video = document.getElementById('previewVideo');
             self.previewplayer = videojs(video);
             self.previewplayer.pause();
         },
@@ -2881,7 +2733,7 @@ export default {
             self.sessionId=sessionId;
            if(sessionId == null){
              self.isLoading = false;
-             return
+             return;
            }
             let data=null;
             data = {
@@ -2902,7 +2754,7 @@ export default {
                self.isLoading = false;
                return;
              }
-            if (url.ErrorCode==undefined&&url.length!=0) {
+            if (url.ErrorCode===undefined&&url.length!==0) {
                 self.isPlayingFlag=1;
                 self.playVideo(self.mpdurl);
                 self.realTimeSpeed=0;
@@ -2912,11 +2764,11 @@ export default {
                     self.realTimeSpeed=self.realTimeSpeed+1;
                 },1000);
             }
-            else{   //当前视频如果返回失败，需处于暂停状态
+            else{
                 self.showGuide=false;
                 self.showError=true;
                 self.isLoading = false;
-                let errorCode=self.mpdurl.ErrorCode; //错误码
+                let errorCode=self.mpdurl.ErrorCode;
                 let errorText= util.getErrorText(errorCode);
                 self.errorText=errorText;
                 self.destroyVideo();
@@ -2927,24 +2779,18 @@ export default {
             if(!self.fullScreen){
                 self.fullWindowScreen();
                 self.fullScreen=true;
-                // setTimeout(() => {
-                //     self.showModelContent=false;
-                //     //self.showInfoContent=false;
-                // }, 3000);
             }
             else{
                 self.exitFullscreen();
                 self.fullScreen=false;
             }
         },
-        //进入全屏
+        //Enter full screen
         fullWindowScreen(...val) {
             console.log(val);
-            let self=this;
-            //self.showControls=true;
             var ele = document.getElementById('videoContent');
-            ele.style.width = "100%";
-            ele.style.height = "100%";
+            ele.style.width = '100%';
+            ele.style.height = '100%';
             if (ele.requestFullscreen) {
                 ele.requestFullscreen();
             }
@@ -2958,12 +2804,12 @@ export default {
                 ele.msRequestFullscreen();
             }
         },
-        //退出全屏
+        //Exit full screen
         exitFullscreen() {
             var de = document;
             var ele = document.getElementById('videoContent');
-            ele.style.width = "auto";
-            ele.style.height = "auto";
+            ele.style.width = 'auto';
+            ele.style.height = 'auto';
             if (de.exitFullscreen) {
                 de.exitFullscreen();
             }
@@ -2990,22 +2836,22 @@ export default {
             let getStore2Temp=data=>{
                 let cityList=[];
                 data.forEach(item=>{
-                    if(cityList.map(x=>x.city).indexOf(item.city)==-1){
+                    if(cityList.map(x=>x.city).indexOf(item.city)===-1){
                         let obj={
                             city:item.city,
                             province:item.province
-                        }
+                        };
                         cityList.push(obj);
                     }
-                })
+                });
                 let storeListTemp=[];
                 for(let i=0;i<cityList.length;i++){
                     let temp=[];
                     let obj={};
                     for(let j=0;j<data.length;j++){
-                        if(cityList[i].city==data[j].city){
+                        if(cityList[i].city===data[j].city){
                             let obj={};
-                            if(self.store.storeId==data[j].storeId){
+                            if(self.store.storeId===data[j].storeId){
                                 obj.isActive=true;
                             }
                             else{
@@ -3016,11 +2862,11 @@ export default {
                             obj.userId=data[j].userId;
                             obj.city=data[j].city;
                             obj.province=data[j].province;
-                            obj.favorite=data[j].favorite==undefined?true:data[j].favorite;
+                            obj.favorite=data[j].favorite===undefined?true:data[j].favorite;
                             obj.device=data[j].device;
                             obj.hasInspect=data[j].hasInspect;
-                            if(data[j].authorizedInspect!=undefined&&data[j].authorizedInspect.length!=0){
-                                obj.authorizedInspect=data[j].authorizedInspect
+                            if(data[j].authorizedInspect!==undefined&&data[j].authorizedInspect.length!==0){
+                                obj.authorizedInspect=data[j].authorizedInspect;
                                 obj.hasInspect=true;
                             }
                             else{
@@ -3034,7 +2880,7 @@ export default {
                     storeListTemp.push(obj);
                 }
                 return storeListTemp;
-            }
+            };
             let temp=[];
             let tempArray=[];
             let tempStore=[];
@@ -3042,8 +2888,8 @@ export default {
                 _item.storeList.forEach((itemDs,indexDs)=>{
                     temp.push(util.getPinyinList(itemDs.name));
                     tempStore.push(itemDs);
-                })
-            })
+                });
+            });
             console.log(temp);
             for(var i=0;i<temp.length;i++){
                 if(temp[i][0].indexOf(self.serachVale.trim())!=-1||
@@ -3053,42 +2899,40 @@ export default {
             }
             self.tabList[2].storeList=getStore2Temp(tempArray);
         },
-        //切换门店
         changeStore(item,index,_item,_index){
             let self=this;
-            self.patrolstore=''
-            self.curSheetIndex=0
-            self.inspectItemList=[]
-            self.inspectList=[]
-            self.sheetName=[]
-            self.tempArr=[]
-            self.showChannelBtns=[]
-            self.patrolStoreName = _item.name
-            self.PatrolList=[]
-            self.hasIgnoretemp=[]
+            self.patrolstore='';
+            self.curSheetIndex=0;
+            self.inspectItemList=[];
+            self.inspectList=[];
+            self.sheetName=[];
+            self.tempArr=[];
+            self.showChannelBtns=[];
+            self.patrolStoreName = _item.name;
+            self.PatrolList=[];
+            self.hasIgnoretemp=[];
             self.$store.dispatch('setPatrolHistory',null);
-            self.isShowWarn=false
-            self.notShowAlert=false
-            self.showIgnoreItem=false
-            self.hasSheet3=false
+            self.isShowWarn=false;
+            self.notShowAlert=false;
+            self.showIgnoreItem=false;
+            self.hasSheet3=false;
             _item.authorizedInspect.forEach(au_item=>{
-                if(au_item.mode==0){
-                    self.PatrolList.push(au_item) //门店对应巡检表
+                if(au_item.mode===0){
+                    self.PatrolList.push(au_item);
                 }
-            })
+            });
             _item.isActive=true;
             self.showStoreUp=true;
             if(!self.isEzviz){
               self.editCount=0;
-              self.playState ? self.stopRealTime() : ''
+              self.playState ? self.stopRealTime() : '';
             }
             else{
-              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : ''
-              if(self.$refs.ezvizVideo!=undefined){
-                 self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : ''
+              !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : '';
+              if(self.$refs.ezvizVideo!==undefined){
+                 self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
               }
             }
-            //self.editCount=0;
             self.showError=false;
             self.curDeviceId=-1;
             self.showFeedBack=false;
@@ -3109,27 +2953,26 @@ export default {
             }
             self.store=obj;
             let curStoreId='';
-            // self.getInspectByStore(self.store.storeId); //以前 获取门店对应的巡检表
             let tabIndex=Number(self.activeIndex);
-            if(tabIndex!=2){
+            if(tabIndex!==2){
                 item.storeList.forEach((itemS,indexS)=>{
-                    if(_index!=indexS){
+                    if(_index!==indexS){
                         itemS.isActive=false;
                     }
-                })
+                });
                 curStoreId=_item.storeId;
             }
             else{
                 item.storeList.forEach((itemS,indexS)=>{
                     itemS.storeList.forEach((itemChild,indexChild)=>{
-                        if(itemChild.storeId!=_item.storeId){
+                        if(itemChild.storeId!==_item.storeId){
                             itemChild.isActive=false;
                         }
                         else{
                             curStoreId=itemChild.storeId;
                         }
-                    })
-                })
+                    });
+                });
             }
             let storeObj={
                 storeId:curStoreId
@@ -3137,12 +2980,10 @@ export default {
             self.saveStoreObj(storeObj);
         },
         changeBrandDialog(){
-            let self = this
         },
         changeStoreDialog(val){
             let self=this;
             self.changeStoreObj.dialogCosed=false;
-            //self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
             if(self.curStoreItem.userId==null){
                 self.noStoreUser.dialogCosed=true;
             }
@@ -3153,7 +2994,7 @@ export default {
         changeInspectDialog(){
             let self = this;
             self.changeInspectObj.dialogCosed=false;
-            self.changeInspectList(self.beforepatrolstore)
+            self.changeInspectList(self.beforepatrolstore);
             self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
         },
         canceldChangeInspect(){
@@ -3182,17 +3023,17 @@ export default {
                 self.showChannelBtns.unshift(self.channelBtns[index-1]);
                 self.showChannelBtns.pop();
                 self.showChannelBtns.forEach((item,index)=>{
-                    if(item.id==self.channel.id){
+                    if(item.id===self.channel.id){
                         item.isClick=true;
                     }
                     else{
                         item.isClick=false;
                     }
                 })
-                if(self.showChannelBtns[0].id==self.channelBtns[0].id){
+                if(self.showChannelBtns[0].id===self.channelBtns[0].id){
                     self.hideLast=false;
                 }
-                if(self.showChannelBtns[count-1].id!=self.channelBtns[self.channelBtns.length-1].id){
+                if(self.showChannelBtns[count-1].id!==self.channelBtns[self.channelBtns.length-1].id){
                     self.hideNext=true;
                 }
             }
@@ -3210,17 +3051,17 @@ export default {
                 self.showChannelBtns.push(self.channelBtns[index+1]);
                 self.showChannelBtns.shift();
                 self.showChannelBtns.forEach((item,index)=>{
-                    if(item.id==self.channel.id){
+                    if(item.id===self.channel.id){
                         item.isClick=true;
                     }
                     else{
                         item.isClick=false;
                     }
                 })
-                if(self.showChannelBtns[0].id!=self.channelBtns[0].id){
+                if(self.showChannelBtns[0].id!==self.channelBtns[0].id){
                     self.hideLast=true;
                 }
-                if(self.showChannelBtns[count-1].id==self.channelBtns[self.channelBtns.length-1].id){
+                if(self.showChannelBtns[count-1].id===self.channelBtns[self.channelBtns.length-1].id){
                     self.hideNext=false;
                 }
             }
@@ -3229,7 +3070,7 @@ export default {
             let self=this;
             let width=document.getElementsByClassName('btn-content')[0].offsetWidth;
             let detailsWidth=window.innerWidth/1440*15+60;
-            let count=parseInt(width/detailsWidth); //当前容器最大可显示数量
+            let count=parseInt(width/detailsWidth);
             if(count>=list.length){
                 self.showChannelBtns=list;
             }
@@ -3254,7 +3095,7 @@ export default {
                 obj.isonline=true;
                 obj.isClick=false;
                 temp.push(obj);
-            })
+            });
             self.channelBtns=temp;
             self.allChannelBtns = temp;
         },
@@ -3273,12 +3114,11 @@ export default {
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
-            //确认总结后，切换巡检表
-            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
+            if( (!self.isEzviz && self.editCount!==0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) || (self.$store.getters.PatrolHistory!=null)){
                 self.changeInspectObj.dialogCosed=true;
-                self.beforepatrolstore=val
+                self.beforepatrolstore=val;
             }else{
-                self.changeInspectList(val)
+                self.changeInspectList(val);
             }
         },
         changeInspectList(val){
@@ -3289,7 +3129,7 @@ export default {
             }
             else{
               !self.showGuide ? self.$refs.ezvizVideo.editCount=0 : '';
-              if(self.$refs.ezvizVideo!=undefined){
+              if(self.$refs.ezvizVideo!==undefined){
                  self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
               }
             }
@@ -3306,7 +3146,7 @@ export default {
             self.showChannelBtns = [];
             self.curSheetIndex=0;
             self.PatrolList.forEach(item=>{
-                if(item.id==val){
+                if(item.id===val){
                     self.patrolstore=item.name;
                 }
             });
@@ -3319,7 +3159,7 @@ export default {
             };
             self.inspectItemList=[];
             checkOutInspectItemV3(params).then(res=>{
-                if(res.errCode==0){
+                if(res.errCode===0){
                     let data=res.data.groups;
                     let inspectSettings = {};
                     res.data.inspectSettings.forEach(item=>{
@@ -3360,7 +3200,7 @@ export default {
                         obj.dealCount=0;
                         obj.Effective=0;
                         obj.isHover=false;
-                        if(index==0){
+                        if(index===0){
                             obj.isClick=true;
                         }
                         else{
@@ -3380,159 +3220,156 @@ export default {
                             itemObj.qualifiedScore=_item.qualifiedScore;
                             itemObj.type=item.type;
                             itemObj.itemScoreTitle='--';
-                            //itemObj.deviceId=_item.deviceId;
                             itemObj.deviceId=_item.deviceIds;
                             itemObj.inspectInput='';
                             itemObj.inputCount=0;
                             itemObj.disabled=true;
-                            itemObj.checked=false;   //是否选中状态
-                            itemObj.isIgnore=false;  //是否被忽略
-                            itemObj.Ruletip=false;  //是否显示提示语
-                            itemObj.manualIgnore=false; //是否手动忽略巡检项
+                            itemObj.checked=false;
+                            itemObj.isIgnore=false;
+                            itemObj.Ruletip=false;
+                            itemObj.manualIgnore=false;
                             itemObj.sourceList=[];
                             itemObj.scoreList=[{val:_item.itemScore,scoreTitle: this.$t('remotePatrol.pass'),isClick:false},
                                                 {val:-1,scoreTitle: this.$t('remotePatrol.failed'),isClick:false}];
                             tempItems.push(itemObj);
-                        })
+                        });
                         obj.items=tempItems;
                         temp.push(obj);
-                    })
-                    let te_temp=[]
+                    });
+                    let te_temp=[];
                     for(let i=0;i<3;i++){
-                        let Typeindex=temp.filter(x=>x.type==i);
-                        let obj={}
-                        if(Typeindex.length!=0){
-                            // te_temp[i]['dealCount']=0
-                            let count=0,label=''
+                        let Typeindex=temp.filter(x=>x.type===i);
+                        if(Typeindex.length!==0){
+                            let count=0,label='';
                             Typeindex.forEach(item=>{
-                                count+=item.items.length
-                            })
-                            if(Typeindex[0].type==0){
-                                label=self.$t('insSettingView.sheetpassfail')
+                                count+=item.items.length;
+                            });
+                            if(Typeindex[0].type===0){
+                                label=self.$t('insSettingView.sheetpassfail');
                             }
-                            if(Typeindex[0].type==1){
-                                label=self.$t('insSettingView.sheetscore')
+                            if(Typeindex[0].type===1){
+                                label=self.$t('insSettingView.sheetscore');
                             }
-                            if(Typeindex[0].type==2){
-                                label=self.$t('insSettingView.sheetother')
+                            if(Typeindex[0].type===2){
+                                label=self.$t('insSettingView.sheetother');
                             }
-                            te_temp.push({inspectList:Typeindex,dealCount:0,Effective:0,count:count,isClick:false,label:label,type:Typeindex[0].type})
+                            te_temp.push({inspectList:Typeindex,dealCount:0,Effective:0,count:count,isClick:false,label:label,type:Typeindex[0].type});
                         }
                     }
-                    self.sheetName=te_temp
-                    self.sheetName[0].isClick=true
-                    self.inspectList=self.sheetName[0].inspectList
-                    let feedobj={ groupId:'feedBack',label: self.$t('remotePatrol.feedbacks'),isClick:false,}
-                    if(self.sheetName.length!=0){
+                    self.sheetName=te_temp;
+                    self.sheetName[0].isClick=true;
+                    self.inspectList=self.sheetName[0].inspectList;
+                    let feedobj={ groupId:'feedBack',label: self.$t('remotePatrol.feedbacks'),isClick:false,};
+                    if(self.sheetName.length!==0){
                         self.sheetName.push(feedobj);
                         self.getItemByGroup(self.sheetName[0].inspectList[0],0);
                     }
                 }
-            })
+            });
         },
         hasIgnoreItem(){
-            let self=this
-            self.showIgnoreItem=true
-            self.showFeedBack=false
-            self.isShowWarn=false
+            let self=this;
+            self.showIgnoreItem=true;
+            self.showFeedBack=false;
+            self.isShowWarn=false;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
-            let hasIgnoretemp=[]
+            let hasIgnoretemp=[];
             sheetName.forEach(s_item=>{
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
-                        if(_item.inputCount==0&&!_item.manualIgnore){
-                            hasIgnoretemp.push(_item)
-                        }else if(_item.inputCount!=0){
-                            self.tempArr.push(_item.type)
+                        if(_item.inputCount===0&&!_item.manualIgnore){
+                            hasIgnoretemp.push(_item);
+                        }else if(_item.inputCount!==0){
+                            self.tempArr.push(_item.type);
                         }
-                    })
-                })
-            })
-            self.hasIgnoretemp=hasIgnoretemp
+                    });
+                });
+            });
+            self.hasIgnoretemp=hasIgnoretemp;
         },
         backToPatrol(){
-            let self=this
-            self.showIgnoreItem=false
-            self.showFeedBack = self.sheetName[Number(self.sheetName.length-1)].isClick ? true : false
+            let self=this;
+            self.showIgnoreItem=false;
+            self.showFeedBack = self.sheetName[Number(self.sheetName.length-1)].isClick;
             let indexFeed=self.sheetName.map(x=>x.groupId).indexOf('feedBack');
             let sheetName=self.sheetName.slice(0,indexFeed);
             sheetName.forEach(s_item=>{
-                let dealtemp=[],notIgnoretemp=[]
+                let dealtemp=[],notIgnoretemp=[];
                 s_item.inspectList.forEach(item=>{
                     item.items.forEach((_item,_index)=>{
                         self.hasIgnoretemp.forEach((h_item,h_index)=>{
-                            if(h_item.id==_item.id){
-                                item.items[_index]=self.hasIgnoretemp[h_index]
+                            if(h_item.id===_item.id){
+                                item.items[_index]=self.hasIgnoretemp[h_index];
                             }
-                        })
-                        if(item.items[_index].inputCount==1||item.items[_index].manualIgnore){
-                            let obj={}
-                            obj.dealCount=1
-                            dealtemp.push(obj)
+                        });
+                        if(item.items[_index].inputCount===1||item.items[_index].manualIgnore){
+                            let obj={};
+                            obj.dealCount=1;
+                            dealtemp.push(obj);
                         }
-                        if(item.items[_index].inputCount==1){
-                            let obj={}
-                            obj.manualCount=1
-                            notIgnoretemp.push(obj)
+                        if(item.items[_index].inputCount===1){
+                            let obj={};
+                            obj.manualCount=1;
+                            notIgnoretemp.push(obj);
                         }
                         
-                    })
-                })
-                s_item.dealCount=dealtemp.length
-                s_item.Effective=notIgnoretemp.length
+                    });
+                });
+                s_item.dealCount=dealtemp.length;
+                s_item.Effective=notIgnoretemp.length;
                 if(s_item.isClick&&!self.showFeedBack){
-                    self.inspectItemList=s_item.inspectList[self.curGroupIndex].items
+                    self.inspectItemList=s_item.inspectList[self.curGroupIndex].items;
                 }
-            })
-            self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount==0) ? true : false
-            self.notShowAlert = self.sheetName.every(x=>x.count==x.dealCount)
+            });
+            self.isShowWarn = !self.hasSheet3&&self.hasIgnoretemp.some(x=>x.inputCount===0);
+            self.notShowAlert = self.sheetName.every(x=>x.count===x.dealCount);
         },
         changeSheet(item,index){
-            let self=this
-            if(item.groupId=='feedBack'){
+            let self=this;
+            if(item.groupId==='feedBack'){
                 let PatrolHistory = self.$store.getters.PatrolHistory;
                 if(PatrolHistory!=null){
-                    self.eventList = PatrolHistory.eventList
-                    self.showFeedBackInfo = self.eventList.length==0 ? true : false
-                    self.showFeedBack = true
+                    self.eventList = PatrolHistory.eventList;
+                    self.showFeedBackInfo = self.eventList.length===0;
+                    self.showFeedBack = true;
                 }else{
                     self.showFeedBack=true;
-                    self.showFeedBackInfo = self.eventList.length==0 ? true : false
+                    self.showFeedBackInfo = self.eventList.length===0;
                     self.showGuide=false;
                     console.log(self.channel);
                     self.channelBtns = self.allChannelBtns.concat();
                     self.channelBtns.forEach((_item,_index)=>{
                         if(self.channel!=null){
-                            if(_item.id==self.channel.id){
+                            if(_item.id===self.channel.id){
                                 _item.isClick=true;
                             }
                             else{
                                 _item.isClick=false;
                             }
                         }
-                    })
+                    });
                     self.$nextTick(()=>{
                         self.getshowBtns(self.channelBtns);
-                    })
+                    });
                 }
             }else{
-                self.inspectList=item.inspectList
-                self.curSheetIndex=index
+                self.inspectList=item.inspectList;
+                self.curSheetIndex=index;
                 self.getItemByGroup(item.inspectList[0],0);
             }
             self.sheetName.forEach((_item,_index)=>{
-                if(index==_index){
-                    _item.isClick= _item.isClick==false ? true : false
+                if(index===_index){
+                    _item.isClick= _item.isClick===false;
                 }else{
-                    _item.isClick=false
+                    _item.isClick=false;
                 }
-            })
+            });
 
         },
         clickStore(item,index,_item,_index){
             let self=this;
-            if(!_item.hasInspect&&_item.hasInspect!=undefined){
+            if(!_item.hasInspect&&_item.hasInspect!==undefined){
                 return false;
             }
             self.curTabIndex=index;
@@ -3543,7 +3380,7 @@ export default {
               self.videoLoadingObj.dialogCosed=true;
               return false;
             }
-            if( (!self.isEzviz && self.editCount!=0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory!=null)){
+            if( (!self.isEzviz && self.editCount!==0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) || (self.$store.getters.PatrolHistory!==null)){
                 self.changeStoreObj.dialogCosed=true;
             }
             else{
@@ -3574,7 +3411,7 @@ export default {
        * handle ezviz video snapshot
        */
       editEzvizCanvas(src){
-          console.log(src)
+          console.log(src);
           let self=this;
           self.sourceList = [];
           let obj={};
@@ -3622,13 +3459,13 @@ export default {
           fileName:self.bucketImage+'/'+'inspect'+'_'+util.getCurTimeStr()+'_'+self.store.storeId+'_'+self.curItemId+'.jpg',
           file:util.base64ToBlob(src),
           deviceId: self.channel.id
-        }
+        };
 
         let picObj={
           eventName:obj.eventName,
           eventDes:obj.eventDes,
           sourceObj:srcObj,
-        }
+        };
         self.eventList.push(picObj);
         self.showFeedBackInfo=false;
       },
@@ -3649,7 +3486,7 @@ export default {
           eventName: ezvizObj.eventName,
           eventDes: ezvizObj.eventDes,
           sourceObj: srcObj,
-        }
+        };
         self.eventList.push(videoObj);
         self.showFeedBackInfo=false;
       },
@@ -3682,25 +3519,24 @@ export default {
         return new Promise((resolve, reject)=>{
           getVideoAuthority().then(res=>{
             console.log(res);
-            resolve(res)
+            resolve(res);
           }).then(result=>{
             self.videoAuthority = result.data.authorized;
           })
             .catch(error=>{
             console.log(error);
-          })
-        })
+          });
+        });
       },
       itemDescriptionChanged(val, item){
-        let self = this;
         let content = filterString.all(val,200);
         console.log(content);
         item.inspectInput = content;
         let length = filterString.getContentLength(val);
         if(length>200){
-              item.Ruletip=true
+              item.Ruletip=true;
           }else{
-              item.Ruletip=false
+              item.Ruletip=false;
           }
       },
       eventNameChanged(val){
@@ -3711,9 +3547,9 @@ export default {
         self.showEventNameInfo = false;
         let length = filterString.getContentLength(val);
         if(length>50){
-              this.eventNameRuletip=true
+              this.eventNameRuletip=true;
           }else{
-              this.eventNameRuletip=false
+              this.eventNameRuletip=false;
           }
       },
       eventDesChanged(val){
@@ -3723,27 +3559,27 @@ export default {
         self.eventDes = content;
         let length = filterString.getContentLength(val);
         if(length>200){
-              this.eventDesRuletip=true
+              this.eventDesRuletip=true;
           }else{
-              this.eventDesRuletip=false
+              this.eventDesRuletip=false;
           }
       },
       notShowInputRuleTips(e,item){
-        if(e=='item'){
-            item.Ruletip=false
-        }else if(e=='eventName'){
-            this.eventNameRuletip=false
-        }else if(e=='eventDes'){
-            this.eventDesRuletip=false
+        if(e==='item'){
+            item.Ruletip=false;
+        }else if(e==='eventName'){
+            this.eventNameRuletip=false;
+        }else if(e==='eventDes'){
+            this.eventDesRuletip=false;
         }
       },
       onPlayerWaiting(e){
-        console.log('video is loading')
-        this.showModelContent = false
+        console.log('video is loading');
+        this.showModelContent = false;
       },
       onPlayerPlaying(e){
-        console.log('video is playing')
-        this.showModelContent = true
+        console.log('video is playing');
+        this.showModelContent = true;
       }
     },
     beforeDestroy() {
@@ -3752,7 +3588,7 @@ export default {
       window.onresize = null;
       self.visibilityChange = null;
     }
-}
+};
 </script>
 <style lang="scss" scoped>
     $red:#f31d65;
@@ -4626,9 +4462,6 @@ export default {
                                 line-height: 50px;
                             }
                         }
-                        .Group-content-details{
-                            
-                        }
                     }
                     .item-content{
                         .feedbacks-content{
@@ -4926,9 +4759,6 @@ export default {
                             color: #fff;
                             border-radius: 13px;
                             cursor: pointer;
-                            .iconscore{
-                                //margin-left: 10px;
-                            }
                           .el-dropdown-link{
                             display: inline-block;
                             font-size: 12px;
