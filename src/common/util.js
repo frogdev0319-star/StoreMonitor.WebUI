@@ -89,16 +89,16 @@ export default {
   },
 
   getDaysCount() {
-    const date = new Date();
-    const month = date.getMonth();
+    let date = new Date();
+    let month = date.getMonth();
     date.setMonth(month + 1);
     date.setDate(0);
     return date.getDate();
   },
 
   getDaysArry() {
-    const day = this.getDaysCount();
-    const arr = [];
+    let day = this.getDaysCount();
+    let arr = [];
     for (let i = 1; i <= day; i++) {
       arr.push(i);
     }
@@ -106,8 +106,8 @@ export default {
   },
 
   getInitDay() {
-    const day = this.getDaysCount();
-    const arr = [];
+    let day = this.getDaysCount();
+    let arr = [];
     for (let i = 1; i <= day; i++) {
       arr.push(0);
     }
@@ -115,8 +115,8 @@ export default {
   },
 
   getDaysRandom() {
-    const day = this.getDaysCount();
-    const arr = [];
+    let day = this.getDaysCount();
+    let arr = [];
     for (let i = 1; i <= day; i++) {
       arr.push(Math.round(Math.random() * 100));
     }
@@ -132,8 +132,8 @@ export default {
   },
 
   getRandom1(start, end) {
-    const length = end - start;
-    const num = (Math.random() * (length) + start);
+    let length = end - start;
+    let num = (Math.random() * (length) + start);
     return num;
   },
 
@@ -198,8 +198,8 @@ export default {
 
   random_string(len) {
     len = len || 32;
-    const chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-    const maxPos = chars.length;
+    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    let maxPos = chars.length;
     let pwd = '';
     for (let i = 0; i < len; i++) {
       pwd += chars.charAt(Math.floor(Math.random() * maxPos));
@@ -586,11 +586,11 @@ export default {
   },
 
   base64ToBlob(urlData) {
-    const arr = urlData.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
-    const bytes = window.atob(arr[1]);
-    const ab = new ArrayBuffer(bytes.length);
-    const ia = new Uint8Array(ab);
+    let arr = urlData.split(',');
+    let mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
+    let bytes = window.atob(arr[1]);
+    let ab = new ArrayBuffer(bytes.length);
+    let ia = new Uint8Array(ab);
 
     for (let i = 0; i < bytes.length; i++) {
       ia[i] = bytes.charCodeAt(i);
@@ -667,26 +667,26 @@ export default {
      */
 
   getMonthBetween(start, end) {
-    const result = [];
-    const s = start.split('-');
-    const e = end.split('-');
-    const min = new Date();
-    const max = new Date();
+    let result = [];
+    let s = start.split('-');
+    let e = end.split('-');
+    let min = new Date();
+    let max = new Date();
     min.setFullYear(s[0], s[1]);
     max.setFullYear(e[0], e[1]);
-    const curr = min;
+    let curr = min;
     while (curr <= max) {
-      const month = curr.getMonth();
+      let month = curr.getMonth();
       let str = curr.getFullYear() + '-' + (month);
-      const s = curr.getFullYear() + '-0';
+      let s = curr.getFullYear() + '-0';
       if (str == s) {
         str = curr.getFullYear() + '-12';
       }
       result.push(str);
       curr.setMonth(month + 1);
     }
-    const arr = [];
-    const newArr = [];
+    let arr = [];
+    let newArr = [];
     for (let i = 0; i < result.length; i++) {
       arr.push(result[i].split('-'));
     }
@@ -731,15 +731,15 @@ export default {
       const s = MM + '/' + dd;
       return (s);
     };
-    const dateAllArr = new Array();
-    const ab = begin.split('-');
-    const ae = end.split('-');
-    const db = new Date();
+    let dateAllArr = new Array();
+    let ab = begin.split('-');
+    let ae = end.split('-');
+    let db = new Date();
     db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);
-    const de = new Date();
+    let de = new Date();
     de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);
-    const unixDb = db.getTime();
-    const unixDe = de.getTime();
+    let unixDb = db.getTime();
+    let unixDe = de.getTime();
     for (let k = unixDb; k <= unixDe;) {
       dateAllArr.push((new Date(parseInt(k))).format().toString() + '-' + (new Date(parseInt(k + 6 * 24 * 60 * 60 * 1000))).format().toString());
       k = k + 7 * 24 * 60 * 60 * 1000;
@@ -748,9 +748,9 @@ export default {
   },
 
   judgeStart(start) {
-    const startTime = new Date(start);
-    const oweek = startTime.getDay();
-    const mSeconds = startTime.getTime();
+    let startTime = new Date(start);
+    let oweek = startTime.getDay();
+    let mSeconds = startTime.getTime();
     switch (oweek) {
       case 0:
         return mSeconds - 6 * 24 * 60 * 60 * 1000;
@@ -777,7 +777,7 @@ export default {
   },
 
   isDot(num) {
-    const result = (num.toString()).indexOf('.');
+    let result = (num.toString()).indexOf('.');
     return result !== -1;
   },
   /**
@@ -791,24 +791,24 @@ export default {
     if (!valueList[idx]) {
       return 0;
     }
-    const sum = valueList.reduce(function(acc, val) {
+    let sum = valueList.reduce(function(acc, val) {
       return acc + (isNaN(val) ? 0 : val);
     }, 0);
     if (sum === 0) {
       return 0;
     }
-    const digits = Math.pow(10, precision);
-    const votesPerQuota = valueList.map(function(val) {
+    let digits = Math.pow(10, precision);
+    let votesPerQuota = valueList.map(function(val) {
       return (isNaN(val) ? 0 : val) / sum * digits * 100;
     });
-    const targetSeats = digits * 100;
-    const seats = votesPerQuota.map(function(votes) {
+    let targetSeats = digits * 100;
+    let seats = votesPerQuota.map(function(votes) {
       return Math.floor(votes);
     });
     let currentSum = seats.reduce(function(acc, val) {
       return acc + val;
     }, 0);
-    const remainder = votesPerQuota.map(function(votes, idx) {
+    let remainder = votesPerQuota.map(function(votes, idx) {
       return votes - seats[idx];
     });
     while (currentSum < targetSeats) {
@@ -887,5 +887,6 @@ class indexedDB {
       };
     });
   }
+
 }
 export { indexedDB };

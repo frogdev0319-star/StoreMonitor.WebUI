@@ -1190,7 +1190,8 @@ export default {
       if (!self.isEzviz) {
         if (document.hidden) {
           self.stopVideoPlay()
-          self.stopTimer();        } else {
+          self.stopTimer();
+        } else {
           console.log(self.isPlayingFlag);
           if(this.currentState === 'loading'){
             self.startVideo(self.channel.ivsId, self.channel.channelId, null)
