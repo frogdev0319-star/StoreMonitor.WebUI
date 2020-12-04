@@ -832,26 +832,7 @@ export default {
       dateValue: new Date(),
       changeFlag: false,
       eventNameRuletip: false,
-      eventDesRuletip: false,
-
-      uri: null,
-      play: true,
-      fullScreen: false,
-      paused: true,
-      muted: false,
-      currentState: 'blank', // 'blank','loading','play','inline'
-      error: '',
-      streamProtocol: 'DASH',
-      sessionId: null,
-      userName: null,
-      password: null,
-      IVSID: null,
-      channelId: null,
-      realType: true,
-      lastTime: null,
-      currentTime: null,
-      onEndflag: false,
-      showError: false,
+      eventDesRuletip: false
     };
   },
 
@@ -908,8 +889,7 @@ export default {
       console.log(val);
       if (val >= 300) {
         self.stopVideoPlay();
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null;
+        self.stopTimer();
       }
     }
   },
@@ -986,7 +966,7 @@ export default {
       if (document.hidden) {
         if (self.playState && !self.playBackState) {
           self.stopVideoPlay()
-          window.clearInterval(self.timerPlayReal);
+          self.stopTimer();
         }
       } else {
         console.log(this.currentState);
