@@ -102,10 +102,10 @@
               <div v-if="index==0" class="header-content tabTitle">
                 <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
                 <span class="name-title">{{ $t('insSettingView.inspectName') }}</span>
-                <span :style="sheetName.some(x=>x.id==1&&x.isClick)?'width: calc((100% - 405px) * 12.5/29)':'width: calc((100% - 405px) * 15.3/29)'" class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
+                <span :style="sheetName.some(x=>x.id==1&&x.isClick)?'width: calc((100% - 405px) * 11/29)':'width: calc((100% - 405px) * 15.3/29)'" class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
                 <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" :style="'width: calc((100% - 405px) * 2.5/29);'" class="score-title">{{ $t('insSettingView.sheetscore0') }}</span>
                 <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{$t('insSettingView.sheetscore0')}}</span> -->
-                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 3/29);">{{ $t('insSettingView.sheetscore3') }}</span>
+                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 4/29);">{{ $t('insSettingView.sheetscore3') }}</span>
                 <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 6/29);">{{ $t('insSettingView.sheetscore1') }}</span>
                 <span v-if="sheetName.some(x=>x.id!==1&&x.isClick)" class="score-title">{{ $t('insSettingView.score') }}</span>
                 <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{ $t('insSettingView.operation') }}</span>
@@ -128,7 +128,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column prop="name" width="300px"/>
-                  <el-table-column :min-width="'23%'" prop="description"/>
+                  <el-table-column :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'18%':'23%'" prop="description"/>
                   <el-table-column :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'" prop="score" align="center">
                     <template slot-scope="scope">
                       <span>{{ scope.row.score }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>

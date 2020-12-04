@@ -753,7 +753,7 @@ export default {
       const eventpic = eventList.filter(x => x.sourceObj != null);
       self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
       tempList[0] = {
-        itemTitleName: self.$t('reportView.notableItem'),
+        itemTitleName: self.$t('remotePatrol.notableItem'),
         iconSrc: 'icon-zhongxindingwei',
         itemCount: UnqualifiedTemp.length,
         itemList: UnqualifiedTemp,

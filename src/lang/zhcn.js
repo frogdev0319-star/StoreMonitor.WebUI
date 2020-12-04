@@ -200,7 +200,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'uploading': '正在上传中', // Sprint11
+    'uploading': '正在上传中',
     'storeTag': '标签',
     'patrolWay': '巡检方式',
     'patrolResult': '巡检结果',
@@ -447,21 +447,21 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'ruleInspect': '巡检规则设置', // Sprint11
-    'PatrolScoreCalculation': '巡检得分计算', // Sprint11
-    'CalculationMethod': '考评总分计算方式', // Sprint11
-    'Proportional': '比例制', // Sprint11
-    'ProportionalDes': '考评总分=【SUM（每项巡检得分）/SUM（Tab1/Tab2巡检总分）*100】+附加项得分', // Sprint11
-    'totalScore': '总分制', // Sprint11
-    'totalScoreDes': '考评总分=SUM（每项巡检得分）', // Sprint11
-    'totalScorRange': '考评总分范围设置', // Sprint11
-    'setMinScore': '最低', // Sprint11
-    'setMaxScore': '最高', // Sprint11
-    'isCheckSuggest': '巡检建议值', // Sprint11
-    'patrolSuggest': '中存在不合格项时，巡检结果为立即督导', // Sprint11
-    'PSCrule1': '与其他tab组合时，', // Sprint11
-    'PSCrule2': '项目分值参与考评总分计算', // Sprint11
-    'PSCrule3': '中忽略项目视同得分', // Sprint11
+    'ruleInspect': '巡检规则设置',
+    'PatrolScoreCalculation': '巡检得分计算',
+    'CalculationMethod': '考评总分计算方式',
+    'Proportional': '总分-百分制',
+    'ProportionalDes': '考评总分=【SUM(每项巡检得分)/SUM（Tab1/Tab2巡检总分）*100】+附加项得分',
+    'totalScore': '总分-累加制',
+    'totalScoreDes': '考评总分= SUM(每项巡检得分)',
+    'totalScorRange': '考评总分范围设置',
+    'setMinScore': '最低',
+    'setMaxScore': '最高',
+    'isCheckSuggest': '巡检建议值',
+    'patrolSuggest': '中存在不合格项时，巡检结果为：立即督导',
+    'PSCrule1': '与其他tab组合时，',
+    'PSCrule2': '项目分值参与考评总分运算',
+    'PSCrule3': '中忽略项目视同得分',
     'OnlyOthers': '【巡检评分项】sheet页内容不能为空',
     'beforeImport': 'sheet页内容不能为空',
     'Ratingitems': '评级项目',
@@ -494,8 +494,8 @@ export default {
     'sheetscore0': '项目总分值',
     'sheetscore1': '低于*分，须门店负责人处理',
     'sheetscore2': '项目分值(必填，-100分~100分)',
-    'sheetscore3': '评分选项', // Sprint11
-    'sheetscoreA': '项目分值(选填，1分~50分)', // Sprint11
+    'sheetscore3': '评分选项',
+    'sheetscoreA': '项目分值(选填，1分~50分)',
     'sheetpassfail': '合格率评估项',
     'sheetscore': '巡检评分项',
     'sheetother': '附加评分项',
@@ -531,9 +531,10 @@ export default {
     'excelIllegalCategory': '存在“@#￥%^&*”非法字符！',
     'excelEmpty': '巡检类别与巡检项名称不能为空',
     'passfailexcelEmpty': '巡检项名称不能为空！',
+    'excelPassFailScoreType': '项目分值选填，取值范围为1~50的整数',
     'excelFullScoreType': '项目总分值必填，取值范围为1~50的整数',
     'excelMinScoreType': '巡检项最低分值必填，取值范围为1~项目总分值的整数',
-    'excelScoreItemType': '评分选项，取值范围为0~满分值', // Sprint11
+    'excelScoreItemType': '评分选项，取值范围为0~满分值',
     'excelOtherScoreType': '项目分值必填，取值范围为-100~100的整数',
     'bindingstore': '绑定中',
     'excelLongItem': '巡检项长度不可超过100个字符！',

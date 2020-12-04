@@ -197,7 +197,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'uploading': '正在上传中', // Sprint11
+    'uploading': 'Uploading...',
     'storeTag': 'Tag',
     'patrolWay': 'Inspection Type',
     'patrolResult': 'Result',
@@ -444,21 +444,20 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'ruleInspect': '巡检规则设置', // Sprint11
-    'PatrolScoreCalculation': '巡检得分计算', // Sprint11
-    'CalculationMethod': '考评总分计算方式', // Sprint11
-    'Proportional': '比例制', // Sprint11
-    'ProportionalDes': '考评总分=【SUM（每项巡检得分）/SUM（Tab1/Tab2巡检总分）*100】+附加项得分', // Sprint11
-    'totalScore': '总分制', // Sprint11
-    'totalScoreDes': '考评总分=SUM（每项巡检得分）', // Sprint11
-    'totalScorRange': '考评总分范围设置', // Sprint11
-    'setMinScore': '最低', // Sprint11
-    'setMaxScore': '最高', // Sprint11
-    'isCheckSuggest': '巡检建议值', // Sprint11
-    'patrolSuggest': '中存在不合格项时，巡检结果为立即督导', // Sprint11
-    'PSCrule1': '与其他tab组合时，', // Sprint11
-    'PSCrule2': '项目分值参与考评总分计算', // Sprint11
-    'PSCrule3': '中忽略项目视同得分', // Sprint11
+    'ruleInspect': 'Rule Settings',
+    'PatrolScoreCalculation': 'Inspection score calculation',
+    'CalculationMethod': 'Calculation method of total score',
+    'Proportional': 'Total Score-Percentage System',
+    'ProportionalDes': 'Total score = [SUM (per inspection score)/SUM (Tab1/Tab2 total score) *100] + additional item score',
+    'totalScore': 'Cumulative score system',
+    'totalScoreDes': 'Total score = SUM (per inspection score)',
+    'totalScorRange': 'Range of total score',
+    'setMinScore': 'lowest',
+    'setMaxScore': 'highest',
+    'isCheckSuggest': 'Recommended value for inspection',
+    'PSCrule1': 'When combined with other tabs, the ',
+    'PSCrule2': ' project score will participate in the evaluation of the total score calculation',
+    'PSCrule3': 'Calculate the score of ignored items in',
     'OnlyOthers': 'The content of the [Score] sheet page cannot be empty',
     'Ratingitems': 'Rating items',
     'Addscoreitems': 'Additional scoring items',
@@ -489,8 +488,8 @@ export default {
     'sheetscore0': 'Total score',
     'sheetscore1': 'Anomaly Events-Score Threshold',
     'sheetscore2': 'Score(Required, -100~100points)',
-    'sheetscore3': '评分选项', // Sprint11
-    'sheetscoreA': '项目分值(选填，1分~50分)', // Sprint11
+    'sheetscore3': 'Score Options',
+    'sheetscoreA': 'Score(Optional, 1~50points)',
     'sheetpassfail': 'Pass-Failed',
     'sheetscore': 'Score items',
     'sheetother': 'Other items',
@@ -527,9 +526,10 @@ export default {
     'excelIllegalCategory': "llegal characters '@#￥%^&*'!",
     'excelEmpty': "The inspection category and item name can't empty",
     'passfailexcelEmpty': "The inspection item can't empty",
+    'excelPassFailScoreType': 'Score:Optional, Integer,  1~50points',
     'excelFullScoreType': 'Total Score: Required, Integer, 1~50points',
     'excelMinScoreType': 'Anomaly Events-Score Threshold: Optional, Integer, 1point~Total Score',
-    'excelScoreItemType': '评分选项，取值范围为0~满分值', // Sprint11
+    'excelScoreItemType': 'The value range of the score options is 0~full marks',
     'excelOtherScoreType': 'Score:Required, Integer,  -100~100points',
     'bindingstore': 'Binding',
     'excelLongItem': 'The length of item is 100 characters at most!',

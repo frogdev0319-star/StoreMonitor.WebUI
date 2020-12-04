@@ -1,3 +1,4 @@
+/* eslint-disable arrow-spacing */
 <template>
   <el-row class="el-addrute">
     <el-col :span="24" class="el-rute-title">
@@ -22,7 +23,7 @@
           :disabled="false"
           :input-size="`mini`"
           :selected="ModelPost"
-          :all="$t('reportView.all')"
+          :all="$t('remotePatrol.all')"
           @changeInput="changeSelect(arguments)"/>
       </div>
       <div class="post-right">
@@ -206,7 +207,7 @@
                   :disabled="false"
                   :input-size="`mini`"
                   :selected="item.Score_4"
-                  :all="$t('reportView.all')"
+                  :all="$t('remotePatrol.all')"
                   @changeInput="changeScore4($event,item)"/>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
@@ -299,7 +300,7 @@
                   :disabled="false"
                   :input-size="`mini`"
                   :selected="selectAvailable"
-                  :all="$t('reportView.all')"
+                  :all="$t('remotePatrol.all')"
                   @changeInput="changeAvailable(arguments)"/>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
@@ -327,7 +328,6 @@
 </template>
 
 <script>
-import api from '@/api/index';
 import util from '@/common/util';
 import { validateInput } from '@/common/validate';
 import { inpectRESTful, titleRESTful } from '@/api/index';
@@ -356,12 +356,12 @@ export default {
       ModelAddPost: [],
       groupList: [],
       activeSheetName: '',
-      groupNameTemp: '', // 临时存放
+      groupNameTemp: '',
       groupNameInput: '',
       napeTitle: '',
       showEditTab: false,
       napeList: [],
-      napeDepTemp: '', // 临时存放
+      napeDepTemp: '',
       showAddGroup: false,
       enterNameRuletip: false,
       enterListNameRuletip: false,
@@ -370,8 +370,8 @@ export default {
       newNapeChecked: false,
       newNapeName: '',
       newNapeDep: '',
-      groupIndex: 0, // 当前选择的类别索引.
-      curGroup: '', // 当前点击的类别实体
+      groupIndex: 0,
+      curGroup: '',
       showDeleteItem: false,
       showDeleteGroup: false,
       deleteItemFlag: '',
@@ -380,7 +380,6 @@ export default {
       varyWindowWidth: window.innerWidth,
       bindStoreList: [],
       lang: this.$i18n.locale,
-      // tabNameLang: this.$route.params.tabNameLang,
       routeName: this.$route.params.routeName,
       routeData: this.$route.params.routeData,
       showLengthNameWarning: false,
@@ -418,6 +417,7 @@ export default {
     self.initData();
     self.getTitleList();
   },
+
   methods: {
     getTitleList() {
       const self = this;
@@ -428,7 +428,7 @@ export default {
           const roleId = item.roleId;
         });
         self.tableData = res.data;
-        if (self.tableData.length == 0) {
+        if (self.tableData.length === 0) {
           self.noData = self.$t('deviceView.noData');
         }
         const listArray = [];
@@ -446,6 +446,7 @@ export default {
           console.log(err);
         });
     },
+
     getUserTitleList() {
       return new Promise((resolve, reject) => {
         titleRESTful.getUserTitleList().then(res => {
@@ -453,11 +454,13 @@ export default {
         });
       });
     },
+
     editTabName() {
       const self = this;
       self.showEditTab = true;
       self.editRouteName = self.routeName;
     },
+
     RouteNameLength(val) {
       const self = this;
       const content = filterString.all(val, 30);
@@ -470,9 +473,10 @@ export default {
         self.showLengthNameWarning = false;
       }
     },
+
     confirmEditTab() {
       const self = this;
-      if (self.editRouteName == '') {
+      if (self.editRouteName === '') {
         self.notify(self.$t('insSettingView.enterListName'), 'warning', 3000);
         return false;
       }
@@ -481,7 +485,7 @@ export default {
         name: self.editRouteName
       };
       inpectRESTful.UpdateInspectGroupTag(params).then(res => {
-        if (res.errCode == 0) {
+        if (res.errCode === 0) {
           self.showEditTab = false;
           self.routeName = self.editRouteName;
           self.showLengthNameWarning = false;
@@ -493,16 +497,19 @@ export default {
         }
       });
     },
+
     cancelEditTab() {
       const self = this;
       self.showEditTab = false;
     },
+
     handleSheetClick(val) {
       const self = this;
       self.showAddGroup = false;
       self.showAddNape = false;
       self.refreshData(0);
     },
+
     clickGroupItem(index, item) {
       const self = this;
       item.isClick = true;
@@ -513,19 +520,20 @@ export default {
       } else {
         self.napeTitle = `${item.groupName} ${self.$t('insSettingView.itemsOfCate')}`;
       }
-      // self.napeTitle=`${item.groupName}类别巡检项`;
       self.showAddNape = false;
       self.groupList.forEach((_item, _index) => {
-        if (index != _index) {
+        if (index !== _index) {
           _item.isClick = false;
         }
       });
       self.getNapeList(index, item);
     },
+
     clickItem(index, item) {
       const self = this;
     },
-    getTagAll(params) { // 获取巡检表
+
+    getTagAll(params) {
       const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList(params).then(res => {
@@ -536,7 +544,8 @@ export default {
         });
       });
     },
-    getInspectGroupBindAll(params) { // 获取巡检类别关联职务
+
+    getInspectGroupBindAll(params) {
       const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectGroupBindList(params).then(res => {
@@ -547,13 +556,14 @@ export default {
         });
       });
     },
+
     async submitBindTitle() {
       const self = this;
       let resBindGroup = null, resUnbindGroup = null;
       let paramsBind = {};
       let paramsUnbind = {};
       let titleIds = [];
-      if (self.ModelPost[0] == '-1') {
+      if (self.ModelPost[0] === '-1') {
         titleIds = self.ModelPost.slice(1);
       } else {
         titleIds = self.ModelPost;
@@ -577,7 +587,7 @@ export default {
       });
       const groupBindItems = [];
       let bindtitleIds = [];
-      if (self.ModelPost[0] == '-1') {
+      if (self.ModelPost[0] === '-1') {
         bindtitleIds = self.ModelPost.slice(1);
       } else {
         bindtitleIds = self.ModelPost;
@@ -593,32 +603,30 @@ export default {
           groupBindItems.push(obj);
         });
       });
-      // 解绑职务参数
       paramsUnbind = {
         groupItems: groupItems
       };
-      // 绑定职务参数
       paramsBind = {
         groupItems: groupBindItems
       };
-      if (postBind[0].userTitles.length != 0) {
+      if (postBind[0].userTitles.length !== 0) {
         resUnbindGroup = await self.unbindGroup(paramsUnbind);
-        if (resUnbindGroup.errMsg == 'Success' && bindtitleIds.length != 0) {
+        if (resUnbindGroup.errMsg === 'Success' && bindtitleIds.length !== 0) {
           resBindGroup = await self.bindGroup(paramsBind);
-        } else if (resUnbindGroup.errMsg == 'Success' && titleIds.length == 0) {
+        } else if (resUnbindGroup.errMsg === 'Success' && titleIds.length === 0) {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.refreshData(self.groupIndex);
           return false;
         }
       } else {
-        if (bindtitleIds.length != 0) {
+        if (bindtitleIds.length !== 0) {
           resBindGroup = await self.bindGroup(paramsBind);
-        } else if (bindtitleIds.length == 0) {
+        } else if (bindtitleIds.length === 0) {
           self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           return false;
         }
       }
-      if (resBindGroup.errMsg == 'Success') {
+      if (resBindGroup.errMsg === 'Success') {
         self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
         self.refreshData(self.groupIndex);
       } else {
@@ -626,10 +634,11 @@ export default {
         return false;
       }
     },
+
     async confirmEditGroup(index, item) {
       const self = this;
       const temp = [];
-      if (item.groupName == null || item.groupName.length == 0) {
+      if (item.groupName == null || item.groupName.length === 0) {
         self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
@@ -648,7 +657,7 @@ export default {
       };
       let resUpdateGroup = null;
       resUpdateGroup = await self.updateGroup(params);
-      if (resUpdateGroup.errMsg == 'Success') {
+      if (resUpdateGroup.errMsg === 'Success') {
         self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
         item.isEdit = false;
         self.refreshData(self.groupIndex);
@@ -657,6 +666,7 @@ export default {
         return false;
       }
     },
+
     updateGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.updateInspectGroup(params).then(res => {
@@ -665,6 +675,7 @@ export default {
         });
       });
     },
+
     unbindGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.UnbindInspectGroupAndTitle(params).then(res => {
@@ -673,6 +684,7 @@ export default {
         });
       });
     },
+
     bindGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.BindInspectGroup(params).then(res => {
@@ -681,17 +693,18 @@ export default {
         });
       });
     },
+
     cancelEditGroup(index, item) {
       const self = this;
       item.isEdit = false;
       item.groupName = self.groupNameTemp;
     },
     /**
-         * Add group functions
-         */
+     * Add group functions
+     */
     addGroup() {
       const self = this;
-      if (self.typeTemp.length == 1 && self.typeTemp[0] == 0 && self.activeSheetName == '2') {
+      if (self.typeTemp.length === 1 && self.typeTemp[0] === 0 && self.activeSheetName === '2') {
         self.notify(self.$t('insSettingView.notAllowAdd'), 'warning', 3000);
         return false;
       }
@@ -701,6 +714,7 @@ export default {
         item.isEdit = false;
       });
     },
+
     changeSelect(val) {
       const self = this;
       self.ModelPost = Array.from(val)[0]; // 选中的职务
@@ -724,6 +738,7 @@ export default {
       const self = this;
       self.ModelAddPost = Array.from(val)[0]; // 选中的职务
     },
+
     async confirmAddGroup() {
       const self = this;
       const temp = [];
@@ -731,13 +746,9 @@ export default {
         self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
-      // if(validateInput(self.groupNameInput)){
-      //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-      //     return false;
-      // }
       let mode = 0;
       const tabIndex = sessionStorage.getItem('TabIndex');
-      mode = tabIndex == '0' ? 0 : (tabIndex == '1' ? 1 : 0);
+      mode = tabIndex === '0' ? 0 : (tabIndex === '1' ? 1 : 0);
       const obj = {
         name: self.groupNameInput,
         mode: mode,
@@ -750,7 +761,7 @@ export default {
       };
       inpectRESTful.addInspectGroup(params).then(res => {
         const codeMsg = res.errMsg;
-        if (codeMsg != undefined && codeMsg == 'Success') {
+        if (codeMsg != undefined && codeMsg === 'Success') {
           const obj = {
             id: res.data[0],
             groupName: self.groupNameInput,
@@ -761,14 +772,13 @@ export default {
             itemData: []
           };
           self.groupList.push(obj);
-          // 绑定职务参数
           let titleIds = [];
-          if (self.ModelPost[0] == '-1') {
+          if (self.ModelPost[0] === '-1') {
             titleIds = self.ModelPost.slice(1);
           } else {
             titleIds = self.ModelPost;
           }
-          if (titleIds.length != 0) {
+          if (titleIds.length !== 0) {
             const paramsBind = {
               groupItems: [{
                 groupId: res.data[0],
@@ -781,15 +791,13 @@ export default {
           self.showAddGroup = false;
           self.refreshData(self.groupList.length - 1);
           self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
-          // setTimeout(function(){
-          //     PubSub.publish('change-color',{showTag:true});
-          // },1000)
         } else {
           self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
           return false;
         }
       });
     },
+
     cancelAddGroup() {
       const self = this;
       self.showAddGroup = false;
@@ -800,22 +808,24 @@ export default {
       item.showEdit = true;
 
       self.groupList.forEach((_item, _index) => {
-        if (index != _index) {
+        if (index !== _index) {
           _item.showEdit = false;
         }
       });
     },
+
     editGroup(index, item) {
       const self = this;
       item.isEdit = true;
       item.showEdit = false;
       self.groupNameTemp = item.groupName;
       self.groupList.forEach((_item, _index) => {
-        if (index != _index) {
+        if (index !== _index) {
           _item.isEdit = false;
         }
       });
     },
+
     deleteItemData(idArr) {
       const self = this;
       const params = { 'itemIds': idArr };
@@ -827,6 +837,7 @@ export default {
         });
       });
     },
+
     deleteGroupData(idArr) {
       const self = this;
       const params = { 'groupIds': idArr };
@@ -838,13 +849,14 @@ export default {
         });
       });
     },
+
     async deleteGroup(index, item) {
       const self = this;
-      if (self.groupList.length == 1) {
-        if ((self.typeTemp.length == 2 && !self.typeTemp.some(x => x == 0) || self.typeTemp.length == 3) && item.type == 1) {
+      if (self.groupList.length === 1) {
+        if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && item.type === 1) {
           self.showFailInfo = true;
           return false;
-        } else if (self.typeTemp.length == 1) {
+        } else if (self.typeTemp.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
           const bindSchedule = await self.getScheduleFromDB(params);
@@ -854,7 +866,7 @@ export default {
               arrtemp.push(item.extra.inspectId);
             }
           });
-          if (arrtemp.indexOf(self.routeData[0].inspectId) != -1) {
+          if (arrtemp.indexOf(self.routeData[0].inspectId) !== -1) {
             self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
             return false;
           }
@@ -863,6 +875,7 @@ export default {
       self.showDeleteGroup = true;
       self.curGroup = item;
     },
+
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
@@ -873,6 +886,7 @@ export default {
         });
       });
     },
+
     async confirmDeleteGroup() {
       const self = this;
       const idGroupArr = [];
@@ -882,33 +896,32 @@ export default {
         idItemArr.push(item.id);
       });
       self.showDeleteGroup = false;
-      if (idItemArr.length == 0) { // 当前分组下无巡检项
+      if (idItemArr.length === 0) {
         const errMsg = await self.deleteGroupData(idGroupArr);
-        if (errMsg != undefined && errMsg == 'Success') {
+        if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
-          if (self.groupList.length == 1) {
+          if (self.groupList.length === 1) {
             self.groupList = [];
             self.napeList = [];
             self.napeTitle = '';
           } else {
             console.log(self.groupIndex);
-            self.refreshData(self.groupIndex == 0 ? self.groupIndex : self.groupIndex - 1);
+            self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
           }
         }
       } else {
         const errMsgItem = await self.deleteItemData(idItemArr);
-        if (errMsgItem != undefined && errMsgItem == 'Success') {
+        if (errMsgItem != undefined && errMsgItem === 'Success') {
           const errMsgGroup = await self.deleteGroupData(idGroupArr);
-          if (errMsgGroup != undefined && errMsgGroup == 'Success') {
+          if (errMsgGroup != undefined && errMsgGroup === 'Success') {
             self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
-            // 刷新页面
-            if (self.groupList.length == 1) {
+            if (self.groupList.length === 1) {
               self.groupList = [];
               self.napeList = [];
               self.napeTitle = '';
             } else {
               console.log(self.groupIndex);
-              self.refreshData(self.groupIndex == 0 ? self.groupIndex : self.groupIndex - 1);
+              self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
             }
           } else {
             self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
@@ -919,10 +932,11 @@ export default {
           return false;
         }
       }
-      if (self.typeTemp.length == 1 && self.groupList.length == 0) {
+      if (self.typeTemp.length === 1 && self.groupList.length === 0) {
         self.$router.push({ name: 'inspectSetting', params: { val: 'del' }});
       }
     },
+
     addNape() {
       const self = this;
       self.showAddNape = !self.showAddNape;
@@ -950,6 +964,7 @@ export default {
       });
       self.availableScores = availableScores;
     },
+
     deleteNape(item) {
       const self = this;
       let count = 0;
@@ -958,12 +973,12 @@ export default {
           count++;
         }
       });
-      if (count == 0) {
+      if (count === 0) {
         self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
-      if (count == self.napeList.length && self.groupList.length == 1) {
-        if ((self.typeTemp.length == 2 && !self.typeTemp.some(x => x == 0) || self.typeTemp.length == 3) && self.groupList[0].type == 1) {
+      if (count === self.napeList.length && self.groupList.length === 1) {
+        if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
           self.showFailInfo = true;
           return false;
         }
@@ -971,6 +986,7 @@ export default {
       self.showDeleteItem = true;
       self.deleteItemFlag = 'G';
     },
+
     async confirmDeleteItem() {
       const self = this;
       const idArr = [];
@@ -981,16 +997,13 @@ export default {
             if (item.checked) {
               idArr.push(item.id);
             }
-          });
-          break;
-        default:
+          }); break;
           console.log('error Flag!'); break;
       }
       const errMsg = await self.deleteItemData(idArr);
-      if (errMsg != undefined && errMsg == 'Success') {
+      if (errMsg != undefined && errMsg === 'Success') {
         self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
         self.showDeleteItem = false;
-        // 刷新页面,删除页面上在后台已经删除的数据
         self.refreshData(self.groupIndex);
         self.groupList[self.groupIndex].groupNum -= idArr.length;
       } else {
@@ -998,6 +1011,7 @@ export default {
         return false;
       }
     },
+
     confirmeditNape(index, item) {
       const self = this;
       const temp = [];
@@ -1075,6 +1089,7 @@ export default {
         }
       });
     },
+
     cancelEditNape(index, item) {
       const curEditItem = JSON.parse(sessionStorage.getItem('curEditItem'));
       item.isClick = curEditItem.isClick;
@@ -1086,6 +1101,7 @@ export default {
       item.availableScoreStr = curEditItem.availableScoreStr;
       item.napeName = curEditItem.napeNameShow;
     },
+
     confirmaddNape() {
       const self = this;
       const temp = [];
@@ -1170,9 +1186,6 @@ export default {
             Score_1: self.newScore,
             Score_2: self.newCritical,
             Score_3: self.newAddScore,
-            // Score_1:self.newScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
-            // Score_2:self.newCritical + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
-            // Score_3:self.newAddScore + (self.lang!='en'?self.$t('remotePatrol.scorecount'):''),
             isClick: false,
             checked: false
           };
@@ -1215,9 +1228,11 @@ export default {
         }
       });
     },
+
     cancelAddNape() {
       this.showAddNape = false;
     },
+
     handleEdit(index, item) {
       const self = this;
       self.napeDepTemp = item.napeDep;
@@ -1247,11 +1262,12 @@ export default {
         }
       });
     },
+
     handleDelete(index, item) {
       console.log(index);
       const self = this;
-      if (self.napeList.length == 1 && self.groupList.length == 1) {
-        if ((self.typeTemp.length == 2 && !self.typeTemp.some(x => x == 0) || self.typeTemp.length == 3) && self.groupList[0].type == 1) {
+      if (self.napeList.length === 1 && self.groupList.length === 1) {
+        if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
           self.showFailInfo = true;
           return false;
         }
@@ -1271,13 +1287,14 @@ export default {
           console.log(res);
           const code = res.errMsg;
           const data = res.data;
-          if (code != null && code == 'Success') {
+          if (code != null && code === 'Success') {
             console.log(res.data);
           }
           resolve(data);
         });
       });
     },
+
     getPersonData() {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList().then(res => {
@@ -1285,24 +1302,25 @@ export default {
         });
       });
     },
+
     getBindStoreList() {
       const self = this;
       const inspectId = self.routeData[0].inspectId;
       const params = { inspectId: inspectId };
       inpectRESTful.getInspectBindList(params).then(res => {
         console.log(res.errMsg);
-        if (res.errMsg != undefined && res.errMsg == 'Success') {
+        if (res.errMsg != undefined && res.errMsg === 'Success') {
           const data = res.data;
           self.bindStoreList = data;
         }
       });
     },
+
     async refreshData(index) {
       const self = this;
       const asds = self.routeData;
       const curTag = self.tabName;
       const allData = await self.getAllData();
-      // let personData=await self.getPersonData()
       const data = util.getRouteByTag(curTag, allData);
       console.log(data);
       const temp = [];
@@ -1331,10 +1349,10 @@ export default {
         const usertext = [];
         postBind.forEach(p_item => {
           if (t_item.id == p_item.groupId) {
-            if (p_item.userTitles.length != 0) {
+            if (p_item.userTitles.length !== 0) {
               p_item.userTitles.forEach(u_item => {
                 if (titleList.data.length == p_item.userTitles.length) {
-                  t_item['textModel'] = self.$t('reportView.all');
+                  t_item['textModel'] = self.$t('remotePatrol.all');
                 } else {
                   usertext.push(u_item.titleName);
                   t_item['textModel'] = usertext.toString();
@@ -1349,7 +1367,7 @@ export default {
           }
         });
       });
-      if (self.ModelPost.length == 0) {
+      if (self.ModelPost.length === 0) {
         self.ModelPost = temp[0].ModelPost;
       }
       const te_temp = [];
@@ -1357,17 +1375,17 @@ export default {
       let sheetTemp = [];
       const obj = { passfail: [], score: [], other: [] };
       for (let i = 0; i < 3; i++) {
-        const Typeindex = temp.filter(x => x.type == i);
-        if (Typeindex.length != 0) {
+        const Typeindex = temp.filter(x => x.type === i);
+        if (Typeindex.length !== 0) {
           te_temp.push(Typeindex);
           type_temp.push(Typeindex[0].type);
-          if (Typeindex[0].type == 0) {
+          if (Typeindex[0].type === 0) {
             obj.passfail = Typeindex;
           }
-          if (Typeindex[0].type == 1) {
+          if (Typeindex[0].type === 1) {
             obj.score = Typeindex;
           }
-          if (Typeindex[0].type == 2) {
+          if (Typeindex[0].type === 2) {
             obj.other = Typeindex;
           }
         }
@@ -1377,12 +1395,12 @@ export default {
       self.firstLoad = false;
       self.allRoutedata = te_temp;
       self.typeTemp = type_temp;
-      self.groupList = self.activeSheetName == '0' ? sheetTemp.passfail : (self.activeSheetName == '1' ? sheetTemp.score : sheetTemp.other);
-      if (self.groupList.length != 0) {
+      self.groupList = self.activeSheetName === '0' ? sheetTemp.passfail : (self.activeSheetName === '1' ? sheetTemp.score : sheetTemp.other);
+      if (self.groupList.length !== 0) {
         self.groupList[index].isClick = true;
         self.curGroup = self.groupList[index];
         self.groupIndex = index;
-        if (self.lang == 'en') {
+        if (self.lang === 'en') {
           self.napeTitle = `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
         } else {
           self.napeTitle = `${self.groupList[index].groupName} ${self.$t('insSettingView.itemsOfCate')}`;
@@ -1390,13 +1408,14 @@ export default {
         self.getNapeList(index, self.groupList[index]);
       } else {
         self.napeList = [];
-        if (self.lang == 'en') {
+        if (self.lang === 'en') {
           self.napeTitle = `${self.$t('insSettingView.itemsOfCate')}`;
         } else {
           self.napeTitle = `${self.$t('insSettingView.itemsOfCate')}`;
         }
       }
     },
+
     getNapeList(index, item) {
       console.log(index);
       const self = this;
@@ -1452,6 +1471,7 @@ export default {
       self.refreshData(0);
       self.getBindStoreList();
     },
+
     notify(msg, type, time) {
       this.$message({
         message: msg,
@@ -1459,12 +1479,13 @@ export default {
         duration: time
       });
     },
+
     groupNameChange(val, item) {
       const self = this;
       const comment = filterString.all(val, 30);
       const length = filterString.getContentLength(val);
       console.log(comment, length);
-      if (Object.keys(item).length == 0) {
+      if (Object.keys(item).length === 0) {
         self.groupNameInput = comment;
       } else {
         item.groupName = comment;
@@ -1475,21 +1496,24 @@ export default {
         this.enterNameRuletip = false;
       }
     },
-    inputChange(val, TabIndex) {
+
+    inputChange(val) {
       const self = this;
-      if (val.indexOf('-') != -1 && TabIndex === '2') {
+      if (val.indexOf('-') !== -1) {
         self.newAddScore = '-' + val.replace(/[^\d]/g, '');
       } else {
         self.newAddScore = val.replace(/[^\d]/g, '');
       }
     },
-    editinputChange(item, index, TabIndex) {
-      if (item.Score_3.indexOf('-') != -1 && TabIndex === '2') {
+
+    editinputChange(item, index) {
+      if (item.Score_3.indexOf('-') !== -1) {
         item.Score_3 = '-' + item.Score_3.replace(/[^\d]/g, '');
       } else {
         item.Score_3 = item.Score_3.replace(/[^\d]/g, '');
       }
     },
+
     selectFullScore(val, item) {
       const self = this;
       const arr = [];
@@ -1514,12 +1538,13 @@ export default {
         self.selectAvailable = arr.slice(0, val + 1);
       }
     },
+
     napeNameChange(val, item) {
       const self = this;
       const comment = filterString.all(val, 100);
       const length = filterString.getContentLength(val);
       console.log(comment, length);
-      if (Object.keys(item).length == 0) {
+      if (Object.keys(item).length === 0) {
         self.newNapeName = comment;
       } else {
         item.napeName = comment;
@@ -1530,12 +1555,13 @@ export default {
         this.enterListNameRuletip = false;
       }
     },
+
     napeDepChange(val, item) {
       const self = this;
       const comment = filterString.all(val, 1200);
       const length = filterString.getContentLength(val);
       console.log(comment, length);
-      if (Object.keys(item).length == 0) {
+      if (Object.keys(item).length === 0) {
         self.newNapeDep = comment;
       } else {
         item.napeDep = comment;
@@ -1546,20 +1572,23 @@ export default {
         this.descriptionRuletip = false;
       }
     },
+
     notShowInputRuleTips(e) {
-      if (e == 'enterName') {
+      if (e === 'enterName') {
         this.enterNameRuletip = false;
-      } else if (e == 'enterListName') {
+      } else if (e === 'enterListName') {
         this.enterListNameRuletip = false;
-      } else if (e == 'description') {
+      } else if (e === 'description') {
         this.descriptionRuletip = false;
       }
     }
+
   },
+
   beforeRouteLeave(to, from, next) {
     console.log(to.path);
     next();
-    if (to.path == '/storemanage') {
+    if (to.path === '/storemanage') {
       PubSub.publish('change-color', { showTag: false });
     }
   }

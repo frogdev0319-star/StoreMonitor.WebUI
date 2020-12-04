@@ -200,7 +200,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'uploading': '正在上传中', // Sprint11
+    'uploading': '正在上傳中',
     'storeTag': ' 標籤',
     'patrolWay': ' 巡店方式',
     'patrolResult': ' 巡檢結果',
@@ -447,21 +447,21 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'ruleInspect': '巡检规则设置', // Sprint11
-    'PatrolScoreCalculation': '巡检得分计算', // Sprint11
-    'CalculationMethod': '考评总分计算方式', // Sprint11
-    'Proportional': '比例制', // Sprint11
-    'ProportionalDes': '考评总分=【SUM（每项巡检得分）/SUM（Tab1/Tab2巡检总分）*100】+附加项得分', // Sprint11
-    'totalScore': '总分制', // Sprint11
-    'totalScoreDes': '考评总分=SUM（每项巡检得分）', // Sprint11
-    'totalScorRange': '考评总分范围设置', // Sprint11
-    'setMinScore': '最低', // Sprint11
-    'setMaxScore': '最高', // Sprint11
-    'isCheckSuggest': '巡检建议值', // Sprint11
-    'patrolSuggest': '中存在不合格项时，巡检结果为立即督导', // Sprint11
-    'PSCrule1': '与其他tab组合时，', // Sprint11
-    'PSCrule2': '项目分值参与考评总分计算', // Sprint11
-    'PSCrule3': '中忽略项目视同得分', // Sprint11
+    'ruleInspect': '巡檢規則設置',
+    'PatrolScoreCalculation': '巡檢得分計算',
+    'CalculationMethod': '考評總分計算方式',
+    'Proportional': '總分-比例製',
+    'ProportionalDes': '考評總分=【SUM(每項巡檢得分)/SUM（Tab1/Tab2巡檢總分）*100】+附加項得分',
+    'totalScore': '總分-累加製',
+    'totalScoreDes': '考評總分= SUM(每項巡檢得分)',
+    'totalScorRange': '考評總分範圍設置',
+    'setMinScore': '最低',
+    'setMaxScore': '最高',
+    'isCheckSuggest': '巡檢建議值',
+    'patrolSuggest': '中存在不合格項時，巡檢結果為：立即督導',
+    'PSCrule1': '與其他tab組合時，',
+    'PSCrule2': '項目分值參與考評總分運算',
+    'PSCrule3': '中忽略項目視同得分',
     'OnlyOthers': ' 【巡檢評分項】sheet頁內容不能為空',
     'beforeImport': ' sheet頁內容不能為空',
     'Ratingitems': ' 評級項目',
@@ -494,8 +494,8 @@ export default {
     'sheetscore0': ' 項目總分值',
     'sheetscore1': ' 低於*分，須門店負責人處理',
     'sheetscore2': ' 項目分值（必填，-100分~100分）',
-    'sheetscore3': '评分选项', // Sprint11
-    'sheetscoreA': '项目分值(选填，1分~50分)', // Sprint11
+    'sheetscore3': '評分選項',
+    'sheetscoreA': '項目分值(選填，1分~50分)',
     'sheetpassfail': ' 合格率評估項',
     'sheetscore': ' 巡檢評分項',
     'sheetother': ' 附加評分項',
@@ -532,9 +532,10 @@ export default {
     'excelIllegalCategory': ' 存在“@#￥%^&*”非法字符！',
     'excelEmpty': ' 巡檢類別與巡檢項名稱不能為空',
     'passfailexcelEmpty': ' 巡检项不能为空！',
+    'excelPassFailScoreType': '項目分值選填，取值範圍為1~50的整數',
     'excelFullScoreType': ' 項目總分值必填，取值範圍為1~50的整數',
     'excelMinScoreType': ' 巡檢項最低分值必填，取值範圍為1~項目總分值的整數',
-    'excelScoreItemType': '评分选项，取值范围为0~满分值', // Sprint11
+    'excelScoreItemType': '評分選項，取值範圍為0~滿分值',
     'excelOtherScoreType': ' 項目分值必填，取值範圍為-100~100的整數',
     'bindingstore': ' 綁定中',
     'excelLongItem': ' 巡檢項長度不可超過100個字元！',

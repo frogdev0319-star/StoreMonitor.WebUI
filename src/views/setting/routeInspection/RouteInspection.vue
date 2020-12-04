@@ -1,22 +1,37 @@
 <template>
   <el-row class="el-route-container">
     <el-col :span="24" class="el-route-header">
-      <div v-if="itemhoverName!=''" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">{{ itemhoverName }}<div class="triangle"/></div>
+      <div v-if="itemhoverName !== ''" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">
+        {{ itemhoverName }}<div class="triangle"/>
+      </div>
       <el-col :span="7" class="el-route-btns">
-        <span :class="lang == 'en'? 'en-bind-title': 'bind-title'">{{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}</span>
-        <el-button :class="lang=='en'? 'en-el-bind-btn': 'el-bind-btn' " :disabled="elTableData[Number(activeName)].data.length==0" size="mini" class="btn-class" type="primary" @click="bindStore">
+        <span :class="lang === 'en'? 'en-bind-title': 'bind-title'">
+          {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
+        </span>
+        <el-button
+          :class="lang === 'en' ? 'en-el-bind-btn' : 'el-bind-btn' "
+          :disabled="elTableData[Number(activeName)].data.length === 0"
+          size="mini"
+          class="btn-class"
+          type="primary"
+          @click="bindStore">
           <div class="btn-area">
             <i class="iconfont icon-quxiaolianjie"/>
             <span>{{ $t('insSettingView.bindList') }}</span>
           </div>
         </el-button>
-        <input id="loadFileEx" ref="loadFileEx" type="file" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
-
+        <input
+          id="loadFileEx"
+          ref="loadFileEx"
+          type="file"
+          style="display: none"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          @change="importfxx(this)" >
         <el-button
           v-for="(item,index) in btnList"
           :key="index"
           :disabled="item.enabled"
-          :class="lang=='en'? 'en-el-handle-btn': 'el-handle-btn' "
+          :class="lang === 'en' ? 'en-el-handle-btn' : 'el-handle-btn' "
           size="mini"
           @click="handleNape(index,item)">
           <div class="btn-area">
@@ -27,7 +42,7 @@
 
         <el-dialog
           v-if="showImportContent"
-          :title="$t('insSettingView.import')"
+          :title= "$t('insSettingView.import')"
           :visible.sync="showImportContent"
           :append-to-body="true"
           :close-on-click-modal="false"
@@ -49,7 +64,7 @@
             </div>
             <div class="tabName-input-content">
               <input
-                v-if="checkValue== this.addPatrol"
+                v-if="checkValue === this.addPatrol"
                 v-model="tabNameInput"
                 :placeholder="$t('insSettingView.enterListName')"
                 type="text"
@@ -57,12 +72,16 @@
             </div>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">{{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">
+              {{ $t('insSettingView.cancel') }}</el-button>
 
             <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('insSettingView.select') }}
-              <!-- <div class="file-sliver"  v-if="hideUpload"> -->
-              <input id="upload" ref="loadFile" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
-              <!-- </div> -->
+              <input
+                id="upload"
+                ref="loadFile"
+                type="file"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                @change="importfxx(this)" >
             </a>
           </div>
         </el-dialog>
@@ -79,34 +98,23 @@
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
             <div class="nameinput" style="padding:30px 40px 10px 40px;height:60px;">
-              <el-input v-model="ImportName" :placeholder="$t('insSettingView.enterListName')" style="border-bottom:1px solid #ddd;" @input="watchName"/>
+              <el-input
+                v-model="ImportName"
+                :placeholder="$t('insSettingView.enterListName')"
+                style="border-bottom:1px solid #ddd;"
+                @input="watchName"/>
               <p v-if="isShowWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{ warningContent }}</p>
             </div>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="cancelImportName">{{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmImportName">{{ $t('insSettingView.select') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" style="" @click="cancelImportName">
+              {{ $t('insSettingView.cancel') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmImportName">
+              {{ $t('insSettingView.select') }}
+            </el-button>
           </div>
         </el-dialog>
-        <!-- <el-dialog :title="$t('insSettingView.prompt')"
-                :visible.sync="showConfirmImport" v-if="showConfirmImport"
-                :append-to-body='true'
-                :close-on-click-modal="false"
-                width="28%"
-                top="35vh"
-                left="40vh">
-                    <div class="dialog-content" style="overflow:hidden;width:100%;">
-                        <hr style="border: 0.5px solid #dfe2e9;"/>
-                        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"></i>
-                            <span style="display: inline-block; vertical-align: middle;">{{$t('insSettingView.clearInfo')}}</span>
-                        </p>
-                    </div>
-                    <div slot="footer" class="dialog-footer">
-                        <el-button class="file-cancel-btn" @click="showConfirmImport = false" size="mini" style="">{{$t('insSettingView.cancel')}}</el-button>
-                        <el-button class="file-confirm-btn" @click="confirmImportFile" size="mini" type="primary">{{$t('insSettingView.confirm')}}</el-button>
-                    </div>
-                </el-dialog> -->
         <el-dialog
           v-if="showFailInfo"
           :title="$t('insSettingView.importFailTitle')"
@@ -130,8 +138,12 @@
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">{{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">{{ $t('insSettingView.confirm') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">
+              {{ $t('insSettingView.cancel') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">
+              {{ $t('insSettingView.confirm') }}
+            </el-button>
           </div>
         </el-dialog>
         <el-dialog
@@ -151,8 +163,12 @@
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showSingleDeleteContent = false">{{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">{{ $t('insSettingView.confirm') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showSingleDeleteContent = false">
+              {{ $t('insSettingView.cancel') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">
+              {{ $t('insSettingView.confirm') }}
+            </el-button>
           </div>
         </el-dialog>
         <el-dialog
@@ -172,28 +188,47 @@
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showNoPostDialog = false">{{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmToBind">{{ $t('insSettingView.confirm') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showNoPostDialog = false">
+              {{ $t('insSettingView.cancel') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmToBind">
+              {{ $t('insSettingView.confirm') }}
+            </el-button>
+          </div>
+        </el-dialog>
+        <el-dialog
+          v-if="showImportSucceed"
+          :title="$t('remotePatrol.prompt')"
+          :visible.sync="showImportSucceed"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToBindData') }}</span>
+            </p>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportSucceed = false">
+              {{ $t('insSettingView.cancel') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="toSetRules">
+              {{ $t('insSettingView.confirm') }}
+            </el-button>
           </div>
         </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs">
         <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index):item.label" :name="index.toString()" :closable="index!=0&&index!=1?true:false" >
-            <el-tabs v-if="item.data.length!=0" id="patrltabs-content" v-model="patrolActive" :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
+          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label" :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false" >
+            <el-tabs v-if="item.data.length !== 0" id="patrltabs-content" v-model="patrolActive" :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
                 <div v-if="_item.routeData&&!loading">
-                  <route-detail
-                    :ref="curIndex"
-                    :route-data="_item.routeData"
-                    :route-name="_item.name"
-                    :down-src="downLoadSrc"
-                    :all-routedata="_item.allRoutedata"
-                    :sheet-name="_item.sheetName"
-                    :tab-name="_item.name"
-                    @refreshList="getTagList"
-                    @change-routeData="changerouteData"/>
+                  <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"/>
                 </div>
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
                   <img :src="loadingGif">
@@ -204,9 +239,10 @@
             <div v-else :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
               <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"/>
               <p class="empty-title">
-                {{ $t('insSettingView.please') }}<a :href="downLoadSrc" :download="fileName" class="downLoad-btn">{{ $t('insSettingView.downloadInfo') }}</a>
+                {{ $t('insSettingView.please') }}
+                <a :href="downLoadSrc" :download="fileName" class="downLoad-btn">{{ $t('insSettingView.downloadInfo') }}</a>
                 {{ $t('insSettingView.toEdit') }}
-                <span @click="showNameImport=true">{{ $t('insSettingView.thenImport') }}</span>
+                <span @click="showNameImport = true">{{ $t('insSettingView.thenImport') }}</span>
                 {{ $t('insSettingView.waveline') }}
               </p>
               <input id="uploadFile" ref="loadFile" type="file" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
@@ -219,9 +255,8 @@
 </template>
 <script>
 import RouteDetail from '@/views/setting/routeInspection/RouteDetail';
-import api from '@/api/index';
 import { inpectRESTful, titleRESTful } from '@/api/index';
-import { validateInput, validateInspectGroup } from '@/common/validate';
+import { validateInput } from '@/common/validate';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
 import filterString from '@/common/filterString';
@@ -237,7 +272,6 @@ export default {
   },
   data() {
     return {
-      // elTableData:[{label:'远程巡检',routeData:[]},{label:'现场巡检',routeData:[]}],
       elTableData: [{ label: '远程巡检', data: [] }, { label: '现场巡检', data: [] }],
       loadingGif: require('../../../../static/img/loading.gif'),
       radioList: [
@@ -249,10 +283,6 @@ export default {
           'value': '2',
           'label': '现场巡检'
         }
-        // {
-        //     'value':'3',
-        //     'label':'新增巡检表'
-        // }
       ],
       showNoPostDialog: false,
       itemhoverName: '',
@@ -271,7 +301,6 @@ export default {
       showSingleDeleteContent: false,
       reload: true,
       storeNum: 0,
-      // BindStoreList:[],
       activeName: '',
       showImportContent: false,
       showConfirmImport: false,
@@ -283,6 +312,7 @@ export default {
       tabNameInput: '',
       hideUpload: false,
       tempdata: [],
+      showImportSucceed: false,
       btnList: [
         {
           id: 0,
@@ -331,26 +361,29 @@ export default {
   computed: {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
+
   watch: {
     accountChanged(val, oldVal) {
       console.log(val);
       const self = this;
-      if (val != 0) {
+      if (val !== 0) {
         sessionStorage.removeItem('TabPatrolIndex0');
         sessionStorage.removeItem('TabPatrolIndex1');
         self.getTagList('accountChanged');
       }
     }
   },
+
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      if (from.name == 'itemSetting') {
+      if (from.name === 'itemSetting') {
         to.meta.keepAlive = false;
       } else {
         to.meta.keepAlive = false;
       }
     });
   },
+
   beforeRouteLeave(to, from, next) {
     const self = this;
     if (to.name === 'itemSetting' || to.name === 'bindStore' || to.name === 'setRule') {
@@ -367,6 +400,7 @@ export default {
       next();
     }
   },
+
   mounted() {
     const self = this;
     const InspectHistory = self.$store.getters.InspectHistory;
@@ -377,6 +411,7 @@ export default {
     self.getTagList();
     self.initData();
   },
+
   methods: {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
@@ -388,10 +423,12 @@ export default {
         });
       });
     },
+
     emptyImport() {
       const self = this;
       document.getElementById('uploadFile').click();
     },
+
     getLang(index) {
       console.log(index);
       if (index === 0) {
@@ -402,6 +439,7 @@ export default {
         return '';
       }
     },
+
     initData() {
       const self = this;
       console.log(self.activeName + 'activeName');
@@ -411,12 +449,13 @@ export default {
         default:self.checkValue = '新增巡检表'; break;
       }
     },
+
     downItem() {
       const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
         console.log(res);
         const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+          type: 'application/vnd.ms-excel'
         });
         const objectUrl = URL.createObjectURL(blob);
         const url = objectUrl;
@@ -440,7 +479,8 @@ export default {
         // window.open(self.downLoadSrc,'_self');
       });
     },
-    getTagAll() { // 获取巡检表
+
+    getTagAll() {
       const self = this;
       const params = {
         mode: parseInt(self.activeName)
@@ -454,15 +494,15 @@ export default {
         });
       });
     },
-    getNapeList(params) { // 获取巡检表内容
+
+    getNapeList(params) {
       const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.getInspectItemList(params).then(res => {
           const code = res.errMsg;
           const data = res.data;
-          if (code != null && code == 'Success') {
+          if (code != null && code === 'Success') {
             self.allData = data;
-            // self.loading.close();
             console.log(res.data);
           }
           resolve(data);
@@ -471,7 +511,8 @@ export default {
         });
       });
     },
-    getInspectGroupBindAll(params) { // 获取巡检类别关联职务
+
+    getInspectGroupBindAll(params) { // get related role
       const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectGroupBindList(params).then(res => {
@@ -482,14 +523,12 @@ export default {
         });
       });
     },
+
     changerouteData(val) {
       const self = this;
-      // self.reload=false
-      // self.$nextTick(() => {
-      //     self.reload=true
       self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData = val;
-	      	// })
     },
+
     async getTagList(val, sheetIndex) {
       const self = this;
       const TagData = await self.getTagAll();
@@ -557,7 +596,7 @@ export default {
             if (te_item.id == ti_item.groupId) {
               if (ti_item.userTitles.length != 0) {
                 if (ti_item.userTitles.length == titleList.data.length) {
-                  te_item['ModelPost'] = self.$t('reportView.all');
+                  te_item['ModelPost'] = self.$t('remotePatrol.all');
                 } else {
                   ti_item.userTitles.forEach(u_item => {
                     usertext.push(u_item.titleName);
@@ -640,7 +679,8 @@ export default {
         self.elTableData = self.elTableData.concat(tempAllData);
         if (val == 'add') {
           self.patrolActive = (TagData.length - 1).toString();
-          self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
+          // self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
+          self.showImportSucceed = true;
         }
       } else {
         self.getDownLoadURL();
@@ -648,6 +688,7 @@ export default {
       }
       self.getBindStoreList();
     },
+
     getUserTitleList() {
       return new Promise((resolve, reject) => {
         titleRESTful.getUserTitleList().then(res => {
@@ -655,6 +696,7 @@ export default {
         });
       });
     },
+
     deleteItem(itemIdList) {
       const params = {
         itemIds: itemIdList
@@ -666,6 +708,7 @@ export default {
         });
       });
     },
+
     deleteGroup(groupIdList) {
       const params = {
         groupIds: groupIdList
@@ -677,6 +720,7 @@ export default {
         });
       });
     },
+
     addGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.addInspectGroup(params).then(res => {
@@ -685,6 +729,7 @@ export default {
         });
       });
     },
+
     addItem(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.addInspectItem(params).then(res => {
@@ -693,6 +738,7 @@ export default {
         });
       });
     },
+
     async addAllData(dataArry) {
       const self = this;
       let mode = self.activeName == '0' ? mode = 0 : mode = 1; // 远程巡检 mode 0,现场巡检  mode 1
@@ -780,6 +826,7 @@ export default {
       }
       // self.showImportContent=false;
     },
+
     handleItem() {
       this.showBtnContent = !this.showBtnContent;
     },
@@ -792,9 +839,10 @@ export default {
         self.confirmToBind();
       }
     },
+
     confirmToBind() {
       const self = this;
-      if (self.elTableData[Number(self.activeName)].data.length == 0) {
+      if (self.elTableData[Number(self.activeName)].data.length === 0) {
         self.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
         return false;
       }
@@ -804,32 +852,30 @@ export default {
           arr.push(_item.id);
         });
       });
-      if (arr.length == 0) {
+      if (arr.length === 0) {
         self.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
         return false;
       }
       sessionStorage.setItem('TabName', self.activeName);
       sessionStorage.setItem('NapeId', JSON.stringify(arr));
-      self.$router.push({ name: 'bindStore', params: { inspectId: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId }});
+      self.$router.push({ name: 'bindStore', params:
+          { inspectId: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId }});
     },
+
     changeValue(obj) {
       const self = this;
       self.tabNameInput = '';
-      if (obj != '新增巡检表') {
+      if (obj !== '新增巡检表') {
         self.hideUpload = false;
       } else {
-        if (self.tabNameInput.length == 0) {
+        if (self.tabNameInput.length === 0) {
           self.hideUpload = true;
         } else {
           self.hideUpload = false;
         }
       }
     },
-    //   confirmImportFile(){
-    //       let self = this;
-    //       self.showConfirmImport=false;
-    //       document.getElementById('loadFile').click()
-    //   },
+
     cancelImportName() {
       const self = this;
       self.isShowWarning = false;
@@ -837,16 +883,15 @@ export default {
     },
     async confirmImportName() {
       const self = this;
-      if (self.ImportName != '') {
-        // 限制巡检表名称不可重复、不可为空、不可超过30字符
+      if (self.ImportName !== '') {
         const TagData = await self.getTagAll();
         let namerepeat = 0;
         TagData.forEach(item => {
-          if (item.name == self.ImportName) {
+          if (item.name === self.ImportName) {
             namerepeat = 1;
           }
         });
-        if (namerepeat == 1) {
+        if (namerepeat === 1) {
           self.isShowWarning = true;
           self.warningContent = self.$t('remotePatrol.Patroltips2');
         } else if (validateInput(self.ImportName)) {
@@ -862,6 +907,7 @@ export default {
         self.warningContent = self.$t('insSettingView.enterListName');
       }
     },
+
     watchName(val) {
       const self = this;
       const content = filterString.all(val, 30);
@@ -875,12 +921,10 @@ export default {
         self.isShowWarning = false;
       }
     },
+
     handleClick(tabObj) {
-      // console.log(tabObj);
       const self = this;
       sessionStorage.setItem('TabIndex', tabObj.index);
-      // sessionStorage.setItem('TabName',self.activeName);
-      // self.getBindStoreList();
       switch (tabObj.index) {
         case '0':
           self.checkValue = '远程巡检'; break;
@@ -889,10 +933,10 @@ export default {
         default:
           self.checkValue = '新增巡检表'; break;
       }
-      if (tabObj.index == '0') {
+      if (tabObj.index === '0') {
         const idx0 = sessionStorage.getItem('TabPatrolIndex0');
-        if (idx0 != null && idx0 != '0') {
-          if (Number(idx0) == self.elTableData[Number(self.activeName)].data.length) {
+        if (idx0 != null && idx0 !== '0') {
+          if (Number(idx0) === self.elTableData[Number(self.activeName)].data.length) {
             self.patrolActive = (Number(idx0) - 1).toString();
           } else {
             self.patrolActive = idx0;
@@ -900,10 +944,10 @@ export default {
         } else {
           self.patrolActive = '0';
         }
-      } else if (tabObj.index == '1') {
+      } else if (tabObj.index === '1') {
         const idx1 = sessionStorage.getItem('TabPatrolIndex1');
-        if (idx1 != null && idx1 != '0') {
-          if (Number(idx1) == self.elTableData[Number(self.activeName)].data.length) {
+        if (idx1 != null && idx1 !== '0') {
+          if (Number(idx1) === self.elTableData[Number(self.activeName)].data.length) {
             self.patrolActive = (Number(idx1) - 1).toString();
           } else {
             self.patrolActive = idx1;
@@ -914,20 +958,23 @@ export default {
       }
       self.getTagList();
     },
+
     overItem(item, index) {
       const self = this;
       self.itemhoverName = item.name;
       self.itemIndex = index;
     },
+
     outItem(item, index) {
       const self = this;
       self.itemhoverName = '';
     },
+
     handleClickPatrol(val) {
       const self = this;
-      if (self.activeName == '0') {
+      if (self.activeName === '0') {
         sessionStorage.setItem('TabPatrolIndex0', val.index);
-      } else if (self.activeName == '1') {
+      } else if (self.activeName === '1') {
         sessionStorage.setItem('TabPatrolIndex1', val.index);
       }
       self.loading = true;
@@ -935,10 +982,19 @@ export default {
       self.btnList[3].enabled = true;
       self.getTagList();
     },
+
+    toSetRules() {
+      const self = this;
+      self.$router.push({ name: 'setRule', params: {
+        routeData: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData,
+        routeName: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].name }
+      });
+    },
+
     async delAllItem() {
       const self = this;
       const datalength = self.elTableData[Number(self.activeName)].data.length;
-      if (datalength == 0) {
+      if (datalength === 0) {
         self.notify(self.$t('insSettingView.deletePatrolList'), 'warning', 3000);
         return false;
       } else {
@@ -951,13 +1007,14 @@ export default {
             arrtemp.push(item.extra.inspectId);
           }
         });
-        if (arrtemp.indexOf(self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId) != -1) {
+        if (arrtemp.indexOf(self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId) !== -1) {
           self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
           return false;
         }
       }
       self.showSingleDeleteContent = true;
     },
+
     confirmDelete() {
       const self = this;
       const arrGroup = [];
@@ -974,13 +1031,13 @@ export default {
       const paramsGroup = {
         'groupIds': arrGroup
       };
-      if (arrItem.length != 0) {
+      if (arrItem.length !== 0) {
         inpectRESTful.deleteInspectItem(params).then(res => {
           const code = res.errMsg;
-          if (code != undefined && code == 'Success') {
-            if (arrGroup.length != 0) {
+          if (code != undefined && code === 'Success') {
+            if (arrGroup.length !== 0) {
               inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-                if (resGroup.errMsg == 'Success') {
+                if (resGroup.errMsg === 'Success') {
                   self.afterDeleteList();
                 }
               });
@@ -994,7 +1051,7 @@ export default {
         });
       } else {
         inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-          if (resGroup.errMsg == 'Success') {
+          if (resGroup.errMsg === 'Success') {
             self.afterDeleteList();
           } else {
             self.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
@@ -1003,12 +1060,14 @@ export default {
         });
       }
     },
+
     afterDeleteList() {
       const self = this;
       self.notify(self.$t('insSettingView.deleteInspectSuss'), 'success', 3000);
       self.showSingleDeleteContent = false;
       self.getTagList('del');
     },
+
     importItem() {
       const self = this;
       const ret = self.isLoginIn();
@@ -1016,10 +1075,10 @@ export default {
       const isGlobalWebsite = Environment.isGlobalWebsite;
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) == 0 && Datalength >= 10) {
+        if (Number(self.activeName) === 0 && Datalength >= 10) {
           self.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
           return false;
-        } else if (Number(self.activeName) == 1 && Datalength >= 10) {
+        } else if (Number(self.activeName) === 1 && Datalength >= 10) {
           self.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
           return false;
         } else {
@@ -1030,25 +1089,10 @@ export default {
         self.showNameImport = true;
         self.ImportName = '';
       }
-      // if(ret.data!=undefined&&ret.data.isLogin){
-      //     if(self.elTableData[Number(self.activeName)].routeData.length!=0){
-      //         self.showConfirmImport=true;
-      //     }
-      //     else{
-      //         //self.showImportContent=true;
-      //       document.getElementById('loadFile').click();
-      //     }
-      // }
-      // else{
-      //     // self.$store.dispatch('LogOut').then(()=>{
-      //     //     self.$router.push('/login');
-      //     // })
-      //     window.location.href='https://portals.storeviu.com';
-      // }
     },
     checkBeforeImport() {
       const self = this;
-      if (self.checkValue == '新增巡检表' && (self.tabNameInput == null || self.tabNameInput.trim().length == 0)) {
+      if (self.checkValue === '新增巡检表' && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
         self.hideUpload = true;
         self.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
         return false;
@@ -1058,11 +1102,11 @@ export default {
     },
     getBindStoreList() {
       const self = this;
-      if (self.elTableData[Number(self.activeName)].data.length != 0) {
+      if (self.elTableData[Number(self.activeName)].data.length !== 0) {
         const inspectId = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
         const params = { inspectId: inspectId };
         inpectRESTful.getInspectBindList(params).then(res => {
-          if (res.errMsg != undefined && res.errMsg == 'Success') {
+          if (res.errMsg != undefined && res.errMsg === 'Success') {
             const data = res.data;
             self.storeNum = data.length;
             self.loading = false;
@@ -1074,6 +1118,7 @@ export default {
         self.storeNum = 0;
       }
     },
+
     isLoginIn() {
       const self = this;
       return new Promise((resolve, reject) => {
@@ -1085,6 +1130,7 @@ export default {
         console.log(err);
       });
     },
+
     async exportItem() {
       const self = this;
       const ret = await self.isLoginIn();
@@ -1094,6 +1140,7 @@ export default {
         window.location.href = 'https://portals.storeviu.com';
       }
     },
+
     async importfxx(obj) {
       const _this = this;
       const inputDOM = this.$refs.inputer;
@@ -1208,7 +1255,7 @@ export default {
                 if (item.c != undefined) {
                   if (filterString.getContentLength(item.c.toString().trim()) > 1200) { flagDesLengthPassFail = true; }
                 }
-                if (item.d != undefined) { // 项目满分值选填，字符类型为1~50整数
+                if (item.d != undefined) {
                   flagPassFailScoreType = !Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > 50;
                 } else {
                   item.d = 10;
@@ -1394,6 +1441,7 @@ export default {
         reader.readAsBinaryString(f);
       }
     },
+
     addTab(targetName) {
       const newTabName = ++this.tabIndex + '';
       this.editableTabs2.push({
@@ -1403,6 +1451,7 @@ export default {
       });
       this.editableTabsValue2 = newTabName;
     },
+
     handleNape(index, item) {
       console.log(item);
       const self = this;
@@ -1413,42 +1462,38 @@ export default {
         case 3: self.delAllItem(); break;
       }
     },
+
     export2Excel() {
       var that = this;
       require.ensure([], () => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'), that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'), that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2')];
+        const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
+          that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
+          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2')];
         const excelData = [];
         let name = '';
         var wb = XLSX.utils.book_new();
-        if (that.elTableData[Number(that.activeName)].data.length == 0) {
-          // let obj={};
-          // obj.gourpname='';
-          // obj.napename='';
-          // obj.score='';
-          // obj.napedep='';
-          // excelData.push(obj);
-          // 巡检表为空时导出处理
-
+        if (that.elTableData[Number(that.activeName)].data.length === 0) {
+          // do nothing
         } else {
           let sheet1data = [], sheet2data = [], sheet3data = [];
           const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
-          const passfail = curData.filter(x => x[0].type == 0)[0];
-          const score = curData.filter(x => x[0].type == 1)[0];
-          const other = curData.filter(x => x[0].type == 2)[0];
+          const passfail = curData.filter(x => x[0].type === 0)[0];
+          const score = curData.filter(x => x[0].type === 1)[0];
+          const other = curData.filter(x => x[0].type === 2)[0];
           name = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name;
           if (passfail != undefined) {
             passfail.forEach(item => {
-              if (item.itemData.length != 0) {
+              if (item.itemData.length !== 0) {
                 item.itemData.forEach((_item, _index) => {
                   const obj = {};
-                  if (_index == 0) {
+                  if (_index === 0) {
                     obj[tHeader[0]] = item.groupName;
                   } else {
                     obj[tHeader[0]] = '';
                   }
                   obj[tHeader[1]] = _item.name;
-                  obj[tHeader[3]] = _item.description == '---' ? '' : _item.description;
+                  obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet1data.push(obj);
                 });
               } else {
@@ -1459,15 +1504,15 @@ export default {
                 sheet1data.push(obj);
               }
             });
-            var sheet1 = XLSX.utils.json_to_sheet(sheet1data);
+            const sheet1 = XLSX.utils.json_to_sheet(sheet1data);
             XLSX.utils.book_append_sheet(wb, sheet1, 'Pass&Fail');
           }
           if (score != undefined) {
             score.forEach(item => {
-              if (item.itemData.length != 0) {
+              if (item.itemData.length !== 0) {
                 item.itemData.forEach((_item, _index) => {
                   const obj = {};
-                  if (_index == 0) {
+                  if (_index === 0) {
                     obj[tHeader[5]] = item.groupName;
                   } else {
                     obj[tHeader[5]] = '';
@@ -1475,7 +1520,7 @@ export default {
                   obj[tHeader[1]] = _item.name;
                   obj[tHeader[2]] = _item.score;
                   obj[tHeader[4]] = _item.qualifiedScore;
-                  obj[tHeader[3]] = _item.description == '---' ? '' : _item.description;
+                  obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet2data.push(obj);
                 });
               } else {
@@ -1493,17 +1538,17 @@ export default {
           }
           if (other != undefined) {
             other.forEach(item => {
-              if (item.itemData.length != 0) {
+              if (item.itemData.length !== 0) {
                 item.itemData.forEach((_item, _index) => {
                   const obj = {};
-                  if (_index == 0) {
+                  if (_index === 0) {
                     obj[tHeader[0]] = item.groupName;
                   } else {
                     obj[tHeader[0]] = '';
                   }
                   obj[tHeader[1]] = _item.name;
                   obj[tHeader[2]] = _item.score;
-                  obj[tHeader[3]] = _item.description == '---' ? '' : _item.description;
+                  obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet3data.push(obj);
                 });
               } else {
@@ -1538,7 +1583,7 @@ export default {
         that.openDownloadDialog(workbookBlob, fileName);
       });
     },
-    // 将workbook装化成blob对象
+
     workbook2blob(workbook) {
       const self = this;
       var wopts = { bookType: 'xlsx', bookSST: false, type: 'binary' };
@@ -1548,12 +1593,14 @@ export default {
       });
       return blob;
     },
+
     s2ab(s) {
       var buf = new ArrayBuffer(s.length);
       var view = new Uint8Array(buf);
-      for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
+      for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
       return buf;
     },
+
     openDownloadDialog(blob, fileName) {
       if (typeof blob === 'object' && blob instanceof Blob) {
         blob = URL.createObjectURL(blob);
@@ -1563,16 +1610,17 @@ export default {
       aLink.download = fileName || '';
       var event;
       if (window.MouseEvent) event = new MouseEvent('click');
-      // 移动端
       else {
         event = document.createEvent('MouseEvents');
         event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
       }
       aLink.dispatchEvent(event);
     },
+
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
+
     notify(msg, type, time) {
       this.$message({
         message: msg,
@@ -1580,6 +1628,7 @@ export default {
         duration: time
       });
     }
+
   }
 };
 </script>
@@ -1921,4 +1970,3 @@ export default {
   }
 
 </style>
-
