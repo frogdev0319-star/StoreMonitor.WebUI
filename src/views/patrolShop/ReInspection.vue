@@ -283,8 +283,6 @@
             <span v-if="showInfoContent" id="channelName">{{ channel!=null?channel.channelName:'' }}</span>
             <div v-if="showInfoContent" class="icon-footer" >
               <div class="iconlside">
-                <!--<i class="iconfont icon-bofang1 iconplay" @click="realTime" v-if="!playState"></i>-->
-                <!--<i class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime" v-else></i>-->
                 <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"class= "iconfont iconplay" @click="onPlay"/>
               </div>
               <div class="screen-content">
@@ -313,8 +311,6 @@
               prload
               autoplay
               class="video-js vjs-fill"
-              @ended="onEnd"
-              @progress="onProgress"
               @waiting="onPlayerWaiting($event)"
               @playing="onPlayerPlaying($event)"/>
           </div>
@@ -953,7 +949,6 @@ export default {
       hasIgnoretemp: [],
 
       uri: null,
-      height: 220,
       play: true,
       fullScreen: false,
       paused: true,
@@ -1000,9 +995,8 @@ export default {
 
     realTimeSpeed(val) {
       console.log(val);
-      if (val >= 300) {
-        this.paused = false;
-        this.onPlay();
+      if (val >= 30) {
+        this.stopVideoPlay()
         this.stopTimer();
       }
     }
@@ -1167,16 +1161,6 @@ export default {
   },
 
   methods: {
-    async onEnd() {
-      this.onEndflag = true;
-      this.paused = true;
-    },
-
-    onProgress(data) {
-      console.log(data);
-      this.currentTime = data.currentTime;
-    },
-
     getDashUrlInfo() {
       getDashServerInfo().then(result => {
         const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
@@ -1199,21 +1183,21 @@ export default {
       console.log(self.isEzviz);
       if (!self.isEzviz) {
         if (document.hidden) {
-          self.paused = false;
-          self.onPlay();
-          self.stopTimer()
+          self.stopVideoPlay()
+          self.stopTimer();
         } else {
           console.log(self.isPlayingFlag);
-          if(self.currentState = 'inline'){
-            self.onPlay();
+          if(this.currentState === 'loading'){
+            self.startVideo(self.channel.ivsId, self.channel.channelId, null)
           }
         }
       }
     },
+
     changeBrand() {
       const self = this;
-      self.paused = false;
-      self.onPlay();
+      self.stopVideoPlay();
+      self.previewplayer && self.previewplayer.dispose();
       if (self.isEzviz && !self.showGuide) {
         self.$refs.ezvizVideo.stopRealTime();
       }
@@ -2295,10 +2279,8 @@ export default {
         }
       });
       if (!self.isEzviz) {
-        // 非萤石平台
         self.curDeviceId = item.id;
-        self.paused = true;
-        self.onPlay();
+        self.startVideo(self.channel.ivsId, self.channel.channelId, null)
       } else {
         // 萤石云平台，切换摄像头
         self.curDeviceId = item.id;
@@ -2356,8 +2338,7 @@ export default {
             }
           });
           if (!self.isEzviz) {
-            self.paused = true;
-            self.onPlay();
+            self.startVideo(self.channel.ivsId, self.channel.channelId, null)
           } else {
             // Ezviz
             if (self.$refs.ezvizVideo != undefined) {
@@ -2679,7 +2660,6 @@ export default {
           await this.stopVideo();
           await this.disconnectVideo();
           await this.offline();
-          this.currentState = 'inline';
           this.paused = true;
         } else {
           if (this.channel === null) {
@@ -2774,8 +2754,10 @@ export default {
           this.stopVideo();
           await this.disconnectVideo();
         }
+        this.paused = true;
         return await this.offline();
       } else {
+        this.paused = true;
         return true;
       }
     },
@@ -2934,6 +2916,7 @@ export default {
         return true;
       }
     },
+
     async realTime() {
       const self = this;
       self.showError = false;
@@ -3121,6 +3104,7 @@ export default {
         self.destroyVideo();
       }
     },
+
     controlScreen() {
       const self = this;
       if (!self.fullScreen) {
@@ -3131,6 +3115,7 @@ export default {
         self.fullScreen = false;
       }
     },
+
     fullWindowScreen(...val) {
       console.log(val);
       const self = this;
@@ -3148,6 +3133,7 @@ export default {
         ele.msRequestFullscreen();
       }
     },
+
     exitFullscreen() {
       var de = document;
       var ele = document.getElementById('videoContent');
@@ -3161,6 +3147,7 @@ export default {
         de.webkitCancelFullScreen();
       }
     },
+
     gonggeScreen() {
       const self = this;
       self.showgongge = true;
@@ -3266,8 +3253,7 @@ export default {
       self.showStoreUp = true;
       if (!self.isEzviz) {
         self.editCount = 0;
-        self.paused = false;
-        self.onPlay();
+        self.stopVideoPlay();
       } else {
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
         if (self.$refs.ezvizVideo != undefined) {
@@ -3687,7 +3673,9 @@ export default {
         self.videoLoadingObj.dialogCosed = true;
         return false;
       }
-      if ((!self.isEzviz && self.editCount != 0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory != null)) {
+      if ((!self.isEzviz && self.editCount != 0)
+        || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)
+        || (self.$store.getters.PatrolHistory != null)) {
         self.changeStoreObj.dialogCosed = true;
       } else {
         if (_item.userId == null) {
