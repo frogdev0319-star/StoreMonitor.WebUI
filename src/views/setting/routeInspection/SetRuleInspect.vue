@@ -86,8 +86,8 @@ export default {
           { name: 'qualifiedForIgnoredWithType1', value: self.checkItem2 },
           { name: 'qualifiedForIgnoredWithType2', value: self.checkItem3 },
           { name: 'hundredMarkType', value: parseInt(self.radio) },
-          { name: 'minScore', value: self.minScore },
-          { name: 'maxScore', value: self.maxScore },
+          { name: 'minScore', value: parseInt(self.minScore) },
+          { name: 'maxScore', value: parseInt(self.maxScore) },
           { name: 'dangerousOnFailedItem', value: self.checkItem4 }
         ]
       };
@@ -158,7 +158,11 @@ export default {
     },
     inputChangeMin(val) {
       const self = this;
-      self.minScore = val.replace(/[^\d]/g, '');
+      if (val.indexOf('-') !== -1) {
+        self.minScore = '-' + val.replace(/[^\d]/g, '');
+      } else {
+        self.minScore = val.replace(/[^\d]/g, '');
+      }
     },
     notify(msg, type, time) {
       this.$message({

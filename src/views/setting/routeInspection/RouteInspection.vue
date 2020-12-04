@@ -782,15 +782,15 @@ export default {
                 const _obj = {};
                 let itemScore = 0, qualifiedScore = 0, description = '', availableScores = [];
                 if (arr[i][0] == 'PassFail') {
-                  itemScore = _item.d;
+                  itemScore = _item.c;
                   qualifiedScore = null;
-                  description = _item.c;
+                  description = _item.d;
                   availableScores = null;
                 } else if (arr[i][0] == 'Score') {
-                  itemScore = _item.d;
-                  qualifiedScore = _item.e;
-                  description = _item.c;
-                  availableScores = _item.f;
+                  itemScore = _item.c;
+                  qualifiedScore = _item.d;
+                  description = _item.f;
+                  availableScores = _item.e;
                 } else if (arr[i][0] == 'Others') {
                   itemScore = _item.c;
                   qualifiedScore = null;
@@ -1253,12 +1253,12 @@ export default {
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthPassFail = true; }
                 if (item.c != undefined) {
-                  if (filterString.getContentLength(item.c.toString().trim()) > 1200) { flagDesLengthPassFail = true; }
+                  flagPassFailScoreType = !Number.isInteger(item.c) || parseInt(item.c) < 1 || parseInt(item.c) > 50;
+                } else {
+                  item.c = 10;
                 }
                 if (item.d != undefined) {
-                  flagPassFailScoreType = !Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > 50;
-                } else {
-                  item.d = 10;
+                  if (filterString.getContentLength(item.d.toString().trim()) > 1200) { flagDesLengthPassFail = true; }
                 }
               } else if (arr[i][0] == 'Score') {
                 if (item.a != undefined && item.a.length != 0) {
@@ -1266,44 +1266,44 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
-                if (item.c != undefined) {
-                  if (filterString.getContentLength(item.c.toString().trim()) > 1200) { flagDesLengthScore = true; }
-                }
-                if (item.d == undefined || item.d.length == 0 || !Number.isInteger(item.d) || parseInt(item.d) < 0 || parseInt(item.d) > 50) { // 项目满分值必填，字符类型为1~10整数
+                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，字符类型为1~10整数
                   flagFullScoreType = true;
                 }
-                if (item.e != undefined) {
-                  if (!Number.isInteger(item.e) || parseInt(item.e) < 1 || parseInt(item.e) > parseInt(item.d)) { // 最低分值选填，字符类型为1~item.c整数
+                if (item.d != undefined) {
+                  if (!Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，字符类型为1~item.c整数
                     flagMinScoreType = true;
                   }
                 } else {
-                  item.e = item.d;
+                  item.d = item.c;
                 }
-                if (item.f != undefined) {
-                  if (item.f.indexOf('/') !== -1) {
-                    const f_Score = item.f.split('/');
+                if (item.e != undefined) {
+                  if (item.e.indexOf('/') !== -1) {
+                    const f_Score = item.e.split('/');
                     const scoreArr = [];
                     f_Score.forEach(f_item => {
                       if (!isNaN(Number(f_item))) {
-                        if (parseInt(f_item) >= 0 && parseInt(f_item) <= item.d) {
+                        if (parseInt(f_item) >= 0 && parseInt(f_item) <= item.c) {
                           scoreArr.push(parseInt(f_item));
                         }
                       }
                     });
-                    item.f = scoreArr;
+                    item.e = scoreArr;
                   } else {
-                    if (!isNaN(Number(item.f))) {
-                      item.f = parseInt(item.f);
+                    if (!isNaN(Number(item.e))) {
+                      item.e = parseInt(item.e);
                     } else {
                       const a = [];
                       for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
-                      item.f = a;
+                      item.e = a;
                     }
                   }
                 } else {
                   const a = [];
                   for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
-                  item.f = a;
+                  item.e = a;
+                }
+                if (item.f != undefined) {
+                  if (filterString.getContentLength(item.f.toString().trim()) > 1200) { flagDesLengthScore = true; }
                 }
               } else if (arr[i][0] == 'Others') {
                 if (item.a != undefined && item.a.length != 0) {
