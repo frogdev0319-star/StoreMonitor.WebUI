@@ -812,21 +812,21 @@ export default {
       inspectList: [],
       showFeedBack: false,
       curGroup: null,
-      curGroupIndex: 0, // 当前选中的group index
-      curItemIndex: 0, // 当前点击的 item index
-      curSheetIndex: 0, // 当前点击的 sheet index
+      curGroupIndex: 0,
+      curItemIndex: 0,
+      curSheetIndex: 0,
       curItem: null,
-      curItemId: 0, // 当前点击的巡检项id
-      curhasIgnoreItem: 0, // 当前选中的忽略项index
+      curItemId: 0,
+      curhasIgnoreItem: 0,
 
       curTabIndex: 0,
       curTabItem: null,
       curStoreIndex: 0,
-      curStoreItem: null, // 当前点击的门店对象
+      curStoreItem: null,
       patrolStoreName: null,
 
       inspectItemList: [],
-      allInspectItemList: [], // 当前全部没有忽略的巡检项
+      allInspectItemList: [],
       deviceList: [],
       protocal: 'DASH',
       curDeviceId: -1,
@@ -1063,31 +1063,6 @@ export default {
       }
       next();
     }
-    // if(self.editCount!=0){
-    //     let confirm=window.confirm('当前巡检尚未完成，确认是否离开页面？');
-    //     if(confirm==true){
-    //         if(to.name!='巡检提交事件'){
-    //             from.meta.keepAlive=false;
-    //             if(self.playState){
-    //                 self.stopRealTime();
-    //             }
-    //         }
-    //         next();
-    //     }
-    //     else{
-    //         next(false);
-    //     }
-    // }
-    // self.isPlayingFlag=-1;
-    // if(to.name!='confirmSum'){
-    //     from.meta.keepAlive=false;
-    // }
-    // if(self.playState){
-    //     self.stopRealTime();
-    //     window.clearInterval(self.timerPlayReal);
-    //     self.timerPlayReal=null;
-    // }
-    // next();
   },
   async mounted() {
     const self = this;
@@ -1202,8 +1177,10 @@ export default {
 
     changeBrand() {
       const self = this;
-      self.stopVideoPlay();
-      self.previewplayer && self.previewplayer.dispose();
+      if(!self.isEzviz){
+        self.stopVideoPlay();
+        self.previewplayer && self.previewplayer.dispose();
+      }
       if (self.isEzviz && !self.showGuide) {
         self.$refs.ezvizVideo.stopRealTime();
       }
@@ -1229,11 +1206,8 @@ export default {
       self.showChannelBtns = [];
       self.showError = false;
       self.errorText = '';
-      // self.getInitStoreData();
       self.getFaStoreData();
-      // self.videoEl=document.getElementById('previewVideo').children[0];
       self.getDeviceList();
-      // self.getVideoAuthority();
     },
     anchorLinkTo() {
       const self = this;
@@ -1413,8 +1387,8 @@ export default {
       const bucketName = 'viumo-n3azju2aknpw';
       const client = new OSS({
         region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-        accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
-        accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
+        accessKeyId: self.oss.ossAccessKeyId,
+        accessKeySecret: self.oss.ossAccessKeySecret,
         // bucket: 'viumo-'+self.accountId
         bucket: bucketName
       });
@@ -1609,7 +1583,7 @@ export default {
       self.isMouseDown = false;
       self.showCutModel = true;
       self.showPenBtn = true;
-      self.showCancelContent = true; // 每次鼠标弹起后显示可以取消的框
+      self.showCancelContent = true;
       if (self.flag != 0 && self.canvasEl != '') {
         const imgObj = new Image();
         imgObj.src = self.canvasEl.toDataURL('image/jpeg');
@@ -1933,7 +1907,7 @@ export default {
             self.patrolStoreName = storeData[0].name;
             storeData[0].authorizedInspect.forEach(au_item => {
               if (au_item.mode == 0) {
-                self.PatrolList.push(au_item); // 门店对应巡检表
+                self.PatrolList.push(au_item);
               }
             });
             self.saveStoreObj(storeObj);
@@ -2179,7 +2153,7 @@ export default {
             });
           });
         });
-        hasIgnoretemp.length == 0 ? self.notShowAlert = true : null; // 没有忽略项时，隐藏提示条
+        hasIgnoretemp.length == 0 ? self.notShowAlert = true : null;
         // self.notShowAlert ? self.notShowAlert=false : null
         self.getDisabled(0);
         self.isDisabled ? self.isShowWarn = true : self.isShowWarn = false;
@@ -2208,7 +2182,6 @@ export default {
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
       if (e == 0) {
-        // 判断是否全部忽略了，若是，弹框提示不可全部忽略
         let count = 0, manualCount = 1;
         sheetName.forEach(s_item => {
           count += s_item.count;
@@ -2285,16 +2258,15 @@ export default {
         self.curDeviceId = item.id;
         self.startVideo(self.channel.ivsId, self.channel.channelId, null)
       } else {
-        // 萤石云平台，切换摄像头
         self.curDeviceId = item.id;
-        if (self.$refs.ezvizVideo.playState) { // 切换前处于播放状态
+        if (self.$refs.ezvizVideo.playState) {
           self.$refs.ezvizVideo.stopRealTime();
           self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
+            self.$refs.ezvizVideo.realTime();
           });
         } else {
           self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
+            self.$refs.ezvizVideo.realTime();
           });
         }
       }
@@ -2310,16 +2282,16 @@ export default {
         return false;
       }
       self.sourceList = [];
-      self.sourceListLength = item.sourceList.length; // 获取总共的媒体文件数目
+      self.sourceListLength = item.sourceList.length;
       const obj = {};
-      if (item.deviceId.length > 0) { // 当前选择的巡检项已绑定设备
+      if (item.deviceId.length > 0) {
         const device = self.getDeviceById(item.deviceId);
         if (device.length > 0) {
           obj.id = device[0].id;
           obj.ivsId = device[0].ivsId;
           obj.channelName = device[0].name;
           obj.channelId = device[0].channelId;
-          self.channel = obj; // 当前巡检项绑定的通道如果跟正在播放的通道不一样，更新通道信息，并播放视频
+          self.channel = obj;
           self.channelBtns = [];
           device.forEach(item => {
             self.allChannelBtns.forEach(_item => {
@@ -2345,14 +2317,14 @@ export default {
           } else {
             // Ezviz
             if (self.$refs.ezvizVideo != undefined) {
-              if (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState) { // 切换前处于播放状态
+              if (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState) {
                 self.$refs.ezvizVideo.stopRealTime();
                 self.$nextTick(() => {
-                  self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
+                  self.$refs.ezvizVideo.realTime();
                 });
               } else {
                 self.$nextTick(() => {
-                  self.$refs.ezvizVideo.realTime(); // 播放当前通道对应的视频(ivsId,channelId)
+                  self.$refs.ezvizVideo.realTime();
                 });
               }
             }
@@ -2740,24 +2712,6 @@ export default {
       this.realTimeSpeed = 0;
     },
 
-    // async stopVideo(){
-    //   if(this.sessionId){
-    //     let state = this.currentState;
-    //     this.currentState = 'blank'
-    //     this.errorText = ''
-    //     if (state === 'play'){
-    //       await this.disconnectVideo();
-    //     }
-    //     return await this.offline();
-    //   }
-    //   else {
-    //     this.currentState = 'blank'
-    //     this.errorText = ''
-    //     this.showError = false
-    //     return true;
-    //   }
-    // },
-
     async stopVideoPlay() {
       if (this.sessionId) {
         const state = this.currentState;
@@ -2929,69 +2883,6 @@ export default {
       }
     },
 
-    async realTime() {
-      const self = this;
-      self.showError = false;
-      // if(!self.videoAuthority){
-      //   self.showError = true;
-      //   self.errorText = self.$t('remotePatrol.videoLicense');
-      //   return false;
-      // }
-      if (self.channel == null) {
-        return false;
-      }
-      window.clearInterval(self.timerPlayReal);
-      self.realTimeSpeed = 0;
-      // self.isLoading = true;
-      self.stopRealTime();
-      const sessionId = await dashAPI.Online();
-      console.log(sessionId);
-      // if(!self.showVideo){
-      //     self.showVideo=true;
-      // }
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      self.sessionId = sessionId;
-      const data = {
-        request: {
-          method: 'connection',
-          sessionID: self.sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      self.mpdurl = await dashAPI.RealTime(1, data); // 1 is start, 0 is stop
-      console.log(self.mpdurl);
-      if (self.mpdurl == null) {
-        self.isLoading = false;
-        return;
-      }
-      if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length != 0) {
-        console.log(self.mpdurl);
-        self.playVideo(self.mpdurl);
-        self.editCount = self.editCount + 1;
-        self.isPlayingFlag = 1;
-        self.isLoading = false;
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = window.setInterval(() => {
-          console.log(self.realTimeSpeed);
-          self.realTimeSpeed = self.realTimeSpeed + 1;
-        }, 1000);
-      } else {
-        self.showGuide = false;
-        self.showError = true;
-        self.isLoading = false;
-        const errorCode = self.mpdurl.ErrorCode; // 错误码
-        const errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-        self.destroyVideo();
-      }
-    },
-
     stopVideo() {
       const self = this;
       console.log('stop video');
@@ -3001,120 +2892,6 @@ export default {
       self.previewplayer = videojs(video);
       self.previewplayer.pause();
       self.stopTimer();
-    },
-
-    async stopRealTimeVisPage() {
-      const self = this;
-      // if(!self.videoAuthority){
-      //   self.showError = true;
-      //   self.errorText = self.$t('remotePatrol.videoLicense');
-      //   return false;
-      // }
-      self.stopVideo();
-      const data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      const ret = await dashAPI.RealTime(0, data);
-      await dashAPI.Offline(self.sessionId);
-    },
-    async stopRealTime() {
-      const self = this;
-      if (self.sessionId) {
-        self.stopVideo();
-        const data = {
-          request: {
-            method: 'disconnection',
-            sessionID: self.sessionId,
-            IVSID: self.channel.ivsId,
-            channel: JSON.stringify(self.channel.channelId),
-            streamType: 'SubStream'
-          }
-        };
-        self.isPlayingFlag = -1;
-        const ret = await dashAPI.RealTime(0, data);
-        await dashAPI.Offline(self.sessionId);
-        window.clearInterval(self.timerPlayReal);
-        self.realTimeSpeed = 0;
-        self.isLoading = false;
-      } else {
-        return true;
-      }
-      // self.showVideo=false;
-      // self.destroyVideo();
-      // self.showGuide=true;
-    },
-    async stopAndRealTime() {
-      const self = this;
-      // if(!self.videoAuthority){
-      //   self.showError = true;
-      //   self.errorText = self.$t('remotePatrol.videoLicense');
-      //   return false;
-      // }
-      //  self.isLoading = true;
-      self.stopVideo();
-      const dataDis = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      window.clearInterval(self.timerPlayReal);
-      self.realTimeSpeed = 0;
-      let url = '';
-      const ret = await dashAPI.RealTime(0, dataDis);
-      await dashAPI.Offline(self.sessionId);
-      const sessionId = await dashAPI.Online();
-      self.sessionId = sessionId;
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      let data = null;
-      data = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      url = await dashAPI.RealTime(1, data);
-
-      self.mpdurl = url;
-      console.log(self.mpdurl);
-      if (self.mpdurl == null) {
-        self.isLoading = false;
-        return;
-      }
-      if (url.ErrorCode == undefined && url.length != 0) {
-        self.isPlayingFlag = 1;
-        self.playVideo(self.mpdurl);
-        self.realTimeSpeed = 0;
-        self.isLoading = false;
-        self.timerPlayReal = window.setInterval(() => {
-          console.log(self.realTimeSpeed);
-          self.realTimeSpeed = self.realTimeSpeed + 1;
-        }, 1000);
-      } else { // 当前视频如果返回失败，需处于暂停状态
-        self.showGuide = false;
-        self.showError = true;
-        self.isLoading = false;
-        const errorCode = self.mpdurl.ErrorCode; // 错误码
-        const errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-        self.destroyVideo();
-      }
     },
 
     controlScreen() {
@@ -3238,7 +3015,6 @@ export default {
       self.tabList[2].storeList = getStore2Temp(tempArray);
     },
 
-    // 切换门店
     changeStore(item, index, _item, _index) {
       const self = this;
       self.patrolstore = '';
@@ -3292,7 +3068,6 @@ export default {
       }
       self.store = obj;
       let curStoreId = '';
-      // self.getInspectByStore(self.store.storeId); //以前 获取门店对应的巡检表
       const tabIndex = Number(self.activeIndex);
       if (tabIndex != 2) {
         item.storeList.forEach((itemS, indexS) => {
@@ -3405,7 +3180,7 @@ export default {
       const self = this;
       const width = document.getElementsByClassName('btn-content')[0].offsetWidth;
       const detailsWidth = window.innerWidth / 1440 * 15 + 60;
-      const count = parseInt(width / detailsWidth); // 当前容器最大可显示数量
+      const count = parseInt(width / detailsWidth);
       if (count >= list.length) {
         self.showChannelBtns = list;
       } else {
@@ -3448,8 +3223,10 @@ export default {
         self.videoLoadingObj.dialogCosed = true;
         return false;
       }
-      // 确认总结后，切换巡检表
-      if ((!self.isEzviz && self.editCount != 0) || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) || (self.$store.getters.PatrolHistory != null)) {
+
+      if ((!self.isEzviz && self.editCount != 0)
+        || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)
+        || (self.$store.getters.PatrolHistory != null)) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       } else {
@@ -3560,10 +3337,10 @@ export default {
               itemObj.inspectInput = '';
               itemObj.inputCount = 0;
               itemObj.disabled = true;
-              itemObj.checked = false; // 是否选中状态
-              itemObj.isIgnore = false; // 是否被忽略
-              itemObj.Ruletip = false; // 是否显示提示语
-              itemObj.manualIgnore = false; // 是否手动忽略巡检项
+              itemObj.checked = false;
+              itemObj.isIgnore = false;
+              itemObj.Ruletip = false;
+              itemObj.manualIgnore = false;
               itemObj.sourceList = [];
               itemObj.scoreList = [{ val: _item.itemScore, scoreTitle: this.$t('remotePatrol.pass'), isClick: false },
                 { val: -1, scoreTitle: this.$t('remotePatrol.failed'), isClick: false }];
