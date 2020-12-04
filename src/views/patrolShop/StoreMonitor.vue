@@ -614,7 +614,7 @@ export default {
       showChannelBtns: [],
       allChannelBtns: [],
       store: {},
-      showStoreUp: true,
+      showStoreUp: false,
       cityList: [],
       popperClass: 'select-popClass',
       showModelContent: true,
