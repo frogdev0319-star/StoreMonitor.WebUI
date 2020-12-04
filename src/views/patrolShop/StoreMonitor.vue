@@ -1929,22 +1929,6 @@ export default {
       window.clearInterval(self.timerPlayReal);
     },
 
-    async stopRealTimeVisPage() {
-      let self = this;
-      self.stopVideo();
-      let data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      let ret = await dashAPI.RealTime(0, data);
-      await dashAPI.Offline(self.sessionId);
-    },
-
     async stopRealTime(...val) {
       console.log(val);
       let self = this;
