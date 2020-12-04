@@ -88,7 +88,7 @@
             <i :class="item.iconSrc" class="iconfont icontemp"/>
             <span class="title-lable">{{ item.itemTitleName }}</span>
             <span style="float:right;" class="count-content"><span class="count">{{ item.itemCount }}</span>
-              <span class="blag">{{ $t('remotePatrol.unit') }}</span></span>
+            <span class="blag">{{ $t('remotePatrol.unit') }}</span></span>
           </div>
           <div class="item-content">
             <div style="margin-bottom:20px;">
@@ -114,15 +114,21 @@
                     <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
                   </div>
                 </div>
-                <div v-if="index !== 2 && _item.sourceList!= null && _item.sourceList.length !== 0
-                || _item.inspectInput != null&&_item.inspectInput !== ''" class="content-detail-main" style="padding-bottom: 20px;">
+                <div
+                  v-if="index !== 2 && _item.sourceList!= null && _item.sourceList.length !== 0
+                  || _item.inspectInput != null&&_item.inspectInput !== ''"
+                  class="content-detail-main"
+                  style="padding-bottom: 20px;">
                   <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
                   <div v-if="_item.inspectInput!=null&&_item.inspectInput!=''" class="cdm-word">
                     <span>{{ _item.inspectInput }}</span>
                   </div>
                   <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                    <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex"
-                         :height="imgHeight+'px'" class="source-details">
+                    <div
+                      v-for="(sourceitem,sourceindex) in _item.sourceList"
+                      :key="sourceindex"
+                      :height="imgHeight+'px'"
+                      class="source-details">
                       <div v-if="sourceitem.mediaType==2" class="img-content">
                         <img
                           :title="imgTitle"
@@ -208,8 +214,9 @@
     </el-col>
     <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
       <div class="body-content">
-        <p>正在上传中</p>
-        <p style="margin-bottom:15px;">共<span>{{ totalnumOfPic }}</span>个附件，已上传<span>{{ uploadingnumOfPic }}</span>个</p>
+        <p>{{ $t('remotePatrol.uploading') }}</p>
+        <p v-if="lang!=='en'" style="margin-bottom:15px;">{{ $t('remotePatrol.upload0') }}<span>{{ totalnumOfPic }}</span>{{ $t('remotePatrol.upload1') }}<span>{{ uploadingnumOfPic }}</span>{{ $t('remotePatrol.unit') }}</p>
+        <p v-if="lang!=='en'" style="margin-bottom:15px;"><span>{{ totalnumOfPic }}  attachments in total,</span><span>{{ uploadingnumOfPic }} uploaded.</span></p>
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
@@ -317,7 +324,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     const self = this;
-    if (to.name != 'remotePatrol') {
+    if (to.name !== 'remotePatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
       next();
@@ -363,7 +370,7 @@ export default {
       const bucketName = self.oss.ossBucketName;
       const endpoint = self.oss.ossEndPoint;
       const key = fileName;
-      if (self.oss.ossVendor == 2) {
+      if (self.oss.ossVendor === 2) {
         return `https://${endpoint}/${bucketName}/${fileName}`;
       } else {
         return `http://${bucketName}.${endpoint}/${fileName}`;
@@ -372,10 +379,10 @@ export default {
     upLoadFile(fileItem) {
       const self = this;
       self.percentage = 0;
-      if (self.oss.ossVendor == null) {
+      if (self.oss.ossVendor === null) {
         self.oss.ossVendor = 1; // 1 -aliyun  2-azure
       }
-      if (self.oss.ossVendor == 1) {
+      if (self.oss.ossVendor === 1) {
         const OSS = require('ali-oss');
         const client = new OSS({
           region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
@@ -425,7 +432,7 @@ export default {
       const self = this;
       item.isActive = true;
       self.resultList.forEach((_item, _index) => {
-        if (index != _index) {
+        if (index !== _index) {
           _item.isActive = false;
         }
       });
@@ -455,9 +462,8 @@ export default {
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
       const storageParams = {};
       storageParams.storeId = self.store.storeId;
-      // 上传文件时获取门店对应的BucketName
       await getStorageInfo(storageParams).then(res => {
-        if (res.errCode == 0) {
+        if (res.errCode === 0) {
           self.oss = res.data;
           console.log(self.oss);
         }
@@ -469,7 +475,7 @@ export default {
             const objItem = {};
             objItem.ts = new Date().getTime();
             objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
-            if (inspect[i].type == 0 || inspect[i].type == 2) {
+            if (inspect[i].type === 0 || inspect[i].type === 2) {
               objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? -1 : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
             } else {
               objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? -1 : inspect[i].inspectList[g].items[j].itemgetScore;
@@ -483,11 +489,11 @@ export default {
                 const obj = {};
                 await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
                   self.uploadingnumOfPic++;
-                  if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType == 2) {
+                  if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
                     obj.mediaType = 2;
                     obj.url = url;
                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                  } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType == 1) {
+                  } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
                     obj.mediaType = 1;
                     obj.url = url;
                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
@@ -495,7 +501,7 @@ export default {
                 }).catch((err) => {
                   upload++;
                 });
-                if (upload != 0) {
+                if (upload !== 0) {
                   self.uploadProgress = false;
                   self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
                   return false;
@@ -515,7 +521,7 @@ export default {
       for (const i in self.eventList) {
         const obj = {};
         obj.ts = new Date().getTime();
-        obj.storeId = self.store.storeId,
+        obj.storeId = self.store.storeId;
 
         obj.subject = self.eventList[i].eventName;
         obj.description = self.eventList[i].eventDes;
@@ -533,7 +539,7 @@ export default {
           }).catch((err) => {
             upload++;
           });
-          if (upload != 0) {
+          if (upload !== 0) {
             self.uploadProgress = false;
             self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
             return false;
@@ -556,8 +562,8 @@ export default {
         feedback: feedEventList
       };
       let routeData = null;
-      upload == 0 && submitInspectItem1(params).then(res => {
-        if (res.errCode == 0) {
+      upload === 0 && submitInspectItem1(params).then(res => {
+        if (res.errCode === 0) {
           const data = res.data;
           self.editFlag = true;
           routeData = {
@@ -583,47 +589,62 @@ export default {
         self.suggest = PatrolComment;
       }
       const routeData = self.$route.params.data;
+      const inspectSettings = self.$route.params.rule;
       const inspect = routeData.inspect;
       const eventList = routeData.event;
       const store = routeData.store;
-      const channel = routeData.channel;
       self.store = store;
       self.inspectList = routeData.inspect;
       self.eventList = routeData.event;
       let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
-      let getscoreTotal = 0, allscoreTotal = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, allpassfailCount = 0;
+      let getscoreTotal = 0, CurAddIgnoreItemScore = 0, allscoreTotal = 0, allAddIgnoreScore = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, getpassfailIgnoreTotal = 0, allpassfailCount = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0, ScoreTotalScoreSystem = 0, OtherTotalScoreSystem = 0;
       inspect.forEach(p_item => {
-        if (p_item.dealCount != 0) {
+        if (p_item.dealCount !== 0) {
           dealType.push(p_item.type);
         }
       });
-      const Tab0Status = false;
+      let Tab0Status = false;
       let inspectPic = 0;
       inspect.forEach(p_item => {
-        var CurItemgetScore = 0, CurNotIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0;
+        var CurItemgetScore = 0, totalScore0 = 0, totalScoreX = 0, CurSc = 0, CurNotIgnoreTotalscore = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
-          let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0;
+          let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0, addNotIgnoreTotalscoreA = 0, addIgnoreScoreA = 0;
           item.items.forEach(s_item => {
             if (s_item.isIgnore) {
               IgnoredArr.push(s_item);
               ignoreTemp.push(s_item);
             } else {
-              if ((p_item.type == 0 || p_item.type == 2) && !s_item.isQualified) {
+              if ((p_item.type === 0 || p_item.type === 2) && !s_item.isQualified) {
                 UnqualifiedArr.push(s_item);
                 UnqualifiedTemp.push(s_item);
-              } else if ((p_item.type == 0 || p_item.type == 2) && s_item.isQualified) {
+              } else if ((p_item.type === 0 || p_item.type === 2) && s_item.isQualified) {
                 QualifiedArr.push(s_item);
-              } else if (p_item.type == 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
+              } else if (p_item.type === 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
                 UnqualifiedTemp.push(s_item);
               }
-              if ((p_item.type == 1 || p_item.type == 2) && s_item.itemgetScore != '--') {
+              if ((p_item.type === 1 || p_item.type === 2) && s_item.itemgetScore !== '--') {
                 totalGetscore += s_item.itemgetScore;
                 notIgnoreTotalscore += s_item.itemScore;
               }
             }
-            if (p_item.type == 1) {
+            if (p_item.type === 1 || p_item.type === 2 && s_item.itemgetScore !== '--') { // 1的所有与2的非忽略项
+              addIgnoreScoreA += s_item.itemgetScore;
+              addNotIgnoreTotalscoreA += s_item.itemScore;
+            }
+            s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
+            if (p_item.type === 0) {
+              PassFileTS += s_item.itemgetScore;
+              totalScore0 += s_item.itemScore;
+              if (!s_item.isIgnore) {
+                PassFileX += s_item.itemgetScore;
+                totalScoreX += s_item.itemScore;
+              }
+            } else if (p_item.type === 1) {
               totalScore += s_item.itemScore;
+              ScoreTS += s_item.itemgetScore;
+            } else if (p_item.type === 2 && !s_item.isIgnore) {
+              OtherTS += s_item.itemgetScore;
             }
             inspectPic += s_item.sourceList.length;
           });
@@ -633,57 +654,94 @@ export default {
           item['itemScore'] = totalScore;
           item['itemgetScore'] = totalGetscore;
           item['notIgnoreTotalscore'] = notIgnoreTotalscore;
-          if (p_item.type == 0) {
+          if (p_item.type === 0) {
             CurPassfailQualified += item.numOfQualified;
             CurpassfailCount += item.numOfUnqualified;
+            CurPassfailIgnore += item.numIgnore;
             getpassfailQualifiedTotal = CurPassfailQualified;
+            getpassfailIgnoreTotal = CurPassfailIgnore;
             allpassfailCount = Number(CurpassfailCount + CurPassfailQualified);
+            PassFileTotalScoreSystem = PassFileTS;
+            PassFileXS = PassFileX;
+            PassFileTotalScore = totalScore0;
+            PassFileTotalScoreX = totalScoreX;
           }
-          if (p_item.type == 1) {
+          if (p_item.type === 1) {
             CurItemgetScore += totalGetscore;
             CurNotIgnoreTotalscore += notIgnoreTotalscore;
+            CurSc += addIgnoreScoreA;
+            CurAddIgnoreItemScore = CurSc;
+            CurAddIgnoreTotalscore += addNotIgnoreTotalscoreA;
             getscoreTotal = CurItemgetScore;
             allscoreTotal = CurNotIgnoreTotalscore;
+            allAddIgnoreScore = CurAddIgnoreTotalscore;
+            ScoreTotalScoreSystem = ScoreTS;
           }
-          if (p_item.type == 2) {
+          if (p_item.type === 2) {
             CurOtherTotalScore += totalGetscore;
             otherGetscoreTotal = CurOtherTotalScore;
+            OtherTotalScoreSystem = OtherTS;
           }
         });
-        if (p_item.type == 0) {
+        if (p_item.type === 0) {
           p_item['tHeader'] = self.theaderPassFail;
-          // if(p_item.inspectList.some(x=>x.numOfUnqualified!=0)&&dealType.some(x=>x==0)){
-          //     self.resultList[0].isShow=false
-          //     self.resultList[1].isShow=false
-          //     self.resultList[2].isActive=true
-          //     Tab0Status=true
-          // }else if(p_item.inspectList.every(x=>x.numOfUnqualified==0)&&dealType.length==1&&dealType.some(x=>x==0)){
-          //     self.resultList[1].isShow=false
-          //     self.resultList[2].isShow=false
-          //     self.resultList[0].isActive=true
-          //     Tab0Status=true
-          // }
-        } else if (p_item.type == 1) {
+          if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.checkItem4) {
+            self.resultList[0].isShow = false;
+            self.resultList[1].isShow = false;
+            self.resultList[2].isActive = true;
+            Tab0Status = true;
+          }
+        } else if (p_item.type === 1) {
           p_item['tHeader'] = self.theaderScore;
-        } else if (p_item.type == 2) {
+        } else if (p_item.type === 2) {
           p_item['tHeader'] = self.theaderOther;
         }
       });
       let s_count = 0;
-      if (dealType.length == 1 && dealType[0] == 0) {
-        s_count = Math.round(getpassfailQualifiedTotal / allpassfailCount * 100);
+      if (dealType.length === 1 && dealType[0] === 0) {
+        if (inspectSettings.radio === '-1') {
+          s_count = Math.round(PassFileTotalScoreSystem);
+        } else {
+          if (inspectSettings.checkItem2) {
+            s_count = Math.round((getpassfailQualifiedTotal + getpassfailIgnoreTotal) / allpassfailCount * 100);
+          } else {
+            s_count = Math.round(getpassfailQualifiedTotal / allpassfailCount * 100);
+          }
+        }
       } else {
-        s_count = Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
+        if (inspectSettings.checkItem1) {
+          if (inspectSettings.radio === '-1') {
+            s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+          } else {
+            if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
+              s_count = Math.round(((PassFileTotalScoreSystem + getscoreTotal) / (allscoreTotal + PassFileTotalScore) * 100) + otherGetscoreTotal);
+            } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+              s_count = Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreSystem) * 100) + otherGetscoreTotal);
+            } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+              s_count = Math.round(((PassFileTotalScoreSystem + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreSystem) * 100) + otherGetscoreTotal);
+            } else {
+              s_count = Math.round(((PassFileXS + getscoreTotal) / (PassFileTotalScoreX + allscoreTotal) * 100) + otherGetscoreTotal);
+            }
+          }
+        } else {
+          if (inspectSettings.radio === '-1') {
+            s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+          } else {
+            if (inspectSettings.checkItem3) {
+              s_count = Math.round((CurAddIgnoreItemScore / allAddIgnoreScore * 100) + otherGetscoreTotal);
+            } else {
+              s_count = Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
+            }
+          }
+        }
       }
-      // if(!Tab0Status&&dealType.length!=1&&inspect[0].type==0||inspect[0].type!=0){
-      //     self.resultList[0].isShow=true
-      //     self.resultList[1].isShow=true
-      //     self.resultList[2].isShow=true
-      //     self.resultList[0].isActive=false
-      //     self.resultList[1].isActive=false
-      //     self.resultList[2].isActive=false
-      // }
-      self.scorecount = s_count > 100 ? 100 : (s_count < 0 ? 0 : s_count);
+      if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
+        self.resultList.forEach(item => {
+          item.isShow = true;
+          item.isActive = false;
+        });
+      }
+      self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : s_count);
       self.summary = inspect;
       eventList.forEach((item, index) => {
         const objFeedBack = {};
@@ -725,7 +783,7 @@ export default {
         getUserInfo().then(res => {
           console.log(res);
           res.data.forEach(item => {
-            if (item.userId == userId) {
+            if (item.userId === userId) {
               const accountId = item.accountId.toLowerCase();
               self.accountId = accountId;
               localStorage.setItem('oss_bucket', accountId);

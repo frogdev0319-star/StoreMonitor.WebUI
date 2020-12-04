@@ -63,17 +63,42 @@ export default {
     return result;
   },
 
+  getThreeMonths(e) {
+    const timeOne = new Date(e);
+    let year = timeOne.getFullYear();
+    const month = timeOne.getMonth() + 1;
+    let day = timeOne.getDate();
+    const hours = timeOne.getHours();
+    const minutes = timeOne.getMinutes();
+    const seconds = timeOne.getSeconds();
+    console.log(`now:${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+    // three month ago
+    let ThreeMonths = month - 3;
+    if (ThreeMonths <= 0) { year = year - 1; }
+    if (ThreeMonths === -2) { ThreeMonths = 10; }
+    if (ThreeMonths === -1) { ThreeMonths = 11; }
+    if (ThreeMonths === 0) { ThreeMonths = 12; }
+    const timeTow = new Date(year, ThreeMonths, 0, hours, minutes, seconds);
+    const ThreeMonthsDay = timeTow.getDate();
+    if (day > ThreeMonthsDay) { day = ThreeMonthsDay; }
+    day = day < 10 ? '0' + day : day;
+    console.log(`three month ago:${year}-${ThreeMonths}-${day} 00:00:00`);
+    const THREE_MONTHS_AGO = `${year}/${ThreeMonths}/${day} 00:00:00`;
+    const THREE_STAMP = new Date(THREE_MONTHS_AGO).getTime();
+    return THREE_STAMP;
+  },
+
   getDaysCount() {
-    let date = new Date();
-    let month = date.getMonth();
+    const date = new Date();
+    const month = date.getMonth();
     date.setMonth(month + 1);
     date.setDate(0);
     return date.getDate();
   },
 
   getDaysArry() {
-    let day = this.getDaysCount();
-    let arr = [];
+    const day = this.getDaysCount();
+    const arr = [];
     for (let i = 1; i <= day; i++) {
       arr.push(i);
     }
@@ -81,8 +106,8 @@ export default {
   },
 
   getInitDay() {
-    let day = this.getDaysCount();
-    let arr = [];
+    const day = this.getDaysCount();
+    const arr = [];
     for (let i = 1; i <= day; i++) {
       arr.push(0);
     }
@@ -90,8 +115,8 @@ export default {
   },
 
   getDaysRandom() {
-    let day = this.getDaysCount();
-    let arr = [];
+    const day = this.getDaysCount();
+    const arr = [];
     for (let i = 1; i <= day; i++) {
       arr.push(Math.round(Math.random() * 100));
     }
@@ -107,8 +132,8 @@ export default {
   },
 
   getRandom1(start, end) {
-    let length = end - start;
-    let num = (Math.random() * (length) + start);
+    const length = end - start;
+    const num = (Math.random() * (length) + start);
     return num;
   },
 
@@ -173,8 +198,8 @@ export default {
 
   random_string(len) {
     len = len || 32;
-    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-    let maxPos = chars.length;
+    const chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    const maxPos = chars.length;
     let pwd = '';
     for (let i = 0; i < len; i++) {
       pwd += chars.charAt(Math.floor(Math.random() * maxPos));
@@ -561,11 +586,11 @@ export default {
   },
 
   base64ToBlob(urlData) {
-    let arr = urlData.split(',');
-    let mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
-    let bytes = window.atob(arr[1]);
-    let ab = new ArrayBuffer(bytes.length);
-    let ia = new Uint8Array(ab);
+    const arr = urlData.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
+    const bytes = window.atob(arr[1]);
+    const ab = new ArrayBuffer(bytes.length);
+    const ia = new Uint8Array(ab);
 
     for (let i = 0; i < bytes.length; i++) {
       ia[i] = bytes.charCodeAt(i);
@@ -642,26 +667,26 @@ export default {
      */
 
   getMonthBetween(start, end) {
-    let result = [];
-    let s = start.split('-');
-    let e = end.split('-');
-    let min = new Date();
-    let max = new Date();
+    const result = [];
+    const s = start.split('-');
+    const e = end.split('-');
+    const min = new Date();
+    const max = new Date();
     min.setFullYear(s[0], s[1]);
     max.setFullYear(e[0], e[1]);
-    let curr = min;
+    const curr = min;
     while (curr <= max) {
-      let month = curr.getMonth();
+      const month = curr.getMonth();
       let str = curr.getFullYear() + '-' + (month);
-      let s = curr.getFullYear() + '-0';
+      const s = curr.getFullYear() + '-0';
       if (str == s) {
         str = curr.getFullYear() + '-12';
       }
       result.push(str);
       curr.setMonth(month + 1);
     }
-    let arr = [];
-    let newArr = [];
+    const arr = [];
+    const newArr = [];
     for (let i = 0; i < result.length; i++) {
       arr.push(result[i].split('-'));
     }
@@ -706,15 +731,15 @@ export default {
       const s = MM + '/' + dd;
       return (s);
     };
-    let dateAllArr = new Array();
-    let ab = begin.split('-');
-    let ae = end.split('-');
-    let db = new Date();
+    const dateAllArr = new Array();
+    const ab = begin.split('-');
+    const ae = end.split('-');
+    const db = new Date();
     db.setUTCFullYear(ab[0], ab[1] - 1, ab[2]);
-    let de = new Date();
+    const de = new Date();
     de.setUTCFullYear(ae[0], ae[1] - 1, ae[2]);
-    let unixDb = db.getTime();
-    let unixDe = de.getTime();
+    const unixDb = db.getTime();
+    const unixDe = de.getTime();
     for (let k = unixDb; k <= unixDe;) {
       dateAllArr.push((new Date(parseInt(k))).format().toString() + '-' + (new Date(parseInt(k + 6 * 24 * 60 * 60 * 1000))).format().toString());
       k = k + 7 * 24 * 60 * 60 * 1000;
@@ -723,9 +748,9 @@ export default {
   },
 
   judgeStart(start) {
-    let startTime = new Date(start);
-    let oweek = startTime.getDay();
-    let mSeconds = startTime.getTime();
+    const startTime = new Date(start);
+    const oweek = startTime.getDay();
+    const mSeconds = startTime.getTime();
     switch (oweek) {
       case 0:
         return mSeconds - 6 * 24 * 60 * 60 * 1000;
@@ -752,7 +777,7 @@ export default {
   },
 
   isDot(num) {
-    let result = (num.toString()).indexOf('.');
+    const result = (num.toString()).indexOf('.');
     return result !== -1;
   },
   /**
@@ -766,24 +791,24 @@ export default {
     if (!valueList[idx]) {
       return 0;
     }
-    let sum = valueList.reduce(function(acc, val) {
+    const sum = valueList.reduce(function(acc, val) {
       return acc + (isNaN(val) ? 0 : val);
     }, 0);
     if (sum === 0) {
       return 0;
     }
-    let digits = Math.pow(10, precision);
-    let votesPerQuota = valueList.map(function(val) {
+    const digits = Math.pow(10, precision);
+    const votesPerQuota = valueList.map(function(val) {
       return (isNaN(val) ? 0 : val) / sum * digits * 100;
     });
-    let targetSeats = digits * 100;
-    let seats = votesPerQuota.map(function(votes) {
+    const targetSeats = digits * 100;
+    const seats = votesPerQuota.map(function(votes) {
       return Math.floor(votes);
     });
     let currentSum = seats.reduce(function(acc, val) {
       return acc + val;
     }, 0);
-    let remainder = votesPerQuota.map(function(votes, idx) {
+    const remainder = votesPerQuota.map(function(votes, idx) {
       return votes - seats[idx];
     });
     while (currentSum < targetSeats) {
@@ -862,6 +887,5 @@ class indexedDB {
       };
     });
   }
-
 }
 export { indexedDB };

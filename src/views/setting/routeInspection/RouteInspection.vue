@@ -8,17 +8,25 @@
         <span :class="lang === 'en'? 'en-bind-title': 'bind-title'">
           {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
         </span>
-        <el-button :class="lang === 'en' ? 'en-el-bind-btn' : 'el-bind-btn' "
-                   :disabled="elTableData[Number(activeName)].data.length === 0" size="mini" class="btn-class"
-                   type="primary" @click="bindStore">
+        <el-button
+          :class="lang === 'en' ? 'en-el-bind-btn' : 'el-bind-btn' "
+          :disabled="elTableData[Number(activeName)].data.length === 0"
+          size="mini"
+          class="btn-class"
+          type="primary"
+          @click="bindStore">
           <div class="btn-area">
             <i class="iconfont icon-quxiaolianjie"/>
             <span>{{ $t('insSettingView.bindList') }}</span>
           </div>
         </el-button>
-        <input id="loadFileEx" ref="loadFileEx" type="file" style="display: none"
-               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-               @change="importfxx(this)" >
+        <input
+          id="loadFileEx"
+          ref="loadFileEx"
+          type="file"
+          style="display: none"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          @change="importfxx(this)" >
         <el-button
           v-for="(item,index) in btnList"
           :key="index"
@@ -68,9 +76,12 @@
               {{ $t('insSettingView.cancel') }}</el-button>
 
             <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('insSettingView.select') }}
-              <input id="upload" ref="loadFile" type="file"
-                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                     @change="importfxx(this)" >
+              <input
+                id="upload"
+                ref="loadFile"
+                type="file"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                @change="importfxx(this)" >
             </a>
           </div>
         </el-dialog>
@@ -87,8 +98,11 @@
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
             <div class="nameinput" style="padding:30px 40px 10px 40px;height:60px;">
-              <el-input v-model="ImportName" :placeholder="$t('insSettingView.enterListName')"
-                        style="border-bottom:1px solid #ddd;" @input="watchName"/>
+              <el-input
+                v-model="ImportName"
+                :placeholder="$t('insSettingView.enterListName')"
+                style="border-bottom:1px solid #ddd;"
+                @input="watchName"/>
               <p v-if="isShowWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{ warningContent }}</p>
             </div>
           </div>
@@ -182,27 +196,39 @@
             </el-button>
           </div>
         </el-dialog>
+        <el-dialog
+          v-if="showImportSucceed"
+          :title="$t('remotePatrol.prompt')"
+          :visible.sync="showImportSucceed"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="28%"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToBindData') }}</span>
+            </p>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportSucceed = false">
+              {{ $t('insSettingView.cancel') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="toSetRules">
+              {{ $t('insSettingView.confirm') }}
+            </el-button>
+          </div>
+        </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs">
         <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane v-for="(item,index) in elTableData" :key="index"
-                       :label="index < 2 ? getLang(index) : item.label" :name="index.toString()"
-                       :closable ="index !== 0 && index !== 1 ? true : false" >
-            <el-tabs v-if="item.data.length !== 0" id="patrltabs-content" v-model="patrolActive"
-                     :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
+          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label" :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false" >
+            <el-tabs v-if="item.data.length !== 0" id="patrltabs-content" v-model="patrolActive" :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
                 <div v-if="_item.routeData&&!loading">
-                  <route-detail
-                    :ref="curIndex"
-                    :route-data="_item.routeData"
-                    :route-name="_item.name"
-                    :down-src="downLoadSrc"
-                    :all-routedata="_item.allRoutedata"
-                    :sheet-name="_item.sheetName"
-                    :tab-name="_item.name"
-                    @refreshList="getTagList"
-                    @change-routeData="changerouteData"/>
+                  <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"/>
                 </div>
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
                   <img :src="loadingGif">
@@ -214,15 +240,12 @@
               <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"/>
               <p class="empty-title">
                 {{ $t('insSettingView.please') }}
-                <a :href="downLoadSrc" :download="fileName" class="downLoad-btn">
-                {{ $t('insSettingView.downloadInfo') }}</a>
+                <a :href="downLoadSrc" :download="fileName" class="downLoad-btn">{{ $t('insSettingView.downloadInfo') }}</a>
                 {{ $t('insSettingView.toEdit') }}
                 <span @click="showNameImport = true">{{ $t('insSettingView.thenImport') }}</span>
                 {{ $t('insSettingView.waveline') }}
               </p>
-              <input id="uploadFile" ref="loadFile" type="file" style="display: none"
-                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                     @change="importfxx(this)" >
+              <input id="uploadFile" ref="loadFile" type="file" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -289,6 +312,7 @@ export default {
       tabNameInput: '',
       hideUpload: false,
       tempdata: [],
+      showImportSucceed: false,
       btnList: [
         {
           id: 0,
@@ -362,7 +386,7 @@ export default {
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    if (to.name === 'itemSetting' || to.name === 'bindStore') {
+    if (to.name === 'itemSetting' || to.name === 'bindStore' || to.name === 'setRule') {
       const historyObj = {
         activeName: self.activeName,
         patrolActive: self.patrolActive
@@ -501,7 +525,6 @@ export default {
     },
 
     changerouteData(val) {
-
       const self = this;
       self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData = val;
     },
@@ -510,16 +533,16 @@ export default {
       const self = this;
       const TagData = await self.getTagAll();
       if (TagData.length != 0) {
-        if (val === 'del' || self.$route.params.val === 'del') {
-          if (Number(self.patrolActive) === TagData.length) {
+        if (val == 'del' || self.$route.params.val == 'del') {
+          if (Number(self.patrolActive) == TagData.length) {
             self.patrolActive = (TagData.length - 1).toString();
           }
         }
-        if (val === 'accountChanged') {
+        if (val == 'accountChanged') {
           self.patrolActive = '0';
         }
         let tagIndex = 0;
-        if (val === 'add') {
+        if (val == 'add') {
           tagIndex = TagData.length - 1;
         } else {
           tagIndex = Number(self.patrolActive);
@@ -545,15 +568,20 @@ export default {
             objChild.id = itemChild.id;
             objChild.checked = false;
             objChild.name = itemChild.subject;
-            objChild.description = (itemChild.description == undefined || itemChild.length === 0) ? '--' : itemChild.description;
+            objChild.description = (itemChild.description == undefined || itemChild.length == 0) ? '--' : itemChild.description;
             objChild.score = itemChild.itemScore;
             objChild.qualifiedScore = itemChild.qualifiedScore;
-
+            let availableScores = '';
+            itemChild.availableScores.forEach((x_item, x_index) => {
+              const isuu = x_index === itemChild.availableScores.length - 1 ? '' : '/';
+              availableScores += x_item + isuu;
+            });
+            objChild.availableScores = availableScores;
             tempChild.push(objChild);
           });
           _obj.itemData = tempChild;
-          _obj.inspectId = TagData[tagIndex].id;
-          _obj.mode = TagData[Number(self.patrolActive)].mode;
+          _obj.inspectId = TagData[tagIndex].id; // 巡检表
+          _obj.mode = TagData[Number(self.patrolActive)].mode; // 巡检类别
           groupids.push(_item.id);
           temp.push(_obj);
         });
@@ -565,14 +593,14 @@ export default {
         temp.forEach(te_item => {
           const usertext = [];
           titletemp.forEach(ti_item => {
-            if (te_item.id === ti_item.groupId) {
-              if (ti_item.userTitles.length !== 0) {
-                if (ti_item.userTitles.length === titleList.data.length) {
+            if (te_item.id == ti_item.groupId) {
+              if (ti_item.userTitles.length != 0) {
+                if (ti_item.userTitles.length == titleList.data.length) {
                   te_item['ModelPost'] = self.$t('remotePatrol.all');
                 } else {
                   ti_item.userTitles.forEach(u_item => {
                     usertext.push(u_item.titleName);
-                    te_item['ModelPost'] = usertext.toString();
+                    te_item['ModelPost'] = usertext.toString();// 关联职务
                   });
                 }
               } else {
@@ -584,32 +612,45 @@ export default {
         const te_temp = [];
         const sheetName = [];
         for (let i = 0; i < 3; i++) {
-          const Typeindex = temp.filter(x => x.type === i);
+          const Typeindex = temp.filter(x => x.type == i);
           let obj = {};
-          if (Typeindex.length !== 0) {
+          if (Typeindex.length != 0) {
             te_temp.push(Typeindex);
-            if (Typeindex[0].type === 0) {
+            if (Typeindex[0].type == 0) {
               obj = { 'id': 0, 'isClick': false, 'label': self.$t('insSettingView.sheetpassfail') };
             }
-            if (Typeindex[0].type === 1) {
+            if (Typeindex[0].type == 1) {
               obj = { 'id': 1, 'isClick': false, 'label': self.$t('insSettingView.sheetscore') };
             }
-            if (Typeindex[0].type === 2) {
+            if (Typeindex[0].type == 2) {
               obj = { 'id': 2, 'isClick': false, 'label': self.$t('insSettingView.sheetother') };
             }
             sheetName.push(obj);
           }
         }
-        const i = sheetIndex != undefined ? (sheetIndex > sheetName.length - 1 ? 0 : sheetIndex) : 0;
+        let i = 0;
+        if (sheetIndex != undefined) {
+          if (sheetName.length == 3) {
+            i = sheetIndex == -1 ? 0 : sheetIndex;
+          } else if (sheetName.length == 2) {
+            if (sheetName.map(x => x.id == 2)) {
+              i = sheetIndex == -1 || sheetIndex == 0 ? 0 : sheetIndex - 1;
+            } else {
+              i = sheetIndex == -1 ? 0 : sheetIndex;
+            }
+          } else if (sheetName.length == 1) {
+            i = 0;
+          }
+        }
         sheetName[i].isClick = true;
         self.tempdata = temp;
         const tagTemp = [];
         TagData.forEach((tag_item, tag_index) => {
           const tagObj = {};
           let label = '';
-          if (tag_item.mode === 0) {
+          if (tag_item.mode == 0) {
             label = '远程巡检';
-          } else if (tag_item.mode === 1) {
+          } else if (tag_item.mode == 1) {
             label = '现场巡检';
           }
           tagObj.label = label;
@@ -619,24 +660,27 @@ export default {
           tagObj.sheetName = sheetName;
           tagTemp.push(tagObj);
         });
-        if (self.activeName === 0) {
-          if (temp.length === 0) {
+        if (self.activeName == 0) {
+          if (temp.length == 0) {
             self.getDownLoadURL();
           }
           self.elTableData[0].data = tagTemp;
-        } else if (self.activeName === 1) {
-          if (temp.length === 0) {
+        } else if (self.activeName == 1) {
+          if (temp.length == 0) {
             self.getDownLoadURL();
           }
           self.elTableData[1].data = tagTemp;
         } else {
           obj.label = item;
           obj.data = { name: '', routeData: te_temp[0] };
+          // tempAllData.push(obj);
         }
+        // })
         self.elTableData = self.elTableData.concat(tempAllData);
-        if (val === 'add') {
+        if (val == 'add') {
           self.patrolActive = (TagData.length - 1).toString();
-          self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
+          // self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
+          self.showImportSucceed = true;
         }
       } else {
         self.getDownLoadURL();
@@ -697,20 +741,20 @@ export default {
 
     async addAllData(dataArry) {
       const self = this;
-      let mode = self.activeName === '0' ? mode = 0 : mode = 1; // 远程巡检 mode 0,现场巡检  mode 1
+      let mode = self.activeName == '0' ? mode = 0 : mode = 1; // 远程巡检 mode 0,现场巡检  mode 1
       const arr = Object.entries(dataArry);
       const tempGroups = [];
       const tempItems = [];
       let type = null;
       for (let i = 0; i < arr.length; i++) {
-        if (arr[i][0] === 'PassFail') {
+        if (arr[i][0] == 'PassFail') {
           type = 0;
-        } else if (arr[i][0] === 'Score') {
+        } else if (arr[i][0] == 'Score') {
           type = 1;
-        } else if (arr[i][0] === 'Others') {
+        } else if (arr[i][0] == 'Others') {
           type = 2;
         }
-        if (arr[i][1].length !== 0) {
+        if (arr[i][1].length != 0) {
           arr[i][1].forEach((item, index) => {
             const obj = {};
             obj.name = item[0].a;
@@ -722,38 +766,42 @@ export default {
         }
       }
       const paramsGroup = {
-        'groups': tempGroups
+        'groups': tempGroups // 巡检类别
       };
       const resGroup = await self.addGroup(paramsGroup);
       const codeGroup = resGroup.errMsg;
       const dataGroup = resGroup.data;
       let groupindex = 0;
-      if (codeGroup != null && codeGroup === 'Success') {
+      if (codeGroup != null && codeGroup == 'Success') {
         for (let i = 0; i < arr.length; i++) {
-          if (arr[i][1].length !== 0) {
+          if (arr[i][1].length != 0) {
             arr[i][1].forEach((item, index) => {
               const objItem = {};
               const temp = [];
               item.forEach((_item, _index) => {
                 const _obj = {};
-                let itemScore = 0, qualifiedScore = 0, description = '';
-                if (arr[i][0] === 'PassFail') {
-                  itemScore = 10;
+                let itemScore = 0, qualifiedScore = 0, description = '', availableScores = [];
+                if (arr[i][0] == 'PassFail') {
+                  itemScore = _item.d;
                   qualifiedScore = null;
                   description = _item.c;
-                } else if (arr[i][0] === 'Score') {
-                  itemScore = _item.c;
-                  qualifiedScore = _item.d;
-                  description = _item.e;
-                } else if (arr[i][0] === 'Others') {
+                  availableScores = null;
+                } else if (arr[i][0] == 'Score') {
+                  itemScore = _item.d;
+                  qualifiedScore = _item.e;
+                  description = _item.c;
+                  availableScores = _item.f;
+                } else if (arr[i][0] == 'Others') {
                   itemScore = _item.c;
                   qualifiedScore = null;
                   description = _item.d;
+                  availableScores = null;
                 }
                 _obj.subject = _item.b;
                 _obj.description = description;
                 _obj.itemScore = itemScore;
                 _obj.qualifiedScore = qualifiedScore;
+                _obj.availableScores = availableScores;
                 temp.push(_obj);
               });
               objItem.groupId = dataGroup[groupindex];
@@ -764,11 +812,11 @@ export default {
           }
         }
         const paramsItem = {
-          'request': tempItems
+          'request': tempItems // 巡检项
         };
         const resItem = await self.addItem(paramsItem);
         const codeItem = resItem.errMsg;
-        if (codeItem != null && codeItem === 'Success') {
+        if (codeItem != null && codeItem == 'Success') {
           self.getTagList('add');
         } else {
           self.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
@@ -776,6 +824,7 @@ export default {
       } else {
         self.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
       }
+      // self.showImportContent=false;
     },
 
     handleItem() {
@@ -934,6 +983,14 @@ export default {
       self.getTagList();
     },
 
+    toSetRules() {
+      const self = this;
+      self.$router.push({ name: 'setRule', params: {
+        routeData: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData,
+        routeName: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].name }
+      });
+    },
+
     async delAllItem() {
       const self = this;
       const datalength = self.elTableData[Number(self.activeName)].data.length;
@@ -1089,23 +1146,23 @@ export default {
       const inputDOM = this.$refs.inputer;
       _this.FileInfo = [];
       this.file = event.currentTarget.files[0];
-      let rABS = false;
-      let f = this.file;
-      let reader = new FileReader();
+      var rABS = false;
+      var f = this.file;
+      var reader = new FileReader();
       FileReader.prototype.readAsBinaryString = function(f) {
-        let binary = '';
-        let rABS = false;
-        let pt = this;
-        let wb;
-        let outdata = {};
-        let reader = new FileReader();
+        var binary = '';
+        var rABS = false;
+        var pt = this;
+        var wb;
+        var outdata = {};
+        var reader = new FileReader();
         reader.onload = function(e) {
           var bytes = new Uint8Array(reader.result);
           var length = bytes.byteLength;
           for (var i = 0; i < length; i++) {
             binary += String.fromCharCode(bytes[i]);
           }
-          let XLSX = require('xlsx');
+          var XLSX = require('xlsx');
           if (rABS) {
             wb = XLSX.read(btoa(fixdata(binary)), {
               type: 'base64'
@@ -1115,7 +1172,7 @@ export default {
               type: 'binary'
             });
           }
-          let sheet1, sheet2, sheet3;
+          var sheet1, sheet2, sheet3;
           const PassFail = wb.Sheets['Pass&Fail'];
           const Score = wb.Sheets['Score'];
           const Others = wb.Sheets['Others'];
@@ -1128,13 +1185,13 @@ export default {
               obj.a = _item.__EMPTY;
               obj.b = _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
-              // obj.d = _item.__EMPTY_3
+              obj.d = _item.__EMPTY_3;
               temp_sheet1.push(obj);
             });
             outdata.PassFail = temp_sheet1;
           }
           if (Score != undefined) {
-            delete Score.A1; delete Score.B1; delete Score.C1; delete Score.D1; delete Score.E1;
+            delete Score.A1; delete Score.B1; delete Score.C1; delete Score.D1; delete Score.E1; delete Score.F1;
             sheet2 = XLSX.utils.sheet_to_json(wb.Sheets['Score']);
             sheet2.forEach((_item, _index) => {
               const obj = {};
@@ -1143,6 +1200,7 @@ export default {
               obj.c = _item.__EMPTY_2;
               obj.d = _item.__EMPTY_3;
               obj.e = _item.__EMPTY_4;
+              obj.f = _item.__EMPTY_5;
               temp_sheet2.push(obj);
             });
             outdata.Score = temp_sheet2;
@@ -1167,16 +1225,16 @@ export default {
           let flagItemNamePassFail = false, flagItemNameScore = false, flagItemNameOthers = false;
           let flagItemRexPassFail = false, flagItemRexScore = false, flagItemRexOthers = false;
           let flagItemLengthPassFail = false, flagItemLengthScore = false, flagItemLengthOthers = false;
+          // let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
           let flagDesLengthPassFail = false, flagDesLengthScore = false, flagDesLengthOthers = false;
-          let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false;
+          let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false, flagPassFailScoreType = false;
           let flagTempError = false;
-          if ((outdata.PassFail == undefined && outdata.Score == undefined
-            && outdata.Others != undefined) || (outdata.PassFail != undefined
-            && outdata.Score == undefined && outdata.Others != undefined) ) {
+          // sheet整合好的巡检表:outdata
+          if ((outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others != undefined) || (outdata.PassFail != undefined && outdata.Score == undefined && outdata.Others != undefined)) {
             _this.$refs.loadFile.value = '';
             _this.$refs.loadFileEx.value = '';
             let msg = '';
-            if (_this.lang === 'en') {
+            if (_this.lang == 'en') {
               msg = _this.$t('insSettingView.OnlyOthers');
             } else {
               msg = '【Score】' + _this.$t('insSettingView.beforeImport');
@@ -1184,90 +1242,88 @@ export default {
             _this.notify(msg, 'warning', 3000);
             return false;
           }
-          outdata.PassFail == undefined && outdata.Score == undefined
-          && outdata.Others == undefined ? flagTempError = true : flagTempError = false;
+          outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? flagTempError = true : flagTempError = false;
           const arr = Object.entries(outdata);
           for (let i = 0; i < arr.length; i++) {
             arr[i][1].forEach((item, index) => {
-              if (arr[i][0] === 'PassFail') {
-                if (item.a != undefined && item.a.length !== 0) {
+              if (arr[i][0] == 'PassFail') {
+                if (item.a != undefined && item.a.length != 0) {
                   indexArryPassFail.push(index);
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthPassFail = true; }
                 }
-                if (item.b == undefined || item.b.length === 0) {
-                  flagItemNamePassFail = true;
-                } else if (filterString.getContentLength(item.b.toString().trim()) > 100)
-                {
-                  flagItemLengthPassFail = true;
-                }
+                if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthPassFail = true; }
                 if (item.c != undefined) {
-                  if (filterString.getContentLength(item.c.toString().trim()) > 1200) {
-                    flagDesLengthPassFail = true;
-                  }
-                }
-              } else if (arr[i][0] === 'Score') {
-                if (item.a != undefined && item.a.length !== 0) {
-                  indexArryScore.push(index);
-                  if (filterString.getContentLength(item.a.toString().trim()) > 30)
-                  {
-                    flaggroupLengthScore = true;
-                  }
-                }
-                if (item.b == undefined || item.b.length === 0) {
-                  flagItemNameScore = true;
-                } else if (filterString.getContentLength(item.b.toString().trim()) > 100) {
-                  flagItemLengthScore = true;
-                }
-                if (item.c == undefined || item.c.length === 0 || !Number.isInteger(item.c) || parseInt(item.c) < 1
-                  || parseInt(item.c) > 10) {
-                  // 1~10
-                  flagFullScoreType = true;
+                  if (filterString.getContentLength(item.c.toString().trim()) > 1200) { flagDesLengthPassFail = true; }
                 }
                 if (item.d != undefined) {
-                  if (!Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > parseInt(item.c)) {
-                    // 1~item.c
+                  flagPassFailScoreType = !Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > 50;
+                } else {
+                  item.d = 10;
+                }
+              } else if (arr[i][0] == 'Score') {
+                if (item.a != undefined && item.a.length != 0) {
+                  indexArryScore.push(index);
+                  if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
+                }
+                if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
+                if (item.c != undefined) {
+                  if (filterString.getContentLength(item.c.toString().trim()) > 1200) { flagDesLengthScore = true; }
+                }
+                if (item.d == undefined || item.d.length == 0 || !Number.isInteger(item.d) || parseInt(item.d) < 0 || parseInt(item.d) > 50) { // 项目满分值必填，字符类型为1~10整数
+                  flagFullScoreType = true;
+                }
+                if (item.e != undefined) {
+                  if (!Number.isInteger(item.e) || parseInt(item.e) < 1 || parseInt(item.e) > parseInt(item.d)) { // 最低分值选填，字符类型为1~item.c整数
                     flagMinScoreType = true;
                   }
                 } else {
-                  item.d = item.c;
+                  item.e = item.d;
                 }
-                if (item.e != undefined) {
-                  if (filterString.getContentLength(item.e.toString().trim()) > 1200) {
-                    flagDesLengthScore = true;
+                if (item.f != undefined) {
+                  if (item.f.indexOf('/') !== -1) {
+                    const f_Score = item.f.split('/');
+                    const scoreArr = [];
+                    f_Score.forEach(f_item => {
+                      if (!isNaN(Number(f_item))) {
+                        if (parseInt(f_item) >= 0 && parseInt(f_item) <= item.d) {
+                          scoreArr.push(parseInt(f_item));
+                        }
+                      }
+                    });
+                    item.f = scoreArr;
+                  } else {
+                    if (!isNaN(Number(item.f))) {
+                      item.f = parseInt(item.f);
+                    } else {
+                      const a = [];
+                      for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
+                      item.f = a;
+                    }
                   }
+                } else {
+                  const a = [];
+                  for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
+                  item.f = a;
                 }
-              } else if (arr[i][0] === 'Others') {
-                if (item.a != undefined && item.a.length !== 0) {
+              } else if (arr[i][0] == 'Others') {
+                if (item.a != undefined && item.a.length != 0) {
                   indexArryOthers.push(index);
-                  if (filterString.getContentLength(item.a.toString().trim()) > 30) {
-                    flaggroupLengthOthers = true;
-                  }
+                  if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthOthers = true; }
                 }
-                if (item.b == undefined || item.b.length === 0) {
-                  flagItemNameOthers = true;
-                } else if (filterString.getContentLength(item.b.toString().trim()) > 100)
-                {
-                  flagItemLengthOthers = true;
-                }
-                if (item.c == undefined || item.c.length === 0 || !Number.isInteger(Math.abs(item.c))
-                  || parseInt(item.c) < -100 || parseInt(item.c) > 100) {
-                  // -100~100
+                if (item.b == undefined || item.b.length == 0) { flagItemNameOthers = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthOthers = true; }
+                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(Math.abs(item.c)) || parseInt(item.c) < -100 || parseInt(item.c) > 100) { // 项目分值必填，字符类型为-100~+100整数
                   flagOtherScoreType = true;
                 }
                 if (item.d != undefined) {
-                  if (filterString.getContentLength(item.d.toString().trim()) > 1200) {
-                    flagDesLengthOthers = true;
-                  }
+                  if (filterString.getContentLength(item.d.toString().trim()) > 1200) { flagDesLengthOthers = true; }
                 }
               }
             });
           }
-          const showWarningIfo = flaggroupLengthPassFail || flaggroupRexPassFail || flagItemNamePassFail
-            || flagItemLengthPassFail || flagItemRexPassFail || flagDesLengthPassFail
-            || flaggroupLengthScore || flaggroupRexScore || flagItemNameScore || flagItemLengthScore
-            || flagItemRexScore || flagDesLengthScore || flaggroupLengthOthers || flaggroupRexOthers
-            || flagItemNameOthers || flagItemLengthOthers || flagItemRexOthers || flagDesLengthOthers
-            || flagFullScoreType || flagMinScoreType || flagOtherScoreType || flagTempError;
+          const showWarningIfo = flaggroupLengthPassFail || flaggroupRexPassFail || flagItemNamePassFail || flagItemLengthPassFail || flagItemRexPassFail || flagDesLengthPassFail ||
+                                         flaggroupLengthScore || flaggroupRexScore || flagItemNameScore || flagItemLengthScore || flagItemRexScore || flagDesLengthScore ||
+                                         flaggroupLengthOthers || flaggroupRexOthers || flagItemNameOthers || flagItemLengthOthers || flagItemRexOthers || flagDesLengthOthers ||
+                                         flagFullScoreType || flagMinScoreType || flagOtherScoreType || flagPassFailScoreType || flagTempError;
           if (showWarningIfo) {
             _this.showFailInfo = true;
             _this.$refs.loadFile.value = '';
@@ -1283,6 +1339,14 @@ export default {
               const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.excelLongCategory');
               _this.FileInfo.push(flag);
             }
+            // if(flaggroupRexPassFail||flagItemRexPassFail||flaggroupRexScore||flagItemRexScore||flaggroupRexOthers||flagItemRexOthers){
+            //     let flagArr = []
+            //     if(flaggroupRexPassFail||flagItemRexPassFail){flagArr.push('PassFail')}
+            //     if(flaggroupRexScore||flagItemRexScore){flagArr.push('Score')}
+            //     if(flaggroupRexOthers||flagItemRexOthers){flagArr.push('Others')}
+            //     let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalCategory')
+            //     _this.FileInfo.push(flag)
+            // }
             if (flagItemNamePassFail || flagItemNameScore || flagItemNameOthers) {
               const flagArr = [];
               if (flagItemNameScore) {
@@ -1312,6 +1376,9 @@ export default {
               const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.excelIllegalDes');
               _this.FileInfo.push(flag);
             }
+            if (flagPassFailScoreType) {
+              _this.FileInfo.push('PassFail' + ' ' + _this.$t('insSettingView.excelPassFailScoreType'));
+            }
             if (flagFullScoreType) {
               _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelFullScoreType'));
             }
@@ -1325,12 +1392,12 @@ export default {
           }
           const arrsheet1 = [];
           if (outdata.PassFail != undefined) {
-            if (indexArryPassFail.length !== 0) {
+            if (indexArryPassFail.length != 0) {
               for (var i = 0; i < indexArryPassFail.length; i++) {
                 arrsheet1[i] = outdata.PassFail.slice(indexArryPassFail[i], indexArryPassFail[i + 1]);
               }
             } else {
-              if (outdata.PassFail.length !== 0) {
+              if (outdata.PassFail.length != 0) {
                 arrsheet1.push(outdata.PassFail);
                 arrsheet1[0][0].a = _this.$t('insSettingView.Ratingitems');
               }
@@ -1338,7 +1405,7 @@ export default {
           }
           const arrsheet2 = [];
           if (outdata.Score != undefined) {
-            if (indexArryScore.length !== 0) {
+            if (indexArryScore.length != 0) {
               for (var i = 0; i < indexArryScore.length; i++) {
                 arrsheet2[i] = outdata.Score.slice(indexArryScore[i], indexArryScore[i + 1]);
               }
@@ -1346,12 +1413,12 @@ export default {
           }
           const arrsheet3 = [];
           if (outdata.Others != undefined) {
-            if (indexArryOthers.length !== 0) {
+            if (indexArryOthers.length != 0) {
               for (var i = 0; i < indexArryOthers.length; i++) {
                 arrsheet3[i] = outdata.Others.slice(indexArryOthers[i], indexArryOthers[i + 1]);
               }
             } else {
-              if (outdata.Others.length !== 0) {
+              if (outdata.Others.length != 0) {
                 arrsheet3.push(outdata.Others);
                 arrsheet3[0][0].a = _this.$t('insSettingView.Addscoreitems');
               }
@@ -1437,7 +1504,7 @@ export default {
                 sheet1data.push(obj);
               }
             });
-            let sheet1 = XLSX.utils.json_to_sheet(sheet1data);
+            const sheet1 = XLSX.utils.json_to_sheet(sheet1data);
             XLSX.utils.book_append_sheet(wb, sheet1, 'Pass&Fail');
           }
           if (score != undefined) {
@@ -1903,4 +1970,3 @@ export default {
   }
 
 </style>
-

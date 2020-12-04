@@ -1,12 +1,9 @@
+/* eslint-disable arrow-spacing */
 <template>
   <el-row class="el-addrute">
     <el-col :span="24" class="el-rute-title">
-      <span v-if="!showEditTab" class="tab-name">{{ routeName }}
-        <i class="iconfont icon-bianji icon-tabname" @click="editTabName"/>
-      </span>
-      <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'"
-                :placeholder="$t('insSettingView.enterListName')" v-model="editRouteName"
-                class="tabName-input" @input="RouteNameLength"/>
+      <span v-if="!showEditTab" class="tab-name">{{ routeName }}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/></span>
+      <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'" :placeholder="$t('insSettingView.enterListName')" v-model="editRouteName" class="tabName-input" @input="RouteNameLength"/>
       <div v-if="showEditTab" class="iconcontent" style="margin-top:28px;">
         <div class="iconlised" @click="confirmEditTab">
           <i class="el-icon-check"/>
@@ -15,9 +12,7 @@
           <i class="el-icon-close"/>
         </div>
       </div>
-      <span v-if="showLengthNameWarning" class="warningtips">
-        {{ $t('insSettingView.enterNameRuletip') }}
-      </span>
+      <span v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</span>
     </el-col>
     <el-col :span="24" class="el-rute-post">
       <div class="post-left">
@@ -32,8 +27,7 @@
           @changeInput="changeSelect(arguments)"/>
       </div>
       <div class="post-right">
-        <el-button :class="lang === 'en' ? 'en-rute-btn': 'rute-btn'" size="mini" type="primary"
-                   class="btn-class" @click="submitBindTitle">
+        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" type="primary" class="btn-class" @click="submitBindTitle">
           {{ $t('remotePatrol.submit') }}
         </el-button>
       </div>
@@ -41,11 +35,9 @@
     <el-col :span="7" class="el-rute-group">
       <div class="group-content">
         <div class="title-content">
-          <span class="level2"><i class="iconfont icon-wenjian icontitle"/>
-            <span class="level2-name">{{ groupTitle }}</span></span>
+          <span class="level2"><i class="iconfont icon-wenjian icontitle"/><span class="level2-name">{{ groupTitle }}</span></span>
           <div class="btn-content">
-            <el-button :class="lang === 'en' ? 'en-rute-btn': 'rute-btn'" size="mini" type="primary"
-                       class="btn-class" @click="addGroup">
+            <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" type="primary" class="btn-class" @click="addGroup">
               <div class="btn-area">
                 <i class="el-icon-plus"/>
                 <span>{{ $t('insSettingView.addCategory') }}</span>
@@ -62,16 +54,12 @@
                 </el-tabs>
               </div>
             </div>
-            <div v-for="(item,index) in groupList" :key="index"
-                 :class="item.isClick ? 'noraml-color' : 'noraml-groupColor'" class="groupItem"
-                 @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)">
+            <div v-for="(item,index) in groupList" :key="index" :class="item.isClick?'noraml-color':'noraml-groupColor'" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)">
               <div v-if="item.isClick" class="proper-flag"/>
               <div>
                 <div class="group-left">
-                  <span v-if="!item.isEdit" :style="item.isClick ? {'color':'#f31d65'} : {}">
-                    {{ item.groupName }}（{{ item.groupNum }}）</span>
-                  <el-input v-if="item.isEdit" v-model="item.groupName" size="mini" class="group-input"
-                            @input="(val)=>groupNameChange(val,item)"/>
+                  <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{ item.groupName }}（{{ item.groupNum }}）</span>
+                  <el-input v-if="item.isEdit" v-model="item.groupName" size="mini" class="group-input" @input="(val)=>groupNameChange(val,item)"/>
                 </div>
                 <div class="group-right">
                   <div v-if="item.showEdit" class="show-edit">
@@ -99,9 +87,7 @@
             </div>
             <div v-if="showAddGroup" class="group-add">
               <div class="group-name-left">
-                <el-input :placeholder="$t('insSettingView.enterName')" v-model="groupNameInput" size="mini"
-                          class="groupName-input" @input="(val)=>groupNameChange(val,{})"
-                          @blur="notShowInputRuleTips('enterName')"/>
+                <el-input :placeholder="$t('insSettingView.enterName')" v-model="groupNameInput" size="mini" class="groupName-input" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"/>
                 <span v-if="enterNameRuletip" class="rules">{{ $t('insSettingView.enterNameRuletip') }}</span>
               </div>
               <div class="group-name-right">
@@ -129,19 +115,15 @@
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
             <div style="margin:20px 20px 20px 26px;">
-              <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;
-              display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">
-                {{ $t('insSettingView.notallowdeletetips') }}</span>
+              <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
+              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>
               <p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>
               <p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>
             </div>
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">
-              {{ $t('insSettingView.confirm') }}</el-button>
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">{{ $t('insSettingView.cancel') }}</el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">{{ $t('insSettingView.confirm') }}</el-button>
           </div>
         </el-dialog>
       </div>
@@ -149,19 +131,17 @@
     <el-col :span="17" class="el-rute-nape">
       <div class="nape-content">
         <div class="title-content">
-          <span :class="lang === 'en' ? 'en-item-title' : 'item-title'" class="level2">
+          <span :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
             <i class="iconfont icon-icon-test icontitle"/>
           <span class="level2-name">{{ napeTitle }}</span></span>
           <div class="btn-content">
-            <el-button :class="lang === 'en' ? 'en-rute-btn': 'rute-btn'" :disabled="groupList.length === 0"
-                       size="mini" type="primary" class="btn-class" @click="addNape">
+            <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" :disabled="groupList.length==0" size="mini" type="primary" class="btn-class" @click="addNape">
               <div class="btn-area">
                 <i class="el-icon-plus"/>
                 <span>{{ $t('insSettingView.addInsItem') }}</span>
               </div>
             </el-button>
-            <el-button :class="lang === 'en' ? 'en-rute-btn' : 'rute-btn'" :disabled="groupList.length === 0"
-                       size="mini" type="primary" class="btn-class" @click="deleteNape">
+            <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" :disabled="groupList.length==0" size="mini" type="primary" class="btn-class" @click="deleteNape">
               <div class="btn-area">
                 <i class="iconfont icon-shanchu"/>
                 <span>{{ $t('insSettingView.deleteInsItem') }}</span>
@@ -172,27 +152,26 @@
         <el-scrollbar id="el-menuscrollbar" style="height:100%;">
           <div :style="{'max-height':varyDivHeight+'px'}" class="nape-items">
             <div v-if="napeList.length!=0" class="nape-items-title">
-              <div :style="activeSheetName === '1'?'flex:2;':(activeSheetName === '2' ? 'flex:3;' : 'flex:2;')"
-                   class="nape-name-title">
+              <div :style="activeSheetName=='1'?'flex:2;':'flex:3'" class="nape-name-title">
                 <span>{{ $t('insSettingView.inspectName') }}</span>
               </div>
-              <div :style="activeSheetName === '1' ? 'flex:3;': (activeSheetName === '2'?'flex:4;' : 'flex:3.3;')"
-                   class="nape-dep-title">
-                <span :style="activeSheetName === '1' ? 'left:5%;': (activeSheetName === '2'?'left:2%;':'')">
-                  {{ $t('insSettingView.inspectionDescp') }}</span>
+              <div :style="activeSheetName=='1'?'flex:2.5;':'flex:4;'" class="nape-dep-title">
+                <span :style="activeSheetName=='1'?'left:5%;':'left:2%;'">{{ $t('insSettingView.inspectionDescp') }}</span>
               </div>
-              <div v-if="activeSheetName === '1'" class="nape-score0-title" style="flex:1;">
+              <div v-if="activeSheetName=='1'" class="nape-score0-title" style="flex:1;">
                 <span style="position:relative;;left:8%;">{{ $t('insSettingView.sheetscore0') }}</span>
               </div>
-              <div v-if="activeSheetName === '1'" class="nape-score0-title"
-                   style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
+              <div v-if="activeSheetName=='1'" class="nape-score0-title" style="flex:1;">
+                <span>{{ $t('insSettingView.sheetscore3') }}</span>
+              </div>
+              <div v-if="activeSheetName=='1'" class="nape-score0-title" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
                 <span>{{ $t('insSettingView.sheetscore1') }}</span>
               </div>
-              <div v-if="activeSheetName === '2'" class="nape-score1-title" style="flex:2;">
-                <span>{{ $t('insSettingView.sheetscore2') }}</span>
+              <div v-if="activeSheetName!='1'" class="nape-score1-title" style="flex:1;">
+                <span style="margin-left:20px;">{{ $t('insSettingView.score') }}</span>
               </div>
-              <div :class="lang === 'en'? 'en-nape-handle-title' : 'nape-handle-title'" style="flex:1;">
-                <span>{{ $t('insSettingView.operation') }}</span>
+              <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
+                <span :style="activeSheetName=='1'?'margin-left:-20px;':'margin-left:10px;'">{{ $t('insSettingView.operation') }}</span>
               </div>
             </div>
             <div
@@ -201,41 +180,45 @@
               :class="!item.isClick?'noraml-color':'active-color'"
               class="nape-items-data"
               @click="clickItem(index,item)">
-              <div :style="activeSheetName === '1'?'flex:2;':(activeSheetName === '2'?'flex:3;':'flex:2;')"
-                   class="nape-name-data">
+              <div :style="activeSheetName=='1'?'flex:2.0;':'flex:3.4;'" class="nape-name-data">
                 <el-checkbox v-model="item.checked" class="item-checkbox"/>
                 <span v-if="!item.isClick" class="nape-name">{{ item.napeNameShow }}</span>
-                <el-input v-if="item.isClick" v-model="item.napeName"
-                          :placeholder="$t('insSettingView.enterItemName')"
-                          size="mini" class="nape-input" @input="(val)=>napeNameChange(val, item)"/>
+                <el-input v-if="item.isClick" v-model="item.napeName" :placeholder="$t('insSettingView.enterItemName')" size="mini" class="nape-input" @input="(val)=>napeNameChange(val, item)"/>
               </div>
-              <div :style="activeSheetName === '1' ? 'flex:2.7;' : (activeSheetName === '2' ? 'flex:4;' : 'flex:3; margin-right:40px;')"
-                   class="nape-dep-data">
+              <div :style="activeSheetName=='1'?'flex:2;':'flex:4;'" class="nape-dep-data">
                 <span v-if="!item.isClick" class="nape-dep">{{ item.napeDep }}</span>
-                <el-input v-if="item.isClick" :autosize="{ minRows: 1}" v-model="item.napeDep"
-                          :placeholder="$t('insSettingView.description')" type="textarea" resize="none"
-                          size="mini" class="nape-input" @input="(val)=>napeDepChange(val, item)"/>
+                <el-input v-if="item.isClick" :autosize="{ minRows: 1}" v-model="item.napeDep" :placeholder="$t('insSettingView.description')" type="textarea" resize="none" size="mini" class="nape-input" @input="(val)=>napeDepChange(val, item)"/>
               </div>
-              <div v-if="activeSheetName === '1'" class="nape-scores-handle" style="flex:1;">
-                <span v-if="!item.isClick" style="margin-left:40px;">{{ item.Score_1 }}
-                  {{ lang !== 'en' ? $t('remotePatrol.scorecount'):'' }}</span>
-                <el-select v-if="item.isClick" v-model="item.Score_1" size="mini"
-                           class="FullScore-input" @change="selectFullScore">
-                  <el-option v-for="item in 10" :key="item" :label="item" :value="item"/>
+              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
+                <span v-if="!item.isClick" style="margin-left:55px;">{{ item.Score_1 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                <el-select v-if="item.isClick" v-model="item.Score_1" size="mini" class="FullScore-input" @change="selectFullScore($event,item)">
+                  <el-option v-for="item in fullScoreTemp" :key="item" :label="item" :value="item"/>
                 </el-select>
               </div>
-              <div v-if="activeSheetName === '1'" class="nape-scores-handle" style="flex:1;">
-                <span v-if="!item.isClick" style="margin-left:40px;">{{ item.Score_2 }}
-                  {{ lang !== 'en'?$t('remotePatrol.scorecount'):'' }}</span>
+              <div v-if="activeSheetName=='1'" :style="item.isClick?'max-width:110px;':'flex:1;margin-left:35px;'" class="nape-scores-handle">
+                <el-tooltip class="item" effect="dark" placement="top">
+                  <div slot="content" style="max-width:120px;">{{ item.availableScoreStr }}</div>
+                  <span v-if="!item.isClick" style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                </el-tooltip>
+                <region-multi-select
+                  v-if="item.isClick"
+                  :options="availableScores"
+                  :placeholder="$t('insSettingView.selectPost')"
+                  :disabled="false"
+                  :input-size="`mini`"
+                  :selected="item.Score_4"
+                  :all="$t('remotePatrol.all')"
+                  @changeInput="changeScore4($event,item)"/>
+              </div>
+              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
+                <span v-if="!item.isClick" style="margin-left:35px;">{{ item.Score_2 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
                 <el-select v-if="item.isClick" v-model="item.Score_2" size="mini" class="critical-input">
                   <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"/>
                 </el-select>
               </div>
-              <div v-if="activeSheetName === '2'" class="nape-scores-handle" style="flex:2;">
-                <span v-if="!item.isClick" style="margin-left:73px;">
-                  {{ item.Score_3 }}{{ lang !== 'en' ? $t('remotePatrol.scorecount') : '' }}</span>
-                <el-input v-if="item.isClick" v-model="item.Score_3" size="mini" class="Itemscores-input"
-                          @input="editinputChange(item,index)"/>
+              <div v-if="activeSheetName!='1'" class="nape-scores-handle" style="flex:1;margin-left:60px;">
+                <span v-if="!item.isClick">{{ item.Score_3 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                <el-input v-if="item.isClick" v-model="item.Score_3" size="mini" class="Itemscores-input" @input="editinputChange(item,index,activeSheetName)"/>
               </div>
               <div v-if="!item.isClick" class="nape-items-handle" style="flex:1;">
                 <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;" @click="handleEdit(index,item)"/>
@@ -263,16 +246,13 @@
                 <hr style="border: 0.5px solid #dfe2e9;;">
 
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;
-                  display: inline-block; vertical-align: middle;"/>
+                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
                   <span style="display: inline-block; vertical-align: middle;">{{ $t('insSettingView.confirmCurDel') }}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteItem = false">
-                  {{ $t('insSettingView.cancel') }}</el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteItem">
-                  {{ $t('insSettingView.confirm') }}</el-button>
+                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteItem = false">{{ $t('insSettingView.cancel') }}</el-button>
+                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteItem">{{ $t('insSettingView.confirm') }}</el-button>
               </div>
             </el-dialog>
 
@@ -294,42 +274,42 @@
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteGroup = false">
-                  {{ $t('insSettingView.cancel') }}</el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteGroup">
-                  {{ $t('insSettingView.confirm') }}</el-button>
+                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteGroup = false">{{ $t('insSettingView.cancel') }}</el-button>
+                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteGroup">{{ $t('insSettingView.confirm') }}</el-button>
               </div>
             </el-dialog>
             <div v-if="showAddNape" :class="'active-color'" class="nape-items-data">
-              <div :style="activeSheetName === '1' ? 'flex:2;' : (activeSheetName === '2' ? 'flex:3;' : 'flex:2;')"
-                   class="nape-name-data">
+              <div :style="activeSheetName=='1'?'flex:2;':'flex:3;'" class="nape-name-data">
                 <el-checkbox v-model="newNapeChecked" class="item-checkbox"/>
-                <el-input v-model="newNapeName" :placeholder="$t('insSettingView.enterItemName')" size="mini"
-                          class="nape-input" @input="(val)=>napeNameChange(val, {})"
-                          @blur="notShowInputRuleTips('enterListName')"/>
-                <span v-if="enterListNameRuletip" class="rules">
-                  {{ $t('insSettingView.enterListNameRuletip') }}</span>
+                <el-input v-model="newNapeName" :placeholder="$t('insSettingView.enterItemName')" size="mini" class="nape-input" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"/>
+                <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
               </div>
-              <div :style="activeSheetName === '1'?'flex:2.7;':(activeSheetName === '2'?'flex:4;':'flex:3;margin-right:40px;')"
-                   class="nape-dep-data">
-                <el-input :autosize="{ minRows: 1}" v-model="newNapeDep"
-                          :placeholder="$t('insSettingView.description')" type="textarea" resize="none"
-                          size="mini" class="nape-input" @input="(val) => napeDepChange(val, {})"
-                          @blur="notShowInputRuleTips('description')"/>
+              <div :style="activeSheetName=='1'?'flex:2.3;':'flex:4;'" class="nape-dep-data">
+                <el-input :autosize="{ minRows: 1}" v-model="newNapeDep" :placeholder="$t('insSettingView.description')" type="textarea" resize="none" size="mini" class="nape-input" @input="(val)=>napeDepChange(val, {})" @blur="notShowInputRuleTips('description')"/>
                 <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
               </div>
-              <div v-if="activeSheetName === '1'" class="nape-scores-handle" style="flex:1;">
-                <el-select v-model="newScore" size="mini" class="FullScore-input" @change="selectFullScore">
-                  <el-option v-for="item in 10" :key="item" :label="item" :value="item"/>
+              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
+                <el-select v-model="newScore" size="mini" class="FullScore-input" @change="selectFullScore($event)">
+                  <el-option v-for="item in 50" :key="item" :label="item" :value="item"/>
                 </el-select>
               </div>
-              <div v-if="activeSheetName === '1'" class="nape-scores-handle" style="flex:1;">
+              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;max-width:110px;">
+                <region-multi-select
+                  :options="availableScores"
+                  :placeholder="$t('insSettingView.selectPost')"
+                  :disabled="false"
+                  :input-size="`mini`"
+                  :selected="selectAvailable"
+                  :all="$t('remotePatrol.all')"
+                  @changeInput="changeAvailable(arguments)"/>
+              </div>
+              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
                 <el-select v-model="newCritical" size="mini" class="critical-input">
                   <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"/>
                 </el-select>
               </div>
-              <div v-if="activeSheetName === '2'" class="nape-scores-handle" style="flex:2;">
-                <el-input v-model="newAddScore" size="mini" class="Itemscores-input" @input="inputChange"/>
+              <div v-if="activeSheetName!='1'" class="nape-scores-handle" style="flex:1;">
+                <el-input v-model="newAddScore" size="mini" class="Itemscores-input" @input="inputChange($event,activeSheetName)"/>
               </div>
               <div class="iconcontent" style="flex:1;">
                 <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
@@ -365,6 +345,9 @@ export default {
       newScore: 10,
       newCritical: 1,
       newAddScore: 0,
+      fullScoreTemp: [],
+      availableScores: [],
+      selectAvailable: [],
       firstLoad: true,
       groupTitle: this.$t('insSettingView.category'),
       showFailInfo: false,
@@ -405,7 +388,7 @@ export default {
       tableData: [],
       noData: '',
       groupIds: [],
-      ScoreList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      ScoreList: [],
       Score_1: '',
       Score_2: '',
       Score_3: '',
@@ -734,12 +717,26 @@ export default {
 
     changeSelect(val) {
       const self = this;
-      self.ModelPost = Array.from(val)[0];
+      self.ModelPost = Array.from(val)[0]; // 选中的职务
     },
-
+    changeScore4(val, item) {
+      if (val[0] === '-1') {
+        item.Score_4 = val.slice(1);
+      } else {
+        item.Score_4 = val;
+      }
+    },
+    changeAvailable(val) {
+      const self = this;
+      if (val[0] === '-1') {
+        self.selectAvailable = val.slice(1);
+      } else {
+        self.selectAvailable = val;
+      }
+    },
     changeAddSelect(val) {
       const self = this;
-      self.ModelAddPost = Array.from(val)[0];
+      self.ModelAddPost = Array.from(val)[0]; // 选中的职务
     },
 
     async confirmAddGroup() {
@@ -947,9 +944,25 @@ export default {
       self.napeList.forEach((_item, _index) => {
         _item.isClick = false;
       });
-      self.newScore = 10;
+      self.newScore = 50;
       self.newCritical = 1;
-      self.ScoreList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      const arr = [];
+      for (var i = 0; i <= 50; i++) {
+        arr.push(i);
+      }
+      self.ScoreList = arr.slice(0, i + 1);
+      self.selectAvailable = arr.slice(0, i + 1);
+      const available = arr.slice(0, i + 1);
+      const availableScores = [];
+      available.forEach(item => {
+        const obj = {
+          label: item,
+          value: item,
+          disabled: false
+        };
+        availableScores.push(obj);
+      });
+      self.availableScores = availableScores;
     },
 
     deleteNape(item) {
@@ -1002,22 +1015,47 @@ export default {
     confirmeditNape(index, item) {
       const self = this;
       const temp = [];
-      if (item.napeName.trim().length === 0) {
+      if (item.napeName.trim().length == 0) {
         self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
-      if (typeof (item.Score_3) !== 'number' && item.Score_3.trim().length === 0) {
+      if (typeof (item.Score_3) !== 'number' && item.Score_3.trim().length == 0) {
         self.notify(self.$t('insSettingView.ScoreEmpty'), 'warning', 3000);
         return false;
       }
-      let itemScore = 0, qualifiedScore = 0;
+      // if(validateInput(item.napeName)||validateInput(item.napeDep)){
+      //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
+      //     return false;
+      // }
+      let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
-        itemScore = 10;
-        qualifiedScore = null;
-      } else if (self.activeSheetName === '1') {
+        if (item.Score_3 > 50 || item.Score_3 < 1) {
+          self.notify(self.$t('insSettingView.sheetscoreA'), 'warning', 3000);
+          return false;
+        } else {
+          itemScore = item.Score_3;
+          qualifiedScore = null;
+        }
+      } else if (self.activeSheetName == '1') {
         itemScore = item.Score_1;
         qualifiedScore = item.Score_2;
-      } else if (self.activeSheetName === '2') {
+        selectAvailable = item.Score_4[0] === '-1' ? item.Score_4.slice(1) : item.Score_4;
+        const availableScores = [];
+        for (let i = 0; i < item.Score_1 + 1; i++) {
+          availableScores.push(i);
+        }
+        selectAvailable.length === 0 ? selectAvailable = availableScores : null;
+        selectAvailable.sort(function(a, b) {
+          return a - b;
+        });
+        if (qualifiedScore > itemScore) {
+          self.notify(self.$t('insSettingView.excelMinScoreType'), 'warning', 3000);
+          return false;
+        } else if (selectAvailable[selectAvailable.length - 1] > itemScore) {
+          self.notify(self.$t('insSettingView.excelScoreItemType'), 'warning', 3000);
+          return false;
+        }
+      } else if (self.activeSheetName == '2') {
         if (item.Score_3 > 100 || item.Score_3 < -100) {
           self.notify(self.$t('insSettingView.sheetscore2'), 'warning', 3000);
           return false;
@@ -1031,7 +1069,8 @@ export default {
         subject: item.napeName,
         description: item.napeDep,
         itemScore: itemScore,
-        qualifiedScore: qualifiedScore
+        qualifiedScore: qualifiedScore,
+        availableScores: selectAvailable
       };
       temp.push(obj);
       const params = {
@@ -1040,7 +1079,7 @@ export default {
       inpectRESTful.updateInspectItem(params).then(res => {
         console.log(res);
         const codeMsg = res.errMsg;
-        if (codeMsg != undefined && codeMsg === 'Success') {
+        if (codeMsg != undefined && codeMsg == 'Success') {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           item.isClick = false;
           self.refreshData(self.groupIndex);
@@ -1052,36 +1091,66 @@ export default {
     },
 
     cancelEditNape(index, item) {
-      const self = this;
-      item.isClick = false;
-      item.napeDep = self.napeDepTemp;
-      item.napeName = item.napeNameShow.slice(item.napeNameShow.indexOf('，') + 1);
+      const curEditItem = JSON.parse(sessionStorage.getItem('curEditItem'));
+      item.isClick = curEditItem.isClick;
+      item.napeDep = curEditItem.napeDep;
+      item.Score_1 = curEditItem.Score_1;
+      item.Score_2 = curEditItem.Score_2;
+      item.Score_3 = curEditItem.Score_3;
+      item.Score_4 = curEditItem.Score_4;
+      item.availableScoreStr = curEditItem.availableScoreStr;
+      item.napeName = curEditItem.napeNameShow;
     },
 
     confirmaddNape() {
       const self = this;
       const temp = [];
-      if (self.newNapeName.trim().length === 0) {
+      if (self.newNapeName.trim().length == 0) {
         self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
-      if (typeof (self.newAddScore) !== 'number' && self.newAddScore.trim().length === 0) {
+      if (typeof (self.newAddScore) !== 'number' && self.newAddScore.trim().length == 0) {
         self.notify(self.$t('insSettingView.ScoreEmpty'), 'warning', 3000);
         return false;
       }
-      let itemScore = 0, qualifiedScore = 0;
-      if (self.activeSheetName === '0') {
-        itemScore = 10;
-        qualifiedScore = null;
-      } else if (self.activeSheetName === '1') {
+      // if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
+      //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
+      //     return false;
+      // }
+      let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
+      if (self.activeSheetName == '0') {
+        if (self.newAddScore > 50 || self.newAddScore < 1) {
+          self.notify(self.$t('insSettingView.sheetscoreA'), 'warning', 3000);
+          return false;
+        } else {
+          itemScore = self.newAddScore;
+          qualifiedScore = null;
+        }
+      } else if (self.activeSheetName == '1') {
         if (self.newCritical > self.newScore) {
           self.notify(self.$t('insSettingView.excelMinScoreType'), 'warning', 3000);
           return false;
         } else {
           itemScore = self.newScore;
           qualifiedScore = self.newCritical;
+          selectAvailable = self.selectAvailable[0] === '-1' ? self.selectAvailable.slice(1) : self.selectAvailable;
+          const availableScores = [];
+          for (let i = 0; i < self.newScore + 1; i++) {
+            availableScores.push(i);
+          }
+          selectAvailable[0].length === 0 ? selectAvailable = availableScores : null;
+          selectAvailable.sort(function(a, b) {
+            return a - b;
+          });
+          if (qualifiedScore > itemScore) {
+            self.notify(self.$t('insSettingView.excelMinScoreType'), 'warning', 3000);
+            return false;
+          } else if (selectAvailable[selectAvailable.length - 1] > itemScore) {
+            self.notify(self.$t('insSettingView.excelScoreItemType'), 'warning', 3000);
+            return false;
+          }
         }
-      } else if (self.activeSheetName === '2') {
+      } else if (self.activeSheetName == '2') {
         if (self.newAddScore > 100 || self.newAddScore < -100) {
           self.notify(self.$t('insSettingView.sheetscore2'), 'warning', 3000);
           return false;
@@ -1094,7 +1163,8 @@ export default {
         subject: self.newNapeName.trim(),
         description: self.newNapeDep.trim(),
         itemScore: itemScore,
-        qualifiedScore: qualifiedScore
+        qualifiedScore: qualifiedScore,
+        availableScores: selectAvailable
       };
       temp.push(objItem);
       const obj = {
@@ -1108,7 +1178,7 @@ export default {
       };
       inpectRESTful.addInspectItem(params).then((res) => {
         const codeMsg = res.errMsg;
-        if (codeMsg != undefined && codeMsg === 'Success') {
+        if (codeMsg != undefined && codeMsg == 'Success') {
           const obj = {
             napeName: self.newNapeName,
             napeNameShow: `${self.napeList.length + 1}，${self.newNapeName}`,
@@ -1136,13 +1206,15 @@ export default {
             };
             tempParams.push(obj);
           });
-          const paramsApply = {
-            storeList: tempParams
-          };
-          inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
-            const res = resApply;
-            console.log(res);
-          });
+          if (tempParams.length !== 0) {
+            const paramsApply = {
+              storeList: tempParams
+            };
+            inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
+              const res = resApply;
+              console.log(res);
+            });
+          }
           self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
           setTimeout(function() {
             console.log(self.tabName);
@@ -1164,13 +1236,28 @@ export default {
     handleEdit(index, item) {
       const self = this;
       self.napeDepTemp = item.napeDep;
+      sessionStorage.setItem('curEditItem', JSON.stringify(item));
       item.isClick = true;
       self.showAddNape = false;
-      self.ScoreList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      // self.ScoreList=arr.slice(0,item.Score_2)
-      // item.napeName=item.napeNameShow.slice(indexOf(',')+1);
+      const arr = [];
+      for (var i = 0; i <= 50; i++) {
+        arr.push(i);
+      }
+      self.fullScoreTemp = arr.slice(1, i + 1);
+      self.ScoreList = arr.slice(0, item.Score_1 + 1);
+      const available = arr.slice(0, item.Score_1 + 1);
+      const availableScores = [];
+      available.forEach(item => {
+        const obj = {
+          label: item,
+          value: item,
+          disabled: false
+        };
+        availableScores.push(obj);
+      });
+      self.availableScores = availableScores;
       self.napeList.forEach((_item, _index) => {
-        if (index !== _index) {
+        if (index != _index) {
           _item.isClick = false;
         }
       });
@@ -1334,6 +1421,16 @@ export default {
       const self = this;
       const temp = [];
       item.itemData.forEach((_item, index) => {
+        const availableScores = [];
+        for (let i = 0; i <= _item.itemScore; i++) {
+          const scoreObj = {
+            label: i,
+            value: i,
+            disabled: false
+          };
+          availableScores.push(scoreObj);
+        }
+        self.availableScores = availableScores;
         const obj = {
           id: _item.id,
           napeName: _item.subject,
@@ -1342,6 +1439,8 @@ export default {
           Score_1: _item.itemScore,
           Score_2: _item.qualifiedScore,
           Score_3: _item.itemScore,
+          Score_4: _item.availableScores,
+          availableScoreStr: _item.availableScores.toString(),
           isClick: false,
           checked: false
         };
@@ -1352,6 +1451,22 @@ export default {
 
     initData() {
       const self = this;
+      const arr = [];
+      for (var i = 0; i <= 50; i++) {
+        arr.push(i);
+      }
+      self.ScoreList = arr.slice(0, i + 1);
+      const available = arr.slice(0, i + 1);
+      const availableScores = [];
+      available.forEach(item => {
+        const obj = {
+          label: item,
+          value: item,
+          disabled: false
+        };
+        availableScores.push(obj);
+      });
+      self.availableScores = availableScores;
       self.tabName = sessionStorage.getItem('GroupName');
       self.refreshData(0);
       self.getBindStoreList();
@@ -1399,10 +1514,29 @@ export default {
       }
     },
 
-    selectFullScore(val) {
+    selectFullScore(val, item) {
       const self = this;
-      const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      self.ScoreList = arr.slice(0, val);
+      const arr = [];
+      for (var i = 0; i <= 50; i++) {
+        arr.push(i);
+      }
+      self.ScoreList = arr.slice(0, val + 1);
+      const available = arr.slice(0, val + 1);
+      const availableScores = [];
+      available.forEach(item => {
+        const obj = {
+          label: item,
+          value: item,
+          disabled: false
+        };
+        availableScores.push(obj);
+      });
+      self.availableScores = availableScores;
+      if (item !== undefined) {
+        item.Score_4 = arr.slice(0, val + 1);
+      } else {
+        self.selectAvailable = arr.slice(0, val + 1);
+      }
     },
 
     napeNameChange(val, item) {
@@ -1458,7 +1592,6 @@ export default {
       PubSub.publish('change-color', { showTag: false });
     }
   }
-
 };
 </script>
 <style lang="scss" scoped>
@@ -1913,7 +2046,7 @@ export default {
                         margin-right: 0px;
                     }
                     .nape-input{
-                        width:calc(220/1920*100vw);
+                        width:calc(200/1920*100vw);
                         min-width:136px;
                         float: left;
                         @include point(margin-left,10);
@@ -1948,7 +2081,7 @@ export default {
                         text-align: left;
                     }
                     .nape-input{
-                        width:calc(250/1920*100vw);
+                        width:calc(200/1920*100vw);
                         min-width:215px;
                         float: left;
                         @include point(margin-left,10);
@@ -1977,15 +2110,15 @@ export default {
                         text-align: left;
                     }
                     .FullScore-input /deep/ .el-input{
-                        width:68px;
+                        width:65px;
                         margin: 0 auto;
                     }
                     .critical-input /deep/ .el-input{
-                        width:68px;
+                        width:65px;
                         margin: 0 auto;
                     }
                     .Itemscores-input{
-                        width:68px;
+                        width:65px;
                         margin: 0 auto;
                     }
                 }
@@ -1998,6 +2131,15 @@ export default {
                       font-size: calc(24/1920*100vw);
                       color: #7d8cad;
                     }
+                }
+                .nape-scores-handle /deep/ .el-select.el-select--mini{
+                    width:110px !important;
+                    height:45px !important;
+                    background-color: #fee4e7 !important;
+                    color:#424151 !important;
+                }
+                .nape-scores-handle /deep/ .el-province .el-input--mini .el-input__icon{
+                    line-height: 0;
                 }
                 .iconcontent{
                     @include point(margin-left,25);
@@ -2054,6 +2196,9 @@ export default {
     width:190px !important;
     height:45px !important;
     color:#424151 !important;
+}
+.nape-scores-handle .content{
+    width:110px !important;
 }
 .el-dialog__body{
     padding: 0px !important;

@@ -41,7 +41,7 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Stable;
+const environJSON = _Environments.Debug_XA;
 const isGlobalWebsite = false;
 
 let Environment;
