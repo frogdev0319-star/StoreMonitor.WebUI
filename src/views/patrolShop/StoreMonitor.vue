@@ -106,28 +106,6 @@
         </div>
       </el-dialog>
       <el-dialog
-        v-if="dialogCommentVideo"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="dialogCommentVideo"
-        :close-on-click-modal="false"
-        :width="680 * percentHeight + 'px'"
-        height="300px"
-        top="5%"
-      >
-        <div class="canvas-content">
-          <hr class="dialog-hr" >
-          <video
-            id="previewCutVideo"
-            :width="580 * percentHeight"
-            :height="430 * percentHeight"
-            :src="curVideoSrc"
-            prload
-            controls
-            autoplay
-          />
-        </div>
-      </el-dialog>
-      <el-dialog
         v-if="showOuter"
         :title="$t('remotePatrol.view')"
         :visible.sync="showOuter"
@@ -190,36 +168,15 @@
       </dialog-vue>
 
       <div v-if="!isEzviz">
-        <div id="videoContent" class="video-content">
-          <div v-if="showGetVideo" class="getvideo-content">
-            <div class="btn-graph">
-              <canvas
-                id="btn-graph-canvas"
-                :width="graphBtnWidth"
-                :height="graphBtnWidth"
-              />
-            </div>
-            <canvas
-              id="vcanvas"
-              :width="varyWindowWidth * 0.418 + 'px'"
-              :height="varyWindowWidth * 0.288 + 'px'"
-            />
-          </div>
+        <div id="videoContent" class="video-content" v-loading="isLoading"
+             element-loading-background="rgba(0, 0, 0, 0.8)">
           <div v-if="showModelContent" class="video-model">
-            <span v-if="showControlInfo" id="channelName">{{
-              channel.channelName
-            }}</span>
+            <span v-if="showControlInfo" id="channelName">
+              {{channel.channelName}}</span>
             <div v-if="showControlInfo" class="icon-footer">
               <div v-if="showStoreUp" class="iconlside">
-                <i
-                  v-if="!playState"
-                  class="iconfont icon-bofang1 iconplay"
-                  @click="realTime"
-                />
-                <i
-                  v-else
-                  class="iconfont icon-zantingtingzhi iconplay"
-                  @click="stopRealTime"
+                <i class="iconfont iconplay" :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"
+                  @click="onPlay"
                 />
               </div>
               <div class="iconrside">
@@ -345,7 +302,6 @@
         :play-back="playBackState"
         :cur-time="playBackTime"
         @confirmEzvizCanvas="editEzvizCanvas"
-        @emitEzvizVideo="confirmEzvizVideo"
       />
       <div class="el-event">
         <div :class="corEvent ? 'event-lside' : ''">
@@ -635,6 +591,8 @@ import filterString from '@/common/filterString.js';
 import { getCookie } from '@/common/auth';
 import { setTimeout } from 'timers';
 import EzvizVideo from '@/components/EzvizVideo.vue';
+import DashHttp from "../../common/DashHttp";
+import { getDashServerInfo } from '@/api/device.js';
 
 export default {
   name: 'StoreMoinitor',
@@ -812,7 +770,6 @@ export default {
       oss: null,
       bucketVideo: '',
       bucketImage: '',
-      showGetVideo: false,
       imageCanvas: new Image(),
       imageCanvasList: [],
       timeDrap: false,
@@ -875,7 +832,26 @@ export default {
       dateValue: new Date(),
       changeFlag: false,
       eventNameRuletip: false,
-      eventDesRuletip: false
+      eventDesRuletip: false,
+
+      uri: null,
+      play: true,
+      fullScreen: false,
+      paused: true,
+      muted: false,
+      currentState: 'blank', // 'blank','loading','play','inline'
+      error: '',
+      streamProtocol: 'DASH',
+      sessionId: null,
+      userName: null,
+      password: null,
+      IVSID: null,
+      channelId: null,
+      realType: true,
+      lastTime: null,
+      currentTime: null,
+      onEndflag: false,
+      showError: false,
     };
   },
 
@@ -931,7 +907,7 @@ export default {
       let self = this;
       console.log(val);
       if (val >= 300) {
-        self.stopRealTime();
+        self.stopVideoPlay();
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
       }
@@ -958,9 +934,7 @@ export default {
     self.timerPlayReal = null;
     self.timeid = null;
     if (!self.isEzviz) {
-      if (self.playState || self.playBackState) {
-        self.stopRealTime();
-      }
+      self.stopVideoPlay();
     } else {
       self.$refs.ezvizVideo.stopRealTime();
     }
@@ -985,7 +959,7 @@ export default {
     self.getUpLoadBucketInfo();
     self.getInitStoreData();
     self.getFaStoreData();
-    self.getWeekDay();
+    self.getDashUrlInfo();
     window.onresize = function() {
       if (!self.checkFull()) {
         self.fullScreen = false;
@@ -1011,13 +985,13 @@ export default {
       let self = this;
       if (document.hidden) {
         if (self.playState && !self.playBackState) {
-          self.stopRealTimeVisPage();
+          self.stopVideoPlay()
           window.clearInterval(self.timerPlayReal);
         }
       } else {
-        console.log(self.playBackState);
-        if (self.isPlayingFlag === 1) {
-          self.realTime();
+        console.log(this.currentState);
+        if(this.currentState === 'loading'){
+          self.startVideo(self.channel.ivsId, self.channel.channelId, null)
         }
       }
     },
@@ -1025,10 +999,8 @@ export default {
     changeBrand() {
       let self = this;
       self.clearEvent();
-      if (self.playState) {
-        self.stopRealTime();
-        self.previewplayer.dispose();
-      }
+      self.stopVideoPlay();
+      self.previewplayer && self.previewplayer.dispose();
       self.activeIndex = '0';
       self.accountId = localStorage.getItem('oss_bucket');
       self.hideLast = false;
@@ -1038,7 +1010,6 @@ export default {
       self.changeFlag = true;
       self.getInitStoreData();
       self.getFaStoreData();
-      self.backCurDateAccount();
     },
 
     getUpLoadBucketInfo() {
@@ -1386,202 +1357,6 @@ export default {
       return d;
     },
 
-    async stopAndPlayHistoryVideo() {
-      let self = this;
-      let state = self.playBackState;
-      self.realTimeStartTs = Number(
-        self.curTime.getTime().toString().substr(0, 10)
-      );
-      console.log(self.realTimeStartTs);
-      self.isLoading = true;
-      self.stopVideo();
-      let data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      let url = '';
-      if (state) {
-        let ret = await dashAPI.playBack(0, data);
-        await dashAPI.Offline(self.sessionId);
-      } else {
-        let ret = await dashAPI.RealTime(0, data);
-        await dashAPI.Offline(self.sessionId);
-      }
-      let sessionId = await dashAPI.Online();
-      self.sessionId = sessionId;
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      let dataonLine = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          beginTime: self.curTime.getTime().toString().substr(0, 10),
-          endTime: (self.curTime.getTime() + (5 * 60 + 1) * 1000)
-            .toString()
-            .substr(0, 10),
-          streamType: 'SubStream'
-        }
-      };
-      url = await dashAPI.playBack(1, dataonLine);
-      self.mpdurl = url;
-      if (url == null) {
-        self.isLoading = false;
-        return;
-      }
-      console.log(self.mpdurl);
-      if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length !== 0) {
-        console.log(self.mpdurl);
-        self.playVideo(self.mpdurl);
-        setTimeout(() => {
-          self.isLoading = false;
-        }, 1000);
-        self.timeid = window.setInterval(function() {
-          self.getProcess();
-        }, 1000);
-      } else {
-        self.playState = false;
-        self.showModelContent = false;
-        self.isLoading = false;
-        console.log(self.mpdurl.ErrorCode);
-        let errorCode = self.mpdurl.ErrorCode;
-        let errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-      }
-    },
-
-    async stopAndAdjustProcessHistoryVideo() {
-      let self = this;
-      let state = self.playBackState;
-      self.stopVideo();
-      window.clearInterval(self.timeid);
-      self.isLoading = true;
-      let data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      let url = '';
-      if (state) {
-        let ret = await dashAPI.playBack(0, data);
-        await dashAPI.Offline(self.sessionId);
-      } else {
-        let ret = await dashAPI.RealTime(0, data);
-        await dashAPI.Offline(self.sessionId);
-      }
-      let sessionId = await dashAPI.Online();
-      self.sessionId = sessionId;
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      let dataonLine = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          beginTime: self.realTimeStartTs.toString().substr(0, 10),
-          endTime: (self.realTimeStartTs + (5 * 60 + 1))
-            .toString()
-            .substr(0, 10),
-          streamType: 'SubStream'
-        }
-      };
-      url = await dashAPI.playBack(1, dataonLine);
-      self.mpdurl = url;
-      console.log(self.mpdurl);
-      if (url == null) {
-        self.isLoading = false;
-        return;
-      }
-      if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length !== 0) {
-        console.log(self.mpdurl);
-        self.playVideo(self.mpdurl);
-        setTimeout(() => {
-          self.isLoading = false;
-        }, 1000);
-        self.timeid = window.setInterval(function() {
-          self.getProcess();
-        }, 1000);
-      } else {
-        self.playState = false;
-        self.showModelContent = false;
-        self.isLoading = false;
-        console.log(self.mpdurl.ErrorCode);
-        let errorCode = self.mpdurl.ErrorCode;
-        let errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-      }
-    },
-
-    async playHistoryVideo() {
-      let self = this;
-      self.realTimeStartTs = Number(
-        self.curTime.getTime().toString().substr(0, 10)
-      );
-      console.log(self.realTimeStartTs);
-      self.isLoading = true;
-      let sessionId = await dashAPI.Online();
-      console.log(sessionId);
-      self.sessionId = sessionId;
-      if (sessionId == null) {
-        self.isLoading = false;
-        return;
-      }
-      let data = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          beginTime: self.curTime.getTime().toString().substr(0, 10),
-          endTime: (self.curTime.getTime() + (5 * 60 + 1) * 1000)
-            .toString()
-            .substr(0, 10),
-          streamType: 'SubStream'
-        }
-      };
-      let url = await dashAPI.playBack(1, data);
-      self.mpdurl = url;
-      if (url == null) {
-        self.isLoading = false;
-        return;
-      }
-      if (url.ErrorCode == undefined && url.length !== 0) {
-        self.playVideo(self.mpdurl);
-        setTimeout(() => {
-          self.isLoading = false;
-        }, 1000);
-        self.timeid = window.setInterval(function() {
-          self.getProcess();
-        }, 1000);
-      } else {
-        self.playState = false;
-        self.showModelContent = false;
-        self.isLoading = false;
-        console.log(self.mpdurl.ErrorCode);
-        let errorCode = self.mpdurl.ErrorCode;
-        let errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-      }
-    },
-
     changeDate(val) {
       let self = this;
       self.startTs = 0;
@@ -1595,6 +1370,7 @@ export default {
       self.playBackTime = Number(d.getTime().toString());
       self.currentTimeValue = 0;
       self.playBackState = true;
+      self.realType = false;
       self.curSpeed = '1 X';
       self.curBack = '';
       if (self.timeid != null) {
@@ -1603,11 +1379,8 @@ export default {
         self.timeid = 0;
       }
       if (!self.isEzviz) {
-        if (self.playState) {
-          self.stopAndPlayHistoryVideo();
-        } else {
-          self.playHistoryVideo();
-        }
+        self.startVideo(self.channel.ivsId, self.channel.channelId, self.startTs);
+        self.realTimeStartTs = self.startTs;
       } else {
         console.log('ezviz');
         self.changeFlag = false;
@@ -1620,7 +1393,6 @@ export default {
       let bucketName = self.oss.ossBucketName;
       let endpoint = self.oss.ossEndPoint;
       let key = fileName;
-      // let url=`http://${bucketName}.${endpoint}/${fileName}`;
       if (self.oss.ossVendor === 2) {
         return `https://${endpoint}/${bucketName}/${fileName}`;
       } else {
@@ -2041,24 +1813,6 @@ export default {
       self.showSnapShotDialog = false;
       self.myDivHeight();
     },
-    processInWebWorker(workerPath) {
-      let blob = URL.createObjectURL(
-        new Blob(
-          [
-            'importScripts("' +
-              workerPath +
-              '");var now = Date.now;function print(text) {postMessage({"type" : "stdout","data" : text});};onmessage = function(event) {var message = event.data;if (message.type === "command") {var Module = {print: print,printErr: print,files: message.files || [],arguments: message.arguments || [],TOTAL_MEMORY: message.TOTAL_MEMORY || false};postMessage({"type" : "start","data" : Module.arguments.join(" ")});postMessage({"type" : "stdout","data" : "Received command: " +Module.arguments.join(" ") +((Module.TOTAL_MEMORY) ? ".  Processing with " + Module.TOTAL_MEMORY + " bits." : "")});var time = now();var result = ffmpeg_run(Module);var totalTime = now() - time;postMessage({"type" : "stdout","data" : "Finished processing (took " + totalTime + "ms)"});postMessage({"type" : "done","data" : result,"time" : totalTime});}};postMessage({"type" : "ready"});'
-          ],
-          {
-            type: 'application/javascript'
-          }
-        )
-      );
-
-      let worker = new Worker(blob);
-      URL.revokeObjectURL(blob);
-      return worker;
-    },
 
     async playVideo(url) {
       let self = this;
@@ -2092,13 +1846,16 @@ export default {
         return false;
       }
       self.isLoading = true;
-      let sessionId = await dashAPI.Online();
-      console.log(sessionId);
-      self.sessionId = sessionId;
-      if (sessionId == null) {
-        self.isLoading = false;
+      if(!await this.online()){
         return;
       }
+      // let sessionId = await dashAPI.Online();
+      // console.log(sessionId);
+      // self.sessionId = sessionId;
+      // if (sessionId == null) {
+      //   self.isLoading = false;
+      //   return;
+      // }
       let data = null;
       let url = '';
       if (self.timeid != null) {
@@ -2111,6 +1868,7 @@ export default {
       if (self.playBackState) {
         self.curSpeed = '1 X';
         self.curBack = '';
+        self.history()
         data = {
           request: {
             method: 'connection',
@@ -2275,7 +2033,7 @@ export default {
       self.currentStr = getTimeStr(curTime);
       self.durationStr = getTimeStr(duration);
       if (curTime >= duration) {
-        self.stopHDash();
+        self.stopVideoPlay();
         window.clearInterval(self.timeid);
         self.timeid = null;
         self.timeid = 0;
@@ -2322,8 +2080,7 @@ export default {
           if (curTime > 10) {
             video.player.currentTime(curTime - 10);
           } else {
-            console.log(self.realTimeStartTs);
-            self.stopAndAdjustProcessHistoryVideo();
+            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs)
           }
           break;
         }
@@ -2332,8 +2089,7 @@ export default {
           if (curTime > 30) {
             video.player.currentTime(curTime - 30);
           } else {
-            console.log(self.realTimeStartTs);
-            self.stopAndAdjustProcessHistoryVideo();
+            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs)
           }
           break;
         }
@@ -2343,11 +2099,13 @@ export default {
             if (curTime > 60) {
               video.player.currentTime(curTime - 60);
             } else {
-              console.log(self.realTimeStartTs);
-              self.stopAndAdjustProcessHistoryVideo();
+              self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs)
             }
+            break;
           }
+        default:{
           break;
+        }
       }
     },
 
@@ -2601,7 +2359,7 @@ export default {
 
     clickStore(item, index, _item, _index) {
       let self = this;
-      if (self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
+      if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
         self.videoLoadingObj.dialogCosed = true;
         return false;
       }
@@ -2632,10 +2390,9 @@ export default {
       let temp = [];
       self.hideLast = false;
       self.hideNext = false;
+      self.showCutContent = false;
       if (!self.isEzviz) {
-        if (self.playState) {
-          self.stopRealTime();
-        }
+        self.stopVideoPlay();
       } else {
         self.$refs.ezvizVideo.showError = false;
         self.$refs.ezvizVideo.playBack &&
@@ -2687,109 +2444,6 @@ export default {
       }
     },
 
-    async stopAndRealTime() {
-      let self = this;
-      self.isLoading = true;
-      self.stopVideo();
-      let dataDis = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.channel.ivsId,
-          channel: JSON.stringify(self.channel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      let url = '';
-      if (self.timeid != null) {
-        window.clearInterval(self.timeid);
-        self.timeid = null;
-        self.timeid = 0;
-      }
-      window.clearInterval(self.timerPlayReal);
-      self.realTimeSpeed = 0;
-      if (self.playBackState) {
-        self.realTimeStartTs = self.startTs;
-        let ret = await dashAPI.playBack(0, dataDis);
-        await dashAPI.Offline(self.sessionId);
-        let sessionId = await dashAPI.Online();
-        self.sessionId = sessionId;
-        if (sessionId == null) {
-          self.isLoading = false;
-          return;
-        }
-        let data = null;
-        data = {
-          request: {
-            method: 'connection',
-            sessionID: sessionId,
-            streamingProtocol: this.protocal,
-            IVSID: self.channel.ivsId,
-            channel: JSON.stringify(self.channel.channelId),
-            beginTime: self.curTime.getTime().toString().substr(0, 10),
-            endTime: (self.curTime.getTime() + (5 * 60 + 1) * 1000)
-              .toString()
-              .substr(0, 10),
-            streamType: 'SubStream'
-          }
-        };
-        url = await dashAPI.playBack(1, data);
-      } else {
-        let ret = await dashAPI.RealTime(0, dataDis);
-        await dashAPI.Offline(self.sessionId);
-        let sessionId = await dashAPI.Online();
-        self.sessionId = sessionId;
-        if (sessionId == null) {
-          self.isLoading = false;
-          return;
-        }
-        let data = null;
-        data = {
-          request: {
-            method: 'connection',
-            sessionID: sessionId,
-            streamingProtocol: this.protocal,
-            IVSID: self.channel.ivsId,
-            channel: JSON.stringify(self.channel.channelId),
-            streamType: 'SubStream'
-          }
-        };
-        url = await dashAPI.RealTime(1, data);
-      }
-      self.mpdurl = url;
-      if (self.mpdurl == null) {
-        self.isLoading = false;
-        return;
-      }
-      console.log(self.mpdurl);
-      if (url.ErrorCode == undefined && url.length !== 0) {
-        self.playVideo(self.mpdurl);
-        setTimeout(() => {
-          self.isLoading = false;
-        }, 1000);
-        if (self.playBackState) {
-          self.timeid = window.setInterval(function() {
-            self.getProcess();
-          }, 1000);
-        } else {
-          self.isPlayingFlag = 1;
-          self.realTimeSpeed = 0;
-
-          self.timerPlayReal = window.setInterval(() => {
-            self.realTimeSpeed = self.realTimeSpeed + 1;
-          }, 1000);
-        }
-      } else {
-        self.playState = false;
-        self.showModelContent = false;
-        self.isLoading = false;
-        console.log(self.mpdurl.ErrorCode);
-        let errorCode = self.mpdurl.ErrorCode;
-        let errorText = util.getErrorText(errorCode);
-        self.errorText = errorText;
-      }
-    },
-
     changeChannel(item, index) {
       let self = this;
       self.showModelContent = true;
@@ -2812,10 +2466,11 @@ export default {
         }
       });
       if (!self.isEzviz) {
-        if (self.playState) {
-          self.stopAndRealTime();
-        } else {
-          self.realTime();
+        if(self.playBackState){
+          self.startVideo(self.channel.ivsId, self.channel.channelId, self.startTs)
+        }
+        else{
+          self.startVideo(self.channel.ivsId, self.channel.channelId, null)
         }
       } else {
         self.$refs.ezvizVideo.playBack &&
@@ -2919,7 +2574,7 @@ export default {
 
     clickBtn(item, index) {
       let self = this;
-      if (self.isLoading || (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
+      if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
         self.videoLoadingObj.dialogCosed = true;
         return false;
       }
@@ -2940,14 +2595,10 @@ export default {
       self.showModelContent = true;
       self.curYear = new Date().getFullYear();
       self.curMonth = new Date().getMonth() + 1;
-      self.getWeekDay();
+      self.realType = true;
       if (!self.isEzviz) {
         if (self.store.storeId != undefined) {
-          if (self.playState) {
-            self.stopAndRealTime();
-          } else {
-            self.realTime();
-          }
+          self.startVideo(self.channel.ivsId, self.channel.channelId, null)
         }
       } else {
         self.playBackTime = 0;
@@ -2955,90 +2606,6 @@ export default {
           self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
         });
       }
-    },
-
-    backCurDateAccount() {
-      let self = this;
-      self.dateValue = new Date();
-      self.curTime = new Date();
-      self.playBackState = false;
-      self.showModelContent = true;
-      self.curYear = new Date().getFullYear();
-      self.curMonth = new Date().getMonth() + 1;
-      self.getWeekDay();
-      if (!self.isEzviz) {
-        if (self.store.storeId != undefined) {
-          if (self.playState) {
-            self.stopAndRealTime();
-          } else {
-            self.realTime();
-          }
-        }
-      }
-    },
-
-    getWeekDay() {
-      let self = this;
-      let curWeek = util.getDateCurMonth(self.curYear, self.curMonth);
-      let dayNum = util.getDayNum(self.curYear, self.curMonth);
-      let forWardMonth = self.curMonth === 1 ? 12 : self.curMonth - 1;
-      let forWardYear = self.curMonth === 1 ? self.curYear - 1 : self.curYear;
-      let forWardDayNum = util.getDayNum(forWardYear, forWardMonth);
-      let datenew = new Array(42);
-      let indexTemp = 0;
-      let temp = [];
-      let today = new Date().getDate();
-      let curMonth = new Date().getMonth() + 1;
-      if (curWeek === 0) {
-        curWeek = 7;
-      }
-      for (let i = 0; i < datenew.length; i++) {
-        let obj = {};
-        obj.showBack = false;
-
-        if (i < curWeek) {
-          obj.showOp = true;
-          obj.data = forWardDayNum - (curWeek - 1 - i);
-          datenew[i] = forWardDayNum - (curWeek - 1 - i);
-        } else if (i === curWeek) {
-          obj.showOp = false;
-          obj.data = 1;
-          datenew[i] = 1;
-        } else {
-          datenew[i] = 1 + (i - curWeek);
-          if (datenew[i] === dayNum) {
-            indexTemp = i;
-          }
-          obj.showOp = false;
-
-          obj.data = datenew[i] = 1 + (i - curWeek);
-        }
-        temp.push(obj);
-      }
-      let dateList = [];
-      for (let i = 0; i < temp.length; i += 7) {
-        dateList.push(temp.slice(i, i + 7));
-      }
-      self.weekDays = dateList;
-      self.weekDays.forEach((item, index) => {
-        item.forEach((_item, _index) => {
-          if (
-            _item.data === today &&
-            curMonth === self.curMonth &&
-            (index !== 0 || (index === 0 && _item.data <= 7))
-          ) {
-            _item.showBack = true;
-            self.curDayNum = today;
-            self.curMonthNum = self.curMonth;
-            self.curYearNum = self.curYear;
-          }
-          if (self.afterCurDate(index, _item)) {
-            _item.disabed = true;
-          } else {
-            _item.disabed = false;
-          }
-        });
-      });
     },
 
     myDivHeight() {
@@ -3080,21 +2647,6 @@ export default {
       obj.fileName = self.bucketImage + '/' + 'event' + '_' + util.getCurTimeStr() + '_' +
                       self.store.storeId + '_' + self.channel.channelId + '.jpg';
       obj.file = util.base64ToBlob(obj.src);
-      self.sourceList.push(obj);
-    },
-
-    confirmEzvizVideo(blob) {
-      let self = this;
-      console.log(blob);
-      let url = URL.createObjectURL(blob);
-      console.log(url);
-      let obj = {};
-      obj.fileName = self.bucketImage + '/' + 'event' + '_' + util.getCurTimeStr() + '_'
-                    + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      obj.file = blob;
-      obj.mediaType = 1;
-      obj.src = url;
-      obj.height = '100px';
       self.sourceList.push(obj);
     },
 
@@ -3147,11 +2699,13 @@ export default {
     onPlayerWaiting() {
       console.log('video is loading');
       this.showCutContent = false;
+      this.isLoading = true;
     },
 
     onPlayerPlaying() {
       console.log('video is playing');
       this.showCutContent = true;
+      this.isLoading = false;
     },
 
     searchChannel() {
@@ -3160,24 +2714,321 @@ export default {
       let temp = [];
       let tempArray = [];
       let tempChannel = [];
-      tempChannelList.forEach((_item, _index) => {
+      tempChannelList.forEach((_item) => {
         console.log(_item.name);
         temp.push(util.getPinyinList(_item.name));
         tempChannel.push(_item);
       });
       for (let i = 0; i < temp.length; i++) {
         if (
-          temp[i][0].indexOf(self.serachChannelValue.trim()) !== -1 ||
-          temp[i][1].indexOf(self.serachChannelValue.trim()) !== -1
+          temp[i][0].indexOf(self.serachChannelValue.trim()) !== -1
+          || temp[i][1].indexOf(self.serachChannelValue.trim()) !== -1
         ) {
           tempArray.push(tempChannel[i]);
         }
       }
       self.channelBtns = tempArray;
       self.getshowBtns(tempArray);
-    }
+    },
 
-  }
+    async onPlay() {
+      const paused = !this.paused;
+      this.showError = false;
+      this.showModelContent = true;
+      this.errorText = '';
+      if (this.realType === true) {
+        if (paused) {
+          await this.stopVideo();
+          await this.disconnectVideo();
+          await this.offline();
+          this.currentState = 'inline';
+          this.paused = true;
+        } else {
+          if (this.channel === null) {
+            this.paused = true;
+          }
+          else{
+            await this.startVideo(this.channel.ivsId, this.channel.channelId, null);
+          }
+        }
+      } else {
+        if (paused) {
+          this.paused = true;
+          await this.stopVideo();
+          await this.disconnectVideo();
+          await this.offline();
+          this.currentState = 'inline';
+          this.paused = true;
+        } else {
+          this.startVideo(this.channel.ivsId, this.channel.channelId, this.realTimeStartTs);
+          // if (this.onEndflag) {
+          //   this.startVideo(this.channel.ivsId, this.channel.channelId, this.realTimeStartTs);
+          // } else {
+          //   this.paused = false;
+          //   this.startVideo(this.channel.ivsId, this.channel.channelId, this.realTimeStartTs);
+          // }
+        }
+      }
+    },
+
+    async startVideo(IVSID, channelId, startTs) {
+      try {
+        if (IVSID === null || channelId === null) {
+          const error = this.$t('remotePatrol.dashServerError') + '5';
+          this.currentState = 'blank';
+          this.errorText = error;
+          this.showError = true;
+        } else {
+          this.isLoading = true;
+          if (!await this.stopVideoPlay()) {
+            return;
+          }
+          if (!await this.online()) {
+            return;
+          }
+          this.IVSID = IVSID;
+          this.channelId = channelId.toString();
+          let self = this;
+          if (startTs) {
+            if(await this.history(startTs) ){
+              this.timeid = window.setInterval(function() {
+                self.getProcess();
+              }, 1000);
+            }
+          } else {
+            if(await this.connectVideo()){
+              this.startTimer();
+            }
+          }
+        }
+      } catch (e) {
+        if (e.message !== 'Network request failed') {
+          this.currentState = 'blank';
+          this.errorText = e.message;
+        }
+      }
+    },
+
+    startTimer(){
+      this.realTimeSpeed = 0;
+      this.isLoading = false;
+      this.timerPlayReal = window.setInterval(() => {
+        console.log(this.realTimeSpeed);
+        this.realTimeSpeed = this.realTimeSpeed + 1;
+      }, 1000);
+    },
+
+    stopTimer(){
+      window.clearInterval(this.timerPlayReal);
+      this.realTimeSpeed = 0;
+
+      window.clearInterval(this.timeid);
+      this.timeid = 0;
+    },
+
+    async stopVideoPlay() {
+      this.paused = true;
+      if (this.sessionId) {
+        const state = this.currentState;
+        this.currentState = 'loading';
+        if (state === 'play') {
+          this.stopVideo();
+          await this.disconnectVideo();
+        }
+        return await this.offline();
+      } else {
+        return true;
+      }
+    },
+
+    async online() {
+      const data = {};
+      const request = {};
+      request.username = this.userName;
+      request.password = this.password;
+      data.request = request;
+      this.currentState = 'loading';
+      if (await DashHttp.putDash('Authority/Online', data)) {
+        this.sessionId = DashHttp.getResult().SessionID;
+        return true;
+      } else {
+        let error = this.$t('remotePatrol.dashServerError');
+        if (DashHttp.getResult() != null) {
+          error += DashHttp.getResult().ErrorCode;
+        }
+        this.currentState = 'blank';
+        this.errorText = error;
+        this.showError = true;
+        this.showModelContent = false;
+        return false;
+      }
+    },
+
+    async offline() {
+      if (this.sessionId != null) {
+        const data = {};
+        const request = {};
+        request.sessionID = this.sessionId;
+        data.request = request;
+        if (await DashHttp.putDash('Authority/Offline', data)) {
+          this.sessionId = null;
+          return true;
+        } else {
+          if (DashHttp.getResult() != null) {
+            const errorCode = DashHttp.getResult().ErrorCode;
+            if (errorCode === 3) {
+              this.sessionId = null;
+              return true;
+            } else {
+              const error = this.$t('remotePatrol.dashServerError') + errorCode;
+              return false;
+            }
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return true;
+      }
+    },
+
+    async connectVideo() {
+      console.log('Connect Video--');
+      const data = {};
+      const request = {};
+      request.method = 'connection';
+      request.sessionID = this.sessionId;
+      request.streamingProtocol = this.streamProtocol;
+      request.withAudio = true;
+      request.streamType = 'SubStream';
+      request.IVSID = this.IVSID;
+      request.channel = this.channelId;
+      data.request = request;
+      this.realType = true;
+      if (await DashHttp.putDash('LiveStream', data)) {
+        const url = DashHttp.getResult().mpd;
+        this.uri = url;
+        console.log(this.uri);
+        this.playVideo(url);
+        this.currentState = 'play';
+        this.paused = false;
+        this.errorText = '';
+        this.isLoading = false;
+        this.playState
+        return true;
+      } else {
+        let error = this.$t('remotePatrol.dashServerError');
+        if (DashHttp.getResult() != null) {
+          error += DashHttp.getResult().ErrorCode;
+          this.currentState = 'blank';
+          this.errorText = error;
+          this.showError = true;
+          this.showModelContent = false;
+          this.isLoading = false;
+          return false;
+        }
+      }
+    },
+
+    async history(startTs) {
+      const data = {};
+      const request = {};
+      request.method = 'connection';
+      request.sessionID = this.sessionId;
+      request.streamingProtocol = this.streamProtocol;
+      request.withAudio = true;
+      request.transcodeResolution = 'D1';
+      request.IVSID = this.IVSID;
+      request.channel = this.channelId;
+      request.beginTime = startTs.toString();
+      request.endTime = (startTs + 300).toString();
+
+      data.request = request;
+      this.realType = false;
+      if (await DashHttp.putDash('PlaybackStream', data)) {
+        const url = DashHttp.getResult().mpd;
+        this.uri = url;
+        console.log(this.uri);
+        this.playVideo(url);
+        this.currentState = 'play';
+        this.paused = false;
+        this.errorText = '';
+        this.onEndflag = false;
+        this.lastTime = startTs + 300;
+        return true;
+      } else {
+        let error = this.$t('remotePatrol.dashServerError');
+        if (DashHttp.getResult() != null) {
+          error += DashHttp.getResult().ErrorCode;
+          this.currentState = 'blank';
+          this.paused = false;
+          this.errorText = error;
+          return false;
+        }
+      }
+    },
+
+    async disconnectVideo() {
+      if (this.sessionId != null) {
+        const data = {};
+        const request = {};
+        request.method = 'disconnection';
+        request.sessionID = this.sessionId;
+        request.IVSID = this.IVSID;
+        request.channel = this.channelId;
+        request.streamType = 'SubStream';
+        data.request = request;
+        const url = this.realType ? 'LiveStream' : 'PlaybackStream';
+        if (await DashHttp.putDash(url, data)) {
+          return true;
+        } else {
+          if (DashHttp.getResult() != null) {
+            const errorCode = DashHttp.getResult().ErrorCode;
+            if (errorCode === 3) {
+              return true;
+            } else {
+              if (errorCode !== 24) {
+                const error = this.$t('remotePatrol.dashServerError') + errorCode;
+              }
+              return false;
+            }
+          } else {
+            return false;
+          }
+        }
+      } else {
+        return true;
+      }
+    },
+
+    stopVideo() {
+      const self = this;
+      console.log('stop video')
+      self.playState = false;
+      var video = document.getElementById('previewVideo');
+      self.previewplayer = videojs(video);
+      self.previewplayer.pause();
+      self.stopTimer();
+    },
+
+    getDashUrlInfo() {
+      getDashServerInfo().then(result => {
+        const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
+        this.userName = result.data.loginId;
+        this.password = result.data.password;
+        const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
+        console.log(url);
+        DashHttp.setDashHost(url);
+      }).catch(error => {
+        if (error.message !== 'Network request failed') {
+          this.currentState = 'blank';
+          this.errorText = error;
+          this.showError = true;
+        }
+      });
+    },
+
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -3470,6 +3321,7 @@ $h1: #292e36;
       margin: calc(25 / 1920 * 100vw);
       margin-bottom: 0;
       height: 420px;
+      z-index: 10;
       .getvideo-content {
         position: absolute;
         z-index: 930;
@@ -4175,159 +4027,6 @@ $h1: #292e36;
           width: 120px;
         }
       }
-      /**
-                @media screen and (min-width: 1366px){
-                    .date-picker-content{
-                        text-align: left;
-                        @include point(padding-left,20);
-                        position: relative;
-                        span{
-                            font-size: 14px;
-                            color: $black;
-                            margin-right: 15px;
-                            @include point(margin-left,30);
-                        }
-                        .time-picker{
-                            width: 120px;
-                        }
-                        .backdate-btn{
-                            position: absolute;
-                            @include point(right,20);
-                            font-size: 12px;
-                            line-height: 12px;
-                            border-radius: 3px !important;
-                        }
-                    }
-                }
-              @media screen and (max-width: 1440px){
-                .date-picker-content{
-                  text-align: left;
-                  @include point(padding-left,10);
-                  position: relative;
-                  span{
-                    font-size: 12px;
-                    color: $black;
-                    margin-right: 10px;
-                    @include point(margin-left,10);
-                  }
-                  .time-picker{
-                    width: 110px;
-                    font-size: 12px;
-                  }
-                  .backdate-btn{
-                    position: absolute;
-                    @include point(right,10);
-                    font-size: 12px;
-                    line-height: 12px;
-                    width: 120px;
-                    padding: 6px 0;
-                  }
-                }
-              }
-                @media screen and (max-width: 1366px){
-                    .date-picker-content{
-                        text-align: left;
-                        @include point(padding-left,10);
-                        position: relative;
-                        span{
-                            font-size: 12px;
-                            color: $black;
-                            margin-right: 10px;
-                            @include point(margin-left,10);
-                        }
-                        .time-picker{
-                            width: 110px;
-                            font-size: 12px;
-                        }
-                        .backdate-btn{
-                            position: absolute;
-                            @include point(right,10);
-                            font-size: 12px;
-                            line-height: 12px;
-                            width: 120px;
-                            padding: 6px 0;
-                        }
-                    }
-                }
-                .date-content{
-                    text-align: center;
-                    margin-top: 10px;
-                    @include point(padding-left,25);
-                    @include point(padding-right,25);
-                    .date-header{
-                        margin-bottom: 10px;
-                        position: relative;
-                        user-select: none;
-                        -webkit-user-select: none;
-                        -moz-user-select: none;
-                        .icon-arrow{
-                            font-size: 25px;
-                            opacity: 0.2;
-                            position: relative;
-                            top: 4px;
-                            cursor: pointer;
-                        }
-                        span{
-                            font-size: 14px;
-                            font-weight: bold;
-                            @include point(margin,25);
-                        }
-                    }
-                    .date-data{
-                        text-align: left;
-                        padding-left: 10px;
-                        .date-title{
-                            display: inline-block;
-                            width: 14%;
-                            position: relative;
-                            @include point(left,10);
-                            font-size: 12px;
-                            margin-bottom: 15px;
-                        }
-                        .date-details{
-                            margin-bottom: 8px;
-                            .data{
-                                width: 14%;
-                                display: inline-block;
-                            }
-                            span{
-                                display: block;
-                                @include point(width,30);
-                                @include point(height,30);
-                                @include point(margin,3);
-                                background-color: #fff;
-                                @include point(line-height,30);
-                                text-align: center;
-                                font-size: 12px;
-                                @include point(border-radius,18);
-                                //cursor: pointer;
-                            }
-                            .disabedColor{
-                                color:#C3D3EA;
-                            }
-                            .opColor{
-                                background-color: $red !important;
-                                color: #fff !important;
-                            }
-                            .noramlColor{
-                                background-color: #fff;
-                            }
-                            .noramldColor{
-                                color: #C3D3EA;
-                                background-color: #F3F3F3;
-                            }
-                        }
-                        .schedule-tag{
-                            width: 16px;
-                            height: 16px;
-                            background-color: $red;
-                            border-radius: 8px;
-                            margin-top: 20px;
-                            display: inline-block;
-                        }
-                    }
-                }
-              */
     }
   }
 }
