@@ -214,8 +214,9 @@
     </el-col>
     <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
       <div class="body-content">
-        <p>正在上传中</p>
-        <p style="margin-bottom:15px;">共<span>{{ totalnumOfPic }}</span>个附件，已上传<span>{{ uploadingnumOfPic }}</span>个</p>
+        <p>{{ $t('remotePatrol.uploading') }}</p>
+        <p v-if="lang!=='en'" style="margin-bottom:15px;">{{ $t('remotePatrol.upload0') }}<span>{{ totalnumOfPic }}</span>{{ $t('remotePatrol.upload1') }}<span>{{ uploadingnumOfPic }}</span>{{ $t('remotePatrol.unit') }}</p>
+        <p v-if="lang!=='en'" style="margin-bottom:15px;"><span>{{ totalnumOfPic }}  attachments in total,</span><span>{{ uploadingnumOfPic }} uploaded.</span></p>
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>

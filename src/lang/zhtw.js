@@ -201,6 +201,8 @@ export default {
   // Patrol page language
   'remotePatrol': {
     'uploading': '正在上傳中',
+    'upload0': '共',
+    'upload1': '個附件，已上傳',
     'storeTag': ' 標籤',
     'patrolWay': ' 巡店方式',
     'patrolResult': ' 巡檢結果',
