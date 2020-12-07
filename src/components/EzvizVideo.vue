@@ -75,14 +75,6 @@
             <span>{{ $t('remotePatrol.snapshot') }}</span>
           </div>
         </transition>
-        <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang === 'en'? 'en-iconright1' : 'iconright1'"
-               style="display: none" @click="getVideo">
-            <i v-if="lang === 'en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
-            <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
-            <span>{{ $t('remotePatrol.record') }}</span>
-          </div>
-        </transition>
         <div id="myPlayer" ref="myPlayer"/>
       </div>
       <!-- full screen -->
