@@ -1670,10 +1670,9 @@ export default {
           'numOfUnqualified', 'numOfIgnored', 'qualifiedRatePer'];
         that.params.filter = {
           'page': 0,
-          'size': self.total
+          'size': that.total
         };
-        console.log(that.params);
-        let regionResult = await that.getInspectStatsItemInfo(self.params);
+        let regionResult = await that.getInspectStatsItemInfo(that.params);
         let curData = [];
         if (regionResult.errCode === 0) {
           let result = regionResult.data;
@@ -1686,7 +1685,7 @@ export default {
           }
         }
         let data = that.formatJson(filterVal, curData);
-        let patrolName = self.curType === 0 ? 'Remote Patrol' : 'Onsite Patrol';
+        let patrolName = that.curType === 0 ? 'Remote Patrol' : 'Onsite Patrol';
         let fileName = patrolName + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });

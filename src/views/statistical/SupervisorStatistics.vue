@@ -969,10 +969,11 @@ export default {
             default:
               item.mode = self.$t('overview.superTaskmode3');
               item.schedule.forEach((_item, _index) => {
-                let days = moment('20200101').add(_item.day, 'days');
+                let days = self.$moment('20200101').add(_item.day, 'days');
                 let isuu = _index === item.schedule.length - 1 ? '' : ',';
                 if (self.lang !== 'en') {
-                  scheduleStr += days.format('M') + self.$t('overview.superTaskmode2') + days.format('D') + self.$t('overview.superTaskmode0') + isuu;
+                  scheduleStr += days.format('M') + self.$t('overview.superTaskmode2') + days.format('D')
+                    + self.$t('overview.superTaskmode0') + isuu;
                 } else {
                   scheduleStr += days.format('LL') + ' ';
                 }
