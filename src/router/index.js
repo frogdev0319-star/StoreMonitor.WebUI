@@ -10,15 +10,15 @@ Vue.use(Router);
  * all roles can be accessed
  */
 export const constantRoutes = [
-  {
-    path: '/login',
-    name: 'Login',
-    hidden: true,
-    component: LoginForm,
-    meta: {
-      requireAuth: false
-    }
-  },
+  // {
+  //   path: '/login',
+  //   name: 'Login',
+  //   hidden: true,
+  //   component: LoginForm,
+  //   meta: {
+  //     requireAuth: false
+  //   }
+  // },
   {
     path: '*',
     redirect: '/'
