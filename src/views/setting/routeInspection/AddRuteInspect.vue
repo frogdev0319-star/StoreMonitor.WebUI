@@ -1431,6 +1431,15 @@ export default {
           availableScores.push(scoreObj);
         }
         self.availableScores = availableScores;
+        let availableScoreStr = '';
+        if(_item.availableScores.length!==0){
+          availableScoreStr = _item.availableScores.toString()
+        }else{
+          for(let i=0;i<_item.itemScore+1;i++){
+            const isuu = i === _item.itemScore ? '' : '/';
+            availableScoreStr += i + isuu;
+          };
+        }
         const obj = {
           id: _item.id,
           napeName: _item.subject,
@@ -1440,7 +1449,7 @@ export default {
           Score_2: _item.qualifiedScore,
           Score_3: _item.itemScore,
           Score_4: _item.availableScores,
-          availableScoreStr: _item.availableScores.toString(),
+          availableScoreStr: availableScoreStr,
           isClick: false,
           checked: false
         };

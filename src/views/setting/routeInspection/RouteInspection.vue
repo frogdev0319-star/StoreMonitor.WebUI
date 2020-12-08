@@ -572,10 +572,17 @@ export default {
             objChild.score = itemChild.itemScore;
             objChild.qualifiedScore = itemChild.qualifiedScore;
             let availableScores = '';
-            itemChild.availableScores.forEach((x_item, x_index) => {
-              const isuu = x_index === itemChild.availableScores.length - 1 ? '' : '/';
-              availableScores += x_item + isuu;
-            });
+            if(itemChild.availableScores.length!==0){
+              itemChild.availableScores.forEach((x_item, x_index) => {
+                const isuu = x_index === itemChild.availableScores.length - 1 ? '' : '/';
+                availableScores += x_item + isuu;
+              });
+            }else{
+              for(let i=0;i<itemChild.itemScore+1;i++){
+                const isuu = i === itemChild.itemScore ? '' : '/';
+                availableScores += i + isuu;
+              }
+            }
             objChild.availableScores = availableScores;
             tempChild.push(objChild);
           });

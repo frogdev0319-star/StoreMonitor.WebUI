@@ -875,13 +875,13 @@ export default {
       if (storeIdChecked.length === count) { // all checked to bind
         const resBind = await self.bindNapeToStore(paramsBind).catch((err) => self.loading = false);
         console.log(resBind);
-        if (resBind.errMsg === 'Success' && resBind.errCode === '0') {
+        if (resBind.errMsg === 'Success' && resBind.errCode === 0) {
           flag = true;
         }
       } else if (storeIdUnchecked.length === count) { // all unchecked to unbind
         const resUnBind = await self.UnbindNapeToStore(paramsUnBind).catch((err) => self.loading = false);
         console.log(resUnBind);
-        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === '0') {
+        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === 0) {
           flag = true;
         }
       } else {
