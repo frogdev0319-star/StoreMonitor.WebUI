@@ -133,12 +133,12 @@ export default {
         self.isSuccess = routeData.isSuccess;
       }
       if (self.isSuccess) {
-        self.$route.matched[2].name = self.$t('storeView.successSubmit');
+        self.$route.matched[2].name = 'successSubmit';
         if (routeData != null && routeData.user.length != 0) {
           self.leader = routeData.user[0].userName;
         }
       } else {
-        self.$route.matched[2].name = self.$t('storeView.failSubmit');
+        self.$route.matched[2].name = 'failSubmit';
         if (self.isSuccess == false) {
           PubSub.publish('success-page', { changeStyle: true });
         }

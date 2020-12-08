@@ -5,6 +5,7 @@ import i18n from '@/lang';
 
 import Environment from '@/common/environment';
 const version = Environment.VERSION;
+const isGlobalWebsite = Environment.isGlobalWebsite;
 
 export const getEzvizList = data => {
   return request({
@@ -64,7 +65,7 @@ export const getEzvizAccountList = data => {
 
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 const instance = axios.create({
-  baseURL: 'https://open.ys7.com/api/',
+  baseURL: isGlobalWebsite ? 'https://open.ezvizlife.com/api/' : 'https://open.ys7.com/api/',
   // baseURL: 'https://isgpopen.ezvizlife.com/api/',
   timeout: 3 * 1000,
   withCredentials: false, // 默认的
