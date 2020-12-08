@@ -3323,7 +3323,14 @@ export default {
               itemObj.subject = _item.subject;
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;
-              const itemScoreLength = _item.availableScores;
+              let itemScoreLength = [];
+              if(_item.availableScores.length!==0){
+                itemScoreLength = _item.availableScores;
+              }else{
+                for(let i=0;i<_item.itemScore+1;i++){
+                  itemScoreLength.push(i)
+                }
+              }
               itemScoreLength.sort((a, b) => { return a - b; });
               itemObj.itemScoreLength = itemScoreLength.reverse();
               itemObj.itemgetScore = '--';

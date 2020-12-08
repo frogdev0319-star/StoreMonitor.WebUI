@@ -250,7 +250,7 @@
       </el-dialog>
     </div>
     <div v-if="ispdf" class="el-overview-content">
-      <el-col id="pdfDom" :span="24" class="el-overview" style="padding:40px 20px;">
+      <el-col id="pdfDom" ref="printPDF" :span="24" class="el-overview" style="padding:40px 20px;width:1150px;">
         <div :span="24" class="export-header">
           <p>
             <span>{{ $t('remotePatrol.storeSelect') }}：</span>
@@ -266,44 +266,51 @@
           </p>
         </div>
         <el-row class="first-row">
-          <el-col :span="24" class="kpi-list">
-            <div class="title">{{ $t('overview.eventGraph') }}</div>
+          <el-col :span="24">
+            <img :src="pdfSrc">
           </el-col>
-          <el-col :span="3" class="kpi-list">
-            <div class="kpi-content">
-              <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
-                <div class="event-title">{{ item.eventTitle }}</div>
-                <div class="event-num">{{ item.eventNum }}</div>
+        </el-row>
+        <div class="no-print">
+          <el-row class="first-row" id="imgTest" style="width:1045px;">
+            <el-col :span="24" class="kpi-list" style="background-color:#ffffff;">
+              <div class="title">{{ $t('overview.eventGraph') }}</div>
+            </el-col>
+            <el-col :span="3" class="kpi-list" style="background-color:#ffffff;">
+              <div class="kpi-content">
+                <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
+                  <div class="event-title">{{ item.eventTitle }}</div>
+                  <div class="event-num">{{ item.eventNum }}</div>
+                </div>
               </div>
-            </div>
-          </el-col>
-          <el-col :span="14" class="store-events">
-            <div class="region-result">
-              <div class="charts-content">
-                <v-chart ref="storeEventRef" :options="storeEventsOptions" :auto-resize="true"
-                         class="result-content"/>
+            </el-col>
+            <el-col :span="14" class="store-events" style="background-color:#ffffff;">
+              <div class="region-result">
+                <div class="charts-content">
+                  <v-chart ref="storeEventRef" :options="storeEventsOptions" :auto-resize="true"
+                          class="result-content"/>
+                </div>
               </div>
-            </div>
-          </el-col>
-          <el-col :span="7" class="source-list">
-            <div class="pct-content">
-              <div class="pct-panel">
-                <v-chart ref="eventSourceRef" :auto-resize="true" :options="eventSourceOptions"
-                         class="chart-content"/>
-              </div>
-              <div class="pct-nums">
-                <div v-for="(item, index) in sourcePerArray" :class="lang === 'en' ? 'en-label' : ''"
-                     :key="index" class="content-labels">
-                  <div class="excellent_nums">{{ item.percent }}%</div>
-                  <div class="excellent_labels">
-                    <span :class="`label-` + index" class="labels excellent-label"/>
-                    <span class="label-desc">{{ item.type }}</span>
+            </el-col>
+            <el-col :span="7" class="source-list" style="background-color:#ffffff;">
+              <div class="pct-content">
+                <div class="pct-panel">
+                  <v-chart ref="eventSourceRef" :auto-resize="true" :options="eventSourceOptions"
+                          class="chart-content"/>
+                </div>
+                <div class="pct-nums">
+                  <div v-for="(item, index) in sourcePerArray" :class="lang === 'en' ? 'en-label' : ''"
+                      :key="index" class="content-labels">
+                    <div class="excellent_nums">{{ item.percent }}%</div>
+                    <div class="excellent_labels">
+                      <span :class="`label-` + index" class="labels excellent-label"/>
+                      <span class="label-desc">{{ item.type }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </el-col>
-        </el-row>
+            </el-col>
+          </el-row>
+        </div>
         <el-row class="second-row" style="padding-bottom:20px;">
           <el-col :span="24" class="items-title">
             <span class="title">{{ $t('overview.eventList') }}</span>
@@ -404,6 +411,7 @@ import { mapGetters } from 'vuex';
 import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
 import util from '../../common/util.js';
 import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOverview';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'EventStatistics',
@@ -417,6 +425,7 @@ export default {
   data() {
     return {
       ispdf: false,
+      pdfSrc: '',
       paramsStoreIds: [],
       storeNameStr: '',
       storeTagStr: '',
@@ -650,21 +659,24 @@ export default {
     handleDown() {
       let self = this;
       self.ispdf = true;
-      if (self.total > 0) {
-        self.eventPDFData = self.allEventData;
-      }
-      setTimeout(() => {
-        self.getPdf();
-        if (sessionStorage.getItem('startPDF') === 'start') {
-          sessionStorage.removeItem('startPDF', 'start');
-          if (sessionStorage.getItem('endPDF') === 'end') {
-            sessionStorage.removeItem('endPDF', 'end');
-            setTimeout(() => {
+      this.$nextTick(() => {
+        let img = document.getElementById('imgTest');
+        setTimeout(()=>{
+          html2canvas(img).then(function (canvas) {
+            var oGrayImg = canvas.toDataURL('image/jpeg');
+            self.pdfSrc = oGrayImg;
+          })
+          new Promise(function(resolve) {
+            self.eventPDFData = self.allEventData;
+            resolve(true);
+          }).then(function() {
+            setTimeout(()=>{
+              self.$print(self.$refs.printPDF);
               self.ispdf = false;
-            }, 1000);
-          }
-        }
-      }, 1000);
+            },1000)
+          });
+        },1000)
+      });
     },
 
     dateChange(val) {
@@ -1724,6 +1736,11 @@ export default {
   }
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
+  }
+  @media print {
+   #imgTest{
+     page-break-inside:avoid;
+   }
   }
   *{
     box-sizing: border-box;
