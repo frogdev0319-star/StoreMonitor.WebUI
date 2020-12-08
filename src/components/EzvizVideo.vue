@@ -1943,6 +1943,7 @@ export default {
     }
     #myPlayer{
       min-height: 420px;
+      margin: auto;
     }
     #channelName{
       position: absolute;

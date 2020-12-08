@@ -583,7 +583,6 @@ import {
 } from '@/api/event';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
-import dashAPI from '@/api/dash';
 import videojs from '../../../static/video.js';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import DialogVue from '@/components/DialogVue.vue';

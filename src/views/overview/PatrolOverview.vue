@@ -2010,6 +2010,9 @@ export default {
                 margin: 0 calc(30/1920*100vw) 0 calc(20/1920*100vw);
                 width: 55px;
                 text-align: left;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
               }
               .ranking-num {
                 font-size: calc(14/1920*100vw);

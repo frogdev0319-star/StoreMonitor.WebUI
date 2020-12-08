@@ -664,7 +664,6 @@ import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
 import { getStorageInfo } from '@/api/event';
 import { getDeviceList } from '@/api/device';
-import dashAPI from '@/api/dash';
 import videojs from '../../../static/video.js';
 import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';

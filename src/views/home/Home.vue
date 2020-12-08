@@ -17,7 +17,7 @@
               :key="item.path"
               :to="{ path:item.path}"
               class="breadcrumb-item" >
-              <span :style="breadList.length > 2 && index === 1 ? {'color':'#7d8cad','font-weight':'normal'}:{'font-weight':'bold','color':'#182752'}">
+              <span :class="breadList.length > 2 && index === 1 ? 'normal-breadcrumb-span': 'bold-breadcrumb-span'">
                 {{ $t(`route.${item.name}`) }}</span>
             </el-breadcrumb-item>
           </el-breadcrumb>
@@ -25,12 +25,16 @@
         <div class="headUrl-content">
           <div class="system-name">{{ $t('route.mgt') }}</div>
           <el-dropdown class="el-user-drop" >
-            <span class="username" style="cursor:pointer;">{{ userName }}
-              <i class="el-icon-arrow-down el-icon--right" style="margin-left:6px;cursor:pointer;"/></span>
-            <img :src="headUrl" alt="头像" class="headImg" style="cursor:pointer;">
-            <el-dropdown-menu slot="dropdown" class="dropdown" style="margin-top:0px;">
-              <el-dropdown-item :disabeled="true" style="width:120px;padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
-              <el-dropdown-item style="width:120px;padding-left:20px" @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
+            <span class="username">
+              {{ userName }}
+              <i class="el-icon-arrow-down el-icon--right"/>
+            </span>
+            <img :src="headUrl" alt="" class="headImg">
+            <el-dropdown-menu slot="dropdown" class="dropdown">
+              <el-dropdown-item :disabeled="true" class="dropdown-item" style="width:120px;
+              padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
+              <el-dropdown-item class="dropdown-item" @click.native="fedlogout" style=" width:120px;
+              padding-left:20px;">{{ $t('route.logOut') }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -170,7 +174,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.5.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.5.1 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -467,6 +471,7 @@ export default {
       let first = matched[1];
       this.breadList = matched;
     },
+
     getWindowSize() {
       let docEl = document.documentElement,
         resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
@@ -539,7 +544,7 @@ export default {
             self.userName = item.userName.length > 10 ? item.userName.substr(0, 10) + '...' : item.userName;
             self.accountId = item.accountId;
             let accountId = item.accountId.toLowerCase();
-            localStorage.setItem('oss_bucket', accountId); // 初始进来存储
+            localStorage.setItem('oss_bucket', accountId);
             self.roleId = item.roleId;
           }
         });
@@ -703,13 +708,19 @@ export default {
       .breadcrumb-inner{
         float:left;
         .breadcrumb-item{
-          //@include point(height,60);
-          //@include point(line-height,60);
           height: 80px;
           line-height: 80px;
           font-size: 16px;
           &:first-child{
             margin-left: 30px;
+          }
+          .bold-breadcrumb-span{
+            font-weight: bold;
+            color: #182752;
+          }
+          .normal-breadcrumb-span{
+            font-weight: normal;
+            color: #7d8cad;
           }
         }
       }
@@ -759,15 +770,26 @@ export default {
             overflow: hidden;
             text-overflow:ellipsis;
             white-space: nowrap;
+            cursor: pointer;
             i{
               color:#f31d65;
               font-weight: bold;
+              margin-left:6px;
+              cursor:pointer;
             }
           }
           .headImg{
             position: relative;
             top: 10px;
             margin-left: 10px;
+            cursor: pointer;
+          }
+          .dropdown{
+            margin-top:0px;
+            .dropdown-item{
+              width:120px !important;
+              padding-left:20px !important;
+            }
           }
         }
       }
@@ -776,7 +798,6 @@ export default {
     .main{
       display: flex;
       position: absolute;
-      //@include point(top,60);
       top: 80px;
       bottom:0px;
       background-color: #f4f5f9;
