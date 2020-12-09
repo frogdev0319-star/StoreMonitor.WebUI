@@ -26,7 +26,7 @@
                     :label="item.value">{{ item.label }}</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <div v-if="ezvizAccountInfo.scope === '0'">
+              <div v-if="ezvizAccountInfo.scope === 0">
                 <el-col :span="24">
                   <el-form-item :label="$t('deviceView.mobilePhone')" prop="ezvizAccount">
                     <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" />
@@ -236,7 +236,7 @@ export default {
         appKey: '',
         appSecret: '',
         accessToken: '',
-        scope: '0',
+        scope: 0,
         target: '',
         comment: ''
       },
@@ -244,11 +244,11 @@ export default {
       ezvizScopes: [
         {
           'label': this.$t('deviceView.storeViuAccount'),
-          'value': '0'
+          'value': 0
         },
         {
           'label': this.$t('deviceView.userAccount'),
-          'value': '1'
+          'value': 1
         }
       ],
       total: 0,
@@ -331,7 +331,7 @@ export default {
         appKey: '',
         appSecret: '',
         accessToken: '',
-        scope: '0',
+        scope: 0,
         target: '',
         comment: ''
       };
@@ -533,7 +533,7 @@ export default {
       self.ezvizAccountInfo.scope = row.scope;
       self.ezvizAccountInfo.comment = row.comment;
       self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
-      self.curLength = filterString.getContentLength(row.comment);
+      self.curLength = row.comment ? filterString.getContentLength(row.comment) : 0;
       self.deleteId = row.id;
       if (row.scope === 1) {
         self.getAccessToken();

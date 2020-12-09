@@ -328,8 +328,8 @@ function (t, e) {
                                 this[M] = Object.assign(a, o);
                                 var s = {
                                     border: "#343434",
-                                    borderSelect: "#FFCC00",
-                                    background: "#4C4B4B"
+                                    borderSelect: "#000000",
+                                    background: "#00000"
                                 };
                                 s = Object.assign(s, o.oStyle),
                                 this[M].oStyle = s,
