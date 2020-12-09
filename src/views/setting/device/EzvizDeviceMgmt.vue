@@ -309,7 +309,9 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('deviceView.store')" prop="storeId">
-                  <el-select v-model="addDeviceData.storeId" :disabled="isAddAgain" style="width: 100%;">
+                  <el-select v-model="addDeviceData.storeId" :disabled="isAddAgain"
+                             filterable :filter-method="filterStoreOption"
+                             style="width: 100%;">
                     <el-option
                       v-for="item in storeDataList"
                       :key="item.storeId"
@@ -533,6 +535,8 @@ import { mapGetters } from 'vuex';
 import { getStoreList, getBriefStoreList } from '@/api/store';
 import EzvizAccount from './EzvizAccount';
 import filterString from '@/common/filterString';
+import util from "../../../common/util";
+import lodash from "lodash";
 
 export default {
   name: 'NvrDeviceMgmt',
@@ -655,6 +659,7 @@ export default {
         }
       ],
       storeDataList: [],
+      allStoreDataList: [],
       newChannelNumList: [],
       channelBtnDisabled: false,
       editNvrChannelNumList: [],
@@ -777,6 +782,7 @@ export default {
             tempStore.push(obj);
           });
           self.storeDataList = tempStore;
+          self.allStoreDataList = tempStore;
         }
       });
     },
@@ -1521,6 +1527,7 @@ export default {
         tempStore.push(obj);
       });
       self.storeDataList = tempStore;
+      self.allStoreDataList = tempStore;
     },
 
     getStoreData(params) {
@@ -1554,6 +1561,7 @@ export default {
       self.isAddAgain = true;
       console.log(self.addDeviceData);
       self.showAddNvrDialog = true;
+      self.storeDataList = self.allStoreDataList;
     },
 
     addSingleNvr() {
@@ -1568,14 +1576,12 @@ export default {
         params.channelCount = obj.channelCount;
         params.validationCode = obj.validationCode;
         params.ezvizAccount = obj.ezvizAccount;
-        console.log(params);
         ezvizRESTful.updateEzvizDevice(params).then(res => {
           let errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
             self.showAddNvrDialog = false;
             self.isAddAgain = false;
-            console.log(self.nvrData[self.curIndex]);
             self.nvrData[self.curIndex].tempNvrName = obj.name;
             self.nvrData[self.curIndex].tempEzvizAccount = obj.ezvizAccount;
             self.nvrData[self.curIndex].tempChannelCount = obj.channelCount;
@@ -1595,7 +1601,6 @@ export default {
       } else {
         self.$refs['nvrForm'].validate(async(valid) => {
           if (valid) {
-            console.log(self.addDeviceData);
             let nvrParams = {};
             let nvrArray = [];
             nvrArray.push(self.addDeviceData);
@@ -1637,7 +1642,6 @@ export default {
       let self = this;
       self.$refs['channelForm'].validate(async(valid) => {
         if (valid) {
-          console.log(self.addChannelData);
           let json = {};
           json.name = self.addChannelData.name;
           json.storeId = self.curNVRItem.storeId;
@@ -1653,11 +1657,9 @@ export default {
             // get channel id and attach image to channel
             let fm = new FormData();
             let channelId = res1.data[0];
-            console.log(channelId);
             fm.append('id', channelId);
             fm.append('picture', self.file);
             let attachRes = await self.attachImageToDevice(fm);
-            console.log(attachRes);
             if (attachRes.errMsg === 'Success') {
               self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             }
@@ -1710,7 +1712,6 @@ export default {
       obj.deviceIds = idsArr;
       let params = obj;
       deviceRESTful.deleteDevice(params).then(res => {
-        console.log(res.data);
         let errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
@@ -1740,18 +1741,18 @@ export default {
       self.curNVRItem = item;
       self.channelCountTemp = item.channelCount;
       self.curIndex = index;
-      console.log(item.serialNumber);
       self.getChannelListByDevice(item.serialNumber);
       // show update dialog
       self.addDeviceData = item;
       self.isAddAgain = true;
-      console.log(self.addDeviceData);
       self.showAddNvrDialog = true;
+      self.storeDataList = self.allStoreDataList;
     },
 
     showAddDialog() {
       let self = this;
       self.showAddNvrDialog = true;
+      self.storeDataList = self.allStoreDataList;
       self.isAddAgain = false;
       self.addDeviceData = { name: '', validationCode: '', storeId: self.storeDataList[0].storeId,
         serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount };
@@ -1759,7 +1760,6 @@ export default {
 
     confirmEditNvr(index, item) {
       let self = this;
-      console.log(item);
       let obj = {};
       obj.serialNumber = item.serialNumber;
       obj.name = item.tempNvrName;
@@ -1961,7 +1961,29 @@ export default {
       } else if (e === 'deviceName') {
         this.deviceRuletip = false;
       }
-    }
+    },
+
+    filterStoreOption(value) {
+      let storeList = lodash.cloneDeep(this.allStoreDataList);
+      if(value){
+        let temp = [];
+        let tempArray = [];
+        let tempStoreList = [];
+        storeList.forEach((_item) => {
+          temp.push(util.getPinyinList(_item.label));
+          tempStoreList.push(_item);
+        });
+        for (let i = 0; i < temp.length; i++) {
+          if ( temp[i][0].indexOf(value.trim()) !== -1
+            || temp[i][1].indexOf(value.trim()) !== -1 ) {
+            tempArray.push(tempStoreList[i]);
+          }
+        }
+        this.storeDataList = tempArray;
+      }else{
+        this.storeDataList = storeList;
+      }
+    },
   }
 };
 </script>
