@@ -449,7 +449,7 @@ export default {
     addAccount() {
       let self = this;
       let appFormValid = true;
-      if (self.ezvizAccountInfo.scope === 1) {
+      if (Number(self.ezvizAccountInfo.scope) === 1) {
         self.$refs['appForm'].validate(async(valid) => {
           if (valid) {
             if (self.ezvizAccountInfo.accessToken.length > 0) {
@@ -473,7 +473,7 @@ export default {
             accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
             accountParams.comment = self.ezvizAccountInfo.comment;
             accountParams.scope = Number(self.ezvizAccountInfo.scope);
-            if (self.ezvizAccountInfo.scope === 1) {
+            if (Number(self.ezvizAccountInfo.scope) === 1) {
               accountParams.accountName = self.ezvizAccountInfo.accountName;
               accountParams.appKey = self.ezvizAccountInfo.appKey;
               accountParams.appSecret = self.ezvizAccountInfo.appSecret;

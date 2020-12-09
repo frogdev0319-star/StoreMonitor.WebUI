@@ -1770,7 +1770,7 @@ export default {
           }
         } else {
           if (isGlobalWebsite) {
-            self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/'
+            self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/'
               + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           } else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/'
@@ -1783,7 +1783,7 @@ export default {
             + '/' + self.channelInfo.channelId + '.live';
         } else {
           if (isGlobalWebsite) {
-            self.videoUrl = 'ezopen://srp12345@open.ezviz.com/' + self.channelInfo.ivsId + '/'
+            self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/'
               + self.channelInfo.channelId + '.live';
           } else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/'

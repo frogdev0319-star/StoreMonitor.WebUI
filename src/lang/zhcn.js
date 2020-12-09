@@ -552,6 +552,7 @@ export default {
     'confirmCurDel': '确认删除当前巡检项？',
     'confirmDelData': '确认删除当前巡检表?',
     'confirmToBindData': '巡检表尚未与职务关联',
+    'confirmToSetRule': '巡检表导入成功，是否现在设置巡检考评规则？',
     'please': '请先',
     'downloadInfo': '下载巡检表模板',
     'toEdit': '进行编辑，再点击',

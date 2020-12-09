@@ -544,6 +544,7 @@ export default {
     'confirmCurDel': 'Confirm delete current items?',
     'confirmDelData': 'Confirm to delete the inspection list?',
     'confirmToBindData': 'The inspection list is not associated with the system role.',
+    'confirmToSetRule': 'Imported successfully! Do you want to set inspection rules now?',
     'please': 'Please ',
     'downloadInfo': 'download template',
     'toEdit': 'to edit and ',
