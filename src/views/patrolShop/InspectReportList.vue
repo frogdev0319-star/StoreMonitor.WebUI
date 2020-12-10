@@ -1026,7 +1026,7 @@ export default {
       const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
       const dateStr = hour + ':' + minutes + ':' + second;
       const timeTemp = [];
-      timeTemp[0] = dateStr;
+      timeTemp[0] = '00:00:00';
       timeTemp[1] = dateStr;
       self.defaultTime = timeTemp;
     },

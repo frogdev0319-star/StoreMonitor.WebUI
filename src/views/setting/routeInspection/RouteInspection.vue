@@ -208,7 +208,7 @@
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToBindData') }}</span>
+              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToSetRule') }}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -640,7 +640,7 @@ export default {
           if (sheetName.length == 3) {
             i = sheetIndex == -1 ? 0 : sheetIndex;
           } else if (sheetName.length == 2) {
-            if (sheetName.map(x => x.id == 2)) {
+            if (sheetName.some(x => x.id == 2)) {
               i = sheetIndex == -1 || sheetIndex == 0 ? 0 : sheetIndex - 1;
             } else {
               i = sheetIndex == -1 ? 0 : sheetIndex;

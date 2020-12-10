@@ -216,7 +216,7 @@
       <div class="body-content">
         <p>{{ $t('remotePatrol.uploading') }}</p>
         <p v-if="lang!=='en'" style="margin-bottom:15px;">{{ $t('remotePatrol.upload0') }}<span>{{ totalnumOfPic }}</span>{{ $t('remotePatrol.upload1') }}<span>{{ uploadingnumOfPic }}</span>{{ $t('remotePatrol.unit') }}</p>
-        <p v-if="lang!=='en'" style="margin-bottom:15px;"><span>{{ totalnumOfPic }}  attachments in total,</span><span>{{ uploadingnumOfPic }} uploaded.</span></p>
+        <p v-if="lang==='en'" style="margin-bottom:15px;"><span>{{ totalnumOfPic }}  attachments in total,</span><span>{{ uploadingnumOfPic }} uploaded.</span></p>
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>

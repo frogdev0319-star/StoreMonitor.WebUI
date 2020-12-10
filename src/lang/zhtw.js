@@ -552,6 +552,7 @@ export default {
     'confirmCurDel': ' 確認刪除當前巡檢項？',
     'confirmDelData': ' 確認刪除當前巡檢表?',
     'confirmToBindData': ' 巡檢表尚未與職務關聯',
+    'confirmToSetRule': '巡檢表導入成功，是否現在設置巡檢考評規則？',
     'please': ' 請先',
     'downloadInfo': ' 下載巡檢表範本',
     'toEdit': ' 進行編輯，再點擊',
