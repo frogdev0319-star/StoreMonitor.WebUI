@@ -1476,12 +1476,13 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
           that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
-          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2')];
+          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'),that.$t('insSettingView.tHeaderE'),that.$t('insSettingView.tHeaderG'),that.$t('insSettingView.sheetscore2'),];
         const excelData = [];
         let name = '';
         var wb = XLSX.utils.book_new();
         if (that.elTableData[Number(that.activeName)].data.length === 0) {
-          // do nothing
+          that.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
+          return false;
         } else {
           let sheet1data = [], sheet2data = [], sheet3data = [];
           const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
@@ -1500,6 +1501,7 @@ export default {
                     obj[tHeader[0]] = '';
                   }
                   obj[tHeader[1]] = _item.name;
+                  obj[tHeader[6]] = _item.score;
                   obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet1data.push(obj);
                 });
@@ -1507,6 +1509,7 @@ export default {
                 const obj = {};
                 obj[tHeader[0]] = item.groupName;
                 obj[tHeader[1]] = '';
+                obj[tHeader[6]] = '';
                 obj[tHeader[3]] = '';
                 sheet1data.push(obj);
               }
@@ -1527,6 +1530,7 @@ export default {
                   obj[tHeader[1]] = _item.name;
                   obj[tHeader[2]] = _item.score;
                   obj[tHeader[4]] = _item.qualifiedScore;
+                  obj[tHeader[7]] = _item.availableScores;
                   obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet2data.push(obj);
                 });
@@ -1536,6 +1540,7 @@ export default {
                 obj[tHeader[1]] = '';
                 obj[tHeader[2]] = '';
                 obj[tHeader[4]] = _item.qualifiedScore;
+                obj[tHeader[7]] = '';
                 obj[tHeader[3]] = '';
                 sheet2data.push(obj);
               }
@@ -1554,7 +1559,7 @@ export default {
                     obj[tHeader[0]] = '';
                   }
                   obj[tHeader[1]] = _item.name;
-                  obj[tHeader[2]] = _item.score;
+                  obj[tHeader[8]] = _item.score;
                   obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet3data.push(obj);
                 });
@@ -1562,7 +1567,7 @@ export default {
                 const obj = {};
                 obj[tHeader[0]] = item.groupName;
                 obj[tHeader[1]] = '';
-                obj[tHeader[2]] = '';
+                obj[tHeader[8]] = '';
                 obj[tHeader[3]] = '';
                 sheet3data.push(obj);
               }

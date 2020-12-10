@@ -52,7 +52,6 @@
           <div class="header-score">
             <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
             <span class="span-2">{{ scorecount }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
-            <span class="span-3">({{ $t('remotePatrol.scorerule') }})</span>
           </div>
         </div>
         <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">

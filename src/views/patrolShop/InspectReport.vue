@@ -31,7 +31,6 @@
           <div class="header-score">
             <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
             <span class="span-2">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
-            <span class="span-3">({{ $t('remotePatrol.scorerule') }})</span>
             <span class="span-4">{{ $t('remotePatrol.scoreU') }}</span>
           </div>
           <v-chart ref="chartRadar" :options="options" :auto-resize="true" class="chart-content"/>

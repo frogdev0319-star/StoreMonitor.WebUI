@@ -728,11 +728,11 @@ export default {
     },
     changeAvailable(val) {
       const self = this;
-      if (val[0] === '-1') {
-        self.selectAvailable = val.slice(1);
-      } else {
-        self.selectAvailable = val;
-      }
+      // if (val[0] === '-1') {
+      //   self.selectAvailable = Array.from(val).slice(1);
+      // } else {
+        self.selectAvailable = Array.from(val)[0];
+      // }
     },
     changeAddSelect(val) {
       const self = this;
@@ -1138,7 +1138,7 @@ export default {
           for (let i = 0; i < self.newScore + 1; i++) {
             availableScores.push(i);
           }
-          selectAvailable[0].length === 0 ? selectAvailable = availableScores : null;
+          selectAvailable.length === 0 ? selectAvailable = availableScores : null;
           selectAvailable.sort(function(a, b) {
             return a - b;
           });
