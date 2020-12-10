@@ -1,0 +1,45 @@
+.date-picker-poper .el-button--text {
+  visibility: hidden !important;
+}
+
+.el-input__inner .el-input__inner {
+  border: 1px solid #dddddd;
+}
+
+.process-panel .el-progress-circle {
+  width: 150px !important;
+  height: 150px !important;
+}
+
+.el-tooltip-class.el-tooltip__popper[x-placement^='bottom'] .popper__arrow {
+  border-bottom-color: rgba(30, 34, 52, 0.75);
+  display: none;
+}
+
+.el-tooltip-class.el-tooltip__popper[x-placement^='bottom'] .popper__arrow:after {
+  border-bottom-color: rgba(30, 34, 52, 0.75);
+}
+
+.el-tooltip-class.el-tooltip__popper.is-dark {
+  background: rgba(30, 34, 52, 0.75) !important;
+  font-size: 14px !important;
+  line-height: 21px;
+  padding: 5px;
+}
+
+.item-process .el-progress-bar .el-progress-bar__outer {
+  background-color: #fff;
+}
+
+.inactive-item-process .el-progress-bar .el-progress-bar__outer {
+  background-color: #f4f5f9;
+}
+
+.region-process .el-progress-bar .el-progress-bar__outer {
+  background-color: #f4f5f9;
+}
+
+.el-range-editor--mini .el-range-separator {
+  height: calc(35 / 1920 * 100vw);
+  line-height: calc(35 / 1920 * 100vw);
+}

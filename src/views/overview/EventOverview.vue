@@ -1107,6 +1107,7 @@ export default {
     }
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
@@ -1115,16 +1116,4 @@ export default {
 
 <style>
   @import '../../assets/css/pagination.css';
-  .date-picker-poper .el-button--text{
-    visibility: hidden !important;
-  }
-  .item-process .el-progress-bar .el-progress-bar__outer{
-    background-color: #fff;
-  }
-  .store-list .el-select.el-input__inner, .store-list .el-select .el-input__inner:focus{
-    border: 1px solid #E4E7ED !important;
-  }
-  .store-list .el-select .el-input.is-focus .el-input__inner{
-    border: 1px solid #E4E7ED !important;
-  }
 </style>
