@@ -75,7 +75,7 @@ export default {
     'htmltopdfD': 'Event Processing Statistics PDF',
     'date': 'Date',
     'dataRangeTips': '* Date ranges :  7 ~ 365 days',
-    'totalStore': 'Total Stores',
+    'totalStore': 'Total Stores:',
     'totalUnit': '',
     'superTaskmode0': 'day',
     'superTaskmode1': 'Weekly',
