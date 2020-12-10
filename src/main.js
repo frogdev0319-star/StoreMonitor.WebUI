@@ -18,6 +18,7 @@ import i18n from './lang';
 import moment from 'moment';
 import elCascaderMulti from 'el-cascader-multi';
 import htmlToPdf from '@/plugins/htmlToPdf';
+import './assets/sass/index.scss';
 
 Vue.use(ProgressPlugin);
 Vue.use(elCascaderMulti);

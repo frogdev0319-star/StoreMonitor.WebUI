@@ -1,0 +1,17 @@
+@import "./element_ui.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Roboto, Microsoft YaHei,'Microsoft JhengHei', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
