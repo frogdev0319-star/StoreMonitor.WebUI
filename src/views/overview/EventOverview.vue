@@ -319,7 +319,6 @@ export default {
 
   watch: {
     accountChanged(val) {
-      console.log(val);
       let self = this;
       if (val !== 0) {
         self.timeMode = 1;
@@ -369,7 +368,6 @@ export default {
   methods: {
     dateChange(val) {
       let self = this;
-      console.log(val);
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       let daysDiff = self.$moment(end).diff(start, 'days');
@@ -395,7 +393,6 @@ export default {
       }
       daysDiff = self.$moment(end).diff(start, 'days');
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      console.log(self.timeMode);
       self.params.beginTs = start;
       self.params.endTs = end;
       self.initData();
@@ -430,7 +427,6 @@ export default {
 
     changeStore(val) {
       let self = this;
-      console.log(val);
       self.storeIds = [];
       if (val === -1) {
         self.storeIds = [];
@@ -457,7 +453,6 @@ export default {
           item.checked = true;
         });
       } else {
-        console.log(item);
         let daysStr = '';
         let selectedStores = [];
         daysStr = item.label;
@@ -465,8 +460,6 @@ export default {
 
         self.storeName = daysStr;
         self.storeIds = selectedStores;
-        console.log(self.storeIds);
-        console.log(self.storeName);
         self.storeDataList.forEach(item => {
           item.checked = false;
         });
@@ -485,26 +478,32 @@ export default {
           'size': 2000
         }
       };
-      let retData = await self.getStoreData(params);
-      let storeList = retData.data.content;
-      let tempStore = [];
-      tempStore.push(
-        { storeId: '-1',
-          label: self.$t('overview.all'),
-          value: self.$t('overview.all') }
-      );
-      storeList.forEach(item => {
-        let obj = {
-          storeId: item.storeId,
-          label: item.name,
-          value: item.name,
-          userId: item.userId,
-          userName: item.userName,
-          checked: true
-        };
-        tempStore.push(obj);
-      });
-      self.storeDataList = tempStore;
+      try {
+        let retData = await self.getStoreData(params);
+        let storeList = retData.data.content;
+        let tempStore = [];
+        tempStore.push(
+          { storeId: '-1',
+            label: self.$t('overview.all'),
+            value: self.$t('overview.all') }
+        );
+        storeList.forEach(item => {
+          let obj = {
+            storeId: item.storeId,
+            label: item.name,
+            value: item.name,
+            userId: item.userId,
+            userName: item.userName,
+            checked: true
+          };
+          tempStore.push(obj);
+        });
+        self.storeDataList = tempStore;
+      }
+      catch (e) {
+        self.storeDataList = [];
+        console.log("EventOverview-getAllStoreList:" + e);
+      }
     },
 
     getStoreData(params) {
@@ -513,7 +512,6 @@ export default {
         getStoreList(params).then(res => {
           let errMsg = res.errMsg;
           if (errMsg && errMsg === 'Success') {
-            let data = res.data;
             resolve(res);
           }
         }).catch(err => {
@@ -540,11 +538,9 @@ export default {
         let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
         weekList.splice(0, 1, firstWeekStr);
         weekList.splice(arrLength - 1, 1, lastWeekStr);
-        console.log(weekList);
         self.daysRangeList = weekList;
       } else if (self.timeMode === 2) {
         let monthArray = util.getMonthBetween(startDay, endDay);
-        console.log(monthArray);
         self.daysRangeList = monthArray;
       }
       self.getEventStatsStatics();
@@ -554,25 +550,29 @@ export default {
 
     async getEventStatsStatics() {
       let self = this;
-      let eventResult = await self.getEventStatsOverview(self.params);
-      console.log(eventResult);
-      if (eventResult.errCode === 0) {
-        let result = eventResult.data;
-        if (result) {
-          self.eventKPIs[0].eventNum = result.numOfNewEventsToday;
-          self.eventKPIs[1].eventNum = result.numOfClosedEventsToday;
-          self.eventKPIs[2].eventNum = result.numOfOpenEvents;
-          self.numOfStores = result.numOfStores;
-          self.eventBySource = result.eventBySource;
-          self.eventByStatus = result.eventByStatus;
-        } else {
-          self.eventKPIs.forEach(item => {
-            item.eventNum = 0;
-          });
+      try {
+        let eventResult = await self.getEventStatsOverview(self.params);
+        if (eventResult.errCode === 0) {
+          let result = eventResult.data;
+          if (Object.keys(result).length > 0) {
+            self.eventKPIs[0].eventNum = result.numOfNewEventsToday;
+            self.eventKPIs[1].eventNum = result.numOfClosedEventsToday;
+            self.eventKPIs[2].eventNum = result.numOfOpenEvents;
+            self.numOfStores = result.numOfStores;
+            self.eventBySource = result.eventBySource;
+            self.eventByStatus = result.eventByStatus;
+          } else {
+            self.eventKPIs.forEach(item => {
+              item.eventNum = 0;
+            });
+          }
         }
+        self.getEventBySourcePie();
+        self.getEventByStatusPie();
       }
-      self.getEventBySourcePie();
-      self.getEventByStatusPie();
+      catch (e) {
+        console.log("EventOverview-getEventStatsStatics:" + e);
+      }
     },
 
     getEventStatsOverview(params) {
@@ -590,7 +590,6 @@ export default {
       let self = this;
       let jsonArray = self.sourceLegend;
       let sourcePieList = self.eventBySource;
-      console.log(sourcePieList);
       let remoteEventNum = 0;
       let onsiteEventNum = 0;
       let storeEventNum = 0;
@@ -608,7 +607,6 @@ export default {
         }
       });
       let totalArray = [remoteEventNum, onsiteEventNum, storeEventNum];
-      console.log(totalArray);
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -669,8 +667,8 @@ export default {
         ]
       };
       self.sourcePerArray = jsonArray;
-      console.log(self.sourcePerArray);
     },
+
     getEventByStatusPie() {
       let self = this;
       let jsonArray = self.statusLegend;
@@ -692,7 +690,6 @@ export default {
         }
       });
       let totalArray = [pendingEventNum, doneEventNum, closedEventNum];
-      console.log(totalArray);
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -705,17 +702,24 @@ export default {
       } else {
         seriesData = [];
       }
-      self.eventStatusOptions = {
+      self.eventStatusOptions = self.getEventByStatusPieOption();
+      self.eventStatusOptions.series[0].data = seriesData;
+      self.statusPerArray = jsonArray;
+    },
+
+    getEventByStatusPieOption(){
+      let self = this;
+      let pieOption = {
         tooltip: {
           trigger: 'item',
-          formatter: '{b} : {c} ({d}%)',
-          textStyle: {
+            formatter: '{b} : {c} ({d}%)',
+            textStyle: {
             align: 'left'
           },
-          backgroundColor: self.echartBackground
+          backgroundColor: this.echartBackground
         },
         textStyle: {
-          fontFamily: self.fontFamily
+          fontFamily: this.fontFamily
         },
         series: [
           {
@@ -735,7 +739,7 @@ export default {
                 show: false
               }
             },
-            data: seriesData,
+            data: [],
             itemStyle: {
               emphasis: {
                 shadowBlur: 10,
@@ -744,7 +748,7 @@ export default {
               },
               normal: {
                 color: function(params) {
-                  var colorList = [self.pendingColor, self.doneColor, self.closedColor];
+                  let colorList = [self.pendingColor, self.doneColor, self.closedColor];
                   return colorList[params.dataIndex];
                 }
               }
@@ -752,8 +756,30 @@ export default {
           }
         ]
       };
-      self.statusPerArray = jsonArray;
-      console.log(self.statusPerArray);
+      return pieOption;
+    },
+
+    getEventRankingInfoSetting(){
+      let settingObj = {};
+      if (this.rankType === 0) {
+        settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent')];
+        settingObj.colorArray = [this.pendingColor];
+        settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
+      } else if (this.rankType === 2) {
+        settingObj.axisArray = ['门店名称', this.$t('overview.closedEvents')];
+        settingObj.colorArray = [this.closedColor];
+        settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
+      } else {
+        settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent'),
+                                  this.$t('overview.processedEvent'), this.$t('overview.closedEvents')];
+        settingObj.colorArray = [this.pendingColor, this.doneColor, this.closedColor];
+        settingObj.seriesData = [
+          { type: 'bar', stack: 'test', barWidth: 35 },
+          { type: 'bar', stack: 'test', barWidth: 35 },
+          { type: 'bar', stack: 'test', barWidth: 35 }
+        ];
+      }
+      return settingObj;
     },
 
     async getEventRankingInfo() {
@@ -762,57 +788,38 @@ export default {
       params = JSON.parse(JSON.stringify(self.params));
       params.numOfStores = 5;
       params.rankType = self.rankType;
-      let axisArray = [];
-      let colorArray = [];
-      let seriesData = [];
-      if (self.rankType === 0) {
-        axisArray = ['门店名称', self.$t('overview.pendingEvent')];
-        colorArray = [self.pendingColor];
-        seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
-      } else if (self.rankType === 2) {
-        axisArray = ['门店名称', self.$t('overview.closedEvents')];
-        colorArray = [self.closedColor];
-        seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
-      } else {
-        axisArray = ['门店名称', self.$t('overview.pendingEvent'), self.$t('overview.processedEvent'), self.$t('overview.closedEvents')];
-        colorArray = [self.pendingColor, self.doneColor, self.closedColor];
-        seriesData = [
-          { type: 'bar', stack: 'test', barWidth: 35 },
-          { type: 'bar', stack: 'test', barWidth: 35 },
-          { type: 'bar', stack: 'test', barWidth: 35 }
-        ];
-      }
-      let rankingResult = await self.getEventStatsRanking(params);
-      console.log(rankingResult);
+      let {axisArray, colorArray, seriesData} = self.getEventRankingInfoSetting();
       let rankingOption = self.getEventRankingOption(colorArray, seriesData)
-      if (rankingResult.errCode === 0) {
-        let result = rankingResult.data;
-        console.log(result);
-        self.statusStoreList = result;
-        let soureceList = [];
-        soureceList.push(axisArray);
-        result.forEach(item => {
-          let itemArray = [];
-          itemArray.push(item.storeName);
-          if (self.rankType === 3) {
-            itemArray.push(item.numOfUnprocessed);
-            itemArray.push(item.numOfInprocess);
-            itemArray.push(item.numOfProcessed);
-          } else if (self.rankType === 0) {
-            itemArray.push(item.numOfUnprocessed);
-          } else if (self.rankType === 2) {
-            itemArray.push(item.numOfProcessed);
-          } else {
-
-          }
-          soureceList.push(itemArray);
-        });
-        console.log(soureceList);
-        rankingOption.dataset.source = soureceList;
-      } else {
-        rankingOption.dataset.source = [];
+      try {
+        let rankingResult = await self.getEventStatsRanking(params);
+        if (rankingResult.errCode === 0) {
+          let result = rankingResult.data;
+          self.statusStoreList = result;
+          let soureceList = [];
+          soureceList.push(axisArray);
+          result.forEach(item => {
+            let itemArray = [];
+            itemArray.push(item.storeName);
+            if (self.rankType === 3) {
+              itemArray.push(item.numOfUnprocessed);
+              itemArray.push(item.numOfInprocess);
+              itemArray.push(item.numOfProcessed);
+            } else if (self.rankType === 0) {
+              itemArray.push(item.numOfUnprocessed);
+            } else if (self.rankType === 2) {
+              itemArray.push(item.numOfProcessed);
+            }
+            soureceList.push(itemArray);
+          });
+          rankingOption.dataset.source = soureceList;
+        } else {
+          rankingOption.dataset.source = [];
+        }
+        self.storeStatusOptions = rankingOption;
+      }catch (e) {
+        self.storeStatusOptions = rankingOption;
+        console.log("EventOverview-getEventRankingInfo:" + e);
       }
-      self.storeStatusOptions = rankingOption;
     },
 
     getEventRankingOption(colorArray, seriesData){
@@ -934,9 +941,44 @@ export default {
       params = JSON.parse(JSON.stringify(self.params));
       params.storeIds = self.storeIds;
       params.timeMode = self.timeMode;
-      let storeEventResult = await self.getStoreEventData(params);
-      let option = {
-        color: [self.newColor, self.doneColor, self.closedColor],
+      let option = self.getStoreEventStaticsOption();
+      try {
+        let storeEventResult = await self.getStoreEventData(params);
+        if (storeEventResult.errCode === 0) {
+          let result = storeEventResult.data;
+          self.storeEventList = result;
+          let soureceList = [];
+          soureceList.push(self.storeEventLegend);
+          let sumOfNewEvents = 0;
+          let sumOfProcessedEvents = 0;
+          let sumOfClosedEvents = 0;
+          result.forEach((item, index) => {
+            let storeList = item.stores;
+            storeList.forEach(_item => {
+              sumOfNewEvents += _item.numOfNewEvents;
+              sumOfProcessedEvents += _item.numOfProcessedEvents;
+              sumOfClosedEvents += _item.numOfClosedEvents;
+            });
+            let itemArray = [];
+            itemArray.push(self.daysRangeList[index]);
+            itemArray.push(sumOfNewEvents);
+            itemArray.push(sumOfProcessedEvents);
+            itemArray.push(sumOfClosedEvents);
+            soureceList.push(itemArray);
+          });
+          option.dataset.source = soureceList;
+        }
+        self.storeEventsOptions = option;
+      }
+      catch (e) {
+        self.storeEventsOptions = option;
+        console.log("EventOverview-getStoreEventStatics:" + e);
+      }
+    },
+
+    getStoreEventStaticsOption(){
+      let storeOption = {
+        color: [this.newColor, this.doneColor, this.closedColor],
         legend: {
           x: 'center',
           y: 'bottom',
@@ -946,7 +988,7 @@ export default {
           padding: 0,
           icon: 'rect',
           textStyle: {
-            color: self.echartColor,
+            color: this.echartColor,
             fontSize: 12,
             padding: [0, 0, 0, 5],
             height: 12,
@@ -954,7 +996,7 @@ export default {
           }
         },
         textStyle: {
-          fontFamily: self.fontFamily
+          fontFamily: this.fontFamily
         },
         grid: {
           containLabel: true,
@@ -972,7 +1014,7 @@ export default {
           textStyle: {
             align: 'left'
           },
-          backgroundColor: self.echartBackground
+          backgroundColor: this.echartBackground
         },
         dataset: {
           source: []
@@ -1012,7 +1054,7 @@ export default {
           splitLine: {
             show: true,
             lineStyle: {
-              color: self.echartAxiasColor,
+              color: this.echartAxiasColor,
               width: 1
             }
           },
@@ -1043,48 +1085,24 @@ export default {
           { type: 'line', areaStyle: { color: 'rgba(114,161,243, 0.1)' }, symbol: 'none' }
         ]
       };
-      if (storeEventResult.errCode === 0) {
-        let result = storeEventResult.data;
-        console.log(result);
-        self.storeEventList = result;
-        let soureceList = [];
-        soureceList.push(self.storeEventLegend);
-        let sumOfNewEvents = 0;
-        let sumOfProcessedEvents = 0;
-        let sumOfClosedEvents = 0;
-        result.forEach((item, index) => {
-          let storeList = item.stores;
-          storeList.forEach(_item => {
-            sumOfNewEvents += _item.numOfNewEvents;
-            sumOfProcessedEvents += _item.numOfProcessedEvents;
-            sumOfClosedEvents += _item.numOfClosedEvents;
-          });
-          let itemArray = [];
-          itemArray.push(self.daysRangeList[index]);
-          itemArray.push(sumOfNewEvents);
-          itemArray.push(sumOfProcessedEvents);
-          itemArray.push(sumOfClosedEvents);
-          soureceList.push(itemArray);
-        });
-        console.log(soureceList);
-        option.dataset.source = soureceList;
-      }
-      console.log(option);
-      self.storeEventsOptions = option;
+      return storeOption;
     },
+
     getStoreEventData(params) {
       return new Promise((resolve, reject) => {
         getEventStatsOverStore(params).then(res => {
           resolve(res);
+        }).catch(err =>{
+          reject(err)
         });
       });
     },
+
     changeRankType(val) {
       let self = this;
-      console.log(val);
-      console.log(self.rankType);
       self.getEventRankingInfo();
     },
+
     toPercent(point) {
       let tempPoint = Number(point * 100);
       let str = '';
@@ -1092,14 +1110,15 @@ export default {
       str += '%';
       return str;
     },
+
     adjustChart() {
       let self = this;
-      console.log('尺寸改变');
       self.$refs.storeEventRef.resize();
       self.$refs.storeStatusRef.resize();
       self.$refs.eventSourceRef.resize();
       self.$refs.eventStatusRef.resize();
     },
+
     handleSideBar(e) {
       if (e.target === e.currentTarget || e.target === this) {
         this.adjustChart();

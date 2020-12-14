@@ -408,8 +408,7 @@ export default {
   },
 
   watch: {
-    accountChanged(val, oldVal) {
-      console.log(val);
+    accountChanged(val) {
       let self = this;
       if (val !== 0) {
         self.timeMode = 1;
@@ -489,10 +488,8 @@ export default {
     },
 
     timelineHandler(event) {
-      console.log(event);
       let self = this;
       self.currentIndex = event.currentIndex;
-      console.log(self.currentIndex);
     },
 
     previousGroup() {
@@ -516,7 +513,6 @@ export default {
       } else {
         self.showNextGroup = true;
       }
-      console.log(self.curGroupIndex);
       self.getRegionInspectResultData();
     },
 
@@ -526,7 +522,6 @@ export default {
       let resultData = self.regionInspectListData;
       if (resultData.length > 0) {
         let regions = resultData[0].regions;
-        console.log(regions);
         let regionList = [];
         self.regionGroups[self.curGroupIndex].forEach((item) => {
           regionList.push(item.region);
@@ -539,7 +534,6 @@ export default {
           let dangerousList = [];
           let improvedList = [];
           let passList = [];
-          // let excellentList = [];
           region.forEach(_item => {
             if (self.regionList.indexOf(_item.region) === -1) {
               return;
@@ -587,7 +581,6 @@ export default {
     },
 
     async showItemRadar(item, index) {
-      console.log(item);
       let self = this;
       self.curItemId = item.inspectItemId;
       self.curItemName = item.inspectItemName;
@@ -600,39 +593,41 @@ export default {
       let itemsParam = {};
       itemsParam = JSON.parse(JSON.stringify(self.params));
       itemsParam.itemId = self.curItemId;
-      console.log(itemsParam);
-      let result = await self.getInspectItemsOverRegion(itemsParam);
-      console.log(result);
-
       let options = self.getItemRadarOption();
-      let tempIndicator = [];
-      let seriesValue = [];
-      if (result.errCode === 0) {
-        let resultData = result.data;
-        let max = 0;
-        resultData.map(function(item) {
-          if (item.numOfUnqualified > max) {
-            max = item.numOfUnqualified;
-          }
-        });
-        resultData.forEach(item => {
-          let obj = {};
-          obj.name = item.regionName;
-          obj.max = max;
-          tempIndicator.push(obj);
-          seriesValue.push(item.numOfUnqualified);
-        });
+      try {
+        let result = await self.getInspectItemsOverRegion(itemsParam);
+        let tempIndicator = [];
+        let seriesValue = [];
+        if (result.errCode === 0) {
+          let resultData = result.data;
+          let max = 0;
+          resultData.map(function(item) {
+            if (item.numOfUnqualified > max) {
+              max = item.numOfUnqualified;
+            }
+          });
+          resultData.forEach(item => {
+            let obj = {};
+            obj.name = item.regionName;
+            obj.max = max;
+            tempIndicator.push(obj);
+            seriesValue.push(item.numOfUnqualified);
+          });
+        }
+        let temp = [];
+        let obj = { value: seriesValue };
+        temp.push(obj);
+        options.radar[0].indicator = tempIndicator;
+        options.radar[1].indicator = tempIndicator;
+        options.series[0].data = temp;
+        options.series[1].data = temp;
+        options.radar.splitNumber = 5;
+        self.itemsRadarOption = options;
       }
-      let temp = [];
-      let obj = { value: seriesValue };
-      temp.push(obj);
-      options.radar[0].indicator = tempIndicator;
-      options.radar[1].indicator = tempIndicator;
-      options.series[0].data = temp;
-      options.series[1].data = temp;
-      options.radar.splitNumber = 5;
-      self.itemsRadarOption = options;
-      console.log(self.itemsRadarOption);
+      catch (e) {
+        self.itemsRadarOption = options;
+        console.log("PatrolOverview-showItemRadar:" + e);
+      }
     },
 
     getItemRadarOption(){
@@ -662,7 +657,6 @@ export default {
               padding: [3, 5]
             },
             formatter: (params) => {
-              console.log(params);
               let str = '';
               if (params.length > 6) {
                 str = params.substr(0, 6) + '...';
@@ -777,7 +771,6 @@ export default {
       }
       daysDiff = self.$moment(end).diff(start, 'days');
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      console.log(self.timeMode);
       self.params.beginTs = start;
       self.params.endTs = end;
       self.params.roleId = self.ModelPost;
@@ -802,11 +795,9 @@ export default {
         let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
         weekList.splice(0, 1, firstWeekStr);
         weekList.splice(arrLength - 1, 1, lastWeekStr);
-        console.log(weekList);
         self.daysRangeList = weekList;
       } else if (self.timeMode === 2) {
         let monthArray = util.getMonthBetween(startDay, endDay);
-        console.log(monthArray);
         self.daysRangeList = monthArray;
       }
       self.getStoreNumAndCycle();
@@ -930,26 +921,31 @@ export default {
           fiveArray.push(json);
         }
       });
-      console.log(fiveArray);
       self.regionTopFive = fiveArray;
     },
 
     async getStoreNumAndCycle() {
       let self = this;
-      let storeNumAndCycle = await self.getInspectStatsOverview(self.params);
-      console.log(storeNumAndCycle);
-      if (storeNumAndCycle.errCode === 0) {
-        let result = storeNumAndCycle.data;
-        if (result) {
-          self.totalStoreNum = result.numOfStores;
-          self.numOfInspects = result.numOfInspects;
-          self.cycleOfInspect = result.cycleOfInspect === -1 ? 'N/A' : result.cycleOfInspect;
+      try {
+        let storeNumAndCycle = await self.getInspectStatsOverview(self.params);
+        if (storeNumAndCycle.errCode === 0) {
+          let result = storeNumAndCycle.data;
+          if (result) {
+            self.totalStoreNum = result.numOfStores;
+            self.numOfInspects = result.numOfInspects;
+            self.cycleOfInspect = result.cycleOfInspect === -1 ? 'N/A' : result.cycleOfInspect;
+          }
+        } else {
+          self.totalStoreNum = 0;
+          self.numOfInspects = 0;
+          self.cycleOfInspect = 0;
         }
-      } else {
-        self.notify(self.$t('overview.queryFail'), 'warning', 3000);
+      }
+      catch (e) {
         self.totalStoreNum = 0;
         self.numOfInspects = 0;
         self.cycleOfInspect = 0;
+        console.log("PatrolOverview-getStoreNumAndCycle:" + e);
       }
     },
 
@@ -957,6 +953,8 @@ export default {
       return new Promise((resolve, reject) => {
         getInspectStatsOverview(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err)
         });
       });
     },
@@ -979,45 +977,39 @@ export default {
 
     async getBestAndWorstStores() {
       let self = this;
-      let bestAndWorstStoreRes = await self.getInspectStatsOverStore(self.params);
-      console.log(bestAndWorstStoreRes);
-      let errCode = bestAndWorstStoreRes.errCode;
-      if (errCode === 0) {
-        let resData = bestAndWorstStoreRes.data;
-        let bestStore = resData.bestStore;
-        let worstStore = resData.worstStore;
-        let storesArray = [];
-        if (bestStore) {
-          let bestJson = {};
-          bestJson.storeSort = self.$t('overview.starStore');
-          bestJson.storeName = bestStore.storeName;
-          bestJson.iconSrc = self.bestStoreIcon;
-          bestJson.qualifiedRate = self.$t('overview.passRate') + ' ' + bestStore.qualifiedRate + '%';
-          storesArray.push(bestJson);
-        } else {
-          let bestJson = {};
-          bestJson.storeSort = self.$t('overview.starStore');
-          bestJson.storeName = '';
-          bestJson.iconSrc = self.bestStoreIcon;
-          storesArray.push(bestJson);
-        }
-        if (worstStore) {
-          let worstJson = {};
-          worstJson.storeSort = self.$t('overview.backwordStroe');
-          worstJson.storeName = worstStore.storeName;
-          worstJson.iconSrc = self.worstStoreIcon;
-          worstJson.qualifiedRate = self.$t('overview.passRate') + ' ' + worstStore.qualifiedRate + '%';
-          storesArray.push(worstJson);
-        } else {
-          let worstJson = {};
-          worstJson.storeName = '';
-          worstJson.storeSort = self.$t('overview.backwordStroe');
-          worstJson.iconSrc = self.worstStoreIcon;
-          storesArray.push(worstJson);
+      let storesArray = new Array(2).fill({});
+      storesArray[0].storeSort = self.$t('overview.starStore');
+      storesArray[0].storeName = '';
+      storesArray[0].iconSrc = self.bestStoreIcon;
+      storesArray[0].qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
+
+      storesArray[1].storeSort = self.$t('overview.starStore');
+      storesArray[1].storeName = '';
+      storesArray[1].iconSrc = self.bestStoreIcon;
+      storesArray[1].qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
+
+      try {
+        let bestAndWorstStoreRes = await self.getInspectStatsOverStore(self.params);
+        let errCode = bestAndWorstStoreRes.errCode;
+        if (errCode === 0) {
+          let resData = bestAndWorstStoreRes.data;
+          let bestStore = resData.bestStore;
+          let worstStore = resData.worstStore;
+          if (bestStore) {
+            storesArray[0].storeName = bestStore.storeName;
+            storesArray[0].qualifiedRate = self.$t('overview.passRate') + ' ' + bestStore.qualifiedRate + '%';
+          }
+          if (worstStore) {
+            storesArray[1].storeName = bestStore.storeName;
+            storesArray[1].qualifiedRate = self.$t('overview.passRate') + ' ' + bestStore.qualifiedRate + '%';
+          }
+          self.bestAndWorstStore = storesArray;
         }
         self.bestAndWorstStore = storesArray;
-      } else {
-        self.notify(self.$t('overview.queryFail'), 'warning', 3000);
+      }
+      catch (e) {
+        self.bestAndWorstStore = storesArray;
+        console.log("PatrolOverview - getBestAndWorstStores:" + e);
       }
     },
 
@@ -1025,8 +1017,7 @@ export default {
       return new Promise((resolve, reject) => {
         getInspectStatsOverStore(params).then(res => {
           resolve(res);
-        })
-        .catch(err => {
+        }).catch(err => {
           reject(err)
         });
       });
@@ -1044,7 +1035,6 @@ export default {
         let totalUnqualified = 0;
         let totalQualified = 0;
         let resultData = inspectItems.data;
-
         try {
           resultData.forEach(item => {
             totalIgnored += item.numOfIgnored;
@@ -1154,84 +1144,92 @@ export default {
       params.lowestFirst = self.isWorstWork;
       params.numOfPerson = 5;
       params.roleId = self.ModelPost;
-      let result = await self.getInspectStatsOverPerson(params);
-      console.log(result);
-      let tempTaskList = [];
-      if (result.errCode === 0) {
-        let resultData = result.data;
-        resultData.forEach(item => {
-          let json = {};
-          json.supervisorName = item.supervisorName;
-          let completionRate = item.completionRate;
-          completionRate = util.isDot(completionRate) ? completionRate.toFixed(2) : completionRate;
-          json.completionRate = completionRate;
-          let perStr = item.completionRate.toFixed(0);
-          json.percent = parseInt(perStr);
-          tempTaskList.push(json);
-        });
+      try {
+        let result = await self.getInspectStatsOverPerson(params);
+        let tempTaskList = [];
+        if (result.errCode === 0) {
+          let resultData = result.data;
+          resultData.forEach(item => {
+            let json = {};
+            json.supervisorName = item.supervisorName;
+            let completionRate = item.completionRate;
+            completionRate = util.isDot(completionRate) ? completionRate.toFixed(2) : completionRate;
+            json.completionRate = completionRate;
+            let perStr = item.completionRate.toFixed(0);
+            json.percent = parseInt(perStr);
+            tempTaskList.push(json);
+          });
+        }
+        self.taskList = tempTaskList;
       }
-      self.taskList = tempTaskList;
+      catch (e) {
+        self.taskList = [];
+        console.log("PatrolOverview-getInspectTaskRanking:" + e);
+      }
     },
 
     getInspectStatsOverPerson(params) {
-      console.log(params);
       return new Promise((resolve, reject) => {
         GetInspectStatsOverPerson(params).then(res => {
           resolve(res);
+        }).catch(err=>{
+          reject(err)
         });
       });
     },
 
     async getPassRateAndCycle() {
       let self = this;
-      let result = await self.getPassRateAndInspectRate(self.params);
-      console.log(result);
-      self.regionResultList = result.data;
       let cycleOptions = self.getPassRateAndCycleOption();
-      let dangerRateMoreArray = [];
-      let dangerRateLessArray = [];
-      let passRateMoreArray = [];
-      let passRateLessArray = [];
-      if (result.errCode === 0) {
-        let resultData = result.data;
-        if (resultData.length > 0) {
-          resultData.forEach(item => {
-            let inspectNum = item.numOfReport;
-            let inspectCycle = item.cycleOfInspect;
-            let qualifiedRate = item.qualifiedRate;
-            let excellentRate = item.excellentRate;
-            let dangerRate = ((item.numOfDangerous / inspectNum) * 100).toFixed(2);
-            let floatRage = parseInt(dangerRate);
-            let region = item.region;
-            let tempArray = [];
-            if (inspectCycle > 0) {
-              tempArray.push(qualifiedRate);
-              tempArray.push(inspectCycle);
-              tempArray.push(excellentRate);
-              tempArray.push(parseFloat(dangerRate));
-              tempArray.push(region);
-              console.log(tempArray);
-              if (qualifiedRate > 50) {
-                qualifiedRate >= 60 ? passRateMoreArray.push(tempArray) : passRateLessArray.push(tempArray);
-              } else {
-                floatRage >= 60 ? dangerRateMoreArray.push(tempArray) : dangerRateLessArray.push(tempArray);
+      try {
+        let result = await self.getPassRateAndInspectRate(self.params);
+        self.regionResultList = result.data;
+        let dangerRateMoreArray = [];
+        let dangerRateLessArray = [];
+        let passRateMoreArray = [];
+        let passRateLessArray = [];
+        if (result.errCode === 0) {
+          let resultData = result.data;
+          if (resultData.length > 0) {
+            resultData.forEach(item => {
+              let inspectNum = item.numOfReport;
+              let inspectCycle = item.cycleOfInspect;
+              let qualifiedRate = item.qualifiedRate;
+              let excellentRate = item.excellentRate;
+              let dangerRate = ((item.numOfDangerous / inspectNum) * 100).toFixed(2);
+              let floatRage = parseInt(dangerRate);
+              let region = item.region;
+              let tempArray = [];
+              if (inspectCycle > 0) {
+                tempArray.push(qualifiedRate);
+                tempArray.push(inspectCycle);
+                tempArray.push(excellentRate);
+                tempArray.push(parseFloat(dangerRate));
+                tempArray.push(region);
+                if (qualifiedRate > 50) {
+                  qualifiedRate >= 60 ? passRateMoreArray.push(tempArray) : passRateLessArray.push(tempArray);
+                } else {
+                  floatRage >= 60 ? dangerRateMoreArray.push(tempArray) : dangerRateLessArray.push(tempArray);
+                }
               }
-            } else {
-              //do nothing
-            }
-          });
-          cycleOptions.series[0].data = dangerRateMoreArray;
-          cycleOptions.series[1].data = dangerRateLessArray;
-          cycleOptions.series[2].data = passRateMoreArray;
-          cycleOptions.series[3].data = passRateLessArray;
+            });
+            cycleOptions.series[0].data = dangerRateMoreArray;
+            cycleOptions.series[1].data = dangerRateLessArray;
+            cycleOptions.series[2].data = passRateMoreArray;
+            cycleOptions.series[3].data = passRateLessArray;
+          } else {
+            cycleOptions.series[4].data = [[0, 31]];
+          }
         } else {
           cycleOptions.series[4].data = [[0, 31]];
         }
-      } else {
-        cycleOptions.series[4].data = [[0, 31]];
+        self.cycleOption = cycleOptions;
+        self.getTopFiveRegionList();
       }
-      self.cycleOption = cycleOptions;
-      self.getTopFiveRegionList();
+      catch (e) {
+        self.cycleOption = cycleOptions;
+        console.log("PatrolOverview-getPassRateAndCycle:" + e);
+      }
     },
 
     getPassRateAndCycleOption() {
@@ -1503,7 +1501,6 @@ export default {
       if (result.errCode === 0) {
         let resultData = result.data;
         self.regionInspectListData = resultData;
-        console.log(resultData);
         if (resultData.length > 0) {
           resultData.forEach(item => {
             let regions = item.regions;
@@ -1511,16 +1508,13 @@ export default {
               return item1.region < item2.region ? 1 : -1;
             });
           });
-          console.log(resultData);
           let regions = resultData[0].regions;
-          console.log(regions);
           let length = regions.length;
           let groupSize = Math.ceil(length / self.showRegionNum);
           self.totalGroupNum = groupSize;
           self.totalGroupNum > 1 ? self.showNextGroup = true : self.showNextGroup = false;
           let tempRegions = util.groupArrayOnSize(regions, self.showRegionNum);
           self.regionGroups = tempRegions;
-          console.log(tempRegions);
           let regionList = [];
           tempRegions[0].forEach((item) => {
             regionList.push(item.region);
