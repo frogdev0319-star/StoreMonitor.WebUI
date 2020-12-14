@@ -105,6 +105,14 @@
                             style="width: 100%"
                             size="mini"
                           >
+                            <el-table-column type="expand">
+                              <template slot-scope="props">
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
+                                  <span>{{$t('overview.patrolStore')}}:</span>
+                                  <span style="flex:1;">{{props.row.appliedStores}}</span>
+                                </div>
+                              </template>
+                            </el-table-column>
                             <el-table-column
                               v-for="(_item,_index) in planTableInfo"
                               :key="_index"
@@ -127,6 +135,18 @@
                             style="width: 100%"
                             size="mini"
                           >
+                            <el-table-column type="expand">
+                              <template slot-scope="props">
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
+                                  <span>{{$t('overview.inspectedStores')}}:</span>
+                                  <span style="flex:1;">{{props.row.completedStoresStr}}</span>
+                                </div>
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
+                                  <span>{{$t('overview.uninspectedStores')}}:</span>
+                                  <span style="flex:1;">{{props.row.incompletedStoresStr}}</span>
+                                </div>
+                              </template>
+                            </el-table-column>
                             <el-table-column
                               v-for="(_item,_index) in implementTableInfo"
                               :key="_index"
@@ -225,7 +245,7 @@
                     :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth"/>
                   <el-table-column :label="$t('overview.detail')" type="expand" width="100px">
                     <template slot-scope="scope">
-                      <el-tabs v-model="activePDFFirst" @tab-click="handleClick">
+                      <el-tabs v-model="activePDFFirst" @tab-click="handleClick" style="width:990px;">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="First">
                           <el-table
                             :data="scope.row.planTableData"
@@ -236,9 +256,18 @@
                             align="left"
                             stripe
                             border
+                            default-expand-all
                             style="width: 100%"
                             size="mini"
                           >
+                            <el-table-column type="expand">
+                              <template slot-scope="props">
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
+                                  <span>{{$t('overview.patrolStore')}}:</span>
+                                  <span style="flex:1;">{{props.row.appliedStores}}</span>
+                                </div>
+                              </template>
+                            </el-table-column>
                             <el-table-column
                               v-for="(_item,_index) in planTableInfo"
                               :key="_index"
@@ -249,7 +278,7 @@
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
-                      <el-tabs v-model="activePDFSecond" @tab-click="handleClick">
+                      <el-tabs v-model="activePDFSecond" @tab-click="handleClick" style="width:990px;">
                         <el-tab-pane :label="$t('overview.patrolExecution')" name="Second">
                           <el-table
                             :data="scope.row.implementTableData"
@@ -260,9 +289,22 @@
                             align="left"
                             stripe
                             border
+                            default-expand-all
                             style="width: 100%"
                             size="mini"
                           >
+                            <el-table-column type="expand">
+                              <template slot-scope="props">
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
+                                  <span>{{$t('overview.inspectedStores')}}:</span>
+                                  <span style="flex:1;">{{props.row.completedStoresStr}}</span>
+                                </div>
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
+                                  <span>{{$t('overview.uninspectedStores')}}:</span>
+                                  <span style="flex:1;">{{props.row.incompletedStoresStr}}</span>
+                                </div>
+                              </template>
+                            </el-table-column>
                             <el-table-column
                               v-for="(_item,_index) in implementTableInfo"
                               :key="_index"
@@ -435,12 +477,12 @@ export default {
           'width': '13%',
           'className': 'col1'
         },
-        {
-          'prop': 'appliedStores',
-          'label': this.$t('overview.patrolStore'),
-          'width': '27%',
-          'className': 'col2'
-        },
+        // {
+        //   'prop': 'appliedStores',
+        //   'label': this.$t('overview.patrolStore'),
+        //   'width': '27%',
+        //   'className': 'col2'
+        // },
         {
           'prop': 'schedule',
           'label': this.$t('overview.planDes'),
@@ -473,14 +515,14 @@ export default {
           'prop': 'inspectTagName',
           'label': this.$t('overview.patrolLists')
         },
-        {
-          'prop': 'completedStoresStr',
-          'label': this.$t('overview.inspectedStores')
-        },
-        {
-          'prop': 'incompletedStoresStr',
-          'label': this.$t('overview.uninspectedStores')
-        },
+        // {
+        //   'prop': 'completedStoresStr',
+        //   'label': this.$t('overview.inspectedStores')
+        // },
+        // {
+        //   'prop': 'incompletedStoresStr',
+        //   'label': this.$t('overview.uninspectedStores')
+        // },
         {
           'prop': 'percentSchedule',
           'label': this.$t('overview.taskPerformance')
