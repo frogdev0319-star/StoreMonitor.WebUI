@@ -726,7 +726,8 @@ export default {
       tempStore.push(
         { storeId: '-1',
           label: self.$t('overview.all'),
-          value: self.$t('overview.all') }
+          value: self.$t('overview.all')
+        }
       );
       storeList.forEach(item => {
         let storeObj = {
@@ -1712,45 +1713,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../assets/css/textstyle.css';
-  @import '../../assets/css/importfile.css';
-  $red:#f31d65;
-  $black:#182752;
-  $border:#e3e9f4;
-  $background:#f4f5f9;
-  $tab:#7d8cad;
-  $h1:#292e36;
-  $pending: #fea316;
-  $done: #434c5e;
-  $closed: #72a1f3;
-  $pass: #72a1f3;
-  $onsite: #fb804f;
-  $store: #fccc3f;
-  @function rem($val){
-    @return $val/16+rem;
-  }
-  @function checkRem($val){
-    @if($val==auto){@return auto;}
-    @else if($val==0){@return 0;}
-    @else{@return rem($val);}
-  }
-  @mixin point($poi,$val){
-    #{$poi}:checkRem($val);
-  }
-  @media print {
-   #imgTest{
-     page-break-inside:avoid;
-   }
-  }
-  *{
-    box-sizing: border-box;
-    font-family: Roboto, Arial, 'Microsoft YaHei',serif;
-  }
+  @import "../../assets/sass/stastical.scss";
+
   .el-overview-content {
     width: 100%;
     position: relative;
     height: auto;
-    /*background-color: #f6f9fe;*/
     font-size: calc(14/1920*100vw);
     padding-bottom: 20px;
     .statistics-header{
@@ -1758,7 +1726,6 @@ export default {
       border-bottom: 1px solid $border;
       background-color: #fff;
       padding-top: 30px;
-      // padding-bottom: 30px;
       color: $black;
       .header-details1{
         text-align: left;
@@ -1800,18 +1767,6 @@ export default {
             color: #fff;
             font-weight: 500;
             line-height: 1.1;
-          }
-          .store-list{
-            margin-top: 10px;
-            margin-left: 10px;
-            padding: 0;
-            .store-item{
-              // white-space: nowrap;
-              font-size: 14px;
-              margin: 0;
-              list-style-type: none;
-              color: #fff;
-            }
           }
         }
       }
@@ -2186,100 +2141,6 @@ export default {
         }
       }
     }
-  }
-</style>
-<style>
-  @import '../../assets/css/pagination.css';
-  .LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0px 20px 30px 20px !important;
-  }
-  .date-picker-poper .el-button--text{
-    visibility: hidden !important;
-  }
-  .item-process .el-progress-bar .el-progress-bar__outer{
-    background-color: #fff;
-  }
-  .store-list .el-select.el-input__inner, .store-list .el-select .el-input__inner:focus{
-    border: 1px solid #E4E7ED !important;
-  }
-  .store-list .el-select .el-input.is-focus .el-input__inner{
-    border: 1px solid #E4E7ED !important;
-  }
-</style>
-<style>
-  .header-class{
-    height: 40px;
-    font-size: 12px;
-    font-family: Arial, 'Microsoft YaHei';
-    font-weight: bold;
-    color: #7d8cad;
-    background-color: #f4f5f9 !important;
-    border-right: none !important;
-  }
-  .cell-class{
-    padding-left: 20px;
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-  .el-table__row.row-class{
-    height: 35px;
-  }
-  body .el-table th.gutter {
-    display: table-cell !important
-  }
-  .el-table--border td.cell-class:nth-last-of-type(1) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .el-table__header-wrapper th.header-class:nth-last-of-type(2) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .header-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .header-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-
-  .name-wrapper .el-tag--small{
-    width: 45px;
-    font-size: calc(14/1920*100vw);
-    font-family: Arial;
-    padding: 0 0;
-    text-align: center;
-  }
-  .remote .el-tag{
-    color: #f31d65;
-    border: 1px solid #f31d65;
-  }
-  .onsite .el-tag{
-    color: #fb804f;
-    border: 1px solid #fb804f;
-  }
-  .video .el-tag{
-    color: #fccc3f;
-    border: 1px solid #fccc3f;
-  }
-
-  .header-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .header-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-  .cell-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .cell-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-  .el-table__empty-block{
-    border-bottom: 1px solid #e3e9f4;
-  }
-  .el-table-panel .el-table.el-table--striped.el-table--border.el-table--enable-row-hover.el-table--mini{
-    border-right: 1px solid #e3e9f4;
   }
 </style>
 

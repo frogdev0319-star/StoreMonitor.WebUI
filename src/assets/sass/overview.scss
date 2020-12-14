@@ -384,16 +384,6 @@ $ignored: #cad1db;
                 width: 150px !important;
                 height: 150px !important;
                 margin: 0 auto;
-                /*@media screen and (max-width: 1440px) {*/
-                /*  width: 126px;*/
-                /*  height: 126px;*/
-                /*  margin: 0 auto;*/
-                /*}*/
-                /*@media screen and (max-width: 1280px) {*/
-                /*  width: 112px;*/
-                /*  height: 112px;*/
-                /*  margin: 0 auto;*/
-                /*}*/
               }
             }
             .percent-num {
@@ -488,9 +478,6 @@ $ignored: #cad1db;
                   color: $tab;
                   font-size: 12px;
                 }
-                // .label-0 {
-                //   background-color: $excellent;
-                // }
                 .label-0 {
                   background-color: $pass;
                 }
@@ -580,8 +567,6 @@ $ignored: #cad1db;
                 .ranking-num {
                   font-size: calc(14 / 1920 * 100vw);
                   margin-right: calc(45 / 1920 * 100vw);
-                  /*position: relative;*/
-                  /*top: calc(8/1920*100vw);*/
                   text-align: left;
                 }
               }

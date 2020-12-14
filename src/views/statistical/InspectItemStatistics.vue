@@ -83,18 +83,19 @@
             <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
             <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
           </el-tooltip>
-          <el-button :class="lang === 'en' ? 'en-search-btn' : 'search-btn' " :disabled="storeDataList.length === 0"
+          <el-button :class="lang === 'en' ? 'en-search-btn' : 'search-btn' "
+                     :disabled="storeDataList.length === 0"
                      size="mini" type="primary" @click="searchData">{{ $t('remotePatrol.search') }}
           </el-button>
         </el-col>
       </el-col>
-      <el-col :span="24" class="items-content">
+      <el-col :span="24" class="items-content content">
         <el-col :span="24" class="contents-container">
           <el-col :span="24" class="items-row">
             <el-col :span="24" class="items-title">
               <span class="title">{{ $t('overview.itemChartReport') }}</span>
               <div class="exprotBtn">
-                <el-button :class="lang==='en'? 'en-export-btn':'export-btn' " type="primary" size="mini"
+                <el-button :class="lang === 'en'? 'en-export-btn':'export-btn' " type="primary" size="mini"
                            style="margin-top:-15px;" @click="handleDown()">
                   <div class="btn-area">
                     <i class="iconfont icon-pdf"/>
@@ -219,7 +220,7 @@
       </el-dialog>
     </div>
     <div v-if="ispdf" class="item-container">
-      <el-col id="pdfDom" :span="24" class="items-content" style="padding:40px 20px;">
+      <el-col id="pdfDom" :span="24" class="items-content content" style="padding:40px 20px;">
         <div :span="24" class="export-header">
           <p>
             <span>{{ $t('remotePatrol.storeSelect') }}：</span>
@@ -1711,150 +1712,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  $red:#f31d65;
-  $black:#182752;
-  $border:#e3e9f4;
-  $background:#f4f5f9;
-  $tab:#7d8cad;
-  $h1:#292e36;
-  $excellent: #57e78f;
-  $pass: #72a1f3;
-  $failed: #ffd035;
-  $ignored: #cad1db;
-  *{
-    box-sizing: border-box;
-    font-family: Roboto, Arial, 'Microsoft YaHei',serif;
-  }
+  @import "../../assets/sass/stastical.scss";
+
   .item-container{
     padding-bottom: 20px;
-    .statistics-header{
-      margin-bottom: 30px;
-      border-bottom: 1px solid $border;
-      background-color: #fff;
-      padding-top: 30px;
-      // padding-bottom: 30px;
-      color: $black;
-      .header-details1{
-        text-align: left;
-        padding-left: calc(30/1920*100vw);
-        padding-right: calc(30/1920*100vw);
-        height: 20px;
-        line-height: 20px;
-        position: relative;
-        span{
-          font-size: calc(14/1920*100vw);
-          margin-right: calc(20/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-        }
-        .choice-store{
-          color: $tab;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 90%;
-          display: inline-block;
-          i{
-            margin-right: calc(16/1920*100vw);
-            font-size: calc(16/1920*100vw);
-          }
-        }
-        .store-selected{
-          top: unset;
-          background-color: rgba(30, 34, 52, 0.75);
-          position: absolute;
-          /* display: none; */
-          z-index: 1;
-          padding: 20px;
-          min-width: 200px;
-          border-radius: 10px;
-          left: calc(80 / 1920 * 100vw);
-          h1{
-            white-space: nowrap;
-            font-size: 18px;
-            margin: 0;
-            color: #fff;
-            font-weight: 500;
-            line-height: 1.1;
-          }
-          .store-list{
-            margin-top: 10px;
-            margin-left: 10px;
-            padding: 0;
-            .store-item{
-              // white-space: nowrap;
-              font-size: 14px;
-              margin: 0;
-              list-style-type: none;
-              color: #fff;
-            }
-          }
-        }
-      }
-      .header-details{
-        text-align: left;
-        padding-left: calc(30/1920*100vw);
-        position: relative;
-        .search-content{
-          display: inline-block;
-        }
-        .date-range {
-          border: 1px solid #ccc;
-          width: 200px;
-          height: calc(35 / 1920 * 100vw);
-          min-height: 28px;
-        }
-        .item {
-          color: $tab;
-          margin-left: calc(20 / 1920 * 100vw);
-          margin-right: calc(8 / 1920 * 100vw);
-        }
-        .iconbangzhu{
-          font-size: calc(20 / 1920 * 100vw);
-          position: relative;
-          color: $tab;
-        }
-        span{
-          font-size: calc(14/1920*100vw);
-          margin-right: calc(20/1920*100vw);
-        }
-        @media screen and(max-width: 1366px){
-          .en-span-class{
-            margin-right: 60px;
-          }
-        }
-        .el-province{
-          width: calc(160/1920*100vw);
-          margin-right: calc(15/1920*100vw);
-          min-width: 85px;
-          min-height: 28px;
-        }
-        .search-btn{
-          width: calc(130/1920*100vw);
-          height: calc(36/1920*100vw);
-          padding: 0 0;
-          font-size: calc(14/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-          float: right;
-        }
-        .en-search-btn{
-          width: calc(130/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-          border-color: $red;
-          height: calc(36/1920*100vw);
-          padding: 0 0;
-          font-size: calc(14/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-          float: right;
-        }
-      }
-      .header-details:nth-child(1){
-        padding-right: calc(60/1920*100vw);
-      }
-      .header-details:nth-child(2){
-        padding-top:15px;
-        padding-bottom: 30px;
-        padding-right: calc(60/1920*100vw);
-      }
+    .header-details span{
+      margin-left: 0;
+    }
+    .en-search-btn, .search-btn{
+      float: right;
     }
     .items-content{
       padding: 0 calc(30/1920*100vw) 0;
@@ -2294,63 +2160,5 @@ export default {
       }
     }
 
-  }
-</style>
-<style>
-/* .el-cascader-menu {width: 200px; }
-.el-cascader-menu__wrap ul li{list-style: none;}
-.el-scrollbar__view{ padding: 0 15px;}
-.el-icon-arrow-right{float: right;}
-.in-active-path{color:#f31d65;font-weight: 600;}
-.el-cascader-node{font-size: 14px;margin: 10px 0;}
-.el-cascader-node:hover{color:#f31d65;font-weight: 600;cursor: pointer;}
-.el-cascader-menu__list .is-active{color:#f31d65;font-weight: 600;} */
-  .LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0px 20px 30px 20px !important;
-  }
-  .header-class{
-    height: 40px;
-    font-size: 12px;
-    font-family: Arial, 'Microsoft YaHei';
-    font-weight: bold;
-    color: #7d8cad;
-    background-color: #f4f5f9 !important;
-    border-right: none !important;
-  }
-  .cell-class{
-    height: 35px;
-    padding-left: 20px;
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-
-  body .el-table th.gutter {
-    display: table-cell !important
-  }
-
-  .el-table__row.row-class{
-    height: 35px;
-  }
-  .el-table--border td.cell-class:nth-last-of-type(1) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .el-table__header-wrapper th.header-class:nth-last-of-type(2) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-
-  .header-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .header-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-  .el-table__empty-block{
-    border-bottom: 1px solid #e3e9f4;
-  }
-  .el-table-panel .el-table.el-table--striped.el-table--border.el-table--enable-row-hover.el-table--mini{
-    border-right: 1px solid #e3e9f4;
   }
 </style>

@@ -864,7 +864,8 @@ export default {
       require.ensure([], async() => {
         let { export_json_to_excel } = require('@/excel/Export2Excel');
         let tHeader = that.exportItmesHeader;
-        let filterVal = ['supervisorName', 'numOfStores', 'numOfTasked', 'numOfCompleted', 'numOfUnscheduled', 'completionRatePer'];
+        let filterVal = ['supervisorName', 'numOfStores', 'numOfTasked', 'numOfCompleted',
+                          'numOfUnscheduled', 'completionRatePer'];
         let self = this;
         self.params.filter = {
           'page': 0,
@@ -1297,96 +1298,5 @@ export default {
       }
     }
 
-  }
-</style>
-<style>
-  .LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0px 20px 30px 20px !important;
-  }
-  .header-class, .inside-header-class{
-    height: 40px;
-    font-size: 12px;
-    font-family: Arial, 'Microsoft YaHei';
-    font-weight: bold;
-    color: #7d8cad;
-    background-color: #f4f5f9 !important;
-    border-right: none !important;
-  }
-  .el-table__row > .cell-class{
-    padding-left: 20px;
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-
-  .el-table__row > .inside-cell-class{
-    padding-left: 25px;
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-
-  body .el-table th.gutter {
-    display: table-cell !important
-  }
-
-  .el-table__expanded-cell[class*=cell] {
-    padding: calc(25/1920*100vw) calc(40/1920*100vw) calc(30/1920*100vw) calc(60/1920*100vw) !important;
-  }
-  .el-table__expand-column .cell{
-    paddding-left: calc(20/1920*100vw);
-    text-align: left;
-  }
-  .el-table__expand-icon{
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-  .cell-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .cell-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-  .header-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .header-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-
-  .inside-header-class .cell{
-    padding-left: calc(25/1920*100vw) !important;
-  }
-  .inside-cell-class .cell{
-    padding-left: calc(25/1920*100vw) !important;
-  }
-  .el-table--mini th, .el-table--mini td{
-    padding: 0 !important;
-  }
-  .el-table__empty-block{
-    border-bottom: 1px solid #e3e9f4;
-  }
-  .el-table-panel .el-table.el-table--striped.el-table--border.el-table--enable-row-hover.el-table--mini{
-    border-right: 1px solid #e3e9f4;
-  }
-  .el-table--enable-row-hover .el-table__body tr:hover > td{
-    background-color: #f5f7fa !important;
-  }
-  .el-table__row.row-class, .el-table__row.inside-row-class{
-    height: 35px;
-  }
-  .el-table--border td.cell-class:nth-last-of-type(1) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .el-table--border td.inside-cell-class:nth-last-of-type(1) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-
-  .el-table__header-wrapper th.header-class:nth-last-of-type(2) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .el-table__header-wrapper th.inside-header-class:nth-last-of-type(2) {
-    border-right: 1px solid #EBEEF5 !important;
   }
 </style>

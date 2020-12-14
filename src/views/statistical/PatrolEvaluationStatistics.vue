@@ -77,12 +77,13 @@
           </el-tooltip>
 
           <div class="exprotBtn" style="float:right;">
-            <el-button :class="lang === 'en' ? 'en-search-btn' : 'search-btn' " :disabled="storeDataList.length === 0"
+            <el-button :class="lang === 'en' ? 'en-search-btn' : 'search-btn' "
+                       :disabled="storeDataList.length === 0"
                        style="vertical-align: middle;" size="mini" type="primary" @click="searchData">
               {{ $t('remotePatrol.search') }}
             </el-button>
-            <el-button :class="lang === 'en'? 'en-search-btn':'search-btn' " style="vertical-align: middle;" type="primary"
-                       size="mini" @click="handleDown()">
+            <el-button :class="lang === 'en'? 'en-search-btn':'search-btn' " style="vertical-align: middle;"
+                       type="primary" size="mini" @click="handleExportReport()">
               <div class="btn-area">
                 <i class="iconfont icon-pdf" style="font-size: calc(24/1920*100vw);vertical-align: middle;"/>
                 <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;vertical-align: middle;">{{ $t('remotePatrol.InspectionDetail') }}</span>
@@ -91,9 +92,9 @@
           </div>
         </el-col>
       </el-col>
-      <div class="statistics-content">
+      <div class="statistics-content content">
         <el-col :span="24" class="region-chart">
-          <el-col :span="24" class="region-header">
+          <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
                 {{ $t('overview.regionalAssessment') }}
@@ -134,14 +135,15 @@
             <div class="region-result">
               <div class="region-content">
                 <div class="region-result-panel">
-                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true" class="result-content" />
+                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                           class="result-content" />
                 </div>
               </div>
             </div>
           </el-col>
         </el-col>
         <el-col :sapn="24" class="region-list">
-          <el-col :span="24" class="region-header">
+          <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
                 {{ $t('overview.regionalList') }}
@@ -203,7 +205,7 @@
         </el-col>
 
         <el-col :sapn="24" class="store-list">
-          <el-col :span="24" class="region-header">
+          <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
                 {{ $t('overview.storeList') }}
@@ -300,9 +302,9 @@
           <span class="content-header">{{ storeDateValue }}</span>
         </p>
       </div>
-      <div class="statistics-content">
+      <div class="statistics-content content">
         <el-col :span="24" class="region-chart">
-          <el-col :span="24" class="region-header">
+          <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
                 {{ $t('overview.regionalAssessment') }}
@@ -350,7 +352,7 @@
           </el-col>
         </el-col>
         <el-col :sapn="24" class="region-list" style="padding-bottom:20px;">
-          <el-col :span="24" class="region-header">
+          <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
                 {{ $t('overview.regionalList') }}
@@ -396,7 +398,7 @@
         </el-col>
 
         <el-col :sapn="24" class="store-list" style="padding-bottom:20px;">
-          <el-col :span="24" class="region-header">
+          <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
                 {{ $t('overview.storeList') }}
@@ -793,7 +795,7 @@ export default {
   },
 
   methods: {
-    handleDown() {
+    handleExportReport() {
       let self = this;
       self.ispdf = true;
       require.ensure([], async() => {
@@ -2148,153 +2150,7 @@ export default {
     handleRegionsChange(val) {
       let self = this;
       self.curRegion = val;
-      let option = {
-        color: ['#f31d65', '#6097f4'],
-        legend: {
-          x: 'center',
-          y: 'bottom',
-          itemWidth: 10,
-          itemHeight: 10,
-          itemGap: 20,
-          padding: 0,
-          icon: 'rect',
-          textStyle: {
-            color: self.echartColor,
-            fontSize: 12,
-            padding: [0, 0, 0, 5],
-            height: 12,
-            lineHeight: 12
-          }
-        },
-        grid: {
-          containLabel: true,
-          top: '40',
-          left: '8',
-          right: '5',
-          bottom: '32'
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'cross',
-            label: {
-              show: false
-            }
-          },
-          padding: 5,
-          textStyle: {
-            align: 'left'
-          },
-          backgroundColor: self.echartBackground
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: true,
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          splitLine: {
-            show: false,
-            lineStyle: {
-              type: 'dashed'
-            }
-          },
-          axisLine: {
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            fontStyle: 12,
-            margin: 10
-          },
-          data: self.daysRangeList
-        },
-        yAxis: [
-          {
-            type: 'value',
-            name: '合格率(%)',
-            minInterval: 10,
-            max: 100,
-            nameLocation: 'end',
-            nameTextStyle: {
-              align: 'left',
-              padding: [0, 10]
-            },
-
-            splitLine: {
-              show: true,
-              lineStyle: {
-                color: self.echartAxiasColor,
-                width: 1
-              }
-            },
-            axisTick: {
-              show: false
-            },
-            axisLine: {
-              onZero: false,
-              show: true,
-              lineStyle: {
-                color: 'self.echartAxiasColor'
-              }
-            },
-            axisLabel: {
-              show: true,
-              fontStyle: 12,
-              margin: 10,
-              color: '#7d8cab'
-            }
-          },
-          {
-            type: 'value',
-            max: 100,
-            position: 'right',
-            axisLabel: {
-              show: false,
-              interval: 'auto'
-            },
-            splitNumber: 20,
-            axisTick: {
-              show: false
-            },
-            splitLine: {
-              show: false
-            },
-            axisLine: {
-              onZero: false,
-              show: true,
-              lineStyle: {
-                color: 'self.echartAxiasColor'
-              }
-            }
-          }
-        ],
-        series: [
-          {
-            type: 'line',
-            symbol: 'none',
-            yAxisIndex: 0,
-            smooth: true,
-            name: '',
-            data: []
-          },
-          {
-            type: 'line',
-            symbol: 'none',
-            yAxisIndex: 1,
-            smooth: true,
-            name: '',
-            data: []
-          }
-        ]
-      };
+      let option = self.getInspectLineOption();
       let filterResult = self.jsonArrayHasSpecifiedValue(self.curRegion, self.regionDataList);
 
       let regionData1 = [];
@@ -2363,28 +2219,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  $red:#f31d65;
-  $black:#182752;
-  $border:#e3e9f4;
-  $background:#f4f5f9;
-  $tab:#7d8cad;
-  $h1:#292e36;
-  $qualified:#6097F3;
-  $noqualied:#FDBA40;
-  $suggestBack:#F1F6FE;
-  $excellent: #57e78f;
-  $dangerous:#f31d65;
-  $improved: #ffd035;
-  $pass: #72a1f3;
-  $failed: #ffd035;
-  $ignored: #cad1db;
+  @import "../../assets/sass/stastical.scss";
 
-  *{
-    box-sizing: border-box;
-    font-family: Roboto, Arial, 'Microsoft YaHei';
-  }
   .statistics-container{
-    /*margin-bottom: 20px;*/
     .export-header{
       min-height: 100px;
       margin: 0 20px 20px 20px;
@@ -2402,217 +2239,12 @@ export default {
         }
       }
     }
-    .statistics-header{
-      margin-bottom: 20px;
-      border-bottom: 1px solid $border;
-      background-color: #fff;
-      padding-top: 30px;
-      color: $black;
-      .header-details1{
-        text-align: left;
-        padding-left: calc(30/1920*100vw);
-        padding-right: calc(30/1920*100vw);
-        height: 20px;
-        line-height: 20px;
-        span{
-          font-size: calc(14/1920*100vw);
-          margin-right: calc(20/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-        }
-        .choice-store{
-          color: $tab;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 90%;
-          display: inline-block;
-          i{
-            margin-right: calc(16/1920*100vw);
-            font-size: calc(16/1920*100vw);
-          }
-        }
-        .store-selected{
-          top: unset;
-          background-color: rgba(30, 34, 52, 0.75);
-          position: absolute;
-          /* display: none; */
-          z-index: 1;
-          padding: 20px;
-          min-width: 200px;
-          border-radius: 10px;
-          left: calc(80 / 1920 * 100vw);
-          h1{
-            white-space: nowrap;
-            font-size: 18px;
-            margin: 0;
-            color: #fff;
-            font-weight: 500;
-            line-height: 1.1;
-          }
-          .store-list{
-            margin-top: 10px;
-            margin-left: 10px;
-            padding: 0;
-            .store-item{
-              font-size: 14px;
-              margin: 0;
-              list-style-type: none;
-              background-color: rgba(30, 34, 52, 0.75);
-              color: #fff;
-            }
-          }
-        }
-      }
-      .header-details{
-        text-align: left;
-        padding-left: calc(30/1920*100vw);
-        position: relative;
-        .search-content{
-          display: inline-block;
-        }
-        .date-range {
-          border: 1px solid #ccc;
-          width: 200px;
-          height: calc(35 / 1920 * 100vw);
-          min-height: 28px;
-          /*.el-range-separator{*/
-          /*height: calc(35 / 1920 * 100vw);*/
-          /*line-height: calc(35 / 1920 * 100vw);*/
-          /*}*/
-        }
-        .item {
-          color: $tab;
-          margin-left: calc(20 / 1920 * 100vw);
-          margin-right: calc(8 / 1920 * 100vw);
-        }
-        .iconbangzhu{
-          font-size: calc(20 / 1920 * 100vw);
-          position: relative;
-          color: $tab;
-        }
-        span{
-          font-size: calc(14/1920*100vw);
-          margin-right: calc(20/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-        }
-        @media screen and(max-width: 1366px){
-          .en-span-class{
-            margin-right: 60px;
-          }
-        }
-        .el-province{
-          width: calc(160/1920*100vw);
-          margin-right: calc(15/1920*100vw);
-          min-height: 28px;
-          min-width: 85px
-        }
-        .search-btn{
-          width: calc(130/1920*100vw);
-          height: calc(36/1920*100vw);
-          padding: 0 0;
-          font-size: calc(14/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-        }
-        .en-search-btn{
-          width: calc(130/1920*100vw);
-          min-width:115px;
-          margin-left: calc(20/1920*100vw);
-          height: calc(36/1920*100vw);
-          padding: 0 0;
-          font-size: calc(14/1920*100vw);
-          margin-left: calc(20/1920*100vw);
-        }
-      }
-      .header-details:nth-child(2){
-        padding-top:15px;
-        padding-bottom: 30px;
-        padding-right: calc(60/1920*100vw);
-      }
-    }
+
     .statistics-content{
       margin-left: calc(30/1920*100vw);
       margin-right: calc(30/1920*100vw);
     }
-    .region-header{
-      height: 70px;
-      text-align: left;
-      padding-left: calc(30/1920*100vw);
-      padding-right: calc(30/1920*100vw);
-      border-bottom: 1px solid $border;
-      .title{
-        display: inline-block;
-        font-size: calc(20/1920*100vw);
-        padding-top: 30px;
-      }
-      .exprotBtn{
-        float: right;
-        padding-top: 25px;
-      }
-      .export-btn{
-        border-color: $red;
-        z-index: 990;
-        height: calc(36/1920*100vw);
-        width: calc(130/1920*100vw);
-        margin: 0;
-        padding: 0;
-        font-size: calc(14/1920*100vw);
-        line-height: calc(36/1920*100vw);
-        color: #ffffff;
-        border-width: 0;
-        border-radius: 4px;
-        top: calc(24/1920*100vw);
-        width: calc(160/1920*100vw);
-        min-width: 120px;
-        .btn-area{
-          padding: 0 calc(6/1920*100vw);
-          height: calc(36/1920*100vw);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          .icon-excel{
-            margin-right: calc(18/1920*100vw);
-            font-size: calc(24/1920*100vw);
-            height: calc(24/1920*100vw);
-            width: calc(24/1920*100vw);
-          }
-          .spanClass{
-            font-size: calc(14/1920*100vw);
-            display: inline-block;
-          }
-        }
-      }
-      .en-export-btn{
-        border-color: $red;
-        z-index: 990;
-        height: calc(36/1920*100vw);
-        margin: 0;
-        padding: 0;
-        font-size: calc(14/1920*100vw);
-        line-height: calc(36/1920*100vw);
-        color: #ffffff;
-        border-width: 0;
-        border-radius: 4px;
-        width: calc(160/1920*100vw);
-        min-width: 120px;
-        .btn-area{
-          position: relative;
-          padding: 0 calc(6/1920*100vw);
-          height: calc(36/1920*100vw);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          .icon-excel{
-            margin-right: calc(18/1920*100vw);
-            width: calc(24/1920*100vw);
-            height: calc(24/1920*100vw);
-          }
-          .spanClass{
-            font-size: calc(14/1920*100vw);
-            display: inline-block;
-          }
-        }
-      }
-    }
+
     .region-chart{
       background-color: #fff;
       margin-right: calc(30/1920*100vw);
@@ -2688,11 +2320,6 @@ export default {
       }
       .charts-content{
         padding:0 calc(30/1920*100vw);
-        .title{
-          height: 70px;
-          text-align: right;
-          padding-top: 20px;
-        }
         .region-result-panel{
           height:260px;
         }
@@ -2743,69 +2370,5 @@ export default {
       margin: 30px calc(30/1920*100vw);
       height:13%;
     }
-  }
-</style>
-<style>
-.LoadDialog /deep/ .el-dialog__header{
-    padding-bottom:0;
-  }
-  .LoadDialog /deep/ .el-dialog__body{
-    padding:0px 20px 30px 20px !important;
-  }
-.el-table__body-wrapper::-webkit-scrollbar{
-    height: 8px;
-}
-.el-table__body-wrapper::-webkit-scrollbar-thumb{
-    border-radius: 2px;
-}
-.el-table__body-wrapper::-webkit-scrollbar-track{
-    border-radius: 2px;
-}
-  .header-class{
-    height: 40px;
-    font-size: 12px;
-    font-family: Roboto, Arial, 'Microsoft YaHei';
-    font-weight: bold;
-    color: #7d8cad;
-    background-color: #f4f5f9 !important;
-    border-right: none !important;
-  }
-  .cell-class{
-    height: 35px;
-    padding-left: 20px;
-    font-size: calc(14/1920*100vw);
-    color: #182752;
-  }
-
-  body .el-table th.gutter {
-    display: table-cell !important
-  }
-
-  .el-table__row.row-class{
-    height: 35px;
-  }
-  .el-table--border td.cell-class:nth-last-of-type(1) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .el-table__header-wrapper th.header-class:nth-last-of-type(2) {
-    border-right: 1px solid #EBEEF5 !important;
-  }
-  .header-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .header-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-  .cell-class .cell{
-    padding-left: calc(20/1920*100vw) !important;
-  }
-  .cell-class:first-child .cell{
-    padding-left: calc(70/1920*100vw) !important;
-  }
-  .el-table__empty-block{
-    border-bottom: 1px solid #e3e9f4;
-  }
-  .el-table-panel .el-table.el-table--striped.el-table--border.el-table--enable-row-hover.el-table--mini{
-    border-right: 1px solid #e3e9f4;
   }
 </style>
