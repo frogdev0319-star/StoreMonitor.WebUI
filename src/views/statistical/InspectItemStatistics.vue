@@ -178,7 +178,7 @@
                     :prop="_item.prop"
                     :label="_item.label"
                     :sortable="_item.sortable"
-                    :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
+                    :min-width="lang !== 'en'? _item.width : _item.maxWidth"/>
                   <div slot="empty">
                     <div>
                       <i class="iconfont icon-zhengque empty-data-icon"/>
@@ -508,22 +508,19 @@ export default {
   watch: {
     async accountChanged(val) {
       let self = this;
-      if (val !==0) {
+      if (val !== 0) {
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
         let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
-        console.log(self.lang);
         self.initDaysRange();
         await self.initData();
         self.curStoreTag = [];
       }
     },
 
-    numberOfElements(val, oldVal) {
-      console.log(val);
-      console.log(oldVal);
+    numberOfElements(val) {
       let self = this;
       if (val === 0 && self.totalElements > 0) {
         self.params.filter.page -= 1;
@@ -609,7 +606,6 @@ export default {
     },
 
     sortChange(col) {
-      console.log(col);
       let self = this;
       let order = col.order;
       self.order = order;
@@ -705,8 +701,10 @@ export default {
       let temp = [];
       if (data.errCode === 0 && data.errMsg === 'Success') {
         self.storeList = data.data;
-        if (self.storeList.length !==0) {
-          self.storeList.forEach(item => {
+        let length = self.storeList.length;
+        if (length > 0) {
+          for(let i = 0; i < length; i++){
+            let item = self.storeList[i];
             let country = item.country;
             if (temp.map(x => x.label).indexOf(country) === -1) {
               let obj = {
@@ -715,7 +713,7 @@ export default {
               };
               temp.push(obj);
             }
-          });
+          }
         }
         let countryList = temp;
         self.countryList[0] = {};
@@ -742,7 +740,6 @@ export default {
 
     dateChange(val) {
       let self = this;
-      console.log(val);
       self.currentIndex = 0;
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -769,7 +766,6 @@ export default {
       }
       daysDiff = self.$moment(end).diff(start, 'days');
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      console.log(self.timeMode);
       self.params.beginTs = start;
       self.params.endTs = end;
       self.initDaysRange();
@@ -801,19 +797,16 @@ export default {
     },
 
     handleStoreChange(arr) {
-      console.log(arr);
       this.curStore = arr;
       this.changeStore(arr);
     },
 
     handleProChange(arr) {
-      console.log(arr);
       this.curProvince = arr;
       this.changePro(arr);
     },
 
     handleCityChange(arr) {
-      console.log(arr);
       this.curCity = arr;
       this.changeCity(arr);
     },
@@ -826,7 +819,7 @@ export default {
         val.forEach((_item, _index) => {
           let isuu = _index === val.length - 1 ? '' : '，';
           if (item.storeId === _item) {
-            if (self.curStoreTag.length !==0) {
+            if (self.curStoreTag.length !== 0) {
               self.curStoreTag.forEach(v_item => {
                 item.tagIds.forEach(t_item => {
                   if ( (t_item === v_item && self.curCountry === item.country)
@@ -854,7 +847,7 @@ export default {
       self.storeTagStr = tagStr;
       let InspectArr = [];
       self.AllStore.data.content.forEach(item => {
-        if (self.paramsStoreIds.indexOf(item.storeId) !==-1 && item.appliedInspect.length !==0) {
+        if (self.paramsStoreIds.indexOf(item.storeId) !== -1 && item.appliedInspect.length !== 0) {
           InspectArr.push(item.appliedInspect);
         }
       });
@@ -868,13 +861,12 @@ export default {
         });
       });
       self.inspectTypeList = InspectList;
-      if (InspectList.length !==0) {
-        self.inspectList = InspectList[0].name;
+      if (InspectList.length !== 0) {
+        self.inspectList = InspectList[0].id;
       }
     },
 
     changePro(val) {
-      console.log(val);
       let self = this;
       self.inspectList = '';
       self.curCity = [];
@@ -952,7 +944,7 @@ export default {
       });
       self.inspectTypeList = InspectList;
       if (InspectList.length !== 0) {
-        self.inspectList = InspectList[0].name;
+        self.inspectList = InspectList[0].id;
       }
     },
 
@@ -1013,13 +1005,12 @@ export default {
       });
       self.inspectTypeList = InspectList;
       if (InspectList.length !== 0) {
-        self.inspectList = InspectList[0].name;
+        self.inspectList = InspectList[0].id;
       }
     },
 
     changeCountry(val) {
       let self = this;
-      console.log(val);
       self.inspectList = '';
       self.curProvince = [];
       self.curCity = [];
@@ -1118,24 +1109,19 @@ export default {
       });
       self.inspectTypeList = InspectList;
       if (InspectList.length !== 0) {
-        self.inspectList = InspectList[0].name;
+        self.inspectList = InspectList[0].id;
       }
     },
 
     changeCity(val) {
       let self = this;
       self.clearStoreInfo();
-      console.log(val);
       self.inspectList = '';
       let storeList = self.storeList;
       let temp = [];
       if (val.length === 0) {
-        console.log(self.curProvince);
         self.curProvince.forEach(_item => {
-          console.log(_item);
-
           storeList.forEach(item => {
-            console.log(item);
             if (item.province === _item) {
               let obj = {};
               obj.storeId = item.storeId;
@@ -1165,7 +1151,6 @@ export default {
           });
         });
       }
-      console.log(temp);
       self.storeDataList = temp;
       let storeArr = [], arr = [];
       self.storeDataList.forEach(item => {
@@ -1191,7 +1176,7 @@ export default {
       });
       self.inspectTypeList = InspectList;
       if (InspectList.length !== 0) {
-        self.inspectList = InspectList[0].name;
+        self.inspectList = InspectList[0].id;
       }
     },
 
@@ -1210,14 +1195,17 @@ export default {
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
       self.params.order = { direction: self.direction, property: self.property };
       self.params.mode = self.curType;
-      self.inspectTypeList.forEach(item => {
-        if (self.inspectList === item.name) {
-          self.params.inspectId = self.inspectList = item.id;
-          self.storePatrolLists = item.name;
+      let length = self.inspectTypeList.length;
+      for (let i = 0; i < length; i++) {
+        let name = self.inspectTypeList[i].name;
+        let id = self.inspectTypeList[i].id;
+        if (self.inspectList === id) {
+          self.params.inspectId = id;
+          self.storePatrolLists = name;
         } else {
           self.params.inspectId = self.inspectList;
         }
-      });
+      }
       await self.getInspectItemsTable();
     },
 
@@ -1226,7 +1214,9 @@ export default {
       let storeList = self.storeList;
       let temp = [];
       let tempStore = [];
-      storeList.forEach(item => {
+      let storeLength = storeList.length;
+      for (let storeIndex = 0; storeIndex < storeLength; storeIndex++) {
+        let item = storeList[storeIndex];
         if (item.country === val || val === '-1') {
           if (temp.map(x => x.value).indexOf(item.province) === -1) {
             let obj = {
@@ -1244,9 +1234,8 @@ export default {
           };
           tempStore.push(obj);
         }
-      });
+      }
       self.provinceList = temp;
-      console.log(self.provinceList);
       let cityTemp = [];
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
@@ -1303,7 +1292,7 @@ export default {
       });
       self.inspectTypeList = InspectList;
       if (InspectList.length !== 0) {
-        self.inspectList = InspectList[0].name;
+        self.inspectList = InspectList[0].id;
       }
       self.changeStore(self.curStore);
       self.searchData();
@@ -1325,18 +1314,17 @@ export default {
 
     async getInspectItemsTable() {
       let self = this;
-      let inspectItems = await self.getInspectStatsItemInfo(self.params);
-      let ignorePer = 0;
-      let errCode = inspectItems.errCode;
       let seriesData = [];
-      if (errCode === 0) {
+      try {
+        let inspectItems = await self.getInspectStatsItemInfo(self.params);
+        let ignorePer = 0;
+        let errCode = inspectItems.errCode;
+        if (errCode === 0) {
         let totalIgnored = 0;
         let totalUnqualified = 0;
         let totalQualified = 0;
         let totalExcellent = 0;
         let resultData = inspectItems.data;
-        console.log(resultData);
-        try {
           let content = resultData.content;
           content.forEach(item => {
             item.qualifiedRateStr = item.qualifiedRate + '%';
@@ -1347,12 +1335,13 @@ export default {
           });
           self.itemsTableData = resultData.content;
           self.total = resultData.totalElements;
-          console.log(resultData.content);
           await self.getInspectCharts();
-        } catch (e) {
-          seriesData = [];
-          self.itemsTableData = [];
         }
+      }
+      catch (e) {
+        seriesData = [];
+        self.itemsTableData = [];
+        console.log("InspectItemStatistics-getInspectItemsTable:" + e);
       }
     },
 
@@ -1415,7 +1404,6 @@ export default {
       params.endTs = self.params.endTs;
       params.storeIds = self.params.storeIds;
       params.mode = self.params.mode;
-      console.log(self.total);
       self.itemsOptions = self.getInspectChartOption()
       if (self.total > 0) {
         self.hasNoData = false;
@@ -1451,7 +1439,6 @@ export default {
             seriesData = [];
           }
           let totalArray = [totalQualified, totalUnqualified, totalIgnored];
-          console.log(totalArray);
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
           jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -1472,116 +1459,7 @@ export default {
     getCatergyRadar(arr) {
       let self = this;
       let mergeData = self.getCatergyByMerge(arr);
-      console.log(mergeData);
-      let options = {
-        backgroundColor: '#fff',
-        tooltip: {
-          textStyle: {
-            align: 'left'
-          },
-          backgroundColor: self.echartBackground
-        },
-        textStyle: {
-          fontFamily: self.fontFamily
-        },
-        legend: {
-          data: ['inspect radar']
-        },
-        radar: [{
-          shape: 'circle',
-          center: ['50%', '50%'],
-          nameGap: 5,
-          name: {
-            textStyle: {
-              color: '#7d8cad',
-              backgroundColor: '#fff',
-              borderRadius: 3,
-              padding: [3, 5]
-            },
-            formatter: (params) => {
-              console.log(params);
-              let str = '';
-              if (params.length > 6) {
-                str = params.substr(0, 6) + '...';
-              } else {
-                str = params;
-              }
-              return str;
-            }
-          },
-          indicator: [],
-          axisLine: {
-            lineStyle: {
-              color: self.echartAxiasColor
-            }
-          },
-          splitArea: {
-            show: false
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              width: 1,
-              color: self.echartAxiasColor
-            }
-          }
-        },
-        {
-          shape: 'circle',
-          center: ['50%', '50%'],
-          nameGap: 5,
-          indicator: [],
-          name: {
-            textStyle: {
-              color: 'rgba(255,255,255,0)',
-              borderRadius: 3,
-              padding: [3, 5]
-            }
-          },
-          splitArea: {
-            show: false
-          },
-          axisLine: {
-            lineStyle: {
-              color: self.echartAxiasColor
-            }
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              width: 1,
-              color: self.echartAxiasColor
-            }
-          }
-        }
-        ],
-        series: [
-          {
-            type: 'radar',
-            data: []
-          },
-          {
-            type: 'radar',
-            data: [],
-            name: self.$t('insSettingView.category'),
-            radarIndex: 1,
-            itemStyle: {
-              normal: {
-                lineStyle: {
-                  color: '#f31d65',
-                  width: 1
-                },
-                areaStyle: {
-                  color: 'rgba(243, 29, 101, 0.5)'
-                }
-              }
-            },
-            tooltip: {
-              trigger: 'item'
-            }
-          }
-        ]
-      };
+      let options = self.getCatergyRadarOption();
       let tempIndicator = [];
       let seriesValue = [];
       mergeData.forEach(item => {
@@ -1607,7 +1485,6 @@ export default {
       options.series[1].data = temp;
       options.radar.splitNumber = 5;
       self.itemsRadarOption = options;
-      console.log(self.itemsRadarOption);
     },
 
     getCatergyByMerge(arr) {
@@ -1633,19 +1510,130 @@ export default {
       return dest;
     },
 
+    getCatergyRadarOption() {
+      let radarOptions = {
+        backgroundColor: '#fff',
+        tooltip: {
+          textStyle: {
+            align: 'left'
+          },
+          backgroundColor: this.echartBackground
+        },
+        textStyle: {
+          fontFamily: this.fontFamily
+        },
+        legend: {
+          data: ['inspect radar']
+        },
+        radar: [{
+          shape: 'circle',
+          center: ['50%', '50%'],
+          nameGap: 5,
+          name: {
+            textStyle: {
+              color: '#7d8cad',
+              backgroundColor: '#fff',
+              borderRadius: 3,
+              padding: [3, 5]
+            },
+            formatter: (params) => {
+              let str = '';
+              if (params.length > 6) {
+                str = params.substr(0, 6) + '...';
+              } else {
+                str = params;
+              }
+              return str;
+            }
+          },
+          indicator: [],
+          axisLine: {
+            lineStyle: {
+              color: this.echartAxiasColor
+            }
+          },
+          splitArea: {
+            show: false
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              width: 1,
+              color: this.echartAxiasColor
+            }
+          }
+        },
+          {
+            shape: 'circle',
+            center: ['50%', '50%'],
+            nameGap: 5,
+            indicator: [],
+            name: {
+              textStyle: {
+                color: 'rgba(255,255,255,0)',
+                borderRadius: 3,
+                padding: [3, 5]
+              }
+            },
+            splitArea: {
+              show: false
+            },
+            axisLine: {
+              lineStyle: {
+                color: this.echartAxiasColor
+              }
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                width: 1,
+                color: this.echartAxiasColor
+              }
+            }
+          }
+        ],
+        series: [
+          {
+            type: 'radar',
+            data: []
+          },
+          {
+            type: 'radar',
+            data: [],
+            name: this.$t('insSettingView.category'),
+            radarIndex: 1,
+            itemStyle: {
+              normal: {
+                lineStyle: {
+                  color: '#f31d65',
+                  width: 1
+                },
+                areaStyle: {
+                  color: 'rgba(243, 29, 101, 0.5)'
+                }
+              }
+            },
+            tooltip: {
+              trigger: 'item'
+            }
+          }
+        ]
+      };
+      return radarOptions;
+    },
     getInspectStatsItemInfo(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsItemOverviewV2(params).then(res => {
           resolve(res);
+        }).catch(err =>{
+          reject(err)
         });
       });
     },
 
     async initData() {
       let self = this;
-      console.log(self.curStore);
       let storeIds = self.curStore.filter(item => item !== -1);
-      console.log(storeIds);
       self.params.storeIds = storeIds;
 
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
@@ -1681,7 +1669,6 @@ export default {
             result.content.forEach(item => {
               item.qualifiedRatePer = item.qualifiedRate + '%';
             });
-            console.log(result.content);
             curData = result.content;
           }
         }

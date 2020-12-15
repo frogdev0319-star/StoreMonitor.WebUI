@@ -448,6 +448,7 @@
   </div>
 </template>
 <script>
+
 import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import MultiSelect from '@/components/MultiSelect';
@@ -752,7 +753,6 @@ export default {
 
   watch: {
     async accountChanged(val) {
-      console.log(val);
       let self = this;
       if (val !== 0) {
         let self = this;
@@ -1152,7 +1152,6 @@ export default {
         getStoreList(params).then(res => {
           let errMsg = res.errMsg;
           if (errMsg && errMsg === 'Success') {
-            let data = res.data;
             resolve(res);
           }
         }).catch(res => {
@@ -1648,34 +1647,6 @@ export default {
       });
     },
 
-    async getExportData() {
-      let self = this;
-      let size = self.totalStore;
-      self.params.filter = {
-        'page': 0,
-        'size': size
-      };
-      self.params.regionMode = 3;
-      self.getInspectStatsOverviewWithRegion(self.params);
-      return new Promise((resolve, reject) => {
-        eventRESTful.getEventList(self.params).then((res) => {
-          let data = res.data.content;
-          let temp = [];
-          data.forEach(item => {
-            let obj = {};
-            obj.subject = item.subject;
-            obj.storeName = item.storeName;
-            obj.assignerName = item.assignerName;
-            obj.ts = util.getDateTime(item.ts);
-            temp.push(obj);
-          });
-          resolve(temp);
-        }).catch(err => {
-          console.log('Error:' + err);
-        });
-      });
-    },
-
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
@@ -1715,60 +1686,63 @@ export default {
       }
       params.region = region;
       params.timeMode = self.timeMode;
-      let regionResult = await self.getInspectResultOverRegion(params);
-      let option = self.getInspectLineOption();
-      if (regionResult.errCode === 0) {
-        let result = regionResult.data;
-        let soureceList = [];
-        let sortedProviceOrCity = [];
-        sortedProviceOrCity = region === 1 ? JSON.parse(JSON.stringify(self.curRegionI)) : JSON.parse(JSON.stringify(self.curRegionII));
-        let filterResult = self.jsonArrayHasSpecifiedValue(sortedProviceOrCity, result);
-        self.regionDataList = filterResult;
-        let regionArray = [];
-        filterResult[0].regions.forEach(item => {
-          let json = {};
-          json.label = item.region;
-          json.value = item.region;
-          json.disabled = false;
-          regionArray.push(json);
-        });
-        self.regionsList = regionArray;
-        self.curRegion = [];
-        self.regionsList.length > 0 ? self.curRegion.push(self.regionsList[0].value) : self.curRegion;
-        self.regionsList.length > 1 ? self.curRegion.push(self.regionsList[1].value) : self.curRegion;
-        let filterTwoResult = self.jsonArrayHasSpecifiedValue(self.curRegion, filterResult);
-
-        let regionData1 = [];
-        let regionData2 = [];
-        filterTwoResult.forEach((item, index) => {
-          let filterRegions = item.regions;
-          filterRegions.forEach((_item, _index) => {
-            let sumOfReports = 0;
-            let sunOfExcellent = 0;
-            let sumOfQualified = 0;
-            let percentRegion = 0;
-            sunOfExcellent += _item.numOfExcellent;
-            sumOfQualified += _item.numOfQualified;
-            sumOfReports += +_item.numOfQualified + _item.numOfDangerous;
-            if (sumOfReports === 0) {
-              percentRegion = 0;
-            } else {
-              let percent = (sunOfExcellent + sumOfQualified) / sumOfReports * 100;
-              percentRegion = percent.toFixed(2);
-            }
-            if (_index === 0) {
-              regionData1.push(percentRegion);
-              option.series[0].name = _item.region;
-            } else {
-              regionData2.push(percentRegion);
-              option.series[1].name = _item.region;
-            }
+      try {
+        let regionResult = await self.getInspectResultOverRegion(params);
+        let option = self.getInspectLineOption();
+        if (regionResult.errCode === 0) {
+          let result = regionResult.data;
+          let sortedProviceOrCity = [];
+          sortedProviceOrCity = region === 1 ? JSON.parse(JSON.stringify(self.curRegionI)) : JSON.parse(JSON.stringify(self.curRegionII));
+          let filterResult = self.jsonArrayHasSpecifiedValue(sortedProviceOrCity, result);
+          self.regionDataList = filterResult;
+          let regionArray = [];
+          filterResult[0].regions.forEach(item => {
+            let json = {};
+            json.label = item.region;
+            json.value = item.region;
+            json.disabled = false;
+            regionArray.push(json);
           });
-        });
-        option.series[0].data = regionData1;
-        option.series[1].data = regionData2;
+          self.regionsList = regionArray;
+          self.curRegion = [];
+          self.regionsList.length > 0 ? self.curRegion.push(self.regionsList[0].value) : self.curRegion;
+          self.regionsList.length > 1 ? self.curRegion.push(self.regionsList[1].value) : self.curRegion;
+          let filterTwoResult = self.jsonArrayHasSpecifiedValue(self.curRegion, filterResult);
+
+          let regionData1 = [];
+          let regionData2 = [];
+          filterTwoResult.forEach((item, index) => {
+            let filterRegions = item.regions;
+            filterRegions.forEach((_item, _index) => {
+              let sumOfReports = 0;
+              let sunOfExcellent = 0;
+              let sumOfQualified = 0;
+              let percentRegion = 0;
+              sunOfExcellent += _item.numOfExcellent;
+              sumOfQualified += _item.numOfQualified;
+              sumOfReports += +_item.numOfQualified + _item.numOfDangerous;
+              if (sumOfReports === 0) {
+                percentRegion = 0;
+              } else {
+                let percent = (sunOfExcellent + sumOfQualified) / sumOfReports * 100;
+                percentRegion = percent.toFixed(2);
+              }
+              if (_index === 0) {
+                regionData1.push(percentRegion);
+                option.series[0].name = _item.region;
+              } else {
+                regionData2.push(percentRegion);
+                option.series[1].name = _item.region;
+              }
+            });
+          });
+          option.series[0].data = regionData1;
+          option.series[1].data = regionData2;
+        }
+        self.regionsChartsOptions = option;
+      }catch (e) {
+        console.log("PatrolEvaluationStatistics-getInspectStatsLine:" + e);
       }
-      self.regionsChartsOptions = option;
     },
 
     getInspectLineOption(){

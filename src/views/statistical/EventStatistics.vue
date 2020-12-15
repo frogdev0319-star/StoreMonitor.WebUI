@@ -412,6 +412,7 @@ import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
 import util from '../../common/util.js';
 import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOverview';
 import html2canvas from 'html2canvas';
+import Lodash from 'lodash';
 
 export default {
   name: 'EventStatistics',
@@ -706,7 +707,6 @@ export default {
       }
       daysDiff = self.$moment(end).diff(start, 'days');
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      console.log(self.timeMode);
       self.params.beginTs = start;
       self.params.endTs = end;
       self.initDaysRange();
@@ -1175,80 +1175,6 @@ export default {
       self.selectAllProAndCity(val);
     },
 
-    changeCountrysss(val) {
-      let self = this;
-      self.curProvince = [];
-      self.curCity = [];
-      self.curStoreTag = [];
-      let storeList = self.storeList;
-      let tempStore = [];
-      let temp = [];
-      self.clearProviceInfo();
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      if (val === '') {
-        storeList.forEach(item => {
-          let storeObj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            userName: item.userName
-          };
-          tempStore.push(storeObj);
-        });
-        // self.storeDataList=tempStore;
-        self.checkAllStore = false;
-      } else {
-        storeList.forEach(item => {
-          if (item.country === val) {
-            if (temp.map(x => x.value).indexOf(item.province) === -1) {
-              let obj = {
-                label: item.province,
-                value: item.province
-              };
-              temp.push(obj);
-            }
-            let obj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              userName: item.userName
-            };
-            tempStore.push(obj);
-          }
-        });
-      }
-      self.provinceList = temp;
-      self.storeDataList = tempStore;
-      let cityTemp = [];
-      self.provinceList.forEach(_item => {
-        storeList.forEach(item => {
-          if (item.province === _item.value) {
-            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              let obj = {
-                label: item.city,
-                value: item.city
-              };
-              cityTemp.push(obj);
-            }
-          }
-        });
-      });
-      self.cityList = cityTemp;
-      let provinceArr = [];
-      self.provinceList.forEach(item => {
-        provinceArr.push(item.value);
-      });
-      self.curProvince = provinceArr;
-      let cityArr = [];
-      self.cityList.forEach(item => {
-        cityArr.push(item.value);
-      });
-      self.curCity = cityArr;
-    },
-
     changeCity(val) {
       let self = this;
       self.clearStoreInfo();
@@ -1451,10 +1377,8 @@ export default {
       let storeIds = self.paramsStoreIds;
       self.params.storeIds = storeIds;
       let eventResult = await self.getEventTableDataInfo(self.params);
-      let qualifiedPer = 0;
       let ignorePer = 0;
       let errCode = eventResult.errCode;
-      let seriesData = [];
       if (errCode === 0) {
         let result = eventResult.data;
         if (result) {
@@ -1497,35 +1421,52 @@ export default {
 
       params.filter = { page: self.page - 1, size: self.total };
       params.order = { direction: self.direction, property: self.property };
-      if (self.total > 0) {
-        let eventResult = await self.getEventTableDataInfo(params);
-        let errCode = eventResult.errCode;
-        if (errCode === 0) {
-          let result = eventResult.data;
-          if (result) {
-            let content = result.content;
-            content.forEach(item => {
-              let numOfTotal = item.numOfTotal;
-              if (numOfTotal === 0) {
-                item.remotePer = 0 + '%';
-                item.onsitePer = 0 + '%';
-                item.videoPer = 0 + '%';
-              } else {
-                item.remotePer = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-                item.onsitePer = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-                item.videoPer = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-              }
-            });
-            self.allEventData = content;
+      try{
+        if (self.total > 0) {
+          let eventResult = await self.getEventTableDataInfo(params);
+          let errCode = eventResult.errCode;
+          if (errCode === 0) {
+            let result = eventResult.data;
+            if (result) {
+              let content = result.content;
+              content.forEach(item => {
+                let numOfTotal = item.numOfTotal;
+                if (numOfTotal === 0) {
+                  item.remotePer = 0 + '%';
+                  item.onsitePer = 0 + '%';
+                  item.videoPer = 0 + '%';
+                } else {
+                  item.remotePer = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+                  item.onsitePer = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+                  item.videoPer = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+                }
+              });
+              self.allEventData = content;
+            }
+          } else {
+            self.allEventData = [];
           }
         } else {
           self.allEventData = [];
         }
-      } else {
-        self.allEventData = [];
+        self.getEventTableDataFromEventData();
+        self.getEventsNum();
+        self.getEventBySourcePie();
+      }catch (e) {
+        console.log("EventStatistics-getAllEventData:" + e);
       }
-      self.getEventsNum();
-      self.getEventBySourcePie();
+    },
+
+    getEventTableDataFromEventData(){
+      let allTableData = this.allEventData;
+      if( this.totalElements < this.params.filter.size ){
+        this.tableData = Lodash.cloneDeep(allTableData);
+      }
+      else{
+        let startIndex = this.params.filter.page;
+        let endIndex = this.params.filter.size;
+        this.tableData =  allTableData.slice(startIndex, endIndex);
+      }
     },
 
     getEventsNum() {
@@ -1576,17 +1517,24 @@ export default {
       } else {
         seriesData = [];
       }
-      self.eventSourceOptions = {
+      let pieOption = self.getEventBySourcePieOption();
+      pieOption.series[0].data = seriesData;
+      self.eventSourceOptions = pieOption;
+      self.sourcePerArray = jsonArray;
+    },
+
+    getEventBySourcePieOption(){
+      let pieOption = {
         tooltip: {
           trigger: 'item',
           formatter: '{b} : {c} ({d}%)',
           textStyle: {
             align: 'left'
           },
-          backgroundColor: self.echartBackground
+          backgroundColor: this.echartBackground
         },
         textStyle: {
-          fontFamily: self.fontFamily
+          fontFamily: this.fontFamily
         },
         series: [
           {
@@ -1606,7 +1554,7 @@ export default {
                 show: false
               }
             },
-            data: seriesData,
+            data: [],
             itemStyle: {
               emphasis: {
                 shadowBlur: 10,
@@ -1623,7 +1571,7 @@ export default {
           }
         ]
       };
-      self.sourcePerArray = jsonArray;
+      return pieOption;
     },
 
     getEventTableDataInfo(params) {

@@ -513,9 +513,7 @@ export default {
         self.initData();
       }
     },
-    numberOfElements(val, oldVal) {
-      console.log(val);
-      console.log(oldVal);
+    numberOfElements(val) {
       let self = this;
       if (val === 0 && self.totalElements > 0) {
         self.params.filter.page -= 1;
@@ -540,6 +538,8 @@ export default {
         GetScheduleTaskList(params).then(res => {
           let data = res;
           resolve(data);
+        }).catch(err =>{
+          reject(err);
         });
       });
     },
@@ -580,6 +580,8 @@ export default {
                     }).then(function() {
                       self.$print(self.$refs.printPDF);
                       self.ispdf = false;
+                    }).catch(err =>{
+                      console.log("SupervisorStatistics-handleDown:" + err);
                     });
                   }
                 });
@@ -735,7 +737,6 @@ export default {
 
     dateChange(val) {
       let self = this;
-      console.log(val);
       self.currentIndex = 0;
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -762,7 +763,6 @@ export default {
       }
       daysDiff = self.$moment(end).diff(start, 'days');
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      console.log(self.timeMode);
       self.params.beginTs = start;
       self.params.endTs = end;
       self.initDaysRange();
@@ -787,11 +787,9 @@ export default {
         let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
         weekList.splice(0, 1, firstWeekStr);
         weekList.splice(arrLength - 1, 1, lastWeekStr);
-        console.log(weekList);
         self.daysRangeList = weekList;
       } else if (self.timeMode === 2) {
         let monthArray = util.getMonthBetween(startDay, endDay);
-        console.log(monthArray);
         self.daysRangeList = monthArray;
       }
     },
@@ -811,7 +809,6 @@ export default {
 
       if (errCode === 0) {
         let resultData = inspectItems.data;
-        console.log(resultData);
         try {
           let content = resultData.content;
           content.forEach(item => {
@@ -819,8 +816,8 @@ export default {
           });
           self.supervisorTableData = resultData.content;
           self.total = resultData.totalElements;
-          console.log(resultData.content);
         } catch (e) {
+          console.log("SupervisorStatistics-getInspectPersonTable:" + e);
           self.supervisorTableData = [];
         }
       }
@@ -830,6 +827,8 @@ export default {
       return new Promise((resolve, reject) => {
         getInspectStatsOverPersonV2(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err)
         });
       });
     },
@@ -871,7 +870,6 @@ export default {
           'page': 0,
           'size': self.total
         };
-        console.log(self.params);
         let regionResult = await that.getInspectStatsPersonInfo(self.params);
         let curData = [];
         if (regionResult.errCode === 0) {
@@ -880,7 +878,6 @@ export default {
             result.content.forEach(item => {
               item.completionRatePer = item.completionRate + '%';
             });
-            console.log(result.content);
             curData = result.content;
           }
         }
@@ -909,14 +906,12 @@ export default {
       }
       params.supervisorId = supervisorId;
       params.category = [0, 1];
-      console.log(params);
       let result = await self.getInspectorPlan(params);
       let retData = await self.getBriefStoreData();
       let storeList = retData.data;
       let errCode = result.errCode;
       if (errCode === 0) {
         let resultData = result.data;
-        console.log(resultData);
         resultData.forEach(item => {
           item.category = item.category === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol');
           let scheduleStr = '';
@@ -1013,7 +1008,6 @@ export default {
       let errCode = result.errCode;
       if (errCode === 0) {
         let resultData = result.data;
-        console.log(resultData);
         try {
           let content = resultData.content;
           content.forEach(item => {
