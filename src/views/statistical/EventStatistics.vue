@@ -1332,6 +1332,12 @@ export default {
         self.params.storeIds = self.paramsStoreIds;
         self.params.filter = { page: self.page - 1, size: self.sizeNum };
         self.params.order = { direction: self.direction, property: self.property };
+
+        /**
+         *firstly, call getEventTableData to get all event num and display the first page of table
+         * secondly, call getAllEventData to get all event and pie chart data
+         */
+
         await self.getEventTableData();
         await self.getAllEventData();
         self.getStoreEventStatics();
