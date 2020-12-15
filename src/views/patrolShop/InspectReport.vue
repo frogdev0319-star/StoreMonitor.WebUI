@@ -506,7 +506,6 @@ export default {
         reportId: self.report.reportId
       };
       getInspectReportDetail(params).then(res => {
-        console.log(res);
         let data = res.data;
         let temp = [];
         let feedtemp = [];
@@ -524,7 +523,6 @@ export default {
             details.comment = item.comment;
             details.description = item.description;
             details.grade = item.grade;
-            // gradetotal.push(item.grade)
             if (item.attachment.length !== 0) {
               let _temp = [];
               let audioObj = {};
@@ -582,6 +580,8 @@ export default {
           });
           self.feedbacks = feedtemp;
         }
+      }).catch(err => {
+        console.log("InspectReportDetail-getReportDetail: "+ err);
       });
     },
 
@@ -604,8 +604,6 @@ export default {
 
     openOuter(item, $ev) {
       let self = this;
-      console.log(item);
-      console.log($ev.target.onerror);
       if (item != null) {
         self.showOuter = true;
         self.checkImgSrc = item.url;
@@ -615,11 +613,9 @@ export default {
 
     getGroupsDuration(item) {
       let self = this;
-      console.log(item);
       if (item.showAudio) {
         let audio = self.$refs[item.audio.audioRef][0];
         let du = audio.duration;
-        console.log(du);
         if (isNaN(du)) {
           item.showAudio = false;
         } else {
@@ -628,18 +624,15 @@ export default {
             du = 1;
           }
           item.audio.audioOftenText = parseInt(du) + '"';
-          console.log(item.audio.audioOftenText);
         }
       }
     },
 
     getFeedBacksDuration(item) {
       let self = this;
-      console.log(item);
       if (item.showAudio) {
         let audio = self.$refs[item.audio.audioRef][0];
         let du = audio.duration;
-        console.log(du);
         if (isNaN(du)) {
           item.showAudio = false;
         } else {
@@ -648,7 +641,6 @@ export default {
             du = 1;
           }
           item.audio.audioOftenText = parseInt(du) + '"';
-          console.log(item.audio.audioOftenText);
         }
       }
     },
@@ -697,6 +689,54 @@ export default {
       });
     },
 
+    getSummaryInfo(summary){
+      let summaryTemp = [];
+      summary.forEach(item => {
+        let obj = {};
+        obj.groupId = item.groupId;
+        obj.groupName = item.groupName;
+        obj.count = item.numOfTotalItems;
+        obj.isQua = item.result === 1;
+        obj.numOfExcellentItems = item.numOfExcellentItems;
+        obj.numOfQualifiedItems = item.numOfQualifiedItems;
+        obj.numOfUnqualifiedItems = item.numOfUnqualifiedItems;
+        summaryTemp.push(obj);
+      });
+      this.summary = summaryTemp;
+    },
+
+    getReportItemsListInfo(data){
+      let tempArray = [];
+      this.isInsiteInspect && data.signature ? tempArray = new Array(4) : tempArray = new Array(3);
+      tempArray[0] = {
+        itemTitleName: this.$t('remotePatrol.notableItem'),
+        iconSrc: 'icon-zhongxindingwei',
+        itemCount: data.focalItems.length,
+        itemList: data.focalItems
+      };
+      tempArray[1] = {
+        itemTitleName: this.$t('remotePatrol.inapplicableItem'),
+        iconSrc: 'icon-hulve',
+        itemCount: data.ignoredItems.length,
+        itemList: data.ignoredItems
+      };
+      tempArray[2] = {
+        itemTitleName: this.$t('remotePatrol.feedbacks'),
+        iconSrc: 'icon-fankui',
+        itemCount: data.feedback.length,
+        itemList: data.feedback
+      };
+      if (this.isInsiteInspect && data.signature) {
+        tempArray[3] = {
+          itemTitleName: this.$t('remotePatrol.signature'),
+          iconSrc: 'icon-fankui',
+          itemCount: '',
+          itemList: data.signature.content
+        };
+      }
+      this.tempList = tempArray;
+    },
+
     async getReportInfo() {
       let self = this;
       let reportId = self.report.reportId;
@@ -706,64 +746,27 @@ export default {
         reportIds: temp
       };
       getInspectReportInfo(params).then(res => {
-        console.log(res);
-        let data = res.data[0].info;
-        self.suggest = data.comment;
-        let summary = data.summary;
-        let te_temp = [];
-        for (let i = 0; i < 3; i++) {
-          let Typeindex = summary.filter(x => x.type === i);
-          if (Typeindex.length !== 0) {
-            Typeindex[0].type === 0 ? te_temp.push(Typeindex) : '';
-            Typeindex[0].type === 1 ? te_temp.push(Typeindex) : '';
-            Typeindex[0].type === 2 ? te_temp.push(Typeindex) : '';
+        if(res.errCode === 0 && res.data.length > 0){
+          let data = res.data[0].info;
+          self.suggest = data.comment;
+          let summary = data.summary;
+          let te_temp = [];
+          for (let i = 0; i < 3; i++) {
+            let typeIndex = summary.filter(x => x.type === i);
+            if (typeIndex.length !== 0) {
+              typeIndex[0].type === 0 ? te_temp.push(typeIndex) : '';
+              typeIndex[0].type === 1 ? te_temp.push(typeIndex) : '';
+              typeIndex[0].type === 2 ? te_temp.push(typeIndex) : '';
+            }
           }
+          self.tableData = te_temp;
+          self.totalScore = data.totalScore;
+          self.getSummaryInfo(summary);
+          self.getReportItemsListInfo(data);
+          self.getRadarOption();
         }
-        self.tableData = te_temp;
-        self.totalScore = data.totalScore;
-        let summaryTemp = [];
-        summary.forEach(item => {
-          let obj = {};
-          obj.groupId = item.groupId;
-          obj.groupName = item.groupName;
-          obj.count = item.numOfTotalItems;
-          obj.isQua = item.result === 1;
-          obj.numOfExcellentItems = item.numOfExcellentItems;
-          obj.numOfQualifiedItems = item.numOfQualifiedItems;
-          obj.numOfUnqualifiedItems = item.numOfUnqualifiedItems;
-          summaryTemp.push(obj);
-        });
-        self.summary = summaryTemp;
-        let tempArray = [];
-        self.isInsiteInspect && data.signature ? tempArray = new Array(4) : tempArray = new Array(3);
-        tempArray[0] = {
-          itemTitleName: self.$t('remotePatrol.notableItem'),
-          iconSrc: 'icon-zhongxindingwei',
-          itemCount: data.focalItems.length,
-          itemList: data.focalItems
-        };
-        tempArray[1] = {
-          itemTitleName: self.$t('remotePatrol.inapplicableItem'),
-          iconSrc: 'icon-hulve',
-          itemCount: data.ignoredItems.length,
-          itemList: data.ignoredItems
-        };
-        tempArray[2] = {
-          itemTitleName: self.$t('remotePatrol.feedbacks'),
-          iconSrc: 'icon-fankui',
-          itemCount: data.feedback.length,
-          itemList: data.feedback
-        };
-        if (self.isInsiteInspect && data.signature) {
-          tempArray[3] = {
-            itemTitleName: self.$t('remotePatrol.signature'),
-            iconSrc: 'icon-fankui',
-            itemCount: '',
-            itemList: data.signature.content
-          };
-        }
-        self.tempList = tempArray;
-        self.getRadarOption();
+      }).catch(err => {
+        console.log("InspectReportDetail-getReportInfo: "+ err);
       });
     },
 
@@ -819,7 +822,6 @@ export default {
                 padding: [3, 5]
               },
               formatter: (params) => {
-                console.log(params);
                 let str = '';
                 if (params.length > 10) {
                   str = params.substr(0, 10) + '...';
