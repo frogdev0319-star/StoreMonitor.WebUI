@@ -882,28 +882,24 @@ export default {
 
     isEzviz() {
       let self = this;
-      console.log(self.$store.state.user);
       return self.$store.state.user.isEzviz;
     }
 
   },
 
   watch: {
-    accountChanged(val, oldVal) {
-      console.log(val);
+    accountChanged(val) {
       let self = this;
       if (val !== 0) {
         self.changeBrand();
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
-          console.log(self.$route.meta.keepAlive);
         }, 300);
       }
     },
 
     realTimeSpeed(val) {
       let self = this;
-      console.log(val);
       if (val >= 300) {
         self.stopVideoPlay();
         self.stopTimer();
@@ -917,7 +913,6 @@ export default {
     } else {
       to.meta.isBack = false;
     }
-    console.log(to.meta.keepAlive);
     next((vm) => {
       vm.clearEvent();
     });
@@ -943,7 +938,6 @@ export default {
     } else {
       from.meta.keepAlive = true;
     }
-    console.log(from.meta.keepAlive);
     next();
   },
 
@@ -986,7 +980,6 @@ export default {
           self.stopTimer();
         }
       } else {
-        console.log(this.currentState);
         if(this.currentState === 'loading'){
           self.startVideo(self.channel.ivsId, self.channel.channelId, null)
         }
@@ -1090,7 +1083,6 @@ export default {
           break;
         case 1:
           data = self.getStoreObj();
-          console.log(data);
           self.tabList[1].storeList = getStoreTemp(data);
           break;
         case 2:
@@ -1130,36 +1122,40 @@ export default {
         });
         return temp;
       };
-      let res = await self.getFaStoreList();
-      if (res.errCode === 0) {
-        let storeData = res.data;
-        self.tabList[0].storeList = getStoreTemp(storeData);
-        if (storeData.length === 0) {
-          self.showStoreUp = false;
-          self.store = {};
-          self.channel = {};
-          self.channelBtns = [];
-          self.showChannelBtns = [];
-          self.allChannelBtns = [];
-        } else {
-          let obj = {};
-          obj.storeId = storeData[0].storeId;
-          obj.storeName = storeData[0].name;
-          obj.storeTitle = storeData[0].name;
-          obj.userName = storeData[0].userName;
-          obj.storeUp = true;
-          obj.storeUpTitle = self.$t('remotePatrol.stared');
-          self.store = obj;
-          self.showStoreUp = true;
-          let curStoreId = storeData[0].storeId;
+      try {
+        let res = await self.getFaStoreList();
+        if (res.errCode === 0) {
+          let storeData = res.data;
+          self.tabList[0].storeList = getStoreTemp(storeData);
+          if (storeData.length === 0) {
+            self.showStoreUp = false;
+            self.store = {};
+            self.channel = {};
+            self.channelBtns = [];
+            self.showChannelBtns = [];
+            self.allChannelBtns = [];
+          } else {
+            let obj = {};
+            obj.storeId = storeData[0].storeId;
+            obj.storeName = storeData[0].name;
+            obj.storeTitle = storeData[0].name;
+            obj.userName = storeData[0].userName;
+            obj.storeUp = true;
+            obj.storeUpTitle = self.$t('remotePatrol.stared');
+            self.store = obj;
+            self.showStoreUp = true;
+            let curStoreId = storeData[0].storeId;
 
-          let storeObj = {
-            storeId: curStoreId
-          };
-
-          self.saveStoreObj(storeObj);
-          self.getChannelByStore(self.tabList[0].storeList[0]);
+            let storeObj = {
+              storeId: curStoreId
+            };
+            self.saveStoreObj(storeObj);
+            self.getChannelByStore(self.tabList[0].storeList[0]);
+          }
         }
+      }
+      catch (err) {
+        console.log("StoreMonitor-getFaStoreData: " + err);
       }
     },
 
@@ -1201,18 +1197,86 @@ export default {
         }
         return storeListTemp;
       };
-      let res = await self.getAllStoreList();
-      if (res.errCode === 0) {
-        let storeData = res.data.content;
-        self.allInitStoreList = storeData;
-        if (storeData.length === 0) {
-          self.tabList[2].storeList = [];
-          self.tempStoreList = [];
-        } else {
-          self.tabList[2].storeList = getStore2Temp(storeData);
-          self.tempStoreList = getStore2Temp(storeData);
+      try {
+        let res = await self.getAllStoreList();
+        if (res.errCode === 0) {
+          let storeData = res.data.content;
+          self.allInitStoreList = storeData;
+          if (storeData.length === 0) {
+            self.tabList[2].storeList = [];
+            self.tempStoreList = [];
+          } else {
+            self.tabList[2].storeList = getStore2Temp(storeData);
+            self.tempStoreList = getStore2Temp(storeData);
+          }
         }
+      }catch (err) {
+        console.log("StoreMonitor-getInitStoreData: " + err);
       }
+    },
+
+    addFavoriteStore(params){
+      let self = this;
+      addFavoriteStore(params).then((res) => {
+        if (res.errCode === 0) {
+          self.store.storeUp = true;
+          self.store.storeUpTitle = self.$t('remotePatrol.stared');
+          self.getStoreList();
+          self.tabList[2].storeList.forEach((item, index) => {
+            item.storeList.forEach((_item, _index) => {
+              if (self.store.storeId === _item.storeId) {
+                _item.favorite = true;
+              }
+            });
+          });
+          self.tempStoreList.forEach((item, index) => {
+            item.storeList.forEach((_item, _index) => {
+              if (self.store.storeId === _item.storeId) {
+                _item.favorite = true;
+              }
+            });
+          });
+          self.allInitStoreList.forEach((item, index) => {
+            if (self.store.storeId === item.storeId) {
+              item.favorite = true;
+            }
+          });
+        }
+      }).catch(err => {
+        console.log("StoreMonitor-addFavoriteStore: " + err);
+      });
+    },
+
+    deleteFavoriteStore(params){
+      let self = this;
+      deleteFavoriteStore(params).then((res) => {
+        if (res.errCode === 0) {
+          self.store.storeUp = false;
+          self.store.storeUpTitle = self.$t('remotePatrol.clickToStar');
+          self.getStoreList();
+          self.tabList[2].storeList.forEach((item, index) => {
+            item.storeList.forEach((_item, _index) => {
+              if (self.store.storeId === _item.storeId) {
+                _item.favorite = false;
+              }
+            });
+          });
+          self.tempStoreList.forEach((item, index) => {
+            item.storeList.forEach((_item, _index) => {
+              if (self.store.storeId === _item.storeId) {
+                _item.favorite = false;
+              }
+            });
+          });
+          self.allInitStoreList.forEach((item, index) => {
+            if (self.store.storeId === item.storeId) {
+              item.favorite = false;
+            }
+          });
+        }
+      }).catch(err => {
+        console.log("StoreMonitor-deleteFavoriteStore: " + err);
+      });
     },
 
     addStoreUp() {
@@ -1223,59 +1287,9 @@ export default {
         storeIds: temp
       };
       if (!self.store.storeUp) {
-        addFavoriteStore(params).then((res) => {
-          if (res.errCode === 0) {
-            self.store.storeUp = true;
-            self.store.storeUpTitle = self.$t('remotePatrol.stared');
-            self.getStoreList();
-            self.tabList[2].storeList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId === _item.storeId) {
-                  _item.favorite = true;
-                }
-              });
-            });
-            self.tempStoreList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId === _item.storeId) {
-                  _item.favorite = true;
-                }
-              });
-            });
-            self.allInitStoreList.forEach((item, index) => {
-              if (self.store.storeId === item.storeId) {
-                item.favorite = true;
-              }
-            });
-          }
-        });
+        self.addFavoriteStore(params);
       } else {
-        deleteFavoriteStore(params).then((res) => {
-          if (res.errCode === 0) {
-            self.store.storeUp = false;
-            self.store.storeUpTitle = self.$t('remotePatrol.clickToStar');
-            self.getStoreList();
-            self.tabList[2].storeList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId === _item.storeId) {
-                  _item.favorite = false;
-                }
-              });
-            });
-            self.tempStoreList.forEach((item, index) => {
-              item.storeList.forEach((_item, _index) => {
-                if (self.store.storeId === _item.storeId) {
-                  _item.favorite = false;
-                }
-              });
-            });
-            self.allInitStoreList.forEach((item, index) => {
-              if (self.store.storeId === item.storeId) {
-                item.favorite = false;
-              }
-            });
-          }
-        });
+        self.deleteFavoriteStore(params);
       }
     },
 
@@ -1299,11 +1313,13 @@ export default {
           property: 'ts'
         }
       };
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         getEventList(params).then((res) => {
           let data = res.data.content;
           resolve(data);
         });
+      }).catch(err =>{
+        console.log("StoreMonitor-getEventList: " + err);
       });
     },
 
@@ -1318,7 +1334,7 @@ export default {
         let data = await self.getEventList();
         data = data.slice(0, 5);
         let temp = [];
-        data.forEach((item, index) => {
+        data.forEach((item) => {
           let obj = {};
           obj.id = item.id;
           obj.name = item.subject;
@@ -1363,11 +1379,9 @@ export default {
       self.startTs = 0;
       self.showModelContent = true;
       let d = self.getCurTime();
-      console.log(d);
       self.curTime = d;
       let dstr = Number(d.getTime().toString().substr(0, 10));
       self.startTs = dstr;
-      console.log(self.startTs);
       self.playBackTime = Number(d.getTime().toString());
       self.currentTimeValue = 0;
       self.playBackState = true;
@@ -1383,7 +1397,6 @@ export default {
         self.startVideo(self.channel.ivsId, self.channel.channelId, self.startTs);
         self.realTimeStartTs = self.startTs;
       } else {
-        console.log('ezviz');
         self.changeFlag = false;
         self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
       }
@@ -1393,7 +1406,6 @@ export default {
       let self = this;
       let bucketName = self.oss.ossBucketName;
       let endpoint = self.oss.ossEndPoint;
-      let key = fileName;
       if (self.oss.ossVendor === 2) {
         return `https://${endpoint}/${bucketName}/${fileName}`;
       } else {
@@ -1401,70 +1413,76 @@ export default {
       }
     },
 
-    upLoadFile(fileItem) {
+    uploadFileToAliyun(fileItem){
+      let self = this;
+      let OSS = require('ali-oss');
+      let client = new OSS({
+        region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.') ),
+        accessKeyId: self.oss.ossAccessKeyId,
+        accessKeySecret: self.oss.ossAccessKeySecret,
+        bucket: self.oss.ossBucketName
+      });
+      let name = fileItem.fileName;
+      return new Promise((resolve, reject) => {
+        client.multipartUpload(name, fileItem.file, {
+          progress: function * (percentage, cpt) {
+            self.percentage = percentage;
+          }
+        })
+        .then((results) => {
+          let url = self.getFileUrl(results.name);
+          resolve(url);
+        })
+        .catch((err) => {
+          console.log("StoreMonitor-uploadFileToAliyun: " + err);
+        });
+      });
+    },
+
+    uploadFileToAzure(fileItem){
+      let self = this;
+      let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+      let containerURL = new azblob.ContainerURL(
+        url,
+        azblob.StorageURL.newPipeline(new azblob.AnonymousCredential())
+      );
+      let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(
+        containerURL,
+        fileItem.fileName
+      );
+      return new Promise((resolve, reject) => {
+        azblob.uploadBrowserDataToBlockBlob(
+          azblob.Aborter.none,
+          fileItem.file,
+          blockBlobURL
+        )
+        .then((results) => {
+          let url = self.getFileUrl(fileItem.fileName);
+          resolve(url);
+        })
+        .catch((err) => {
+          console.log("StoreMonitor-uploadFileToAzure: " + err);
+        });
+      });
+    },
+
+    async upLoadFile(fileItem) {
       let self = this;
       self.percentage = 0;
+      let url = '';
       if (self.oss.ossVendor == null) {
         self.oss.ossVendor = 1;
       }
       if (self.oss.ossVendor === 1) {
-        let OSS = require('ali-oss');
-        let client = new OSS({
-          region: self.oss.ossEndPoint.slice(
-            0,
-            self.oss.ossEndPoint.indexOf('.')
-          ),
-          accessKeyId: self.oss.ossAccessKeyId,
-          accessKeySecret: self.oss.ossAccessKeySecret,
-          bucket: self.oss.ossBucketName
-        });
-        let name = fileItem.fileName;
-        return new Promise((resolve, reject) => {
-          client.multipartUpload(name, fileItem.file, {
-              progress: function * (percentage, cpt) {
-                self.percentage = percentage;
-              }
-            })
-            .then((results) => {
-              let url = self.getFileUrl(results.name);
-              resolve(url);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        });
+        url = await self.uploadFileToAliyun(fileItem);
       } else {
-        let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-        let containerURL = new azblob.ContainerURL(
-          url,
-          azblob.StorageURL.newPipeline(new azblob.AnonymousCredential())
-        );
-        let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(
-          containerURL,
-          fileItem.fileName
-        );
-        return new Promise((resolve, reject) => {
-          azblob
-            .uploadBrowserDataToBlockBlob(
-              azblob.Aborter.none,
-              fileItem.file,
-              blockBlobURL
-            )
-            .then((results) => {
-              let url = self.getFileUrl(fileItem.fileName);
-              console.log(url);
-              resolve(url);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        });
+        url = await self.uploadFileToAzure(fileItem);
       }
+      return url;
     },
 
     openOuter(item) {
       let self = this;
-      console.log(item);
       if (item != null) {
         self.showOuter = true;
         self.checkImgSrc = item.src;
@@ -1474,6 +1492,151 @@ export default {
     deleteImg(item, index) {
       let self = this;
       self.sourceList.splice(index, 1);
+    },
+
+    getStorageInfo(){
+      let self = this;
+      let params = {};
+      params.storeId = self.store.storeId;
+      return new Promise((resolve, reject) => {
+        getStorageInfo(params).then((res) => {
+          if (res.errCode === 0) {
+            self.oss = res.data;
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      })
+    },
+
+     async getAttachmentFileUrl(){
+      let tempFileUrl = [];
+      for (let i = 0; i < this.sourceList.length; i++) {
+        let obj = {};
+        if (this.sourceList[i].mediaType === 2) {
+          let url = await this.upLoadFile(this.sourceList[i]);
+          obj.mediaType = 2;
+          obj.url = url;
+          obj.deviceId = this.channel.id;
+        } else if (this.sourceList[i].mediaType === 1) {
+          let url = await this.upLoadFile(this.sourceList[i]);
+          obj.mediaType = 1;
+          obj.url = url;
+          obj.deviceId = this.channel.id;
+        }
+        tempFileUrl.push(obj);
+      }
+      return tempFileUrl;
+    },
+
+    addEvent(tempFileUrl) {
+      let self = this;
+      let commentobj = {
+        ts: new Date().getTime(),
+        description: self.eventDes.trim(),
+        attachment: tempFileUrl,
+        status: 0
+      };
+      let curTs = util.getCurDate2StrBySign('/');
+      let obj = {};
+      obj.ts = new Date().getTime();
+      obj.subject = self.eventName.trim();
+      obj.storeId = self.store.storeId;
+      obj.deviceId = self.channel.id;
+      obj.comment = commentobj;
+      let params = obj;
+      let isSuccess = false;
+      addEvent(params).then((res) => {
+        self.fullscreenLoading = false;
+        let notifiedTo = res.data.notifiedTo;
+        if (res.errCode === 0) {
+          isSuccess = true;
+        } else {
+          isSuccess = false;
+        }
+        let routeData = {
+          flag: {
+            addEventType: 'add',
+            isSuccess: isSuccess
+          },
+          store: {
+            storeId: self.store.storeId,
+            storeName: self.store.storeName
+          },
+          channel: {
+            deviceId: self.channel.id
+          },
+          event: {
+            eventIds: [],
+            eventName: self.eventName,
+            description: self.eventDes.trim(),
+            fileList: tempFileUrl
+          },
+          user: notifiedTo,
+          ts: curTs
+        };
+        sessionStorage.setItem('store_submit', JSON.stringify(routeData));
+        self.$router.push({
+          name: 'storeSubEvent',
+          params: { data: routeData }
+        });
+      }).catch(err => {
+        console.log("StoreMonitor-addEvent" + err);
+      });
+    },
+
+    async addComment(tempFileUrl){
+      let self = this;
+      let isSuccess = false;
+      let eventIds = [];
+      eventIds.push(self.curEvent);
+      let obj = {
+        eventIds: eventIds,
+        comment: {
+          ts: new Date().getTime(),
+          description: self.eventDes.trim(),
+          attachment: tempFileUrl,
+          status: 0
+        }
+      };
+      let curTs = util.getCurDate2StrBySign('/');
+      let params = obj;
+      addComment(params).then((res) => {
+        self.fullscreenLoading = false;
+        if (res.errCode === 0) {
+          isSuccess = true;
+        } else {
+          isSuccess = false;
+        }
+        let routeData = {
+          flag: {
+            addEventType: 'cor',
+            isSuccess: isSuccess
+          },
+          store: {
+            storeId: self.store.storeId,
+            storeName: self.store.storeName
+          },
+          channel: {
+            deviceId: self.channel.id
+          },
+          event: {
+            eventIds: eventIds,
+            eventName: self.eventName,
+            description: self.eventDes.trim(),
+            fileList: tempFileUrl
+          },
+          ts: curTs
+        };
+        sessionStorage.setItem('store_submit', JSON.stringify(routeData));
+        self.$router.push({
+          name: 'storeSubEvent',
+          params: { data: routeData }
+        });
+      }).catch(err => {
+        console.log("StoreMonitor-addComment" + err);
+      });
     },
 
     async submit() {
@@ -1486,130 +1649,13 @@ export default {
         self.showEventDescInfo = true;
         return false;
       }
-      let params = {};
-      params.storeId = self.store.storeId;
-      await getStorageInfo(params).then((res) => {
-        if (res.errCode === 0) {
-          self.oss = res.data;
-          console.log(self.oss);
-        }
-      });
-      let tempFileUrl = [];
-      for (let i = 0; i < self.sourceList.length; i++) {
-        let obj = {};
-        if (self.sourceList[i].mediaType === 2) {
-          let url = await self.upLoadFile(self.sourceList[i]);
-          obj.mediaType = 2;
-          obj.url = url;
-          obj.deviceId = self.channel.id;
-        } else if (self.sourceList[i].mediaType === 1) {
-          let url = await self.upLoadFile(self.sourceList[i]);
-          obj.mediaType = 1;
-          obj.url = url;
-          obj.deviceId = self.channel.id;
-        }
-        tempFileUrl.push(obj);
-      }
-      let eventIds = [];
-      eventIds.push(self.curEvent);
+      await self.getStorageInfo();
+      let tempFileUrl = await self.getAttachmentFileUrl();
       self.fullscreenLoading = true;
-      let isSuccess = false;
       if (self.evBtns[0].isActive) {
-        let commentobj = {
-          ts: new Date().getTime(),
-          description: self.eventDes.trim(),
-          attachment: tempFileUrl,
-          status: 0
-        };
-        let curTs = util.getCurDate2StrBySign('/');
-        let obj = {};
-        obj.ts = new Date().getTime();
-        obj.subject = self.eventName.trim();
-        obj.storeId = self.store.storeId;
-        obj.deviceId = self.channel.id;
-        obj.comment = commentobj;
-        let params = obj;
-        addEvent(params).then((res) => {
-          self.fullscreenLoading = false;
-          console.log(res.data);
-          let notifiedTo = res.data.notifiedTo;
-          if (res.errCode === 0) {
-            isSuccess = true;
-          } else {
-            isSuccess = false;
-          }
-          let routeData = {
-            flag: {
-              addEventType: 'add',
-              isSuccess: isSuccess
-            },
-            store: {
-              storeId: self.store.storeId,
-              storeName: self.store.storeName
-            },
-            channel: {
-              deviceId: self.channel.id
-            },
-            event: {
-              eventIds: [],
-              eventName: self.eventName,
-              description: self.eventDes.trim(),
-              fileList: tempFileUrl
-            },
-            user: notifiedTo,
-            ts: curTs
-          };
-          sessionStorage.setItem('store_submit', JSON.stringify(routeData));
-          self.$router.push({
-            name: 'storeSubEvent',
-            params: { data: routeData }
-          });
-        });
+        self.addEvent(tempFileUrl);
       } else {
-        let obj = {
-          eventIds: eventIds,
-          comment: {
-            ts: new Date().getTime(),
-            description: self.eventDes.trim(),
-            attachment: tempFileUrl,
-            status: 0
-          }
-        };
-        let curTs = util.getCurDate2StrBySign('/');
-        let params = obj;
-        addComment(params).then((res) => {
-          self.fullscreenLoading = false;
-          if (res.errCode === 0) {
-            isSuccess = true;
-          } else {
-            isSuccess = false;
-          }
-          let routeData = {
-            flag: {
-              addEventType: 'cor',
-              isSuccess: isSuccess
-            },
-            store: {
-              storeId: self.store.storeId,
-              storeName: self.store.storeName
-            },
-            channel: {
-              deviceId: self.channel.id
-            },
-            event: {
-              eventIds: eventIds,
-              eventName: self.eventName,
-              description: self.eventDes.trim(),
-              fileList: tempFileUrl
-            },
-            ts: curTs
-          };
-          sessionStorage.setItem('store_submit', JSON.stringify(routeData));
-          self.$router.push({
-            name: 'storeSubEvent',
-            params: { data: routeData }
-          });
-        });
+        self.addComment(tempFileUrl);
       }
     },
 
@@ -1689,8 +1735,6 @@ export default {
     },
 
     mouseUpAction(e) {
-      console.log(e);
-      console.log(e.target.className);
       let self = this;
       self.isMouseDown = false;
       // self.showCutModel=true;
@@ -1709,7 +1753,6 @@ export default {
     },
 
     mouseLeaveAction(e) {
-      console.log(e);
       let self = this;
       self.isMouseDown = false;
     },
@@ -1817,7 +1860,6 @@ export default {
 
     async playVideo(url) {
       let self = this;
-      console.log('playvideo enter!');
       self.playState = true;
       self.showCutContent = true;
       let video = document.getElementById('previewVideo');
@@ -1859,10 +1901,7 @@ export default {
       let duration = 300;
       self.durationTimeValue = duration;
       self.currentTimeValue = curTime;
-      console.log(curTime);
-      console.log(self.startTs);
       self.realTimeStartTs++;
-      console.log(self.realTimeStartTs);
       let getTimeStr = function(val) {
         let hour = 0;
         let minute = 0;
@@ -1889,7 +1928,6 @@ export default {
     },
 
     adjustSpeed(val) {
-      console.log(val);
       let self = this;
       let video = document.getElementById('previewVideo');
       switch (val) {
@@ -1913,15 +1951,10 @@ export default {
     },
 
     async adjustProcess(val, label) {
-      console.log(val);
       let self = this;
       self.curBack = label;
       let video = document.getElementById('previewVideo');
       let curTime = video.player.currentTime();
-      console.log(curTime);
-      let time = parseInt(self.currentTimeValue);
-      console.log(self.realTimeStartTs);
-      console.log(time);
       switch (val) {
         case 0: {
           self.realTimeStartTs = self.realTimeStartTs - 10;
@@ -1969,7 +2002,6 @@ export default {
     },
 
     fullWindowScreen(...val) {
-      console.log(val);
       let self = this;
       let ele = document.getElementById('videoContent');
       ele.style.width = '100%';
@@ -2159,7 +2191,6 @@ export default {
           self.allInitStoreList.map((x) => x.storeId).indexOf(item.storeId)
         );
       });
-      console.log(indexArray);
       indexArray = indexArray.filter(function(x) {
         return x !== -1;
       });
@@ -2207,10 +2238,10 @@ export default {
 
     clickStore(item, index, _item, _index) {
       let self = this;
-      if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       self.showStoreUp = true;
 
       self.curTabIndex = index;
@@ -2485,7 +2516,6 @@ export default {
     },
 
     editEzvizCanvas(src) {
-      console.log('picture--' + src);
       let self = this;
       let obj = {};
       obj.mediaType = 2;
@@ -2511,7 +2541,6 @@ export default {
     eventNameChanged(val) {
       let self = this;
       let content = filterString.standard(val, 50);
-      console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
       let length = filterString.getContentLength(val);
@@ -2525,7 +2554,6 @@ export default {
     eventDesChanged(val) {
       let self = this;
       let content = filterString.all(val, 200);
-      console.log(content);
       self.eventDes = content;
       self.showEventDescInfo = false;
       let length = filterString.getContentLength(val);
@@ -2545,13 +2573,11 @@ export default {
     },
 
     onPlayerWaiting() {
-      console.log('video is loading');
       this.showCutContent = false;
       this.isLoading = true;
     },
 
     onPlayerPlaying() {
-      console.log('video is playing');
       this.showCutContent = true;
       this.isLoading = false;
     },
@@ -2563,15 +2589,13 @@ export default {
       let tempArray = [];
       let tempChannel = [];
       tempChannelList.forEach((_item) => {
-        console.log(_item.name);
         temp.push(util.getPinyinList(_item.name));
         tempChannel.push(_item);
       });
       for (let i = 0; i < temp.length; i++) {
-        if (
-          temp[i][0].indexOf(self.serachChannelValue.trim()) !== -1
-          || temp[i][1].indexOf(self.serachChannelValue.trim()) !== -1
-        ) {
+        if ( temp[i][0].indexOf(self.serachChannelValue.trim()) !== -1
+            || temp[i][1].indexOf(self.serachChannelValue.trim()) !== -1)
+        {
           tempArray.push(tempChannel[i]);
         }
       }
@@ -2609,12 +2633,6 @@ export default {
           this.paused = true;
         } else {
           this.startVideo(this.channel.ivsId, this.channel.channelId, this.realTimeStartTs);
-          // if (this.onEndflag) {
-          //   this.startVideo(this.channel.ivsId, this.channel.channelId, this.realTimeStartTs);
-          // } else {
-          //   this.paused = false;
-          //   this.startVideo(this.channel.ivsId, this.channel.channelId, this.realTimeStartTs);
-          // }
         }
       }
     },
@@ -2622,7 +2640,7 @@ export default {
     async startVideo(IVSID, channelId, startTs) {
       try {
         if (IVSID === null || channelId === null) {
-          const error = this.$t('remotePatrol.dashServerError') + '5';
+          let error = this.$t('remotePatrol.dashServerError') + '5';
           this.currentState = 'blank';
           this.errorText = error;
           this.showError = true;
@@ -2661,7 +2679,6 @@ export default {
       this.realTimeSpeed = 0;
       this.isLoading = false;
       this.timerPlayReal = window.setInterval(() => {
-        console.log(this.realTimeSpeed);
         this.realTimeSpeed = this.realTimeSpeed + 1;
       }, 1000);
     },
@@ -2742,7 +2759,6 @@ export default {
     },
 
     async connectVideo() {
-      console.log('Connect Video--');
       const data = {};
       const request = {};
       request.method = 'connection';
@@ -2757,7 +2773,6 @@ export default {
       if (await DashHttp.putDash('LiveStream', data)) {
         const url = DashHttp.getResult().mpd;
         this.uri = url;
-        console.log(this.uri);
         this.playVideo(url);
         this.currentState = 'play';
         this.paused = false;
@@ -2797,7 +2812,6 @@ export default {
       if (await DashHttp.putDash('PlaybackStream', data)) {
         const url = DashHttp.getResult().mpd;
         this.uri = url;
-        console.log(this.uri);
         this.playVideo(url);
         this.currentState = 'play';
         this.paused = false;
@@ -2852,7 +2866,6 @@ export default {
 
     stopVideo() {
       const self = this;
-      console.log('stop video')
       self.playState = false;
       var video = document.getElementById('previewVideo');
       self.previewplayer = videojs(video);
@@ -2866,7 +2879,6 @@ export default {
         this.userName = result.data.loginId;
         this.password = result.data.password;
         const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-        console.log(url);
         DashHttp.setDashHost(url);
       }).catch(error => {
         if (error.message !== 'Network request failed') {
