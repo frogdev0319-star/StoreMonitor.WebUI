@@ -405,31 +405,24 @@ export default {
     },
     isEzviz() {
       const self = this;
-      console.log(self.$store.state.user);
       return self.$store.state.user.isEzviz;
     }
   },
   watch: {
-    realTimeSpeed(val, oldVal) {
+    realTimeSpeed(val) {
       const self = this;
-      console.log(val);
       if (val >= 300) {
         self.stopRealTime();
         self.showControlInfo = false;
       }
     }
   },
-  // beforeRouteLeave (to, from, next) {
-  //     if(to.name=='事件管理'){
-  //         to.meta.keepAlive=true;
-  //     }
-  //     next();
-  // },
+
   mounted() {
     const self = this;
     self.getBtnList();
-    self.getSessionData(); // 获取session中存储的event信息
-    self.getCommentList(0); // 获取comment信息
+    self.getSessionData();
+    self.getCommentList(0);
     self.$nextTick(function() {
       setTimeout(() => {
         self.myfun();
@@ -451,15 +444,7 @@ export default {
       }
     };
   },
-  created() {
-    const self = this;
-  },
-  updated() {
-    const self = this;
-    self.commentList.forEach((item, index) => {
-      console.log(self.$refs);
-    });
-  },
+
   beforeDestroy() {
     window.clearInterval(this.timeid);
     window.onresize = null;
@@ -469,7 +454,6 @@ export default {
     ivsIdChange(val) {
       const self = this;
       const comment = filterString.all(val, 200);
-      console.log(comment);
       self.eventDes = comment;
       const length = filterString.getContentLength(val);
       if (length > 200) {
@@ -483,14 +467,9 @@ export default {
       this.ivsIdRuletip = false;
     },
 
-    // record current time
-    onTimeupdate(e) {
-      console.log('currentTime', e.cache_.currentTime);
-    },
     async playVideo(url) {
       const self = this;
       self.playState = true;
-      console.log('playvideo enter!');
       var video = document.getElementById('previewVideo');
       this.previewplayer = videojs(video);
       this.previewplayer.src({ src: url, type: this.protocal === 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
@@ -516,8 +495,6 @@ export default {
 
     openOuter(item, $ev) {
       const self = this;
-      console.log(item);
-      console.log($ev.target.onerror);
       if (item != null) {
         self.showOuter = true;
         self.checkImgSrc = item.url;
@@ -537,7 +514,6 @@ export default {
       const self = this;
       self.realTimeSpeed = 0;
       const sessionId = await dashAPI.Online();
-      console.log(sessionId);
       self.sessionId = sessionId;
       const data = {
         request: {
@@ -550,13 +526,10 @@ export default {
         }
       };
       self.mpdurl = await dashAPI.RealTime(1, data); // 1 is start, 0 is stop
-      console.log(self.mpdurl);
       if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length !== 0) {
-        console.log(self.mpdurl);
         self.playVideo(self.mpdurl);
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = window.setInterval(() => {
-          console.log(self.realTimeSpeed);
           self.realTimeSpeed = self.realTimeSpeed + 1;
         }, 1000);
       }
@@ -618,7 +591,6 @@ export default {
     },
 
     fullWindowScreen(...val) {
-      console.log(val);
       const self = this;
       var ele = document.getElementById('videoContent');
       ele.style.width = '100%';
@@ -734,7 +706,6 @@ export default {
           }
         });
       });
-      console.log(self.event);
     },
 
     getDuration() {
@@ -742,8 +713,6 @@ export default {
       if (self.showAudio) {
         const audio = self.$refs.audioRef;
         let du = audio.duration;
-        console.log(du);
-        console.log(typeof (du) === 'string');
         if (isNaN(du)) {
           self.showAudio = false;
         } else {
@@ -758,11 +727,9 @@ export default {
 
     getCommentDuration(item) {
       const self = this;
-      console.log(item);
       if (item.showAudio) {
         const audio = self.$refs[item.audio.audioRef][0];
         let du = audio.duration;
-        console.log(du);
         if (isNaN(du)) {
           item.showAudio = false;
         } else {
@@ -771,7 +738,6 @@ export default {
             du = 1;
           }
           item.audio.audioOftenText = parseInt(du) + '"';
-          console.log(item.audio.audioOftenText);
         }
       }
     },
@@ -806,7 +772,6 @@ export default {
 
     startSpeechItem(item, index) {
       const self = this;
-      console.log(item);
       self.$refs[item.audio.audioRef][0].ended ? item.audio.isPlaying = false : null;
       if (!item.audio.isPlaying) {
         self.$refs[item.audio.audioRef][0].play();
@@ -851,7 +816,6 @@ export default {
         const data = res.data;
         if (errMsg === 'Success') {
           const comments = data[0];
-          console.log(comments);
           const dataComments = comments.comment;
           const temp = [];
           self.curStatus = dataComments[0].status;
@@ -938,7 +902,6 @@ export default {
         comment: comments
       };
       eventRESTful.addComment(params).then(res => {
-        console.log(res);
         const errMsg = res.errMsg;
         if (errMsg === 'Success') {
           self.notify(this.$t('storeView.successSubmit'), 'success', 3000);
@@ -953,6 +916,8 @@ export default {
           self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
           return false;
         }
+      }).catch( err => {
+        console.log('EventDetail-addComment:' + err);
       });
     },
 
@@ -1012,30 +977,9 @@ export default {
       });
     },
 
-    createBeforeunloadHandler() {
-      window.addEventListener('beforeunload', this.beforeunloadHandler, false);
-    },
-
-    destroyedBeforeunloadHandler() {
-      window.removeEventListener('beforeunload', this.beforeunloadHandler, false);
-      this.beforeunloadHandler = null;
-    },
-
-    beforeunloadHandler(e) {
-      e.returnValue = '确定要关闭窗口吗？';
-      console.log('释放权限操作');
-      alert();
-      setTimeout(function() {
-        setTimeout(function() {
-          console.log('恢复用户权限操作');
-        }, 50);
-      }, 50);
-    },
-
     getBtnList() {
       const self = this;
       const authorities = self.$store.state.user.authorities;
-      console.log(authorities);
       PermissionHelper.setData(authorities);
       const tempBtnList = [];
       PermissionHelper.enableEventHandle() && tempBtnList.push({

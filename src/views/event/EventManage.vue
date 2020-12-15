@@ -195,6 +195,7 @@
 </template>
 
 <script>
+
 import util from '../../common/util.js';
 import { eventRESTful } from '@/api/index';
 import { getCookie } from '@/common/auth';
@@ -327,6 +328,7 @@ export default {
       selfClassName: 'self-class-name'
     };
   },
+
   computed: {
     tableHieght() {
       if (this.windowHeight > 800) {
@@ -340,13 +342,13 @@ export default {
 
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
+
   watch: {
-    accountChanged(val, oldVal) {
+    accountChanged(val) {
       let self = this;
       if (val !== 0) {
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
-          console.log(self.$route.meta.keepAlive);
         },
         300);
         self.ifChangeAccount = true;
@@ -391,8 +393,6 @@ export default {
 
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      console.log(row);
-      console.log(columnIndex);
       let obj = {};
       if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
@@ -652,14 +652,12 @@ export default {
 
     handleProChange(arr) {
       let self = this;
-      console.log(arr);
       self.curProvince = arr;
       self.changePro(arr);
     },
 
     handleCityChange(arr) {
       let self = this;
-      console.log(arr);
       self.curCity = arr;
       self.changeCity(arr);
     },
@@ -689,19 +687,25 @@ export default {
     changeStore(val) {
       let self = this;
       let str = '';
-      self.tempStoreData.forEach((item) => {
-        val.forEach(_item => {
-          if (item.storeId === _item) {
-            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
-              item.tagIds.forEach(t_item => {
-                if ((t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1')) {
-                  str += _item + '，';
-                }
-              });
-            }) : (item.storeId === _item ? str += _item + '，' : null);
-          }
+      val.forEach(selectedItem => {
+        self.tempStoreData.forEach((storeItem) => {
+          self.getSelectedStoreString(selectedItem, storeItem);
         });
       });
+    },
+
+    getSelectedStoreString(selectedItem, storeItem){
+      let self = this;
+      let str = '';
+      if (storeItem.storeId === selectedItem) {
+        self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
+          storeItem.tagIds.forEach(t_item => {
+            if ((t_item === v_item && self.curCountry === storeItem.country) || (t_item === v_item && self.curCountry === '-1')) {
+              str += selectedItem + '，';
+            }
+          });
+        }) : (storeItem.storeId === selectedItem ? str += selectedItem + '，' : null);
+      }
       str = str.substr(0, str.length - 1);
       self.storeStr = str;
       self.searchEventList();
@@ -769,7 +773,6 @@ export default {
     },
 
     toEventDetail(row) {
-      console.log(row);
       let self = this;
       this.event = row;
       sessionStorage.setItem('event', JSON.stringify(this.event));
@@ -778,7 +781,6 @@ export default {
     },
 
     sortChange(col) {
-      console.log(col);
       let self = this;
       let tabIndex = Number(self.activeName);
       self.tableDataList[tabIndex].page = 1;
@@ -810,81 +812,8 @@ export default {
 
     async getEventList(val) {
       let self = this;
-      let tabIndex = Number(self.activeName);
-      let like = {};
-      if (self.serachVale.trim().length !== 0) {
-        like = { subject: self.serachVale.trim(), assignerName: self.serachVale.trim(), storeName: self.serachVale.trim() };
-      } else {
-        like = {};
-      }
-      let storeId = self.storeStr.split('，');
-      let status = [];
-      if (self.curState.length !== 0) {
-        if (self.curState.length === 1) {
-          status = self.curState[0];
-        } else {
-          let allStatus = self.curState.some(item => item === '-1');
-          if (allStatus) {
-            status = [0, 1, 2, 3];
-          } else {
-            status = self.curState;
-          }
-        }
-      } else {
-        status = -1;
-      }
-      let page = 0;
-      if (val === 'currentChange') {
-        page = self.tableDataList[tabIndex].page - 1;
-      }
-      if (val === 'Back') {
-        page = self.params.filter.page;
-      }
-      let start = '', end = '';
-      if (val === 0) {
-        start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-      } else {
-        start = self.dateValue[0];
-        let endTime = self.dateValue[1];
-        end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
-      }
-      self.params = {
-        beginTs: start,
-        endTs: end,
-        clause: {
-          status: status,
-          storeId: storeId
-        },
-        filter: {
-          page: page,
-          size: self.tableDataList[tabIndex].sizeNum
-        },
-        like: like
-      };
-      let curTabSortColumn = self.sortColumnOfTab[tabIndex];
-      let order = curTabSortColumn.sortType.order;
-      let prop = curTabSortColumn.sortType.prop;
-      if (order !== '' && prop !== '') {
-        self.params.order = {
-          direction: order,
-          property: prop
-        };
-      } else {
-        self.params.order = {
-          direction: 'desc',
-          property: 'ts'
-        };
-      }
-      // if(self.params.hasOwnProperty('clause')&&typeof(self.params.clause.status)=='object'){  //传入的是一个数组类型
-      //     if(tabIndex==4){
-      //         for(var key in self.params){
-      //             if(key=='clause'){
-      //                 delete self.params.clause.assigner
-      //             }
-      //         }
-      //     }
-      // }
+      let tabIndex = Number(this.activeName);
+      self.getEventListRequestParams(val);
       eventRESTful.getEventList(self.params).then((res) => {
         let data = res.data.content;
         let temp = [];
@@ -917,14 +846,81 @@ export default {
         });
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalElements;
-        // if(tabIndex==0){
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
         self.totalElements = res.data.totalElements;
         self.numberOfElements = res.data.numberOfElements;
-        // }
       }).catch(err => {
-        console.log('Error:' + err);
+        console.log('EventManagement-getEventList:' + err);
       });
+    },
+
+    getEventListRequestParams(val){
+      let tabIndex = Number(this.activeName);
+      let like = {};
+      if (this.serachVale.trim().length !== 0) {
+        like = { subject: this.serachVale.trim(), assignerName: this.serachVale.trim(), storeName: this.serachVale.trim() };
+      } else {
+        like = {};
+      }
+      let storeId = this.storeStr.split('，');
+      let status = [];
+      if (this.curState.length !== 0) {
+        if (this.curState.length === 1) {
+          status = this.curState[0];
+        } else {
+          let allStatus = this.curState.some(item => item === '-1');
+          if (allStatus) {
+            status = [0, 1, 2, 3];
+          } else {
+            status = this.curState;
+          }
+        }
+      } else {
+        status = -1;
+      }
+      let page = 0;
+      if (val === 'currentChange') {
+        page = this.tableDataList[tabIndex].page - 1;
+      }
+      if (val === 'Back') {
+        page = this.params.filter.page;
+      }
+      let start = '', end = '';
+      if (val === 0) {
+        start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+      } else {
+        start = this.dateValue[0];
+        let endTime = this.dateValue[1];
+        end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      }
+      this.params = {
+        beginTs: start,
+        endTs: end,
+        clause: {
+          status: status,
+          storeId: storeId
+        },
+        filter: {
+          page: page,
+          size: this.tableDataList[tabIndex].sizeNum
+        },
+        like: like
+      };
+      let curTabSortColumn = this.sortColumnOfTab[tabIndex];
+      let order = curTabSortColumn.sortType.order;
+      let prop = curTabSortColumn.sortType.prop;
+      if (order.length > 0 && prop.length > 0) {
+        this.params.order = {
+          direction: order,
+          property: prop
+        };
+      } else {
+        this.params.order = {
+          direction: 'desc',
+          property: 'ts'
+        };
+      }
     },
 
     sizeChange(val) {
@@ -968,13 +964,14 @@ export default {
       };
       eventRESTful.GetEventCountByStatus(params).then(res => {
         let data = res.data;
-        let errMsg = res.errMsg;
         let numOfEventTotal = 0;
         for (let i = 0; i < 4; i++) {
           self.tableDataList[i].eventCount = data[i].numOfEvent;
           numOfEventTotal += data[i].numOfEvent;
         }
         self.tableDataList[4].eventCount = numOfEventTotal;
+      }).catch(err => {
+        console.log('EventManagement-getEventCount:' + err);
       });
     },
 
@@ -984,13 +981,11 @@ export default {
       params.filter = {};
       return new Promise((resolve, reject) => {
         eventRESTful.getEventList(params).then((res) => {
-          console.log(res);
           let size = res.data.totalElements;
           resolve(size);
-        })
-          .catch((error) => {
+        }).catch((error) => {
             reject(error);
-          });
+        });
       });
     },
 
@@ -1003,7 +998,6 @@ export default {
       };
       return new Promise((resolve, reject) => {
         eventRESTful.getEventList(self.params).then((res) => {
-          console.log(res);
           let data = res.data.content;
           let temp = [];
           data.forEach(item => {
@@ -1017,7 +1011,7 @@ export default {
           });
           resolve(temp);
         }).catch(err => {
-          console.log('Error:' + err);
+          console.log('EventMangement-getExportData:' + err);
         });
       });
     },
@@ -1025,7 +1019,6 @@ export default {
     getExportFileName() {
       let self = this;
       let tabIndex = Number(self.activeName);
-      console.log(tabIndex);
       let label = '';
       switch (tabIndex) {
         case 0: label = this.$t('eventView.pendingEve'); break;
@@ -1040,29 +1033,32 @@ export default {
     },
 
     async export2Excel() {
-      var that = this;
-      let ret = await that.isLoginIn();
-      if (ret.data != undefined && ret.data.isLogin) {
-        let tabIndex = Number(that.activeName);
-        if (that.tableDataList[tabIndex].tableData.length === 0) {
-          that.$message({
-            message: this.$t('eventView.noEvents'),
-            type: 'warning',
-            duration: 3 * 1000
+      let that = this;
+      try {
+        let ret = await that.isLoginIn();
+        if (ret.data != undefined && ret.data.isLogin) {
+          let tabIndex = Number(that.activeName);
+          if (that.tableDataList[tabIndex].tableData.length === 0) {
+            that.$message({
+              message: this.$t('eventView.noEvents'),
+              type: 'warning',
+              duration: 3 * 1000
+            });
+            return false;
+          }
+          require.ensure([], async() => {
+            let { export_json_to_excel } = require('@/excel/Export2Excel');
+            let tHeader = that.exportDataHeader;
+            let filterVal = ['subject', 'storeName', 'inspectTagName', 'assignerName', 'ts'];
+            let curData = await that.getExportData();
+            let data = that.formatJson(filterVal, curData);
+            export_json_to_excel(tHeader, data, that.getExportFileName());
           });
-          return false;
+        } else {
+          window.location.href = 'https://portals.storeviu.com';
         }
-        require.ensure([], async() => {
-          let { export_json_to_excel } = require('@/excel/Export2Excel');
-          let tHeader = that.exportDataHeader;
-          let filterVal = ['subject', 'storeName', 'inspectTagName', 'assignerName', 'ts'];
-          console.log(that.activeName);
-          let curData = await that.getExportData();
-          let data = that.formatJson(filterVal, curData);
-          export_json_to_excel(tHeader, data, that.getExportFileName());
-        });
-      } else {
-        window.location.href = 'https://portals.storeviu.com';
+      }catch (err) {
+        console.log("EventManagement-export2Excel" + err);
       }
     },
 
@@ -1087,11 +1083,10 @@ export default {
       let self = this;
       return new Promise((resolve, reject) => {
         isLoginIn().then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
-      }).catch(err => {
-        console.log(err);
       });
     },
 
@@ -1109,8 +1104,13 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
-      self.getCountryStore();
-      self.getTagListData();
+      try {
+        self.getCountryStore();
+        self.getTagListData();
+      }
+      catch (err) {
+        console.log("EventMangement-initData: " + err)
+      }
     }
   },
 
@@ -1126,17 +1126,12 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    console.log(this.params);
     if (to.name !== 'eventDetails') {
       from.meta.keepAlive = false;
-      next(vm => {
-        console.log(vm);
-      });
+      next();
     } else {
       from.meta.keepAlive = true;
-      next(vm => {
-        console.log(vm);
-      });
+      next();
     }
   }
 
