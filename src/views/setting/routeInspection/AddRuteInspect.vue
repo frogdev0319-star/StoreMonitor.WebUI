@@ -196,7 +196,7 @@
                 </el-select>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" :style="item.isClick?'':'flex:1;'">
-                <el-tooltip class="item" effect="dark" placement="top">
+                <el-tooltip v-if="!item.isClick" class="item" effect="dark" placement="top">
                   <div slot="content" style="max-width:120px;">{{ item.availableScoreStr }}</div>
                   <span v-if="!item.isClick" style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
                 </el-tooltip>
