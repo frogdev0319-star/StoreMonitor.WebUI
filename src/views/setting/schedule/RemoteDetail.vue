@@ -336,7 +336,7 @@
               <div class="el-bind-footer">
                 <div class="el-btn-content">
                   <el-button :disabled="storeList.length === 0" class="btn" size="mini" type="primary"
-                             @click="bindScheduleBtn">
+                             @click="validateBindScheduleParam">
                     <span>{{ $t('scheduleView.saveAndApply') }}</span>
                   </el-button>
                 </div>
@@ -431,7 +431,8 @@ export default {
       tempStoreList: [],
       showAddTime: false,
       scheduleList: ['点检排程一'],
-      InspectorList: [{ id: 3, label: this.$t('insSettingView.storesupervisor'), disabled: false }, { id: 4, label: this.$t('insSettingView.storesuperManage'), disabled: false }],
+      InspectorList: [{ id: 3, label: this.$t('insSettingView.storesupervisor'), disabled: false },
+        { id: 4, label: this.$t('insSettingView.storesuperManage'), disabled: false }],
       // Inspector:[],
       paneList: [],
       lang: this.$i18n.locale,
@@ -825,11 +826,10 @@ export default {
 
   methods: {
     getBindStore() {
-      const self = this;
-      const params = { inspectId: self.inspectId };
+      let self = this;
+      let params = { inspectId: self.inspectId };
       return new Promise((resolve, reject) => {
         getInspectBindList(params).then(res => {
-          console.log(res.errMsg);
           if (res.errMsg != undefined && res.errMsg === 'Success') {
             resolve(res);
           }
@@ -840,60 +840,51 @@ export default {
     },
 
     noWeekDialog(val) {
-      const self = this;
-      self.selectWeekObj.dialogCosed = false;
+      this.selectWeekObj.dialogCosed = false;
     },
 
     cancelNoWeek(val) {
-      const self = this;
-      self.selectWeekObj.dialogCosed = false;
+      this.selectWeekObj.dialogCosed = false;
     },
 
     noTimeDialog() {
-      const self = this;
-      self.selectTimeObj.dialogCosed = false;
+      this.selectTimeObj.dialogCosed = false;
     },
 
     cancelNoTime(val) {
-      const self = this;
-      self.selectTimeObj.dialogCosed = false;
+      this.selectTimeObj.dialogCosed = false;
     },
 
     noSelfMonthDialog() {
-      const self = this;
-      self.selectSelfMonthObj.dialogCosed = false;
+      this.selectSelfMonthObj.dialogCosed = false;
     },
 
     cancelNoSelfMonth(val) {
-      const self = this;
-      self.selectSelfMonthObj.dialogCosed = false;
+      this.selectSelfMonthObj.dialogCosed = false;
     },
 
     addScheduleButton() {
-      const self = this;
-      self.scheduleName = '';
-      self.showAddDialog = true;
+      this.scheduleName = '';
+      this.showAddDialog = true;
     },
 
     deleteScheduleButton() {
-      const self = this;
-      self.showDeleteDialog = true;
+      this.showDeleteDialog = true;
     },
 
-    bindScheduleBtn() {
-      const self = this;
-      const tabIndex = Number(self.activeName);
-      const mode = self.paneList[tabIndex].mode;
-      const notifyTime = self.paneList[tabIndex].notifyTime;
+    validateBindScheduleParam() {
+      let self = this;
+      let tabIndex = Number(self.activeName);
+      let mode = self.paneList[tabIndex].mode;
+      let notifyTime = self.paneList[tabIndex].notifyTime;
       let dayArray = [];
-      const dayArrayLength = self.paneList[tabIndex].schedule[0].day.length;
+      let dayArrayLength = self.paneList[tabIndex].schedule[0].day.length;
       if (mode === 1 || mode === 2 && dayArrayLength > 0) {
         dayArray = self.paneList[tabIndex].schedule[0].day.filter(item => item !== '-1');
       }
-      const name = self.paneList[tabIndex].name;
-      const schedule = self.paneList[tabIndex].schedule;
-      const assignedTo = self.paneList[tabIndex].assignedTo;
-      console.log(schedule);
+      let name = self.paneList[tabIndex].name;
+      let schedule = self.paneList[tabIndex].schedule;
+      let assignedTo = self.paneList[tabIndex].assignedTo;
       if (name === '') {
         self.notify(self.$t('scheduleView.emptyName'), 'warning', 3000);
         self.$refs.scheduleName[tabIndex].focus();
@@ -903,7 +894,6 @@ export default {
         self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning', 3000);
         return false;
       }
-      console.log(dayArray);
       if (assignedTo.length === 0) {
         self.notify(self.$t('scheduleView.emptyAssignedTo'), 'warning', 3000);
         return false;
@@ -926,7 +916,6 @@ export default {
             lackDay = true;
           }
         });
-        console.log(lackMonth + '..' + lackDay);
         if (lackMonth) {
           self.notify(self.$t('scheduleView.emptyMonth'), 'warning', 3000);
           return false;
@@ -944,18 +933,20 @@ export default {
     },
 
     handleClick(val) {
-      const self = this;
+      let self = this;
       self.activeName = val.index;
       self.selectTab = val.label;
-      const tabIndex = Number(self.activeName);
+      let tabIndex = Number(self.activeName);
       self.scheduleId = self.paneList[tabIndex].schId;
       self.$emit('sendActiveName', self.activeName);
       self.searchStore();
-      self.changeSelectSelfMonth(self.paneList[tabIndex], self.paneList[tabIndex].schedule);
+      if(self.paneList[tabIndex].mode !== 1){
+        self.changeSelectSelfMonth(self.paneList[tabIndex], self.paneList[tabIndex].schedule);
+      }
     },
 
     addMonth() {
-      const self = this;
+      let self = this;
       self.showAddMonth = true;
       self.paneList[Number(self.activeName)].schedule.push({
         month: '',
@@ -966,89 +957,27 @@ export default {
     },
 
     addScheduleService() {
-      const self = this;
-      const params = {};
-      const tabIndex = Number(self.activeName);
-      params.name = self.paneList[tabIndex].name;
-      params.comment = parseInt(self.activePatrol) === 0 ? '远程巡检计划' : '现场巡检计划';
-      params.category = parseInt(self.isActive);
-      params.mode = self.paneList[tabIndex].mode;
-      params.enable = Number(self.paneList[tabIndex].enable);
-      const execOnce = self.paneList[tabIndex].execOnce;
-      const year = self.$moment().format('YYYY');
-      params.from = self.$moment(year).startOf('year').valueOf();
-      params.to = -1;
-      self.paneList[tabIndex].from = params.from;
-      self.paneList[tabIndex].to = params.to;
-      self.paneList[tabIndex].modeDisabled = true;
-      if (self.paneList[tabIndex].notifyTime.length > 0) {
-        params.notifyTime = self.hourToSecond(self.paneList[tabIndex].notifyTime);
-      }
-      params.dueDays = self.paneList[tabIndex].dueDays;
-      const ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
-      if (ifNotifyOneDay) {
-        params.aheadNotification = 86400;
-      } else {
-        params.aheadNotification = 0;
-      }
-      const tempSchedule = [];
-      if (params.mode === 1 || params.mode === 2) {
-        // weekly mode
-        const selectedWeek = self.paneList[tabIndex].schedule[0].day;
-        selectedWeek.forEach(item => {
-          const tempSche = {};
-          if (item !== '-1') {
-            tempSche.day = Number(item);
-            tempSchedule.push(tempSche);
-          }
-        });
-        console.log(tempSchedule);
-      } else if (params.mode === 3) {
-        if (execOnce) {
-          params.to = self.$moment().endOf('year').valueOf();
-        } else {
-          params.to = -1;
-        }
-        const selfSche = self.paneList[tabIndex].schedule;
-        selfSche.forEach(item => {
-          const month = item.month;
-          const days = item.day;
-          days.forEach(_item => {
-            const dayOfYear = self.$moment([year, month - 1, _item]).dayOfYear();
-            const obj = {};
-            obj.day = dayOfYear;
-            tempSchedule.push(obj);
-          });
-        });
-        console.log(tempSchedule);
-      }
-      params.schedule = tempSchedule;
-      console.log(params.schedule);
-      params.extra = {
-        inspectId: self.isActivePatrol,
-        assignedTo: self.paneList[tabIndex].assignedTo
-      };
+      let self = this;
+      let params = self.getUpdateScheduleParams();
       return new Promise((resolve, reject) => {
         addNewSchedule(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
-          const errCode = res.errCode;
-          const data = res.data.scheduleId;
-          console.log(data);
+          let data = res.data.scheduleId;
           resolve(data);
-        });
+        }).catch(err => {
+          console.log("PatrolSchedule-addScheduleService: " + err);
+          reject(err);
+        });;
       });
     },
 
     async addSchedule(val) {
-      const self = this;
+      let self = this;
       self.isActivePatrol = val;
       self.scheduleName = self.$t('scheduleView.newSchedule');
       self.showAddDialog = false;
-      const selfMonth = self.selfMonthList.slice(0);
+      let selfMonth = self.selfMonthList.slice(0);
       selfMonth.forEach(item => { item.disabled = false; });
-      console.log(selfMonth);
-      const addInfo = {
+      let addInfo = {
         name: self.scheduleName,
         mode: self.activePatrol === '0' ? 1 : 2,
         schId: 0,
@@ -1069,7 +998,7 @@ export default {
         Ruletip: false
       };
       self.paneList.push(addInfo);
-      const pane = self.paneList;
+      let pane = self.paneList;
       self.$emit('paneList', pane.length);
       self.activeName = (pane.length - 1).toString();
       self.selectTab = self.scheduleName;
@@ -1077,39 +1006,36 @@ export default {
       self.isDisabled = false;
       self.searchStore();
       self.isAdd = true;
-      console.log(self.paneList);
       self.$emit('sendActiveName', self.activeName);
     },
 
     async searchStoreInput() {
-      const self = this;
-      const params = {};
-      console.log(self.tempStoreList);
-      const tempStoreList = self.tempStoreList;
-      const getStore2Temp = data => {
-        const cityList = [];
+      let self = this;
+      let params = {};
+      let tempStoreList = self.tempStoreList;
+      let getStore2Temp = data => {
+        let cityList = [];
         data.forEach(item => {
           if (cityList.map(x => x.city).indexOf(item.city) === -1) {
-            const obj = {
+            let obj = {
               city: item.city,
               province: item.province
             };
             cityList.push(obj);
           }
         });
-        const storeListTemp = [];
+        let storeListTemp = [];
         for (let i = 0; i < cityList.length; i++) {
-          const temp = [];
-          const obj = {};
+          let temp = [];
+          let obj = {};
           for (let j = 0; j < data.length; j++) {
             if (cityList[i].city === data[j].city) {
-              const obj = {};
+              let obj = {};
               obj.storeId = data[j].storeId;
               obj.name = data[j].name;
               obj.city = data[j].city;
               obj.checked = data[j].checked;
               obj.disabled = data[j].disabled;
-              console.log(obj);
               temp.push(obj);
             }
           }
@@ -1120,9 +1046,9 @@ export default {
         }
         return storeListTemp;
       };
-      const temp = [];
-      const tempArray = [];
-      const tempStore = [];
+      let temp = [];
+      let tempArray = [];
+      let tempStore = [];
       tempStoreList.forEach((_item, _index) => {
         _item.itemData.forEach((itemDs, indexDs) => {
           temp.push(util.getPinyinList(itemDs.name));
@@ -1151,38 +1077,36 @@ export default {
     },
 
     getStoreData(params) {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
-          const data = res.data;
-          console.log(data);
+          let data = res.data;
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     async getStoreByCity(data) {
-      const self = this;
-      const bindStore = await self.getBindStore();
-      const bindStoreId = await self.getBindStoreList();
+      let self = this;
+      let bindStore = await self.getBindStore();
+      let bindStoreId = await self.getBindStoreList();
       self.storeCount = bindStoreId.length;
-      console.log(data);
-      const cityList = [];
+      let cityList = [];
       data.forEach(item => {
         if (cityList.indexOf(item.city) === -1) {
           cityList.push(item.city);
         }
       });
-      const temp = [];
+      let temp = [];
       cityList.forEach(item => {
-        const obj = {};
+        let obj = {};
         obj.city = item;
-        const _temp = [];
+        let _temp = [];
         data.forEach(_item => {
           if (item === _item.city) {
-            const _obj = {};
+            let _obj = {};
             obj.province = _item.province;
             _obj.storeName = _item.name;
             _obj.storeId = _item.storeId;
@@ -1192,17 +1116,17 @@ export default {
         obj.store = _temp;
         temp.push(obj);
       });
-      const groupTemp = [];
-      const mode = self.paneList[Number(self.activeName)].mode;
+      let groupTemp = [];
+      let mode = self.paneList[Number(self.activeName)].mode;
       temp.forEach(item => {
-        const groupObj = {};
+        let groupObj = {};
         groupObj.province = item.province;
         groupObj.cityName = item.city;
-        const _temp = [];
+        let _temp = [];
         let _tempCount = 0;
         let _tempDisCount = 0;
         item.store.forEach(_item => {
-          const _obj = {};
+          let _obj = {};
           if (bindStore.data.indexOf(_item.storeId) === -1) {
             _obj.disabled = true;
             _tempDisCount++;
@@ -1254,7 +1178,7 @@ export default {
         self.allData = true;
       }
       self.allDisabled = disCount === self.storeList.length;
-      const totalConut = disCount + count;
+      let totalConut = disCount + count;
       if (totalConut === self.storeList.length) {
         if (count > 0) {
           self.allDisabled = false;
@@ -1267,24 +1191,21 @@ export default {
     },
 
     getBindStoreList() {
-      const self = this;
-      const scheduleId = self.scheduleId;
-      console.log(scheduleId);
-      const params = {};
+      let self = this;
+      let scheduleId = self.scheduleId;
+      let params = {};
       params.scheduleId = scheduleId;
       if (params.scheduleId === 0) {
         return [];
       } else if (params.scheduleId === -1) {
-        console.log(self.paneList);
         params.scheduleId = self.paneList[0].schId;
       }
       return new Promise((resolve, reject) => {
         getScheduleBindList(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
-          const data = res.data;
-          console.log(data);
+          let data = res.data;
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1293,6 +1214,8 @@ export default {
       return new Promise((resolve, reject) => {
         bindScheduleAndStore(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1301,12 +1224,14 @@ export default {
       return new Promise((resolve, reject) => {
         unbindScheduleAndStore(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     async bindSchedule() {
-      const self = this;
+      let self = this;
       let scheId = self.paneList[Number(self.activeName)].schId;
       self.showBindDialog = false;
       let isAdd = false;
@@ -1317,16 +1242,22 @@ export default {
         self.scheduleName = '';
         self.scheduleId = scheId;
         self.isAdd = false;
-      } else {
-        //do nothing
       }
       if (!isAdd) {
         await self.updateScheduleInfo();
       }
-      const storeIdChecked = [];
-      const storeIdUnchecked = [];
+      self.bindOrUnbindStore(scheId).then(res => {
+        self.getHasBoundStroeIds();
+      }).catch( err =>{
+        console.log("PatrolSchedule-bindSchedule: " + err);
+      });
+    },
+
+    async bindOrUnbindStore(scheId){
+      let self = this;
+      let storeIdChecked = [];
+      let storeIdUnchecked = [];
       let count = 0;
-      const mode = self.paneList[Number(self.activeName)].mode;
       self.storeList.forEach(item => {
         count += item.itemData.length;
         item.itemData.forEach(_item => {
@@ -1334,75 +1265,68 @@ export default {
             storeIdChecked.push(_item.storeId);
           } else {
             storeIdUnchecked.push(_item.storeId);
-            console.log(self.hasBoundStoreIds);
           }
         });
       });
 
-      const tempchecked = [];
-      const obj = {
+      let tempchecked = [];
+      let obj = {
         scheduleId: scheId,
         storeIds: storeIdChecked
       };
       tempchecked.push(obj);
-      console.log(tempchecked);
-      const paramsBind = {
+      let paramsBind = {
         items: tempchecked
       };
-      console.log(paramsBind);
-
-      const tempUnchecked = [];
-      const unbindobj = {
+      let tempUnchecked = [];
+      let unbindobj = {
         scheduleId: scheId,
         storeIds: storeIdUnchecked
       };
       tempUnchecked.push(unbindobj);
 
-      const paramsUnBind = {
+      let paramsUnBind = {
         items: tempUnchecked
       };
-      console.log(paramsUnBind);
       let flag = false;
       if (storeIdChecked.length === count) {
-        const resBind = await self.bindScheduleToStore(paramsBind);
-        console.log(resBind);
+        let resBind = await self.bindScheduleToStore(paramsBind);
         if (resBind.errMsg === 'Success' && resBind.errCode === '0') {
           flag = true;
         }
       } else if (storeIdUnchecked.length === count) {
-        const resUnBind = await self.unbindScheToStore(paramsUnBind);
-        console.log(resUnBind);
+        let resUnBind = await self.unbindScheToStore(paramsUnBind);
         if (resUnBind.errMsg === 'Success' && resUnBind.errCode === '0') {
           flag = true;
         }
       } else {
-        const resBind = await self.bindScheduleToStore(paramsBind);
-        const resUnBind = await self.unbindScheToStore(paramsUnBind);
+        let resBind = await self.bindScheduleToStore(paramsBind);
+        let resUnBind = await self.unbindScheToStore(paramsUnBind);
         if (resBind.errMsg === 'Success' && resUnBind.errMsg === 'Success') {
           flag = true;
         }
       }
       if (flag) {
-        const bindIdList = await self.getBindStoreList();
+        let bindIdList = await self.getBindStoreList();
         self.storeCount = bindIdList.length;
-        self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
+        self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length}
+                    ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
+        return true;
       } else {
         self.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
         return false;
       }
-      self.getHasBoundStroeIds();
     },
 
     deleteMonthAndDays(index) {
-      console.log(index);
-      const self = this;
-      const schedule = self.paneList[Number(self.activeName)].schedule;
+      let self = this;
+      let schedule = self.paneList[Number(self.activeName)].schedule;
       if (index === -1) {
         self.showAddMonth = false;
       } else {
         schedule.splice(index, 1);
       }
-      const selectMonth = [];
+      let selectMonth = [];
       schedule.forEach(item => {
         selectMonth.push(item.month);
       });
@@ -1412,7 +1336,6 @@ export default {
         });
       });
       selectMonth.forEach(item => {
-        console.log(item);
         schedule.forEach(schedule => {
           schedule.selfMonthList.forEach(month => {
             if (month.value === item) {
@@ -1424,8 +1347,8 @@ export default {
     },
 
     async searchStore() {
-      const self = this;
-      const mode = self.paneList[Number(self.activeName)].mode;
+      let self = this;
+      let mode = self.paneList[Number(self.activeName)].mode;
       if (mode === 2) {
         self.monthList = self.bigMonthList.slice(0, 28);
       } else {
@@ -1440,9 +1363,8 @@ export default {
           size: 2000
         }
       };
-      const resData = await self.getStoreData(params);
-      const data = resData.content;
-      console.log(data);
+      let resData = await self.getStoreData(params);
+      let data = resData.content;
       self.getStoreByCity(data);
 
       let count = 0;
@@ -1455,8 +1377,7 @@ export default {
     },
 
     choiceAll(val) {
-      console.log(val);
-      const self = this;
+      let self = this;
       self.storeList.forEach(item => {
         if (!item.disabled) {
           item.checked = val;
@@ -1470,21 +1391,20 @@ export default {
     },
 
     choiceAllGroup(item) {
-      const self = this;
-      console.log(item);
-      const obj = item;
+      let self = this;
+      let obj = item;
       item.itemData.forEach(item => {
         if (!item.disabled) {
           item.checked = obj.checked;
         }
       });
-      const arr = [];
+      let arr = [];
       self.storeList.forEach(_item => {
         if (_item.checked) {
           arr.push(_item);
         }
       });
-      const disArr = [];
+      let disArr = [];
       self.storeList.forEach(_item => {
         if (_item.disabled) {
           disArr.push(_item);
@@ -1498,8 +1418,7 @@ export default {
     },
 
     choiceAllDevice(index, item) {
-      const self = this;
-      console.log(index);
+      let self = this;
       let count = 0;
       item.itemData.forEach(itemS => {
         if (itemS.checked) {
@@ -1540,29 +1459,28 @@ export default {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
-          const data = res.data;
-          console.log(data);
+          let data = res.data;
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     getTagAll() {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList().then(res => {
-          const data = res.data;
+          let data = res.data;
           resolve(data);
         }).catch(err => {
-          console.log(err.message);
+          reject(err);
         });
       });
     },
 
     async getScheduleList(val, e) {
-      const self = this;
+      let self = this;
       self.isActivePatrol = val;
       self.isActive = e;
       self.activeName = '0';
@@ -1570,8 +1488,8 @@ export default {
       self.scheduleList = [];
       self.InspectorList[0].disabled = false;
       self.InspectorList[1].disabled = false;
-      const tag = await self.getTagAll();
-      const role = [];
+      let tag = await self.getTagAll();
+      let role = [];
       tag.forEach(item => {
         if (val === item.id) {
           item.appliedTo.forEach(ass_item => {
@@ -1590,23 +1508,21 @@ export default {
         self.InspectorList[1].disabled = false;
       }
       if (val === 'noInspect') {
-        self.getTemp();
+        self.getScheduleTemplate();
       } else {
-        const params = {};
+        let params = {};
         params.category = parseInt(e);
-        const data = await self.getScheduleFromDB(params);
+        let data = await self.getScheduleFromDB(params);
         if (data.length !== 0) {
-          const paneArr = [];
+          let paneArr = [];
           data.forEach(item => {
             if (item.extra.inspectId === val) {
               paneArr.push(item);
             }
           });
-          const tempAllData = [];
           if (paneArr.length !== 0) {
             paneArr.forEach(_item => {
-              console.log(_item);
-              const tempScheduleData = {};
+              let tempScheduleData = {};
               tempScheduleData.name = _item.name;
               tempScheduleData.mode = _item.mode;
               tempScheduleData.modeDisabled = true;
@@ -1615,7 +1531,7 @@ export default {
               tempScheduleData.notifyTime = (_item.notifyTime === -1) ? '' : self.secondsToHour(_item.notifyTime);
               tempScheduleData.from = self.$moment(_item.from).format('YYYY');
               tempScheduleData.assignedTo = _item.extra.assignedTo;
-              const aheadNotification = _item.aheadNotification;
+              let aheadNotification = _item.aheadNotification;
 
               if (aheadNotification === 86400) {
                 tempScheduleData.ifNotifyOneDay = true;
@@ -1624,21 +1540,17 @@ export default {
               }
               tempScheduleData.dueDays = _item.dueDays;
               tempScheduleData.execOnce = _item.to != -1;
-              const tempSchedules = _item.schedule;
-              console.log(tempSchedules);
-              const mode = _item.mode; // 0 daily, 1 weekly, 2 monthly, 3 self defined
-              const dayArray = [];
-              const timeArray = [];
+              let tempSchedules = _item.schedule;
+              let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly, 3 self defined
+              let dayArray = [];
+              let timeArray = [];
               tempSchedules.forEach(sche => {
-                console.log(sche);
-                const day = sche.day;
+                let day = sche.day;
                 dayArray.push(day);
-                console.log(dayArray);
-
-                const period = sche.period;
+                let period = sche.period;
                 period.forEach(periods => {
-                  const from = periods.from;
-                  const hours = self.secondsToHour(from);
+                  let from = periods.from;
+                  let hours = self.secondsToHour(from);
                   if (timeArray.indexOf(hours) === -1) {
                     timeArray.push(self.secondsToHour(from));
                   } else {
@@ -1647,27 +1559,23 @@ export default {
                 });
               });
               if (mode === 3) {
-                const tempArray = [];
+                let tempArray = [];
                 let scheduleSelf = [];
                 dayArray.forEach(item => {
-                  const monthDay = self.$moment([tempScheduleData.from]).dayOfYear(item).format('M-D');
+                  let monthDay = self.$moment([tempScheduleData.from]).dayOfYear(item).format('M-D');
                   tempArray.push(monthDay);
                 });
-                console.log(tempArray);
                 scheduleSelf = self.formatMonthDay(tempArray);
-                console.log(scheduleSelf);
-                const selectMonth = [];
+                let selectMonth = [];
                 scheduleSelf.forEach(item => {
-                  const month = parseInt(item.month);
+                  let month = parseInt(item.month);
                   selectMonth.push(item.month);
-                  console.log(item.day.map(Number));
-                  const year = self.$moment().format('YYYY');
-                  const days = self.$moment([year, month - 1]).daysInMonth();
-                  console.log(days);
+                  let year = self.$moment().format('YYYY');
+                  let days = self.$moment([year, month - 1]).daysInMonth();
                   item.monthList = self.bigMonthList.slice(0, days);
                   item.showMonthContent = false;
                   item.showSelfDefineMonth = false;
-                  const selfMonth = self.selfMonthList.slice(0);
+                  let selfMonth = self.selfMonthList.slice(0);
                   selfMonth.forEach(item => { item.disabled = false; });
                   item.selfMonthList = selfMonth;
                   item.day = item.day.map(Number);
@@ -1688,36 +1596,33 @@ export default {
                 tempScheduleData.schedule = [{}];
                 tempScheduleData.schedule[0].day = dayArray;
               }
-              console.log(timeArray);
               tempScheduleData.timeArray = timeArray;
               tempScheduleData.dayArray = dayArray;
               self.paneList.push(tempScheduleData);
             });
           } else {
-            self.getTemp();
+            self.getScheduleTemplate();
           }
           if (self.isFirstLoad) {
             self.isFirstLoad = false;
             self.selectTab = this.paneList[Number(self.activeName)].name;
             self.scheduleId = self.paneList[0].schId;
-            console.log(self.dayArray);
           }
           self.scheduleId = self.paneList[0].schId;
-          console.log(self.paneList);
           self.getHasBoundStroeIds();
         } else if (data.length === 0) {
-          self.getTemp();
+          self.getScheduleTemplate();
         }
       }
       self.searchStore();
     },
 
-    getTemp() {
-      const self = this;
+    getScheduleTemplate() {
+      let self = this;
       self.scheduleName = self.$t('scheduleView.newSchedule');
-      const selfMonth = self.selfMonthList.slice(0);
+      let selfMonth = self.selfMonthList.slice(0);
       selfMonth.forEach(item => { item.disabled = false; });
-      const addInfo = {
+      let addInfo = {
         name: self.scheduleName,
         mode: self.activePatrol === '0' ? 1 : 2,
         schId: 0,
@@ -1747,45 +1652,42 @@ export default {
     },
 
     getHasBoundStroeIds() {
-      const self = this;
+      let self = this;
       self.hasBoundStoreIds = [];
       self.paneList.forEach(item => {
-        const sheduleId = item.schId;
-        const mode = item.mode;
-        console.log(sheduleId + '....' + mode);
+        let sheduleId = item.schId;
+        let mode = item.mode;
         if (mode !== 3) {
-          const params = {};
+          let params = {};
           params.scheduleId = sheduleId;
           return new Promise((resolve, reject) => {
             getScheduleBindList(params).then(res => {
-              console.log(res);
-              const errMsg = res.errMsg;
-              const data = res.data;
-              console.log(data);
+              let errMsg = res.errMsg;
+              let data = res.data;
               data.forEach(_item => {
                 if (self.hasBoundStoreIds.indexOf(_item) === -1) {
                   self.hasBoundStoreIds.push(_item);
-                } else {
-                  // do nothing
                 }
               });
               resolve(data);
+            }).catch(err => {
+              console.log("PatrolSchedule-getHasBoundStroeIds: " + err);
+              reject(err)
             });
           });
         }
       });
-      console.log(self.hasBoundStoreIds);
     },
 
     secondsToHour(second) {
-      const changedData = [parseInt(second / 60 / 60), second / 60 % 60].join(':')
+      let changedData = [parseInt(second / 60 / 60), second / 60 % 60].join(':')
         .replace(/\b(\d)\b/g, '0$1');
       return changedData;
     },
 
     hourToSecond(hourStr) {
-      const hourArray = hourStr.split(':');
-      const changedSec = Number(hourArray[0]) * 3600 + Number(hourArray[1]) * 60;
+      let hourArray = hourStr.split(':');
+      let changedSec = Number(hourArray[0]) * 3600 + Number(hourArray[1]) * 60;
       return changedSec;
     },
 
@@ -1798,24 +1700,36 @@ export default {
     },
 
     updateScheduleInfo() {
-      const params = {};
-      const self = this;
-      const tabIndex = Number(self.activeName);
+      let params = this.getUpdateScheduleParams();
+      return new Promise((resolve, reject) => {
+        updateSchedule(params).then(res => {
+          let data = res.errCode;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    getUpdateScheduleParams(){
+      let params = {};
+      let self = this;
+      let tabIndex = Number(self.activeName);
       params.id = self.paneList[tabIndex].schId;
       params.name = self.paneList[tabIndex].name;
       params.comment = parseInt(self.activePatrol) === 0 ? '远程巡检计划' : '现场巡检计划';
       params.category = parseInt(self.isActive);
       params.enable = Number(self.paneList[tabIndex].enable);
       params.mode = self.paneList[tabIndex].mode;
-      const execOnce = self.paneList[tabIndex].execOnce;
-      const ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
+      let execOnce = self.paneList[tabIndex].execOnce;
+      let ifNotifyOneDay = self.paneList[tabIndex].ifNotifyOneDay;
       if (ifNotifyOneDay) {
-        params.aheadNotification = 86400; // 提前一天的秒数
+        params.aheadNotification = 86400;
       } else {
-        params.aheadNotification = 0; // 不提前通知
+        params.aheadNotification = 0;
       }
-      const year = self.paneList[tabIndex].from; // 年self.paneList[tabIndex].from; //年
-      const strYear = self.$moment(year).format('YYYY'); // 年
+      let year = self.paneList[tabIndex].from;
+      let strYear = self.$moment(year).format('YYYY');
       params.from = self.$moment(year).startOf('year').valueOf();
       params.to = -1;
       if (self.paneList[tabIndex].notifyTime != null) {
@@ -1823,31 +1737,30 @@ export default {
       } else {
         params.notifyTime = -1;
       }
-      params.dueDays = self.paneList[tabIndex].dueDays; // 执行时效
-      const tempSchedule = [];
+      params.dueDays = self.paneList[tabIndex].dueDays;
+      let tempSchedule = [];
       if (params.mode === 1 || params.mode === 2) {
-        const selectedWeek = self.paneList[tabIndex].schedule[0].day;
+        let selectedWeek = self.paneList[tabIndex].schedule[0].day;
         selectedWeek.forEach(item => {
-          const tempSche = {};
+          let tempSche = {};
           if (item !== '-1') {
             tempSche.day = Number(item);
             tempSchedule.push(tempSche);
           }
         });
-        console.log(tempSchedule);
       } else if (params.mode === 3) {
         if (execOnce) {
           params.to = self.$moment().endOf('year').valueOf();
         } else {
           params.to = -1;
         }
-        const selfSche = self.paneList[tabIndex].schedule;
+        let selfSche = self.paneList[tabIndex].schedule;
         selfSche.forEach(item => {
-          const month = Number(item.month);
-          const days = item.day;
+          let month = Number(item.month);
+          let days = item.day;
           days.forEach(_item => {
-            const dayOfYear = self.$moment([strYear, month - 1, _item]).dayOfYear();
-            const obj = {};
+            let dayOfYear = self.$moment([strYear, month - 1, _item]).dayOfYear();
+            let obj = {};
             obj.day = dayOfYear;
             obj.period = [];
             tempSchedule.push(obj);
@@ -1859,34 +1772,24 @@ export default {
         inspectId: self.inspectId,
         assignedTo: self.paneList[tabIndex].assignedTo
       };
-      console.log(params);
-      return new Promise((resolve, reject) => {
-        updateSchedule(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
-          const data = res.errCode;
-          resolve(data);
-        });
-      });
+      return params;
     },
 
     deleteSchedule() {
-      const self = this;
+      let self = this;
       self.showDeleteDialog = false;
       if (self.scheduleId === 0) {
         self.initData();
       } else {
-        const scheduleIds = [];
+        let scheduleIds = [];
         scheduleIds.push(self.scheduleId);
-        const params = {};
+        let params = {};
         params.scheduleIds = scheduleIds;
 
         return new Promise((resolve, reject) => {
           deleteScheduleService(params).then(res => {
-            console.log(res);
-            const errMsg = res.errMsg;
-            const data = res.errCode;
-            console.log(data);
+            let errMsg = res.errMsg;
+            let data = res.errCode;
             if (data === 0) {
               self.notify(self.$t('scheduleView.deleteSuss'), 'success', 3000);
             } else {
@@ -1894,13 +1797,16 @@ export default {
             }
             self.initData();
             resolve(data);
+          }).catch(err => {
+            console.log("PatrolSchedule-getHasBoundStroeIds: " + err);
+            reject(err);
           });
         });
       }
     },
 
     initData() {
-      const self = this;
+      let self = this;
       self.paneList.splice(Number(self.activeName), 1);
       self.activeName = '0';
       self.scheduleId = self.paneList[0].schId;
@@ -1908,45 +1814,41 @@ export default {
       self.scheduleId = self.paneList[0].schId;
       self.enable = self.paneList[0].enable;
       self.notifyTime = self.paneList[0].notifyTime;
-      console.log(self.scheduleId);
       self.getHasBoundStroeIds();
       self.searchStore();
     },
 
     formatMonthDay(array) {
-      const b = [];
-      const map = {};
+      let monthDayArr = [];
+      let monthDayMap = {};
       for (let i = 0; i < array.length; i++) {
-        console.log(array[i]);
-        var a = array[i].split('-');
-        const temp = {};
-        temp.month = a[0];
-        temp.day = a[1];
-        b.push(temp);
+        let monthArr = array[i].split('-');
+        let temp = {};
+        temp.month = monthArr[0];
+        temp.day = monthArr[1];
+        monthDayArr.push(temp);
       }
-      console.log(b);
-      for (const o of b) {
-        if (!map.hasOwnProperty(o.month)) {
-          map[o.month] = o;
-          const val = map[o.month].day;
-          map[o.month].day = [val];
+      for (let monthObj of monthDayArr) {
+        if (!monthDayMap.hasOwnProperty(monthObj.month)) {
+          monthDayMap[monthObj.month] = monthObj;
+          let val = monthDayMap[monthObj.month].day;
+          monthDayMap[monthObj.month].day = [val];
         } else {
-          map[o.month].day.push(o.day);
+          monthDayMap[monthObj.month].day.push(monthObj.day);
         }
       }
-      const arr = [];
-      for (const item in map) {
-        arr.push(map[item]);
-        console.log(arr);
+      let arr = [];
+      for (let item in monthDayMap) {
+        arr.push(monthDayMap[item]);
       }
       return arr;
     },
 
     scheduluNameChange(val, item) {
-      const self = this;
-      const comment = filterString.all(val, 30);
+      let self = this;
+      let comment = filterString.all(val, 30);
       item.name = comment;
-      const length = filterString.getContentLength(val);
+      let length = filterString.getContentLength(val);
       if (length > 30) {
         item.Ruletip = true;
       } else {
@@ -1959,12 +1861,12 @@ export default {
     },
 
     changeSelectWeek(val, item) {
-      const self = this;
+      let self = this;
       item.schedule[0].day = Array.from(val)[0];
     },
 
     changeSelectMonth(val, item) {
-      const self = this;
+      let self = this;
       item.schedule[0].day = Array.from(val)[0];
     },
 
@@ -1973,33 +1875,31 @@ export default {
     },
 
     changeSelectSelfMonth(_item, singItem) {
-      const self = this;
-      const selectMonth = [];
+      let self = this;
+      let selectMonth = [];
       _item.schedule.forEach(item => {
         selectMonth.push(item.month);
       });
-      _item.schedule.forEach(schedule => {
-        schedule.selfMonthList.forEach(month => {
-          month.disabled = false;
-        });
-      });
-      selectMonth.forEach(item => {
-        console.log(item);
+      if(_item.mode !== 2){
         _item.schedule.forEach(schedule => {
-          console.log(schedule);
           schedule.selfMonthList.forEach(month => {
-            if (month.value === item) {
-              month.disabled = true;
-            }
-            console.log(month);
+            month.disabled = false;
           });
         });
-      });
+        selectMonth.forEach(item => {
+          _item.schedule.forEach(schedule => {
+            schedule.selfMonthList.forEach(month => {
+              if (month.value === item) {
+                month.disabled = true;
+              }
+            });
+          });
+        });
+      }
       // change dayList based on month selected
-      const month = parseInt(singItem.month);
-      const year = self.$moment().format('YYYY');
-      const days = self.$moment([year, month - 1]).daysInMonth();
-      console.log(days);
+      let month = parseInt(singItem.month);
+      let year = self.$moment().format('YYYY');
+      let days = self.$moment([year, month - 1]).daysInMonth();
       singItem.monthList = self.bigMonthList.slice(0, days);
     }
 

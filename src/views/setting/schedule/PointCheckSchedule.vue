@@ -554,7 +554,6 @@ export default {
   },
   watch: {
     accountChanged(val) {
-      console.log(val);
       let self = this;
       if (val !== 0) {
         self.isFirstLoad = true;
@@ -580,11 +579,9 @@ export default {
       let tabIndex = Number(self.activeName);
       let mode = self.paneList[tabIndex].mode;
       let timeList = self.paneList[tabIndex].timeList;
-      let name = self.paneList[tabIndex].name;
+      let name = self.paneList[tabIndex].name.trim();
       let weekSchedule = self.paneList[tabIndex].weeklySchedule;
-      console.log(weekSchedule);
-      console.log(timeList);
-      if (name === '') {
+      if (name.length == 0) {
         self.notify(self.$t('scheduleView.emptyName'), 'warning', 3000);
         self.$refs.scheduleName[tabIndex].focus();
         return false;
@@ -605,7 +602,6 @@ export default {
             lackTime = true;
           }
         });
-        console.log(lackDay + '..' + lackTime);
         if (lackDay) {
           self.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
           return false;
@@ -628,7 +624,6 @@ export default {
     },
 
     handleClick(val) {
-      console.log(val);
       let self = this;
       self.activeName = val.index;
       self.selectTab = val.label;
@@ -647,11 +642,9 @@ export default {
       if (type === 1) {
         let selectedWeek = self.dayArray;
         self.selectWeek = selectedWeek;
-        console.log(selectedWeek + 'selectedWeek');
         self.choiceWeek();
       } else if (type === 2) {
         let selectedMonth = self.dayArray;
-        console.log(selectedMonth + 'selectedMonth');
         self.selectMonth = selectedMonth;
         self.choiceDayTime();
       } else {
@@ -673,16 +666,13 @@ export default {
           selectedWeek.push(_item);
         });
       });
-      console.log(selectedWeek);
       schedule.forEach(item => {
         item.weekList.forEach(_item => {
           _item.disabled = false;
         });
       });
       selectedWeek.forEach(item => {
-        console.log(item);
         schedule.forEach(sche => {
-          console.log(sche);
           sche.weekList.forEach(week => {
             if (week.value === item) {
               week.disabled = true;
@@ -691,9 +681,7 @@ export default {
         });
       });
       schedule.forEach(item => {
-        console.log(item);
         item.dayArray.forEach(day => {
-          console.log(day);
           item.weekList.forEach(week => {
             if (week.value === day) {
               week.disabled = false;
@@ -716,14 +704,11 @@ export default {
         });
       });
       selectTime.forEach(item => {
-        console.log(item);
         actPanList.timeList.forEach(schedule => {
-          console.log(schedule);
           schedule.timeArray.forEach(time => {
             if (time.value === item) {
               time.disabled = true;
             }
-            console.log(time);
           });
         });
       });
@@ -742,13 +727,27 @@ export default {
       params.to = -1;
       params.notityTime = 0;
       self.isDisabled = true;
+      params.schedule = self.getParmasScheduleInfo(params);;
+
+      return new Promise((resolve, reject) => {
+        addNewSchedule(params).then(res => {
+          let data = res.data.scheduleId;
+          resolve(data);
+        }).catch(err => {
+          console.log("PointCheckSchedule-addScheduleService: "+ err);
+          reject(err)
+        });
+      });
+    },
+
+    getParmasScheduleInfo(params){
+      let self = this;
       let tempSchedule = [];
       if (params.mode === 0) {
         // Daily Mode
         let tempPeriod = [];
         let timeSelect = self.paneList[tabIndex].timeList;
         timeSelect.forEach(item => {
-          console.log(item);
           let time = item.time;
           if (time.length > 0) {
             let seconds = self.hourToSecond(time);
@@ -764,16 +763,13 @@ export default {
       } else if (params.mode === 1) {
         // Weekly Mode
         let schedule = self.paneList[tabIndex].weeklySchedule;
-        console.log(schedule);
         schedule.forEach(item => {
           let timeArray = item.timeArray;
           let selectedWeek = item.dayArray.filter(item => item !== '-1');
           selectedWeek.forEach(_item => {
-            console.log(_item);
             let timePeriod = [];
             let tempSche = {};
             timeArray.forEach(_it => {
-              console.log(_it);
               let seconds = self.hourToSecond(_it);
               let obj = {};
               obj.from = seconds;
@@ -784,18 +780,15 @@ export default {
             tempSchedule.push(tempSche);
           });
         });
-        console.log(tempSchedule);
       } else if (params.mode === 2) {
         // Monthly mode
         let timeSelected = self.paneList[tabIndex].timeList;
         let selectedMonth = self.selectMonth;
         self.paneList[tabIndex].dayArray = self.selectMonth;
         selectedMonth.forEach(item => {
-          console.log(item);
           let timePeriod = [];
           let tempSche = {};
           timeSelected.forEach(_item => {
-            console.log(_item);
             let time = _item.time;
             if (time.length > 0) {
               let seconds = self.hourToSecond(time);
@@ -808,18 +801,8 @@ export default {
           tempSche.period = timePeriod;
           tempSchedule.push(tempSche);
         });
-        console.log(tempSchedule);
       }
-      params.schedule = tempSchedule;
-      return new Promise((resolve, reject) => {
-        addNewSchedule(params).then(res => {
-          let data = res.data.scheduleId;
-          console.log(data);
-          resolve(data);
-        }).catch(err => {
-          reject(err)
-        });
-      });
+      return tempSchedule;
     },
 
     async addSchedule() {
@@ -849,12 +832,10 @@ export default {
       self.searchStore();
       self.selectWeek = [];
       self.selectMonth = [];
-      console.log(self.paneList);
     },
 
     async searchStoreInput() {
       let self = this;
-      console.log(self.tempStoreList);
       let tempStoreList = self.tempStoreList;
       let getStore2Temp = data => {
         let cityList = [];
@@ -879,7 +860,6 @@ export default {
               obj.city = data[j].city;
               obj.checked = data[j].checked;
               obj.disabled = data[j].disabled;
-              console.log(obj);
               temp.push(obj);
             }
           }
@@ -920,10 +900,10 @@ export default {
       let self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          console.log(res);
           let data = res.data;
-          console.log(data);
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -932,14 +912,12 @@ export default {
       let self = this;
       let bindStoreId = await self.getBindStoreList();
       self.storeCount = bindStoreId.length;
-      console.log(data);
       let cityList = [];
       data.forEach(item => {
         if (cityList.indexOf(item.city) === -1) {
           cityList.push(item.city);
         }
       });
-      console.log(cityList);
       let temp = [];
       cityList.forEach(item => {
         let obj = {};
@@ -957,7 +935,6 @@ export default {
         obj.store = _temp;
         temp.push(obj);
       });
-      console.log(temp);
       let groupTemp = [];
       temp.forEach(item => {
         let groupObj = {};
@@ -1003,8 +980,6 @@ export default {
       });
       self.storeList = groupTemp;
       self.tempStoreList = groupTemp;
-      console.log(self.storeList);
-      console.log(self.tempStoreList);
       let count = 0;
       self.storeList.forEach(item => {
         if (item.checked) {
@@ -1045,22 +1020,20 @@ export default {
     getBindStoreList() {
       let self = this;
       let scheduleId = self.scheduleId;
-      console.log(scheduleId);
       let params = {};
       params.scheduleId = scheduleId;
       if (params.scheduleId === 0) {
         return [];
       } else if (params.scheduleId === -1) {
-        console.log(self.paneList);
         params.scheduleId = self.paneList[0].schId;
       }
       return new Promise((resolve, reject) => {
         getScheduleBindList(params).then(res => {
-          console.log(res);
           let errMsg = res.errMsg;
           let data = res.data;
-          console.log(data);
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1068,7 +1041,6 @@ export default {
     addTime() {
       let self = this;
       self.showAddTime = true;
-      console.log(self.showAddTime);
       self.paneList[Number(self.activeName)].timeList.push({
         time: '',
         timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray))
@@ -1088,10 +1060,8 @@ export default {
     },
 
     deleteWeekDays(index) {
-      console.log(index);
       let self = this;
-      self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1); // 删除时间
-      console.log(self.paneList[Number(self.activeName)].weeklySchedule);
+      self.paneList[Number(self.activeName)].weeklySchedule.splice(index, 1);
       self.choiceWeek(index);
     },
 
@@ -1107,6 +1077,8 @@ export default {
       return new Promise((resolve, reject) => {
         unbindScheduleAndStore(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1124,8 +1096,6 @@ export default {
         self.scheduleId = scheId;
         self.scheduleName = '';
         self.isAdd = false;
-      } else {
-        // do nothing
       }
       if (!isAdd) {
         await self.updateScheduleInfo();
@@ -1143,19 +1113,15 @@ export default {
           }
         });
       });
-
       let tempchecked = [];
       let obj = {
         scheduleId: scheId,
         storeIds: storeIdChecked
       };
       tempchecked.push(obj);
-      console.log(tempchecked);
       let paramsBind = {
         items: tempchecked
       };
-      console.log(paramsBind);
-
       let tempUnchecked = [];
       let unbindobj = {
         scheduleId: scheId,
@@ -1166,17 +1132,14 @@ export default {
       let paramsUnBind = {
         items: tempUnchecked
       };
-      console.log(paramsUnBind);
       let flag = false;
       if (storeIdChecked.length === count) {
         let resBind = await self.bindScheduleToStore(paramsBind);
-        console.log(resBind);
         if (resBind.errMsg === 'Success' && resBind.errCode === '0') {
           flag = true;
         }
       } else if (storeIdUnchecked.length === count) {
         let resUnBind = await self.unbindScheToStore(paramsUnBind);
-        console.log(resUnBind);
         if (resUnBind.errMsg === 'Success' && resUnBind.errCode === '0') {
           flag = true;
         }
@@ -1190,21 +1153,19 @@ export default {
       if (flag) {
         let bindIdList = await self.getBindStoreList();
         self.storeCount = bindIdList.length;
-        self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length} ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
+        self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length}
+                    ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
       } else {
         self.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
         return false;
       }
       self.dayArray = this.paneList[Number(self.activeName)].dayArray;
-      console.log(self.dayArray);
       self.getHasBoundStroeIds();
     },
 
     deleteCurTime(index) {
-      console.log(index);
       let self = this;
       self.paneList[Number(self.activeName)].timeList.splice(index, 1);
-      console.log(self.paneList[Number(self.activeName)].timeList);
       self.choiceDayTime(index);
     },
 
@@ -1222,7 +1183,6 @@ export default {
 
       let resData = await self.getStoreData(params);
       let data = resData.content;
-      console.log(data);
       self.getStoreByCity(data);
 
       let count = 0;
@@ -1254,7 +1214,6 @@ export default {
 
     choiceAllGroup(item) {
       let self = this;
-      console.log(item);
       let obj = item;
       item.itemData.forEach(item => {
         if (!item.disabled) {
@@ -1279,7 +1238,6 @@ export default {
 
     choiceAllDevice(index, item) {
       let self = this;
-      console.log(index);
       let count = 0;
       item.itemData.forEach(itemS => {
         if (itemS.checked) {
@@ -1321,11 +1279,11 @@ export default {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
-          console.log(res);
           let errMsg = res.errMsg;
           let data = res.data;
-          console.log(data);
           resolve(data);
+        }).catch(err => {
+          reject(err)
         });
       });
     },
@@ -1336,103 +1294,104 @@ export default {
       self.paneList = [];
       let params = {};
       params.category = 2; // point check schedule
-      let data = await self.getScheduleFromDB(params);
-      if (data.length !== 0) {
-        data.forEach(item => {
-          let name = item.name;
-          if (self.scheduleList.indexOf(name) === -1) {
-            self.scheduleList.push(name);
-          }
-        });
-        let tempAllData = [];
-        data.forEach(_item => {
-          let tempScheduleData = {};
-          tempScheduleData.name = _item.name;
-          tempScheduleData.mode = _item.mode;
-          tempScheduleData.modeDisabled = true;
-          tempScheduleData.schId = _item.id; // 排程id
-          tempScheduleData.scheduleInfo = _item;
-          tempScheduleData.enable = Boolean(_item.enable);
-          let tempSchedules = _item.schedule;
-          console.log(tempSchedules);
-          let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly
-          let dayArray = []; // 存放1，2两种类型选中的时间
-          let timeArray = []; // 存放3种类型的执行时间
-          let weeklyScheduleArray = []; // 存放周模式下的执行天数和时间
-          tempSchedules.forEach(sche => {
-            console.log(sche);
-            let day = sche.day;
-            dayArray.push(day);
-            let tempWeeklySchedule = {};
-            tempWeeklySchedule.day = day;
-            let tempWeeklyTimeArr = [];
-            let period = sche.period.sort(self.getSortFun('from'));
-            period.forEach(periods => {
-              let from = periods.from;
-              let hours = self.secondsToHour(from);
-              tempWeeklyTimeArr.push(hours);
-              if (timeArray.indexOf(hours) === -1) {
-                timeArray.push(self.secondsToHour(from));
-              } else {
-
-              }
-            });
-            tempWeeklySchedule.timeArray = tempWeeklyTimeArr;
-            weeklyScheduleArray.push(tempWeeklySchedule);
-            console.log(tempWeeklySchedule);
-          });
-          let weeklySchedule = self.transformArray(weeklyScheduleArray);
-          console.log(weeklySchedule);
-          console.log(dayArray);
-          tempScheduleData.timeArray = timeArray;
-
-          let timeList = [];
-          timeArray.forEach(_item => {
-            let timeJson = {};
-            timeJson.time = _item;
-            timeJson.timeArray = JSON.parse(JSON.stringify(self.weeklyTimeArray));
-            timeList.push(timeJson);
-          });
-          tempScheduleData.timeList = timeList;
-          console.log(timeList);
-          tempScheduleData.weeklySchedule = weeklySchedule;
-          tempScheduleData.dayArray = dayArray;
-          self.paneList.push(tempScheduleData);
-        });
-
-        if (self.isFirstLoad) {
-          self.selectTab = self.paneList[0].name;
-          self.scheduleId = self.paneList[0].schId;
-          self.isFirstLoad = false;
-          self.dayArray = this.paneList[0].dayArray;
-          console.log(self.dayArray);
-          self.echoMonthAndWeek(); // 回显初次加载时选择的月和周
-          self.searchStore();
+      try {
+        let data = await self.getScheduleFromDB(params);
+        if (data.length > 0) {
+          self.initScheduleData(data);
+          self.getHasBoundStroeIds();
+        } else if (data.length === 0) {
+          self.initAddScheduleInfo();
         }
-        console.log(self.paneList);
-        self.getHasBoundStroeIds();
-      } else if (data.length === 0) {
-        console.log(self.paneList);
-        let scheduleInfo = {
-          name: '点检计划一',
-          mode: 0,
-          modeDisabled: false,
-          schId: 0,
-          dayArray: [],
-          enable: false,
-          to: -1,
-          dueDays: 1,
-          weeklySchedule: [{ dayArray: [], timeArray: [], weekList: JSON.parse(JSON.stringify(self.weekList)) }],
-          timeList: [{ time: '', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray)) }]
-        };
-        self.paneList.push(scheduleInfo);
-        self.scheduleName = '点检计划一';
-        self.selectTab = '点检计划一';
-        self.scheduleId = 0;
-        self.isDisabled = false;
-        self.isAdd = true;
+      }
+      catch (err) {
+        console.log("PointCheckSchedule-getScheduleList: " + err);
+      }
+    },
+
+    initScheduleData(data){
+      let self = this;
+      data.forEach(item => {
+        let name = item.name;
+        if (self.scheduleList.indexOf(name) === -1) {
+          self.scheduleList.push(name);
+        }
+      });
+      data.forEach(_item => {
+        let tempScheduleData = {};
+        tempScheduleData.name = _item.name;
+        tempScheduleData.mode = _item.mode;
+        tempScheduleData.modeDisabled = true;
+        tempScheduleData.schId = _item.id;
+        tempScheduleData.scheduleInfo = _item;
+        tempScheduleData.enable = Boolean(_item.enable);
+        let tempSchedules = _item.schedule;
+        let mode = _item.mode; // 0 daily, 1 weekly, 2 monthly
+        let dayArray = [];
+        let timeArray = [];
+        let weeklyScheduleArray = [];
+        tempSchedules.forEach(sche => {
+          let day = sche.day;
+          dayArray.push(day);
+          let tempWeeklySchedule = {};
+          tempWeeklySchedule.day = day;
+          let tempWeeklyTimeArr = [];
+          let period = sche.period.sort(self.getSortFun('from'));
+          period.forEach(periods => {
+            let from = periods.from;
+            let hours = self.secondsToHour(from);
+            tempWeeklyTimeArr.push(hours);
+            if (timeArray.indexOf(hours) === -1) {
+              timeArray.push(self.secondsToHour(from));
+            }
+          });
+          tempWeeklySchedule.timeArray = tempWeeklyTimeArr;
+          weeklyScheduleArray.push(tempWeeklySchedule);
+        });
+        let weeklySchedule = self.transformArray(weeklyScheduleArray);
+        tempScheduleData.timeArray = timeArray;
+
+        let timeList = [];
+        timeArray.forEach(_item => {
+          let timeJson = {};
+          timeJson.time = _item;
+          timeJson.timeArray = JSON.parse(JSON.stringify(self.weeklyTimeArray));
+          timeList.push(timeJson);
+        });
+        tempScheduleData.timeList = timeList;
+        tempScheduleData.weeklySchedule = weeklySchedule;
+        tempScheduleData.dayArray = dayArray;
+        self.paneList.push(tempScheduleData);
+      });
+      if (self.isFirstLoad) {
+        self.selectTab = self.paneList[0].name;
+        self.scheduleId = self.paneList[0].schId;
+        self.isFirstLoad = false;
+        self.dayArray = this.paneList[0].dayArray;
+        self.echoMonthAndWeek();
         self.searchStore();
       }
+    },
+
+    initAddScheduleInfo(){
+      let scheduleInfo = {
+        name: '点检计划一',
+        mode: 0,
+        modeDisabled: false,
+        schId: 0,
+        dayArray: [],
+        enable: false,
+        to: -1,
+        dueDays: 1,
+        weeklySchedule: [{ dayArray: [], timeArray: [], weekList: JSON.parse(JSON.stringify(self.weekList)) }],
+        timeList: [{ time: '', timeArray: JSON.parse(JSON.stringify(self.weeklyTimeArray)) }]
+      };
+      this.paneList.push(scheduleInfo);
+      this.scheduleName = '点检计划一';
+      this.selectTab = '点检计划一';
+      this.scheduleId = 0;
+      this.isDisabled = false;
+      this.isAdd = true;
+      this.searchStore();
     },
 
     getSortFun(sortBy) {
@@ -1457,7 +1416,6 @@ export default {
       for (let item in map) {
         arr.push(map[item]);
       }
-      console.log(arr);
       arr.forEach(item => {
         item.dayArray.sort();
         item.weekList = JSON.parse(JSON.stringify(self.weekList));
@@ -1471,43 +1429,35 @@ export default {
       self.paneList.forEach(item => {
         let sheduleId = item.schId;
         let mode = item.mode;
-        console.log(sheduleId + '....' + mode);
         if (mode !== 3) {
           let params = {};
           params.scheduleId = sheduleId;
           return new Promise((resolve, reject) => {
             getScheduleBindList(params).then(res => {
-              console.log(res);
-              let errMsg = res.errMsg;
               let data = res.data;
-              console.log(data);
               data.forEach(_item => {
                 if (self.hasBoundStoreIds.indexOf(_item) === -1) {
                   self.hasBoundStoreIds.push(_item);
-                } else {
-                  // do nothing
                 }
               });
               resolve(data);
+            }).catch(err => {
+              console.log("PointCheckSchedule-getHasBoundStroeIds:" + err);
+              reject(err);
             });
           });
         }
       });
-      console.log(self.hasBoundStoreIds);
     },
     secondsToHour(second) {
-      console.log(second);
       let changedData = [parseInt(second / 60 / 60), second / 60 % 60].join(':')
         .replace(/\b(\d)\b/g, '0$1');
-      console.log(changedData);
       return changedData;
     },
 
     hourToSecond(hourStr) {
-      console.log(hourStr);
       let hourArray = hourStr.split(':');
       let changedSec = Number(hourArray[0]) * 3600 + Number(hourArray[1]) * 60;
-      console.log(changedSec);
       return changedSec;
     },
 
@@ -1539,7 +1489,6 @@ export default {
         let tempPeriod = [];
         let timeSelect = self.paneList[tabIndex].timeList;
         timeSelect.forEach(item => {
-          console.log(item);
           let time = item.time;
           let seconds = self.hourToSecond(time);
           let obj = {};
@@ -1553,16 +1502,13 @@ export default {
       } else if (mode === 1) {
         // Weekly Mode
         let schedule = self.paneList[tabIndex].weeklySchedule;
-        console.log(schedule);
         schedule.forEach(item => {
           let timeArray = item.timeArray;
           let selectedWeek = item.dayArray.filter(item => item !== '-1');
           selectedWeek.forEach(_item => {
-            console.log(_item);
             let timePeriod = [];
             let tempSche = {};
             timeArray.forEach(_it => {
-              console.log(_it);
               let seconds = self.hourToSecond(_it);
               let obj = {};
               obj.from = seconds;
@@ -1573,18 +1519,15 @@ export default {
             tempSchedule.push(tempSche);
           });
         });
-        console.log(tempSchedule);
       } else if (mode === 2) {
         // Monthly Mode
         let timeSelected = self.paneList[tabIndex].timeList;
         let selectedMonth = self.selectMonth;
         self.paneList[tabIndex].dayArray = self.selectMonth;
         selectedMonth.forEach(item => {
-          console.log(item);
           let timePeriod = [];
           let tempSche = {};
           timeSelected.forEach(_item => {
-            console.log(_item);
             let time = _item.time;
             let seconds = self.hourToSecond(time);
             let obj = {};
@@ -1595,19 +1538,15 @@ export default {
           tempSche.period = timePeriod;
           tempSchedule.push(tempSche);
         });
-        console.log(tempSchedule);
-      } else {
-
       }
       params.schedule = tempSchedule;
-      console.log(params.schedule);
       return new Promise((resolve, reject) => {
         updateSchedule(params).then(res => {
-          console.log(res);
           let errMsg = res.errMsg;
           let data = res.errCode;
-          console.log(data);
           resolve(data);
+        }).catch(err => {
+          reject(err)
         });
       });
     },
@@ -1615,6 +1554,7 @@ export default {
     deleteScheduleBtn() {
       this.showDeleteDialog = true;
     },
+
     deleteSchedule() {
       let self = this;
       self.showDeleteDialog = false;
@@ -1625,13 +1565,9 @@ export default {
         scheduleIds.push(self.scheduleId);
         let params = {};
         params.scheduleIds = scheduleIds;
-        console.log(params.scheduleIds);
         return new Promise((resolve, reject) => {
           deleteScheduleService(params).then(res => {
-            console.log(res);
-            let errMsg = res.errMsg;
             let data = res.errCode;
-            console.log(data);
             if (data === 0) {
               self.notify(self.$t('scheduleView.deleteSuss'), 'success', 3000);
             } else {
@@ -1639,6 +1575,8 @@ export default {
             }
             self.initData();
             resolve(data);
+          }).catch(err => {
+            console.log("PointCheckSchedule-deleteSchedule: " + err);
           });
         });
       }
@@ -1652,14 +1590,12 @@ export default {
       self.dayArray = self.paneList[0].dayArray;
       self.echoMonthAndWeek();
       self.scheduleId = self.paneList[0].schId;
-      console.log(self.scheduleId);
       self.getHasBoundStroeIds();
     },
 
     getSelectTimeArray() {
       let self = this;
       let date = self.$moment().format('YYYY-MM-DD');
-      console.log(date);
       let startIime = self.$moment(date + ' 08:00:00').valueOf();
       let endTime = self.$moment(date + ' 23:45:00').valueOf();
       let timeArray = [];
@@ -1676,12 +1612,10 @@ export default {
         timeJson.disabled = false;
         self.weeklyTimeArray.push(timeJson);
       });
-      console.log(self.weeklyTimeArray);
     },
 
     changeSelectMonth(val, item) {
       let self = this;
-      console.log(Array.from(val)[0]);
       self.selectMonth = Array.from(val)[0];
     },
 
@@ -1693,9 +1627,7 @@ export default {
 
     changeSelectWeekTime(val, item) {
       let self = this;
-      console.log(val);
       item.timeArray = val;
-      console.log(item.timeArray);
     }
   }
 };

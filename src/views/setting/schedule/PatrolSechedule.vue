@@ -13,8 +13,8 @@
           <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
             <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"/>
           </el-select>
-          <el-select v-model="isActivePatrol" :placeholder="$t('storeView.selectPlaceholder')"
-                     @change="changePatrolList(isActivePatrol,isActive)">
+          <el-select v-model="activePatrolId" :placeholder="$t('storeView.selectPlaceholder')"
+                     @change="changePatrolList(activePatrolId,isActive)">
             <el-option v-for="(item,index) in InspectList" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </div>
@@ -46,7 +46,7 @@
         </div>
       </el-col>
       <el-col :span="24" class="el-schedule-tabs">
-        <remote-detail ref="remoteHandle" :active-patrol = "activePatrol" :inspect-id="isActivePatrol"
+        <remote-detail ref="remoteHandle" :active-patrol = "activePatrol" :inspect-id="activePatrolId"
                        @sendActiveName = "changeActiveName" @paneList="getpaneList"/>
       </el-col>
     </div>
@@ -97,12 +97,12 @@ export default {
       activeName: '0',
       activePatrol: '0',
       isActive: 0,
-      isActivePatrol: '',
+      activePatrolId: 0,
       paneLength: 0
     };
   },
   watch: {
-    accountChanged(val, oldVal) {
+    accountChanged(val) {
       console.log(val);
       let self = this;
       if (val !== 0) {
@@ -123,7 +123,7 @@ export default {
   methods: {
     changePatrolType(val) {
       let self = this;
-      self.isActivePatrol = '';
+      self.activePatrolId = 0;
       self.getTagList(val);
     },
 
@@ -155,14 +155,13 @@ export default {
           });
           self.InspectList = InspectList;
           if (self.InspectList.length !== 0) {
-            self.isActivePatrol = self.InspectList[0].id;
-            self.changePatrolList(self.isActivePatrol, self.isActive);
+            self.activePatrolId = self.InspectList[0].id;
+            self.changePatrolList(self.activePatrolId, self.isActive);
           } else {
             self.changePatrolList('noInspect', self.isActive);
           }
           resolve(data);
         }).catch(err => {
-          console.log(err.message);
           reject(err)
         });
       });
@@ -180,7 +179,7 @@ export default {
         self.notify(self.$t('insSettingView.SchdRemoteLength'), 'warning', 3000);
         return false;
       } else {
-        self.$refs.remoteHandle.addSchedule(self.isActivePatrol);
+        self.$refs.remoteHandle.addSchedule(self.activePatrolId);
       }
     },
     notify(msg, type, time) {
@@ -192,7 +191,6 @@ export default {
     },
 
     changeActiveName(val) {
-      console.log(val + 'from sun');
       this.activeName = val;
     },
 
