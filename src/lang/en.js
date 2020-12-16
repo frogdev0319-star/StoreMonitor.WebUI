@@ -447,6 +447,7 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
+    'rangeScoreTips': 'The lowest value of the total score shall not be higher than the highest value',
     'ruleInspect': 'Rule Settings',
     'PatrolScoreCalculation': 'Inspection score calculation',
     'CalculationMethod': 'Calculation method of total score',
@@ -534,7 +535,7 @@ export default {
     'passfailexcelEmpty': "The inspection item can't empty",
     'excelPassFailScoreType': 'Score:Optional, Integer,  1~50points',
     'excelFullScoreType': 'Total Score: Required, Integer, 1~50points',
-    'excelMinScoreType': 'Anomaly Events-Score Threshold: Optional, Integer, 1point~Total Score',
+    'excelMinScoreType': 'Anomaly Events-Score Threshold: Optional, Integer, 0 point~Total Score',
     'excelScoreItemType': 'The value range of the score options is 0~full marks',
     'excelOtherScoreType': 'Score:Required, Integer,  -100~100points',
     'bindingstore': 'Binding',

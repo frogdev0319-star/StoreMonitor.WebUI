@@ -38,6 +38,7 @@
         <span class="input-text">{{ $t('remotePatrol.scorecount') }}~</span>
         <el-input :placeholder="$t('insSettingView.setMaxScore')" v-model="maxScore" class="input" @input="inputChangeMax"/>
         <span class="input-text">{{ $t('remotePatrol.scorecount') }}</span>
+        <span v-if="ScoreMsg" class="score_msg">*{{$t('insSettingView.rangeScoreTips')}}</span>
       </p>
     </el-col>
     <el-col :span="24" class="el-rute-content">
@@ -69,7 +70,8 @@ export default {
       checkItem3: false,
       checkItem4: false,
       routeData: this.$route.params.routeData,
-      lang: this.$i18n.locale
+      lang: this.$i18n.locale,
+      ScoreMsg: false
     };
   },
   mounted() {
@@ -79,25 +81,27 @@ export default {
   methods: {
     async submitRule() {
       const self = this;
-      const params = {
-        inspectTagId: self.routeData[0].inspectId,
-        ruleItems: [
-          { name: 'includedInTotalScoreWithType1', value: self.checkItem1 },
-          { name: 'qualifiedForIgnoredWithType1', value: self.checkItem2 },
-          { name: 'qualifiedForIgnoredWithType2', value: self.checkItem3 },
-          { name: 'hundredMarkType', value: parseInt(self.radio) },
-          { name: 'minScore', value: parseInt(self.minScore) },
-          { name: 'maxScore', value: parseInt(self.maxScore) },
-          { name: 'dangerousOnFailedItem', value: self.checkItem4 }
-        ]
-      };
-      const res = await self.updateInspectRule(params);
-      if (res.errCode === 0) {
-        self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-        return false;
-      } else {
-        self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-        return false;
+      if(!self.ScoreMsg){
+        const params = {
+          inspectTagId: self.routeData[0].inspectId,
+          ruleItems: [
+            { name: 'includedInTotalScoreWithType1', value: self.checkItem1 },
+            { name: 'qualifiedForIgnoredWithType1', value: self.checkItem2 },
+            { name: 'qualifiedForIgnoredWithType2', value: self.checkItem3 },
+            { name: 'hundredMarkType', value: parseInt(self.radio) },
+            { name: 'minScore', value: parseInt(self.minScore) },
+            { name: 'maxScore', value: parseInt(self.maxScore) },
+            { name: 'dangerousOnFailedItem', value: self.checkItem4 }
+          ]
+        };
+        const res = await self.updateInspectRule(params);
+        if (res.errCode === 0) {
+          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          return false;
+        } else {
+          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          return false;
+        }
       }
     },
     async getRule() {
@@ -154,7 +158,12 @@ export default {
     },
     inputChangeMax(val) {
       const self = this;
-      self.maxScore = val.replace(/[^\d]/g, '');
+      if (val.indexOf('-') !== -1) {
+        self.maxScore = '-' + val.replace(/[^\d]/g, '');
+      } else {
+        self.maxScore = val.replace(/[^\d]/g, '');
+      }
+      self.ScoreMsg = parseInt(self.minScore)>parseInt(self.maxScore);
     },
     inputChangeMin(val) {
       const self = this;
@@ -163,6 +172,7 @@ export default {
       } else {
         self.minScore = val.replace(/[^\d]/g, '');
       }
+      self.ScoreMsg = parseInt(self.minScore)>parseInt(self.maxScore);
     },
     notify(msg, type, time) {
       this.$message({
@@ -271,6 +281,10 @@ $itemHeight:50px;
             }
             .input-text{
                 margin:0 calc(10/1920*100vw);
+            }
+            .score_msg{
+              font-size: calc(10/1920*100vw);
+              color:red;
             }
             .rangeScore{
                 margin-right: calc(20/1920*100vw);

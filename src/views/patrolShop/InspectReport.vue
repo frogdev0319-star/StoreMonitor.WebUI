@@ -23,7 +23,7 @@
       <div v-if="suggest!=null&&suggest.length!=0" class="suggest">
         <div class="suggest-content">
           <span>{{ $t('remotePatrol.advice') }}</span>
-          <span style="flex:1;" v-html="turnSuggest(suggest)"/>
+          <span v-html="turnSuggest(suggest)"/>
         </div>
       </div>
       <el-row class="report-content">
@@ -1016,6 +1016,11 @@ export default {
         span:first-child {
           width:100px;
           padding-right: calc(20 / 1920 * 100vw);
+        }
+        span:last-child{
+          flex:1;
+          min-width:200px;
+          word-wrap: break-word;
         }
       }
       .report-content {

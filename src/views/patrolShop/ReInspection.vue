@@ -2161,7 +2161,6 @@ export default {
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
-      self.curItem.disabled = false;
       if (self.showIgnoreItem) {
         self.hasIgnoretemp[self.curItemIndex].dealCount != 0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
       } else {

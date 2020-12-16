@@ -452,6 +452,7 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
+    'rangeScoreTips': '考評總分最低值不得高於最高值',
     'ruleInspect': '巡檢規則設置',
     'PatrolScoreCalculation': '巡檢得分計算',
     'CalculationMethod': '考評總分計算方式',
@@ -542,7 +543,7 @@ export default {
     'passfailexcelEmpty': ' 巡检项不能为空！',
     'excelPassFailScoreType': '項目分值選填，取值範圍為1~50的整數',
     'excelFullScoreType': ' 項目總分值必填，取值範圍為1~50的整數',
-    'excelMinScoreType': ' 巡檢項最低分值必填，取值範圍為1~項目總分值的整數',
+    'excelMinScoreType': ' 巡檢項最低分值必填，取值範圍為0~項目總分值的整數',
     'excelScoreItemType': '評分選項，取值範圍為0~滿分值',
     'excelOtherScoreType': ' 項目分值必填，取值範圍為-100~100的整數',
     'bindingstore': ' 綁定中',

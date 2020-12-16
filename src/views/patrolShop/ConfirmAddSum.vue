@@ -596,7 +596,7 @@ export default {
       self.inspectList = routeData.inspect;
       self.eventList = routeData.event;
       let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
-      let getscoreTotal = 0, CurAddIgnoreItemScore = 0, allscoreTotal = 0, allAddIgnoreScore = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, getpassfailIgnoreTotal = 0, allpassfailCount = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0, ScoreTotalScoreSystem = 0, OtherTotalScoreSystem = 0;
+      let getscoreTotal = 0, CurAddIgnoreItemScore = 0, allscoreTotal = 0, allScoreB = 0, allAddIgnoreScore = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, getpassfailIgnoreTotal = 0, allpassfailCount = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0, ScoreTotalScoreSystem = 0, OtherTotalScoreSystem = 0;
       inspect.forEach(p_item => {
         if (p_item.dealCount !== 0) {
           dealType.push(p_item.type);
@@ -605,7 +605,7 @@ export default {
       let Tab0Status = false;
       let inspectPic = 0;
       inspect.forEach(p_item => {
-        var CurItemgetScore = 0, totalScore0 = 0, totalScoreX = 0, CurSc = 0, CurNotIgnoreTotalscore = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0;
+        var CurItemgetScore = 0, totalScore0 = 0, totalScoreX = 0, CurSc = 0, CurNotIgnoreTotalscore = 0,  CurAddScoreB = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
           let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0, addNotIgnoreTotalscoreA = 0, addIgnoreScoreA = 0;
@@ -671,8 +671,10 @@ export default {
             CurSc += addIgnoreScoreA;
             CurAddIgnoreItemScore = CurSc;
             CurAddIgnoreTotalscore += addNotIgnoreTotalscoreA;
+            CurAddScoreB += item.itemScore
             getscoreTotal = CurItemgetScore;
             allscoreTotal = CurNotIgnoreTotalscore;
+            allScoreB = CurAddScoreB;
             allAddIgnoreScore = CurAddIgnoreTotalscore;
             ScoreTotalScoreSystem = ScoreTS;
           }
@@ -715,7 +717,7 @@ export default {
             if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
               s_count = Math.round(((PassFileTotalScoreSystem + getscoreTotal) / (allscoreTotal + PassFileTotalScore) * 100) + otherGetscoreTotal);
             } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreSystem) * 100) + otherGetscoreTotal);
+              s_count = Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + allScoreB) * 100) + otherGetscoreTotal);
             } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
               s_count = Math.round(((PassFileTotalScoreSystem + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreSystem) * 100) + otherGetscoreTotal);
             } else {

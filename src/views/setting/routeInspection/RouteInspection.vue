@@ -1273,11 +1273,11 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
-                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，字符类型为1~10整数
+                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，字符类型为0~50整数
                   flagFullScoreType = true;
                 }
                 if (item.d != undefined) {
-                  if (!Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，字符类型为1~item.c整数
+                  if (!Number.isInteger(item.d) || parseInt(item.d) < 0 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，字符类型为0~item.c整数
                     flagMinScoreType = true;
                   }
                 } else {
