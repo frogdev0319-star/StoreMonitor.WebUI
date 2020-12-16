@@ -117,21 +117,8 @@ export default {
       curTag: '远程巡检',
       storeTitle: '',
       store: {},
-      storeLinder: '王三洋',
       phone: ' ',
       schedule: '',
-      scheduleList: [
-        {
-          id: 0,
-          label: '排程一',
-          value: '排程一'
-        },
-        {
-          id: 1,
-          label: '排程二',
-          value: '排程二'
-        }
-      ],
       personList: [],
       curPerson: '',
       scheduleData: [],
@@ -158,9 +145,9 @@ export default {
   },
 
   async mounted() {
-    const self = this;
+    let self = this;
     self.store = JSON.parse(sessionStorage.getItem('STORE_ROW'));
-    const storeId = self.store.storeId;
+    let storeId = self.store.storeId;
     self.storeTitle = self.store.name;
     self.userId = self.store.userId;
     self.userName = self.store.userName;
@@ -181,18 +168,18 @@ export default {
 
   methods: {
     changeStoreDialog() {
-      const self = this;
+      let self = this;
       self.changeStoreObj.dialogCosed = false;
       self.getNapeByStore(self.store.storeId);
     },
 
     canceldChangeStore() {
-      const self = this;
+      let self = this;
       self.changeStoreObj.dialogCosed = false;
     },
 
     beforeleave(e, w) {
-      const self = this;
+      let self = this;
       let isshowdialog = false;
       self.allRoutedata.forEach(item => {
         item.forEach(a_item => {
@@ -219,7 +206,7 @@ export default {
     },
 
     changeSheet(e) {
-      const self = this;
+      let self = this;
       self.sheetName.forEach(item => {
         if (item.id === e) {
           item.isClick = true;
@@ -235,15 +222,14 @@ export default {
     },
 
     getChannelByStore(storeId) {
-      const self = this;
-      const params = { storeId: storeId };
+      let self = this;
+      let params = { storeId: storeId };
       getDeviceList(params).then(res => {
-        console.log(res);
-        const data = res.data;
-        const temp = [];
+        let data = res.data;
+        let temp = [];
         if (data.length !== 0) {
           data.forEach(item => {
-            const obj = {};
+            let obj = {};
             obj.id = item.id;
             obj.name = item.name;
             obj.ivsId = item.ivsId;
@@ -253,13 +239,14 @@ export default {
             temp.push(obj);
           });
           self.alleList = temp;
-          // self.getNapeByStore(storeId)
         }
+      }).catch(err => {
+        console.log("StoreDetail-getChannelByStore: " + err);
       });
     },
 
     clickItem(item, index) {
-      const self = this;
+      let self = this;
       item.isClick = true;
       self.scheduleData.forEach((_item, index) => {
         _item.itemData.forEach((itemS, indexS) => {
@@ -271,7 +258,7 @@ export default {
     },
 
     changeDeviceId(val, item) {
-      const self = this;
+      let self = this;
       item.channelvalue = val;
     },
 
@@ -280,7 +267,7 @@ export default {
     },
 
     getNapeByStore(storeId, idx) {
-      const self = this;
+      let self = this;
       let index = 0;
       self.sheetName = [];
       if (idx != undefined) {
@@ -288,71 +275,82 @@ export default {
       } else {
         index = self.activeName;
       }
-      const params = {
+      let params = {
         storeId: storeId,
         mode: 0,
         authorizedOnly: 0,
         tagName: self.appliedInspect[index].name,
         inspectId: self.appliedInspect[index].id
       };
+      self.checkoutInspectItems(params);
+    },
+
+    checkoutInspectItems(params){
+      let self = this;
       checkOutInspectItemV3(params).then(res => {
-        console.log(res);
-        const data = res.data.groups;
-        const temp = [];
-        if (data.length !== 0) {
-          data.forEach(item => {
-            const obj = {};
-            obj.id = item.groupId;
-            obj.napeName = item.groupName;
-            obj.type = item.type;
-            obj.napeNum = item.items.length;
-            const _temp = [];
-            for (const _item of item.items) {
-              const _obj = {};
-              _obj.id = _item.id;
-              _obj.subject = _item.subject;
-              _obj.channelvalue = [];
-              _obj.oldChannelvalue = [];
-              _item.deviceIds.forEach(id => {
-                if (id !== -1) {
-                  _obj.channelvalue.push(id);
-                }
-                _obj.oldChannelvalue.push(id);
-              });
-              _obj.isClick = false,
-              _temp.push(_obj);
-            }
-            obj.itemData = _temp;
-            temp.push(obj);
-          });
+        let data = res.data.groups;
+        let tempInfo = [];
+        if (data.length > 0) {
+          tempInfo = self.getItemsGroupAndInfo(data);
         }
-        const te_temp = [];
+        let scheduleArray = [];
         for (let i = 0; i < 3; i++) {
-          const Typeindex = temp.filter(x => x.type === i);
-          let obj = {};
-          if (Typeindex.length !== 0) {
-            te_temp.push(Typeindex);
-            if (Typeindex[0].type === 0) {
-              obj = { 'id': 0, 'isClick': false, 'label': self.$t('insSettingView.sheetpassfail') };
+          let  typeIndex = tempInfo.filter(x => x.type === i);
+          let sheetObj = {};
+          if (typeIndex.length > 0) {
+            scheduleArray.push(typeIndex);
+            if (typeIndex[0].type === 0) {
+              sheetObj = { 'id': 0, 'isClick': false, 'label': self.$t('insSettingView.sheetpassfail') };
             }
-            if (Typeindex[0].type === 1) {
-              obj = { 'id': 1, 'isClick': false, 'label': self.$t('insSettingView.sheetscore') };
+            if (typeIndex[0].type === 1) {
+              sheetObj = { 'id': 1, 'isClick': false, 'label': self.$t('insSettingView.sheetscore') };
             }
-            if (Typeindex[0].type === 2) {
-              obj = { 'id': 2, 'isClick': false, 'label': self.$t('insSettingView.sheetother') };
+            if (typeIndex[0].type === 2) {
+              sheetObj = { 'id': 2, 'isClick': false, 'label': self.$t('insSettingView.sheetother') };
             }
-            self.sheetName.push(obj);
+            self.sheetName.push(sheetObj);
           }
         }
-        self.allRoutedata = te_temp;
+        self.allRoutedata = scheduleArray;
         self.sheetName[0].isClick = true;
-        self.scheduleData = te_temp[0];
+        self.scheduleData = scheduleArray[0];
+      }).catch(err => {
+        console.log("StoreDetail-checkoutInspectItems: " + err);
       });
     },
 
+    getItemsGroupAndInfo(data){
+      let infoArr = [];
+      data.forEach(item => {
+        let groupObj = {};
+        groupObj.id = item.groupId;
+        groupObj.napeName = item.groupName;
+        groupObj.type = item.type;
+        groupObj.napeNum = item.items.length;
+        let tempItemArr = [];
+        for (let _item of item.items) {
+          let itemObj = {};
+          itemObj.id = _item.id;
+          itemObj.subject = _item.subject;
+          itemObj.channelvalue = [];
+          itemObj.oldChannelvalue = [];
+          _item.deviceIds.forEach(id => {
+            if (id !== -1) {
+              itemObj.channelvalue.push(id);
+            }
+            itemObj.oldChannelvalue.push(id);
+          });
+          itemObj.isClick = false;
+          tempItemArr.push(itemObj);
+        }
+        groupObj.itemData = tempItemArr;
+        infoArr.push(groupObj);
+      });
+      return infoArr;
+    },
+
     changePerson(val) {
-      console.log(val);
-      const self = this;
+      let self = this;
       self.personList.forEach(item => {
         if (item.userId === val) {
           self.phone = item.phoneNumber;
@@ -361,16 +359,15 @@ export default {
     },
 
     getUserList() {
-      const self = this;
-      const params = {
+      let self = this;
+      let params = {
         storeId: self.store.storeId
       };
       getUserInfo(params).then(res => {
-        console.log(res);
-        const temp = res.data;
+        let temp = res.data;
         if (self.supervisorId != null && self.supervisorId.length !== 0) {
           if (temp.map(x => x.userId).indexOf(self.supervisorId) === -1) {
-            const obj = {
+            let obj = {
               userId: self.store.supervisorId,
               userName: self.store.supervisorId,
               phoneNumber: self.store.phone
@@ -379,30 +376,29 @@ export default {
           }
         }
         self.personList = temp;
-        console.log(self.personList);
-        // self.curPerson=self.userId;
         self.curPerson = self.supervisorId;
+      }).catch(err =>{
+        console.log("StoreDetail-getUserList: " + err);
       });
     },
 
     cancelSubmitDialog() {
-      const self = this;
+      let self = this;
       self.changeSubmitObj.dialogCosed = false;
     },
 
     async submitData() {
-      const self = this;
-      console.log(self.scheduleData);
+      let self = this;
       let count = 0;
       let countChannel = 0;
-      const temp = [];
-      const unbindTemp = [];
+      let temp = [];
+      let unbindTemp = [];
       self.allRoutedata.forEach(all_item => {
         all_item.forEach(item => {
           count += item.itemData.length;
           item.itemData.forEach(_item => {
-            const obj = {};
-            const unbindObj = {};
+            let obj = {};
+            let unbindObj = {};
             if (_item.channelvalue.length !== 0) {
               countChannel++;
               obj.inspectItemId = _item.id;
@@ -419,41 +415,36 @@ export default {
           });
         });
       });
-      const paramsUpdateStore = {
-        'store': [
-          {
-            'storeId': self.store.storeId,
-            'supervisorId': self.supervisorId
-          }
-        ]
-      };
-      if (self.scheduleData.length === 0) {
-        //do nothing
-      } else {
-        if ((count !== 0 && (count !== countChannel)) || countChannel === 0) {
+      if (self.scheduleData.length > 0) {
+        if ( (count !== 0 && (count !== countChannel)) || countChannel === 0 ) {
           self.notify(this.$t('storeView.selectAllChanels'), 'warning', 3000);
           return false;
         }
-        const paramsInspec = {
+        let paramsInspec = {
           items: temp
         };
         let resUpdateStore = null, resBindInspect = null, resUnbindInspect = null;
-        if (unbindTemp.length > 0) {
-          const unbindParams = {
-            items: unbindTemp
-          };
-          resUnbindInspect = await self.unbindInspectItem(unbindParams);
+        try {
+          if (unbindTemp.length > 0) {
+            let unbindParams = {
+              items: unbindTemp
+            };
+            resUnbindInspect = await self.unbindInspectItem(unbindParams);
+          }
+          if (resUnbindInspect == null || resUnbindInspect.errMsg === 'Success') {
+            resBindInspect = await self.bindInspectItem(paramsInspec);
+          }
+          if ( (resUpdateStore == null && (resBindInspect != null && resBindInspect.errMsg === 'Success')) ) {
+            self.notify(this.$t('storeView.successSubmit'), 'success', 3000);
+            self.changeSubmitObj.dialogCosed = false;
+            self.getNapeByStore(self.store.storeId);
+          } else {
+            self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
+            return false;
+          }
         }
-        if (resUnbindInspect == null || resUnbindInspect.errMsg === 'Success') {
-          resBindInspect = await self.bindInspectItem(paramsInspec);
-        }
-        if ((resUpdateStore == null && (resBindInspect != null && resBindInspect.errMsg === 'Success'))) {
-          self.notify(this.$t('storeView.successSubmit'), 'success', 3000);
-          self.changeSubmitObj.dialogCosed = false;
-          self.getNapeByStore(self.store.storeId);
-        } else {
-          self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
-          return false;
+        catch (err) {
+          console.log("StoreDetail-submitData: " + err);
         }
       }
     },
@@ -461,8 +452,9 @@ export default {
     bindInspectItem(params) {
       return new Promise((resolve, reject) => {
         bindInspectItemV2(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err =>{
+          reject(err);
         });
       });
     },
@@ -470,8 +462,9 @@ export default {
     unbindInspectItem(params) {
       return new Promise((resolve, reject) => {
         unbindInspectItemV2(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err =>{
+          reject(err);
         });
       });
     },
@@ -479,8 +472,9 @@ export default {
     updateStoreInfo(params) {
       return new Promise((resolve, reject) => {
         updateStoreInfo(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err =>{
+          reject(err);
         });
       });
     },

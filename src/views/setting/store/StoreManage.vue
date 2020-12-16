@@ -235,8 +235,7 @@ export default {
   },
 
   watch: {
-    accountChanged(val, oldVal) {
-      console.log(val);
+    accountChanged(val) {
       const self = this;
       if (val !==0) {
         self.getInitData();
@@ -280,10 +279,8 @@ export default {
 
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      console.log(row);
-      console.log(columnIndex);
       let obj = {};
-      if (columnIndex == 0) {
+      if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
       } else {
         obj = { 'border-right': '1px solid #e3e9f4' };
@@ -394,7 +391,7 @@ export default {
         });
       }
       self.storeDataList = temp;
-      let str = '', storeArr = [], arr = [];
+      let storeArr = [], arr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
         arr.push(item.value);
@@ -411,14 +408,12 @@ export default {
 
     handleProChange(arr) {
       const self = this;
-      console.log(arr);
       self.curProvince = arr;
       self.changePro(arr);
     },
 
     handleCityChange(arr) {
       const self = this;
-      console.log(arr);
       self.curCity = arr;
       self.changeCity(arr);
     },
@@ -448,7 +443,7 @@ export default {
     changeStore(val) {
       const self = this;
       let str = '';
-      self.tempStoreData.forEach((item, index) => {
+      self.tempStoreData.forEach((item) => {
         val.forEach(_item => {
           if (item.storeId === _item) {
             self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
@@ -506,56 +501,61 @@ export default {
       const self = this;
       self.page = val;
       self.getStoreList(self.params);
-      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
-      const offestTop = dom.offsetTop;
+      let dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+      let offestTop = dom.offsetTop;
       if (dom != undefined) {
         document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop = 0;
       }
     },
 
     async getCountryStore() {
-      const self = this;
-      const data = await self.getBriefStoreData();
-      const temp = [];
-      if (data.errCode === 0 && data.errMsg === 'Success') {
-        self.tempStoreData = data.data;
-        if (self.tempStoreData.length !== 0) {
-          self.tempStoreData.forEach(item => {
-            const country = item.country;
-            if (temp.map(x => x.label).indexOf(country) === -1) {
-              const obj = {
-                value: country,
-                label: country
-              };
-              temp.push(obj);
-            }
-          });
+      let self = this;
+      try {
+        let data = await self.getBriefStoreData();
+        let countryArr = [];
+        if (data.errCode === 0 && data.errMsg === 'Success') {
+          self.tempStoreData = data.data;
+          if (self.tempStoreData.length !== 0) {
+            self.tempStoreData.forEach(item => {
+              let country = item.country;
+              if (countryArr.map(x => x.label).indexOf(country) === -1) {
+                let obj = {
+                  value: country,
+                  label: country
+                };
+                countryArr.push(obj);
+              }
+            });
+          }
+          let countryList = countryArr;
+          self.CountryList[0] = {};
+          self.CountryList[0].label = self.$t('remotePatrol.country');
+          self.CountryList[0].countryList = countryList;
+          self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+          self.curCountry = countryList[0].value;
+          self.selectAllProAndCity(self.curCountry);
         }
-        const countryList = temp;
-        self.CountryList[0] = {};
-        self.CountryList[0].label = self.$t('remotePatrol.country');
-        self.CountryList[0].countryList = countryList;
-        self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = countryList[0].value;
-        self.selectAllProAndCity(self.curCountry);
+      }
+      catch (err) {
+        console.log("StoreManagement-getCountryStore: " + err);
       }
     },
 
     selectAllProAndCity(val) {
-      const self = this;
-      const storeList = self.tempStoreData;
-      const temp = [];
-      const tempStore = [];
+      let self = this;
+      let storeList = self.tempStoreData;
+      let temp = [];
+      let tempStore = [];
       storeList.forEach(item => {
         if (item.country === val || val === '-1') {
           if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            const obj = {
+            let obj = {
               label: item.province,
               value: item.province
             };
             temp.push(obj);
           }
-          const obj = {
+          let obj = {
             storeId: item.storeId,
             label: item.name,
             value: item.name,
@@ -566,12 +566,12 @@ export default {
         }
       });
       self.provinceList = temp;
-      const cityTemp = [];
+      let cityTemp = [];
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
           if (item.province === _item.value) {
             if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              const obj = {
+              let obj = {
                 label: item.city,
                 value: item.city
               };
@@ -581,19 +581,19 @@ export default {
         });
       });
       self.cityList = cityTemp;
-      const provinceArr = [];
+      let provinceArr = [];
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
       self.curProvince = provinceArr;
 
-      const cityArr = [];
+      let cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
       self.curCity = cityArr;
       self.storeDataList = tempStore;
-      const storeArr = [];
+      let storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
@@ -602,7 +602,7 @@ export default {
     },
 
     clearPage() {
-      const self = this;
+      let self = this;
       self.params = {};
       self.curProvince = [];
       self.curCitys = this.$t('storeView.cityPlaceholder');
@@ -612,7 +612,7 @@ export default {
     },
 
     getInitData() {
-      const self = this;
+      let self = this;
       self.clearPage();
       self.getCountryStore();
       self.getTagListData();
@@ -624,13 +624,42 @@ export default {
     },
 
     async getStoreList(params) {
-      const self = this;
+      let self = this;
+      try {
+        await self.getTableData(params);
+        let paramsGetBind = {
+          'storeIds': self.tableData.map(x => x.storeId)
+        };
+        let tempStoreId = self.tableData.map(x => x.storeId);
+        if (paramsGetBind.storeIds.length !== 0) {
+          getInspectBindCount(paramsGetBind).then(res => {
+            let data = res.data;
+            let tempRet = [];
+            for (let i = 0; i < tempStoreId.length; i++) {
+              for (let j = 0; j < data.length; j++) {
+                if (tempStoreId[i] === data[j].storeId) {
+                  tempRet.push(data[j]);
+                }
+              }
+            }
+            for (let i = 0; i < data.length; i++) {
+              self.tableData[i].bindDevice = (tempRet[i].unbindCount === 0);
+            }
+          })
+        }
+      }
+      catch (e) {
+        console.log("StoreManagement-getStoreList: " + err);
+      }
+    },
+
+    async getTableData(params){
       params.filter = { page: this.page - 1, size: this.sizeNum };
-      const data = await self.getStoreData(params);
-      self.storeData = data.data;
-      const temp = [];
-      self.storeData.content.forEach(item => {
-        const storeObj = {};
+      let data = await this.getStoreData(params);
+      this.storeData = data.data;
+      let tempStoreArr = [];
+      this.storeData.content.forEach(item => {
+        let storeObj = {};
         storeObj.bindDevice = false;
         storeObj.storeId = item.storeId;
         storeObj.name = item.name;
@@ -642,60 +671,39 @@ export default {
         storeObj.favorite = item.favorite;
         storeObj.appliedInspect = item.appliedInspect;
         if (item.appliedInspect.length !== 0) {
-          const au_inspect = [];
-          const mode = [];
+          let au_inspect = [];
+          let mode = [];
           item.appliedInspect.forEach(au_item => {
             mode.push(au_item.mode);
           });
           if (mode.indexOf(0) !== -1) {
-            au_inspect.push(self.$t('overview.remotePatrol'));
+            au_inspect.push(this.$t('overview.remotePatrol'));
           }
           if (mode.indexOf(1) !== -1) {
-            au_inspect.push(self.$t('overview.onsitePatrol'));
+            au_inspect.push(this.$t('overview.onsitePatrol'));
           }
           storeObj.napeTable = au_inspect.join('，');
         } else {
           storeObj.napeTable = '--';
         }
-        if (storeObj.napeTable.indexOf(self.$t('overview.remotePatrol')) === -1) {
+        if (storeObj.napeTable.indexOf(this.$t('overview.remotePatrol')) === -1) {
           storeObj.showTag = false;
         } else {
           storeObj.showTag = true;
         }
         storeObj.schedue = '--';
         storeObj.device = item.device;
-        temp.push(storeObj);
+        tempStoreArr.push(storeObj);
       });
-      const paramsGetBind = {
-        'storeIds': temp.map(x => x.storeId)
-      };
-      const tempStoreId = temp.map(x => x.storeId);
-      self.tableData = temp;
-      console.log(self.tableData);
-      if (self.tableData.length === 0) {
-        self.noData = self.$t('storeView.noStoreData');
+      this.tableData = tempStoreArr;
+      if (this.tableData.length === 0) {
+        this.noData = this.$t('storeView.noStoreData');
       }
-      self.total = self.storeData.totalElements;
-      if (paramsGetBind.storeIds.length !== 0) {
-        getInspectBindCount(paramsGetBind).then(res => {
-          const data = res.data;
-          const tempRet = [];
-          for (let i = 0; i < tempStoreId.length; i++) {
-            for (let j = 0; j < data.length; j++) {
-              if (tempStoreId[i] === data[j].storeId) {
-                tempRet.push(data[j]);
-              }
-            }
-          }
-          for (let i = 0; i < data.length; i++) {
-            self.tableData[i].bindDevice = (tempRet[i].unbindCount === 0);
-          }
-        })
-      }
+      this.total = this.storeData.totalElements;
     },
 
     searchEventList() {
-      const self = this;
+      let self = this;
       self.params.clause = {};
       self.page = 1;
       if (self.serachVale.length !== 0) {
@@ -710,7 +718,7 @@ export default {
     },
 
     sortChange(column) {
-      const self = this;
+      let self = this;
       self.params.order = {
         direction: column.order === 'ascending' ? 'asc' : 'desc',
         property: column.prop
@@ -720,7 +728,7 @@ export default {
     },
 
     toEventDetail(row) {
-      const self = this;
+      let self = this;
       if (row.napeTable.indexOf(self.$t('overview.remotePatrol')) !== -1) {
         sessionStorage.setItem('STORE_ROW', JSON.stringify(row));
         self.$router.push({ name: 'storeDetail', params: row });
@@ -731,24 +739,24 @@ export default {
     },
 
     getStoreData(params) {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          const errMsg = res.errMsg;
+          let errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             resolve(res);
           }
-        }).catch(res => {
-          resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     getBriefStoreData() {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {
-          const errMsg = res.errMsg;
+          let errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             resolve(res);
           }
@@ -759,13 +767,13 @@ export default {
     },
 
     getTagListData() {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         GetTagList().then(res => {
-          const errMsg = res.errMsg;
+          let errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             res.data.forEach(item => {
-              const obj = {};
+              let obj = {};
               obj.value = item.tagId;
               obj.label = item.tagName;
               obj.disabled = false;
@@ -774,6 +782,7 @@ export default {
             resolve(res);
           }
         }).catch(err => {
+          console.log("StoreManagement-getTagListData: " + err);
           reject(err);
         });
       });
