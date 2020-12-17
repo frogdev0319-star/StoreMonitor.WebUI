@@ -3063,7 +3063,6 @@ $h1: #292e36;
         outline: none;
       }
     }
-    /*截图区域css*/
     #cancelBtn {
       @include point(width, 76);
       @include point(margin-right, 20);
