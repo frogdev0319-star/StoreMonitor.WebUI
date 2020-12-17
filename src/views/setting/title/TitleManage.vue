@@ -157,8 +157,6 @@ export default {
 
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      console.log(row);
-      console.log(columnIndex);
       let obj = {};
       if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4' };
@@ -210,7 +208,6 @@ export default {
     deleteTitle() {
       const self = this;
       self.deleteUserTitle().then(res => {
-        console.log(res);
         if (res.errCode === 0) {
           self.notify(self.$t('titleView.deleteSuss'), 'success', 3000);
         } else {
@@ -220,7 +217,7 @@ export default {
         self.showDeleteDialog = false;
       })
       .catch(error => {
-        console.log(error)
+        console.log("TitleManagement-deleteTitle: " + error);
       });
     },
 
@@ -228,7 +225,6 @@ export default {
       const self = this;
       const params = {};
       params.titleIds = self.deleteIds;
-      console.log(params);
       return new Promise((resolve, reject) => {
         titleRESTful.deleteTitle(params).then(res => {
           resolve(res);
@@ -242,7 +238,6 @@ export default {
       const self = this;
       self.tableData = [];
       self.getUserTitleList().then((res) => {
-        console.log(res);
         res.data.forEach(item => {
           const roleId = item.roleId;
         });
@@ -255,11 +250,10 @@ export default {
           listArray.push(item.title);
         });
         self.titleList = listArray;
-        console.log(self.titleList);
       })
-        .catch(err => {
-          console.log(err);
-        });
+      .catch(err => {
+        console.log("TitleManagement-getTitleList: " + err);
+      });
     },
 
     getUserTitleList() {
