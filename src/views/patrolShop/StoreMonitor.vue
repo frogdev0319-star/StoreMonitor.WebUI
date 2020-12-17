@@ -889,7 +889,7 @@ export default {
   },
 
   watch: {
-    accountChanged(val, oldVal) {
+    accountChanged(val) {
       console.log(val);
       let self = this;
       if (val !== 0) {
@@ -998,7 +998,7 @@ export default {
       self.clearEvent();
       if(!self.isEzviz){
         self.stopVideoPlay();
-        self.previewplayer && self.previewplayer.dispose();
+        //self.previewplayer && self.previewplayer.dispose();
       }
       self.activeIndex = '0';
       self.accountId = localStorage.getItem('oss_bucket');
@@ -1009,6 +1009,7 @@ export default {
       self.changeFlag = true;
       self.playBackState = false;
       self.currentTimeValue = 0;
+      self.showModelContent = true;
       self.getInitStoreData();
       self.getFaStoreData();
     },
@@ -1856,7 +1857,7 @@ export default {
       let self = this;
       let video = document.getElementById('previewVideo');
       let curTime = video.player.currentTime();
-      let duration = 30;
+      let duration = 300;
       self.durationTimeValue = duration;
       self.currentTimeValue = curTime;
       console.log(curTime);
@@ -2207,10 +2208,10 @@ export default {
 
     clickStore(item, index, _item, _index) {
       let self = this;
-      if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       self.showStoreUp = true;
 
       self.curTabIndex = index;
@@ -2422,10 +2423,10 @@ export default {
 
     clickBtn(item, index) {
       let self = this;
-      if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       self.curChannelItem = item;
       self.curChannelIndex = index;
       if (self.eventName.trim().length !== 0) {
