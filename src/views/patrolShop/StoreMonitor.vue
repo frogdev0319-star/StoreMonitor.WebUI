@@ -2678,11 +2678,12 @@ export default {
       if (this.sessionId) {
         const state = this.currentState;
         this.currentState = 'loading';
+        this.paused = true;
+        this.currentTimeValue = 0;
         if (state === 'play') {
           this.stopVideo();
           await this.disconnectVideo();
         }
-        this.paused = true;
         return await this.offline();
       } else {
         this.paused = true;
