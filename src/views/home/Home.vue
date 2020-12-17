@@ -456,19 +456,23 @@ export default {
       this.breadList = [];
       let currentRoute = this.$route.fullPath;
       let matched = this.$route.matched.filter(x => x.name);
-      console.log(matched);
       if (matched.length > 2 && matched[1].name === 'scheduleManage') {
         // patrol setting
-        if (matched[2].tempName == undefined) {
-          matched[2].tempName = `${this.$t('route.scheduleManage')}${this.$t('route.leftBracket')}
-                              ${this.$t('route.' + matched[2].name)}${this.$t('route.rightBracket')}`;
-          matched[2].name = matched[2].tempName;
-        } else {
-          matched[2].name = matched[2].tempName;
+        switch (currentRoute) {
+          case "/pointCheck":{
+            matched[2].name = 'checkSchedule';
+            break;
+          }
+          case "/patrolSechedule":{
+            matched[2].name = 'patrolSecheduleManage';
+            break;
+          }
+          default:{
+            break;
+          }
         }
         matched.splice(1, 1);
       }
-      let first = matched[1];
       this.breadList = matched;
     },
 

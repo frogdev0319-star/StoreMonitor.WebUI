@@ -158,9 +158,9 @@ export default {
         self.showLeader = false;
       }
       if (self.isSuccess) {
-        self.$route.matched[2].name = self.$t('storeView.successSubmit');
+        self.$route.matched[2].name = 'successSubmit';
       } else {
-        self.$route.matched[2].name = self.$t('storeView.failSubmit');
+        self.$route.matched[2].name = 'failSubmit';
       }
     },
 

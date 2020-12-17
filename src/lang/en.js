@@ -18,6 +18,8 @@ export default {
     'deviceManage': 'Device Management',
     'storeManage': 'Store Management',
     'scheduleManage': 'Schedule Settings',
+    'checkSchedule': 'Schedule Settings(Check Schedule)',
+    'patrolSecheduleManage': 'Schedule Settings（Patrol Sechedule)',
     'otherSetting': 'Other Settings',
     'transactionMonitor': 'Transaction Monitoring',
     'storeChecking': 'Store Checking',
