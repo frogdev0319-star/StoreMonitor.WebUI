@@ -167,7 +167,6 @@ export default {
     let validateEzvizAccount = (rule, value, callback) => {
       let self = this;
       let reg = /^1[3|4|5|7|8|9][0-9]\d{8}$/;
-      console.log(reg.test(value));
       if (!value) {
         return callback(new Error(this.$t('deviceView.enterAccount')));
       } else {
@@ -196,7 +195,6 @@ export default {
         return callback(new Error(this.$t('deviceView.enterAccountName')));
       } else {
         let reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,20}$/;
-        console.log(reg.test(value));
         if (reg.test(value)) {
           callback();
         } else {
@@ -312,8 +310,6 @@ export default {
 
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      console.log(row);
-      console.log(columnIndex);
       let obj = {};
       if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
@@ -365,7 +361,6 @@ export default {
         totalMsg += `${self.userAccountNum}${this.$t('deviceView.userAccountNum')}`;
       }
       self.totalMsg = totalMsg;
-      console.log(accountList);
       self.tableData = accountList;
       if (self.tableData.length === 0) {
         self.noData = self.$t('deviceView.noData');
@@ -375,7 +370,6 @@ export default {
         listArray.push(item.ezvizAccount);
       });
       self.accountList = listArray;
-      console.log(self.accountList);
     },
 
     getEzvizAccountList() {
@@ -395,7 +389,6 @@ export default {
           if (valid) {
             self.getAccessTokenMethod();
           } else {
-            console.log('error submit!!');
             return false;
           }
         });
@@ -412,11 +405,9 @@ export default {
       obj.appSecret = self.ezvizAccountInfo.appSecret;
       let params = qs.stringify(obj);
       let result = await ezvizRESTful.getAccessToken(params);
-      console.log(result);
       try {
         let data = result.data;
         let code = data.code;
-        console.log(code);
         if (code !== '200') {
           switch (code) {
             case '10005': {
@@ -441,8 +432,8 @@ export default {
         } else {
           self.ezvizAccountInfo.accessToken = data.data.accessToken;
         }
-      } catch (e) {
-
+      } catch (err) {
+        console.log("EzvizAccount-getAccessTokenMethod: " + err);
       }
     },
 
@@ -459,7 +450,6 @@ export default {
               self.$refs.tokenInput.focus();
             }
           } else {
-            console.log('error submit!!');
             appFormValid = false;
             return false;
           }
@@ -467,52 +457,14 @@ export default {
       }
       self.$refs['accountForm'].validate(async(valid) => {
         if (valid && appFormValid) {
-          console.log(self.ezvizAccountInfo);
-          let accountParams = {};
           if (self.isAdd) {
-            accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
-            accountParams.comment = self.ezvizAccountInfo.comment;
-            accountParams.scope = Number(self.ezvizAccountInfo.scope);
-            if (self.ezvizAccountInfo.scope === 1) {
-              accountParams.accountName = self.ezvizAccountInfo.accountName;
-              accountParams.appKey = self.ezvizAccountInfo.appKey;
-              accountParams.appSecret = self.ezvizAccountInfo.appSecret;
-            } else {
-
-            }
-            let res = await ezvizRESTful.addEzvizAccount(accountParams);
-            if (res.errCode === 0) {
-              self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-              self.showAddAccount = false;
-            } else {
-              self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-              self.showAddAccount = false;
-            }
+            self.addEzvizAccount();
           } else {
             // update
-            accountParams.id = self.deleteId;
-            accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
-            accountParams.comment = self.ezvizAccountInfo.comment;
-            // accountParams.scope = Number(self.ezvizAccountInfo.scope);
-            if (self.ezvizAccountInfo.scope === 1) {
-              accountParams.accountName = self.ezvizAccountInfo.accountName;
-              accountParams.appKey = self.ezvizAccountInfo.appKey;
-              accountParams.appSecret = self.ezvizAccountInfo.appSecret;
-            } else {
-
-            }
-            let res = await ezvizRESTful.updateEzvizAccount(accountParams);
-            if (res.errCode === 0) {
-              self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-              self.showAddAccount = false;
-            } else {
-              self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-              self.showAddAccount = false;
-            }
+            self.updateEzvizAccount();
           }
           self.getAccountList();
         } else {
-          console.log('error submit!!');
           if (self.ezvizAccountInfo.scope === 1) {
             self.errorMsg = self.$t('deviceView.enterDeveloperKey');
           }
@@ -522,8 +474,58 @@ export default {
       });
     },
 
+    async addEzvizAccount(){
+      let self = this;
+      let accountParams = {};
+      accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
+      accountParams.comment = self.ezvizAccountInfo.comment;
+      accountParams.scope = Number(self.ezvizAccountInfo.scope);
+      if (self.ezvizAccountInfo.scope === 1) {
+        accountParams.accountName = self.ezvizAccountInfo.accountName;
+        accountParams.appKey = self.ezvizAccountInfo.appKey;
+        accountParams.appSecret = self.ezvizAccountInfo.appSecret;
+      }
+      try {
+        let res = await ezvizRESTful.addEzvizAccount(accountParams);
+        if (res.errCode === 0) {
+          self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+          self.showAddAccount = false;
+        } else {
+          self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+          self.showAddAccount = false;
+        }
+      } catch (err) {
+        console.log("EzvizAccount-addEzvizAccount: " + err);
+      }
+    },
+
+    async updateEzvizAccount(){
+      let self = this;
+      let accountParams = {};
+      accountParams.id = self.deleteId;
+      accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
+      accountParams.comment = self.ezvizAccountInfo.comment;
+      // accountParams.scope = Number(self.ezvizAccountInfo.scope);
+      if (self.ezvizAccountInfo.scope === 1) {
+        accountParams.accountName = self.ezvizAccountInfo.accountName;
+        accountParams.appKey = self.ezvizAccountInfo.appKey;
+        accountParams.appSecret = self.ezvizAccountInfo.appSecret;
+      }
+      try {
+        let res = await ezvizRESTful.updateEzvizAccount(accountParams);
+        if (res.errCode === 0) {
+          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          self.showAddAccount = false;
+        } else {
+          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          self.showAddAccount = false;
+        }
+      }catch (err) {
+        console.log("EzvizAccount-addEzvizAccount: " + err);
+      }
+    },
+
     updateAccount(row) {
-      console.log(row);
       let self = this;
       self.isAdd = false;
       self.ezvizAccountInfo.ezvizAccount = row.ezvizAccount;
@@ -558,16 +560,20 @@ export default {
       let self = this;
       let accountParams = {};
       accountParams.accountId = self.deleteId;
-      console.log(accountParams.accountId);
-      let res = await ezvizRESTful.deleteEzvizAccount(accountParams);
-      if (res.errCode === 0) {
-        self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
-        self.showDeleteAccount = false;
-      } else {
-        self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
-        self.showDeleteAccount = false;
+      try {
+        let res = await ezvizRESTful.deleteEzvizAccount(accountParams);
+        if (res.errCode === 0) {
+          self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+          self.showDeleteAccount = false;
+        } else {
+          self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+          self.showDeleteAccount = false;
+        }
+        self.getAccountList();
       }
-      self.getAccountList();
+      catch (err) {
+        console.log("EzvizAccount-deleteAccount: " + err);
+      }
     },
 
     commentChange(val) {

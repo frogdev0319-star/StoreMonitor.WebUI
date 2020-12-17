@@ -636,10 +636,10 @@ export default {
         }
       ],
       storeDataList: [],
-      newChannelNumList: [], // 新增通道时可选的通道号
-      channelBtnDisabled: false, // 新增通道按钮是否禁用
-      editNvrChannelNumList: [], // 编辑NVR时的通道列表
-      showConfirmDelete: false, // 删除NVR时的提示信息
+      newChannelNumList: [],
+      channelBtnDisabled: false,
+      editNvrChannelNumList: [],
+      showConfirmDelete: false,
       rules: {
         ivsId: [
           { required: true, message: this.$t('deviceView.inputIvsId'), trigger: 'blur' }
@@ -679,8 +679,7 @@ export default {
     };
   },
   watch: {
-    accountChanged(val, oldVal) {
-      console.log(val);
+    accountChanged(val) {
       const self = this;
       if (val !== 0) {
         self.InitData();
@@ -704,20 +703,18 @@ export default {
   },
 
   methods: {
-    handleChange(file, fileList) {
+    handleChange(file) {
       this.addChannelData.pictureUrl = file.url;
       this.addChannelData.file = file;
       this.file = file.raw;
-      console.log(this.addChannelData.pictureUrl);
     },
 
-    handleEditChange(file, fileList) {
+    handleEditChange(file) {
       const self = this;
       self.isUpdate = false;
       this.channelList.forEach(item => {
         if (item.isClick) {
           item.tempUrl = file.url;
-          console.log(item.tempUrl);
         }
       });
       this.file = file.raw;
@@ -726,7 +723,6 @@ export default {
     beforeAvatarUpload(file) {
       const fileName = file.name.split('.');
       const fileType = fileName[fileName.length - 1];
-      console.log(fileType);
       const isJPEG = fileType === 'jpeg';
       const isJPG = fileType === 'jpg';
       const isPNG = fileType === 'png';
@@ -787,23 +783,25 @@ export default {
       const self = this;
       return new Promise((resolve, reject) => {
         deviceRESTful.getDashServerInfo().then(res => {
-          console.log(res.errMsg);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     checkBeforeImport() {
       const self = this;
-      console.log('checkbeforeImport');
     },
 
     checkDashInfo() {
       const self = this;
       let msg = '';
-      if (self.dash.url.toString().trim().length === 0 || self.dash.httpCmdPort.toString().trim().length === 0
+      if (self.dash.url.toString().trim().length === 0
+        || self.dash.httpCmdPort.toString().trim().length === 0
         || self.dash.httpsCmdPort.toString().trim().length === 0
-        || self.dash.dataPort.toString().trim().length === 0) {
+        || self.dash.dataPort.toString().trim().length === 0)
+      {
         msg = this.$t('deviceView.emptyInfo');
       }
       if (!validateURL(self.dash.url)) {
@@ -896,7 +894,6 @@ export default {
     },
 
     handleClick(tabs) {
-      console.log(tabs);
       const self = this;
       const index = Number(tabs.index);
       switch (index) {
@@ -961,7 +958,6 @@ export default {
     filterNVR() {
       const self = this;
       self.nvrFilter = !self.nvrFilter;
-      console.log(self.nvrFilter);
       self.page = 1;
       self.nvrFilterName = 'name';
       const params = {
@@ -980,7 +976,6 @@ export default {
     filterStore() {
       const self = this;
       self.storeFilter = !self.storeFilter;
-      console.log(self.storeFilter);
       self.page = 1;
       self.nvrFilterName = 'storeName';
       const params = {
@@ -999,7 +994,6 @@ export default {
     filterChannelNum() {
       const self = this;
       self.channelNumFilter = !self.channelNumFilter;
-      console.log(self.channelNumFilter);
       self.page = 1;
       self.nvrFilterName = 'channelCount';
       const params = {
@@ -1033,6 +1027,8 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.deleteNVR(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1041,6 +1037,8 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.addNVR(params).then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1049,6 +1047,8 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.addDevice(params).then(resDevice => {
           resolve(resDevice);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1069,6 +1069,8 @@ export default {
             data = res.data.content;
           }
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1077,7 +1079,6 @@ export default {
       const self = this;
       const data = await self.getAllNVRData();
       self.channelData = await self.getChannelData();
-      console.log(data);
       const nvrList = [];
       const channelList = self.channelData.map(x => x.id);
       data.forEach(item => {
@@ -1199,7 +1200,6 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = ['StoreID', '所属门店', 'IVS ID', 'NVR名称', '通道数', '通道名称', '通道序号'];
         const filterVal = ['storeId', 'storeName', 'ivsId', 'nvrName', 'channelCount', 'channelName', 'channelNum'];
-        console.log(that.activeName);
         const nvrData = await that.getAllNVRData();
         const channelData = that.channelData;
         const excelData = [];
@@ -1234,7 +1234,6 @@ export default {
 
     handleNVR(index, item) {
       const self = this;
-      console.log(item);
       switch (index) {
         case 0: self.importItem(); break;
         case 1: self.exportItem(); break;
@@ -1261,88 +1260,94 @@ export default {
       item.tempName = item.name;
       self.file = '';
       if (item.id === 0) {
-        console.log(self.channelList);
         self.channelList.splice(index, 1);
       }
     },
 
     confrimEdit(index, item) {
-      const self = this;
-      const obj = {};
       if (item.id !== 0) {
-        self.isUpdate = false;
-        obj.id = self.curChannelItem.id;
-        obj.name = self.curChannelItem.tempName;
-        if (obj.name.trim().length === 0) {
-          self.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
-          return false;
-        }
-        const params = obj;
-        let attachRes = {};
-        deviceRESTful.updateDevice(params).then(async res => {
-          console.log(res.data);
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            if (item.tempUrl !== item.pictureUrl) {
-              const fm = new FormData();
-              fm.append('id', self.curChannelItem.id);
-              fm.append('picture', self.file);
-              attachRes = await self.attachImageToDevice(fm);
-              console.log(attachRes);
-            } else {
-              // do nothing
-            }
-            if (attachRes.errMsg === 'Success') {
-              self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-            }
-            self.curChannelItem.isClick = false;
-            self.file = '';
-          } else {
-            self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          }
-        })
-          .then(async() => {
-            self.channelData = await self.getChannelData();
-            self.getChannelListByNVR(self.curNVRItem.ivsId);
-          });
+        this.updateNvrChannel(item)
       } else {
-        console.log(item);
-        const json = {};
-        json.name = item.tempName;
-        json.storeId = self.curNVRItem.storeId;
-        json.ivsId = self.curNVRItem.ivsId;
-        json.channelId = item.channelId;
-        json.vendor = 0;
-        const deviceArr = [];
-        deviceArr.push(json);
-        const params = {};
-        params.device = deviceArr;
-        deviceRESTful.addDevice(params).then(res => {
-          console.log(res.data);
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-            self.curChannelItem.isClick = false;
-          } else {
-            self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-          }
-        })
-          .then(async() => {
-            self.channelData = await self.getChannelData();
-            self.getChannelListByNVR(self.curNVRItem.ivsId);
-          });
+
       }
     },
 
-    getNVRList(params) {
-      const self = this;
-      deviceRESTful.getNVRList(params).then(res => {
+    updateNvrChannel(item) {
+      let self = this;
+      self.isUpdate = false;
+      let channelObj = {};
+      channelObj.id = self.curChannelItem.id;
+      channelObj.name = self.curChannelItem.tempName;
+      if (channelObj.name.trim().length === 0) {
+        self.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
+        return false;
+      }
+      const params = channelObj;
+      let attachRes = {};
+      deviceRESTful.updateDevice(params).then(async res => {
         const errMsg = res.errMsg;
-        const temp = [];
         if (errMsg != undefined && errMsg === 'Success') {
-          const data = res.data.content;
+          if (item.tempUrl !== item.pictureUrl) {
+            const fm = new FormData();
+            fm.append('id', self.curChannelItem.id);
+            fm.append('picture', self.file);
+            attachRes = await self.attachImageToDevice(fm);
+          }
+          if (attachRes.errMsg === 'Success') {
+            self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          }
+          self.curChannelItem.isClick = false;
+          self.file = '';
+        } else {
+          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+        }
+      })
+      .then(async() => {
+        self.channelData = await self.getChannelData();
+        self.getChannelListByNVR(self.curNVRItem.ivsId);
+      }).catch(err => {
+        console.log("NVRDeviceManagement-updateNvrChannel: " + err);
+      });
+    },
+
+    addNvrChannel(item){
+      let self = this;
+      let json = {};
+      json.name = item.tempName;
+      json.storeId = self.curNVRItem.storeId;
+      json.ivsId = self.curNVRItem.ivsId;
+      json.channelId = item.channelId;
+      json.vendor = 0;
+      let deviceArr = [];
+      deviceArr.push(json);
+      let params = {};
+      params.device = deviceArr;
+      deviceRESTful.addDevice(params).then(res => {
+        let errMsg = res.errMsg;
+        if (errMsg != undefined && errMsg === 'Success') {
+          self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+          self.curChannelItem.isClick = false;
+        } else {
+          self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+        }
+      })
+        .then(async() => {
+          self.channelData = await self.getChannelData();
+          self.getChannelListByNVR(self.curNVRItem.ivsId);
+        }).catch(err => {
+        console.log("NVRDeviceManagement-addNvrChannel: " + err);
+      });
+    },
+
+    getNVRList(params) {
+      let self = this;
+      deviceRESTful.getNVRList(params).then(res => {
+        let errMsg = res.errMsg;
+        let temp = [];
+        if (errMsg != undefined && errMsg === 'Success') {
+          let data = res.data.content;
           data.forEach((item, index) => {
-            const obj = {};
+            let obj = {};
             obj.ivsId = item.ivsId;
             obj.name = item.name;
             obj.tempDeviceName = item.name;
@@ -1365,10 +1370,8 @@ export default {
       })
         .then(async() => {
           if (self.nvrData.length !== 0) {
-            console.log(self.nvrData[0].ivsId);
             self.curNVRItem = self.nvrData[0];
             self.channelData = await self.getChannelData();
-            console.log(self.channelData);
             self.getChannelListByNVR(self.nvrData[0].ivsId);
           } else {
             self.channelData = [];
@@ -1382,25 +1385,25 @@ export default {
     },
 
     getChannelData() {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         deviceRESTful.getDeviceList().then(res => {
-          const errMsg = res.errMsg;
-          console.log(res);
+          let errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            const data = res.data;
             resolve(res.data);
           }
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     getChannelListByNVR(ivsId) {
-      const self = this;
-      const temp = [];
+      let self = this;
+      let temp = [];
       self.channelData.forEach(item => {
         if (item.ivsId === ivsId) {
-          const obj = {};
+          let obj = {};
           obj.id = item.id;
           obj.name = item.name;
           obj.tempName = item.name;
@@ -1412,7 +1415,6 @@ export default {
         }
       });
       self.channelList = temp;
-      console.log(self.channelList);
       if (self.channelList.length === self.curNVRItem.channelCount) {
         self.channelBtnDisabled = true;
       } else {
@@ -1422,30 +1424,28 @@ export default {
       if (self.channelList === 0) {
         self.editNvrChannelNumList = self.channelNumList;
       } else {
-        console.log(self.channelList);
-        const sortArr = self.channelList.sort(self.getSortFun('channelId'));
-        const lastChannel = sortArr[sortArr.length - 1];
-        const maxChannleId = lastChannel.channelId;
-        console.log(maxChannleId);
-        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
+        let sortArr = self.channelList.sort(self.getSortFun('channelId'));
+        let lastChannel = sortArr[sortArr.length - 1];
+        let maxChannleId = lastChannel.channelId;
+        let spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
         self.editNvrChannelNumList = spliceArray;
       }
     },
 
     async InitData() {
-      const self = this;
+      let self = this;
       if (self.varyWindowHeight >= 760) {
         self.sizeNum = 20;
       } else {
         self.sizeChange = 10;
       }
       self.$store.dispatch('GetDash').then((res) => {
-        const data = res.data;
+        let data = res.data;
         if (res.errMsg == 'Success' && res.errCode == 0) {
           self.dash = data;
         }
       });
-      const params = {
+      let params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1459,19 +1459,19 @@ export default {
     },
 
     async getAllStoreList() {
-      const self = this;
-      const params = {
+      let self = this;
+      let params = {
         'filter': {
           'page': 0,
           'size': 2000
         }
       };
-      const retData = await self.getStoreData(params);
-      const storeList = retData.data.content;
+      let retData = await self.getStoreData(params);
+      let storeList = retData.data.content;
       self.storeList = storeList;
-      const tempStore = [];
+      let tempStore = [];
       storeList.forEach(item => {
-        const obj = {
+        let obj = {
           storeId: item.storeId,
           label: item.name,
           value: item.name,
@@ -1484,15 +1484,15 @@ export default {
     },
 
     getBriefStoreData() {
-      const self = this;
+      let self = this;
       getBriefStoreList().then(res => {
-        const errMsg = res.errMsg;
+        let errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
-          const storeList = res.data;
+          let storeList = res.data;
           self.storeList = storeList;
-          const tempStore = [];
+          let tempStore = [];
           storeList.forEach(item => {
-            const obj = {
+            let obj = {
               storeId: item.storeId,
               label: item.name,
               value: item.name,
@@ -1506,31 +1506,30 @@ export default {
     },
 
     getStoreData(params) {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          const errMsg = res.errMsg;
+          let errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            const data = res.data;
+            let data = res.data;
             resolve(res);
           }
-        }).catch(res => {
-          resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     // add NVR
     addSingleNvr() {
-      const self = this;
+      let self = this;
       self.$refs['nvrForm'].validate(async(valid) => {
         if (valid) {
-          console.log(self.addNvrData);
-          const nvrParams = {};
-          const nvrArray = [];
+          let nvrParams = {};
+          let nvrArray = [];
           nvrArray.push(self.addNvrData);
           nvrParams.nvr = nvrArray;
-          const res1 = await self.addNVR(nvrParams);
+          let res1 = await self.addNVR(nvrParams);
 
           if (res1.errMsg === 'Success') {
             self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
@@ -1541,7 +1540,7 @@ export default {
           }
           self.addNvrData = { ivsId: '', name: '', channelCount: 1, storeId: self.storeDataList[0].storeId };
           self.page = 1;
-          const params = {
+          let params = {
             'filter': {
               'page': self.page - 1,
               'size': self.sizeNum
@@ -1553,7 +1552,6 @@ export default {
           };
           self.getNVRList(params);
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -1561,35 +1559,32 @@ export default {
 
     // cancel to add nvr
     cancelAddNvr() {
-      const self = this;
+      let self = this;
       self.showAddNvrDialog = false;
     },
 
     // add channel
     addSingleChannel() {
-      const self = this;
+      let self = this;
       self.$refs['channelForm'].validate(async(valid) => {
         if (valid) {
-          console.log(self.addChannelData);
-          const json = {};
+          let json = {};
           json.name = self.addChannelData.name;
           json.storeId = self.curNVRItem.storeId;
           json.ivsId = self.curNVRItem.ivsId;
           json.channelId = self.addChannelData.channelId;
           json.vendor = 0;
-          const deviceArr = [];
+          let deviceArr = [];
           deviceArr.push(json);
-          const devParams = {};
+          let devParams = {};
           devParams.device = deviceArr;
-          const res1 = await self.addDevice(devParams);
+          let res1 = await self.addDevice(devParams);
           if (res1.errMsg === 'Success') {
-            const fm = new FormData();
-            const channelId = res1.data[0];
-            console.log(channelId);
+            let fm = new FormData();
+            let channelId = res1.data[0];
             fm.append('id', channelId);
             fm.append('picture', self.file);
-            const attachRes = await self.attachImageToDevice(fm);
-            console.log(attachRes);
+            let attachRes = await self.attachImageToDevice(fm);
             if (attachRes.errMsg === 'Success') {
               self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             }
@@ -1600,7 +1595,7 @@ export default {
           }
           self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
           self.page = 1;
-          const params = {
+          let params = {
             'filter': {
               'page': self.page - 1,
               'size': self.sizeNum
@@ -1613,7 +1608,6 @@ export default {
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -1621,7 +1615,7 @@ export default {
 
     // cancel to add channel
     cancelAddSingleChannel() {
-      const self = this;
+      let self = this;
       self.showAddChannelDialog = false;
       self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
     },
@@ -1630,28 +1624,28 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.attachImageToDevice(params).then(resDevice => {
           resolve(resDevice);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     handleDelete(index, item) {
-      const self = this;
-      console.log(index);
+      let self = this;
       self.showDeleteChannel = true;
       self.deleteChannelId = item.id;
     },
 
     deleteSingleChannel() {
-      const self = this;
+      let self = this;
       self.showDeleteChannel = false;
-      const idsArr = [];
+      let idsArr = [];
       idsArr.push(self.deleteChannelId);
-      const obj = {};
+      let obj = {};
       obj.deviceIds = idsArr;
-      const params = obj;
+      let params = obj;
       deviceRESTful.deleteDevice(params).then(res => {
-        console.log(res.data);
-        const errMsg = res.errMsg;
+        let errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
         } else {
@@ -1661,11 +1655,13 @@ export default {
         .then(async() => {
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
-        });
+        }).catch(err => {
+        console.log("NVRDeviceManagement-deleteSingleChannel: " + err);
+      });
     },
 
     editSingleNvr(index, item) {
-      const self = this;
+      let self = this;
       item.isEditing = true;
       self.nvrData.forEach((_item, _index) => {
         if (index !== _index) {
@@ -1675,16 +1671,15 @@ export default {
     },
 
     showAddDialog() {
-      const self = this;
+      let self = this;
       self.showAddNvrDialog = true;
       self.addNvrData = { ivsId: '', name: '', channelCount: 1, storeId: self.storeDataList[0].storeId };
     },
 
     confirmEditNvr(index, item) {
-      const self = this;
-      console.log(item);
+      let self = this;
       item.name = item.tempDeviceName;
-      const obj = {};
+      let obj = {};
       obj.ivsId = item.ivsId;
       obj.name = item.tempDeviceName;
       obj.storeId = item.storeId;
@@ -1693,14 +1688,12 @@ export default {
         self.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
         return false;
       }
-      const arr = [];
+      let arr = [];
       arr.push(obj);
-      const params = {};
+      let params = {};
       params.nvr = arr;
-      console.log(params);
       deviceRESTful.updateNVR(params).then(res => {
-        console.log(res.data);
-        const errMsg = res.errMsg;
+        let errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           item.isEditing = false;
@@ -1712,63 +1705,66 @@ export default {
         .then(async() => {
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
-        });
+        }).catch(err => {
+        console.log("NVRDeviceManagement-confirmEditNvr: " + err);
+      });
     },
 
     cancelEditNvr(index, item) {
-      const self = this;
+      let self = this;
       item.isEditing = false;
       item.tempDeviceName = item.name;
       item.tempChannelCount = item.channelCount;
     },
 
     async deleteSingleNVR() {
-      const self = this;
+      let self = this;
       self.showConfirmDelete = false;
-      const ivsId = self.curNVRItem.ivsId;
-      const nvrList = [];
+      let ivsId = self.curNVRItem.ivsId;
+      let nvrList = [];
       nvrList.push(ivsId);
-      console.log(nvrList);
-      const channelList = self.channelList.map(x => x.id);
-      console.log(channelList);
-      if (channelList.length > 0) {
-        const res1 = await self.deleteChannel(channelList);
-        const res2 = await self.deleteNVR(nvrList);
-        if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
-          self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+      let channelList = self.channelList.map(x => x.id);
+      try {
+        if (channelList.length > 0) {
+          let res1 = await self.deleteChannel(channelList);
+          let res2 = await self.deleteNVR(nvrList);
+          if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
+            self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+          } else {
+            self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+          }
         } else {
-          self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+          let res2 = await self.deleteNVR(nvrList);
+          if (res2.errMsg === 'Success') {
+            self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+          } else {
+            self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+          }
         }
-      } else {
-        const res2 = await self.deleteNVR(nvrList);
-        if (res2.errMsg === 'Success') {
-          self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
-        } else {
-          self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
-        }
+        let params = {
+          'filter': {
+            'page': self.page - 1,
+            'size': self.sizeNum
+          },
+          'order': {
+            'direction': 'asc',
+            'property': 'name'
+          }
+        };
+        self.getNVRList(params);
       }
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': 'asc',
-          'property': 'name'
-        }
-      };
-      self.getNVRList(params);
+      catch (err) {
+        console.log("NVRDeviceManagement-deleteSingleNVR: " + err);
+      }
     },
 
     addNewChannel() {
-      const self = this;
-      const channelNum = self.curNVRItem.channelCount;
-      console.log(channelNum);
+      let self = this;
+      let channelNum = self.curNVRItem.channelCount;
       self.channelNumList.forEach(item => {
         item.disabled = false;
       });
-      const spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
-      console.log(self.channelList);
+      let spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
       spliceArray.forEach(item => {
         self.channelList.forEach(_item => {
           if (item.value === _item.channelId) {
@@ -1776,11 +1772,10 @@ export default {
           }
         });
       });
-      const deepArray = JSON.parse(JSON.stringify(spliceArray));
+      let deepArray = JSON.parse(JSON.stringify(spliceArray));
       deepArray.forEach(item => {
         item.label = item.label.split(' ')[0];
       });
-      console.log(deepArray);
       self.newChannelNumList = deepArray;
       self.showAddChannelDialog = true;
       self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
@@ -1800,16 +1795,16 @@ export default {
       });
     },
     ...mapMutations(['SET_DASHURL']),
+
     nvrNameChange(val, item) {
-      const self = this;
-      const comment = filterString.all(val, 20);
-      console.log(comment);
+      let self = this;
+      let comment = filterString.all(val, 20);
       if (Object.keys(item).length === 0) {
         self.addNvrData.name = comment;
       } else {
         item.tempDeviceName = comment;
       }
-      const length = filterString.getContentLength(val);
+      let length = filterString.getContentLength(val);
       if (length > 20) {
         this.NvrnameRuletip = true;
       } else {
@@ -1818,15 +1813,14 @@ export default {
     },
 
     channelNameChange(val, item) {
-      const self = this;
-      const comment = filterString.all(val, 20);
-      console.log(comment);
+      let self = this;
+      let comment = filterString.all(val, 20);
       if (Object.keys(item).length === 0) {
         self.addChannelData.name = comment;
       } else {
         item.tempName = comment;
       }
-      const length = filterString.getContentLength(val);
+      let length = filterString.getContentLength(val);
       if (length > 20) {
         this.channelNameRuletip = true;
       } else {
@@ -1835,17 +1829,17 @@ export default {
     },
 
     ivsIdChange(val) {
-      const self = this;
-      const comment = filterString.all(val, 30);
-      console.log(comment);
+      let self = this;
+      let comment = filterString.all(val, 30);
       self.addNvrData.ivsId = comment;
-      const length = filterString.getContentLength(val);
+      let length = filterString.getContentLength(val);
       if (length > 30) {
         this.ivsIdRuletip = true;
       } else {
         this.ivsIdRuletip = false;
       }
     },
+
     notShowInputRuleTips(e) {
       if (e === 'ivsId') {
         this.ivsIdRuletip = false;
@@ -1858,9 +1852,8 @@ export default {
   },
 
   mounted() {
-    const self = this;
-    self.InitData();
-    self.getBriefStoreData();
+    this.InitData();
+    this.getBriefStoreData();
   }
 
 };
