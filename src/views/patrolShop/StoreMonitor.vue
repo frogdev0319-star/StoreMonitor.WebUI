@@ -982,12 +982,12 @@ export default {
       let self = this;
       if (document.hidden) {
         if (self.playState && !self.playBackState) {
-          self.stopVideoPlay()
+          self.stopVideoPlay();
           self.stopTimer();
         }
       } else {
         console.log(this.currentState);
-        if(this.currentState === 'loading'){
+        if(!self.playBackState && this.currentState === 'loading'){
           self.startVideo(self.channel.ivsId, self.channel.channelId, null)
         }
       }
@@ -1856,7 +1856,7 @@ export default {
       let self = this;
       let video = document.getElementById('previewVideo');
       let curTime = video.player.currentTime();
-      let duration = 300;
+      let duration = 30;
       self.durationTimeValue = duration;
       self.currentTimeValue = curTime;
       console.log(curTime);
@@ -2678,11 +2678,12 @@ export default {
       if (this.sessionId) {
         const state = this.currentState;
         this.currentState = 'loading';
+        this.paused = true;
+        this.currentTimeValue = 0;
         if (state === 'play') {
           this.stopVideo();
           await this.disconnectVideo();
         }
-        this.paused = true;
         return await this.offline();
       } else {
         this.paused = true;

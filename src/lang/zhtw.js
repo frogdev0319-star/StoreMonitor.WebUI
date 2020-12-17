@@ -19,6 +19,8 @@ export default {
     'deviceManage': ' 設備管理',
     'storeManage': ' 門店管理',
     'scheduleManage': ' 排程配置',
+    'checkSchedule': '排程配置（點檢排程）',
+    'patrolSecheduleManage': '排程配置（巡檢排程)',
     'otherSetting': ' 其他設置',
     'transactionMonitor': ' 交易巡視',
     'storeChecking': ' 門店檢點',
