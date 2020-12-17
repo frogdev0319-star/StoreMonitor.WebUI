@@ -1037,19 +1037,21 @@ export default {
           let isuu = _index === val.length - 1 ? '' : '，';
           if (item.storeId === _item) {
             if (self.curStoreTag.length !== 0) {
-              self.curStoreTag.forEach(v_item => {
-                item.tagIds.forEach(t_item => {
-                  if ((t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1')) {
-                    storeIds.push(_item);
-                    NameStr += item.name + isuu;
+              if (item.tagIds.length !== 0) {
+                self.curStoreTag.forEach(v_item => {
+                  item.tagIds.forEach(t_item => {
+                    if ((t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1')) {
+                      storeIds.push(_item);
+                      NameStr += item.name + isuu;
+                    }
                     self.storeTagList.forEach(r_item => {
                       if (r_item.value === v_item) {
-                        TagStr.indexOf(r_item.label) === '-1' ? TagStr += r_item.label + '，' : null;
+                        TagStr.indexOf(r_item.label) === -1 ? TagStr += r_item.label + '，' : null;
                       }
                     });
-                  }
+                  });
                 });
-              });
+              }
             } else {
               storeIds.push(_item);
               NameStr += item.name + isuu;
