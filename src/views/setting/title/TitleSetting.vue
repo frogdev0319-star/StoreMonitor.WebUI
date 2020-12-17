@@ -472,79 +472,66 @@
         self.getRequiredAuthority();
       },
 
-      getRequiredAuthority() {
-        // get required Authority of every title
-        let self = this;
-        let roleId = self.infoForm.roleId;
-        PermissionHelper.setData(self.authorityInfoLists[roleId - 1].requiredAuth);
-        let length = self.authorityInfoLists[roleId - 1].requiredAuth.length;
-
-        if (roleId < 4) {
-          switch (length) {
-            case 1:{
-              // inspect report
-              self.roleNameList[1].children[2].checked = true;
-              self.roleNameList[1].children[2].disabled = true;
-              // store monitor
-              self.roleNameList[1].children[4].checked = true;
-              self.roleNameList[1].children[4].disabled = true;
-              break;
-            }
-            case 2:{
-              // inspect report
-              self.roleNameList[1].children[2].checked = true;
-              self.roleNameList[1].children[2].disabled = true;
-              // store monitor
-              self.roleNameList[1].children[4].checked = true;
-              self.roleNameList[1].children[4].disabled = true;
-              // close event
-              self.roleNameList[2].children[1].checked = true;
-              self.roleNameList[2].children[1].disabled = true;
-              break;
-            }
-            case 3: {
-              // inspect report
-              self.roleNameList[1].children[2].checked = true;
-              self.roleNameList[1].children[2].disabled = true;
-              // store monitor
-              self.roleNameList[1].children[4].checked = true;
-              self.roleNameList[1].children[4].disabled = true;
-              // close event
-              self.roleNameList[2].children[1].checked = true;
-              self.roleNameList[2].children[1].disabled = true;
-
-              self.roleNameList[4].children[3].checked = true;
-              self.roleNameList[4].children[3].disabled = false;
-              break;
-            }
-            default:{
-              break;
-            }
+    getRequiredAuthority() {
+      // get required Authority of every title
+      let self = this;
+      let roleId = self.infoForm.roleId;
+      let requiredAuth = self.authorityInfoLists[roleId - 1].requiredAuth;
+      let authLength = requiredAuth.length;
+      if (roleId < 4) {
+        switch (authLength) {
+          case 1:{
+            // inspect report
+            self.roleNameList[1].children[2].checked = true;
+            self.roleNameList[1].children[2].disabled = true;
+            // store monitor
+            self.roleNameList[1].children[4].checked = true;
+            self.roleNameList[1].children[4].disabled = true;
+            break;
           }
-          // // inspect report
-          // self.roleNameList[1].children[2].checked = true;
-          // self.roleNameList[1].children[2].disabled = true;
-          // // store monitor
-          // self.roleNameList[1].children[4].checked = true;
-          // self.roleNameList[1].children[4].disabled = true;
-          // // close event
-          // self.roleNameList[2].children[1].checked = true;
-          // self.roleNameList[2].children[1].disabled = true;
-          // //
-          // self.roleNameList[4].children[3].checked = true;
-          // self.roleNameList[4].children[3].disabled = false;
-        } else if (roleId === 4) {
-          self.roleNameList[1].children[0].disabled = false;
-          self.roleNameList[1].children[1].disabled = false;
-          // inspect report
-          self.roleNameList[1].children[2].checked = true;
-          self.roleNameList[1].children[2].disabled = true;
-          //
-          self.roleNameList[1].children[3].checked = true;
-          self.roleNameList[1].children[3].disabled = false;
-          // store monitor
-          self.roleNameList[1].children[4].checked = true;
-          self.roleNameList[1].children[4].disabled = true;
+          case 2:{
+            // inspect report
+            self.roleNameList[1].children[2].checked = true;
+            self.roleNameList[1].children[2].disabled = true;
+            // store monitor
+            self.roleNameList[1].children[4].checked = true;
+            self.roleNameList[1].children[4].disabled = true;
+            // close event
+            self.roleNameList[2].children[1].checked = true;
+            self.roleNameList[2].children[1].disabled = true;
+            break;
+          }
+          case 3: {
+            // inspect report
+            self.roleNameList[1].children[2].checked = true;
+            self.roleNameList[1].children[2].disabled = true;
+            // store monitor
+            self.roleNameList[1].children[4].checked = true;
+            self.roleNameList[1].children[4].disabled = true;
+            // close event
+            self.roleNameList[2].children[1].checked = true;
+            self.roleNameList[2].children[1].disabled = true;
+
+            self.roleNameList[4].children[3].checked = true;
+            self.roleNameList[4].children[3].disabled = false;
+            break;
+          }
+          default:{
+            break;
+          }
+        }
+      } else if (roleId === 4) {
+        self.roleNameList[1].children[0].disabled = false;
+        self.roleNameList[1].children[1].disabled = false;
+        // inspect report
+        self.roleNameList[1].children[2].checked = true;
+        self.roleNameList[1].children[2].disabled = true;
+        //
+        self.roleNameList[1].children[3].checked = true;
+        self.roleNameList[1].children[3].disabled = false;
+        // store monitor
+        self.roleNameList[1].children[4].checked = true;
+        self.roleNameList[1].children[4].disabled = true;
 
           // handle event
           self.roleNameList[2].children[0].checked = true;

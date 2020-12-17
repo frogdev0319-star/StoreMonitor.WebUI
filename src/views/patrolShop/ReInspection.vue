@@ -2161,7 +2161,6 @@ export default {
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
-      self.curItem.disabled = false;
       if (self.showIgnoreItem) {
         self.hasIgnoretemp[self.curItemIndex].dealCount != 0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
       } else {
@@ -2230,10 +2229,10 @@ export default {
     clickBtn(item, index) {
       const self = this;
       console.log(item);
-      if ((self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ((self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       const obj = {
         id: item.id,
         channelId: item.channelId,
@@ -2276,10 +2275,10 @@ export default {
       if (item.isIgnore) {
         return false;
       }
-      if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       const obj = {};
@@ -3492,10 +3491,10 @@ export default {
       self.curTabItem = item;
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
-      if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       if ((!self.isEzviz && self.editCount != 0)
         || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)
         || (self.$store.getters.PatrolHistory != null)) {

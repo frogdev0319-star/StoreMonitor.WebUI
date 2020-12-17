@@ -1017,7 +1017,7 @@ export default {
       let second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
       let dateStr = hour + ':' + minutes + ':' + second;
       let timeTemp = [];
-      timeTemp[0] = dateStr;
+      timeTemp[0] = '00:00:00';
       timeTemp[1] = dateStr;
       self.defaultTime = timeTemp;
     },

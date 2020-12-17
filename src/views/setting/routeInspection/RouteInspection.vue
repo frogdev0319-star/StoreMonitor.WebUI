@@ -208,7 +208,7 @@
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
             <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToBindData') }}</span>
+              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToSetRule') }}</span>
             </p>
           </div>
           <div slot="footer" class="dialog-footer">
@@ -640,7 +640,7 @@ export default {
           if (sheetName.length == 3) {
             i = sheetIndex == -1 ? 0 : sheetIndex;
           } else if (sheetName.length == 2) {
-            if (sheetName.map(x => x.id == 2)) {
+            if (sheetName.some(x => x.id == 2)) {
               i = sheetIndex == -1 || sheetIndex == 0 ? 0 : sheetIndex - 1;
             } else {
               i = sheetIndex == -1 ? 0 : sheetIndex;
@@ -1281,11 +1281,11 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
-                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，字符类型为1~10整数
+                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，字符类型为0~50整数
                   flagFullScoreType = true;
                 }
                 if (item.d != undefined) {
-                  if (!Number.isInteger(item.d) || parseInt(item.d) < 1 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，字符类型为1~item.c整数
+                  if (!Number.isInteger(item.d) || parseInt(item.d) < 0 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，字符类型为0~item.c整数
                     flagMinScoreType = true;
                   }
                 } else {
@@ -1484,12 +1484,13 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
           that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
-          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2')];
+          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'),that.$t('insSettingView.tHeaderE'),that.$t('insSettingView.tHeaderG'),that.$t('insSettingView.sheetscore2'),];
         const excelData = [];
         let name = '';
         var wb = XLSX.utils.book_new();
         if (that.elTableData[Number(that.activeName)].data.length === 0) {
-          // do nothing
+          that.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
+          return false;
         } else {
           let sheet1data = [], sheet2data = [], sheet3data = [];
           const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
@@ -1508,6 +1509,7 @@ export default {
                     obj[tHeader[0]] = '';
                   }
                   obj[tHeader[1]] = _item.name;
+                  obj[tHeader[6]] = _item.score;
                   obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet1data.push(obj);
                 });
@@ -1515,6 +1517,7 @@ export default {
                 const obj = {};
                 obj[tHeader[0]] = item.groupName;
                 obj[tHeader[1]] = '';
+                obj[tHeader[6]] = '';
                 obj[tHeader[3]] = '';
                 sheet1data.push(obj);
               }
@@ -1535,6 +1538,7 @@ export default {
                   obj[tHeader[1]] = _item.name;
                   obj[tHeader[2]] = _item.score;
                   obj[tHeader[4]] = _item.qualifiedScore;
+                  obj[tHeader[7]] = _item.availableScores;
                   obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet2data.push(obj);
                 });
@@ -1544,6 +1548,7 @@ export default {
                 obj[tHeader[1]] = '';
                 obj[tHeader[2]] = '';
                 obj[tHeader[4]] = _item.qualifiedScore;
+                obj[tHeader[7]] = '';
                 obj[tHeader[3]] = '';
                 sheet2data.push(obj);
               }
@@ -1562,7 +1567,7 @@ export default {
                     obj[tHeader[0]] = '';
                   }
                   obj[tHeader[1]] = _item.name;
-                  obj[tHeader[2]] = _item.score;
+                  obj[tHeader[8]] = _item.score;
                   obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
                   sheet3data.push(obj);
                 });
@@ -1570,7 +1575,7 @@ export default {
                 const obj = {};
                 obj[tHeader[0]] = item.groupName;
                 obj[tHeader[1]] = '';
-                obj[tHeader[2]] = '';
+                obj[tHeader[8]] = '';
                 obj[tHeader[3]] = '';
                 sheet3data.push(obj);
               }

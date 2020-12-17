@@ -173,6 +173,7 @@ export default {
 
   mounted() {
     const self = this;
+    self.InitData();
     self.getCountryStore();
     self.getTagListData();
   },
@@ -932,8 +933,6 @@ export default {
         }
       }
       self.tabName = name;
-      self.tabNameLang = nameLang;
-      self.searchStore();
     },
 
     notify(msg, type, time) {

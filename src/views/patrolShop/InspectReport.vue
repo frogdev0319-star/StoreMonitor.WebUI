@@ -23,7 +23,7 @@
       <div v-if="suggest!=null&&suggest.length!=0" class="suggest">
         <div class="suggest-content">
           <span>{{ $t('remotePatrol.advice') }}</span>
-          <span style="flex:1;" v-html="turnSuggest(suggest)"/>
+          <span v-html="turnSuggest(suggest)"/>
         </div>
       </div>
       <el-row class="report-content">
@@ -31,7 +31,6 @@
           <div class="header-score">
             <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
             <span class="span-2">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
-            <span class="span-3">({{ $t('remotePatrol.scorerule') }})</span>
             <span class="span-4">{{ $t('remotePatrol.scoreU') }}</span>
           </div>
           <v-chart ref="chartRadar" :options="options" :auto-resize="true" class="chart-content"/>
@@ -1019,6 +1018,11 @@ export default {
         span:first-child {
           width:100px;
           padding-right: calc(20 / 1920 * 100vw);
+        }
+        span:last-child{
+          flex:1;
+          min-width:200px;
+          word-wrap: break-word;
         }
       }
       .report-content {

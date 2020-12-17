@@ -650,51 +650,6 @@ export default {
       self.getInspectItemsTable();
     },
 
-    async getRegionInfo() {
-      let self = this;
-      let params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      let retData = await self.getStoreData(params);
-      let storeList = retData.data.content;
-      self.storeList = storeList;
-      let getCountry = storeList => {
-        let temp = [];
-        storeList.forEach(item => {
-          if (temp.map(x => x.value).indexOf(item.country) === -1) {
-            let obj = {
-              label: item.country,
-              value: item.country
-            };
-            temp.push(obj);
-          }
-        });
-        return temp;
-      };
-      let countryList = getCountry(storeList);
-      let tempStore = [];
-      storeList.forEach(item => {
-        let obj = {
-          storeId: item.storeId,
-          label: item.name,
-          value: item.name,
-          userId: item.userId,
-          userName: item.userName,
-          checked: false
-        };
-        tempStore.push(obj);
-      });
-      self.storeDataList = tempStore;
-      self.countryList[0] = {};
-      self.countryList[0].label = self.$t('remotePatrol.country');
-      self.countryList[0].countryList = countryList;
-      self.curCountry = countryList[0].label;
-      self.selectAllProAndCity(self.curCountry);
-    },
-
     async getCountryStore() {
       let self = this;
       let data = await self.getBriefStoreData();
@@ -819,21 +774,22 @@ export default {
         val.forEach((_item, _index) => {
           let isuu = _index === val.length - 1 ? '' : '，';
           if (item.storeId === _item) {
-            if (self.curStoreTag.length !== 0) {
-              self.curStoreTag.forEach(v_item => {
-                item.tagIds.forEach(t_item => {
-                  if ( (t_item === v_item && self.curCountry === item.country)
-                      || (t_item === v_item && self.curCountry === '-1') ) {
-                    storeIds.push(_item);
-                    nameStr += item.name + isuu;
+            if (self.curStoreTag.length !==0) {
+              if(item.tagIds.length!==0){
+                self.curStoreTag.forEach(v_item => {
+                  item.tagIds.forEach(t_item => {
+                    if ( (t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1') ) {
+                      storeIds.push(_item);
+                      nameStr += item.name + isuu;
+                    }
                     self.StoreTagList.forEach(r_item => {
                       if (r_item.value === v_item) {
-                        tagStr.indexOf(r_item.label) === '-1' ? tagStr += r_item.label + '，' : null;
+                        tagStr.indexOf(r_item.label) === -1 ? tagStr += r_item.label + '，' : null;
                       }
                     });
-                  }
+                  });
                 });
-              });
+              }
             } else {
               storeIds.push(_item);
               nameStr += item.name + isuu;
@@ -1021,96 +977,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      if (val === '') {
-        storeList.forEach(item => {
-          let obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            tagIds: item.tagIds
-          };
-          tempStore.push(obj);
-        });
-        self.checkAllStore = false;
-      } else {
-        storeList.forEach(item => {
-          if (item.country === val) {
-            if (temp.map(x => x.value).indexOf(item.province) === -1) {
-              let obj = {
-                label: item.province,
-                value: item.province
-              };
-              temp.push(obj);
-            }
-            let obj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              tagIds: item.tagIds
-            };
-            tempStore.push(obj);
-          }
-        });
-      }
-      self.provinceList = temp;
-      self.storeDataList = tempStore;
-      let cityTemp = [];
-      self.provinceList.forEach(_item => {
-        storeList.forEach(item => {
-          if (item.province === _item.value) {
-            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              let obj = {
-                label: item.city,
-                value: item.city
-              };
-              cityTemp.push(obj);
-            }
-          }
-        });
-      });
-      self.cityList = cityTemp;
-      let provinceArr = [];
-      self.provinceList.forEach(item => {
-        provinceArr.push(item.value);
-      });
-      self.curProvince = provinceArr;
-
-      let cityArr = [];
-      self.cityList.forEach(item => {
-        cityArr.push(item.value);
-      });
-      self.curCity = cityArr;
-      self.storeDataList = tempStore;
-
-      let storeArr = [], arr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-      self.curStore = storeArr;
-      self.changeStore(self.curStore);
-
-      let InspectArr = [];
-      self.AllStore.data.content.forEach(item => {
-        if (storeArr.indexOf(item.storeId) !== -1 && item.appliedInspect.length !== 0) {
-          InspectArr.push(item.appliedInspect);
-        }
-      });
-      let newArr = [], InspectList = [];
-      InspectArr.forEach(item => {
-        item.forEach(_item => {
-          if (!newArr.includes(_item.id)) {
-            newArr.push(_item.id);
-            InspectList.push(_item);
-          }
-        });
-      });
-      self.inspectTypeList = InspectList;
-      if (InspectList.length !== 0) {
-        self.inspectList = InspectList[0].id;
-      }
+      self.selectAllProAndCity(val);
     },
 
     changeCity(val) {

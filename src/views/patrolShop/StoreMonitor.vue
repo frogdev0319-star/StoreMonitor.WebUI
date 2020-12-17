@@ -976,11 +976,11 @@ export default {
       let self = this;
       if (document.hidden) {
         if (self.playState && !self.playBackState) {
-          self.stopVideoPlay()
+          self.stopVideoPlay();
           self.stopTimer();
         }
       } else {
-        if(this.currentState === 'loading'){
+        if(!self.playBackState && this.currentState === 'loading'){
           self.startVideo(self.channel.ivsId, self.channel.channelId, null)
         }
       }
@@ -991,7 +991,7 @@ export default {
       self.clearEvent();
       if(!self.isEzviz){
         self.stopVideoPlay();
-        self.previewplayer && self.previewplayer.dispose();
+        //self.previewplayer && self.previewplayer.dispose();
       }
       self.activeIndex = '0';
       self.accountId = localStorage.getItem('oss_bucket');
@@ -1002,6 +1002,7 @@ export default {
       self.changeFlag = true;
       self.playBackState = false;
       self.currentTimeValue = 0;
+      self.showModelContent = true;
       self.getInitStoreData();
       self.getFaStoreData();
     },
@@ -2453,10 +2454,10 @@ export default {
 
     clickBtn(item, index) {
       let self = this;
-      if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
       self.curChannelItem = item;
       self.curChannelIndex = index;
       if (self.eventName.trim().length !== 0) {
@@ -2695,11 +2696,12 @@ export default {
       if (this.sessionId) {
         const state = this.currentState;
         this.currentState = 'loading';
+        this.paused = true;
+        this.currentTimeValue = 0;
         if (state === 'play') {
           this.stopVideo();
           await this.disconnectVideo();
         }
-        this.paused = true;
         return await this.offline();
       } else {
         this.paused = true;

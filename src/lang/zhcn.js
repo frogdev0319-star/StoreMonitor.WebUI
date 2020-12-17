@@ -19,6 +19,8 @@ export default {
     'deviceManage': '设备管理',
     'storeManage': '门店管理',
     'scheduleManage': '排程设置',
+    'checkSchedule': '排程设置（点检排程）',
+    'patrolSecheduleManage': '排程设置（巡检排程)',
     'otherSetting': '其他设置',
     'transactionMonitor': '交易巡视',
     'storeChecking': '门店点检',
@@ -452,6 +454,7 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
+    'rangeScoreTips': '考评总分最低值不得高于最高值',
     'ruleInspect': '巡检规则设置',
     'PatrolScoreCalculation': '巡检得分计算',
     'CalculationMethod': '考评总分计算方式',
@@ -479,9 +482,12 @@ export default {
     'tHeaderA': '巡检类别（选填，30字符）',
     'tHeaderA2': '巡检类别（必填，30字符）',
     'tHeaderB': '巡检项名称（必填，100字符）',
-    'tHeaderC': '项目满分值（1~100分）',
+    'tHeaderC': '项目总分值（必填，1~50分）',
     'tHeaderD': '巡检项目详细说明（选填，1200字符）',
-    'tHeaderF': '低于*分，须门店负责人处理（选填，1~10分）',
+    'tHeaderE': '项目分值（选填，1~50分，默认10分）',
+    'tHeaderF': '低于*分，须门店负责人处理（选填，0~满分）',
+    'tHeaderG': '评分选项（选填，0~满分）',
+    'haveNothingToExport': '当前没有可导出的巡检表',//Sprint12
     'bindWith': '已绑定',
     'bindStore': '家门店',
     'bindList': '巡检表绑定',
@@ -539,7 +545,7 @@ export default {
     'passfailexcelEmpty': '巡检项名称不能为空！',
     'excelPassFailScoreType': '项目分值选填，取值范围为1~50的整数',
     'excelFullScoreType': '项目总分值必填，取值范围为1~50的整数',
-    'excelMinScoreType': '巡检项最低分值必填，取值范围为1~项目总分值的整数',
+    'excelMinScoreType': '巡检项最低分值必填，取值范围为0~项目总分值的整数',
     'excelScoreItemType': '评分选项，取值范围为0~满分值',
     'excelOtherScoreType': '项目分值必填，取值范围为-100~100的整数',
     'bindingstore': '绑定中',
@@ -552,6 +558,7 @@ export default {
     'confirmCurDel': '确认删除当前巡检项？',
     'confirmDelData': '确认删除当前巡检表?',
     'confirmToBindData': '巡检表尚未与职务关联',
+    'confirmToSetRule': '巡检表导入成功，是否现在设置巡检考评规则？',
     'please': '请先',
     'downloadInfo': '下载巡检表模板',
     'toEdit': '进行编辑，再点击',
