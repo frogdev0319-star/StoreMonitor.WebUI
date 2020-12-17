@@ -687,11 +687,22 @@ export default {
     changeStore(val) {
       let self = this;
       let str = '';
-      val.forEach(selectedItem => {
-        self.tempStoreData.forEach((storeItem) => {
-          self.getSelectedStoreString(selectedItem, storeItem);
+      self.tempStoreData.forEach((item) => {
+        val.forEach(_item => {
+          if (item.storeId === _item) {
+            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
+              item.tagIds.forEach(t_item => {
+                if ((t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1')) {
+                  str += _item + '，';
+                }
+              });
+            }) : (item.storeId === _item ? str += _item + '，' : null);
+          }
         });
       });
+      str = str.substr(0, str.length - 1);
+      self.storeStr = str;
+      self.searchEventList();
     },
 
     getSelectedStoreString(selectedItem, storeItem){
