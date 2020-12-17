@@ -670,7 +670,7 @@ export default {
               resolve(result.data.accessToken);
             })
             .catch(error => {
-              reject();
+              reject(error);
             });
         }
       });
@@ -684,71 +684,69 @@ export default {
         return;
       }
       obj.deviceSerial = self.channelInfo.ivsId;
-      const result = await self.getDeviceIsEncrypt(qs.stringify(obj));
-      console.log(result);
-      let suportUpdatePass = false;
-      if (result === 1) {
-        suportUpdatePass = await getDeviceCapacity(qs.stringify(obj));
-      }
-      console.log(suportUpdatePass);
-      if (result === 1) {
-        if (suportUpdatePass) {
-          // if device encried, get validate code from cache firstly
-          // if not exist, show dialog
-          const deviceObj = {};
-          deviceObj.deviceSerial = self.channelInfo.ivsId;
-          deviceObj.channelId = self.channelInfo.channelId;
-          const result = self.getDeviceValidateCode(deviceObj);
-          if (result.length > 0) {
-            self.videoPassword = result;
-            self.verifyEnterPassword();
+      try {
+        const result = await self.getDeviceIsEncrypt(qs.stringify(obj));
+        let suportUpdatePass = false;
+        if (result === 1) {
+          suportUpdatePass = await getDeviceCapacity(qs.stringify(obj));
+        }
+        if (result === 1) {
+          if (suportUpdatePass) {
+            // if device encried, get validate code from cache firstly
+            // if not exist, show dialog
+            const deviceObj = {};
+            deviceObj.deviceSerial = self.channelInfo.ivsId;
+            deviceObj.channelId = self.channelInfo.channelId;
+            const result = self.getDeviceValidateCode(deviceObj);
+            if (result.length > 0) {
+              self.videoPassword = result;
+              self.verifyEnterPassword();
+            } else {
+              // not exist password
+              self.isLoading = false;
+              self.showError = true;
+              self.errorMsg = self.$t('remotePatrol.videoEncrypted');
+              self.showInputPassword = true;
+            }
           } else {
-            // not exist password
+            // not support update password
             self.isLoading = false;
             self.showError = true;
-            self.errorMsg = self.$t('remotePatrol.videoEncrypted');
-            self.showInputPassword = true;
+            self.errorMsg = self.$t('remotePatrol.videoCannotPlay');
           }
         } else {
-          // not support update password
-          self.isLoading = false;
-          self.showError = true;
-          self.errorMsg = self.$t('remotePatrol.videoCannotPlay');
-        }
-      } else {
-        self.showError = false;
-        self.videoPassword = '';
-        self.times = 0;
-        self.ifIsEncrypt = false;
-        self.changeId && (self.startTs = self.curTime);
-        if (self.playState) {
-          self.decoder.stop();
-          self.playState = false;
-        }
-        self.$nextTick(() => {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer);
-          if (self.fullWindow) {
-            self.initFullWindowVideo();
-          } else {
-            self.initVideo();
+          self.showError = false;
+          self.videoPassword = '';
+          self.times = 0;
+          self.ifIsEncrypt = false;
+          self.changeId && (self.startTs = self.curTime);
+          if (self.playState) {
+            self.decoder.stop();
+            self.playState = false;
           }
-        });
+          self.$nextTick(() => {
+            self.decoder = null;
+            if (self.fullWindow) {
+              self.initFullWindowVideo();
+            } else {
+              self.initVideo();
+            }
+          });
+        }
+      }catch (err) {
+        console.log("EzvizVideo-checkIfEncry" + err);
       }
     },
 
     async getDeviceIsEncrypt(params) {
       const self = this;
-      console.log(params);
       const ret = await getIsEncrypt(params);
-      console.log(ret);
       return ret;
     },
 
     async initVideo() {
       const self = this;
       self.showError = false;
-      console.log(self.playBack);
       self.showModelContent = false;
       if (self.channelInfo == null) {
         return;
@@ -774,10 +772,7 @@ export default {
         }
         self.initPlayerWidth = o.offsetWidth;
         self.initPlayerHeight = height;
-        console.log(width);
-        console.log(height);
         self.getVideoUrl();
-        console.log(self.videoUrl);
         if (self.accessToken === '') {
           self.notify(self.$t('remotePatrol.getAccessTokenError'), 'warning', 3000);
           return;
@@ -815,12 +810,9 @@ export default {
     },
 
     handleError(e) {
-      console.log(e.msg);
       const self = this;
       self.isLoading = false;
-      // self.errorMsg = e.msg;
       self.showError = true;
-      const retcode = e.retcode;
       self.errorMsg = self.getErrorMsg(e);
       if (self.playState) {
         if (!self.fullWindow) {
@@ -904,7 +896,6 @@ export default {
       self.realTimeSpeed = 0;
       window.clearInterval(self.timerPlayReal);
       self.timerPlayReal = window.setInterval(() => {
-        console.log(self.realTimeSpeed);
         self.realTimeSpeed = self.realTimeSpeed + 1;
         if (self.playBack) {
           self.getProcess();
@@ -914,8 +905,6 @@ export default {
         self.playState = true;
         self.isLoading = false;
         self.showModelContent = true;
-        // self.showInfoContent=false;
-        // self.ifOpenSound = false;
         if (self.fullWindow) {
           if (self.ifOpenSound) {
             self.fullDecoder.openSound();
@@ -937,12 +926,10 @@ export default {
     handleFullWindowSuccess() {
       const self = this;
       self.editCount++;
-      // self.playState = true;
       self.showError = false;
       self.errorMsg = '';
       if (self.playState) {
         self.realTimeSpeed = self.realTimeSpeed + 1;
-        console.log(self.realTimeSpeed);
         if (self.playBack) {
           self.getProcess();
         }
@@ -950,12 +937,10 @@ export default {
 
       setTimeout(() => {
         self.showModelContent = true;
-        // self.showInfoContent=false;
         self.isLoading = false;
         if (self.ifOpenSound) {
           self.fullDecoder.openSound();
         }
-        // self.ifOpenSound = false
       }, 2000);
     },
 
@@ -970,7 +955,6 @@ export default {
       }
       if (self.playState) {
         self.realTimeSpeed = self.realTimeSpeed + 1;
-        console.log(self.realTimeSpeed);
         if (self.playBack) {
           self.getProcess();
         }
@@ -1001,7 +985,6 @@ export default {
     },
 
     fullWindowScreen(...val) {
-      console.log(val);
       const self = this;
       self.fullWindow = true;
       var ele = document.getElementById('videoContent');
@@ -1033,8 +1016,6 @@ export default {
       self.$nextTick(() => {
         ele.style.width = self.initPlayerWidth + 'px';
         ele.style.height = self.initPlayerHeight + 'px';
-        // playerEle.style.width = self.initPlayerWidth + 'px';
-        // playerEle.style.height = self.initPlayerHeight + 'px';
       });
       const width = ele.offsetWidth;
       const height = ele.offsetHeight;
@@ -1070,8 +1051,6 @@ export default {
             width = 560;
             break;
         }
-        console.log(self.initPlayerWidth);
-        console.log(self.initPlayerHeight);
         self.getVideoUrl();
         const isGlobalWebsite = Environment.isGlobalWebsite;
         const decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China';
@@ -1102,8 +1081,6 @@ export default {
             handleSuccess: self.handleExitFullScreenSuccess
           });
         }
-      } else {
-        // do nothing
       }
     },
 
@@ -1134,10 +1111,6 @@ export default {
         const playerEle = self.$refs.myPlayer;
         playerEle.style.width = screen.width + 'px';
         playerEle.style.height = screen.height + 'px';
-        console.log(width);
-        console.log(height);
-        console.log(playerEle);
-        console.log(self.playState);
         self.getVideoUrl();
         const isGlobalWebsite = Environment.isGlobalWebsite;
         const decoderPath = isGlobalWebsite ? './static/ezuikit/ezuikit_Global' : './static/ezuikit/ezuikit_China';
@@ -1168,8 +1141,6 @@ export default {
             handleSuccess: self.handleFullWindowSuccess
           });
         }
-      } else {
-        // do nothing
       }
     },
 
@@ -1206,15 +1177,11 @@ export default {
         return;
       } else {
         const o = document.getElementById('videoContent');
-        // o.style.width= width + 'px'
-        // o.style.height= height + 'px'
         const width = screen.width;
         const height = screen.height;
         const playerEle = self.$refs.myPlayer;
         playerEle.style.width = screen.width + 'px';
         playerEle.style.height = screen.height + 'px';
-        console.log(width);
-        console.log(height);
         self.isLoading = true;
         self.getVideoUrl();
         const isGlobalWebsite = Environment.isGlobalWebsite;
@@ -1269,7 +1236,6 @@ export default {
       }
       self.ifOpenSound = false;
       self.showModelContent = false;
-      // self.showInfoContent=false;
       self.playState = false;
       self.curBack = '';
       self.currentTimeValue = 0;
@@ -1330,7 +1296,6 @@ export default {
           setTimeout(() => {
             self.imgSrc = sessionStorage.getItem('fileUrl');
             const img = document.getElementById('imgTest');
-            // self.stopRealTime();
             if (self.fullWindow) {
               self.exitFullscreen();
               self.fullWindow = false;
@@ -1360,7 +1325,6 @@ export default {
           const img = new Image();
           setTimeout(() => {
             self.imgSrc = sessionStorage.getItem('fileUrl');
-            // self.stopRealTime();
             const img = document.getElementById('imgTest');
             if (self.fullWindow) {
               self.exitFullscreen();
@@ -1412,6 +1376,7 @@ export default {
       ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
       self.imageCanvasList = [];
     },
+
     confirmEditCanvas() {
       const self = this;
       self.showCancelContent = false;
@@ -1477,7 +1442,6 @@ export default {
     },
 
     mouseLeaveAction(e) {
-      console.log(e);
       const self = this;
       self.isMouseDown = false;
     },
@@ -1551,7 +1515,6 @@ export default {
       }
       self.$nextTick(() => {
         self.decoder = null;
-        console.log(self.$refs.myPlayer);
         self.initVideo();
       });
     },
@@ -1564,8 +1527,6 @@ export default {
       self.currentTimeValue = self.times;
       var callback = function(iTime) {
         self.startTs = iTime;
-        console.log('iTime', iTime);
-        console.log('self.startTs', self.startTs);
       };
       if (!self.fullWindow) {
         self.decoder.getOSDTime(callback);
@@ -1583,11 +1544,9 @@ export default {
     },
 
     adjustProcess(val, label) {
-      console.log(val);
       const self = this;
       self.curBack = label;
       var callback = function(iTime) {
-        console.log('iTime', iTime);
         switch (val) {
           case 0: self.startTs = iTime - 10 * 1000; break;
           case 1: self.startTs = iTime - 30 * 1000; break;
@@ -1604,7 +1563,6 @@ export default {
             self.fullDecoder = null;
           }
           self.initFullWindowVideo();
-          console.log('self.startTs', self.startTs);
         } else {
           if (self.playState) {
             if (self.ifOpenSound) {
@@ -1614,7 +1572,6 @@ export default {
             self.decoder = null;
           }
           self.initVideo();
-          console.log('self.startTs', self.startTs);
         }
       };
       if (self.fullWindow) {
@@ -1637,25 +1594,29 @@ export default {
       obj.oldPassword = self.videoPassword;
       obj.newPassword = self.videoPassword;
       const params = qs.stringify(obj);
-      const result = await updateDevicePassword(params);
-      if (result) {
-        self.showInputPassword = false;
-        self.showError = false;
-        self.times = 0;
-        self.startTs = self.curTime;
-        const deviceObj = {};
-        deviceObj.deviceSerial = self.channelInfo.ivsId;
-        deviceObj.channelId = self.channelInfo.channelId;
-        deviceObj.validateCode = self.videoPassword;
-        self.saveDeviceValidateCode(deviceObj);
-        self.$nextTick(() => {
-          self.decoder = null;
-          console.log(self.$refs.myPlayer);
-          self.initVideo();
-        });
-      } else {
-        self.videoPassword = '';
-        self.showInputPassword = true;
+      try {
+        const result = await updateDevicePassword(params);
+        if (result) {
+          self.showInputPassword = false;
+          self.showError = false;
+          self.times = 0;
+          self.startTs = self.curTime;
+          const deviceObj = {};
+          deviceObj.deviceSerial = self.channelInfo.ivsId;
+          deviceObj.channelId = self.channelInfo.channelId;
+          deviceObj.validateCode = self.videoPassword;
+          self.saveDeviceValidateCode(deviceObj);
+          self.$nextTick(() => {
+            self.decoder = null;
+            self.initVideo();
+          });
+        } else {
+          self.videoPassword = '';
+          self.showInputPassword = true;
+        }
+      }
+      catch (err) {
+        console.log("EzvizVideo-verifyEnterPassword" + err);
       }
     },
 
@@ -1690,7 +1651,6 @@ export default {
         }
       });
       temp.push(deviceObj);
-      console.log(temp);
       localStorage.setItem(key, JSON.stringify(temp));
     },
 

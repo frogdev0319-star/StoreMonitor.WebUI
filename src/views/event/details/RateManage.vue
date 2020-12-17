@@ -1025,7 +1025,6 @@ export default {
       const self = this;
       self.showRelatedChannelFlag = false;
       const channel = self.relatedChannels.filter(item => item.id === self.channelRadio);
-      console.log(channel);
       self.curChannel = channel[0];
       self.dialogFormVisible = true;
       self.channelRadio = '';
