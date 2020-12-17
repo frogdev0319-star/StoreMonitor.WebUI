@@ -423,7 +423,6 @@ export default {
       const self = this;
       self.tableData = [];
       self.getUserTitleList().then((res) => {
-        console.log(res);
         res.data.forEach(item => {
           const roleId = item.roleId;
         });
@@ -440,17 +439,18 @@ export default {
           });
         });
         self.titleList = listArray;
-        console.log(self.titleList);
       })
-        .catch(err => {
-          console.log(err);
-        });
+      .catch(err => {
+        console.log("AddRuteInspect-getTitleList: " + err);
+      });
     },
 
     getUserTitleList() {
       return new Promise((resolve, reject) => {
         titleRESTful.getUserTitleList().then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -465,7 +465,6 @@ export default {
       const self = this;
       const content = filterString.all(val, 30);
       const length = filterString.getContentLength(val);
-      console.log(content);
       self.editRouteName = content;
       if (length > 30) {
         self.showLengthNameWarning = true;
@@ -495,6 +494,8 @@ export default {
           self.notify(self.$t('remotePatrol.Patroltips2'), 'warning', 3000);
           return false;
         }
+      }).catch(err => {
+        console.log("AddRuteInspect-confirmEditTab: " + err);
       });
     },
 
@@ -540,7 +541,7 @@ export default {
           const data = res.data;
           resolve(data);
         }).catch(err => {
-          console.log(err.message);
+          reject(err);
         });
       });
     },
@@ -552,7 +553,7 @@ export default {
           const data = res.data;
           resolve(data);
         }).catch(err => {
-          console.log(err.message);
+          reject(err);
         });
       });
     },
@@ -572,7 +573,6 @@ export default {
         groupIds: self.groupIds
       };
       const postBind = await self.getInspectGroupBindAll(postparams);
-      console.log(postBind);
       const groupItems = [];
       postBind.forEach(b_item => {
         const obj = {
@@ -670,8 +670,9 @@ export default {
     updateGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.updateInspectGroup(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -679,8 +680,9 @@ export default {
     unbindGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.UnbindInspectGroupAndTitle(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -688,8 +690,9 @@ export default {
     bindGroup(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.BindInspectGroup(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -717,7 +720,7 @@ export default {
 
     changeSelect(val) {
       const self = this;
-      self.ModelPost = Array.from(val)[0]; // 选中的职务
+      self.ModelPost = Array.from(val)[0];
     },
     changeScore4(val, item) {
       if (val[0] === '-1') {
@@ -736,7 +739,7 @@ export default {
     },
     changeAddSelect(val) {
       const self = this;
-      self.ModelAddPost = Array.from(val)[0]; // 选中的职务
+      self.ModelAddPost = Array.from(val)[0];
     },
 
     async confirmAddGroup() {
@@ -795,6 +798,8 @@ export default {
           self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
           return false;
         }
+      }).catch(err => {
+        reject(err);
       });
     },
 
@@ -832,7 +837,6 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.deleteInspectItem(params).then(res => {
           const errMsg = res.errMsg;
-          console.log(errMsg);
           resolve(errMsg);
         });
       });
@@ -844,7 +848,6 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.deleteInspectGroup(params).then(res => {
           const errMsg = res.errMsg;
-          console.log(errMsg);
           resolve(errMsg);
         });
       });
@@ -879,8 +882,6 @@ export default {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
           const data = res.data;
           resolve(data);
         });
@@ -905,7 +906,6 @@ export default {
             self.napeList = [];
             self.napeTitle = '';
           } else {
-            console.log(self.groupIndex);
             self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
           }
         }
@@ -920,7 +920,6 @@ export default {
               self.napeList = [];
               self.napeTitle = '';
             } else {
-              console.log(self.groupIndex);
               self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
             }
           } else {
@@ -997,8 +996,8 @@ export default {
             if (item.checked) {
               idArr.push(item.id);
             }
-          }); break;
-          console.log('error Flag!'); break;
+          });
+          break;
       }
       const errMsg = await self.deleteItemData(idArr);
       if (errMsg != undefined && errMsg === 'Success') {
@@ -1077,7 +1076,6 @@ export default {
         'items': temp
       };
       inpectRESTful.updateInspectItem(params).then(res => {
-        console.log(res);
         const codeMsg = res.errMsg;
         if (codeMsg != undefined && codeMsg == 'Success') {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
@@ -1087,6 +1085,8 @@ export default {
           self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           return false;
         }
+      }).catch(err => {
+        console.log("AddRuteInspect-confirmeditNape: " + err);
       });
     },
 
@@ -1212,12 +1212,10 @@ export default {
             };
             inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
               const res = resApply;
-              console.log(res);
             });
           }
           self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
           setTimeout(function() {
-            console.log(self.tabName);
             if (self.tabName == '远程巡检') {
               PubSub.publish('change-color', { showTag: true });
             }
@@ -1226,7 +1224,9 @@ export default {
           self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
           return false;
         }
-      });
+      }).catch(err => {
+        console.log("AddRuteInspect-confirmaddNape: " + err);
+      });;
     },
 
     cancelAddNape() {
@@ -1264,7 +1264,6 @@ export default {
     },
 
     handleDelete(index, item) {
-      console.log(index);
       const self = this;
       if (self.napeList.length === 1 && self.groupList.length === 1) {
         if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
@@ -1284,13 +1283,14 @@ export default {
           inspectId: self.routeData[0].inspectId
         };
         inpectRESTful.getInspectItemList(params).then(res => {
-          console.log(res);
           const code = res.errMsg;
           const data = res.data;
           if (code != null && code === 'Success') {
             console.log(res.data);
           }
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1299,6 +1299,8 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList().then(res => {
           resolve(data);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1308,11 +1310,12 @@ export default {
       const inspectId = self.routeData[0].inspectId;
       const params = { inspectId: inspectId };
       inpectRESTful.getInspectBindList(params).then(res => {
-        console.log(res.errMsg);
         if (res.errMsg != undefined && res.errMsg === 'Success') {
           const data = res.data;
           self.bindStoreList = data;
         }
+      }).catch(err => {
+        reject(err);
       });
     },
 
@@ -1322,7 +1325,6 @@ export default {
       const curTag = self.tabName;
       const allData = await self.getAllData();
       const data = util.getRouteByTag(curTag, allData);
-      console.log(data);
       const temp = [];
       const groupIds = [];
       data.forEach(item => {
@@ -1417,7 +1419,6 @@ export default {
     },
 
     getNapeList(index, item) {
-      console.log(index);
       const self = this;
       const temp = [];
       item.itemData.forEach((_item, index) => {
@@ -1493,7 +1494,6 @@ export default {
       const self = this;
       const comment = filterString.all(val, 30);
       const length = filterString.getContentLength(val);
-      console.log(comment, length);
       if (Object.keys(item).length === 0) {
         self.groupNameInput = comment;
       } else {
@@ -1552,7 +1552,6 @@ export default {
       const self = this;
       const comment = filterString.all(val, 100);
       const length = filterString.getContentLength(val);
-      console.log(comment, length);
       if (Object.keys(item).length === 0) {
         self.newNapeName = comment;
       } else {
@@ -1569,7 +1568,6 @@ export default {
       const self = this;
       const comment = filterString.all(val, 1200);
       const length = filterString.getContentLength(val);
-      console.log(comment, length);
       if (Object.keys(item).length === 0) {
         self.newNapeDep = comment;
       } else {
@@ -1595,7 +1593,6 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    console.log(to.path);
     next();
     if (to.path === '/storemanage') {
       PubSub.publish('change-color', { showTag: false });

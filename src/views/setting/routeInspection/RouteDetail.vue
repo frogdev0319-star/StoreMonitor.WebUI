@@ -316,13 +316,12 @@ export default {
   },
 
   mounted() {
-    const self = this;
-    self.getNum();
+    this.getNum();
   },
 
   methods: {
     getNum() {
-      const self = this;
+      let self = this;
       self.typeNum = self.routeData.length;
       let allcount = 0;
       self.routeData.forEach(item => {
@@ -333,7 +332,7 @@ export default {
 
     changeAllData(val) {
       console.log(val);
-      const self = this;
+      let self = this;
       self.routeData.forEach(item => {
         item.checked = val;
         item.itemData.forEach(_item => {
@@ -343,7 +342,7 @@ export default {
     },
 
     changeSheet: function(e) {
-      const self = this;
+      let self = this;
       self.curSheet = e;
       self.allchecked = false;
       self.routeData.forEach(item => {
@@ -363,8 +362,8 @@ export default {
     },
 
     change(item) {
-      const self = this;
-      const arr = [];
+      let self = this;
+      let arr = [];
       console.log(item);
       item.itemData.forEach(_item => {
         _item.checked = item.checked;
@@ -378,8 +377,8 @@ export default {
     },
 
     selectRow(tableIndex, item) {
-      const arr = [];
-      const self = this;
+      let arr = [];
+      let self = this;
       item.itemData.forEach(_item => {
         if (_item.checked) {
           arr.push(_item);
@@ -387,7 +386,7 @@ export default {
       });
       console.log(arr.length);
       item.checked = item.itemData.length === arr.length;
-      const arrCheckedItem = [];
+      let arrCheckedItem = [];
       let count = 0;
       self.routeData.forEach(_item => {
         count += _item.itemData.length;
@@ -401,11 +400,11 @@ export default {
     },
 
     getNapeList() {
-      const self = this;
+      let self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.getInspectItemList().then(res => {
-          const code = res.errMsg;
-          const data = res.data;
+          let code = res.errMsg;
+          let data = res.data;
           if (code != null && code === 'Success') {
             self.allData = data;
           }
@@ -417,21 +416,20 @@ export default {
     },
 
     async refreshData() {
-      const self = this;
-      console.log(self.tabName);
-      const data = await self.getNapeList();
+      let self = this;
+      let data = await self.getNapeList();
       if (data.length !== 0) {
-        const temp = [];
+        let temp = [];
         data.forEach(item => {
           if (item.tag === self.tabName) {
-            const _obj = {};
+            let _obj = {};
             _obj.id = item.id;
             _obj.groupName = item.name;
             _obj.itemCount = item.items.length;
             _obj.checked = false;
-            const tempChild = [];
+            let tempChild = [];
             item.items.forEach(itemChild => {
-              const objChild = {};
+              let objChild = {};
               objChild.id = itemChild.id;
               objChild.checked = false;
               objChild.name = itemChild.subject;
@@ -449,9 +447,9 @@ export default {
     },
 
     async deleteNapes() {
-      const self = this;
-      const arr = [];
-      const countGroup = [];
+      let self = this;
+      let arr = [];
+      let countGroup = [];
       self.routeData.forEach(item => {
         if (item.checked) {
           countGroup.push(item.id);
@@ -466,22 +464,22 @@ export default {
         self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
-      const typeTemp = [];
+      let typeTemp = [];
       self.allRoutedata.forEach(item => {
         item.forEach(_item => {
           typeTemp.push(_item.type);
         });
       });
-      const delData = self.routeData.filter(x => x.itemData.length !== 0);
+      let delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1 || self.allchecked) {
         if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) || self.allRoutedata.length === 3) && delData[0].type === 1) {
           self.showFaildig = true;
           return false;
         } else if (self.allRoutedata.length === 1) {
-          const params = {};
+          let params = {};
           params.category = parseInt(self.routeData[0].mode);
-          const bindSchedule = await self.getScheduleFromDB(params);
-          const arrtemp = [];
+          let bindSchedule = await self.getScheduleFromDB(params);
+          let arrtemp = [];
           bindSchedule.forEach(item => {
             if (item.extra != null) {
               arrtemp.push(item.extra.inspectId);
@@ -499,7 +497,7 @@ export default {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
-          const data = res.data;
+          let data = res.data;
           resolve(data);
         }).catch(err => {
           reject(err);
@@ -508,17 +506,17 @@ export default {
     },
 
     afterDeleteNape() {
-      const self = this;
+      let self = this;
       self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
       self.showDeleteContent = false;
-      const val = 'del';
+      let val = 'del';
       self.$emit('refreshList', val, self.curSheet);
     },
 
     confirmDelete() {
-      const self = this;
-      const arrGroup = [];
-      const arrItem = [];
+      let self = this;
+      let arrGroup = [];
+      let arrItem = [];
       self.routeData.forEach(item => {
         if (item.checked) {
           arrGroup.push(item.id);
@@ -529,16 +527,15 @@ export default {
           }
         });
       });
-      const params = {
+      let params = {
         'itemIds': arrItem
       };
-      const paramsGroup = {
+      let paramsGroup = {
         'groupIds': arrGroup
       };
       if (arrItem.length !== 0) {
         inpectRESTful.deleteInspectItem(params).then(res => {
-          console.log(res.data);
-          const code = res.errMsg;
+          let code = res.errMsg;
           if (code != undefined && code === 'Success') {
             if (arrGroup.length !== 0) {
               inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
@@ -569,37 +566,37 @@ export default {
     },
 
     getDownLoadURL() {
-      const self = this;
+      let self = this;
       inpectRESTful.downLoadTemplate().then(res => {
-        console.log(res);
-        const blob = new Blob([res], {
+        let blob = new Blob([res], {
           type: 'application/vnd.ms-excel'
         });
-        const objectUrl = URL.createObjectURL(blob);
+        let objectUrl = URL.createObjectURL(blob);
         self.downLoadSrc = objectUrl;
+      }).catch(err => {
+        console.log("RouteDetail-getDownLoadURL: "+ err);
       });
     },
 
     async handleDelete(index, row) {
-      console.log(index);
-      const self = this;
-      const typeTemp = [];
+      let self = this;
+      let typeTemp = [];
       self.allRoutedata.forEach(item => {
         item.forEach(_item => {
           typeTemp.push(_item.type);
         });
       });
-      const delData = self.routeData.filter(x => x.itemData.length !== 0);
+      let delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1) {
         if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) ||
           self.allRoutedata.length === 3) && delData[0].type === 1) {
           self.showFaildig = true;
           return false;
         } else if (self.allRoutedata.length === 1) {
-          const params = {};
+          let params = {};
           params.category = parseInt(self.routeData[0].mode);
-          const bindSchedule = await self.getScheduleFromDB();
-          const arrtemp = [];
+          let bindSchedule = await self.getScheduleFromDB();
+          let arrtemp = [];
           bindSchedule.forEach(item => {
             if (item.extra != null) {
               arrtemp.push(item.extra.inspectId);
@@ -612,33 +609,32 @@ export default {
         }
       }
       self.showSingleDeleteContent = true;
-      const id = row.id;
-      const arr = [];
+      let id = row.id;
+      let arr = [];
       arr.push(id);
       self.curDeleteId = arr;
     },
 
     async confirmDeleteSingle() {
-      const self = this;
-      const params = {
+      let self = this;
+      let params = {
         'itemIds': self.curDeleteId
       };
       inpectRESTful.deleteInspectItem(params).then(res => {
-        console.log(res.data);
-        const code = res.errMsg;
+        let code = res.errMsg;
         if (code != undefined && code === 'Success') {
           self.routeData.forEach((r_item, r_index) => {
             if (self.routeData[r_index].itemData.length === 1) {
               r_item.itemData.forEach((d_item, d_index) => {
                 if (self.curDeleteId[0] === d_item.id) {
                   self.curDelGroupId = r_item.id;
-                  const paramsGroup = {
+                  let paramsGroup = {
                     'groupIds': [self.curDelGroupId]
                   };
                   inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
                     self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
                     self.showSingleDeleteContent = false;
-                    const val = 'del';
+                    let val = 'del';
                     self.$emit('refreshList', val, self.curSheet);
                   });
                 }
@@ -646,7 +642,7 @@ export default {
             } else {
               self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
               self.showSingleDeleteContent = false;
-              const val = 'del';
+              let val = 'del';
               self.$emit('refreshList', val, self.curSheet);
             }
           });
@@ -655,11 +651,13 @@ export default {
           return false;
         }
         self.allchecked = false;
-      });
+      }).catch(err => {
+        console.log("RouteDetail-confirmDeleteSingle: "+ err);
+      });;
     },
 
     setItem() {
-      const self = this;
+      let self = this;
       sessionStorage.setItem('NapeItem', JSON.stringify(self.routeData));
       sessionStorage.setItem('GroupName', self.tabName);
       self.$router.push({ name: 'itemSetting', params: { routeData: self.routeData,
@@ -667,22 +665,22 @@ export default {
     },
 
     setRule() {
-      const self = this;
+      let self = this;
       self.$router.push({ name: 'setRule', params: { routeData: self.routeData, routeName: self.routeName }});
     },
 
     downLoadModel() {
-      const url = 'http://' + window.location.host + '/storemonitor/api/v1.0/inspect/template';
+      let url = 'http://' + window.location.host + '/storemonitor/api/v1.0/inspect/template';
       window.open(url);
     },
 
     emptyImport() {
-      const self = this;
+      let self = this;
       document.getElementById('uploadFile').click();
     },
 
     checkBeforeImport() {
-      const self = this;
+      let self = this;
       if (self.checkValue === self.addPatrol && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
         self.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
         return false;

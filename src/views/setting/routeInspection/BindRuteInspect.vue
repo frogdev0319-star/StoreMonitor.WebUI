@@ -423,14 +423,12 @@ export default {
 
     handleProChange(arr) {
       const self = this;
-      console.log(arr);
       self.curProvince = arr;
       self.changePro(arr);
     },
 
     handleCityChange(arr) {
       const self = this;
-      console.log(arr);
       self.curCity = arr;
       self.changeCity(arr);
     },
@@ -528,7 +526,6 @@ export default {
     },
 
     changeCityItem(item) {
-      console.log(item);
       const self = this;
       let str = '';
       const temp = [];
@@ -590,7 +587,7 @@ export default {
       self.allData = self.storeList.length === count;
     },
 
-    searchStore: async function () {
+    async searchStore () {
       const self = this;
       self.showCityContent = false;
       self.serachVale = '';
@@ -641,7 +638,6 @@ export default {
 
     choiceAllGroup(item) {
       const self = this;
-      console.log(item);
       const obj = item;
       item.itemData.forEach(item => {
         item.checked = obj.checked;
@@ -657,7 +653,6 @@ export default {
 
     choiceAllDevice(index, item) {
       const self = this;
-      console.log(index);
       let count = 0;
       item.itemData.forEach(itemS => {
         if (itemS.checked) {
@@ -737,7 +732,6 @@ export default {
     async getStoreByCity(data) {
       const self = this;
       const bindStoreId = await self.getBindStoreList();
-      console.log(data);
       const cityList = [];
       const bindArr = [];
       data.forEach(item => {
@@ -751,7 +745,6 @@ export default {
         });
       });
       self.storeCount = bindArr.length;
-      console.log(cityList);
       const temp = [];
       cityList.forEach(item => {
         const obj = {};
@@ -769,7 +762,6 @@ export default {
         obj.store = _temp;
         temp.push(obj);
       });
-      console.log(temp);
       const groupTemp = [];
       temp.forEach(item => {
         const groupObj = {};
@@ -874,13 +866,11 @@ export default {
       let flag = false;
       if (storeIdChecked.length === count) { // all checked to bind
         const resBind = await self.bindNapeToStore(paramsBind).catch((err) => self.loading = false);
-        console.log(resBind);
         if (resBind.errMsg === 'Success' && resBind.errCode === 0) {
           flag = true;
         }
       } else if (storeIdUnchecked.length === count) { // all unchecked to unbind
         const resUnBind = await self.UnbindNapeToStore(paramsUnBind).catch((err) => self.loading = false);
-        console.log(resUnBind);
         if (resUnBind.errMsg === 'Success' && resUnBind.errCode === 0) {
           flag = true;
         }
@@ -914,9 +904,9 @@ export default {
             resolve(res);
           }
         })
-          .catch(err =>{
-            reject(err)
-          });
+        .catch(err =>{
+          reject(err)
+        });
       });
     },
 

@@ -416,10 +416,10 @@ export default {
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {
-          console.log(res);
-          const errMsg = res.errMsg;
           const data = res.data;
           resolve(data);
+        }).catch(err =>{
+          reject(err);
         });
       });
     },
@@ -430,7 +430,6 @@ export default {
     },
 
     getLang(index) {
-      console.log(index);
       if (index === 0) {
         return this.$t('insSettingView.remotePatrol');
       } else if (index === 1) {
@@ -442,7 +441,6 @@ export default {
 
     initData() {
       const self = this;
-      console.log(self.activeName + 'activeName');
       switch (Number(self.activeName)) {
         case 0: self.checkValue = '远程巡检'; break;
         case 1: self.checkValue = '现场巡检'; break;
@@ -453,7 +451,6 @@ export default {
     downItem() {
       const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
-        console.log(res);
         const blob = new Blob([res], {
           type: 'application/vnd.ms-excel'
         });
@@ -464,19 +461,23 @@ export default {
         link.href = url;
         link.download = self.fileName;
         link.click();
+      }).catch(err => {
+        console.log("RouteInspection-downItem: " + err);
       });
     },
+
     getDownLoadURL() {
       const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
-        console.log(res);
         const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel' // 将会被放入到blob中的数组内容的MIME类型
+          type: 'application/vnd.ms-excel'
         });
         const objectUrl = URL.createObjectURL(blob);
         const url = objectUrl;
         self.downLoadSrc = url;
         // window.open(self.downLoadSrc,'_self');
+      }).catch(err => {
+        console.log("RouteInspection-getDownLoadURL: " + err);
       });
     },
 
@@ -490,7 +491,7 @@ export default {
           const data = res.data;
           resolve(data);
         }).catch(err => {
-          console.log(err.message);
+          reject(err);
         });
       });
     },
@@ -503,7 +504,6 @@ export default {
           const data = res.data;
           if (code != null && code === 'Success') {
             self.allData = data;
-            console.log(res.data);
           }
           resolve(data);
         }).catch(err => {
@@ -700,6 +700,8 @@ export default {
       return new Promise((resolve, reject) => {
         titleRESTful.getUserTitleList().then(res => {
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -712,6 +714,8 @@ export default {
         inpectRESTful.deleteInspectItem(params).then(res => {
           console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -725,6 +729,8 @@ export default {
           console.log(res);
           resolve(res);
         });
+      }).catch(err => {
+        reject(err);
       });
     },
 
@@ -733,6 +739,8 @@ export default {
         inpectRESTful.addInspectGroup(params).then(res => {
           console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -742,13 +750,15 @@ export default {
         inpectRESTful.addInspectItem(params).then(res => {
           console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     async addAllData(dataArry) {
       const self = this;
-      let mode = self.activeName == '0' ? mode = 0 : mode = 1; // 远程巡检 mode 0,现场巡检  mode 1
+      let mode = self.activeName == '0' ? mode = 0 : mode = 1; // remote mode 0,onsite  mode 1
       const arr = Object.entries(dataArry);
       const tempGroups = [];
       const tempItems = [];
@@ -773,7 +783,7 @@ export default {
         }
       }
       const paramsGroup = {
-        'groups': tempGroups // 巡检类别
+        'groups': tempGroups
       };
       const resGroup = await self.addGroup(paramsGroup);
       const codeGroup = resGroup.errMsg;
@@ -819,7 +829,7 @@ export default {
           }
         }
         const paramsItem = {
-          'request': tempItems // 巡检项
+          'request': tempItems
         };
         const resItem = await self.addItem(paramsItem);
         const codeItem = resItem.errMsg;
@@ -1078,7 +1088,6 @@ export default {
     importItem() {
       const self = this;
       const ret = self.isLoginIn();
-      console.log(ret);
       const isGlobalWebsite = Environment.isGlobalWebsite;
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
@@ -1130,7 +1139,6 @@ export default {
       const self = this;
       return new Promise((resolve, reject) => {
         isLoginIn().then(res => {
-          console.log(res);
           resolve(res);
         });
       }).catch(err => {

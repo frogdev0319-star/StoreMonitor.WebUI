@@ -10,7 +10,8 @@
     </el-col>
     <el-col :span="24" class="el-rute-content">
       <p class="rule-title">{{ $t('insSettingView.PatrolScoreCalculation') }}</p>
-      <p class="rule-item"><el-checkbox v-model="checkItem1">{{ $t('insSettingView.PSCrule1') }}Tab1（{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}</el-checkbox></p>
+      <p class="rule-item"><el-checkbox v-model="checkItem1">{{ $t('insSettingView.PSCrule1') }}Tab1
+        （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}</el-checkbox></p>
       <p class="rule-item"><el-checkbox v-model="checkItem2"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span></el-checkbox></p>
       <p class="rule-item"><el-checkbox v-model="checkItem3"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab2（{{ $t('insSettingView.sheetscore') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span> </el-checkbox></p>
       <p class="rule-score">{{ $t('insSettingView.CalculationMethod') }}：</p>
@@ -53,8 +54,6 @@
 </template>
 
 <script>
-// import api from '@/api/index'
-// import {validateInput} from '@/common/validate'
 import { inpectRESTful } from '@/api/index';
 
 export default {
@@ -103,52 +102,57 @@ export default {
     async getRule() {
       const self = this;
       const params = { inspectId: self.routeData[0].inspectId };
-      const res = await self.getInspectRule(params);
-      if (res.errCode === 0) {
-        res.data.forEach(item => {
-          switch (item.name) {
-            case 'includedInTotalScoreWithType1':
-              self.checkItem1 = item.value;
-              break;
-            case 'qualifiedForIgnoredWithType1':
-              self.checkItem2 = item.value;
-              break;
-            case 'qualifiedForIgnoredWithType2':
-              self.checkItem3 = item.value;
-              break;
-            case 'hundredMarkType':
-              self.radio = item.value.toString();
-              break;
-            case 'minScore':
-              self.minScore = item.value;
-              break;
-            case 'maxScore':
-              self.maxScore = item.value;
-              break;
-            case 'dangerousOnFailedItem':
-              self.checkItem4 = item.value;
-              break;
-            default:
-              break;
-          }
-        });
-      } else {
-        console.log(res);
+      try {
+        const res = await self.getInspectRule(params);
+        if (res.errCode === 0) {
+          res.data.forEach(item => {
+            switch (item.name) {
+              case 'includedInTotalScoreWithType1':
+                self.checkItem1 = item.value;
+                break;
+              case 'qualifiedForIgnoredWithType1':
+                self.checkItem2 = item.value;
+                break;
+              case 'qualifiedForIgnoredWithType2':
+                self.checkItem3 = item.value;
+                break;
+              case 'hundredMarkType':
+                self.radio = item.value.toString();
+                break;
+              case 'minScore':
+                self.minScore = item.value;
+                break;
+              case 'maxScore':
+                self.maxScore = item.value;
+                break;
+              case 'dangerousOnFailedItem':
+                self.checkItem4 = item.value;
+                break;
+              default:
+                break;
+            }
+          });
+        }
+      }
+      catch (err) {
+        console.log("SetInspectRule-getRule: " + err);
       }
     },
     updateInspectRule(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.UpdateInspectRuleSettings(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
     getInspectRule(params) {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
-          console.log(res);
           resolve(res);
+        }).catch(err => {
+          reject(err);
         });
       });
     },
