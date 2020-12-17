@@ -325,11 +325,13 @@
               </el-form>
             </div>
             <div slot="footer" class="dialog-footer">
-              <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNvrDialog = false">{{ $t('deviceView.cancle') }}</el-button>
-              <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleNvr">{{ $t('deviceView.confirm') }}</el-button>
+              <el-button class="file-cancel-btn" size="mini" style=""
+                         @click="showAddNvrDialog = false">{{ $t('deviceView.cancle') }}</el-button>
+              <el-button class="file-confirm-btn" size="mini" type="primary"
+                         @click="addSingleNvr">{{ $t('deviceView.confirm') }}</el-button>
             </div>
           </el-dialog>
-          <el-col :span="lang=='en' && varWindowWidth<1920? 13: 13" class="risde">
+          <el-col :span="lang === 'en' && varWindowWidth < 1920? 13: 13" class="risde">
             <div class="nvr-info">
               <span class="info-title">{{ $t('deviceView.channelSetting') }}</span>
               <el-button
@@ -348,6 +350,9 @@
               <div class="nape-dep-title titles">
                 <span>{{ $t('deviceView.devChannelNum') }}</span>
               </div>
+              <div class="nape-picture-title titles">
+                <span>{{ $t('deviceView.thumbnail') }}</span>
+              </div>
               <div class="nape-handle-title titles">
                 <span>{{ $t('deviceView.operation') }}</span>
               </div>
@@ -360,8 +365,12 @@
                   :key="index"
                   class="nape-items-data">
                   <div class="nape-name-data">
-                    <span v-if="!item.isClick" class="nape-name">{{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}</span>
-                    <el-input v-if="item.isClick" v-model="item.tempName" :placeholder="$t('deviceView.inputInspectName')" size="mini" class="nape-input input-details" @input="(val)=>channelNameChange(val,item)"/>
+                    <span v-if="!item.isClick" class="nape-name">
+                      {{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}
+                    </span>
+                    <el-input v-if="item.isClick" v-model="item.tempName"
+                              :placeholder="$t('deviceView.inputInspectName')" size="mini"
+                              class="nape-input input-details" @input="(val)=>channelNameChange(val,item)"/>
                   </div>
                   <div class="nape-dep-data">
                     <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
