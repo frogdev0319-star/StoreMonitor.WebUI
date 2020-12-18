@@ -172,13 +172,13 @@
                   <div class="operation-data titles">
                     <div v-if="item.isEditing" class="iconcontent" style="top:15px;">
                       <div class="iconlised" @click="confirmEditNvr(index,item)">
-                        <i class="el-icon-check" style="position:absolute;top:6px;margin-left:2px;"/>
+                        <i class="el-icon-check"/>
                       </div>
                       <div class="iconrised" @click="cancelEditNvr(index,item)">
-                        <i class="el-icon-close" style="position:absolute;top:6px;margin-left:2px;"/>
+                        <i class="el-icon-close"/>
                       </div>
                     </div>
-                    <div v-if="!item.isEditing" class="iconcontent">
+                    <div v-if="!item.isEditing" class="iconcontent" style="top:15px;">
                       <div class="iconlised" style=" border: none; background-color: rgba(255, 255, 255, 0); color:#2c3e50; font-weight: normal" @click="editSingleNvr(index,item)">
                         <i class="iconfont icon-bianji"/>
                       </div>
@@ -1421,7 +1421,7 @@ export default {
         self.channelBtnDisabled = false;
       }
       // order by channeId of channelList to get max channel num
-      if (self.channelList === 0) {
+      if (self.channelList.length === 0) {
         self.editNvrChannelNumList = self.channelNumList;
       } else {
         let sortArr = self.channelList.sort(self.getSortFun('channelId'));
@@ -2176,27 +2176,27 @@ export default {
                 color: $tab;
               }
               .iconlised{
-                // float: left;
-                // position: relative;
+                float: left;
+                position: relative;
                 background-color: $mainColor;
                 padding: 1px 6px;
                 color: #fff;
                 border-width: 1px 1px 1px 1px;
                 border-style: solid;
                 border-color: #ddd;
-                width:20px;
-                height:23px;
+                @include point(line-height,21);
+                @include point(height,21);
               }
               .iconrised{
-                // float: left;
-                // position: relative;
+                float: left;
+                position: relative;
                 padding: 1px 6px;
                 border-width: 1px 1px 1px 0px;
                 border-style: solid;
                 border-color: #ddd;
                 background-color: rgba(255, 255, 255, 0);
-                width:20px;
-                height:23px;
+                @include point(line-height,21);
+                @include point(height,21);
               }
             }
 
