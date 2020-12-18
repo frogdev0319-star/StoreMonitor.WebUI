@@ -3217,10 +3217,10 @@ export default {
     },
     changeInspect(val) {
       const self = this;
-      if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-        self.videoLoadingObj.dialogCosed = true;
-        return false;
-      }
+      // if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
+      //   self.videoLoadingObj.dialogCosed = true;
+      //   return false;
+      // }
 
       if ((!self.isEzviz && self.editCount != 0)
         || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)

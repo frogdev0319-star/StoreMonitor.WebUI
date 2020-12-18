@@ -1290,13 +1290,15 @@ export default {
       };
       let flag = false;
       if (storeIdChecked.length === count) {
-        let resBind = await self.bindScheduleToStore(paramsBind);
-        if (resBind.errMsg === 'Success' && resBind.errCode === '0') {
+        const resBind = await self.bindScheduleToStore(paramsBind);
+        console.log(resBind);
+        if (resBind.errMsg === 'Success' && resBind.errCode === 0) {
           flag = true;
         }
       } else if (storeIdUnchecked.length === count) {
-        let resUnBind = await self.unbindScheToStore(paramsUnBind);
-        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === '0') {
+        const resUnBind = await self.unbindScheToStore(paramsUnBind);
+        console.log(resUnBind);
+        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === 0) {
           flag = true;
         }
       } else {
