@@ -1137,13 +1137,13 @@ export default {
       if (storeIdChecked.length === count) {
         const resBind = await self.bindScheduleToStore(paramsBind);
         console.log(resBind);
-        if (resBind.errMsg === 'Success' && resBind.errCode === '0') {
+        if (resBind.errMsg === 'Success' && resBind.errCode === 0) {
           flag = true;
         }
       } else if (storeIdUnchecked.length === count) {
         const resUnBind = await self.unbindScheToStore(paramsUnBind);
         console.log(resUnBind);
-        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === '0') {
+        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === 0) {
           flag = true;
         }
       } else {
