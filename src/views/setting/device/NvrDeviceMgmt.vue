@@ -360,7 +360,6 @@
                     </span>
                     <el-upload
                       v-if="item.isClick"
-                      :on-preview="handlePreview"
                       :before-upload="beforeAvatarUpload"
                       :on-change="handleEditChange"
                       class="upload-demo"
