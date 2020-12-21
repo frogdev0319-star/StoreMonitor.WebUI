@@ -1419,7 +1419,7 @@ export default {
         self.channelBtnDisabled = false;
       }
       // order by channeId of channelList to get max channel num
-      if (self.channelList === 0) {
+      if (self.channelList.length === 0) {
         self.editNvrChannelNumList = self.channelNumList;
       } else {
         console.log(self.channelList);
