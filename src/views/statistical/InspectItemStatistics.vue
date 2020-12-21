@@ -677,7 +677,7 @@ export default {
         self.countryList[0].countryList = countryList;
         self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
         self.curCountry = countryList[0].value;
-        self.selectAllProAndCity(self.curCountry);
+        self.selectAllProAndCity(self.curCountry,true);
       }
     },
 
@@ -985,7 +985,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val);
+      self.selectAllProAndCity(val,false);
     },
 
     changeCity(val) {
@@ -1087,7 +1087,7 @@ export default {
       await self.getInspectItemsTable();
     },
 
-    async selectAllProAndCity(val) {
+    async selectAllProAndCity(val,isCreate) {
       let self = this;
       let storeList = self.storeList;
       let temp = [];
@@ -1172,7 +1172,7 @@ export default {
         self.inspectList = InspectList[0].name;
       }
       self.changeStore(self.curStore);
-      self.searchData();
+      isCreate ? self.searchData() : null;
     },
 
     clearProviceInfo() {
