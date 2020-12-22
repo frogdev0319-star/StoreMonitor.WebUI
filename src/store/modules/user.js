@@ -641,7 +641,11 @@ const user = {
           },
         );
         route5.children.length > 0 ? accessedRoutes.push(route5) : '';
-
+        accessedRoutes.push({
+          'path': '*',
+          'redirect': '/',
+          'hidden': true
+        });
         commit('SET_ROUTES', accessedRoutes);
         resolve(accessedRoutes);
       });

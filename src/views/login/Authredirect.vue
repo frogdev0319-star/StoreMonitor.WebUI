@@ -13,11 +13,10 @@ export default{
     async routerPage() {
       const self = this;
       const TokenKey = 'Admin-Token';
-      const itempath = '/storemonitor/api/v1.0';
       const hash = window.location.search.substr(1) || window.location.hash.split('?')[1];
-      if (hash != undefined && hash.length != 0) {
+      if (hash != undefined && hash.length !== 0) {
         const paramsArray = hash.split('&');
-        if (paramsArray.toString().length != 0) {
+        if (paramsArray.toString().length !== 0) {
           const obj = self.queryURL(hash);
           console.log(obj);
           this.$store.commit('SET_TOKEN', obj.token);
@@ -43,13 +42,8 @@ export default{
           setCookie('lang', lang);
         }
       }
-      const { roles } = await self.$store.dispatch('GetUserAuthorities');
-      console.log(roles);
-      // generate accessible routes map based on roles
-      const accessRoutes = await self.$store.dispatch('generateRoutes');
-      // dynamically add accessible routes
-      router.addRoutes(accessRoutes);
-      window.location.href = window.location.origin + window.location.pathname + '#/home';
+      self.$router.push('home');
+      // window.location.href = window.location.origin + window.location.pathname + '#/home';
     },
 
     queryURL(hashValue) {

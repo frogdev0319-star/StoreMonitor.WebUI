@@ -19,6 +19,7 @@ import moment from 'moment';
 import elCascaderMulti from 'el-cascader-multi';
 import htmlToPdf from '@/plugins/htmlToPdf';
 import './assets/sass/index.scss';
+import { resetRouter } from './router';
 
 Vue.use(ProgressPlugin);
 Vue.use(elCascaderMulti);
@@ -38,35 +39,64 @@ process.env.MOCK && require('@/mock');
 
 function getLoginURL() {
   return new Promise((resolve, reject) => {
-    axios.get('serverconfig.json?r=' + (new Date().getTime())).then(res => {
+    axios.get('serverconfig.json').then(res => {
       console.log(res.data.loginURL);
       const url = res.data.loginURL;
       resolve(url);
-    }).catch(err =>{
-      reject(err)
+    }).catch(err => {
+      reject(err);
     });
   });
 }
 
 async function setURL() {
   const url = await getLoginURL();
-  if (url != undefined && url.length != 0) {
+  if (url != undefined && url.length !== 0) {
     sessionStorage.setItem('LoginURL', url);
   }
 }
 setURL();
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(r => r.meta.requireAuth)) {
-    if (getToken()) {
-      next();
-    } else {
-      const url = sessionStorage.getItem('LoginURL');
-      window.location.href = url;
-    }
+router.beforeEach(async(to, from, next) => {
+  console.log(to.name);
+  // determine whether the user has logged in
+  if (!to.name) {
+    // generate accessible routes map based on roles
+    const { roles } = await store.dispatch('GetUserAuthorities');
+    console.log(roles);
+    // generate accessible routes map based on roles
+    const accessRoutes = await store.dispatch('generateRoutes');
+    // dynamically add accessible routes
+    router.addRoutes(accessRoutes);
+
+    // dynamically add accessible routes
+    router.addRoutes(accessRoutes);
+    // hack method to ensure that addRoutes is complete
+    // set the replace: true, so the navigation will not leave a history record
+    next({ ...to, replace: true });
   } else {
+    // if (to.matched.some(r => r.meta.requireAuth)) {
+    //   if (getToken()) {
+    //     next();
+    //   } else {
+    //     // const url = sessionStorage.getItem('LoginURL');
+    //     // window.location.href = url;
+    //   }
+    // } else {
+    //   next();
+    // }
     next();
   }
+  // if (to.matched.some(r => r.meta.requireAuth)) {
+  //   if (getToken()) {
+  //     next();
+  //   } else {
+  //     const url = sessionStorage.getItem('LoginURL');
+  //     window.location.href = url;
+  //   }
+  // } else {
+  //   next();
+  // }
 });
 
 new Vue({
