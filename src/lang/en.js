@@ -719,7 +719,13 @@ export default {
     'enterAccountName': 'Username must be between 1~20 long, can contain Chinese characters, letters and numbers',
     'EzvizAccount': 'Ezviz Account',
     'failedReason': 'Failure Reason: ',
-    'preview': 'Preview Area'
+    'preview': 'Preview Area',
+    'accessKey': 'Access Key',
+    'authorizedDevices': 'Number of devices',
+    'lessThanAuthorizedDevices': 'The number of authorized devices is less than the number of added devices.',
+    'errorAccessKey': 'Incorrect access key!',
+    'moreThanAuthorizedDevices': 'The number of devices for this account exceeds the limit.',
+    'errorDeviceNum': 'The number of authorized devices is invalid!'
   },
 
   // Store Management page language

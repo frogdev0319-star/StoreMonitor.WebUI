@@ -39,8 +39,10 @@
           </div>
         </el-button>
       </div>
-      <el-col :span="varWindowWidth < 1540 ? 12:10"
-              :style="varWindowWidth < 1366 ? {'font-size':'12px'}:{'font-size':'14px'}" class="dash-content">
+      <el-col
+        :span="varWindowWidth < 1540 ? 12:10"
+        :style="varWindowWidth < 1366 ? {'font-size':'12px'}:{'font-size':'14px'}"
+        class="dash-content">
         <el-dialog
           v-if="showImportContent"
           id="importId"
@@ -87,8 +89,11 @@
             <el-button class="file-cancel-btn" size="mini" style="" @click="showConfirmImport = false">
               {{ $t('deviceView.cancle') }}
             </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary"
-                       @click="showImportContent = true; showConfirmImport = false">
+            <el-button
+              class="file-confirm-btn"
+              size="mini"
+              type="primary"
+              @click="showImportContent = true; showConfirmImport = false">
               {{ $t('deviceView.confirm') }}
             </el-button>
           </div>
@@ -113,31 +118,31 @@
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
-              <div class="titles" :class="lang === 'en' ? 'en-comment-title' : 'comment-title'">
+              <div :class="lang === 'en' ? 'en-comment-title' : 'comment-title'" class="titles">
                 <span/>
               </div>
-              <div class="titles" :class="lang === 'en' ? 'en-name-title' : 'name-title'">
+              <div :class="lang === 'en' ? 'en-name-title' : 'name-title'" class="titles">
                 <span>{{ $t('deviceView.deviceName') }}</span>
                 <i
                   :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}"
                   class="icon-filter"
                   @click="filterNVR"/>
               </div>
-              <div class="titles" :class="lang === 'en' ? 'en-model-title': 'model-title'">
+              <div :class="lang === 'en' ? 'en-model-title': 'model-title'" class="titles">
                 <span>{{ $t('deviceView.EzvizAccount') }}</span>
                 <i
                   :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}"
                   class="icon-filter"
                   @click="filterAccount"/>
               </div>
-              <div  class="titles" :class="lang === 'en' ? 'en-store-title': 'store-title'" >
+              <div :class="lang === 'en' ? 'en-store-title': 'store-title'" class="titles" >
                 <span>{{ $t('deviceView.store') }}</span>
                 <i
                   :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}"
                   class="icon-filter"
                   @click="filterStore"/>
               </div>
-              <div class="titles" :class="lang === 'en' ? 'en-count-title': 'count-title'" >
+              <div :class="lang === 'en' ? 'en-count-title': 'count-title'" class="titles" >
                 <span>{{ $t('deviceView.channelNum') }}</span>
               </div>
             </div>
@@ -167,7 +172,7 @@
                       class="item"
                       effect="dark"
                       placement="bottom">
-                      <span>{{ item.tempNvrName.length > 15?  item.tempNvrName.substr(0,15)+'...' : item.tempNvrName }}</span>
+                      <span>{{ item.tempNvrName.length > 15? item.tempNvrName.substr(0,15)+'...' : item.tempNvrName }}</span>
                     </el-tooltip>
                   </div>
                   <div class="model-data titles">
@@ -253,20 +258,32 @@
           >
             <div class="dialog-content" style="overflow:hidden;width:100%;">
               <hr style="border: 0.5px solid #dfe2e9;">
-              <el-form ref="nvrForm" :model="addDeviceData" :rules="rules" class="nvrForm"
-                       label-position="top" size="mini">
+              <el-form
+                ref="nvrForm"
+                :model="addDeviceData"
+                :rules="rules"
+                class="nvrForm"
+                label-position="top"
+                size="mini">
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
-                      <el-input v-model="addDeviceData.serialNumber" :disabled="isAddAgain" style="width: 100%;"
-                                @input="(val)=>serialNumberChange(val)" @blur="notShowInputRuleTips('serialNum')"/>
+                      <el-input
+                        v-model="addDeviceData.serialNumber"
+                        :disabled="isAddAgain"
+                        style="width: 100%;"
+                        @input="(val)=>serialNumberChange(val)"
+                        @blur="notShowInputRuleTips('serialNum')"/>
                       <span v-if="serialRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                     </el-form-item>
                   </el-col>
                   <el-col :span="9" :offset="2">
                     <el-form-item :label="$t('deviceView.validationCode')" prop="validationCode" style="margin-bottom:0;">
-                      <el-input v-model="addDeviceData.validationCode" style="width: 100%;" @input="validateCodeChange"
-                                @blur="notShowInputRuleTips('validationCode')"/>
+                      <el-input
+                        v-model="addDeviceData.validationCode"
+                        style="width: 100%;"
+                        @input="validateCodeChange"
+                        @blur="notShowInputRuleTips('validationCode')"/>
                       <span v-if="validateRuletip" class="rules">{{ $t('deviceView.validateRuletip') }}</span>
                     </el-form-item>
                   </el-col>
@@ -309,9 +326,12 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('deviceView.store')" prop="storeId">
-                  <el-select v-model="addDeviceData.storeId" :disabled="isAddAgain"
-                             filterable :filter-method="filterStoreOption"
-                             style="width: 100%;">
+                  <el-select
+                    v-model="addDeviceData.storeId"
+                    :disabled="isAddAgain"
+                    :filter-method="filterStoreOption"
+                    filterable
+                    style="width: 100%;">
                     <el-option
                       v-for="item in storeDataList"
                       :key="item.storeId"
@@ -325,10 +345,16 @@
               </el-form>
             </div>
             <div slot="footer" class="dialog-footer">
-              <el-button class="file-cancel-btn" size="mini" style=""
-                         @click="showAddNvrDialog = false">{{ $t('deviceView.cancle') }}</el-button>
-              <el-button class="file-confirm-btn" size="mini" type="primary"
-                         @click="addSingleNvr">{{ $t('deviceView.confirm') }}</el-button>
+              <el-button
+                class="file-cancel-btn"
+                size="mini"
+                style=""
+                @click="showAddNvrDialog = false">{{ $t('deviceView.cancle') }}</el-button>
+              <el-button
+                class="file-confirm-btn"
+                size="mini"
+                type="primary"
+                @click="addSingleNvr">{{ $t('deviceView.confirm') }}</el-button>
             </div>
           </el-dialog>
           <el-col :span="lang === 'en' && varWindowWidth < 1920? 13: 13" class="risde">
@@ -368,9 +394,13 @@
                     <span v-if="!item.isClick" class="nape-name">
                       {{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}
                     </span>
-                    <el-input v-if="item.isClick" v-model="item.tempName"
-                              :placeholder="$t('deviceView.inputInspectName')" size="mini"
-                              class="nape-input input-details" @input="(val)=>channelNameChange(val,item)"/>
+                    <el-input
+                      v-if="item.isClick"
+                      v-model="item.tempName"
+                      :placeholder="$t('deviceView.inputInspectName')"
+                      size="mini"
+                      class="nape-input input-details"
+                      @input="(val)=>channelNameChange(val,item)"/>
                   </div>
                   <div class="nape-dep-data">
                     <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
@@ -542,8 +572,8 @@ import { mapGetters } from 'vuex';
 import { getStoreList, getBriefStoreList } from '@/api/store';
 import EzvizAccount from './EzvizAccount';
 import filterString from '@/common/filterString';
-import util from "../../../common/util";
-import lodash from "lodash";
+import util from '../../../common/util';
+import lodash from 'lodash';
 
 export default {
   name: 'NvrDeviceMgmt',
@@ -720,7 +750,7 @@ export default {
   },
   watch: {
     accountChanged(val) {
-      let self = this;
+      const self = this;
       if (val !== 0) {
         self.InitData();
         self.getBriefStoreData();
@@ -744,19 +774,19 @@ export default {
   },
 
   mounted() {
-    let self = this;
+    const self = this;
     self.getAccountList();
   },
 
   methods: {
     callChildAdd() {
-      let self = this;
+      const self = this;
       self.$refs.ezvizAccount.showAddEzvizAccount();
     },
 
     handleClick(tabs) {
-      let self = this;
-      let index = Number(tabs.index);
+      const self = this;
+      const index = Number(tabs.index);
       switch (index) {
         case 0:
           self.getAccountList();
@@ -770,15 +800,15 @@ export default {
     },
 
     getBriefStoreData() {
-      let self = this;
+      const self = this;
       getBriefStoreList().then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
-          let storeList = res.data;
+          const storeList = res.data;
           self.storeList = storeList;
-          let tempStore = [];
+          const tempStore = [];
           storeList.forEach(item => {
-            let obj = {
+            const obj = {
               storeId: item.storeId,
               label: item.name,
               value: item.name,
@@ -799,7 +829,7 @@ export default {
     },
 
     handleEditChange(file, fileList) {
-      let self = this;
+      const self = this;
       self.isUpdate = false;
       this.channelList.forEach(item => {
         if (item.isClick) {
@@ -810,12 +840,12 @@ export default {
     },
 
     beforeAvatarUpload(file) {
-      let fileName = file.name.split('.');
-      let fileType = fileName[fileName.length - 1];
-      let isJPEG = fileType === 'jpeg';
-      let isJPG = fileType === 'jpg';
-      let isPNG = fileType === 'png';
-      let isLt60K = file.size / 1024 < 60;
+      const fileName = file.name.split('.');
+      const fileType = fileName[fileName.length - 1];
+      const isJPEG = fileType === 'jpeg';
+      const isJPG = fileType === 'jpg';
+      const isPNG = fileType === 'png';
+      const isLt60K = file.size / 1024 < 60;
       if (!isJPG && !isJPEG && !isPNG) {
         this.$message.error(this.$t('deviceView.imgTypeInfo'));
         this.file = '';
@@ -856,7 +886,7 @@ export default {
     },
 
     clickNVR(index, item) {
-      let self = this;
+      const self = this;
       item.isClick = true;
       self.curNVRItem = item;
       self.curIndex = index;
@@ -870,7 +900,7 @@ export default {
     },
 
     checkBeforeImport() {
-      let self = this;
+      const self = this;
     },
 
     importItem() {
@@ -878,14 +908,14 @@ export default {
     },
 
     exportItem() {
-      let self = this;
+      const self = this;
       self.export2Excel();
     },
 
     sizeChange(val) {
-      let self = this;
+      const self = this;
       self.sizeNum = val;
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -899,9 +929,9 @@ export default {
     },
 
     currentChange(val) {
-      let self = this;
+      const self = this;
       self.page = val;
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -916,11 +946,11 @@ export default {
 
     // nvr list filter
     filterNVR() {
-      let self = this;
+      const self = this;
       self.nvrFilter = !self.nvrFilter;
       self.page = 1;
       self.nvrFilterName = 'name';
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -934,11 +964,11 @@ export default {
     },
 
     filterModel() {
-      let self = this;
+      const self = this;
       self.modelFilter = !self.modelFilter;
       self.page = 1;
       self.nvrFilterName = 'storeName';
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -952,11 +982,11 @@ export default {
     },
 
     filterAccount() {
-      let self = this;
+      const self = this;
       self.modelFilter = !self.modelFilter;
       self.page = 1;
       self.nvrFilterName = 'ezvizAccount';
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -970,11 +1000,11 @@ export default {
     },
 
     filterStore() {
-      let self = this;
+      const self = this;
       self.storeFilter = !self.storeFilter;
       self.page = 1;
       self.nvrFilterName = 'storeName';
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -988,11 +1018,11 @@ export default {
     },
 
     filterChannelNum() {
-      let self = this;
+      const self = this;
       self.channelNumFilter = !self.channelNumFilter;
       self.page = 1;
       self.nvrFilterName = 'channelCount';
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1006,7 +1036,7 @@ export default {
     },
 
     deleteChannel(channelList) {
-      let params = {
+      const params = {
         deviceIds: channelList
       };
       return new Promise((resolve, reject) => {
@@ -1017,7 +1047,7 @@ export default {
     },
 
     deleteNVR(nvrList) {
-      let params = {
+      const params = {
         ivsIds: nvrList
       };
       return new Promise((resolve, reject) => {
@@ -1044,7 +1074,7 @@ export default {
         ezvizRESTful.addEzivzDevice(params).then(resDevice => {
           resolve(resDevice);
         }).catch((err) => {
-          reject(err)
+          reject(err);
         });
       });
     },
@@ -1054,14 +1084,14 @@ export default {
         ezvizRESTful.deleteEzivzDevice(params).then(resDevice => {
           resolve(resDevice);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     getAllDeviceData() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         'filter': {
           'page': 0,
           'size': 1000
@@ -1069,7 +1099,7 @@ export default {
       };
       return new Promise((resolve, reject) => {
         ezvizRESTful.getEzvizList(params).then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           let data = [];
           if (errMsg != undefined && errMsg === 'Success') {
             data = res.data.content;
@@ -1082,8 +1112,8 @@ export default {
     },
 
     getAllNVRData() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         'filter': {
           'page': 0,
           'size': 1000
@@ -1091,7 +1121,7 @@ export default {
       };
       return new Promise((resolve, reject) => {
         deviceRESTful.getNVRList(params).then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           let data = [];
           if (errMsg != undefined && errMsg === 'Success') {
             data = res.data.content;
@@ -1104,13 +1134,13 @@ export default {
     },
 
     async addAllData(paramsNVR, paramsDevice) {
-      let self = this;
-      let data = await self.getAllDeviceData();
+      const self = this;
+      const data = await self.getAllDeviceData();
       self.channelData = await self.getChannelData();
-      let nvrList = [];
-      let channelList = self.channelData.map(x => x.id);
+      const nvrList = [];
+      const channelList = self.channelData.map(x => x.id);
       data.forEach(item => {
-        let json = {};
+        const json = {};
         json.serialNumber = item.serialNumber;
         json.deleteFromEzviz = false;
         nvrList.push(json);
@@ -1128,8 +1158,8 @@ export default {
           self.deleteEzvizDevice(_item);
         });
       }
-      let res1 = await self.addEzivzDevice(paramsNVR);
-      let res2 = await self.addDevice(paramsDevice);
+      const res1 = await self.addEzivzDevice(paramsNVR);
+      const res2 = await self.addDevice(paramsDevice);
       if (res1.errCode === 0 && res2.errCode === 0) {
         self.notify(self.$t('deviceView.importSuss'), 'success', 3000);
         self.showImportContent = false;
@@ -1138,7 +1168,7 @@ export default {
         self.showImportContent = false;
       }
       self.page = 1;
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1152,8 +1182,8 @@ export default {
     },
 
     importfxx(obj) {
-      let _this = this;
-      let inputDOM = this.$refs.inputer;
+      const _this = this;
+      const inputDOM = this.$refs.inputer;
       this.file = event.currentTarget.files[0];
       var rABS = false;
       var f = this.file;
@@ -1186,12 +1216,12 @@ export default {
             _this.notify(this.$t('deviceView.templateError'), 'warning', 3000);
             return false;
           }
-          let arr = outdata;
-          let nvrDataTemp = [];
-          let channelDataTemp = [];
+          const arr = outdata;
+          const nvrDataTemp = [];
+          const channelDataTemp = [];
           arr.forEach((item, index) => {
             if (nvrDataTemp.map(x => x.ivsId).indexOf(item['序列号']) === -1) {
-              let obj = {
+              const obj = {
                 serialNumber: item['序列号'],
                 name: item['设备名称'],
                 channelCount: item['通道数'],
@@ -1201,7 +1231,7 @@ export default {
               };
               nvrDataTemp.push(obj);
             }
-            let obj = {
+            const obj = {
               name: item['通道名称'],
               storeId: item['StoreID'],
               ivsId: item['序列号'],
@@ -1211,10 +1241,10 @@ export default {
             channelDataTemp.push(obj);
           });
 
-          let params1 = {
+          const params1 = {
             'device': nvrDataTemp
           };
-          let params2 = {
+          const params2 = {
             'device': channelDataTemp
           };
           _this.addAllData(params1, params2);
@@ -1231,19 +1261,19 @@ export default {
     export2Excel() {
       var that = this;
       require.ensure([], async() => {
-        let { export_json_to_excel } = require('@/excel/Export2Excel');
-        let tHeader = ['StoreID', '所属门店', '序列号', '设备名称', '设备验证码', '通道数', '通道名称',
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = ['StoreID', '所属门店', '序列号', '设备名称', '设备验证码', '通道数', '通道名称',
           '通道序号', '萤石账号'];
-        let filterVal = ['storeId', 'storeName', 'serialNumber', 'name', 'validationCode',
+        const filterVal = ['storeId', 'storeName', 'serialNumber', 'name', 'validationCode',
           'channelCount', 'channelName', 'channelNum', 'ezvizAccount'];
-        let deviceData = await that.getAllDeviceData();
-        let channelData = that.channelData;
-        let excelData = [];
+        const deviceData = await that.getAllDeviceData();
+        const channelData = that.channelData;
+        const excelData = [];
         if (deviceData.length !== 0 && channelData.length !== 0) {
           deviceData.forEach((item, index) => {
             channelData.forEach((_item, _index) => {
               if (item.serialNumber === _item.ivsId) {
-                let obj = {};
+                const obj = {};
                 obj.storeId = item.storeId;
                 obj.storeName = item.storeName;
                 obj.serialNumber = item.serialNumber;
@@ -1258,8 +1288,8 @@ export default {
             });
           });
         }
-        let list = excelData;
-        let data = that.formatJson(filterVal, list);
+        const list = excelData;
+        const data = that.formatJson(filterVal, list);
         export_json_to_excel(tHeader, data, '看门店-萤石云设备管理导入示例');
       });
     },
@@ -1269,7 +1299,7 @@ export default {
     },
 
     handleNVR(index, item) {
-      let self = this;
+      const self = this;
       switch (index) {
         case 0: self.importItem(); break;
         case 1: self.exportItem(); break;
@@ -1279,7 +1309,7 @@ export default {
     },
 
     handleEdit(index, item) {
-      let self = this;
+      const self = this;
       item.isClick = true;
       self.curChannelItem = item;
       self.channelList.forEach((_item, _index) => {
@@ -1290,7 +1320,7 @@ export default {
     },
 
     cancelEdit(index, item) {
-      let self = this;
+      const self = this;
       self.isUpdate = false;
       item.isClick = false;
       item.tempUrl = item.pictureUrl;
@@ -1302,7 +1332,7 @@ export default {
     },
 
     confrimEdit(index, item) {
-      let self = this;
+      const self = this;
       if (item.id !== 0) {
         self.updateEzvizChannel(item);
       } else {
@@ -1312,8 +1342,8 @@ export default {
     },
 
     updateEzvizChannel(item) {
-      let self = this;
-      let obj = {};
+      const self = this;
+      const obj = {};
       self.isUpdate = false;
       obj.id = self.curChannelItem.id;
       obj.name = self.curChannelItem.tempName;
@@ -1321,13 +1351,13 @@ export default {
         self.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
         return false;
       }
-      let params = obj;
+      const params = obj;
       let attachRes = {};
       deviceRESTful.updateDevice(params).then(async res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           if (item.tempUrl !== item.pictureUrl) {
-            let fm = new FormData();
+            const fm = new FormData();
             fm.append('id', self.curChannelItem.id);
             fm.append('picture', self.file);
             attachRes = await self.attachImageToDevice(fm);
@@ -1341,28 +1371,28 @@ export default {
           self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         }
       })
-      .then(async() => {
-        self.channelData = await self.getChannelData();
-        self.getChannelListByDevice(self.curNVRItem.serialNumber);
-      }).catch(err => {
-      console.log("EzvizDeviceManagement-updateEzvizChannel: " + err);
-    });
+        .then(async() => {
+          self.channelData = await self.getChannelData();
+          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+        }).catch(err => {
+          console.log('EzvizDeviceManagement-updateEzvizChannel: ' + err);
+        });
     },
 
-    addEzvizChannel(item){
-      let self = this;
-      let json = {};
+    addEzvizChannel(item) {
+      const self = this;
+      const json = {};
       json.name = item.tempName;
       json.storeId = self.curNVRItem.storeId;
       json.ivsId = self.curNVRItem.serialNumber;
       json.channelId = item.channelId;
       json.vendor = 1;
-      let deviceArr = [];
+      const deviceArr = [];
       deviceArr.push(json);
-      let params = {};
+      const params = {};
       params.device = deviceArr;
       deviceRESTful.addDevice(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.curChannelItem.isClick = false;
@@ -1370,23 +1400,23 @@ export default {
           self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
         }
       })
-      .then(async() => {
-        self.channelData = await self.getChannelData();
-        self.getChannelListByDevice(self.curNVRItem.serialNumber);
-      }).catch(err => {
-      console.log("EzvizDeviceManagement-addEzvizChannel: " + err);
-    });
+        .then(async() => {
+          self.channelData = await self.getChannelData();
+          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+        }).catch(err => {
+          console.log('EzvizDeviceManagement-addEzvizChannel: ' + err);
+        });
     },
 
     getDeviceList(params) {
-      let self = this;
+      const self = this;
       ezvizRESTful.getEzvizList(params).then(res => {
-        let errMsg = res.errMsg;
-        let temp = [];
+        const errMsg = res.errMsg;
+        const temp = [];
         if (errMsg != undefined && errMsg === 'Success') {
-          let data = res.data.content;
+          const data = res.data.content;
           data.forEach((item, index) => {
-            let obj = {};
+            const obj = {};
             obj.serialNumber = item.serialNumber;
             obj.name = item.name;
             obj.tempNvrName = item.name;
@@ -1426,30 +1456,30 @@ export default {
     },
 
     searchNVRList() {
-      //to do nothing
+      // to do nothing
     },
 
     getChannelData() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         deviceRESTful.getDeviceList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg && errMsg === 'Success') {
-            let data = res.data;
+            const data = res.data;
             resolve(data);
           }
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     getChannelListByDevice(serialNumber) {
-      let self = this;
-      let temp = [];
+      const self = this;
+      const temp = [];
       self.channelData.forEach(item => {
         if (item.ivsId === serialNumber) {
-          let obj = {};
+          const obj = {};
           obj.id = item.id;
           obj.name = item.name;
           obj.tempName = item.name;
@@ -1469,22 +1499,22 @@ export default {
       if (self.channelList.length === 0) {
         self.editNvrChannelNumList = self.channelNumList;
       } else {
-        let sortArr = self.channelList.sort(self.getSortFun('channelId'));
-        let lastChannel = sortArr[sortArr.length - 1];
-        let maxChannleId = lastChannel.channelId;
-        let spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
+        const sortArr = self.channelList.sort(self.getSortFun('channelId'));
+        const lastChannel = sortArr[sortArr.length - 1];
+        const maxChannleId = lastChannel.channelId;
+        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
         self.editNvrChannelNumList = spliceArray;
       }
     },
 
     async InitData() {
-      let self = this;
+      const self = this;
       if (self.varyWindowHeight >= 760) {
         self.sizeNum = 20;
       } else {
         self.sizeChange = 10;
       }
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1498,19 +1528,19 @@ export default {
     },
 
     async getAllStoreList() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         'filter': {
           'page': 0,
           'size': 2000
         }
       };
-      let retData = await self.getStoreData(params);
-      let storeList = retData.data.content;
+      const retData = await self.getStoreData(params);
+      const storeList = retData.data.content;
       self.storeList = storeList;
-      let tempStore = [];
+      const tempStore = [];
       storeList.forEach(item => {
-        let obj = {
+        const obj = {
           storeId: item.storeId,
           label: item.name,
           value: item.name,
@@ -1524,12 +1554,12 @@ export default {
     },
 
     getStoreData(params) {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            let data = res.data;
+            const data = res.data;
             resolve(res);
           }
         }).catch(res => {
@@ -1543,13 +1573,13 @@ export default {
         deviceRESTful.addDevice(params).then(resDevice => {
           resolve(resDevice);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     addAgain(index, item) {
-      let self = this;
+      const self = this;
       self.addDeviceData = item;
       self.isAddAgain = true;
       self.showAddNvrDialog = true;
@@ -1560,15 +1590,15 @@ export default {
       if (this.isAddAgain) {
         this.updateEzvizDeviceInfo();
       } else {
-        this.addEzvizDeviceBasedForm()
+        this.addEzvizDeviceBasedForm();
       }
     },
 
-    updateEzvizDeviceInfo(){
-      let self = this;
-      let obj = self.addDeviceData;
+    updateEzvizDeviceInfo() {
+      const self = this;
+      const obj = self.addDeviceData;
       obj.syncToEzviz = false;
-      let params = {};
+      const params = {};
       params.serialNumber = obj.serialNumber;
       params.name = obj.name;
       params.syncToEzviz = false;
@@ -1576,7 +1606,7 @@ export default {
       params.validationCode = obj.validationCode;
       params.ezvizAccount = obj.ezvizAccount;
       ezvizRESTful.updateEzvizDevice(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.showAddNvrDialog = false;
@@ -1597,19 +1627,38 @@ export default {
           self.channelData = await self.getChannelData();
           self.getChannelListByDevice(self.curNVRItem.serialNumber);
         }).catch(err => {
-        console.log("EzvizDeviceManagement-updateEzvizDeviceInfo: " + err);
-      });
+          console.log('EzvizDeviceManagement-updateEzvizDeviceInfo: ' + err);
+        });
     },
 
-    addEzvizDeviceBasedForm(){
-      let self = this;
+    addEzvizDeviceBasedForm() {
+      const self = this;
       self.$refs['nvrForm'].validate(async(valid) => {
         if (valid) {
-          let nvrParams = {};
-          let nvrArray = [];
+          const nvrParams = {};
+          const nvrArray = [];
           nvrArray.push(self.addDeviceData);
           nvrParams.device = nvrArray;
-          let res1 = await self.addEzivzDevice(nvrParams);
+          const ezvizAccount = nvrArray[0].ezvizAccount;
+          let authDeviceNum = 0;
+          self.ezvizAccountList.forEach(item => {
+            if (ezvizAccount === item.ezvizAccount) {
+              authDeviceNum = item.authDeviceNumber;
+            }
+          });
+          console.log(authDeviceNum);
+          let hasBoundStore = 0;
+          self.nvrData.forEach(item => {
+            if (ezvizAccount === item.ezvizAccount) {
+              hasBoundStore++;
+            }
+          });
+          if (hasBoundStore >= authDeviceNum) {
+            self.notify(self.$t('deviceView.moreThanAuthorizedDevices'), 'warning', 3000);
+            self.showAddNvrDialog = false;
+            return false;
+          }
+          const res1 = await self.addEzivzDevice(nvrParams);
           if (res1.errMsg === 'Success') {
             self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddNvrDialog = false;
@@ -1622,7 +1671,7 @@ export default {
             serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount
           };
           self.page = 1;
-          let params = {
+          const params = {
             'filter': {
               'page': self.page - 1,
               'size': self.sizeNum
@@ -1640,27 +1689,27 @@ export default {
     },
 
     addSingleChannel() {
-      let self = this;
+      const self = this;
       self.$refs['channelForm'].validate(async(valid) => {
         if (valid) {
-          let json = {};
+          const json = {};
           json.name = self.addChannelData.name;
           json.storeId = self.curNVRItem.storeId;
           json.ivsId = self.curNVRItem.serialNumber;
           json.channelId = self.addChannelData.channelId;
           json.vendor = 1;
-          let deviceArr = [];
+          const deviceArr = [];
           deviceArr.push(json);
-          let devParams = {};
+          const devParams = {};
           devParams.device = deviceArr;
-          let res1 = await self.addDevice(devParams);
+          const res1 = await self.addDevice(devParams);
           if (res1.errMsg === 'Success') {
             // get channel id and attach image to channel
-            let fm = new FormData();
-            let channelId = res1.data[0];
+            const fm = new FormData();
+            const channelId = res1.data[0];
             fm.append('id', channelId);
             fm.append('picture', self.file);
-            let attachRes = await self.attachImageToDevice(fm);
+            const attachRes = await self.attachImageToDevice(fm);
             if (attachRes.errMsg === 'Success') {
               self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             }
@@ -1683,28 +1732,28 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.attachImageToDevice(params).then(resDevice => {
           resolve(resDevice);
-        }).catch(err =>{
+        }).catch(err => {
           reject(err);
         });
       });
     },
 
     handleDelete(index, item) {
-      let self = this;
+      const self = this;
       self.showDeleteChannel = true;
       self.deleteChannelId = item.id;
     },
 
     deleteSingleChannel() {
-      let self = this;
+      const self = this;
       self.showDeleteChannel = false;
-      let idsArr = [];
+      const idsArr = [];
       idsArr.push(self.deleteChannelId);
-      let obj = {};
+      const obj = {};
       obj.deviceIds = idsArr;
-      let params = obj;
+      const params = obj;
       deviceRESTful.deleteDevice(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
         } else {
@@ -1715,12 +1764,12 @@ export default {
           self.channelData = await self.getChannelData(); // modify data
           self.getChannelListByDevice(self.curNVRItem.serialNumber);
         }).catch(err => {
-        console.log("EzvizDeviceManagement-deleteSingleChannel: " + err);
-      });
+          console.log('EzvizDeviceManagement-deleteSingleChannel: ' + err);
+        });
     },
 
     editSingleNvr(index, item) {
-      let self = this;
+      const self = this;
       item.isEditing = true;
       item.isClick = true;
       self.nvrData.forEach((_item, _index) => {
@@ -1744,7 +1793,7 @@ export default {
     },
 
     showAddDialog() {
-      let self = this;
+      const self = this;
       self.showAddNvrDialog = true;
       self.storeDataList = self.allStoreDataList;
       self.isAddAgain = false;
@@ -1753,8 +1802,8 @@ export default {
     },
 
     confirmEditNvr(index, item) {
-      let self = this;
-      let obj = {};
+      const self = this;
+      const obj = {};
       obj.serialNumber = item.serialNumber;
       obj.name = item.tempNvrName;
       obj.channelCount = item.tempChannelCount;
@@ -1763,9 +1812,9 @@ export default {
         return false;
       }
       obj.syncToEzviz = false;
-      let params = obj;
+      const params = obj;
       ezvizRESTful.updateEzvizDevice(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           item.isEditing = false;
@@ -1779,35 +1828,35 @@ export default {
         .then(async() => {
           self.getChannelListByDevice(self.curNVRItem.serialNumber);
         }).catch(err => {
-        console.log("EzvizDeviceManagement-confirmEditNvr: " + err);
-      });
+          console.log('EzvizDeviceManagement-confirmEditNvr: ' + err);
+        });
     },
 
     cancelEditNvr(index, item) {
-      let self = this;
+      const self = this;
       item.isEditing = false;
       item.tempNvrName = item.name;
       item.tempChannelCount = item.channelCount;
     },
 
     async deleteSingleNVR() {
-      let self = this;
+      const self = this;
       self.showConfirmDelete = false;
-      let serialNumber = self.curNVRItem.serialNumber;
-      let json = {};
+      const serialNumber = self.curNVRItem.serialNumber;
+      const json = {};
       json.serialNumber = serialNumber;
       json.deleteFromEzviz = self.deleteFromEzviz;
-      let channelList = self.channelList.map(x => x.id);
+      const channelList = self.channelList.map(x => x.id);
       if (channelList.length > 0) {
-        let res1 = await self.deleteChannel(channelList);
-        let res2 = await self.deleteEzvizDevice(json);
+        const res1 = await self.deleteChannel(channelList);
+        const res2 = await self.deleteEzvizDevice(json);
         if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
         } else {
           self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
         }
       } else {
-        let res2 = await self.deleteEzvizDevice(json);
+        const res2 = await self.deleteEzvizDevice(json);
         if (res2.errMsg === 'Success') {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
         } else {
@@ -1815,7 +1864,7 @@ export default {
         }
       }
       self.deleteFromEzviz = false;
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1830,12 +1879,12 @@ export default {
 
     // add new channel
     addNewChannel() {
-      let self = this;
-      let channelNum = self.curNVRItem.channelCount;
+      const self = this;
+      const channelNum = self.curNVRItem.channelCount;
       self.channelNumList.forEach(item => {
         item.disabled = false;
       });
-      let spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
+      const spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
       spliceArray.forEach(item => {
         self.channelList.forEach(_item => {
           if (item.value === _item.channelId) {
@@ -1843,7 +1892,7 @@ export default {
           }
         });
       });
-      let deepArray = JSON.parse(JSON.stringify(spliceArray));
+      const deepArray = JSON.parse(JSON.stringify(spliceArray));
       deepArray.forEach(item => {
         item.label = item.label.split(' ')[0];
       });
@@ -1859,10 +1908,10 @@ export default {
     },
 
     async getAccountList() {
-      let self = this;
+      const self = this;
       self.tableData = [];
-      let retData = await self.getEzvizAccountList();
-      let accountList = retData.data;
+      const retData = await self.getEzvizAccountList();
+      const accountList = retData.data;
       self.ezvizAccountList = accountList;
     },
 
@@ -1870,8 +1919,8 @@ export default {
       return new Promise((resolve, reject) => {
         ezvizRESTful.getEzvizAccountList().then(result => {
           resolve(result);
-        }).catch(err =>{
-          reject(err)
+        }).catch(err => {
+          reject(err);
         });
       });
     },
@@ -1885,14 +1934,14 @@ export default {
     },
 
     channelNameChange(val, item) {
-      let self = this;
-      let comment = filterString.all(val, 20);
+      const self = this;
+      const comment = filterString.all(val, 20);
       if (Object.keys(item).length === 0) {
         self.addChannelData.name = comment;
       } else {
         item.tempName = comment;
       }
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 20) {
         this.channelNameRuletip = true;
       } else {
@@ -1901,10 +1950,10 @@ export default {
     },
 
     serialNumberChange(val) {
-      let self = this;
-      let comment = filterString.all(val, 20);
+      const self = this;
+      const comment = filterString.all(val, 20);
       self.addDeviceData.serialNumber = comment;
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 20) {
         this.serialRuletip = true;
       } else {
@@ -1913,10 +1962,10 @@ export default {
     },
 
     validateCodeChange(val) {
-      let self = this;
-      let comment = filterString.all(val, 10);
+      const self = this;
+      const comment = filterString.all(val, 10);
       self.addDeviceData.validationCode = comment;
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 10) {
         this.validateRuletip = true;
       } else {
@@ -1925,10 +1974,10 @@ export default {
     },
 
     deviceNameChange(val) {
-      let self = this;
-      let comment = filterString.all(val, 20);
+      const self = this;
+      const comment = filterString.all(val, 20);
       self.addDeviceData.name = comment;
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 20) {
         this.deviceRuletip = true;
       } else {
@@ -1949,26 +1998,26 @@ export default {
     },
 
     filterStoreOption(value) {
-      let storeList = lodash.cloneDeep(this.allStoreDataList);
-      if(value){
-        let temp = [];
-        let tempArray = [];
-        let tempStoreList = [];
+      const storeList = lodash.cloneDeep(this.allStoreDataList);
+      if (value) {
+        const temp = [];
+        const tempArray = [];
+        const tempStoreList = [];
         storeList.forEach((_item) => {
           temp.push(util.getPinyinList(_item.label));
           tempStoreList.push(_item);
         });
         for (let i = 0; i < temp.length; i++) {
-          if ( temp[i][0].indexOf(value.trim()) !== -1
-            || temp[i][1].indexOf(value.trim()) !== -1 ) {
+          if (temp[i][0].indexOf(value.trim()) !== -1 ||
+            temp[i][1].indexOf(value.trim()) !== -1) {
             tempArray.push(tempStoreList[i]);
           }
         }
         this.storeDataList = tempArray;
-      }else{
+      } else {
         this.storeDataList = storeList;
       }
-    },
+    }
   }
 };
 </script>

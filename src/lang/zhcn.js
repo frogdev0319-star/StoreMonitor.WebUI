@@ -731,7 +731,13 @@ export default {
     'enterAccountName': '用户名由1~20个汉字、字母或数字组成',
     'EzvizAccount': '萤石账号',
     'failedReason': '失败原因：',
-    'preview': '预览区域'
+    'preview': '预览区域',
+    'accessKey': '访问密钥',
+    'authorizedDevices': '授权设备数',
+    'lessThanAuthorizedDevices': '授权设备数小于已添加的设备数',
+    'errorAccessKey': '访问密钥错误！',
+    'moreThanAuthorizedDevices': '账号关联设备数量超限',
+    'errorDeviceNum': '授权设备数错误！'
   },
 
   // Store Management page language

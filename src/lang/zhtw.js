@@ -729,7 +729,13 @@ export default {
     'enterAccountName': ' 用戶名由1~20個漢字、字母或數字組成',
     'EzvizAccount': ' 螢石賬號',
     'failedReason': ' 失敗原因：',
-    'preview': ' 預覽區域'
+    'preview': ' 預覽區域',
+    'accessKey': '訪問密鑰',
+    'authorizedDevices': '授權設備數',
+    'lessThanAuthorizedDevices': '授權設備數小於已添加的設備數',
+    'errorAccessKey': '訪問密鑰錯誤！',
+    'moreThanAuthorizedDevices': '賬號关联設備數量超限',
+    'errorDeviceNum': '授權設備數錯誤！'
   },
 
   // Store Management page language

@@ -15,10 +15,18 @@
         >
           <div class="dialog-content" style="overflow:hidden;width:100%;">
             <hr style="border: 0.5px solid #dfe2e9;">
-            <el-form ref="accountForm" :model="ezvizAccountInfo" :rules="rules" class="nvrForm"
-                     label-position="top" size="mini">
-              <el-form-item v-if="isAdd" :label="$t('deviceView.selectAccountType')"
-                            required class="radio-item">
+            <el-form
+              ref="accountForm"
+              :model="ezvizAccountInfo"
+              :rules="rules"
+              class="nvrForm"
+              label-position="top"
+              size="mini">
+              <el-form-item
+                v-if="isAdd"
+                :label="$t('deviceView.selectAccountType')"
+                required
+                class="radio-item">
                 <el-radio-group v-model="ezvizAccountInfo.scope">
                   <el-radio
                     v-for="item in ezvizScopes"
@@ -28,8 +36,19 @@
               </el-form-item>
               <div v-if="ezvizAccountInfo.scope === 0">
                 <el-col :span="24">
-                  <el-form-item :label="$t('deviceView.mobilePhone')" prop="ezvizAccount">
-                    <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" />
+                  <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
+                    <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;"/>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item
+                    :label="$t('deviceView.authorizedDevices')"
+                    :error="errorAuthDeviceNum"
+                    prop="authorizedDevices">
+                    <el-input
+                      v-model="ezvizAccountInfo.authorizedDevices"
+                      style="width: 100%;"
+                      @input="(val)=>{ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '')}" />
                   </el-form-item>
                 </el-col>
               </div>
@@ -48,19 +67,30 @@
                 </el-row>
                 <el-form-item :label="$t('deviceView.developerService')" required>
                   <div class="account-list">
-                    <el-form ref="appForm" :label-width="varyWindowHeight < 1600 ? '90px' : '120px'"
-                             :model="ezvizAccountInfo" :rules="rules.appRules" label-position="left"
-                             class="ezviz-account" size="mini">
+                    <el-form
+                      ref="appForm"
+                      :label-width="varyWindowHeight < 1600 ? '90px' : '120px'"
+                      :model="ezvizAccountInfo"
+                      :rules="rules.appRules"
+                      label-position="left"
+                      class="ezviz-account"
+                      size="mini">
                       <el-form-item label="AppKey" prop="appKey">
                         <el-input v-model="ezvizAccountInfo.appKey" :type="isAdd ? '': 'password'" />
                       </el-form-item>
                       <el-form-item label="AppSecret" prop="appSecret">
                         <el-input v-model="ezvizAccountInfo.appSecret" :type="isAdd ? '': 'password'"/>
                       </el-form-item>
-                      <el-form-item :error="errorMsg" prop="accessToken" label="AccessToken"
-                                    class="access-token" >
-                        <el-input ref="tokenInput" v-model="ezvizAccountInfo.accessToken"
-                                  :type="isAdd ? '': 'password'" readonly/>
+                      <el-form-item
+                        :error="errorMsg"
+                        prop="accessToken"
+                        label="AccessToken"
+                        class="access-token" >
+                        <el-input
+                          ref="tokenInput"
+                          v-model="ezvizAccountInfo.accessToken"
+                          :type="isAdd ? '': 'password'"
+                          readonly/>
                         <el-button class="get-button" @click.prevent="getAccessToken()">
                           {{ $t('deviceView.obtain') }}
                         </el-button>
@@ -71,8 +101,12 @@
               </div>
               <el-col :span="24">
                 <el-form-item :label="$t('deviceView.comment')" prop="comment" class="comment-item">
-                  <el-input v-model="ezvizAccountInfo.comment" style="width: 100%;" type="textarea"
-                            @input="commentChange" @blur="notShowInputRuleTips"/>
+                  <el-input
+                    v-model="ezvizAccountInfo.comment"
+                    style="width: 100%;"
+                    type="textarea"
+                    @input="commentChange"
+                    @blur="notShowInputRuleTips"/>
                 </el-form-item>
                 <span class="text" style="float: right;color: #909399;">{{ curLength }}/100</span>
                 <span v-if="commentRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
@@ -81,10 +115,10 @@
           </div>
           <div slot="footer" class="dialog-footer">
             <el-button class="file-cancel-btn" size="mini" style="" @click="showAddAccount = false">
-              {{ $t('deviceView.cancle')}}
+              {{ $t('deviceView.cancle') }}
             </el-button>
             <el-button class="file-confirm-btn" size="mini" type="primary" @click="addAccount">
-              {{ $t('deviceView.confirmAdd')}}
+              {{ $t('deviceView.confirmAdd') }}
             </el-button>
           </div>
         </el-dialog>
@@ -137,14 +171,50 @@
         <div class="dialog-content" style="overflow:hidden;width:100%;">
           <hr style="border: 0.5px solid #dfe2e9;">
           <p style="margin: 20px 20px 20px 26px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;
-            display: inline-block; vertical-align: middle"></i>
+            <i
+              class="el-icon-warning"
+              style="font-size:26px;margin-right:20px;color:#FF9803;
+            display: inline-block; vertical-align: middle"/>
             <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.confirmDelete') }}</span>
           </p>
         </div>
         <div slot="footer" class="dialog-footer">
           <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteAccount = false">
-            {{ $t('deviceView.confirm')}}
+            {{ $t('deviceView.cancle') }}
+          </el-button>
+          <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteAccount()">
+            {{ $t('deviceView.confirm') }}
+          </el-button>
+        </div>
+      </el-dialog>
+      <el-dialog
+        v-if="showDeleteStoreVueAccount"
+        :title="$t('deviceView.deleteAccount')"
+        :visible.sync="showDeleteStoreVueAccount"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        width="28%"
+        top="35vh"
+        left="40vh">
+        <div class="dialog-content" style="overflow:hidden;width:100%;">
+          <hr style="border: 0.5px solid #dfe2e9;">
+          <el-form
+            ref="accountForm"
+            :model="ezvizAccountInfo"
+            :rules="rules"
+            class="nvrForm"
+            label-position="top"
+            size="mini">
+            <el-col :span="24">
+              <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
+                <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;"/>
+              </el-form-item>
+            </el-col>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteStoreVueAccount = false">
+            {{ $t('deviceView.cancle') }}
           </el-button>
           <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteAccount()">
             {{ $t('deviceView.confirm') }}
@@ -156,7 +226,7 @@
 </template>
 
 <script>
-import { deviceRESTful, ezvizRESTful } from '@/api/index';
+import { ezvizRESTful } from '@/api/index';
 import qs from 'qs';
 import filterString from '@/common/filterString.js';
 
@@ -164,41 +234,59 @@ export default {
   name: 'EzvizAccount',
 
   data() {
-    let validateEzvizAccount = (rule, value, callback) => {
-      let self = this;
-      let reg = /^1[3|4|5|7|8|9][0-9]\d{8}$/;
-      if (!value) {
-        return callback(new Error(this.$t('deviceView.enterAccount')));
-      } else {
-        if (self.isAdd) {
-          if (self.accountList.includes(value)) {
-            return callback(new Error(this.$t('deviceView.accountExist')));
-          }
+    const validateEzvizAccount = (rule, value, callback) => {
+      const self = this;
+      if (self.ezvizAccountInfo.scope === 1) {
+        const reg = /^1[3|4|5|7|8|9][0-9]\d{8}$/;
+        if (!value) {
+          return callback(new Error(this.$t('deviceView.enterAccount')));
         } else {
-          if (self.ezvizAccountInfo.oldEzvizAccount === value) {
-            callback();
-          } else {
+          if (self.isAdd) {
             if (self.accountList.includes(value)) {
               return callback(new Error(this.$t('deviceView.accountExist')));
             }
+          } else {
+            if (self.ezvizAccountInfo.oldEzvizAccount === value) {
+              callback();
+            } else {
+              if (self.accountList.includes(value)) {
+                return callback(new Error(this.$t('deviceView.accountExist')));
+              }
+            }
+          }
+          if (reg.test(value)) {
+            callback();
+          } else {
+            return callback(new Error(this.$t('deviceView.enterCorrentAccount')));
           }
         }
-        if (reg.test(value)) {
-          callback();
-        } else {
-          return callback(new Error(this.$t('deviceView.enterCorrentAccount')));
-        }
+      } else {
+        callback();
       }
     };
-    let validateAccountName = (rule, value, callback) => {
+    const validateAccountName = (rule, value, callback) => {
       if (!value) {
         return callback(new Error(this.$t('deviceView.enterAccountName')));
       } else {
-        let reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,20}$/;
+        const reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,20}$/;
         if (reg.test(value)) {
           callback();
         } else {
           return callback(new Error(this.$t('deviceView.enterAccountName')));
+        }
+      }
+    };
+    const validateAccessKey = (rule, value, callback) => {
+      if (!value) {
+        this.errorAccessKey = this.$t('deviceView.errorAccessKey');
+        return callback(new Error(this.$t('deviceView.errorAccessKey')));
+      } else {
+        const reg = /^[a-zA-Z0-9]{1,40}$/;
+        if (reg.test(value)) {
+          callback();
+        } else {
+          this.errorAccessKey = this.$t('deviceView.errorAccessKey');
+          return callback(new Error(this.$t('deviceView.errorAccessKey')));
         }
       }
     };
@@ -236,7 +324,9 @@ export default {
         accessToken: '',
         scope: 0,
         target: '',
-        comment: ''
+        comment: '',
+        accessKey: '',
+        authorizedDevices: 1
       },
       showAddAccount: false,
       ezvizScopes: [
@@ -260,6 +350,9 @@ export default {
         ],
         accountName: [
           { required: true, validator: validateAccountName, trigger: 'blur' }
+        ],
+        accessKey: [
+          { required: true, validator: validateAccessKey, trigger: 'blur' }
         ],
         app: [
           { required: true, message: '' }
@@ -287,7 +380,10 @@ export default {
       totalMsg: '',
       noData: '',
       accountList: [],
-      commentRuletip: false
+      commentRuletip: false,
+      showDeleteStoreVueAccount: false,
+      errorAccessKey: '',
+      errorAuthDeviceNum: ''
     };
   },
 
@@ -304,7 +400,7 @@ export default {
   },
 
   mounted() {
-    let self = this;
+    const self = this;
     self.getAccountList();
   },
 
@@ -320,7 +416,7 @@ export default {
     },
 
     showAddEzvizAccount() {
-      let self = this;
+      const self = this;
       self.ezvizAccountInfo = {
         ezvizAccount: '',
         userName: '',
@@ -329,19 +425,24 @@ export default {
         accessToken: '',
         scope: 0,
         target: '',
-        comment: ''
+        comment: '',
+        accessKey: '',
+        authorizedDevices: 1,
+        appliedStores: 0
       };
       self.isAdd = true;
       self.accountTitle = this.$t('deviceView.addNewAccount');
       self.errorMsg = '';
+      self.errorAccessKey = '';
+      self.errorAuthDeviceNum = '';
       self.showAddAccount = true;
     },
 
     async getAccountList() {
-      let self = this;
+      const self = this;
       self.tableData = [];
-      let retData = await self.getEzvizAccountList();
-      let accountList = retData.data;
+      const retData = await self.getEzvizAccountList();
+      const accountList = retData.data;
       self.allAccountNum = accountList.length;
       self.storeviuNum = 0;
       self.userAccountNum = 0;
@@ -365,7 +466,7 @@ export default {
       if (self.tableData.length === 0) {
         self.noData = self.$t('deviceView.noData');
       }
-      let listArray = [];
+      const listArray = [];
       self.tableData.forEach(item => {
         listArray.push(item.ezvizAccount);
       });
@@ -377,13 +478,13 @@ export default {
         ezvizRESTful.getEzvizAccountList().then(result => {
           resolve(result);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     async getAccessToken() {
-      let self = this;
+      const self = this;
       if (self.isAdd) {
         self.$refs['appForm'].validate(async(valid) => {
           if (valid) {
@@ -398,16 +499,16 @@ export default {
     },
 
     async getAccessTokenMethod() {
-      let self = this;
+      const self = this;
       self.errorMsg = '';
-      let obj = {};
+      const obj = {};
       obj.appKey = self.ezvizAccountInfo.appKey;
       obj.appSecret = self.ezvizAccountInfo.appSecret;
-      let params = qs.stringify(obj);
-      let result = await ezvizRESTful.getAccessToken(params);
+      const params = qs.stringify(obj);
+      const result = await ezvizRESTful.getAccessToken(params);
       try {
-        let data = result.data;
-        let code = data.code;
+        const data = result.data;
+        const code = data.code;
         if (code !== '200') {
           switch (code) {
             case '10005': {
@@ -433,12 +534,12 @@ export default {
           self.ezvizAccountInfo.accessToken = data.data.accessToken;
         }
       } catch (err) {
-        console.log("EzvizAccount-getAccessTokenMethod: " + err);
+        console.log('EzvizAccount-getAccessTokenMethod: ' + err);
       }
     },
 
     addAccount() {
-      let self = this;
+      const self = this;
       let appFormValid = true;
       if (self.ezvizAccountInfo.scope === 1) {
         self.$refs['appForm'].validate(async(valid) => {
@@ -458,12 +559,12 @@ export default {
       self.$refs['accountForm'].validate(async(valid) => {
         if (valid && appFormValid) {
           if (self.isAdd) {
-            self.addEzvizAccount();
+            await self.addEzvizAccount();
           } else {
             // update
-            self.updateEzvizAccount();
+            await self.updateEzvizAccount();
           }
-          self.getAccountList();
+          await self.getAccountList();
         } else {
           if (self.ezvizAccountInfo.scope === 1) {
             self.errorMsg = self.$t('deviceView.enterDeveloperKey');
@@ -474,9 +575,9 @@ export default {
       });
     },
 
-    async addEzvizAccount(){
-      let self = this;
-      let accountParams = {};
+    async addEzvizAccount() {
+      const self = this;
+      const accountParams = {};
       accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
       accountParams.comment = self.ezvizAccountInfo.comment;
       accountParams.scope = Number(self.ezvizAccountInfo.scope);
@@ -484,49 +585,64 @@ export default {
         accountParams.accountName = self.ezvizAccountInfo.accountName;
         accountParams.appKey = self.ezvizAccountInfo.appKey;
         accountParams.appSecret = self.ezvizAccountInfo.appSecret;
+      } else {
+        accountParams.accessKey = self.ezvizAccountInfo.accessKey;
+        accountParams.authDeviceNumber = parseInt(self.ezvizAccountInfo.authorizedDevices);
       }
       try {
-        let res = await ezvizRESTful.addEzvizAccount(accountParams);
+        const res = await ezvizRESTful.addEzvizAccount(accountParams);
         if (res.errCode === 0) {
           self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.showAddAccount = false;
         } else {
-          self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-          self.showAddAccount = false;
+          const msg = res.errMsg;
+          if (self.ezvizAccountInfo.scope === 0) {
+            self.setErrorMsg(msg);
+          } else {
+            self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            self.showAddAccount = false;
+          }
         }
       } catch (err) {
-        console.log("EzvizAccount-addEzvizAccount: " + err);
+        console.log('EzvizAccount-addEzvizAccount: ' + err);
       }
     },
 
-    async updateEzvizAccount(){
-      let self = this;
-      let accountParams = {};
+    async updateEzvizAccount() {
+      const self = this;
+      const accountParams = {};
       accountParams.id = self.deleteId;
       accountParams.ezvizAccount = self.ezvizAccountInfo.ezvizAccount;
       accountParams.comment = self.ezvizAccountInfo.comment;
-      // accountParams.scope = Number(self.ezvizAccountInfo.scope);
       if (self.ezvizAccountInfo.scope === 1) {
         accountParams.accountName = self.ezvizAccountInfo.accountName;
         accountParams.appKey = self.ezvizAccountInfo.appKey;
         accountParams.appSecret = self.ezvizAccountInfo.appSecret;
+      } else {
+        accountParams.accessKey = self.ezvizAccountInfo.accessKey;
+        accountParams.authDeviceNumber = parseInt(self.ezvizAccountInfo.authorizedDevices);
       }
       try {
-        let res = await ezvizRESTful.updateEzvizAccount(accountParams);
+        const res = await ezvizRESTful.updateEzvizAccount(accountParams);
         if (res.errCode === 0) {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.showAddAccount = false;
         } else {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          self.showAddAccount = false;
+          const msg = self.ezvizAccountInfo.scope === 0 ? res.errMsg : self.$t('deviceView.editFail');
+          if (self.ezvizAccountInfo.scope === 0) {
+            self.setErrorMsg(msg);
+          } else {
+            self.notify(msg, 'warning', 3000);
+            self.showAddAccount = false;
+          }
         }
-      }catch (err) {
-        console.log("EzvizAccount-addEzvizAccount: " + err);
+      } catch (err) {
+        console.log('EzvizAccount-addEzvizAccount: ' + err);
       }
     },
 
     updateAccount(row) {
-      let self = this;
+      const self = this;
       self.isAdd = false;
       self.ezvizAccountInfo.ezvizAccount = row.ezvizAccount;
       self.ezvizAccountInfo.accountName = row.accountName;
@@ -537,54 +653,92 @@ export default {
       self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
       self.curLength = row.comment ? filterString.getContentLength(row.comment) : 0;
       self.deleteId = row.id;
+      self.ezvizAccountInfo.authorizedDevices = row.authDeviceNumber;
+      self.ezvizAccountInfo.accessKey = '';
+      self.appliedStores = row.appliedStores;
       if (row.scope === 1) {
         self.getAccessToken();
       }
       self.accountTitle = this.$t('deviceView.updateAccount');
+      self.errorAccessKey = '';
       self.showAddAccount = true;
     },
 
     showDeleteAccountDialog(row) {
-      let self = this;
-      let appliedScored = row.appliedStores;
+      const self = this;
+      self.isAdd = false;
+      self.ezvizAccountInfo.ezvizAccount = row.ezvizAccount;
+      self.ezvizAccountInfo.accountName = row.accountName;
+      self.ezvizAccountInfo.appKey = row.appKey;
+      self.ezvizAccountInfo.appSecret = row.appSecret;
+      self.ezvizAccountInfo.scope = row.scope;
+      self.ezvizAccountInfo.comment = row.comment;
+      self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
+      self.curLength = row.comment ? filterString.getContentLength(row.comment) : 0;
+      self.deleteId = row.id;
+      self.ezvizAccountInfo.accessKey = row.accessKey;
+      self.ezvizAccountInfo.authorizedDevices = row.authorizedDevices;
+      self.errorAuthDeviceNum = '';
+      self.errorAccessKey = '';
+      const appliedScored = row.appliedStores;
       if (appliedScored > 0) {
         self.notify(self.$t('deviceView.canotDeleteInfo'), 'warning', 3000);
         return;
       } else {
         self.deleteId = row.id;
-        self.showDeleteAccount = true;
+        self.ezvizAccountInfo.scope === 0 ? self.showDeleteStoreVueAccount = true : self.showDeleteAccount = true;
       }
     },
 
     async deleteAccount() {
-      let self = this;
-      let accountParams = {};
+      const self = this;
+      if (self.ezvizAccountInfo.scope === 0) {
+        self.$refs['accountForm'].validate(async(valid) => {
+          if (valid) {
+            self.deleteAccountService();
+          } else {
+            return false;
+          }
+        });
+      } else {
+        self.deleteAccountService();
+      }
+    },
+    async deleteAccountService() {
+      const self = this;
+      const accountParams = {};
       accountParams.accountId = self.deleteId;
+      if (self.ezvizAccountInfo.scope === 0) {
+        accountParams.accessKey = self.ezvizAccountInfo.accessKey;
+      }
       try {
-        let res = await ezvizRESTful.deleteEzvizAccount(accountParams);
+        const res = await ezvizRESTful.deleteEzvizAccount(accountParams);
         if (res.errCode === 0) {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
           self.showDeleteAccount = false;
+          self.showDeleteStoreVueAccount = false;
+          self.getAccountList();
         } else {
-          self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
-          self.showDeleteAccount = false;
+          if (self.ezvizAccountInfo.scope === 0) {
+            self.errorAccessKey = res.errMsg;
+          } else {
+            self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+            self.showDeleteAccount = false;
+          }
         }
-        self.getAccountList();
-      }
-      catch (err) {
-        console.log("EzvizAccount-deleteAccount: " + err);
+      } catch (err) {
+        console.log('EzvizAccount-deleteAccount: ' + err);
       }
     },
 
     commentChange(val) {
-      let self = this;
-      let comment = filterString.all(val, 100);
+      const self = this;
+      const comment = filterString.all(val, 100);
       console.log(comment);
-      let commentLength = filterString.getContentLength(comment);
+      const commentLength = filterString.getContentLength(comment);
       self.curLength = commentLength;
       self.ezvizAccountInfo.comment = comment;
-      let length = filterString.getContentLength(val);
-      console.log(comment, length);
+      const length = filterString.getContentLength(val);
       if (length > 100) {
         this.commentRuletip = true;
       } else {
@@ -602,6 +756,25 @@ export default {
         type: type,
         duration: time
       });
+    },
+
+    setErrorMsg(msg) {
+      const self = this;
+      self.errorAccessKey = '';
+      self.errorAuthDeviceNum = '';
+      if (msg.indexOf('access key') !== -1) {
+        self.errorAccessKey = String(Math.random());
+        self.$nextTick(() => { self.errorAccessKey = msg; });
+      } else if (msg.indexOf('authorized devices is invalid') !== -1) {
+        self.errorAuthDeviceNum = String(Math.random());
+        self.$nextTick(() => { self.errorAuthDeviceNum = self.$t('deviceView.errorDeviceNum'); });
+      } else if (msg.indexOf('authorized devices is less than') !== -1) {
+        self.errorAuthDeviceNum = String(Math.random());
+        self.$nextTick(() => { self.errorAuthDeviceNum = self.$t('deviceView.lessThanAuthorizedDevices'); });
+      } else {
+        self.errorAccessKey = String(Math.random());
+        self.$nextTick(() => { self.errorAccessKey = msg; });
+      }
     }
   }
 };
@@ -764,7 +937,7 @@ export default {
     font-size: calc(14/1920*100vw);
   }
   .nvrForm .radio-item {
-    margin-bottom: 0px;
+    margin-bottom: 15px;
   }
   .nvrForm .el-input__count{
     float: right;
