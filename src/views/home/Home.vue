@@ -248,7 +248,7 @@ export default {
 
     routerList() {
       console.log(this.$store.state.user.routes);
-      return this.$store.state.user.routes.slice(2, this.$store.state.user.routes.length);
+      return this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
     },
 
     groupHeight() {

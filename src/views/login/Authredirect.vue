@@ -20,7 +20,7 @@ export default{
           const obj = self.queryURL(hash);
           console.log(obj);
           this.$store.commit('SET_TOKEN', obj.token);
-          if (obj.ezvizProtocol == 'true') {
+          if (obj.ezvizProtocol === 'true') {
             this.$store.commit('SET_ISEZVIZ', true);
             setCookie('isEzviz', true);
           } else {
@@ -42,8 +42,8 @@ export default{
           setCookie('lang', lang);
         }
       }
-      self.$router.push('home');
-      // window.location.href = window.location.origin + window.location.pathname + '#/home';
+      //self.$router.push('home');
+      window.location.href = window.location.origin + window.location.pathname + '#/home';
     },
 
     queryURL(hashValue) {

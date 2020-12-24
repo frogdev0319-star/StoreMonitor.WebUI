@@ -211,7 +211,7 @@ const user = {
     },
 
     GetUserAuthorities({ commit }) {
-      return new Promise(resolve => {
+      return new Promise((resolve,reject) => {
         getUserAuthorities().then((res) => {
           commit('SET_AUTHORITY', res.data.authorities);
           commit('SET_ROLES', [res.data.roleId]);
@@ -365,7 +365,7 @@ const user = {
             ]
           },
         );
-        accessedRoutes.length == 0 ? route2.redirect = route2.children[0].path : '';
+        accessedRoutes.length === 0 ? route2.redirect = route2.children[0].path : '';
         accessedRoutes.push(route2);
 
         const route3 = {
@@ -379,33 +379,35 @@ const user = {
           hidden: false,
           children: []
         };
-        (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) && route3.children.push(
-          {
-            path: '/event',
-            name: 'eventManage',
-            component: resolve => require(['@/views/event/EventManage'], resolve),
-            meta: {
-              keepAlive: true, // the component is't to be cache.
-              requireAuth: true
-            }
-          },
-          {
-            path: '/event',
-            name: 'eventManage',
-            component: resolve => require(['@/views/event/details/RateManage'], resolve),
-            meta: {
-              requireAuth: false
-            },
-            children: [
-              {
-                path: '/rate',
-                name: 'eventDetails',
-                component: resolve => require(['@/views/event/details/RateManage'], resolve)
-
+        (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() ||
+          PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) &&
+          route3.children.push(
+            {
+              path: '/event',
+              name: 'eventManage',
+              component: resolve => require(['@/views/event/EventManage'], resolve),
+              meta: {
+                keepAlive: true, // the component is't to be cache.
+                requireAuth: true
               }
-            ]
-          },
-        );
+            },
+            {
+              path: '/event',
+              name: 'eventManage',
+              component: resolve => require(['@/views/event/details/RateManage'], resolve),
+              meta: {
+                requireAuth: false
+              },
+              children: [
+                {
+                  path: '/rate',
+                  name: 'eventDetails',
+                  component: resolve => require(['@/views/event/details/RateManage'], resolve)
+
+                }
+              ]
+            },
+          );
         accessedRoutes.push(route3);
 
         const route4 = {
