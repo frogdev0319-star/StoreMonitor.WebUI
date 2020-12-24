@@ -19,7 +19,6 @@ import moment from 'moment';
 import elCascaderMulti from 'el-cascader-multi';
 import htmlToPdf from '@/plugins/htmlToPdf';
 import './assets/sass/index.scss';
-import { resetRouter } from './router';
 
 Vue.use(ProgressPlugin);
 Vue.use(elCascaderMulti);
@@ -66,9 +65,6 @@ router.beforeEach(async(to, from, next) => {
     console.log(roles);
     // generate accessible routes map based on roles
     const accessRoutes = await store.dispatch('generateRoutes');
-    // dynamically add accessible routes
-    router.addRoutes(accessRoutes);
-
     // dynamically add accessible routes
     router.addRoutes(accessRoutes);
     // hack method to ensure that addRoutes is complete
