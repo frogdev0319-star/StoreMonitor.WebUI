@@ -18,6 +18,9 @@ $pass: #72a1f3;
 $failed: #ffd035;
 $ignored: #cad1db;
 
+*{
+  box-sizing: border-box;
+}
 .el-date {
   height: 80px;
   line-height: 80px;

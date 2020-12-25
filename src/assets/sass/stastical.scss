@@ -19,6 +19,9 @@ $closed: #72a1f3;
 $onsite: #fb804f;
 $store: #fccc3f;
 
+*{
+  box-sizing: border-box;
+}
 .statistics-header{
   margin-bottom: 30px;
   border-bottom: 1px solid $border;
