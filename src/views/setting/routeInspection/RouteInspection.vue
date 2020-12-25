@@ -643,7 +643,7 @@ export default {
             if (sheetName.some(x => x.id == 2)) {
               i = sheetIndex == -1 || sheetIndex == 0 ? 0 : sheetIndex - 1;
             } else {
-              i = sheetIndex == -1 ? 0 : sheetIndex;
+              i = sheetIndex == -1 ? 0 : (sheetIndex == 2 ? 1 : sheetIndex);
             }
           } else if (sheetName.length == 1) {
             i = 0;
@@ -1292,7 +1292,7 @@ export default {
                   item.d = item.c;
                 }
                 if (item.e != undefined) {
-                  if (item.e.indexOf('/') !== -1) {
+                  if (typeof item.e!=='number'&&item.e.indexOf('/') !== -1) {
                     const f_Score = item.e.split('/');
                     const scoreArr = [];
                     f_Score.forEach(f_item => {
@@ -1305,7 +1305,9 @@ export default {
                     item.e = scoreArr;
                   } else {
                     if (!isNaN(Number(item.e))) {
-                      item.e = parseInt(item.e);
+                      let a = [];
+                      a.push(parseInt(item.e));
+                      item.e = a;
                     } else {
                       const a = [];
                       for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
@@ -1438,6 +1440,16 @@ export default {
                 arrsheet3[0][0].a = _this.$t('insSettingView.Addscoreitems');
               }
             }
+          }
+          if(arrsheet2.length===0&&arrsheet1.length!==0&&arrsheet3.length!==0||arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length!==0){
+            let msg = '';
+            if (_this.lang == 'en') {
+              msg = _this.$t('insSettingView.OnlyOthers');
+            } else {
+              msg = '【Score】' + _this.$t('insSettingView.beforeImport');
+            }
+            _this.notify(msg, 'warning', 3000);
+            return false;
           }
           const dataArry = {
             PassFail: arrsheet1,
