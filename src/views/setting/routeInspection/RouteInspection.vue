@@ -418,7 +418,7 @@ export default {
         getScheduleListService(params).then(res => {
           const data = res.data;
           resolve(data);
-        }).catch(err =>{
+        }).catch(err => {
           reject(err);
         });
       });
@@ -462,7 +462,7 @@ export default {
         link.download = self.fileName;
         link.click();
       }).catch(err => {
-        console.log("RouteInspection-downItem: " + err);
+        console.log('RouteInspection-downItem: ' + err);
       });
     },
 
@@ -477,7 +477,7 @@ export default {
         self.downLoadSrc = url;
         // window.open(self.downLoadSrc,'_self');
       }).catch(err => {
-        console.log("RouteInspection-getDownLoadURL: " + err);
+        console.log('RouteInspection-getDownLoadURL: ' + err);
       });
     },
 
@@ -572,13 +572,13 @@ export default {
             objChild.score = itemChild.itemScore;
             objChild.qualifiedScore = itemChild.qualifiedScore;
             let availableScores = '';
-            if(itemChild.availableScores.length!==0){
+            if (itemChild.availableScores.length !== 0) {
               itemChild.availableScores.forEach((x_item, x_index) => {
                 const isuu = x_index === itemChild.availableScores.length - 1 ? '' : '/';
                 availableScores += x_item + isuu;
               });
-            }else{
-              for(let i=0;i<itemChild.itemScore+1;i++){
+            } else {
+              for (let i = 0; i < itemChild.itemScore + 1; i++) {
                 const isuu = i === itemChild.itemScore ? '' : '/';
                 availableScores += i + isuu;
               }
@@ -875,8 +875,11 @@ export default {
       }
       sessionStorage.setItem('TabName', self.activeName);
       sessionStorage.setItem('NapeId', JSON.stringify(arr));
-      self.$router.push({ name: 'bindStore', params:
-          { inspectId: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId }});
+      const params = {
+        inspectId: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId
+      };
+      sessionStorage.setItem('bindStoreData', JSON.stringify(params));
+      self.$router.push({ name: 'bindStore', params: params });
     },
 
     changeValue(obj) {
@@ -1002,10 +1005,10 @@ export default {
 
     toSetRules() {
       const self = this;
-      self.$router.push({ name: 'setRule', params: {
-        routeData: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData,
-        routeName: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].name }
-      });
+      const activeInpect = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)];
+      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name };
+      sessionStorage.setItem('ruleData', JSON.stringify(params));
+      self.$router.push({ name: 'setRule', params: params });
     },
 
     async delAllItem() {
@@ -1484,7 +1487,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
           that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
-          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'),that.$t('insSettingView.tHeaderE'),that.$t('insSettingView.tHeaderG'),that.$t('insSettingView.sheetscore2'),];
+          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'), that.$t('insSettingView.tHeaderE'), that.$t('insSettingView.tHeaderG'), that.$t('insSettingView.sheetscore2')];
         const excelData = [];
         let name = '';
         var wb = XLSX.utils.book_new();
@@ -1660,7 +1663,8 @@ export default {
     $border: #e3e9f4;
     $tab: #7d8cad;
     *{
-        font-family: Roboto,Arial, Microsoft YaHei;
+       font-family: Roboto,Arial, Microsoft YaHei;
+       box-sizing: content-box;
     }
     @function rem($val){
         @return $val/16+rem;

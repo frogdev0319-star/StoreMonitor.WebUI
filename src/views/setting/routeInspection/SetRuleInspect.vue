@@ -1,7 +1,8 @@
+<!--suppress ALL -->
 <template>
   <el-row class="el-setRule">
     <el-col :span="24" class="el-rute-title">
-      <span class="tab-name">【{{ $route.params.routeName }}】{{ $t('insSettingView.ruleInspect') }}</span>
+      <span class="tab-name">【{{ routeName }}】{{ $t('insSettingView.ruleInspect') }}</span>
       <div style="float:right;">
         <el-button size="mini" type="primary" class="btn-class" @click="submitRule">
           {{ $t('titleView.save') }}
@@ -11,7 +12,7 @@
     <el-col :span="24" class="el-rute-content">
       <p class="rule-title">{{ $t('insSettingView.PatrolScoreCalculation') }}</p>
       <p class="rule-item"><el-checkbox v-model="checkItem1">{{ $t('insSettingView.PSCrule1') }}Tab1
-        （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}</el-checkbox></p>
+      （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}</el-checkbox></p>
       <p class="rule-item"><el-checkbox v-model="checkItem2"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span></el-checkbox></p>
       <p class="rule-item"><el-checkbox v-model="checkItem3"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab2（{{ $t('insSettingView.sheetscore') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span> </el-checkbox></p>
       <p class="rule-score">{{ $t('insSettingView.CalculationMethod') }}：</p>
@@ -39,7 +40,7 @@
         <span class="input-text">{{ $t('remotePatrol.scorecount') }}~</span>
         <el-input :placeholder="$t('insSettingView.setMaxScore')" v-model="maxScore" class="input" @input="inputChangeMax"/>
         <span class="input-text">{{ $t('remotePatrol.scorecount') }}</span>
-        <span v-if="ScoreMsg" class="score_msg">*{{$t('insSettingView.rangeScoreTips')}}</span>
+        <span v-if="ScoreMsg" class="score_msg">*{{ $t('insSettingView.rangeScoreTips') }}</span>
       </p>
     </el-col>
     <el-col :span="24" class="el-rute-content">
@@ -68,10 +69,11 @@ export default {
       checkItem2: false,
       checkItem3: false,
       checkItem4: false,
-      routeData: this.$route.params.routeData,
       lang: this.$i18n.locale,
-      ScoreMsg: false
-    };
+      ScoreMsg: false,
+      inspectId: 0,
+      routeName: ''
+    }
   },
   mounted() {
     const self = this;
@@ -80,9 +82,9 @@ export default {
   methods: {
     async submitRule() {
       const self = this;
-      if(!self.ScoreMsg){
+      if (!self.ScoreMsg) {
         const params = {
-          inspectTagId: self.routeData[0].inspectId,
+          inspectTagId: self.inspectId,
           ruleItems: [
             { name: 'includedInTotalScoreWithType1', value: self.checkItem1 },
             { name: 'qualifiedForIgnoredWithType1', value: self.checkItem2 },
@@ -105,7 +107,10 @@ export default {
     },
     async getRule() {
       const self = this;
-      const params = { inspectId: self.routeData[0].inspectId };
+      const ruleData = JSON.parse(sessionStorage.getItem('ruleData'));
+      self.inspectId = ruleData.inspectId;
+      self.routeName = ruleData.routeName;
+      const params = { inspectId: self.inspectId };
       try {
         const res = await self.getInspectRule(params);
         if (res.errCode === 0) {
@@ -137,9 +142,8 @@ export default {
             }
           });
         }
-      }
-      catch (err) {
-        console.log("SetInspectRule-getRule: " + err);
+      } catch (err) {
+        console.log('SetInspectRule-getRule: ' + err);
       }
     },
     updateInspectRule(params) {
@@ -167,7 +171,7 @@ export default {
       } else {
         self.maxScore = val.replace(/[^\d]/g, '');
       }
-      self.ScoreMsg = parseInt(self.minScore)>parseInt(self.maxScore);
+      self.ScoreMsg = parseInt(self.minScore) > parseInt(self.maxScore);
     },
     inputChangeMin(val) {
       const self = this;
@@ -176,7 +180,7 @@ export default {
       } else {
         self.minScore = val.replace(/[^\d]/g, '');
       }
-      self.ScoreMsg = parseInt(self.minScore)>parseInt(self.maxScore);
+      self.ScoreMsg = parseInt(self.minScore) > parseInt(self.maxScore);
     },
     notify(msg, type, time) {
       this.$message({
@@ -185,6 +189,9 @@ export default {
         duration: time
       });
     }
+  },
+  destroyed(){
+    sessionStorage.removeItem('ruleData');
   }
 };
 </script>

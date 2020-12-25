@@ -170,6 +170,7 @@ export default {
       const self = this;
       self.$router.push({ name: 'titleSetting', params: { isAdd: true }});
       sessionStorage.setItem('titleList', JSON.stringify(self.titleList));
+      sessionStorage.setItem('isAdd', 1);
     },
 
     updateTitle(row) {
@@ -177,6 +178,7 @@ export default {
       self.$router.push({ name: 'titleSetting', params: { isAdd: false }});
       sessionStorage.setItem('titleInfo', JSON.stringify(row));
       sessionStorage.setItem('titleList', JSON.stringify(self.titleList));
+      sessionStorage.setItem('isAdd', 0);
     },
 
     showDeleteDialogMethod(val) {

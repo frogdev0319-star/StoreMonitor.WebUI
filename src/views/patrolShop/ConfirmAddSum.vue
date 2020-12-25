@@ -587,8 +587,9 @@ export default {
       if (PatrolComment != null) {
         self.suggest = PatrolComment;
       }
-      const routeData = self.$route.params.data;
-      const inspectSettings = self.$route.params.rule;
+      const inspectionRule = JSON.parse(sessionStorage.getItem('inspectionRule'));
+      const routeData = inspectionRule.data;
+      const inspectSettings = inspectionRule.rule;
       const inspect = routeData.inspect;
       const eventList = routeData.event;
       const store = routeData.store;
@@ -605,7 +606,7 @@ export default {
       let Tab0Status = false;
       let inspectPic = 0;
       inspect.forEach(p_item => {
-        var CurItemgetScore = 0, totalScore0 = 0, totalScoreX = 0, CurSc = 0, CurNotIgnoreTotalscore = 0,  CurAddScoreB = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0;
+        var CurItemgetScore = 0, totalScore0 = 0, totalScoreX = 0, CurSc = 0, CurNotIgnoreTotalscore = 0, CurAddScoreB = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
           let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0, addNotIgnoreTotalscoreA = 0, addIgnoreScoreA = 0;
@@ -671,7 +672,7 @@ export default {
             CurSc += addIgnoreScoreA;
             CurAddIgnoreItemScore = CurSc;
             CurAddIgnoreTotalscore += addNotIgnoreTotalscoreA;
-            CurAddScoreB += item.itemScore
+            CurAddScoreB += item.itemScore;
             getscoreTotal = CurItemgetScore;
             allscoreTotal = CurNotIgnoreTotalscore;
             allScoreB = CurAddScoreB;

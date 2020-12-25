@@ -195,7 +195,7 @@
                   <el-option v-for="item in fullScoreTemp" :key="item" :label="item" :value="item"/>
                 </el-select>
               </div>
-              <div v-if="activeSheetName=='1'" class="nape-scores-handle" :style="item.isClick?'':'flex:1;'">
+              <div v-if="activeSheetName=='1'" :style="item.isClick?'':'flex:1;'" class="nape-scores-handle">
                 <el-tooltip v-if="!item.isClick" class="item" effect="dark" placement="top">
                   <div slot="content" style="max-width:120px;">{{ item.availableScoreStr }}</div>
                   <span v-if="!item.isClick" style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
@@ -418,6 +418,10 @@ export default {
     self.getTitleList();
   },
 
+  destroyed() {
+    sessionStorage.removeItem('itemSettingData');
+  },
+
   methods: {
     getTitleList() {
       const self = this;
@@ -440,9 +444,9 @@ export default {
         });
         self.titleList = listArray;
       })
-      .catch(err => {
-        console.log("AddRuteInspect-getTitleList: " + err);
-      });
+        .catch(err => {
+          console.log('AddRuteInspect-getTitleList: ' + err);
+        });
     },
 
     getUserTitleList() {
@@ -495,7 +499,7 @@ export default {
           return false;
         }
       }).catch(err => {
-        console.log("AddRuteInspect-confirmEditTab: " + err);
+        console.log('AddRuteInspect-confirmEditTab: ' + err);
       });
     },
 
@@ -734,7 +738,7 @@ export default {
       // if (val[0] === '-1') {
       //   self.selectAvailable = Array.from(val).slice(1);
       // } else {
-        self.selectAvailable = Array.from(val)[0];
+      self.selectAvailable = Array.from(val)[0];
       // }
     },
     changeAddSelect(val) {
@@ -1025,9 +1029,9 @@ export default {
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
         if (typeof (item.Score_3) !== 'number' && item.Score_3.trim().length == 0) {
-            itemScore = 10;
-            qualifiedScore = null;
-        }else{
+          itemScore = 10;
+          qualifiedScore = null;
+        } else {
           if (item.Score_3 > 50 || item.Score_3 < 1) {
             self.notify(self.$t('insSettingView.sheetscoreA'), 'warning', 3000);
             return false;
@@ -1091,7 +1095,7 @@ export default {
           return false;
         }
       }).catch(err => {
-        console.log("AddRuteInspect-confirmeditNape: " + err);
+        console.log('AddRuteInspect-confirmeditNape: ' + err);
       });
     },
 
@@ -1123,7 +1127,7 @@ export default {
         if (typeof (self.newAddScore) !== 'number' && self.newAddScore.trim().length == 0) {
           itemScore = 10;
           qualifiedScore = null;
-        }else{
+        } else {
           if (self.newAddScore > 50 || self.newAddScore < 1) {
             self.notify(self.$t('insSettingView.sheetscoreA'), 'warning', 3000);
             return false;
@@ -1235,8 +1239,8 @@ export default {
           return false;
         }
       }).catch(err => {
-        console.log("AddRuteInspect-confirmaddNape: " + err);
-      });;
+        console.log('AddRuteInspect-confirmaddNape: ' + err);
+      });
     },
 
     cancelAddNape() {
@@ -1443,13 +1447,13 @@ export default {
         }
         self.availableScores = availableScores;
         let availableScoreStr = '';
-        if(_item.availableScores.length!==0){
-          availableScoreStr = _item.availableScores.toString()
-        }else{
-          for(let i=0;i<_item.itemScore+1;i++){
+        if (_item.availableScores.length !== 0) {
+          availableScoreStr = _item.availableScores.toString();
+        } else {
+          for (let i = 0; i < _item.itemScore + 1; i++) {
             const isuu = i === _item.itemScore ? '' : '/';
             availableScoreStr += i + isuu;
-          };
+          }
         }
         const obj = {
           id: _item.id,
@@ -1488,6 +1492,9 @@ export default {
       });
       self.availableScores = availableScores;
       self.tabName = sessionStorage.getItem('GroupName');
+      const itemSettingData = JSON.parse(sessionStorage.getItem('itemSettingData'));
+      self.routeName = itemSettingData.routeName;
+      self.routeData = itemSettingData.routeData;
       self.refreshData(0);
       self.getBindStoreList();
     },

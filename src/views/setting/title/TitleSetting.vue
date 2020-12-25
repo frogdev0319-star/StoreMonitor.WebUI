@@ -307,7 +307,7 @@ export default {
       ],
       tempRoleNameList: [],
       authorityInfoLists: [],
-      isAdd: this.$route.params.isAdd,
+      isAdd: true,
       lang: this.$i18n.locale,
       titleList: JSON.parse(sessionStorage.getItem('titleList'))
     };
@@ -336,9 +336,14 @@ export default {
   mounted() {
     const self = this;
     self.tempRoleNameList = JSON.parse(JSON.stringify(self.roleNameList));
+    self.isAdd = sessionStorage.getItem('isAdd') === '1';
     self.getAuthorityInfoList();
   },
-
+  destroyed() {
+    sessionStorage.removeItem('titleInfo');
+    sessionStorage.removeItem('titleList');
+    sessionStorage.removeItem('isAdd');
+  },
   methods: {
     commentChange(val) {
       const self = this;

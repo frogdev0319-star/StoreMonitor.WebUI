@@ -3,8 +3,13 @@
     <div class="el-bind-header">
       <div class="seacrh-content">
         <span>{{ $t('remotePatrol.storeSelect') }}</span>
-        <el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" :disabled="loading"
-                   size="mini" class="el-province" @change="changeCountry">
+        <el-select
+          v-model="curCountry"
+          :placeholder="$t('remotePatrol.country')"
+          :disabled="loading"
+          size="mini"
+          class="el-province"
+          @change="changeCountry">
           <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
             <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"/>
           </el-option-group>
@@ -61,8 +66,11 @@
         </el-input>
       </div>
     </div>
-    <div v-loading="loading" :element-loading-text="$t('insSettingView.bindingstore')"
-         class="el-bind-content-box" element-loading-background="rgba(255, 255, 255, 0.6)">
+    <div
+      v-loading="loading"
+      :element-loading-text="$t('insSettingView.bindingstore')"
+      class="el-bind-content-box"
+      element-loading-background="rgba(255, 255, 255, 0.6)">
       <p v-if="lang==='en'" class="el-header-title">{{ $t('insSettingView.bindStores') }}</p>
       <p v-else class="el-header-title" >
         {{ $t('insSettingView.selectStore') }}{{ tabName }}{{ $t('insSettingView.needBind') }}
@@ -104,8 +112,12 @@
       </div>
       <div class="el-bind-footer">
         <div class="el-btn-content">
-          <el-button :disabled="storeList.length === 0" :class="lang === 'en' ? 'en-btn' : 'btn'" size="mini"
-                     type="primary" @click="applyNape">
+          <el-button
+            :disabled="storeList.length === 0"
+            :class="lang === 'en' ? 'en-btn' : 'btn'"
+            size="mini"
+            type="primary"
+            @click="applyNape">
             <div class="btn-area">
               <i class="iconfont icon-quxiaolianjie"/>
               <span>{{ $t('insSettingView.confirmBound') }}</span>
@@ -176,6 +188,9 @@ export default {
     self.InitData();
     self.getCountryStore();
     self.getTagListData();
+  },
+  destroyed() {
+    sessionStorage.removeItem('bindStoreData');
   },
 
   methods: {
@@ -588,7 +603,7 @@ export default {
       self.allData = self.storeList.length === count;
     },
 
-    async searchStore () {
+    async searchStore() {
       const self = this;
       self.showCityContent = false;
       self.serachVale = '';
@@ -679,7 +694,7 @@ export default {
           const data = res.data;
           resolve(data);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
@@ -897,17 +912,17 @@ export default {
     },
 
     getBindStoreList() {
-      const self = this;
-      const params = { inspectId: self.$route.params.inspectId };
+      const bindStoreData = JSON.parse(sessionStorage.getItem('bindStoreData'));
+      const params = { inspectId: bindStoreData.inspectId };
       return new Promise((resolve, reject) => {
         getInspectBindList(params).then(res => {
           if (res.errMsg != undefined && res.errMsg === 'Success') {
             resolve(res);
           }
         })
-        .catch(err =>{
-          reject(err)
-        });
+          .catch(err => {
+            reject(err);
+          });
       });
     },
 

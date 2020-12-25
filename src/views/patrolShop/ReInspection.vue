@@ -1001,7 +1001,7 @@ export default {
     realTimeSpeed(val) {
       console.log(val);
       if (val >= 30) {
-        this.stopVideoPlay()
+        this.stopVideoPlay();
         this.stopTimer();
       }
     }
@@ -1163,12 +1163,12 @@ export default {
       console.log(self.isEzviz);
       if (!self.isEzviz) {
         if (document.hidden) {
-          self.stopVideoPlay()
+          self.stopVideoPlay();
           self.stopTimer();
         } else {
           console.log(self.isPlayingFlag);
-          if(this.currentState === 'loading'){
-            self.startVideo(self.channel.ivsId, self.channel.channelId, null)
+          if (this.currentState === 'loading') {
+            self.startVideo(self.channel.ivsId, self.channel.channelId, null);
           }
         }
       }
@@ -1176,7 +1176,7 @@ export default {
 
     changeBrand() {
       const self = this;
-      if(!self.isEzviz){
+      if (!self.isEzviz) {
         self.stopVideoPlay();
         self.previewplayer && self.previewplayer.dispose();
       }
@@ -2254,7 +2254,7 @@ export default {
       });
       if (!self.isEzviz) {
         self.curDeviceId = item.id;
-        self.startVideo(self.channel.ivsId, self.channel.channelId, null)
+        self.startVideo(self.channel.ivsId, self.channel.channelId, null);
       } else {
         self.curDeviceId = item.id;
         if (self.$refs.ezvizVideo.playState) {
@@ -2311,7 +2311,7 @@ export default {
             }
           });
           if (!self.isEzviz) {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, null)
+            self.startVideo(self.channel.ivsId, self.channel.channelId, null);
           } else {
             // Ezviz
             if (self.$refs.ezvizVideo != undefined) {
@@ -2475,7 +2475,9 @@ export default {
         curItemIndex: self.curItemIndex
       };
       self.hasIgnoretemp = [];
-      self.$router.push({ name: 'confirmSum', params: { data: obj, rule: inspectSettings }});
+      const params = { data: obj, rule: inspectSettings };
+      sessionStorage.setItem('inspectionRule', JSON.stringify(params));
+      self.$router.push({ name: 'confirmSum', params: params });
     },
     canceldNoAllInspect() {
       const self = this;
@@ -2590,7 +2592,9 @@ export default {
         curItemIndex: self.curItemIndex
       };
       self.hasIgnoretemp = [];
-      self.$router.push({ name: 'confirmSum', params: { data: obj, rule: inspectSettings }});
+      const params = { data: obj, rule: inspectSettings };
+      sessionStorage.setItem('inspectionRule', JSON.stringify(params));
+      self.$router.push({ name: 'confirmSum', params: params });
     },
     spreadContent() {
       const self = this;
@@ -3222,9 +3226,9 @@ export default {
       //   return false;
       // }
 
-      if ((!self.isEzviz && self.editCount != 0)
-        || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)
-        || (self.$store.getters.PatrolHistory != null)) {
+      if ((!self.isEzviz && self.editCount != 0) ||
+        (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
+        (self.$store.getters.PatrolHistory != null)) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       } else {
@@ -3323,11 +3327,11 @@ export default {
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;
               let itemScoreLength = [];
-              if(_item.availableScores.length!==0){
+              if (_item.availableScores.length !== 0) {
                 itemScoreLength = _item.availableScores;
-              }else{
-                for(let i=0;i<_item.itemScore+1;i++){
-                  itemScoreLength.push(i)
+              } else {
+                for (let i = 0; i < _item.itemScore + 1; i++) {
+                  itemScoreLength.push(i);
                 }
               }
               itemScoreLength.sort((a, b) => { return a - b; });
@@ -3495,9 +3499,9 @@ export default {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
       // }
-      if ((!self.isEzviz && self.editCount != 0)
-        || (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0)
-        || (self.$store.getters.PatrolHistory != null)) {
+      if ((!self.isEzviz && self.editCount != 0) ||
+        (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
+        (self.$store.getters.PatrolHistory != null)) {
         self.changeStoreObj.dialogCosed = true;
       } else {
         if (_item.userId == null) {
