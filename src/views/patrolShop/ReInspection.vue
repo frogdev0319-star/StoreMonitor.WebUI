@@ -1713,7 +1713,7 @@ export default {
               isSheet1 = isSheet2 = sheetName[1].Effective >= 1 || sheetName[0].Effective >= 1;
             } else {
               isSheet1 = isSheet2 = sheetName[1].Effective >= 1;
-              self.hasSheet3 = sheetName[1].Effective >= 1;
+              self.hasSheet3 = !(sheetName[1].Effective >= 1);
             }
           } else {
             isSheet1 = isSheet2 = sheetName[0].Effective >= 1 || sheetName[1].Effective >= 1;
@@ -3413,7 +3413,7 @@ export default {
     backToPatrol() {
       const self = this;
       self.showIgnoreItem = false;
-      self.showFeedBack = !!self.sheetName[Number(self.sheetName.length - 1)].isClick;
+      self.showFeedBack = self.sheetName[Number(self.sheetName.length - 1)].isClick;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
       sheetName.forEach(s_item => {
@@ -3443,7 +3443,7 @@ export default {
           self.inspectItemList = s_item.inspectList[self.curGroupIndex].items;
         }
       });
-      self.isShowWarn = !!(!self.hasSheet3 && self.hasIgnoretemp.some(x => x.inputCount == 0));
+      self.isShowWarn = !self.hasSheet3 && self.hasIgnoretemp.some(x => x.inputCount == 0);
       self.notShowAlert = self.sheetName.every(x => x.count == x.dealCount);
     },
     changeSheet(item, index) {
