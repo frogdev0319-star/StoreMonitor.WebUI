@@ -713,7 +713,15 @@ export default {
       } else {
         if (inspectSettings.checkItem1) {
           if (inspectSettings.radio === '-1') {
-            s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
+              s_count = Math.round(PassFileTotalScoreSystem + OtherTotalScoreSystem);
+            } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+              s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+              s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            } else {
+              s_count = Math.round(OtherTotalScoreSystem);
+            }
           } else {
             if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
               s_count = Math.round(((PassFileTotalScoreSystem + getscoreTotal) / (allscoreTotal + PassFileTotalScore) * 100) + otherGetscoreTotal);
@@ -727,12 +735,16 @@ export default {
           }
         } else {
           if (inspectSettings.radio === '-1') {
-            s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            if (inspectSettings.checkItem3) {
+              s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            }else{
+              s_count = Math.round(OtherTotalScoreSystem);
+            }
           } else {
             if (inspectSettings.checkItem3) {
-              s_count = Math.round((CurAddIgnoreItemScore / allAddIgnoreScore * 100) + otherGetscoreTotal);
+              s_count = allAddIgnoreScore===0 ? 0 : Math.round((CurAddIgnoreItemScore / allAddIgnoreScore * 100) + otherGetscoreTotal);
             } else {
-              s_count = Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
+              s_count = allscoreTotal===0 ? 0 : Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
             }
           }
         }

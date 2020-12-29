@@ -1647,7 +1647,6 @@ export default {
         item.itemScoreTitle = itemDS;
       }
       item.dealCount = item.Effective = item.inputCount = 1;
-      self.getDisabled(1);
     },
     checkScore(item, itemDS, e) {
       const self = this;
@@ -1683,7 +1682,7 @@ export default {
       }
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
-      self.getDisabled(0);
+      self.isDisabled = sheetName.some(item => item.Effective !== 0);
       self.isShowWarn = self.isDisabled && sheetName.some(item => item.Effective !== item.count);
       const hasIgnoretemp = [];
       sheetName.forEach(s_item => {
@@ -1697,52 +1696,7 @@ export default {
       });
       hasIgnoretemp.length === 0 ? self.notShowAlert = true : null;
     },
-    getDisabled(e) {
-      const self = this;
-      let isSheet1 = false, isSheet2 = false, isSheet3 = false;
-      const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
-      if (e === 0) {
-        if (sheetName.length === 1) {
-          isSheet1 = sheetName[0].type === 0 ? sheetName[0].Effective >= 1 : false;
-          isSheet2 = sheetName[0].type === 1 ? sheetName[0].Effective >= 1 : false;
-          isSheet3 = sheetName[0].type === 2 ? sheetName[0].Effective >= 1 : false;
-        } else if (sheetName.some(item => item.type === 0) && sheetName.some(item => item.type === 1)) {
-          if (sheetName.some(item => item.type === 2)) {
-            if (sheetName[2].Effective === 0) {
-              isSheet1 = isSheet2 = sheetName[1].Effective >= 1 || sheetName[0].Effective >= 1;
-            } else {
-              isSheet1 = isSheet2 = sheetName[1].Effective >= 1;
-              self.hasSheet3 = !(sheetName[1].Effective >= 1);
-            }
-          } else {
-            isSheet1 = isSheet2 = sheetName[0].Effective >= 1 || sheetName[1].Effective >= 1;
-          }
-        } else {
-          isSheet2 = sheetName[0].Effective >= 1;
-          self.hasSheet3 = sheetName[0].Effective === 0 && sheetName[1].Effective >= 1;
-        }
-        self.isDisabled = isSheet1 || isSheet2 || isSheet3;
-      } else {
-        if (sheetName.length === 1) {
-          isSheet1 = isSheet2 = true;
-        } else if (sheetName.some(item => item.type === 0) && sheetName.some(item => item.type === 1)) {
-          if (sheetName.some(item => item.type === 2)) {
-            if (sheetName[2].Effective === 0 && self.tempArr.every(x => x === 0)) {
-              isSheet1 = isSheet2 = self.hasIgnoretemp[self.curhasIgnoreItem].type !== 2 || (self.hasIgnoretemp[self.curhasIgnoreItem].type === 2 && self.hasIgnoretemp[self.curhasIgnoreItem].manualIgnore);
-              self.hasSheet3 = !self.hasIgnoretemp[self.curhasIgnoreItem].type !== 2;
-            } else {
-              isSheet1 = isSheet2 = true;
-            }
-          } else {
-            isSheet1 = isSheet2 = true;
-          }
-        } else {
-          isSheet2 = true;
-        }
-        self.isDisabled = isSheet1 || isSheet2;
-      }
-    },
+
     getAllStoreList() {
       const self = this;
       const params = {
@@ -2122,7 +2076,6 @@ export default {
             x.isClick = false;
           });
         }
-        self.getDisabled(1);
       } else {
         self.showGuide = false;
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount != 0 && self.sheetName[self.curSheetIndex].Effective != 0) {
@@ -2153,8 +2106,7 @@ export default {
           });
         });
         hasIgnoretemp.length == 0 ? self.notShowAlert = true : null;
-        // self.notShowAlert ? self.notShowAlert=false : null
-        self.getDisabled(0);
+        self.isDisabled = sheetName.some(item => item.Effective !== 0);
         self.isDisabled ? self.isShowWarn = true : self.isShowWarn = false;
       }
     },
