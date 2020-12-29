@@ -228,31 +228,31 @@
               {{ $t('insSettingView.confirm') }}</el-button>
           </div>
         </el-dialog>
-        <el-dialog
-          v-if="showFaildig"
-          :title="$t('remotePatrol.prompt')"
-          :visible.sync="showFaildig"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <div style="margin:20px 20px 20px 26px;">
-              <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>
-              <p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>
-              <p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>
-            </div>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showFaildig = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFaildig = false">
-              {{ $t('insSettingView.confirm') }}</el-button>
-          </div>
-        </el-dialog>
+        <!--<el-dialog-->
+          <!--v-if="showFaildig"-->
+          <!--:title="$t('remotePatrol.prompt')"-->
+          <!--:visible.sync="showFaildig"-->
+          <!--:append-to-body="true"-->
+          <!--:close-on-click-modal="false"-->
+          <!--width="510px"-->
+          <!--top="35vh"-->
+          <!--left="40vh">-->
+          <!--<div class="dialog-content" style="overflow:hidden;width:100%;">-->
+            <!--<hr style="border: 0.5px solid #dfe2e9;">-->
+            <!--<div style="margin:20px 20px 20px 26px;">-->
+              <!--<i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>-->
+              <!--<span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>-->
+              <!--<p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>-->
+              <!--<p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--<div slot="footer" class="dialog-footer">-->
+            <!--<el-button class="file-cancel-btn" size="mini" style="" @click="showFaildig = false">-->
+              <!--{{ $t('insSettingView.cancel') }}</el-button>-->
+            <!--<el-button class="file-confirm-btn" size="mini" type="primary" @click="showFaildig = false">-->
+              <!--{{ $t('insSettingView.confirm') }}</el-button>-->
+          <!--</div>-->
+        <!--</el-dialog>-->
       </el-col>
     </el-row>
   </div>
@@ -472,10 +472,11 @@ export default {
       });
       const delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1 || self.allchecked) {
-        if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) || self.allRoutedata.length === 3) && delData[0].type === 1) {
-          self.showFaildig = true;
-          return false;
-        } else if (self.allRoutedata.length === 1) {
+        // if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) || self.allRoutedata.length === 3) && delData[0].type === 1) {
+        //   self.showFaildig = true;
+        //   return false;
+        // } else
+        if (self.allRoutedata.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
           const bindSchedule = await self.getScheduleFromDB(params);
@@ -588,11 +589,12 @@ export default {
       });
       const delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1) {
-        if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) ||
-          self.allRoutedata.length === 3) && delData[0].type === 1) {
-          self.showFaildig = true;
-          return false;
-        } else if (self.allRoutedata.length === 1) {
+        // if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) ||
+        //   self.allRoutedata.length === 3) && delData[0].type === 1) {
+        //   self.showFaildig = true;
+        //   return false;
+        // } else
+        if (self.allRoutedata.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
           const bindSchedule = await self.getScheduleFromDB();

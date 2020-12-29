@@ -1248,18 +1248,18 @@ export default {
           let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false, flagPassFailScoreType = false;
           let flagTempError = false;
           // sheet整合好的巡检表:outdata
-          if ((outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others != undefined) || (outdata.PassFail != undefined && outdata.Score == undefined && outdata.Others != undefined)) {
-            _this.$refs.loadFile.value = '';
-            _this.$refs.loadFileEx.value = '';
-            let msg = '';
-            if (_this.lang == 'en') {
-              msg = _this.$t('insSettingView.OnlyOthers');
-            } else {
-              msg = '【Score】' + _this.$t('insSettingView.beforeImport');
-            }
-            _this.notify(msg, 'warning', 3000);
-            return false;
-          }
+          // if ((outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others != undefined) || (outdata.PassFail != undefined && outdata.Score == undefined && outdata.Others != undefined)) {
+          //   _this.$refs.loadFile.value = '';
+          //   _this.$refs.loadFileEx.value = '';
+          //   let msg = '';
+          //   if (_this.lang == 'en') {
+          //     msg = _this.$t('insSettingView.OnlyOthers');
+          //   } else {
+          //     msg = '【Score】' + _this.$t('insSettingView.beforeImport');
+          //   }
+          //   _this.notify(msg, 'warning', 3000);
+          //   return false;
+          // }
           outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? flagTempError = true : flagTempError = false;
           const arr = Object.entries(outdata);
           for (let i = 0; i < arr.length; i++) {
@@ -1444,16 +1444,16 @@ export default {
               }
             }
           }
-          if(arrsheet2.length===0&&arrsheet1.length!==0&&arrsheet3.length!==0||arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length!==0){
-            let msg = '';
-            if (_this.lang == 'en') {
-              msg = _this.$t('insSettingView.OnlyOthers');
-            } else {
-              msg = '【Score】' + _this.$t('insSettingView.beforeImport');
-            }
-            _this.notify(msg, 'warning', 3000);
-            return false;
-          }
+          // if(arrsheet2.length===0&&arrsheet1.length!==0&&arrsheet3.length!==0||arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length!==0){
+          //   let msg = '';
+          //   if (_this.lang == 'en') {
+          //     msg = _this.$t('insSettingView.OnlyOthers');
+          //   } else {
+          //     msg = '【Score】' + _this.$t('insSettingView.beforeImport');
+          //   }
+          //   _this.notify(msg, 'warning', 3000);
+          //   return false;
+          // }
           const dataArry = {
             PassFail: arrsheet1,
             Score: arrsheet2,

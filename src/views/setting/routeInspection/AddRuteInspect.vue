@@ -103,29 +103,29 @@
             </div>
           </div>
         </el-scrollbar>
-        <el-dialog
-          v-if="showFailInfo"
-          :title="$t('remotePatrol.prompt')"
-          :visible.sync="showFailInfo"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <div style="margin:20px 20px 20px 26px;">
-              <i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>
-              <p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>
-              <p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>
-            </div>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">{{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">{{ $t('insSettingView.confirm') }}</el-button>
-          </div>
-        </el-dialog>
+        <!--<el-dialog-->
+          <!--v-if="showFailInfo"-->
+          <!--:title="$t('remotePatrol.prompt')"-->
+          <!--:visible.sync="showFailInfo"-->
+          <!--:append-to-body="true"-->
+          <!--:close-on-click-modal="false"-->
+          <!--width="510px"-->
+          <!--top="35vh"-->
+          <!--left="40vh">-->
+          <!--<div class="dialog-content" style="overflow:hidden;width:100%;">-->
+            <!--<hr style="border: 0.5px solid #dfe2e9;">-->
+            <!--<div style="margin:20px 20px 20px 26px;">-->
+              <!--<i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>-->
+              <!--<span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>-->
+              <!--<p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>-->
+              <!--<p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--<div slot="footer" class="dialog-footer">-->
+            <!--<el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">{{ $t('insSettingView.cancel') }}</el-button>-->
+            <!--<el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">{{ $t('insSettingView.confirm') }}</el-button>-->
+          <!--</div>-->
+        <!--</el-dialog>-->
       </div>
     </el-col>
     <el-col :span="17" class="el-rute-nape">
@@ -860,10 +860,11 @@ export default {
     async deleteGroup(index, item) {
       const self = this;
       if (self.groupList.length === 1) {
-        if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && item.type === 1) {
-          self.showFailInfo = true;
-          return false;
-        } else if (self.typeTemp.length === 1) {
+        // if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && item.type === 1) {
+        //   self.showFailInfo = true;
+        //   return false;
+        // } else
+        if (self.typeTemp.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
           const bindSchedule = await self.getScheduleFromDB(params);
@@ -980,12 +981,12 @@ export default {
         self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
-      if (count === self.napeList.length && self.groupList.length === 1) {
-        if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
-          self.showFailInfo = true;
-          return false;
-        }
-      }
+      // if (count === self.napeList.length && self.groupList.length === 1) {
+      //   if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
+      //     self.showFailInfo = true;
+      //     return false;
+      //   }
+      // }
       self.showDeleteItem = true;
       self.deleteItemFlag = 'G';
     },
@@ -1279,12 +1280,12 @@ export default {
 
     handleDelete(index, item) {
       const self = this;
-      if (self.napeList.length === 1 && self.groupList.length === 1) {
-        if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
-          self.showFailInfo = true;
-          return false;
-        }
-      }
+      // if (self.napeList.length === 1 && self.groupList.length === 1) {
+      //   if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
+      //     self.showFailInfo = true;
+      //     return false;
+      //   }
+      // }
       self.showDeleteItem = true;
       self.deleteItemFlag = 'S';
       self.curItemId = item.id;
