@@ -1681,7 +1681,7 @@ export default {
 
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.standard(val, 50);
+      const content = filterString.all(val, 50);
       console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;

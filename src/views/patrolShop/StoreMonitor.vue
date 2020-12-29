@@ -2541,7 +2541,7 @@ export default {
 
     eventNameChanged(val) {
       let self = this;
-      let content = filterString.standard(val, 50);
+      let content = filterString.all(val, 50);
       self.eventName = content;
       self.showEventNameInfo = false;
       let length = filterString.getContentLength(val);
