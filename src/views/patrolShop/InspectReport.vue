@@ -267,6 +267,11 @@
           </div>
         </el-col>
       </el-row>
+      <el-dialog :visible.sync="downloadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+        <div class="body-content">
+          <p>{{ $t('remotePatrol.downloading') }}</p>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -286,6 +291,8 @@ export default {
   data() {
     return {
       reportId: 0,
+      downloadProgress:false,
+      hasAttachment:0,
       varyWindowWidth: window.innerWidth,
 
       videoSrc: require('../../../static/img/monitor.png'),
@@ -407,14 +414,27 @@ export default {
   methods: {
     handleDown() {
       let self = this;
-      new Promise(function(resolve) {
-        self.isup = true;
-        self.isexportPDF = true;
-        resolve(true);
-      }).then(function() {
-        self.$print(self.$refs.printPDF);
-        self.isexportPDF = false;
-      });
+      if(self.hasAttachment!==0){
+        self.downloadProgress = true;
+      }
+      var timer = setInterval(function () {
+          if (document.readyState === 'complete') {
+              new Promise(async function(resolve) {
+                if(self.hasAttachment!==0){
+                  self.downloadProgress = false;
+                }
+                self.isup = true;
+                self.isexportPDF = true;
+                resolve(true);
+              }).then(function() {
+                setTimeout(()=>{
+                  self.$print(self.$refs.printPDF);
+                  self.isexportPDF = false;
+                },500)
+              });
+              window.clearInterval(timer)
+          }
+      }, 500)
     },
 
     getRouterData() {
@@ -525,6 +545,7 @@ export default {
             if (item.attachment.length !== 0) {
               let _temp = [];
               let audioObj = {};
+              self.hasAttachment++;
               details.showAttachment = true;
               item.attachment.forEach((_item, _index) => {
                 if (_item.mediaType === 0) {
@@ -558,6 +579,7 @@ export default {
             if (item.attachment.length !== 0) {
               let _temp = [];
               let audioObj = {};
+              self.hasAttachment++;
               obj.showAttachment = true;
               item.attachment.forEach((_item, _index) => {
                 if (_item.mediaType === 0) {
@@ -934,6 +956,17 @@ export default {
   }
   .fade-enter, .fade-leave-active {
     opacity: 0
+  }
+  .AddSumupLoad /deep/ .el-dialog__body{
+    padding:30px 40px !important;
+    text-align: left;
+    .body-content{
+        p{
+            margin-bottom:0;
+            color:#182752;
+            font-size: calc(14/1920*100vw);
+        }
+    }
   }
   .report-container {
     width: 100%;
@@ -1375,6 +1408,7 @@ export default {
                     display: inline-block;
                     .img-content{
                       margin-right: calc(10/1920*100vw);
+                      margin-bottom: calc(10/1920*100vw);
                         position: relative;
                         cursor: pointer;
                         .start-icon{

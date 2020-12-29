@@ -205,6 +205,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
+    'downloading':'正在下载中......',
     'uploading': '正在上传中',
     'upload0': '共',
     'upload1': '个附件，已上传',
