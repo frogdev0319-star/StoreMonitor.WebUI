@@ -1030,7 +1030,7 @@ export default {
           self.$store.dispatch('setPatrolHistory', self.historyObj);
         }
         if (self.playState) {
-          self.stopRealTime();
+          self.stopVideoPlay();
           window.clearInterval(self.timerPlayReal);
           self.timerPlayReal = null;
         }
@@ -1052,7 +1052,7 @@ export default {
         self.$store.dispatch('setPatrolHistory', self.historyObj);
       }
       if (self.playState) {
-        self.stopRealTime();
+        self.stopVideoPlay();
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
       }
@@ -1699,13 +1699,14 @@ export default {
     },
     getDisabled(e) {
       const self = this;
-      let isSheet1 = false, isSheet2 = false;
+      let isSheet1 = false, isSheet2 = false, isSheet3 = false;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
       if (e === 0) {
         if (sheetName.length === 1) {
           isSheet1 = sheetName[0].type === 0 ? sheetName[0].Effective >= 1 : false;
           isSheet2 = sheetName[0].type === 1 ? sheetName[0].Effective >= 1 : false;
+          isSheet3 = sheetName[0].type === 2 ? sheetName[0].Effective >= 1 : false;
         } else if (sheetName.some(item => item.type === 0) && sheetName.some(item => item.type === 1)) {
           if (sheetName.some(item => item.type === 2)) {
             if (sheetName[2].Effective === 0) {
@@ -1721,7 +1722,7 @@ export default {
           isSheet2 = sheetName[0].Effective >= 1;
           self.hasSheet3 = sheetName[0].Effective === 0 && sheetName[1].Effective >= 1;
         }
-        self.isDisabled = isSheet1 || isSheet2;
+        self.isDisabled = isSheet1 || isSheet2 || isSheet3;
       } else {
         if (sheetName.length === 1) {
           isSheet1 = isSheet2 = true;
@@ -3238,7 +3239,7 @@ export default {
       const self = this;
       if (!self.isEzviz) {
         self.editCount = 0;
-        self.playState ? self.stopRealTime() : '';
+        self.playState ? self.stopVideoPlay(): '';
       } else {
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
         if (self.$refs.ezvizVideo != undefined) {
@@ -3657,7 +3658,7 @@ export default {
     },
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.standard(val, 50);
+      const content = filterString.all(val, 50);
       console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
