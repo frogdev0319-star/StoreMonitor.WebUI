@@ -429,7 +429,7 @@ export default {
         {
           'prop': 'inspectItemName',
           'label': this.$t('overview.items'),
-          'sortable': 'custom',
+          'sortable': false,
           'pdfmaxWidth': '24%',
           'width': '380',
           'maxWidth': '380'

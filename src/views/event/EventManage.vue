@@ -137,7 +137,6 @@
                 :class-name = "selfClassName"
                 prop="subject"
                 min-width="220"
-                sortable="custom"
                 align="left"
               >
                 <template slot-scope="scope">

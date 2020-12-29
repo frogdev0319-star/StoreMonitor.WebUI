@@ -346,7 +346,7 @@
         </div>
         <el-row v-if="sheetName.length!=0" class="inspect-title">
           <el-col v-if="!notShowAlert" :span="24">
-            <el-alert v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3" :title="$t('remotePatrol.alertContent')" :closable="false" type="warning"/>
+            <el-alert v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3" :title="$t('remotePatrol.allIgnored')" :closable="false" type="warning"/>
             <el-alert v-if="hasSheet3&&!showIgnoreItem&&!isShowWarn" :title="$t('remotePatrol.alertTips1')" :closable="false" type="warning"/>
             <el-alert v-if="isShowWarn" :closable="false" type="warning" show-icon><span style="cursor: pointer;font-weight:bold;" @click="hasIgnoreItem">{{ $t('remotePatrol.clickToContent') }}</span></el-alert>
             <el-alert v-if="showIgnoreItem" :closable="false" type="info" class="info-alert">
@@ -999,8 +999,7 @@ export default {
     },
 
     realTimeSpeed(val) {
-      console.log(val);
-      if (val >= 30) {
+      if (val >= 300) {
         this.stopVideoPlay();
         this.stopTimer();
       }
