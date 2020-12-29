@@ -202,6 +202,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
+    'downloading':'Downloading...',
     'uploading': 'Uploading...',
     'storeTag': 'Tag',
     'patrolWay': 'Inspection Type',
