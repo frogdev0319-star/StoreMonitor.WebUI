@@ -36,6 +36,11 @@
               </el-form-item>
               <div v-if="ezvizAccountInfo.scope === 0">
                 <el-col :span="24">
+                  <el-form-item :label="$t('deviceView.ezvizAccount')" :error="errorAccount" prop="ezvizAccount">
+                    <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" @input="ezvizAccountChanged" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
                   <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
                     <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;"/>
                   </el-form-item>
@@ -55,8 +60,8 @@
               <div v-else>
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item :label="$t('deviceView.mobilePhone')" prop="ezvizAccount">
-                      <el-input v-model="ezvizAccountInfo.ezvizAccount" />
+                    <el-form-item :label="$t('deviceView.mobilePhone')" :error="errorAccount" prop="ezvizAccount">
+                      <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
                     </el-form-item>
                   </el-col>
                   <el-col :span="11" :offset="1">
@@ -236,32 +241,28 @@ export default {
   data() {
     const validateEzvizAccount = (rule, value, callback) => {
       const self = this;
-      if (self.ezvizAccountInfo.scope === 1) {
-        const reg = /^1[3|4|5|7|8|9][0-9]\d{8}$/;
-        if (!value) {
-          return callback(new Error(this.$t('deviceView.enterAccount')));
+      const reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{4,40}$/;
+      if (!value) {
+        return callback(new Error(this.$t('deviceView.enterAccount')));
+      } else {
+        if (self.isAdd) {
+          if (self.accountList.includes(value)) {
+            return callback(new Error(this.$t('deviceView.accountExist')));
+          }
         } else {
-          if (self.isAdd) {
+          if (self.ezvizAccountInfo.oldEzvizAccount === value) {
+            callback();
+          } else {
             if (self.accountList.includes(value)) {
               return callback(new Error(this.$t('deviceView.accountExist')));
             }
-          } else {
-            if (self.ezvizAccountInfo.oldEzvizAccount === value) {
-              callback();
-            } else {
-              if (self.accountList.includes(value)) {
-                return callback(new Error(this.$t('deviceView.accountExist')));
-              }
-            }
-          }
-          if (reg.test(value)) {
-            callback();
-          } else {
-            return callback(new Error(this.$t('deviceView.enterCorrentAccount')));
           }
         }
-      } else {
-        callback();
+        if (reg.test(value)) {
+          callback();
+        } else {
+          return callback(new Error(this.$t('deviceView.enterCorrentAccount')));
+        }
       }
     };
     const validateAccountName = (rule, value, callback) => {
@@ -354,6 +355,11 @@ export default {
         accessKey: [
           { required: true, validator: validateAccessKey, trigger: 'blur' }
         ],
+        authorizedDevices: [
+          {
+            required: true, trigger: 'blur'
+          }
+        ],
         app: [
           { required: true, message: '' }
         ],
@@ -383,7 +389,8 @@ export default {
       commentRuletip: false,
       showDeleteStoreVueAccount: false,
       errorAccessKey: '',
-      errorAuthDeviceNum: ''
+      errorAuthDeviceNum: '',
+      errorAccount: ''
     };
   },
 
@@ -435,42 +442,47 @@ export default {
       self.errorMsg = '';
       self.errorAccessKey = '';
       self.errorAuthDeviceNum = '';
+      self.curLength = 0;
       self.showAddAccount = true;
     },
 
     async getAccountList() {
       const self = this;
       self.tableData = [];
-      const retData = await self.getEzvizAccountList();
-      const accountList = retData.data;
-      self.allAccountNum = accountList.length;
-      self.storeviuNum = 0;
-      self.userAccountNum = 0;
-      accountList.forEach(item => {
-        item.scope === 0 ? self.storeviuNum++ : self.userAccountNum++;
-      });
-      let totalMsg = `${this.$t('deviceView.total')}${self.allAccountNum}
+      try {
+        const retData = await self.getEzvizAccountList();
+        const accountList = retData.data;
+        self.allAccountNum = accountList.length;
+        self.storeviuNum = 0;
+        self.userAccountNum = 0;
+        accountList.forEach(item => {
+          item.scope === 0 ? self.storeviuNum++ : self.userAccountNum++;
+        });
+        let totalMsg = `${this.$t('deviceView.total')}${self.allAccountNum}
                     ${this.$t('deviceView.ezvizAccountNum')}`;
-      if (self.storeviuNum > 0) {
-        if (self.userAccountNum > 0) {
-          totalMsg += `${self.allAccountNum}${this.$t('deviceView.storeViuNum')}
+        if (self.storeviuNum > 0) {
+          if (self.userAccountNum > 0) {
+            totalMsg += `${self.allAccountNum}${this.$t('deviceView.storeViuNum')}
           ${self.userAccountNum}${this.$t('deviceView.userAccountNum')}`;
-        } else {
-          totalMsg += `${self.allAccountNum}${this.$t('deviceView.storeViuNum')}`;
+          } else {
+            totalMsg += `${self.allAccountNum}${this.$t('deviceView.storeViuNum')}`;
+          }
+        } else if (self.userAccountNum > 0) {
+          totalMsg += `${self.userAccountNum}${this.$t('deviceView.userAccountNum')}`;
         }
-      } else if (self.userAccountNum > 0) {
-        totalMsg += `${self.userAccountNum}${this.$t('deviceView.userAccountNum')}`;
+        self.totalMsg = totalMsg;
+        self.tableData = accountList;
+        if (self.tableData.length === 0) {
+          self.noData = self.$t('deviceView.noData');
+        }
+        const listArray = [];
+        self.tableData.forEach(item => {
+          listArray.push(item.ezvizAccount);
+        });
+        self.accountList = listArray;
+      } catch (err) {
+        console.log('EzvizAccount--getAccountList:' + err);
       }
-      self.totalMsg = totalMsg;
-      self.tableData = accountList;
-      if (self.tableData.length === 0) {
-        self.noData = self.$t('deviceView.noData');
-      }
-      const listArray = [];
-      self.tableData.forEach(item => {
-        listArray.push(item.ezvizAccount);
-      });
-      self.accountList = listArray;
     },
 
     getEzvizAccountList() {
@@ -764,16 +776,67 @@ export default {
       self.errorAuthDeviceNum = '';
       if (msg.indexOf('access key') !== -1) {
         self.errorAccessKey = String(Math.random());
-        self.$nextTick(() => { self.errorAccessKey = msg; });
+        self.$nextTick(() => {
+          self.errorAccessKey = msg;
+        });
       } else if (msg.indexOf('authorized devices is invalid') !== -1) {
         self.errorAuthDeviceNum = String(Math.random());
-        self.$nextTick(() => { self.errorAuthDeviceNum = self.$t('deviceView.errorDeviceNum'); });
+        self.$nextTick(() => {
+          self.errorAuthDeviceNum = self.$t('deviceView.errorDeviceNum');
+        });
       } else if (msg.indexOf('authorized devices is less than') !== -1) {
         self.errorAuthDeviceNum = String(Math.random());
-        self.$nextTick(() => { self.errorAuthDeviceNum = self.$t('deviceView.lessThanAuthorizedDevices'); });
-      } else {
+        self.$nextTick(() => {
+          self.errorAuthDeviceNum = self.$t('deviceView.lessThanAuthorizedDevices');
+        });
+      } else if (msg.indexOf('Account does not exist') !== -1) {
+        self.errorAccount = String(Math.random());
+        self.$nextTick(() => {
+          self.errorAccount = self.$t('deviceView.accountNotExist');
+        });
+      } else if (msg.indexOf('Account not authorized') !== -1) {
+        self.errorAccount = String(Math.random());
+        self.$nextTick(() => {
+          self.errorAccount = self.$t('deviceView.accountNotAuthorized');
+        });
+      }
+      else {
         self.errorAccessKey = String(Math.random());
-        self.$nextTick(() => { self.errorAccessKey = msg; });
+        self.$nextTick(() => {
+          self.errorAccessKey = msg;
+        });
+      }
+    },
+
+    ezvizAccountChanged(val) {
+      const self = this;
+      self.errorAccount = '';
+      const comment = filterString.all(val, 40);
+      const length = filterString.getContentLength(val);
+      if (length === 0) {
+        self.$nextTick(() => {
+          self.errorAccount = self.$t('deviceView.enterAccount');
+        });
+      } else if (length >= 4 && length <= 40) {
+        if (self.isAdd) {
+          if (self.accountList.includes(comment)) {
+            self.$nextTick(() => {
+              self.errorAccount = self.$t('deviceView.accountExist');
+            });
+          }
+        } else {
+          if (self.ezvizAccountInfo.oldEzvizAccount === comment) {
+            self.errorAccount = '';
+          } else {
+            if (self.accountList.includes(comment)) {
+              self.errorAccount = self.$t('deviceView.accountExist');
+            }
+          }
+        }
+      } else {
+        self.$nextTick(() => {
+          self.errorAccount = self.$t('deviceView.enterAccount');
+        });
       }
     }
   }

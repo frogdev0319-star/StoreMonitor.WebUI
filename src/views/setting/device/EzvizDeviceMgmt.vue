@@ -1667,8 +1667,12 @@ export default {
             self.showAddNvrDialog = false;
           }
           self.addDeviceData = {
-            name: '', validationCode: '', storeId: self.storeDataList[0].storeId,
-            serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount
+            name: '',
+            validationCode: '',
+            storeId: self.storeDataList.length > 0 ? self.storeDataList[0].storeId : '',
+            serialNumber: '',
+            channelCount: 1,
+            ezvizAccount: self.ezvizAccountList.length > 0 ? self.ezvizAccountList[0].ezvizAccount : ''
           };
           self.page = 1;
           const params = {
@@ -1797,8 +1801,14 @@ export default {
       self.showAddNvrDialog = true;
       self.storeDataList = self.allStoreDataList;
       self.isAddAgain = false;
-      self.addDeviceData = { name: '', validationCode: '', storeId: self.storeDataList[0].storeId,
-        serialNumber: '', channelCount: 1, ezvizAccount: self.ezvizAccountList[0].ezvizAccount };
+      self.addDeviceData = {
+        name: '',
+        validationCode: '',
+        storeId: self.storeDataList.length > 0 ? self.storeDataList[0].storeId : '',
+        serialNumber: '',
+        channelCount: 1,
+        ezvizAccount: self.ezvizAccountList.length > 0 ? self.ezvizAccountList[0].ezvizAccount : ''
+      };
     },
 
     confirmEditNvr(index, item) {
