@@ -1911,6 +1911,7 @@ export default {
       const retData = await self.getEzvizAccountList();
       const accountList = retData.data;
       self.ezvizAccountList = accountList;
+      self.$refs.ezvizAccount.tableData = accountList;
     },
 
     getEzvizAccountList() {
