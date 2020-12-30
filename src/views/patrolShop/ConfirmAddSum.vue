@@ -702,9 +702,9 @@ export default {
           }
         } else {
           if (inspectSettings.checkItem2) {
-            s_count = Math.round(PassFileXN / PassFileTotalScore * 100);
+            s_count = PassFileTotalScore===0 ? 0 : Math.round(PassFileXN / PassFileTotalScore * 100);
           } else {
-            s_count = Math.round(PassFileXS / PassFileTotalScoreX * 100);
+            s_count = PassFileTotalScoreX===0 ? 0 : Math.round(PassFileXS / PassFileTotalScoreX * 100);
           }
         }
       } else {
@@ -721,13 +721,13 @@ export default {
             }
           } else {
             if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileXN + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
+              s_count = parseInt(PassFileTotalScore + ScoreTotalScoreX)===0 ? 0 : Math.round(((PassFileXN + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
             } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileXS + ScoreXN) / (PassFileTotalScoreX + allScoreB) * 100) + otherGetscoreTotal);
+              s_count = parseInt(PassFileTotalScoreX + allScoreB)===0 ? 0 : Math.round(((PassFileXS + ScoreXN) / (PassFileTotalScoreX + allScoreB) * 100) + otherGetscoreTotal);
             } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileXN + ScoreXN) / (PassFileTotalScore + allScoreB) * 100) + otherGetscoreTotal);
+              s_count = parseInt(PassFileTotalScore + allScoreB)===0 ? 0 : Math.round(((PassFileXN + ScoreXN) / (PassFileTotalScore + allScoreB) * 100) + otherGetscoreTotal);
             } else {
-              s_count = Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
+              s_count = parseInt(PassFileTotalScoreX + ScoreTotalScoreX)===0 ? 0 : Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
             }
           }
         } else {
@@ -739,9 +739,9 @@ export default {
             }
           } else {
             if (inspectSettings.checkItem3) {
-              s_count = Math.round((ScoreXN / allScoreB * 100) + otherGetscoreTotal);
+              s_count = allScoreB===0 ? 0 : Math.round((ScoreXN / allScoreB * 100) + otherGetscoreTotal);
             } else {
-              s_count = Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100) + otherGetscoreTotal);
+              s_count = ScoreTotalScoreX===0 ? 0 : Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100) + otherGetscoreTotal);
             }
           }
         }
