@@ -45,7 +45,7 @@
               <div class="total-num">
                 {{ cycleOfInspect }}
                 <span v-if="cycleOfInspect !=='N/A'" class="day">
-                {{ $t('overview.day') }}</span>
+                  {{ $t('overview.day') }}</span>
               </div>
             </div>
           </div>
@@ -55,8 +55,12 @@
           <div class="region-result">
             <div class="region-content">
               <div class="region-result-panel">
-                <v-chart ref="storeChart" :options="storeOptions" :auto-resize="true" class="result-content"
-                         @timelinechanged="timelineHandler"/>
+                <v-chart
+                  ref="storeChart"
+                  :options="storeOptions"
+                  :auto-resize="true"
+                  class="result-content"
+                  @timelinechanged="timelineHandler"/>
                 <i v-if="showPreviousGroup" class="el-icon-arrow-left icon-arrow" @click="previousGroup"/>
                 <div v-if="regionChartEmpty" class="empty-text">{{ $t('overview.noData') }}</div>
                 <i v-if="showNextGroup" class="el-icon-arrow-right icon-arrow" @click="nextGroup"/>
@@ -409,13 +413,13 @@ export default {
 
   watch: {
     accountChanged(val) {
-      let self = this;
+      const self = this;
       if (val !== 0) {
         self.timeMode = 1;
         self.isEnSpan = false;
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
         self.currentIndex = 0;
@@ -425,23 +429,23 @@ export default {
   },
 
   created() {
-    let self = this;
-    let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+    const self = this;
+    const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+    const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
     self.params.beginTs = start;
     self.params.endTs = end;
     self.initData();
   },
 
   mounted() {
-    let self = this;
+    const self = this;
     window.addEventListener('resize', self.adjustPatrolChart, false);
     self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
     self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
   },
 
   beforeDestroy() {
-    let self = this;
+    const self = this;
     window.removeEventListener('resize', self.adjustPatrolChart);
     self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
     self.$refs.storeChart && self.$refs.storeChart.dispose();
@@ -452,48 +456,48 @@ export default {
 
   methods: {
     changBestAndWorst() {
-      let self = this;
+      const self = this;
       self.isWorstArea = !self.isWorstArea;
       self.isWorstArea ? self.showWorstArea() : self.showBestArea();
     },
 
     changWorkerRanking() {
-      let self = this;
+      const self = this;
       self.isWorstWork = !self.isWorstWork;
       self.isWorstWork ? self.showWorstWorks() : self.showBestWorks();
     },
 
     showWorstArea() {
-      let self = this;
+      const self = this;
       self.isWorstArea = true;
       self.getTopFiveRegionList();
     },
 
     showBestArea() {
-      let self = this;
+      const self = this;
       self.isWorstArea = false;
       self.getTopFiveRegionList();
     },
 
     showWorstWorks() {
-      let self = this;
+      const self = this;
       self.isWorstWork = true;
       self.getInspectTaskRanking();
     },
 
     showBestWorks() {
-      let self = this;
+      const self = this;
       self.isWorstWork = false;
       self.getInspectTaskRanking();
     },
 
     timelineHandler(event) {
-      let self = this;
+      const self = this;
       self.currentIndex = event.currentIndex;
     },
 
     previousGroup() {
-      let self = this;
+      const self = this;
       self.curGroupIndex === 0 ? 0 : self.curGroupIndex--;
       if (self.curGroupIndex === 0) {
         self.showPreviousGroup = false;
@@ -505,7 +509,7 @@ export default {
     },
 
     nextGroup() {
-      let self = this;
+      const self = this;
       self.curGroupIndex < self.totalGroupNum - 1 ? self.curGroupIndex++ : self.curGroupIndex;
       if (self.curGroupIndex === self.totalGroupNum - 1) {
         self.showNextGroup = false;
@@ -516,54 +520,54 @@ export default {
       self.getRegionInspectResultData();
     },
 
-    getRegionInspectResultData(){
-      let self = this;
-      let regionOption = self.getRegionInspectOption();
-      let resultData = self.regionInspectListData;
+    getRegionInspectResultData() {
+      const self = this;
+      const regionOption = self.getRegionInspectOption();
+      const resultData = self.regionInspectListData;
       if (resultData.length > 0) {
-        let regions = resultData[0].regions;
-        let regionList = [];
+        const regions = resultData[0].regions;
+        const regionList = [];
         self.regionGroups[self.curGroupIndex].forEach((item) => {
           regionList.push(item.region);
         });
         self.regionList = regionList;
         regionOption.baseOption.xAxis[0].data = self.regionList;
         resultData.forEach((item) => {
-          let dateTime = item.ts;
-          let region = item.regions;
-          let dangerousList = [];
-          let improvedList = [];
-          let passList = [];
+          const dateTime = item.ts;
+          const region = item.regions;
+          const dangerousList = [];
+          const improvedList = [];
+          const passList = [];
           region.forEach(_item => {
             if (self.regionList.indexOf(_item.region) === -1) {
               return;
             }
-            let itemDangerJson = {};
+            const itemDangerJson = {};
             itemDangerJson.name = _item.region;
             itemDangerJson.value = _item.numOfDangerous;
             dangerousList.push(itemDangerJson);
-            let itemImprovedJson = {};
+            const itemImprovedJson = {};
             itemImprovedJson.name = _item.region;
             itemImprovedJson.value = _item.numOfImproved;
             improvedList.push(itemImprovedJson);
-            let itemQualifiedJson = {};
+            const itemQualifiedJson = {};
             itemQualifiedJson.name = _item.region;
             itemQualifiedJson.value = _item.numOfQualified;
             passList.push(itemQualifiedJson);
           });
-          let tempOption = {};
-          let seriesArray = new Array(3);
-          let seriesDanJson = {};
+          const tempOption = {};
+          const seriesArray = new Array(3);
+          const seriesDanJson = {};
           seriesDanJson.stack = 'test';
           seriesDanJson.data = dangerousList;
           seriesArray[0] = seriesDanJson;
 
-          let seriesImproveJson = {};
+          const seriesImproveJson = {};
           seriesImproveJson.stack = 'test';
           seriesImproveJson.data = improvedList;
           seriesArray[1] = seriesImproveJson;
 
-          let seriesPassJson = {};
+          const seriesPassJson = {};
           seriesPassJson.stack = 'test';
           seriesPassJson.data = passList;
           seriesArray[2] = seriesPassJson;
@@ -581,7 +585,7 @@ export default {
     },
 
     async showItemRadar(item, index) {
-      let self = this;
+      const self = this;
       self.curItemId = item.inspectItemId;
       self.curItemName = item.inspectItemName;
       item.isClick = true;
@@ -593,13 +597,13 @@ export default {
       let itemsParam = {};
       itemsParam = JSON.parse(JSON.stringify(self.params));
       itemsParam.itemId = self.curItemId;
-      let options = self.getItemRadarOption();
+      const options = self.getItemRadarOption();
       try {
-        let result = await self.getInspectItemsOverRegion(itemsParam);
-        let tempIndicator = [];
-        let seriesValue = [];
+        const result = await self.getInspectItemsOverRegion(itemsParam);
+        const tempIndicator = [];
+        const seriesValue = [];
         if (result.errCode === 0) {
-          let resultData = result.data;
+          const resultData = result.data;
           let max = 0;
           resultData.map(function(item) {
             if (item.numOfUnqualified > max) {
@@ -607,15 +611,15 @@ export default {
             }
           });
           resultData.forEach(item => {
-            let obj = {};
+            const obj = {};
             obj.name = item.regionName;
             obj.max = max;
             tempIndicator.push(obj);
             seriesValue.push(item.numOfUnqualified);
           });
         }
-        let temp = [];
-        let obj = { value: seriesValue };
+        const temp = [];
+        const obj = { value: seriesValue };
         temp.push(obj);
         options.radar[0].indicator = tempIndicator;
         options.radar[1].indicator = tempIndicator;
@@ -623,15 +627,14 @@ export default {
         options.series[1].data = temp;
         options.radar.splitNumber = 5;
         self.itemsRadarOption = options;
-      }
-      catch (e) {
+      } catch (e) {
         self.itemsRadarOption = options;
-        console.log("PatrolOverview-showItemRadar:" + e);
+        console.log('PatrolOverview-showItemRadar:' + e);
       }
     },
 
-    getItemRadarOption(){
-      let radarOptions = {
+    getItemRadarOption() {
+      const radarOptions = {
         backgroundColor: '#fff',
         tooltip: {
           textStyle: {
@@ -683,34 +686,34 @@ export default {
             }
           }
         },
-          {
-            shape: 'circle',
-            center: ['50%', '50%'],
-            nameGap: 5,
-            indicator: [],
-            name: {
-              textStyle: {
-                color: 'rgba(255,255,255,0)',
-                borderRadius: 3,
-                padding: [3, 5]
-              }
-            },
-            splitArea: {
-              show: false
-            },
-            axisLine: {
-              lineStyle: {
-                color: this.echartAxiasColor
-              }
-            },
-            splitLine: {
-              show: true,
-              lineStyle: {
-                width: 1,
-                color: this.echartAxiasColor
-              }
+        {
+          shape: 'circle',
+          center: ['50%', '50%'],
+          nameGap: 5,
+          indicator: [],
+          name: {
+            textStyle: {
+              color: 'rgba(255,255,255,0)',
+              borderRadius: 3,
+              padding: [3, 5]
+            }
+          },
+          splitArea: {
+            show: false
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.echartAxiasColor
+            }
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              width: 1,
+              color: this.echartAxiasColor
             }
           }
+        }
         ],
         series: [
           {
@@ -743,10 +746,10 @@ export default {
     },
 
     dateChange(val) {
-      let self = this;
+      const self = this;
       self.currentIndex = 0;
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       let daysDiff = self.$moment(end).diff(start, 'days');
       if (daysDiff < 6) {
         self.$message({
@@ -778,26 +781,26 @@ export default {
     },
 
     initData() {
-      let self = this;
-      let start = self.params.beginTs;
-      let end = self.params.endTs;
-      let startDay = self.$moment(start).format('YYYY-MM-DD');
-      let endDay = self.$moment(end).format('YYYY-MM-DD');
-      let startDayWithoutYear = self.$moment(start).format('MM/DD');
-      let endDayWithoutYear = self.$moment(end).format('MM/DD');
+      const self = this;
+      const start = self.params.beginTs;
+      const end = self.params.endTs;
+      const startDay = self.$moment(start).format('YYYY-MM-DD');
+      const endDay = self.$moment(end).format('YYYY-MM-DD');
+      const startDayWithoutYear = self.$moment(start).format('MM/DD');
+      const endDayWithoutYear = self.$moment(end).format('MM/DD');
       if (self.timeMode === 1) {
-        let beginDay = new Date(util.judgeStart(startDay));
-        let weekList = util.getWeek(beginDay, endDay);
-        let arrLength = weekList.length;
-        let firstEndTime = weekList[0].split('-')[1];
-        let firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-        let lastStartTime = weekList[arrLength - 1].split('-')[0];
-        let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
+        const beginDay = new Date(util.judgeStart(startDay));
+        const weekList = util.getWeek(beginDay, endDay);
+        const arrLength = weekList.length;
+        const firstEndTime = weekList[0].split('-')[1];
+        const firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
+        const lastStartTime = weekList[arrLength - 1].split('-')[0];
+        const lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
         weekList.splice(0, 1, firstWeekStr);
         weekList.splice(arrLength - 1, 1, lastWeekStr);
         self.daysRangeList = weekList;
       } else if (self.timeMode === 2) {
-        let monthArray = util.getMonthBetween(startDay, endDay);
+        const monthArray = util.getMonthBetween(startDay, endDay);
         self.daysRangeList = monthArray;
       }
       self.getStoreNumAndCycle();
@@ -855,14 +858,14 @@ export default {
     },
 
     getTopFiveRegionList() {
-      let self = this;
+      const self = this;
       let result = self.regionResultList.concat([]);
       let firstColor = '';
       let secondColor = '';
       let firstName = '';
       let secondName = '';
       let maxValue = 0;
-      let items = [];
+      const items = [];
       if (self.isWorstArea) {
         firstColor = '#f31d65';
         secondColor = '#ffd035';
@@ -886,16 +889,16 @@ export default {
           result = [];
         }
       }
-      let topFiveArray = result.slice(0, 5);
-      let fiveArray = [];
+      const topFiveArray = result.slice(0, 5);
+      const fiveArray = [];
       topFiveArray.forEach(item => {
-        let json = {};
+        const json = {};
         json.region = item.region;
         if (self.isWorstArea) {
-          let tempFirstDouble = (item.numOfDangerous / maxValue) * 100;
-          let tempSecondDouble = (item.numOfImproved / maxValue) * 100;
-          let firstPectStr = tempFirstDouble.toFixed(0);
-          let firstSecondStr = tempSecondDouble.toFixed(0);
+          const tempFirstDouble = (item.numOfDangerous / maxValue) * 100;
+          const tempSecondDouble = (item.numOfImproved / maxValue) * 100;
+          const firstPectStr = tempFirstDouble.toFixed(0);
+          const firstSecondStr = tempSecondDouble.toFixed(0);
           json.firstPercent = parseInt(firstPectStr);
           json.secondPercent = parseInt(firstSecondStr);
           json.firstColor = firstColor;
@@ -906,10 +909,10 @@ export default {
           json.secondNum = item.numOfImproved;
           fiveArray.push(json);
         } else {
-          let tempFirstDouble = (item.numOfExcellent / maxValue) * 100;
-          let tempSecondDouble = (item.numOfQualified / maxValue) * 100;
-          let firstPectStr = tempFirstDouble.toFixed(0);
-          let firstSecondStr = tempSecondDouble.toFixed(0);
+          const tempFirstDouble = (item.numOfExcellent / maxValue) * 100;
+          const tempSecondDouble = (item.numOfQualified / maxValue) * 100;
+          const firstPectStr = tempFirstDouble.toFixed(0);
+          const firstSecondStr = tempSecondDouble.toFixed(0);
           json.firstPercent = parseInt(firstPectStr);
           json.secondPercent = parseInt(firstSecondStr);
           json.firstColor = firstColor;
@@ -925,11 +928,11 @@ export default {
     },
 
     async getStoreNumAndCycle() {
-      let self = this;
+      const self = this;
       try {
-        let storeNumAndCycle = await self.getInspectStatsOverview(self.params);
+        const storeNumAndCycle = await self.getInspectStatsOverview(self.params);
         if (storeNumAndCycle.errCode === 0) {
-          let result = storeNumAndCycle.data;
+          const result = storeNumAndCycle.data;
           if (result) {
             self.totalStoreNum = result.numOfStores;
             self.numOfInspects = result.numOfInspects;
@@ -940,12 +943,11 @@ export default {
           self.numOfInspects = 0;
           self.cycleOfInspect = 0;
         }
-      }
-      catch (e) {
+      } catch (e) {
         self.totalStoreNum = 0;
         self.numOfInspects = 0;
         self.cycleOfInspect = 0;
-        console.log("PatrolOverview-getStoreNumAndCycle:" + e);
+        console.log('PatrolOverview-getStoreNumAndCycle:' + e);
       }
     },
 
@@ -954,13 +956,13 @@ export default {
         getInspectStatsOverview(params).then(res => {
           resolve(res);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     toPercent(point) {
-      let tempPoint = Number(point * 100);
+      const tempPoint = Number(point * 100);
       let str = '';
       util.isDot(tempPoint) ? str = tempPoint.toFixed(2) : str = tempPoint;
       str += '%';
@@ -976,25 +978,29 @@ export default {
     },
 
     async getBestAndWorstStores() {
-      let self = this;
-      let storesArray = new Array(2).fill({});
-      storesArray[0].storeSort = self.$t('overview.starStore');
-      storesArray[0].storeName = '';
-      storesArray[0].iconSrc = self.bestStoreIcon;
-      storesArray[0].qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
+      const self = this;
+      const storesArray = [];
 
-      storesArray[1].storeSort = self.$t('overview.starStore');
-      storesArray[1].storeName = '';
-      storesArray[1].iconSrc = self.bestStoreIcon;
-      storesArray[1].qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
+      const bestStoreObj = {};
+      bestStoreObj.storeSort = self.$t('overview.starStore');
+      bestStoreObj.storeName = '';
+      bestStoreObj.iconSrc = self.bestStoreIcon;
+      bestStoreObj.qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
+      storesArray.push(bestStoreObj);
+      const worstStoreObj = {};
+      worstStoreObj.storeSort = self.$t('overview.backwordStroe');
+      worstStoreObj.storeName = '';
+      worstStoreObj.iconSrc = self.worstStoreIcon;
+      worstStoreObj.qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
+      storesArray.push(worstStoreObj);
 
       try {
-        let bestAndWorstStoreRes = await self.getInspectStatsOverStore(self.params);
-        let errCode = bestAndWorstStoreRes.errCode;
+        const bestAndWorstStoreRes = await self.getInspectStatsOverStore(self.params);
+        const errCode = bestAndWorstStoreRes.errCode;
         if (errCode === 0) {
-          let resData = bestAndWorstStoreRes.data;
-          let bestStore = resData.bestStore;
-          let worstStore = resData.worstStore;
+          const resData = bestAndWorstStoreRes.data;
+          const bestStore = resData.bestStore;
+          const worstStore = resData.worstStore;
           if (bestStore) {
             storesArray[0].storeName = bestStore.storeName;
             storesArray[0].qualifiedRate = self.$t('overview.passRate') + ' ' + bestStore.qualifiedRate + '%';
@@ -1006,10 +1012,9 @@ export default {
           self.bestAndWorstStore = storesArray;
         }
         self.bestAndWorstStore = storesArray;
-      }
-      catch (e) {
+      } catch (e) {
         self.bestAndWorstStore = storesArray;
-        console.log("PatrolOverview - getBestAndWorstStores:" + e);
+        console.log('PatrolOverview - getBestAndWorstStores:' + e);
       }
     },
 
@@ -1018,23 +1023,23 @@ export default {
         getInspectStatsOverStore(params).then(res => {
           resolve(res);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     async getInspectItems() {
-      let self = this;
-      let inspectItems = await self.getInspectStatsItemInfo(self.params);
-      let ignorePer = 0;
-      let errCode = inspectItems.errCode;
-      let jsonArray = self.itemsLegend.slice(1);
+      const self = this;
+      const inspectItems = await self.getInspectStatsItemInfo(self.params);
+      const ignorePer = 0;
+      const errCode = inspectItems.errCode;
+      const jsonArray = self.itemsLegend.slice(1);
       let seriesData = [];
       if (errCode === 0) {
         let totalIgnored = 0;
         let totalUnqualified = 0;
         let totalQualified = 0;
-        let resultData = inspectItems.data;
+        const resultData = inspectItems.data;
         try {
           resultData.forEach(item => {
             totalIgnored += item.numOfIgnored;
@@ -1044,12 +1049,12 @@ export default {
           resultData.sort((item1, item2) => {
             return item1.numOfUnqualified < item2.numOfUnqualified ? 1 : -1;
           });
-          let topFiveArray = resultData.slice(0, 5);
-          let firstItem = topFiveArray[0];
+          const topFiveArray = resultData.slice(0, 5);
+          const firstItem = topFiveArray[0];
           self.curItemId = firstItem.inspectItemId;
           self.curItemName = firstItem.inspectItemName;
           topFiveArray.forEach(item => {
-            let percent = item.numOfUnqualified / firstItem.numOfUnqualified;
+            const percent = item.numOfUnqualified / firstItem.numOfUnqualified;
             item.percent = parseInt((percent * 100).toFixed(0));
           });
           seriesData = [
@@ -1063,7 +1068,7 @@ export default {
           self.itemsTopFive = [];
           seriesData = [];
         }
-        let totalArray = [totalQualified, totalUnqualified, totalIgnored];
+        const totalArray = [totalQualified, totalUnqualified, totalIgnored];
         jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
         jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
         jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -1120,9 +1125,9 @@ export default {
         getInspectStatsItemOverview(params).then(res => {
           resolve(res);
         })
-        .catch(err => {
-          reject(err)
-        });
+          .catch(err => {
+            reject(err);
+          });
       });
     },
 
@@ -1131,40 +1136,39 @@ export default {
         getInspectStatsItemOverviewRegion(params).then(res => {
           resolve(res);
         })
-        .catch(err => {
-          reject(err)
-        });
+          .catch(err => {
+            reject(err);
+          });
       });
     },
 
     async getInspectTaskRanking() {
-      let self = this;
+      const self = this;
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.lowestFirst = self.isWorstWork;
       params.numOfPerson = 5;
       params.roleId = self.ModelPost;
       try {
-        let result = await self.getInspectStatsOverPerson(params);
-        let tempTaskList = [];
+        const result = await self.getInspectStatsOverPerson(params);
+        const tempTaskList = [];
         if (result.errCode === 0) {
-          let resultData = result.data;
+          const resultData = result.data;
           resultData.forEach(item => {
-            let json = {};
+            const json = {};
             json.supervisorName = item.supervisorName;
             let completionRate = item.completionRate;
             completionRate = util.isDot(completionRate) ? completionRate.toFixed(2) : completionRate;
             json.completionRate = completionRate;
-            let perStr = item.completionRate.toFixed(0);
+            const perStr = item.completionRate.toFixed(0);
             json.percent = parseInt(perStr);
             tempTaskList.push(json);
           });
         }
         self.taskList = tempTaskList;
-      }
-      catch (e) {
+      } catch (e) {
         self.taskList = [];
-        console.log("PatrolOverview-getInspectTaskRanking:" + e);
+        console.log('PatrolOverview-getInspectTaskRanking:' + e);
       }
     },
 
@@ -1172,34 +1176,34 @@ export default {
       return new Promise((resolve, reject) => {
         GetInspectStatsOverPerson(params).then(res => {
           resolve(res);
-        }).catch(err=>{
-          reject(err)
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     async getPassRateAndCycle() {
-      let self = this;
-      let cycleOptions = self.getPassRateAndCycleOption();
+      const self = this;
+      const cycleOptions = self.getPassRateAndCycleOption();
       try {
-        let result = await self.getPassRateAndInspectRate(self.params);
+        const result = await self.getPassRateAndInspectRate(self.params);
         self.regionResultList = result.data;
-        let dangerRateMoreArray = [];
-        let dangerRateLessArray = [];
-        let passRateMoreArray = [];
-        let passRateLessArray = [];
+        const dangerRateMoreArray = [];
+        const dangerRateLessArray = [];
+        const passRateMoreArray = [];
+        const passRateLessArray = [];
         if (result.errCode === 0) {
-          let resultData = result.data;
+          const resultData = result.data;
           if (resultData.length > 0) {
             resultData.forEach(item => {
-              let inspectNum = item.numOfReport;
-              let inspectCycle = item.cycleOfInspect;
-              let qualifiedRate = item.qualifiedRate;
-              let excellentRate = item.excellentRate;
-              let dangerRate = ((item.numOfDangerous / inspectNum) * 100).toFixed(2);
-              let floatRage = parseInt(dangerRate);
-              let region = item.region;
-              let tempArray = [];
+              const inspectNum = item.numOfReport;
+              const inspectCycle = item.cycleOfInspect;
+              const qualifiedRate = item.qualifiedRate;
+              const excellentRate = item.excellentRate;
+              const dangerRate = ((item.numOfDangerous / inspectNum) * 100).toFixed(2);
+              const floatRage = parseInt(dangerRate);
+              const region = item.region;
+              const tempArray = [];
               if (inspectCycle > 0) {
                 tempArray.push(qualifiedRate);
                 tempArray.push(inspectCycle);
@@ -1225,16 +1229,15 @@ export default {
         }
         self.cycleOption = cycleOptions;
         self.getTopFiveRegionList();
-      }
-      catch (e) {
+      } catch (e) {
         self.cycleOption = cycleOptions;
-        console.log("PatrolOverview-getPassRateAndCycle:" + e);
+        console.log('PatrolOverview-getPassRateAndCycle:' + e);
       }
     },
 
     getPassRateAndCycleOption() {
-      let self = this;
-      let schema = [
+      const self = this;
+      const schema = [
         { name: 'inspectCycle', index: 0, text: this.$t('overview.cycle') },
         { name: 'passRate', index: 1, text: this.$t('overview.passRate') },
         { name: 'excellentRate', index: 2, text: this.$t('overview.excellentRate') },
@@ -1242,7 +1245,7 @@ export default {
         { name: 'region', index: 5, text: this.$t('overview.region') }
       ];
 
-      let itemPassStyle = {
+      const itemPassStyle = {
         normal: {
           opacity: 0.8,
           shadowOffsetX: 0,
@@ -1251,7 +1254,7 @@ export default {
         }
       };
 
-      let itemDangerStyle = {
+      const itemDangerStyle = {
         normal: {
           opacity: 0.8,
           shadowOffsetX: 0,
@@ -1260,7 +1263,7 @@ export default {
         }
       };
 
-      let options = {
+      const options = {
         backgroundColor: '#fff',
         dataZoom: [
           {
@@ -1310,14 +1313,14 @@ export default {
             type: 'line'
           },
           formatter: function(obj) {
-            let value = obj.value;
+            const value = obj.value;
             if (value[0] == undefined) {
               return;
             }
             let htmlRegion = `${schema[4].text}: `; // region
             let passStr = `${schema[1].text}: `; // pass rate
             let dangerousStr = `${schema[3].text}: `; // dangerous rate
-            let allData = [...options.series[0].data, ...options.series[1].data, ...options.series[2].data, ...options.series[3].data];
+            const allData = [...options.series[0].data, ...options.series[1].data, ...options.series[2].data, ...options.series[3].data];
             allData.forEach(item => {
               if (value[0] === item[0] && value[1] === item[1]) {
                 htmlRegion += `${item[4]},`;
@@ -1483,77 +1486,77 @@ export default {
         getInspectStatsOverviewWithRegion(params).then(res => {
           resolve(res);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
 
     async getRegionInspectResult() {
-      let self = this;
+      const self = this;
       self.dataMap = {};
       self.regionInspectListData = [];
-      let regionOption = self.getRegionInspectOption();
+      const regionOption = self.getRegionInspectOption();
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.region = 1;
       params.timeMode = self.timeMode;
-      let result = await self.getInspectResultOverRegion(params);
+      const result = await self.getInspectResultOverRegion(params);
       if (result.errCode === 0) {
-        let resultData = result.data;
+        const resultData = result.data;
         self.regionInspectListData = resultData;
         if (resultData.length > 0) {
           resultData.forEach(item => {
-            let regions = item.regions;
+            const regions = item.regions;
             regions.sort((item1, item2) => {
               return item1.region < item2.region ? 1 : -1;
             });
           });
-          let regions = resultData[0].regions;
-          let length = regions.length;
-          let groupSize = Math.ceil(length / self.showRegionNum);
+          const regions = resultData[0].regions;
+          const length = regions.length;
+          const groupSize = Math.ceil(length / self.showRegionNum);
           self.totalGroupNum = groupSize;
           self.totalGroupNum > 1 ? self.showNextGroup = true : self.showNextGroup = false;
-          let tempRegions = util.groupArrayOnSize(regions, self.showRegionNum);
+          const tempRegions = util.groupArrayOnSize(regions, self.showRegionNum);
           self.regionGroups = tempRegions;
-          let regionList = [];
+          const regionList = [];
           tempRegions[0].forEach((item) => {
             regionList.push(item.region);
           });
           self.regionList = regionList;
           regionOption.baseOption.xAxis[0].data = self.regionList;
           resultData.forEach((item) => {
-            let dateTime = item.ts;
-            let region = item.regions;
-            let dangerousList = [];
-            let improvedList = [];
-            let passList = [];
+            const dateTime = item.ts;
+            const region = item.regions;
+            const dangerousList = [];
+            const improvedList = [];
+            const passList = [];
             region.forEach(_item => {
-              let itemDangerJson = {};
+              const itemDangerJson = {};
               itemDangerJson.name = _item.region;
               itemDangerJson.value = _item.numOfDangerous;
               dangerousList.push(itemDangerJson);
-              let itemImprovedJson = {};
+              const itemImprovedJson = {};
               itemImprovedJson.name = _item.region;
               itemImprovedJson.value = _item.numOfImproved;
               improvedList.push(itemImprovedJson);
-              let itemQualifiedJson = {};
+              const itemQualifiedJson = {};
               itemQualifiedJson.name = _item.region;
               itemQualifiedJson.value = _item.numOfQualified;
               passList.push(itemQualifiedJson);
             });
-            let tempOption = {};
-            let seriesArray = new Array(3);
-            let seriesDanJson = {};
+            const tempOption = {};
+            const seriesArray = new Array(3);
+            const seriesDanJson = {};
             seriesDanJson.stack = 'test';
             seriesDanJson.data = dangerousList;
             seriesArray[0] = seriesDanJson;
 
-            let seriesImproveJson = {};
+            const seriesImproveJson = {};
             seriesImproveJson.stack = 'test';
             seriesImproveJson.data = improvedList;
             seriesArray[1] = seriesImproveJson;
 
-            let seriesPassJson = {};
+            const seriesPassJson = {};
             seriesPassJson.stack = 'test';
             seriesPassJson.data = passList;
             seriesArray[2] = seriesPassJson;
@@ -1577,7 +1580,7 @@ export default {
     },
 
     getRegionInspectOption() {
-      let regionOption = {
+      const regionOption = {
         baseOption: {
           color: ['#f31d65', '#ffd035', '#72a1f3'],
           timeline: {
@@ -1726,14 +1729,14 @@ export default {
         getInspectStatsOverRegion(params).then(res => {
           resolve(res);
         })
-        .catch(err => {
-          reject(err)
-        });
+          .catch(err => {
+            reject(err);
+          });
       });
     },
 
     adjustPatrolChart() {
-      let self = this;
+      const self = this;
       if (self.$refs.storeChart) {
         self.$refs.storeChart.resize();
       }
