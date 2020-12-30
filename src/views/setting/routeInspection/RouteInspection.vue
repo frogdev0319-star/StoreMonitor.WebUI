@@ -1444,16 +1444,10 @@ export default {
               }
             }
           }
-          // if(arrsheet2.length===0&&arrsheet1.length!==0&&arrsheet3.length!==0||arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length!==0){
-          //   let msg = '';
-          //   if (_this.lang == 'en') {
-          //     msg = _this.$t('insSettingView.OnlyOthers');
-          //   } else {
-          //     msg = '【Score】' + _this.$t('insSettingView.beforeImport');
-          //   }
-          //   _this.notify(msg, 'warning', 3000);
-          //   return false;
-          // }
+          if(arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length===0){
+            _this.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
+            return false;
+          }
           const dataArry = {
             PassFail: arrsheet1,
             Score: arrsheet2,

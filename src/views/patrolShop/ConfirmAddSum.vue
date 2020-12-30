@@ -596,8 +596,9 @@ export default {
       self.inspectList = routeData.inspect;
       self.eventList = routeData.event;
       let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
-      let PassFileXN = 0,ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0;
-      let getscoreTotal = 0, CurAddIgnoreItemScore = 0, allscoreTotal = 0, allScoreB = 0, allAddIgnoreScore = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, getpassfailIgnoreTotal = 0, allpassfailCount = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0, ScoreTotalScoreSystem = 0, OtherTotalScoreSystem = 0;
+      let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
+      let ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0, allScoreB = 0,ScoreTotalScoreSystem = 0;
+      let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
       inspect.forEach(p_item => {
         if (p_item.dealCount !== 0) {
           dealType.push(p_item.type);
@@ -606,11 +607,11 @@ export default {
       let Tab0Status = false;
       let inspectPic = 0;
       inspect.forEach(p_item => {
-        var CurItemgetScore = 0, totalScore0 = 0, CurSc = 0, CurNotIgnoreTotalscore = 0, CurAddScoreB = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
+        let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
         let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
-          let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0, addNotIgnoreTotalscoreA = 0, addIgnoreScoreA = 0;
+          let totalScore = 0, totalGetscore = 0;
           item.items.forEach(s_item => {
             if (s_item.isIgnore) {
               IgnoredArr.push(s_item);
@@ -626,18 +627,13 @@ export default {
               }
               if ((p_item.type === 1 || p_item.type === 2) && s_item.itemgetScore !== '--') {
                 totalGetscore += s_item.itemgetScore;
-                notIgnoreTotalscore += s_item.itemScore;
               }
             }
-            // if (p_item.type === 1 || p_item.type === 2 && s_item.itemgetScore !== '--') { // 1的所有与2的非忽略项
-            //   addIgnoreScoreA += s_item.itemgetScore;
-            //   addNotIgnoreTotalscoreA += s_item.itemScore;
-            // }
             s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
             if (p_item.type === 0) {
               PassFileTS += s_item.itemgetScore;
               totalScore0 += s_item.itemScore;
-              if (!s_item.isIgnore) {
+              if (!s_item.isIgnore&&!s_item.manualIgnore) {
                 PassFileX += s_item.itemgetScore;
                 PassFile_totalScoreX += s_item.itemScore;
               }else{
@@ -646,7 +642,7 @@ export default {
             } else if (p_item.type === 1) {
               totalScore += s_item.itemScore;
               ScoreTS += s_item.itemgetScore;
-              if (!s_item.isIgnore) {
+              if (!s_item.isIgnore&&!s_item.manualIgnore) {
                 ScoreX += s_item.itemgetScore;
                 Score_totalScoreX += s_item.itemScore;
               }else{
@@ -662,14 +658,7 @@ export default {
           item['numIgnore'] = IgnoredArr.length;
           item['itemScore'] = totalScore;
           item['itemgetScore'] = totalGetscore;
-          item['notIgnoreTotalscore'] = notIgnoreTotalscore;
           if (p_item.type === 0) {
-            CurPassfailQualified += item.numOfQualified;
-            CurpassfailCount += item.numOfUnqualified;
-            CurPassfailIgnore += item.numIgnore;
-            getpassfailQualifiedTotal = CurPassfailQualified;
-            getpassfailIgnoreTotal = CurPassfailIgnore;
-            // allpassfailCount = Number(CurpassfailCount + CurPassfailQualified);
             PassFileTotalScoreSystem = PassFileTS;
             PassFileXS = PassFileX;
             PassFileXN = PassFileN + PassFileX;
@@ -677,16 +666,8 @@ export default {
             PassFileTotalScoreX = PassFile_totalScoreX;
           }
           if (p_item.type === 1) {
-            CurItemgetScore += totalGetscore;
-            CurNotIgnoreTotalscore += notIgnoreTotalscore;
-            CurSc += addIgnoreScoreA;
-            CurAddIgnoreItemScore = CurSc;
-            CurAddIgnoreTotalscore += addNotIgnoreTotalscoreA;
             CurAddScoreB += item.itemScore;
-            getscoreTotal = CurItemgetScore;
-            allscoreTotal = CurNotIgnoreTotalscore;
             allScoreB = CurAddScoreB;
-            allAddIgnoreScore = CurAddIgnoreTotalscore;
             ScoreTotalScoreSystem = ScoreTS;
             ScoreXN = ScoreX + ScoreN;
             ScoreTotalScoreX = Score_totalScoreX;

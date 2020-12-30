@@ -540,6 +540,7 @@ export default {
     'emptyInfo': '当前巡检表为空，请新增巡检项后进行操作！',
     'enterSelfListName': '请输入自定义巡检表名称！',
     'templateError': '巡检表模板错误！',
+    'templateEmpty': '巡检表不能为空！',
     'excelLongCategory': '巡检类别长度不可超过30个字符！',
     'excelIllegalCategory': '存在“@#￥%^&*”非法字符！',
     'excelEmpty': '巡检类别与巡检项名称不能为空',

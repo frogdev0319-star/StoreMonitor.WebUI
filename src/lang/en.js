@@ -532,6 +532,7 @@ export default {
     'emptyInfo': 'List is empty, please add inspection items!',
     'enterSelfListName': 'Please Enter Custom List Name',
     'templateError': 'The template of inspection tableis wrong!!',
+    'templateEmpty': 'The inspection table cannot be empty!',
     'excelLongCategory': 'The length of category supports up to 30 characters',
     'excelIllegalCategory': "llegal characters '@#￥%^&*'!",
     'excelEmpty': "The inspection category and item name can't empty",
