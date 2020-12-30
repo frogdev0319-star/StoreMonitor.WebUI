@@ -431,7 +431,8 @@ export default {
                     if(self.hasAttachment!==0){
                       self.downloadProgress = false;
                     }
-                  },timer*30)
+                  },timer*10)
+                  console.log('timer',timer)
                   self.isexportPDF = false;
               });
               window.clearInterval(timer)

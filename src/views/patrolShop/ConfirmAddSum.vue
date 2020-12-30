@@ -596,6 +596,7 @@ export default {
       self.inspectList = routeData.inspect;
       self.eventList = routeData.event;
       let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
+      let PassFileXN = 0,ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0;
       let getscoreTotal = 0, CurAddIgnoreItemScore = 0, allscoreTotal = 0, allScoreB = 0, allAddIgnoreScore = 0, otherGetscoreTotal = 0, getpassfailQualifiedTotal = 0, getpassfailIgnoreTotal = 0, allpassfailCount = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0, ScoreTotalScoreSystem = 0, OtherTotalScoreSystem = 0;
       inspect.forEach(p_item => {
         if (p_item.dealCount !== 0) {
@@ -605,7 +606,8 @@ export default {
       let Tab0Status = false;
       let inspectPic = 0;
       inspect.forEach(p_item => {
-        var CurItemgetScore = 0, totalScore0 = 0, totalScoreX = 0, CurSc = 0, CurNotIgnoreTotalscore = 0, CurAddScoreB = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0;
+        var CurItemgetScore = 0, totalScore0 = 0, CurSc = 0, CurNotIgnoreTotalscore = 0, CurAddScoreB = 0, CurAddIgnoreTotalscore = 0, CurOtherTotalScore = 0, CurPassfailQualified = 0, CurpassfailCount = 0, CurPassfailIgnore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
+        let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
           let totalScore = 0, totalGetscore = 0, notIgnoreTotalscore = 0, addNotIgnoreTotalscoreA = 0, addIgnoreScoreA = 0;
@@ -627,21 +629,29 @@ export default {
                 notIgnoreTotalscore += s_item.itemScore;
               }
             }
-            if (p_item.type === 1 || p_item.type === 2 && s_item.itemgetScore !== '--') { // 1的所有与2的非忽略项
-              addIgnoreScoreA += s_item.itemgetScore;
-              addNotIgnoreTotalscoreA += s_item.itemScore;
-            }
+            // if (p_item.type === 1 || p_item.type === 2 && s_item.itemgetScore !== '--') { // 1的所有与2的非忽略项
+            //   addIgnoreScoreA += s_item.itemgetScore;
+            //   addNotIgnoreTotalscoreA += s_item.itemScore;
+            // }
             s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
             if (p_item.type === 0) {
               PassFileTS += s_item.itemgetScore;
               totalScore0 += s_item.itemScore;
               if (!s_item.isIgnore) {
                 PassFileX += s_item.itemgetScore;
-                totalScoreX += s_item.itemScore;
+                PassFile_totalScoreX += s_item.itemScore;
+              }else{
+                PassFileN += s_item.itemScore;
               }
             } else if (p_item.type === 1) {
               totalScore += s_item.itemScore;
               ScoreTS += s_item.itemgetScore;
+              if (!s_item.isIgnore) {
+                ScoreX += s_item.itemgetScore;
+                Score_totalScoreX += s_item.itemScore;
+              }else{
+                ScoreN += s_item.itemScore;
+              }
             } else if (p_item.type === 2 && !s_item.isIgnore) {
               OtherTS += s_item.itemgetScore;
             }
@@ -659,11 +669,12 @@ export default {
             CurPassfailIgnore += item.numIgnore;
             getpassfailQualifiedTotal = CurPassfailQualified;
             getpassfailIgnoreTotal = CurPassfailIgnore;
-            allpassfailCount = Number(CurpassfailCount + CurPassfailQualified);
+            // allpassfailCount = Number(CurpassfailCount + CurPassfailQualified);
             PassFileTotalScoreSystem = PassFileTS;
             PassFileXS = PassFileX;
+            PassFileXN = PassFileN + PassFileX;
             PassFileTotalScore = totalScore0;
-            PassFileTotalScoreX = totalScoreX;
+            PassFileTotalScoreX = PassFile_totalScoreX;
           }
           if (p_item.type === 1) {
             CurItemgetScore += totalGetscore;
@@ -677,6 +688,8 @@ export default {
             allScoreB = CurAddScoreB;
             allAddIgnoreScore = CurAddIgnoreTotalscore;
             ScoreTotalScoreSystem = ScoreTS;
+            ScoreXN = ScoreX + ScoreN;
+            ScoreTotalScoreX = Score_totalScoreX;
           }
           if (p_item.type === 2) {
             CurOtherTotalScore += totalGetscore;
@@ -701,37 +714,53 @@ export default {
       let s_count = 0;
       if (dealType.length === 1 && dealType[0] === 0) {
         if (inspectSettings.radio === '-1') {
-          s_count = Math.round(PassFileTotalScoreSystem);
+          if(inspectSettings.checkItem2){
+            s_count = Math.round(PassFileXN);
+          }else{
+            s_count = Math.round(PassFileTotalScoreSystem);
+          }
         } else {
           if (inspectSettings.checkItem2) {
-            s_count = Math.round((getpassfailQualifiedTotal + getpassfailIgnoreTotal) / allpassfailCount * 100);
+            s_count = Math.round(PassFileXN / PassFileTotalScore * 100);
           } else {
-            s_count = Math.round(getpassfailQualifiedTotal / allpassfailCount * 100);
+            s_count = Math.round(PassFileXS / PassFileTotalScoreX * 100);
           }
         }
       } else {
         if (inspectSettings.checkItem1) {
           if (inspectSettings.radio === '-1') {
-            s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
+              s_count = Math.round(PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+              s_count = Math.round(PassFileTotalScoreSystem + ScoreXN + OtherTotalScoreSystem);
+            } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+              s_count = Math.round(PassFileXN + ScoreXN + OtherTotalScoreSystem);
+            } else {
+              s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            }
           } else {
             if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileTotalScoreSystem + getscoreTotal) / (allscoreTotal + PassFileTotalScore) * 100) + otherGetscoreTotal);
+              s_count = Math.round(((PassFileXN + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
             } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + allScoreB) * 100) + otherGetscoreTotal);
+              s_count = Math.round(((PassFileXS + ScoreXN) / (PassFileTotalScoreX + allScoreB) * 100) + otherGetscoreTotal);
             } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = Math.round(((PassFileTotalScoreSystem + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreSystem) * 100) + otherGetscoreTotal);
+              s_count = Math.round(((PassFileXN + ScoreXN) / (PassFileTotalScore + allScoreB) * 100) + otherGetscoreTotal);
             } else {
-              s_count = Math.round(((PassFileXS + getscoreTotal) / (PassFileTotalScoreX + allscoreTotal) * 100) + otherGetscoreTotal);
+              s_count = Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
             }
           }
         } else {
           if (inspectSettings.radio === '-1') {
+            if (inspectSettings.checkItem3) {
+              s_count = Math.round(ScoreXN + OtherTotalScoreSystem);
+            } else {
               s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+            }
           } else {
             if (inspectSettings.checkItem3) {
-              s_count = allAddIgnoreScore===0 ? 0 : Math.round((CurAddIgnoreItemScore / allAddIgnoreScore * 100) + otherGetscoreTotal);
+              s_count = Math.round((ScoreXN / allScoreB * 100) + otherGetscoreTotal);
             } else {
-              s_count = allscoreTotal===0 ? 0 : Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
+              s_count = Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100) + otherGetscoreTotal);
             }
           }
         }
