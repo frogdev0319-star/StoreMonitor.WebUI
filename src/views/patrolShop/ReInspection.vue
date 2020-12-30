@@ -346,8 +346,7 @@
         </div>
         <el-row v-if="sheetName.length!=0" class="inspect-title">
           <el-col v-if="!notShowAlert" :span="24">
-            <el-alert v-if="!isShowWarn&&!showIgnoreItem&&!hasSheet3" :title="$t('remotePatrol.allIgnored')" :closable="false" type="warning"/>
-            <el-alert v-if="hasSheet3&&!showIgnoreItem&&!isShowWarn" :title="$t('remotePatrol.alertTips1')" :closable="false" type="warning"/>
+            <el-alert v-if="!isShowWarn&&!showIgnoreItem" :title="$t('remotePatrol.allIgnored')" :closable="false" type="warning"/>
             <el-alert v-if="isShowWarn" :closable="false" type="warning" show-icon><span style="cursor: pointer;font-weight:bold;" @click="hasIgnoreItem">{{ $t('remotePatrol.clickToContent') }}</span></el-alert>
             <el-alert v-if="showIgnoreItem" :closable="false" type="info" class="info-alert">
               <div class="info-left">{{ $t('remotePatrol.hasIgnoreContent') }}</div>
@@ -686,7 +685,6 @@ export default {
       sheetName: [],
       isShowWarn: false,
       notShowAlert: false,
-      hasSheet3: false,
       patrolstore: '',
       PatrolList: [],
       showControls: false,
@@ -1198,7 +1196,6 @@ export default {
       self.showIgnoreItem = false;
       self.isShowWarn = false;
       self.notShowAlert = false;
-      self.hasSheet3 = false;
       self.showFeedBackInfo = true;
       self.accountId = localStorage.getItem('oss_bucket');
       self.showChannelBtns = [];
@@ -2362,6 +2359,7 @@ export default {
                 if (inspectSettings.checkItem2 && _item.type === 0 || inspectSettings.checkItem3 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
                 }
+                _item.itemgetScore = _item.manualIgnore ? '--' : null;
               }
             });
           });
@@ -2379,6 +2377,7 @@ export default {
                   if (inspectSettings.checkItem2 && h_item.type === 0 || inspectSettings.checkItem3 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
                   }
+                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
                 }
                 if (self.hasIgnoretemp[h_index].id == item.items[_index].id) {
                   item.items[_index] = self.hasIgnoretemp[h_index];
@@ -2471,6 +2470,7 @@ export default {
                 if (inspectSettings.checkItem2 && _item.type === 0 || inspectSettings.checkItem3 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
                 }
+                _item.itemgetScore = _item.manualIgnore ? '--' : null;
               }
             });
           });
@@ -2490,6 +2490,7 @@ export default {
                   if (inspectSettings.checkItem2 && h_item.type === 0 || inspectSettings.checkItem3 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
                   }
+                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
                 }
                 if (self.hasIgnoretemp[h_index].id == item.items[_index].id) {
                   item.items[_index] = self.hasIgnoretemp[h_index];
@@ -2985,7 +2986,6 @@ export default {
       self.isShowWarn = false;
       self.notShowAlert = false;
       self.showIgnoreItem = false;
-      self.hasSheet3 = false;
       _item.authorizedInspect.forEach(au_item => {
         if (au_item.mode == 0) {
           self.PatrolList.push(au_item);
@@ -3206,7 +3206,6 @@ export default {
       self.isShowWarn = false;
       self.notShowAlert = false;
       self.showIgnoreItem = false;
-      self.hasSheet3 = false;
       self.eventList = [];
       self.showChannelBtns = [];
       self.curSheetIndex = 0;
@@ -3395,7 +3394,7 @@ export default {
           self.inspectItemList = s_item.inspectList[self.curGroupIndex].items;
         }
       });
-      self.isShowWarn = !self.hasSheet3 && self.hasIgnoretemp.some(x => x.inputCount == 0);
+      self.isShowWarn = self.hasIgnoretemp.some(x => x.inputCount == 0);
       self.notShowAlert = self.sheetName.every(x => x.count == x.dealCount);
     },
     changeSheet(item, index) {
