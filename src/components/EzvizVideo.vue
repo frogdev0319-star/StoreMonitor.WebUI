@@ -529,7 +529,6 @@ export default {
     if (!self.isStoreMonitor) {
       const result = await self.getEzvizAccessToken(self.storeId);
       self.checkIfEncry();
-    } else {
     }
     window.addEventListener('resize', self.resizeFun, false);
     window.addEventListener('visibilitychange', self.visibleChange, false);
@@ -748,6 +747,11 @@ export default {
       const self = this;
       self.showError = false;
       self.showModelContent = false;
+      if (self.accessToken.length === 0) {
+        self.showError = true;
+        self.errorMsg = self.$t('remotePatrol.getAccessTokenError');
+        return;
+      }
       if (self.channelInfo == null) {
         return;
       }
