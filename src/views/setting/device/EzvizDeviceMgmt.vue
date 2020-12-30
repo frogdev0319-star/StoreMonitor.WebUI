@@ -1639,31 +1639,19 @@ export default {
           const nvrArray = [];
           nvrArray.push(self.addDeviceData);
           nvrParams.device = nvrArray;
-          const ezvizAccount = nvrArray[0].ezvizAccount;
-          let authDeviceNum = 0;
-          self.ezvizAccountList.forEach(item => {
-            if (ezvizAccount === item.ezvizAccount) {
-              authDeviceNum = item.authDeviceNumber;
-            }
-          });
-          console.log(authDeviceNum);
-          let hasBoundStore = 0;
-          self.nvrData.forEach(item => {
-            if (ezvizAccount === item.ezvizAccount) {
-              hasBoundStore++;
-            }
-          });
-          if (hasBoundStore >= authDeviceNum) {
-            self.notify(self.$t('deviceView.moreThanAuthorizedDevices'), 'warning', 3000);
-            self.showAddNvrDialog = false;
-            return false;
-          }
           const res1 = await self.addEzivzDevice(nvrParams);
-          if (res1.errMsg === 'Success') {
+          const errMsg = res1.errMsg;
+          if (errMsg === 'Success') {
             self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddNvrDialog = false;
           } else {
-            self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            let displayedMsg = '';
+            if (errMsg.indexOf('exceeds the limit') > 0) {
+              displayedMsg = self.$t('deviceView.moreThanAuthorizedDevices');
+            } else {
+              displayedMsg = self.$t('deviceView.addFailed');
+            }
+            self.notify(displayedMsg, 'warning', 3000);
             self.showAddNvrDialog = false;
           }
           self.addDeviceData = {

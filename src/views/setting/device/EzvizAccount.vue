@@ -123,7 +123,7 @@
               {{ $t('deviceView.cancle') }}
             </el-button>
             <el-button class="file-confirm-btn" size="mini" type="primary" @click="addAccount">
-              {{ $t('deviceView.confirmAdd') }}
+              {{ isAdd ? $t('deviceView.confirmAdd') : $t('deviceView.confirm') }}
             </el-button>
           </div>
         </el-dialog>
@@ -347,7 +347,7 @@ export default {
       errorMsg: '',
       rules: {
         ezvizAccount: [
-          { required: true, validator: validateEzvizAccount, trigger: 'blur' }
+          { required: true, trigger: 'blur' }
         ],
         accountName: [
           { required: true, validator: validateAccountName, trigger: 'blur' }
@@ -812,6 +812,7 @@ export default {
       const self = this;
       self.errorAccount = '';
       const comment = filterString.all(val, 40);
+      self.ezvizAccountInfo.ezvizAccount = comment;
       const length = filterString.getContentLength(val);
       if (length === 0) {
         self.$nextTick(() => {
@@ -835,7 +836,7 @@ export default {
         }
       } else {
         self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.enterAccount');
+          self.errorAccount = self.$t('deviceView.enterCorrentAccount');
         });
       }
     }
