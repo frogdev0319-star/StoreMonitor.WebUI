@@ -208,7 +208,7 @@
             </span>
           </div>
         </div>
-        <span style="display:block;">{{ $t('eventView.addDetails') }}</span>
+        <span style="display:block;"><span style="color:red;">*</span>{{ $t('eventView.addDetails') }}</span>
         <el-input
           :autosize="{ minRows: 2}"
           v-model="eventDes"

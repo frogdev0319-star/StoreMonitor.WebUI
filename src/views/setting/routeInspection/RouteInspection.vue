@@ -1313,13 +1313,13 @@ export default {
                       item.e = a;
                     } else {
                       const a = [];
-                      for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
+                      for (var n = 0; n < item.c + 1; n++) { a[n] = n; }
                       item.e = a;
                     }
                   }
                 } else {
                   const a = [];
-                  for (var n = 0; n < item.d + 1; n++) { a[n] = n; }
+                  for (var n = 0; n < item.c + 1; n++) { a[n] = n; }
                   item.e = a;
                 }
                 if (item.f != undefined) {

@@ -726,12 +726,12 @@ export default {
           }
         } else {
           if (inspectSettings.radio === '-1') {
-            s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+              s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
           } else {
             if (inspectSettings.checkItem3) {
-              s_count = Math.round((CurAddIgnoreItemScore / allAddIgnoreScore * 100) + otherGetscoreTotal);
+              s_count = allAddIgnoreScore===0 ? 0 : Math.round((CurAddIgnoreItemScore / allAddIgnoreScore * 100) + otherGetscoreTotal);
             } else {
-              s_count = Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
+              s_count = allscoreTotal===0 ? 0 : Math.round((getscoreTotal / allscoreTotal * 100) + otherGetscoreTotal);
             }
           }
         }
