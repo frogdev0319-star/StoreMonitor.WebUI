@@ -720,14 +720,23 @@ export default {
               s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
             }
           } else {
+            let total_a = 0,total_b = 0;
             if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
-              s_count = parseInt(PassFileTotalScore + ScoreTotalScoreX)===0 ? 0 : Math.round(((PassFileXN + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
+              total_a = parseInt(PassFileTotalScore + ScoreTotalScoreX);
+              total_b = total_a===0 ? 0 : Math.round(((PassFileXN + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreX) * 100));
+              s_count = Math.round(total_b + otherGetscoreTotal);
             } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = parseInt(PassFileTotalScoreX + allScoreB)===0 ? 0 : Math.round(((PassFileXS + ScoreXN) / (PassFileTotalScoreX + allScoreB) * 100) + otherGetscoreTotal);
+              total_a = parseInt(PassFileTotalScoreX + allScoreB);
+              total_b = total_a===0 ? 0 : Math.round(((PassFileXS + ScoreXN) / (PassFileTotalScoreX + allScoreB) * 100));
+              s_count = Math.round(total_b + otherGetscoreTotal);
             } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              s_count = parseInt(PassFileTotalScore + allScoreB)===0 ? 0 : Math.round(((PassFileXN + ScoreXN) / (PassFileTotalScore + allScoreB) * 100) + otherGetscoreTotal);
+              total_a = parseInt(PassFileTotalScore + allScoreB);
+              total_b = total_a===0 ? 0 : Math.round(((PassFileXN + ScoreXN) / (PassFileTotalScore + allScoreB) * 100));
+              s_count = Math.round(total_b + otherGetscoreTotal);
             } else {
-              s_count = parseInt(PassFileTotalScoreX + ScoreTotalScoreX)===0 ? 0 : Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreX) * 100) + otherGetscoreTotal);
+              total_a = parseInt(PassFileTotalScoreX + ScoreTotalScoreX);
+              total_b = total_a===0 ? 0 : Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreX) * 100));
+              s_count = Math.round(total_b + otherGetscoreTotal);
             }
           }
         } else {
