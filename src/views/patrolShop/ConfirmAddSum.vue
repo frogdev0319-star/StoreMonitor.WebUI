@@ -587,9 +587,8 @@ export default {
       if (PatrolComment != null) {
         self.suggest = PatrolComment;
       }
-      const inspectionRule = JSON.parse(sessionStorage.getItem('inspectionRule'));
-      const routeData = inspectionRule.data;
-      const inspectSettings = inspectionRule.rule;
+      const routeData = self.$route.params.data;
+      const inspectSettings = self.$route.params.rule;
       const inspect = routeData.inspect;
       const eventList = routeData.event;
       const store = routeData.store;

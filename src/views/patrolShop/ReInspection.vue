@@ -2476,7 +2476,6 @@ export default {
       };
       self.hasIgnoretemp = [];
       const params = { data: obj, rule: inspectSettings };
-      sessionStorage.setItem('inspectionRule', JSON.stringify(params));
       self.$router.push({ name: 'confirmSum', params: params });
     },
     canceldNoAllInspect() {
@@ -2593,7 +2592,6 @@ export default {
       };
       self.hasIgnoretemp = [];
       const params = { data: obj, rule: inspectSettings };
-      sessionStorage.setItem('inspectionRule', JSON.stringify(params));
       self.$router.push({ name: 'confirmSum', params: params });
     },
     spreadContent() {
@@ -3239,7 +3237,7 @@ export default {
       const self = this;
       if (!self.isEzviz) {
         self.editCount = 0;
-        self.playState ? self.stopVideoPlay(): '';
+        self.playState ? self.stopVideoPlay() : '';
       } else {
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
         if (self.$refs.ezvizVideo != undefined) {
