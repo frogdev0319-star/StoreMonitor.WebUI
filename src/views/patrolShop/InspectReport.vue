@@ -267,11 +267,13 @@
           </div>
         </el-col>
       </el-row>
-      <el-dialog :visible.sync="downloadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
-        <div class="body-content">
-          <p>{{ $t('remotePatrol.downloading') }}</p>
-        </div>
-      </el-dialog>
+      <div class="no-print">
+        <el-dialog :visible.sync="downloadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+          <div class="body-content">
+            <p>{{ $t('remotePatrol.downloading') }}</p>
+          </div>
+        </el-dialog>
+      </div>
     </div>
   </div>
 </template>
@@ -420,17 +422,17 @@ export default {
       var timer = setInterval(function () {
           if (document.readyState === 'complete') {
               new Promise(async function(resolve) {
-                if(self.hasAttachment!==0){
-                  self.downloadProgress = false;
-                }
                 self.isup = true;
                 self.isexportPDF = true;
                 resolve(true);
               }).then(function() {
-                setTimeout(()=>{
                   self.$print(self.$refs.printPDF);
+                  setTimeout(()=>{
+                    if(self.hasAttachment!==0){
+                      self.downloadProgress = false;
+                    }
+                  },timer*30)
                   self.isexportPDF = false;
-                },500)
               });
               window.clearInterval(timer)
           }
