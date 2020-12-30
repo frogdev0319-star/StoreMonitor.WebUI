@@ -324,6 +324,7 @@ export default {
         }
         case '/bindroute' :
         case '/addroute':
+        case '/setroute':
         {
           path = '/routeinspection';
           break;
