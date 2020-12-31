@@ -783,7 +783,7 @@ export default {
       if (msg.indexOf('access key') !== -1) {
         self.errorAccessKey = String(Math.random());
         self.$nextTick(() => {
-          self.errorAccessKey = msg;
+          self.errorAccessKey = self.$t('deviceView.errorAccessKey');
         });
       } else if (msg.indexOf('authorized devices is invalid') !== -1) {
         self.errorAuthDeviceNum = String(Math.random());
