@@ -1495,6 +1495,8 @@ export default {
       const self = this;
       self.dataMap = {};
       self.regionInspectListData = [];
+      self.showPreviousGroup = false;
+      self.showNextGroup = false;
       const regionOption = self.getRegionInspectOption();
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
