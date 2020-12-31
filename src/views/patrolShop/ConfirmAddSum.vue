@@ -693,7 +693,7 @@ export default {
         }
       });
       let s_count = 0;
-      if (dealType.length === 1 && dealType[0] === 0) {
+      if (inspect.length === 1 && inspect[0].type === 0) {
         if (inspectSettings.radio === '-1') {
           if(inspectSettings.checkItem2){
             s_count = Math.round(PassFileXN);
@@ -747,10 +747,13 @@ export default {
               s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
             }
           } else {
+            let total_a = 0;
             if (inspectSettings.checkItem3) {
-              s_count = allScoreB===0 ? 0 : Math.round((ScoreXN / allScoreB * 100) + otherGetscoreTotal);
+              total_a = allScoreB===0 ? 0 : Math.round((ScoreXN / allScoreB * 100))
+              s_count = Math.round(total_a + otherGetscoreTotal);
             } else {
-              s_count = ScoreTotalScoreX===0 ? 0 : Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100) + otherGetscoreTotal);
+              total_a = ScoreTotalScoreX===0 ? 0 : Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100))
+              s_count = Math.round(total_a + otherGetscoreTotal);
             }
           }
         }
