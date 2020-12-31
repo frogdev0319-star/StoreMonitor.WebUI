@@ -741,7 +741,10 @@ export default {
     'lessThanAuthorizedDevices': '授权设备数小于已添加的设备数',
     'errorAccessKey': '访问密钥错误！',
     'moreThanAuthorizedDevices': '账号关联设备数量超限',
-    'errorDeviceNum': '授权设备数错误！'
+    'errorDeviceNum': '授权设备数错误！',
+    'charterSize': '(4~40个字符)',
+    'enterAuthorizedDevices': '请输入设备授权数',
+    'enterAccessKey': '请输入Access Key'
   },
 
   // Store Management page language

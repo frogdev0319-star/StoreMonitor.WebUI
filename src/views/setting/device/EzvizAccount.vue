@@ -36,7 +36,7 @@
               </el-form-item>
               <div v-if="ezvizAccountInfo.scope === 0">
                 <el-col :span="24">
-                  <el-form-item :label="$t('deviceView.ezvizAccount')" :error="errorAccount" prop="ezvizAccount">
+                  <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`" :error="errorAccount" prop="ezvizAccount">
                     <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" @input="ezvizAccountChanged" />
                   </el-form-item>
                 </el-col>
@@ -60,7 +60,7 @@
               <div v-else>
                 <el-row>
                   <el-col :span="12">
-                    <el-form-item :label="$t('deviceView.mobilePhone')" :error="errorAccount" prop="ezvizAccount">
+                    <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`" :error="errorAccount" prop="ezvizAccount">
                       <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
                     </el-form-item>
                   </el-col>
@@ -241,7 +241,6 @@ export default {
   data() {
     const validateEzvizAccount = (rule, value, callback) => {
       const self = this;
-      const reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{4,40}$/;
       if (!value) {
         return callback(new Error(this.$t('deviceView.enterAccount')));
       } else {
@@ -258,7 +257,8 @@ export default {
             }
           }
         }
-        if (reg.test(value)) {
+        const length = filterString.getContentLength(value);
+        if (length >= 4 && length <= 40) {
           callback();
         } else {
           return callback(new Error(this.$t('deviceView.enterCorrentAccount')));
@@ -279,16 +279,21 @@ export default {
     };
     const validateAccessKey = (rule, value, callback) => {
       if (!value) {
-        this.errorAccessKey = this.$t('deviceView.errorAccessKey');
-        return callback(new Error(this.$t('deviceView.errorAccessKey')));
+        return callback(new Error(this.$t('deviceView.enterAccessKey')));
       } else {
         const reg = /^[a-zA-Z0-9]{1,40}$/;
         if (reg.test(value)) {
           callback();
         } else {
-          this.errorAccessKey = this.$t('deviceView.errorAccessKey');
           return callback(new Error(this.$t('deviceView.errorAccessKey')));
         }
+      }
+    };
+    const validateAuthorizedDevices = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error(this.$t('deviceView.enterAuthorizedDevices')));
+      } else {
+        callback();
       }
     };
     return {
@@ -347,7 +352,7 @@ export default {
       errorMsg: '',
       rules: {
         ezvizAccount: [
-          { required: true, trigger: 'blur' }
+          { required: true, validator: validateEzvizAccount, trigger: 'blur' }
         ],
         accountName: [
           { required: true, validator: validateAccountName, trigger: 'blur' }
@@ -357,7 +362,7 @@ export default {
         ],
         authorizedDevices: [
           {
-            required: true, trigger: 'blur'
+            required: true, validator: validateAuthorizedDevices, trigger: 'blur'
           }
         ],
         app: [
@@ -442,6 +447,7 @@ export default {
       self.errorMsg = '';
       self.errorAccessKey = '';
       self.errorAuthDeviceNum = '';
+      self.errorAccount = '';
       self.curLength = 0;
       self.showAddAccount = true;
     },
@@ -799,8 +805,12 @@ export default {
         self.$nextTick(() => {
           self.errorAccount = self.$t('deviceView.accountNotAuthorized');
         });
-      }
-      else {
+      } else if (msg.indexOf('Account does not exist') !== -1) {
+        self.errorAccount = String(Math.random());
+        self.$nextTick(() => {
+          self.errorAccount = self.$t('deviceView.accountNotExist');
+        });
+      } else {
         self.errorAccessKey = String(Math.random());
         self.$nextTick(() => {
           self.errorAccessKey = msg;
@@ -810,35 +820,8 @@ export default {
 
     ezvizAccountChanged(val) {
       const self = this;
-      self.errorAccount = '';
       const comment = filterString.all(val, 40);
       self.ezvizAccountInfo.ezvizAccount = comment;
-      const length = filterString.getContentLength(val);
-      if (length === 0) {
-        self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.enterAccount');
-        });
-      } else if (length >= 4 && length <= 40) {
-        if (self.isAdd) {
-          if (self.accountList.includes(comment)) {
-            self.$nextTick(() => {
-              self.errorAccount = self.$t('deviceView.accountExist');
-            });
-          }
-        } else {
-          if (self.ezvizAccountInfo.oldEzvizAccount === comment) {
-            self.errorAccount = '';
-          } else {
-            if (self.accountList.includes(comment)) {
-              self.errorAccount = self.$t('deviceView.accountExist');
-            }
-          }
-        }
-      } else {
-        self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.enterCorrentAccount');
-        });
-      }
     }
   }
 };

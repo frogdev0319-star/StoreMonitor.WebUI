@@ -729,7 +729,10 @@ export default {
     'lessThanAuthorizedDevices': 'The number of authorized devices is less than the number of added devices.',
     'errorAccessKey': 'Incorrect access key!',
     'moreThanAuthorizedDevices': 'The number of devices for this account exceeds the limit.',
-    'errorDeviceNum': 'The number of authorized devices is invalid!'
+    'errorDeviceNum': 'The number of authorized devices is invalid!',
+    'charterSize': '(4~40 characters)',
+    'enterAuthorizedDevices': 'Please enter the number of authorized devices',
+    'enterAccessKey': 'Please enter Access Key'
   },
 
   // Store Management page language

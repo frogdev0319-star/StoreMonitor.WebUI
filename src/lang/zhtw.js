@@ -739,7 +739,10 @@ export default {
     'lessThanAuthorizedDevices': '授權設備數小於已添加的設備數',
     'errorAccessKey': '訪問密鑰錯誤！',
     'moreThanAuthorizedDevices': '賬號关联設備數量超限',
-    'errorDeviceNum': '授權設備數錯誤！'
+    'errorDeviceNum': '授權設備數錯誤！',
+    'charterSize': '(4~40個字元)',
+    'enterAuthorizedDevices': '請輸入授權設備數',
+    'enterAccessKey': '請輸入Access Key'
   },
 
   // Store Management page language
