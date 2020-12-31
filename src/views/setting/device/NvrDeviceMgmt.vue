@@ -407,7 +407,7 @@
 
                 <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
                   <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"/>
-                  <span style="margin: 20px;display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
+                  <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
                 </p>
               </div>
               <div slot="footer" class="dialog-footer">

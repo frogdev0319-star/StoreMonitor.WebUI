@@ -959,6 +959,7 @@ export default {
         float: left;
         background-color: #fff;
         margin: calc(30/1920*100vw);
+        margin-bottom: 0;
         padding:0 30px 30px 0px;
         width:96%;
         border: 1px solid $border;
