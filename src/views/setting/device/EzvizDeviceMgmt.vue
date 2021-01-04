@@ -1615,7 +1615,8 @@ export default {
           self.nvrData[self.curIndex].tempEzvizAccount = obj.ezvizAccount;
           self.nvrData[self.curIndex].tempChannelCount = obj.channelCount;
         } else {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          self.setErrorMsg(errMsg);
+          // self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           self.showAddNvrDialog = false;
           self.isAddAgain = false;
           self.nvrData[self.curIndex].name = obj.tempNvrName;
@@ -1645,14 +1646,7 @@ export default {
             self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddNvrDialog = false;
           } else {
-            let displayedMsg = '';
-            if (errMsg.indexOf('exceeds the limit') > 0) {
-              displayedMsg = self.$t('deviceView.moreThanAuthorizedDevices');
-            } else {
-              displayedMsg = self.$t('deviceView.addFailed');
-            }
-            self.notify(displayedMsg, 'warning', 3000);
-            self.showAddNvrDialog = false;
+            self.setErrorMsg(errMsg);
           }
           self.addDeviceData = {
             name: '',
@@ -2016,6 +2010,29 @@ export default {
       } else {
         this.storeDataList = storeList;
       }
+    },
+
+    setErrorMsg(msg) {
+      let displayedMsg = '';
+      if (msg.indexOf('exceeds the limit') !== -1) {
+        displayedMsg = this.$t('deviceView.moreThanAuthorizedDevices');
+      } else if (msg.indexOf('Device already existed') !== -1) {
+        displayedMsg = this.$t('deviceView.deviceExist');
+      } else if (msg.indexOf('Multiple accounts') !== -1) {
+        displayedMsg = this.$t('deviceView.multipleAccOnSameStore');
+      } else if (msg.indexOf('Ezviz access token') !== -1) {
+        displayedMsg = this.$t('deviceView.getAccessTokenError');
+      } else if (msg.indexOf('Duplicate device serial') !== -1) {
+        displayedMsg = this.$t('deviceView.duplicateSeriNum');
+      } else if (msg.indexOf('Store does not exist') !== -1) {
+        displayedMsg = this.$t('deviceView.storeNotExist');
+      } else if (msg.indexOf('No authority') !== -1) {
+        displayedMsg = this.$t('deviceView.noAuthorityForStore');
+      } else {
+        displayedMsg = this.isAddAgain ? this.$t('deviceView.editFail') : this.$t('deviceView.addFailed');
+      }
+      this.notify(displayedMsg, 'warning', 3000);
+      this.showAddNvrDialog = false;
     }
   }
 };

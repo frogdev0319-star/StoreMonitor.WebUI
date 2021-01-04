@@ -744,7 +744,13 @@ export default {
     'errorDeviceNum': '授权设备数错误！',
     'charterSize': '(4~40个字符)',
     'enterAuthorizedDevices': '请输入设备授权数',
-    'enterAccessKey': '请输入Access Key'
+    'enterAccessKey': '请输入Access Key',
+    'deviceExist': '设备已存在',
+    'multipleAccOnSameStore': '同一门店不允许绑定多个账号',
+    'getAccessTokenError': '获取AccessToken失败',
+    'duplicateSeriNum': '重复的设备序列号',
+    'storeNotExist': '门店不存在',
+    'noAuthorityForStore': '对门店无操作权限'
   },
 
   // Store Management page language

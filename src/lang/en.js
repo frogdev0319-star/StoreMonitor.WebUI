@@ -732,7 +732,13 @@ export default {
     'errorDeviceNum': 'The number of authorized devices is invalid!',
     'charterSize': '(4~40 characters)',
     'enterAuthorizedDevices': 'Please enter the number of authorized devices',
-    'enterAccessKey': 'Please enter Access Key'
+    'enterAccessKey': 'Please enter Access Key',
+    'deviceExist': 'Device already existed',
+    'multipleAccOnSameStore': 'Multiple accounts not allowed for the same store',
+    'getAccessTokenError': 'Cannot get Ezviz access token',
+    'duplicateSeriNum': 'Duplicate device serial number',
+    'storeNotExist': 'Store does not exist',
+    'noAuthorityForStore': 'No authority for the specified store'
   },
 
   // Store Management page language

@@ -805,10 +805,10 @@ export default {
         self.$nextTick(() => {
           self.errorAccount = self.$t('deviceView.accountNotAuthorized');
         });
-      } else if (msg.indexOf('Account does not exist') !== -1) {
+      } else if (msg.indexOf('Account already exists') !== -1) {
         self.errorAccount = String(Math.random());
         self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.accountNotExist');
+          self.errorAccount = self.$t('deviceView.accountExist');
         });
       } else {
         self.errorAccessKey = String(Math.random());

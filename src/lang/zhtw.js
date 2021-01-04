@@ -742,7 +742,13 @@ export default {
     'errorDeviceNum': '授權設備數錯誤！',
     'charterSize': '(4~40個字元)',
     'enterAuthorizedDevices': '請輸入授權設備數',
-    'enterAccessKey': '請輸入Access Key'
+    'enterAccessKey': '請輸入Access Key',
+    'deviceExist': '設備已存在',
+    'multipleAccOnSameStore': '同壹門店不允許綁定多個賬號',
+    'getAccessTokenError': '獲取AccessToken失敗',
+    'duplicateSeriNum': '重復的設備序列號',
+    'storeNotExist': '門店不存在',
+    'noAuthorityForStore': '對門店無操作權限'
   },
 
   // Store Management page language
