@@ -1364,6 +1364,7 @@ $suggestBack:#F1F6FE;
         padding-right: calc(20/1920*100vw);
         padding-left: calc(20/1920*100vw);
         .card-content{
+            box-sizing: content-box;
             border: 1px solid $border;
             background-color: #fff;
             padding-top: 20px;
