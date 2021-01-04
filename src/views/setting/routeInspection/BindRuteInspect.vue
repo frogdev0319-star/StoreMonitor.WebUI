@@ -928,26 +928,22 @@ export default {
 
     InitData() {
       const self = this;
-      let name = '';
       let nameLang = '';
       switch (Number(sessionStorage.getItem('TabName'))) {
         case 0: {
-          name = '远程巡检';
           nameLang = self.$t('insSettingView.remotePatrol');
           break;
         }
         case 1: {
-          name = '现场巡检';
           nameLang = self.$t('insSettingView.onsitePatrol');
           break;
         }
         default: {
-          name = 'test';
           nameLang = 'test';
           break;
         }
       }
-      self.tabName = name;
+      self.tabName = nameLang;
     },
 
     notify(msg, type, time) {

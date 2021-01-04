@@ -575,7 +575,7 @@ export default {
     'selectProviceInfo': ' 按省份選擇',
     'selectStore': ' 請選擇',
     'bindStores': ' 绑定门店',
-    'total': ' 表共有',
+    'total': '表共有',
     'bind': ' 已綁定',
     'relateAllStores': ' 綁定至所有門店',
     'loadingbindstore': ' 載入中',
@@ -593,8 +593,8 @@ export default {
     'titleEmpty': ' 類別名稱不能為空！',
     'ScoreEmpty': ' 項目分值不能為空',
     'illegalStr': ' 當前輸入含有非法字元！',
-    'remotePatrol': ' 遠端巡檢',
-    'onsitePatrol': ' 現場巡檢',
+    'remotePatrol': '遠端巡檢',
+    'onsitePatrol': '現場巡檢',
     'cancel': ' 取 消',
     'prompt': ' 提 示',
     'confirm': ' 確 認',
@@ -604,7 +604,7 @@ export default {
     'searchPlaceholder': ' 請輸入關鍵詞搜索門店',
     'addSuss': ' 添加成功',
     'addFail': ' 添加失敗',
-    'needBind': ' 表，需要綁定的門店',
+    'needBind': '表，需要綁定的門店',
     'itemsOfCate': ' 類別巡檢項'
   },
 
