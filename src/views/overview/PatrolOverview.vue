@@ -1006,8 +1006,8 @@ export default {
             storesArray[0].qualifiedRate = self.$t('overview.passRate') + ' ' + bestStore.qualifiedRate + '%';
           }
           if (worstStore) {
-            storesArray[1].storeName = bestStore.storeName;
-            storesArray[1].qualifiedRate = self.$t('overview.passRate') + ' ' + bestStore.qualifiedRate + '%';
+            storesArray[1].storeName = worstStore.storeName;
+            storesArray[1].qualifiedRate = self.$t('overview.passRate') + ' ' + worstStore.qualifiedRate + '%';
           }
           self.bestAndWorstStore = storesArray;
         }
