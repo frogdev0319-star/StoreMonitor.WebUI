@@ -450,6 +450,10 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
+    'addTitleItem':'Add Inspection Items',//Sprint14
+    'editTitleItem':'Edit Inspection Items',//Sprint14
+    'enterScore':'Please enter the score',//Sprint14
+    'sheetscore3_des':'(The scoring options are separated by '/')',//Sprint14
     'rangeScoreTips': 'The lowest value of the total score shall not be higher than the highest value',
     'ruleInspect': 'Rule Settings',
     'PatrolScoreCalculation': 'Inspection score calculation',
@@ -475,11 +479,11 @@ export default {
     'tHeaderA': 'Inspection Category(Optional, 30 characters)',
     'tHeaderA2': 'Inspection Category(Required, 30 characters)',
     'tHeaderB': 'Inspection Items(Required, 100 characters)',
-    'tHeaderC': 'Score(1~50points)',
+    'tHeaderC': 'Score(0~50points)',
     'tHeaderD': 'Inspection Item Description(Optional,1200 characters)',
     'tHeaderE': 'Score(Optional, 1~50points,default 10 points)',
-    'tHeaderF': 'Anomaly Events-Score Threshold(Optional，0~full marks)',
-    'tHeaderG': 'Score Options(Optional，0~full marks)',
+    'tHeaderF': 'Anomaly Events-Score Threshold(Optional，-50~full marks)',
+    'tHeaderG': 'Score Options(Required-50~full marks)',
     'haveNothingToExport': 'There are currently no patrol tables to export',
     'bindWith': 'Binded with ',
     'bindStore': 'stores',
@@ -538,10 +542,18 @@ export default {
     'excelEmpty': "The inspection category and item name can't empty",
     'passfailexcelEmpty': "The inspection item can't empty",
     'excelPassFailScoreType': 'Score:Optional, Integer,  1~50points',
-    'excelFullScoreType': 'Total Score: Required, Integer, 1~50points',
-    'excelMinScoreType': 'Anomaly Events-Score Threshold: Optional, Integer, 0 point~Total Score',
-    'excelScoreItemType': 'The value range of the score options is 0~full marks',
+    'excelFullScoreType': 'Total Score: Required, Integer, 0~50points',
+    'excelMinScoreType': 'Anomaly Events-Score Threshold: Optional, Integer, -50 point~Total Score',
+    'excelScoreItemType': 'Score Options: Required, Integer, -50~full marks',
     'excelOtherScoreType': 'Score:Required, Integer,  -100~100points',
+    'excelScoreItemEmpty': 'The score options cannot be empty!',
+    'setScoreItemRange': 'The value range is -50~full marks!',
+    'setFullScoreRange': 'The value range is 0~50!',
+    'setFullScoreEmpty': 'The total score cannot be empty!',
+    'setMinScoreRange': 'The value range is -50~Total Score!',
+    'setPassFileRange': 'The value range is 1~50!',
+    'setOtherRange': 'The value range is -100~100!',
+    'setOtherEmpty': 'The score cannot be empty!',
     'bindingstore': 'Binding',
     'excelLongItem': 'The length of item is 100 characters at most!',
     'excelIllegalDes': 'The length of item description is 300 characters at most!',

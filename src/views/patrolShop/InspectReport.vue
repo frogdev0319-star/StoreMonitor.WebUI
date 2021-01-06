@@ -1261,10 +1261,10 @@ export default {
                 background-color: $tab;
                 display: inline-block;
                 margin-right: calc(16 / 1920 * 100vw);
+                margin-top: 3px;
               }
               .item-name{
                 flex: 1;
-                margin-top:-3px;
               }
               .item-des {
                 display: block;

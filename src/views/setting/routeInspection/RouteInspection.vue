@@ -1245,8 +1245,8 @@ export default {
           let flagItemLengthPassFail = false, flagItemLengthScore = false, flagItemLengthOthers = false;
           // let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
           let flagDesLengthPassFail = false, flagDesLengthScore = false, flagDesLengthOthers = false;
-          let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false, flagPassFailScoreType = false;
-          let flagTempError = false;
+          let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false, flagPassFailScoreType = false,flagScoreItemType = false;
+          let flagTempError = false,flagScoreItemEmpty = false;
           // sheet整合好的巡检表:outdata
           // if ((outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others != undefined) || (outdata.PassFail != undefined && outdata.Score == undefined && outdata.Others != undefined)) {
           //   _this.$refs.loadFile.value = '';
@@ -1284,43 +1284,37 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
-                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，字符类型为0~50整数
+                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，取值范围为0~50整数
                   flagFullScoreType = true;
                 }
                 if (item.d != undefined) {
-                  if (!Number.isInteger(item.d) || parseInt(item.d) < 0 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，字符类型为0~item.c整数
+                  if (!Number.isInteger(item.d) || parseInt(item.d) < -50 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，取值范围为-50~满分
                     flagMinScoreType = true;
                   }
                 } else {
                   item.d = item.c;
                 }
-                if (item.e != undefined) {
+                if (item.e != undefined || item.e.length !== 0) {
                   if (typeof item.e!=='number'&&item.e.indexOf('/') !== -1) {
                     const f_Score = item.e.split('/');
                     const scoreArr = [];
                     f_Score.forEach(f_item => {
-                      if (!isNaN(Number(f_item))) {
-                        if (parseInt(f_item) >= 0 && parseInt(f_item) <= item.c) {
+                      if (!isNaN(Number(f_item)) && parseInt(f_item) >= -50 && parseInt(f_item) <= item.c) {
                           scoreArr.push(parseInt(f_item));
-                        }
                       }
                     });
-                    item.e = scoreArr;
+                    scoreArr.length===0 ? flagScoreItemEmpty = true : item.e = scoreArr;
                   } else {
-                    if (!isNaN(Number(item.e))) {
+                    if (!isNaN(Number(item.e)) && parseInt(item.e) >= -50 && parseInt(item.e) <= item.c) {
                       let a = [];
                       a.push(parseInt(item.e));
                       item.e = a;
                     } else {
-                      const a = [];
-                      for (var n = 0; n < item.c + 1; n++) { a[n] = n; }
-                      item.e = a;
+                      flagScoreItemType = true
                     }
                   }
                 } else {
-                  const a = [];
-                  for (var n = 0; n < item.c + 1; n++) { a[n] = n; }
-                  item.e = a;
+                  flagScoreItemEmpty = true
                 }
                 if (item.f != undefined) {
                   if (filterString.getContentLength(item.f.toString().trim()) > 1200) { flagDesLengthScore = true; }
@@ -1343,7 +1337,7 @@ export default {
           const showWarningIfo = flaggroupLengthPassFail || flaggroupRexPassFail || flagItemNamePassFail || flagItemLengthPassFail || flagItemRexPassFail || flagDesLengthPassFail ||
                                          flaggroupLengthScore || flaggroupRexScore || flagItemNameScore || flagItemLengthScore || flagItemRexScore || flagDesLengthScore ||
                                          flaggroupLengthOthers || flaggroupRexOthers || flagItemNameOthers || flagItemLengthOthers || flagItemRexOthers || flagDesLengthOthers ||
-                                         flagFullScoreType || flagMinScoreType || flagOtherScoreType || flagPassFailScoreType || flagTempError;
+                                         flagFullScoreType || flagMinScoreType || flagOtherScoreType || flagPassFailScoreType || flagTempError || flagScoreItemType || flagScoreItemEmpty;
           if (showWarningIfo) {
             _this.showFailInfo = true;
             _this.$refs.loadFile.value = '';
@@ -1407,6 +1401,12 @@ export default {
             }
             if (flagOtherScoreType) {
               _this.FileInfo.push('Others' + ' ' + _this.$t('insSettingView.excelOtherScoreType'));
+            }
+            if(flagScoreItemType){
+              _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelScoreItemType'));
+            }
+            if(flagScoreItemEmpty){
+              _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelScoreItemEmpty'));
             }
             return false;
           }
