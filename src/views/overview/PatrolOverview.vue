@@ -263,22 +263,6 @@
 
 <script>
 import ECharts from 'vue-echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/chart/map';
-import 'echarts/lib/chart/radar';
-import 'echarts/lib/chart/scatter';
-import 'echarts/lib/chart/effectScatter';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/polar';
-import 'echarts/lib/component/geo';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/title';
-import 'echarts/lib/component/visualMap';
-import 'echarts/lib/component/dataset';
-import 'echarts/map/js/world';
-import 'zrender/lib/svg/svg';
 import util from '../../common/util.js';
 import {
   getInspectStatsOverview,
@@ -289,17 +273,18 @@ import {
   getInspectStatsOverviewWithRegion,
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
-import { Message } from 'element-ui';
-import { getCookie } from '@/common/auth';
-import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
-import { getInspectStatsOverPersonV2 } from '@/api/inspectOverview';
+import resize from '@/components/mixins/resize';
 
 export default {
   name: 'ExceptEvent',
+
   components: {
     'v-chart': ECharts
   },
+
+  mixins: [resize],
+
   data() {
     return {
       dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
@@ -402,7 +387,6 @@ export default {
       descending: require('../../../static/img/descending.png'),
       ascending: require('../../../static/img/ascending.png'),
       currentIndex: 0,
-      sidebarElm: null,
       fontFamily: 'Roboto, Microsoft YaHei'
     };
   },
@@ -437,21 +421,11 @@ export default {
     self.initData();
   },
 
-  mounted() {
-    const self = this;
-    window.addEventListener('resize', self.adjustPatrolChart, false);
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
-  },
-
   beforeDestroy() {
-    const self = this;
-    window.removeEventListener('resize', self.adjustPatrolChart);
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
-    self.$refs.storeChart && self.$refs.storeChart.dispose();
-    self.$refs.itemsPie && self.$refs.itemsPie.dispose();
-    self.$refs.itemsRadar && self.$refs.itemsRadar.dispose();
-    self.$refs.cycleChart && self.$refs.cycleChart.dispose();
+    this.$refs.storeChart && this.$refs.storeChart.dispose();
+    this.$refs.itemsPie && this.$refs.itemsPie.dispose();
+    this.$refs.itemsRadar && this.$refs.itemsRadar.dispose();
+    this.$refs.cycleChart && this.$refs.cycleChart.dispose();
   },
 
   methods: {
@@ -1737,26 +1711,11 @@ export default {
       });
     },
 
-    adjustPatrolChart() {
-      const self = this;
-      if (self.$refs.storeChart) {
-        self.$refs.storeChart.resize();
-      }
-      if (self.$refs.itemsPie) {
-        self.$refs.itemsPie.resize();
-      }
-      if (self.$refs.itemsRadar) {
-        self.$refs.itemsRadar.resize();
-      }
-      if (self.$refs.cycleChart) {
-        self.$refs.cycleChart.resize();
-      }
-    },
-
-    handleSideBar(e) {
-      if (e.target === e.currentTarget || e.target === this) {
-        this.adjustPatrolChart();
-      }
+    adjustChart() {
+      this.$refs.storeChart && this.$refs.storeChart.resize();
+      this.$refs.itemsPie && this.$refs.itemsPie.resize();
+      this.$refs.itemsRadar && this.$refs.itemsRadar.resize();
+      this.$refs.cycleChart && this.$refs.cycleChart.resize();
     }
 
   }

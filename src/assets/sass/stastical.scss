@@ -34,11 +34,6 @@ $store: #fccc3f;
     padding-right: calc(30/1920*100vw);
     height: 20px;
     line-height: 20px;
-    span{
-      font-size: calc(14/1920*100vw);
-      margin-right: calc(20/1920*100vw);
-      margin-left: calc(20/1920*100vw);
-    }
     .choice-store{
       color: $tab;
       white-space: nowrap;
@@ -104,11 +99,6 @@ $store: #fccc3f;
       font-size: calc(20 / 1920 * 100vw);
       position: relative;
       color: $tab;
-    }
-    span{
-      font-size: calc(14/1920*100vw);
-      margin-right: calc(20/1920*100vw);
-      margin-left: calc(20/1920*100vw);
     }
     @media screen and(max-width: 1366px){
       .en-span-class{

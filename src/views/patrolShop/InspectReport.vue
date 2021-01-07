@@ -41,16 +41,25 @@
           <table v-for="(s_item,s_index) in tableData" :key="s_index" class="table table-bordered">
             <thead>
               <tr v-if="s_item[0].type==0">
-                <th v-for="(t_item ,t_index) in theaderPassFail" :key="t_index"
-                    :style="t_item.width" scope="col">{{ t_item.name }}</th>
+                <th
+                  v-for="(t_item ,t_index) in theaderPassFail"
+                  :key="t_index"
+                  :style="t_item.width"
+                  scope="col">{{ t_item.name }}</th>
               </tr>
               <tr v-if="s_item[0].type==1">
-                <th v-for="(t_item ,t_index) in theaderScore" :key="t_index"
-                    :style="t_item.width" scope="col">{{ t_item.name }}</th>
+                <th
+                  v-for="(t_item ,t_index) in theaderScore"
+                  :key="t_index"
+                  :style="t_item.width"
+                  scope="col">{{ t_item.name }}</th>
               </tr>
               <tr v-if="s_item[0].type==2">
-                <th v-for="(t_item ,t_index) in theaderOther" :key="t_index"
-                    :style="t_item.width" scope="col">{{ t_item.name }}</th>
+                <th
+                  v-for="(t_item ,t_index) in theaderOther"
+                  :key="t_index"
+                  :style="t_item.width"
+                  scope="col">{{ t_item.name }}</th>
               </tr>
             </thead>
             <tbody>
@@ -76,8 +85,11 @@
         </el-col>
       </el-row>
       <el-row class="row-footer">
-        <el-col v-for="(item,index) in tempList" :span="tempList.length === 4 ? 6 : 8"
-                :key="index" class="details-content">
+        <el-col
+          v-for="(item,index) in tempList"
+          :span="tempList.length === 4 ? 6 : 8"
+          :key="index"
+          class="details-content">
           <div v-if="index < 3" class="details">
             <div class="item-header">
               <i :class="item.iconSrc" class="iconfont icontemp"/>
@@ -138,10 +150,12 @@
                   </div>
                   <div v-if="item.groupType==1&&_item.grade!=-1" class="title-btn">
                     {{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}
-                   </div>
+                  </div>
                 </div>
-                <div v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
-                     class="content-detail-main" style="padding-bottom: 20px;">
+                <div
+                  v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
+                  class="content-detail-main"
+                  style="padding-bottom: 20px;">
                   <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
                   <div v-if="_item.showAudio" class="cdm-voice">
                     <div class="speech-info" @click="startSpeechItem(_item,_index)">
@@ -156,8 +170,11 @@
                     <span>{{ _item.comment }}</span>
                   </div>
                   <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
-                    <div v-for="(sourceitem,sourceindex) in _item.sourceList" :key="sourceindex"
-                         :height="imgHeight+'px'" class="source-details">
+                    <div
+                      v-for="(sourceitem,sourceindex) in _item.sourceList"
+                      :key="sourceindex"
+                      :height="imgHeight+'px'"
+                      class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
                         <img
                           :title="imgTitle"
@@ -168,11 +185,16 @@
                           class="imgLittle imgInner"
                           @click="openOuter(sourceitem,$event)">
                       </div>
-                      <div v-if="sourceitem.mediaType==1" class="img-content "
-                           @click="playCommentVideo(sourceitem,sourceindex)">
+                      <div
+                        v-if="sourceitem.mediaType==1"
+                        class="img-content "
+                        @click="playCommentVideo(sourceitem,sourceindex)">
                         <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img :style="isexportPDF ? 'width:130px;':'width: calc(130/1920*100vw);'"
-                             :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                        <img
+                          :style="isexportPDF ? 'width:130px;':'width: calc(130/1920*100vw);'"
+                          :src="videoImgSrc"
+                          :height="imgHeight+'px'"
+                          class="imgLittle">
                       </div>
                     </div>
                   </div>
@@ -187,8 +209,9 @@
                     <p class="title1">{{ index+1 }}.{{ item.subject }}</p>
                   </div>
                 </div>
-                <div v-if="item.showAttachment || item.description != null&&item.description !== ''"
-                     class="content-detail-main">
+                <div
+                  v-if="item.showAttachment || item.description != null&&item.description !== ''"
+                  class="content-detail-main">
                   <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
                   <div v-if="item.showAudio" class="cdm-voice">
                     <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
@@ -203,8 +226,11 @@
                     <span>{{ item.description }}</span>
                   </div>
                   <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
-                    <div v-for="(sourceitem,index) in item.sourceList" :key="index" :height="imgHeight+'px'"
-                         class="source-details">
+                    <div
+                      v-for="(sourceitem,index) in item.sourceList"
+                      :key="index"
+                      :height="imgHeight+'px'"
+                      class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
                         <img
                           :title="imgTitle"
@@ -215,11 +241,16 @@
                           class="imgLittle imgInner"
                           @click="openOuter(sourceitem,$event)">
                       </div>
-                      <div v-if="sourceitem.mediaType === 1" class="img-content "
-                           @click="playCommentVideo(sourceitem,index)">
+                      <div
+                        v-if="sourceitem.mediaType === 1"
+                        class="img-content "
+                        @click="playCommentVideo(sourceitem,index)">
                         <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'" :src="videoImgSrc"
-                             :height="imgHeight+'px'" class="imgLittle">
+                        <img
+                          :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
+                          :src="videoImgSrc"
+                          :height="imgHeight+'px'"
+                          class="imgLittle">
                       </div>
                     </div>
                   </div>
@@ -279,22 +310,26 @@
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import 'echarts/lib/chart/radar';
 import { getInspectReportInfo, getInspectReportDetail } from '../../api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
+import resize from '@/components/mixins/resize';
 
 export default {
   name: 'InspectReport',
+
   components: {
     'v-chart': ECharts
   },
+
+  mixins: [resize],
+
   data() {
     return {
       reportId: 0,
-      downloadProgress:false,
-      hasAttachment:0,
+      downloadProgress: false,
+      hasAttachment: 0,
       varyWindowWidth: window.innerWidth,
 
       videoSrc: require('../../../static/img/monitor.png'),
@@ -395,55 +430,45 @@ export default {
   },
 
   mounted() {
-    let self = this;
-    window.addEventListener('resize', self.adjustChart, false);
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
-    self.getReportInfo();
-    self.getReportDetail();
+    this.getReportInfo();
+    this.getReportDetail();
   },
 
   beforeDestroy() {
-    let self = this;
-    window.removeEventListener('resize', self.adjustChart);
-    self.adjustChart = null;
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
-    if (self.$refs.chartRadar) {
-      self.$refs.chartRadar.dispose();
-    }
+    self.$refs.chartRadar && self.$refs.chartRadar.dispose();
   },
 
   methods: {
     handleDown() {
-      let self = this;
-      if(self.hasAttachment!==0){
+      const self = this;
+      if (self.hasAttachment !== 0) {
         self.downloadProgress = true;
       }
-      var timer = setInterval(function () {
-          if (document.readyState === 'complete') {
-              new Promise(async function(resolve) {
-                self.isup = true;
-                self.isexportPDF = true;
-                resolve(true);
-              }).then(function() {
-                  self.$print(self.$refs.printPDF);
-                  setTimeout(()=>{
-                    if(self.hasAttachment!==0){
-                      self.downloadProgress = false;
-                    }
-                  },timer*10)
-                  console.log('timer',timer)
-                  self.isexportPDF = false;
-              });
-              window.clearInterval(timer)
-          }
-      }, 500)
+      var timer = setInterval(function() {
+        if (document.readyState === 'complete') {
+          new Promise(async function(resolve) {
+            self.isup = true;
+            self.isexportPDF = true;
+            resolve(true);
+          }).then(function() {
+            self.$print(self.$refs.printPDF);
+            setTimeout(() => {
+              if (self.hasAttachment !== 0) {
+                self.downloadProgress = false;
+              }
+            }, timer * 10);
+            console.log('timer', timer);
+            self.isexportPDF = false;
+          });
+          window.clearInterval(timer);
+        }
+      }, 500);
     },
 
     getRouterData() {
-      let self = this;
-      let routeData = JSON.parse(sessionStorage.getItem('report_data'));
-      let obj = {};
+      const self = this;
+      const routeData = JSON.parse(sessionStorage.getItem('report_data'));
+      const obj = {};
       obj.reportId = routeData.id;
       obj.storeName = routeData.storeName;
       obj.status = routeData.status;
@@ -523,31 +548,31 @@ export default {
     },
 
     async getReportDetail() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         reportId: self.report.reportId
       };
       getInspectReportDetail(params).then(res => {
-        let data = res.data;
-        let temp = [];
-        let feedtemp = [];
+        const data = res.data;
+        const temp = [];
+        const feedtemp = [];
         // let gradetotal = []
         data.groups.forEach((groupitem, groupindex) => {
-          let obj = {
+          const obj = {
             items: []
           };
           obj.groupId = groupitem.groupId;
           obj.groupName = groupitem.groupName;
           obj.groupType = groupitem.groupType;
           groupitem.items.forEach((item, index) => {
-            let details = {};
+            const details = {};
             details.subject = item.subject;
             details.comment = item.comment;
             details.description = item.description;
             details.grade = item.grade;
             if (item.attachment.length !== 0) {
-              let _temp = [];
-              let audioObj = {};
+              const _temp = [];
+              const audioObj = {};
               self.hasAttachment++;
               details.showAttachment = true;
               item.attachment.forEach((_item, _index) => {
@@ -576,12 +601,12 @@ export default {
         } else {
           this.showFeedBacks = true;
           data.feedbacks.forEach((item, index) => {
-            let obj = {};
+            const obj = {};
             obj.subject = item.subject;
             obj.description = item.description;
             if (item.attachment.length !== 0) {
-              let _temp = [];
-              let audioObj = {};
+              const _temp = [];
+              const audioObj = {};
               self.hasAttachment++;
               obj.showAttachment = true;
               item.attachment.forEach((_item, _index) => {
@@ -605,7 +630,7 @@ export default {
           self.feedbacks = feedtemp;
         }
       }).catch(err => {
-        console.log("InspectReportDetail-getReportDetail: "+ err);
+        console.log('InspectReportDetail-getReportDetail: ' + err);
       });
     },
 
@@ -616,7 +641,7 @@ export default {
     },
 
     playCommentVideo(item, index) {
-      let self = this;
+      const self = this;
       self.dialogCommentVideo = true;
       self.$nextTick(function() {
         var video = document.getElementById('previewVideo');
@@ -627,7 +652,7 @@ export default {
     },
 
     openOuter(item, $ev) {
-      let self = this;
+      const self = this;
       if (item != null) {
         self.showOuter = true;
         self.checkImgSrc = item.url;
@@ -636,14 +661,14 @@ export default {
     },
 
     getGroupsDuration(item) {
-      let self = this;
+      const self = this;
       if (item.showAudio) {
-        let audio = self.$refs[item.audio.audioRef][0];
+        const audio = self.$refs[item.audio.audioRef][0];
         let du = audio.duration;
         if (isNaN(du)) {
           item.showAudio = false;
         } else {
-          let duration = Math.floor(du);
+          const duration = Math.floor(du);
           if (duration === 0) {
             du = 1;
           }
@@ -653,14 +678,14 @@ export default {
     },
 
     getFeedBacksDuration(item) {
-      let self = this;
+      const self = this;
       if (item.showAudio) {
-        let audio = self.$refs[item.audio.audioRef][0];
+        const audio = self.$refs[item.audio.audioRef][0];
         let du = audio.duration;
         if (isNaN(du)) {
           item.showAudio = false;
         } else {
-          let duration = Math.floor(du);
+          const duration = Math.floor(du);
           if (duration === 0) {
             du = 1;
           }
@@ -670,7 +695,7 @@ export default {
     },
 
     startSpeechItem(item, index) {
-      let self = this;
+      const self = this;
       if (!item.audio.isPlaying) {
         self.$refs[item.audio.audioRef][0].play();
         item.audio.isPlaying = true;
@@ -693,7 +718,7 @@ export default {
     },
 
     startSpeechFeedBacks(item, index) {
-      let self = this;
+      const self = this;
       if (!item.audio.isPlaying) {
         self.$refs[item.audio.audioRef][0].play();
         item.audio.isPlaying = true;
@@ -713,10 +738,10 @@ export default {
       });
     },
 
-    getSummaryInfo(summary){
-      let summaryTemp = [];
+    getSummaryInfo(summary) {
+      const summaryTemp = [];
       summary.forEach(item => {
-        let obj = {};
+        const obj = {};
         obj.groupId = item.groupId;
         obj.groupName = item.groupName;
         obj.count = item.numOfTotalItems;
@@ -729,7 +754,7 @@ export default {
       this.summary = summaryTemp;
     },
 
-    getReportItemsListInfo(data){
+    getReportItemsListInfo(data) {
       let tempArray = [];
       this.isInsiteInspect && data.signature ? tempArray = new Array(4) : tempArray = new Array(3);
       tempArray[0] = {
@@ -762,21 +787,21 @@ export default {
     },
 
     async getReportInfo() {
-      let self = this;
-      let reportId = self.report.reportId;
-      let temp = [];
+      const self = this;
+      const reportId = self.report.reportId;
+      const temp = [];
       temp.push(reportId);
-      let params = {
+      const params = {
         reportIds: temp
       };
       getInspectReportInfo(params).then(res => {
-        if(res.errCode === 0 && res.data.length > 0){
-          let data = res.data[0].info;
+        if (res.errCode === 0 && res.data.length > 0) {
+          const data = res.data[0].info;
           self.suggest = data.comment;
-          let summary = data.summary;
-          let te_temp = [];
+          const summary = data.summary;
+          const te_temp = [];
           for (let i = 0; i < 3; i++) {
-            let typeIndex = summary.filter(x => x.type === i);
+            const typeIndex = summary.filter(x => x.type === i);
             if (typeIndex.length !== 0) {
               typeIndex[0].type === 0 ? te_temp.push(typeIndex) : '';
               typeIndex[0].type === 1 ? te_temp.push(typeIndex) : '';
@@ -790,25 +815,25 @@ export default {
           self.getRadarOption();
         }
       }).catch(err => {
-        console.log("InspectReportDetail-getReportInfo: "+ err);
+        console.log('InspectReportDetail-getReportInfo: ' + err);
       });
     },
 
     getRadarOption() {
-      let self = this;
-      let options = self.getRadarChartOption();
-      let tempIndicator = [];
-      let seriesValue = [];
+      const self = this;
+      const options = self.getRadarChartOption();
+      const tempIndicator = [];
+      const seriesValue = [];
       self.summary.forEach(item => {
-        let obj = {};
+        const obj = {};
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
-                  ? 1 : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
+          ? 1 : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
         tempIndicator.push(obj);
         seriesValue.push(item.numOfQualifiedItems);
       });
-      let temp = [];
-      let obj = { value: seriesValue };
+      const temp = [];
+      const obj = { value: seriesValue };
       temp.push(obj);
       options.radar[0].indicator = tempIndicator;
       options.radar[1].indicator = tempIndicator;
@@ -823,7 +848,7 @@ export default {
     },
 
     getRadarChartOption() {
-      let radarChartOption = {
+      const radarChartOption = {
         backgroundColor: '#fff',
         tooltip: {
           backgroundColor: 'rgba(30,34,52,0.75)'
@@ -878,26 +903,26 @@ export default {
           type: 'radar',
           data: []
         },
-          {
-            type: 'radar',
-            data: [],
-            name: this.$t('remotePatrol.category'),
-            radarIndex: 1,
-            itemStyle: {
-              normal: {
-                lineStyle: {
-                  color: '#FDBA40',
-                  width: 4
-                },
-                areaStyle: {
-                  color: '#D7E5FD'
-                }
+        {
+          type: 'radar',
+          data: [],
+          name: this.$t('remotePatrol.category'),
+          radarIndex: 1,
+          itemStyle: {
+            normal: {
+              lineStyle: {
+                color: '#FDBA40',
+                width: 4
+              },
+              areaStyle: {
+                color: '#D7E5FD'
               }
-            },
-            tooltip: {
-              trigger: 'item'
             }
+          },
+          tooltip: {
+            trigger: 'item'
           }
+        }
         ]
       };
       return radarChartOption;
@@ -907,17 +932,8 @@ export default {
       return data.replace(/(\r\n|\n|\r)/gm, '<br/>');
     },
 
-    handleSideBar(e) {
-      if (e.target === e.currentTarget || e.target === this) {
-        this.adjustChart();
-      }
-    },
-
     adjustChart() {
-      let self = this;
-      if (self.$refs.chartRadar) {
-        self.$refs.chartRadar.resize();
-      }
+      this.$refs.chartRadar && this.$refs.chartRadar.resize();
     }
   }
 };

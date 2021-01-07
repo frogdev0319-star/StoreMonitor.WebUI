@@ -57,8 +57,11 @@
               </el-select>
             </div>
             <div class="charts-content">
-              <v-chart ref="storeEventRef" :options="storeEventsOptions" :auto-resize="true"
-                       class="result-content"/>
+              <v-chart
+                ref="storeEventRef"
+                :options="storeEventsOptions"
+                :auto-resize="true"
+                class="result-content"/>
             </div>
           </div>
 
@@ -69,12 +72,18 @@
           </div>
           <div class="pct-content">
             <div class="pct-panel">
-              <v-chart ref="eventSourceRef" :auto-resize="true" :options="eventSourceOptions"
-                       class="chart-content"/>
+              <v-chart
+                ref="eventSourceRef"
+                :auto-resize="true"
+                :options="eventSourceOptions"
+                class="chart-content"/>
             </div>
             <div class="pct-nums">
-              <div v-for="(item, index) in sourcePerArray" :class="lang === 'en'? 'en-label' : ''" :key="index"
-                   class="content-labels">
+              <div
+                v-for="(item, index) in sourcePerArray"
+                :class="lang === 'en'? 'en-label' : ''"
+                :key="index"
+                class="content-labels">
                 <div class="excellent_nums">{{ item.percent }}%</div>
                 <div class="excellent_labels">
                   <span :class="`label-` + index" class="labels excellent-label"/>
@@ -92,8 +101,11 @@
           </div>
           <div class="pct-content">
             <div class="pct-panel">
-              <v-chart ref="eventStatusRef" :auto-resize="true" :options="eventStatusOptions"
-                       class="chart-content"/>
+              <v-chart
+                ref="eventStatusRef"
+                :auto-resize="true"
+                :options="eventStatusOptions"
+                class="chart-content"/>
             </div>
             <div class="pct-nums">
               <div v-for="(item, index) in statusPerArray" :key="index" class="content-labels">
@@ -112,7 +124,7 @@
             <div class="store-panel">
               <div class="store-list">
                 <span class="store-name">{{ $t('overview.rankType') }}</span>
-                <el-select v-model="rankType"  style="width: 200px" size="mini" @change="changeRankType">
+                <el-select v-model="rankType" style="width: 200px" size="mini" @change="changeRankType">
                   <el-option
                     v-for="item in rankTypeArr"
                     :key="item.value"
@@ -122,8 +134,11 @@
                 </el-select>
               </div>
               <div class="status-content">
-                <v-chart ref="storeStatusRef" :options="storeStatusOptions" :auto-resize="true"
-                         class="result-content"/>
+                <v-chart
+                  ref="storeStatusRef"
+                  :options="storeStatusOptions"
+                  :auto-resize="true"
+                  class="result-content"/>
               </div>
             </div>
           </div>
@@ -136,27 +151,11 @@
 
 <script>
 import ECharts from 'vue-echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/chart/map';
-import 'echarts/lib/chart/radar';
-import 'echarts/lib/chart/scatter';
-import 'echarts/lib/chart/effectScatter';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/polar';
-import 'echarts/lib/component/geo';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/title';
-import 'echarts/lib/component/visualMap';
-import 'echarts/lib/component/dataset';
-import 'echarts/map/js/world';
-import 'zrender/lib/svg/svg';
 import util from '../../common/util.js';
-import { getStoreList, getBriefStoreList } from '@/api/store';
-import { getCookie } from '@/common/auth';
+import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
+import resize from '@/components/mixins/resize';
 
 export default {
   name: 'ExceptEvent',
@@ -164,6 +163,8 @@ export default {
   components: {
     'v-chart': ECharts
   },
+
+  mixins: [resize],
 
   data() {
     return {
@@ -308,7 +309,6 @@ export default {
       ],
       echartAxiasColor: '#e3e9f4',
       echartBackground: 'rgba(30,34,52,0.75)',
-      sidebarElm: null,
       fontFamily: 'Roboto, Microsoft YaHei'
     };
   },
@@ -319,7 +319,7 @@ export default {
 
   watch: {
     accountChanged(val) {
-      let self = this;
+      const self = this;
       if (val !== 0) {
         self.timeMode = 1;
         self.rankType = 3;
@@ -329,8 +329,8 @@ export default {
         self.curStore = this.$t('overview.all');
         self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
         self.initData();
@@ -339,37 +339,27 @@ export default {
   },
 
   created() {
-    let self = this;
+    const self = this;
     self.getBriefStoreData();
-    let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+    const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+    const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
     self.params.beginTs = start;
     self.params.endTs = end;
     self.initData();
   },
 
-  mounted() {
-    let self = this;
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
-    window.addEventListener('resize', self.adjustChart, false);
-  },
-
   beforeDestroy() {
-    let self = this;
-    window.removeEventListener('resize', self.adjustChart);
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar);
-    self.$refs.storeEventRef && self.$refs.storeEventRef.dispose();
-    self.$refs.storeStatusRef && self.$refs.storeStatusRef.dispose();
-    self.$refs.eventSourceRef && self.$refs.eventSourceRef.dispose();
-    self.$refs.eventStatusRef && self.$refs.eventStatusRef.dispose();
+    this.$refs.storeEventRef && this.$refs.storeEventRef.dispose();
+    this.$refs.storeStatusRef && this.$refs.storeStatusRef.dispose();
+    this.$refs.eventSourceRef && this.$refs.eventSourceRef.dispose();
+    this.$refs.eventStatusRef && this.$refs.eventStatusRef.dispose();
   },
 
   methods: {
     dateChange(val) {
-      let self = this;
+      const self = this;
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       let daysDiff = self.$moment(end).diff(start, 'days');
       if (daysDiff < 6) {
         self.$message({
@@ -399,19 +389,19 @@ export default {
     },
 
     getBriefStoreData() {
-      let self = this;
+      const self = this;
       getBriefStoreList().then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
-          let storeList = res.data;
-          let tempStore = [];
+          const storeList = res.data;
+          const tempStore = [];
           tempStore.push(
             { storeId: '-1',
               label: self.$t('overview.all'),
               value: self.$t('overview.all') }
           );
           storeList.forEach(item => {
-            let obj = {
+            const obj = {
               storeId: item.storeId,
               label: item.name,
               value: item.name,
@@ -426,7 +416,7 @@ export default {
     },
 
     changeStore(val) {
-      let self = this;
+      const self = this;
       self.storeIds = [];
       if (val === -1) {
         self.storeIds = [];
@@ -437,13 +427,13 @@ export default {
     },
 
     choiceStore() {
-      let self = this;
+      const self = this;
       self.showStoreContent = !self.showStoreContent;
       self.showMonthDrap = true;
     },
 
     changeStoreItem(item) {
-      let self = this;
+      const self = this;
       self.checkAllStore = false;
       if (item === -1) {
         self.checkAllStore = true;
@@ -454,7 +444,7 @@ export default {
         });
       } else {
         let daysStr = '';
-        let selectedStores = [];
+        const selectedStores = [];
         daysStr = item.label;
         selectedStores.push(item.storeId);
 
@@ -470,77 +460,27 @@ export default {
       self.getStoreEventStatics();
     },
 
-    async getAllStoreList() {
-      let self = this;
-      let params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      try {
-        let retData = await self.getStoreData(params);
-        let storeList = retData.data.content;
-        let tempStore = [];
-        tempStore.push(
-          { storeId: '-1',
-            label: self.$t('overview.all'),
-            value: self.$t('overview.all') }
-        );
-        storeList.forEach(item => {
-          let obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            userName: item.userName,
-            checked: true
-          };
-          tempStore.push(obj);
-        });
-        self.storeDataList = tempStore;
-      }
-      catch (e) {
-        self.storeDataList = [];
-        console.log("EventOverview-getAllStoreList:" + e);
-      }
-    },
-
-    getStoreData(params) {
-      let self = this;
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          let errMsg = res.errMsg;
-          if (errMsg && errMsg === 'Success') {
-            resolve(res);
-          }
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
     initData() {
-      let self = this;
-      let start = self.params.beginTs;
-      let end = self.params.endTs;
-      let startDay = self.$moment(start).format('YYYY-MM-DD');
-      let endDay = self.$moment(end).format('YYYY-MM-DD');
-      let startDayWithoutYear = self.$moment(start).format('MM/DD');
-      let endDayWithoutYear = self.$moment(end).format('MM/DD');
+      const self = this;
+      const start = self.params.beginTs;
+      const end = self.params.endTs;
+      const startDay = self.$moment(start).format('YYYY-MM-DD');
+      const endDay = self.$moment(end).format('YYYY-MM-DD');
+      const startDayWithoutYear = self.$moment(start).format('MM/DD');
+      const endDayWithoutYear = self.$moment(end).format('MM/DD');
       if (self.timeMode === 1) {
-        let beginDay = new Date(util.judgeStart(startDay));
-        let weekList = util.getWeek(beginDay, endDay);
-        let arrLength = weekList.length;
-        let firstEndTime = weekList[0].split('-')[1];
-        let firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-        let lastStartTime = weekList[arrLength - 1].split('-')[0];
-        let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
+        const beginDay = new Date(util.judgeStart(startDay));
+        const weekList = util.getWeek(beginDay, endDay);
+        const arrLength = weekList.length;
+        const firstEndTime = weekList[0].split('-')[1];
+        const firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
+        const lastStartTime = weekList[arrLength - 1].split('-')[0];
+        const lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
         weekList.splice(0, 1, firstWeekStr);
         weekList.splice(arrLength - 1, 1, lastWeekStr);
         self.daysRangeList = weekList;
       } else if (self.timeMode === 2) {
-        let monthArray = util.getMonthBetween(startDay, endDay);
+        const monthArray = util.getMonthBetween(startDay, endDay);
         self.daysRangeList = monthArray;
       }
       self.getEventStatsStatics();
@@ -549,11 +489,11 @@ export default {
     },
 
     async getEventStatsStatics() {
-      let self = this;
+      const self = this;
       try {
-        let eventResult = await self.getEventStatsOverview(self.params);
+        const eventResult = await self.getEventStatsOverview(self.params);
         if (eventResult.errCode === 0) {
-          let result = eventResult.data;
+          const result = eventResult.data;
           if (Object.keys(result).length > 0) {
             self.eventKPIs[0].eventNum = result.numOfNewEventsToday;
             self.eventKPIs[1].eventNum = result.numOfClosedEventsToday;
@@ -569,9 +509,8 @@ export default {
         }
         self.getEventBySourcePie();
         self.getEventByStatusPie();
-      }
-      catch (e) {
-        console.log("EventOverview-getEventStatsStatics:" + e);
+      } catch (e) {
+        console.log('EventOverview-getEventStatsStatics:' + e);
       }
     },
 
@@ -580,16 +519,16 @@ export default {
         getEventStatsOverview(params).then(res => {
           resolve(res);
         })
-        .catch(err => {
-        reject(err);
-      })
+          .catch(err => {
+            reject(err);
+          });
       });
     },
 
     getEventBySourcePie() {
-      let self = this;
-      let jsonArray = self.sourceLegend;
-      let sourcePieList = self.eventBySource;
+      const self = this;
+      const jsonArray = self.sourceLegend;
+      const sourcePieList = self.eventBySource;
       let remoteEventNum = 0;
       let onsiteEventNum = 0;
       let storeEventNum = 0;
@@ -606,7 +545,7 @@ export default {
           onsiteEventNum = item.numOfEvent;
         }
       });
-      let totalArray = [remoteEventNum, onsiteEventNum, storeEventNum];
+      const totalArray = [remoteEventNum, onsiteEventNum, storeEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -658,7 +597,7 @@ export default {
               },
               normal: {
                 color: function(params) {
-                  let colorList = ['#f31d65', '#fb804f', '#fccc3f'];
+                  const colorList = ['#f31d65', '#fb804f', '#fccc3f'];
                   return colorList[params.dataIndex];
                 }
               }
@@ -670,9 +609,9 @@ export default {
     },
 
     getEventByStatusPie() {
-      let self = this;
-      let jsonArray = self.statusLegend;
-      let statusPieList = self.eventByStatus;
+      const self = this;
+      const jsonArray = self.statusLegend;
+      const statusPieList = self.eventByStatus;
       let pendingEventNum = 0;
       let doneEventNum = 0;
       let closedEventNum = 0;
@@ -689,7 +628,7 @@ export default {
           closedEventNum = item.numOfEvent;
         }
       });
-      let totalArray = [pendingEventNum, doneEventNum, closedEventNum];
+      const totalArray = [pendingEventNum, doneEventNum, closedEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
@@ -707,13 +646,13 @@ export default {
       self.statusPerArray = jsonArray;
     },
 
-    getEventByStatusPieOption(){
-      let self = this;
-      let pieOption = {
+    getEventByStatusPieOption() {
+      const self = this;
+      const pieOption = {
         tooltip: {
           trigger: 'item',
-            formatter: '{b} : {c} ({d}%)',
-            textStyle: {
+          formatter: '{b} : {c} ({d}%)',
+          textStyle: {
             align: 'left'
           },
           backgroundColor: this.echartBackground
@@ -748,7 +687,7 @@ export default {
               },
               normal: {
                 color: function(params) {
-                  let colorList = [self.pendingColor, self.doneColor, self.closedColor];
+                  const colorList = [self.pendingColor, self.doneColor, self.closedColor];
                   return colorList[params.dataIndex];
                 }
               }
@@ -759,8 +698,8 @@ export default {
       return pieOption;
     },
 
-    getEventRankingInfoSetting(){
-      let settingObj = {};
+    getEventRankingInfoSetting() {
+      const settingObj = {};
       if (this.rankType === 0) {
         settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent')];
         settingObj.colorArray = [this.pendingColor];
@@ -771,7 +710,7 @@ export default {
         settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
       } else {
         settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent'),
-                                  this.$t('overview.processedEvent'), this.$t('overview.closedEvents')];
+          this.$t('overview.processedEvent'), this.$t('overview.closedEvents')];
         settingObj.colorArray = [this.pendingColor, this.doneColor, this.closedColor];
         settingObj.seriesData = [
           { type: 'bar', stack: 'test', barWidth: 35 },
@@ -783,22 +722,22 @@ export default {
     },
 
     async getEventRankingInfo() {
-      let self = this;
+      const self = this;
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.numOfStores = 5;
       params.rankType = self.rankType;
-      let {axisArray, colorArray, seriesData} = self.getEventRankingInfoSetting();
-      let rankingOption = self.getEventRankingOption(colorArray, seriesData)
+      const { axisArray, colorArray, seriesData } = self.getEventRankingInfoSetting();
+      const rankingOption = self.getEventRankingOption(colorArray, seriesData);
       try {
-        let rankingResult = await self.getEventStatsRanking(params);
+        const rankingResult = await self.getEventStatsRanking(params);
         if (rankingResult.errCode === 0) {
-          let result = rankingResult.data;
+          const result = rankingResult.data;
           self.statusStoreList = result;
-          let soureceList = [];
+          const soureceList = [];
           soureceList.push(axisArray);
           result.forEach(item => {
-            let itemArray = [];
+            const itemArray = [];
             itemArray.push(item.storeName);
             if (self.rankType === 3) {
               itemArray.push(item.numOfUnprocessed);
@@ -816,46 +755,46 @@ export default {
           rankingOption.dataset.source = [];
         }
         self.storeStatusOptions = rankingOption;
-      }catch (e) {
+      } catch (e) {
         self.storeStatusOptions = rankingOption;
-        console.log("EventOverview-getEventRankingInfo:" + e);
+        console.log('EventOverview-getEventRankingInfo:' + e);
       }
     },
 
-    getEventRankingOption(colorArray, seriesData){
-      let rankingOption = {
-          color: colorArray,
-          legend: {
-            x: 'center',
-            y: 'bottom',
-            itemWidth: 10,
-            itemHeight: 10,
-            itemGap: 20,
-            padding: 0,
-            icon: 'rect',
-            textStyle: {
+    getEventRankingOption(colorArray, seriesData) {
+      const rankingOption = {
+        color: colorArray,
+        legend: {
+          x: 'center',
+          y: 'bottom',
+          itemWidth: 10,
+          itemHeight: 10,
+          itemGap: 20,
+          padding: 0,
+          icon: 'rect',
+          textStyle: {
             color: this.echartColor,
-              fontSize: 12,
-              padding: [0, 0, 0, 5]
+            fontSize: 12,
+            padding: [0, 0, 0, 5]
           }
         },
         grid: {
           containLabel: true,
-            top: '10',
-            left: '8',
-            right: '0',
-            bottom: '32'
+          top: '10',
+          left: '8',
+          right: '0',
+          bottom: '32'
         },
         textStyle: {
           fontFamily: this.fontFamily
         },
         tooltip: {
           trigger: 'axis',
-            axisPointer: {
+          axisPointer: {
             type: 'none'
           },
           padding: 5,
-            textStyle: {
+          textStyle: {
             align: 'left'
           },
           backgroundColor: this.echartBackground
@@ -865,58 +804,58 @@ export default {
         },
         xAxis: {
           type: 'category',
-            axisTick: {
+          axisTick: {
             show: false,
-              inside: true,
-              lineStyle: {
+            inside: true,
+            lineStyle: {
               color: '#7D8CAB',
-                fontSize: 12
+              fontSize: 12
             }
           },
           splitLine: {
             show: false,
-              lineStyle: {
+            lineStyle: {
               type: 'dashed'
             }
           },
           axisLine: {
             show: false,
-              lineStyle: {
+            lineStyle: {
               color: '#7D8CAB'
             }
           },
           axisLabel: {
             fontStyle: 12,
-              margin: 10
+            margin: 10
           }
         },
         yAxis: {
           // interval: 20,
           minInterval: 20,
-            axisTick: {
+          axisTick: {
             show: false,
-              inside: true,
-              lineStyle: {
+            inside: true,
+            lineStyle: {
               color: '#7D8CAB',
-                fontSize: 12
+              fontSize: 12
             }
           },
           splitLine: {
             show: true,
-              lineStyle: {
+            lineStyle: {
               color: this.echartAxiasColor,
-                width: 1
+              width: 1
             }
           },
           axisLine: {
             show: false,
-              lineStyle: {
+            lineStyle: {
               color: '#7D8CAB'
             }
           },
           axisLabel: {
             fontStyle: 12,
-              margin: 10
+            margin: 10
           }
         },
         series: seriesData
@@ -929,37 +868,37 @@ export default {
         getEventStatsRankInfo(params).then(res => {
           resolve(res);
         })
-        .catch(err => {
-        reject(err)
-      });
+          .catch(err => {
+            reject(err);
+          });
       });
     },
 
     async getStoreEventStatics() {
-      let self = this;
+      const self = this;
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.storeIds = self.storeIds;
       params.timeMode = self.timeMode;
-      let option = self.getStoreEventStaticsOption();
+      const option = self.getStoreEventStaticsOption();
       try {
-        let storeEventResult = await self.getStoreEventData(params);
+        const storeEventResult = await self.getStoreEventData(params);
         if (storeEventResult.errCode === 0) {
-          let result = storeEventResult.data;
+          const result = storeEventResult.data;
           self.storeEventList = result;
-          let soureceList = [];
+          const soureceList = [];
           soureceList.push(self.storeEventLegend);
           let sumOfNewEvents = 0;
           let sumOfProcessedEvents = 0;
           let sumOfClosedEvents = 0;
           result.forEach((item, index) => {
-            let storeList = item.stores;
+            const storeList = item.stores;
             storeList.forEach(_item => {
               sumOfNewEvents += _item.numOfNewEvents;
               sumOfProcessedEvents += _item.numOfProcessedEvents;
               sumOfClosedEvents += _item.numOfClosedEvents;
             });
-            let itemArray = [];
+            const itemArray = [];
             itemArray.push(self.daysRangeList[index]);
             itemArray.push(sumOfNewEvents);
             itemArray.push(sumOfProcessedEvents);
@@ -969,15 +908,14 @@ export default {
           option.dataset.source = soureceList;
         }
         self.storeEventsOptions = option;
-      }
-      catch (e) {
+      } catch (e) {
         self.storeEventsOptions = option;
-        console.log("EventOverview-getStoreEventStatics:" + e);
+        console.log('EventOverview-getStoreEventStatics:' + e);
       }
     },
 
-    getStoreEventStaticsOption(){
-      let storeOption = {
+    getStoreEventStaticsOption() {
+      const storeOption = {
         color: [this.newColor, this.doneColor, this.closedColor],
         legend: {
           x: 'center',
@@ -1092,19 +1030,19 @@ export default {
       return new Promise((resolve, reject) => {
         getEventStatsOverStore(params).then(res => {
           resolve(res);
-        }).catch(err =>{
-          reject(err)
+        }).catch(err => {
+          reject(err);
         });
       });
     },
 
     changeRankType(val) {
-      let self = this;
+      const self = this;
       self.getEventRankingInfo();
     },
 
     toPercent(point) {
-      let tempPoint = Number(point * 100);
+      const tempPoint = Number(point * 100);
       let str = '';
       util.isDot(tempPoint) ? str = tempPoint.toFixed(2) : str = tempPoint;
       str += '%';
@@ -1112,17 +1050,10 @@ export default {
     },
 
     adjustChart() {
-      let self = this;
-      self.$refs.storeEventRef.resize();
-      self.$refs.storeStatusRef.resize();
-      self.$refs.eventSourceRef.resize();
-      self.$refs.eventStatusRef.resize();
-    },
-
-    handleSideBar(e) {
-      if (e.target === e.currentTarget || e.target === this) {
-        this.adjustChart();
-      }
+      this.$refs.storeEventRef && this.$refs.storeEventRef.resize();
+      this.$refs.storeStatusRef && this.$refs.storeStatusRef.resize();
+      this.$refs.eventSourceRef && this.$refs.eventSourceRef.resize();
+      this.$refs.eventStatusRef && this.$refs.eventStatusRef.resize();
     }
   }
 };
