@@ -250,29 +250,10 @@
 
 <script>
 import ECharts from 'vue-echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/chart/map';
-import 'echarts/lib/chart/radar';
-import 'echarts/lib/chart/scatter';
-import 'echarts/lib/chart/effectScatter';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/polar';
-import 'echarts/lib/component/geo';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/title';
-import 'echarts/lib/component/visualMap';
-import 'echarts/lib/component/dataset';
-import 'echarts/map/js/world';
-import 'zrender/lib/svg/svg';
-import MultiSelect from '@/components/MultiSelect';
-import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
-import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
 import util from '../../common/util.js';
-import { inpectRESTful } from '@/api/index';
 import SearchComponent from '@/components/SearchComponent';
+import resize from '@/components/mixins/resize';
 
 import {
   getInspectStatsItemOverviewV2
@@ -282,12 +263,10 @@ export default {
   name: 'InspectItemStatistics',
 
   components: {
-    MultiSelect,
     'v-chart': ECharts,
-    RegionMultiSelect,
     SearchComponent
   },
-
+  mixins: [resize],
   data() {
     return {
       storeNameStr: '',
@@ -398,8 +377,6 @@ export default {
       echartAxiasColor: '#e3e9f4',
       rowClass: 'row-class',
       fontFamily: 'Roboto, Microsoft YaHei',
-      sidebarElm: null,
-      AllStore: [],
       order: {
         direction: 'asc',
         property: 'qualifiedRate'
@@ -440,20 +417,9 @@ export default {
     this.initData();
   },
 
-  mounted() {
-    const self = this;
-    window.addEventListener('resize', self.adjustChart, false);
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
-  },
-
   beforeDestroy() {
-    const self = this;
-    window.removeEventListener('resize', self.adjustChart);
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
-    self.$refs.itemsPie && self.$refs.itemsPie.dispose();
-    self.$refs.itemsRadar && self.$refs.itemsRadar.dispose();
-    self.adjustChart = null;
+    this.$refs.itemsPie && this.$refs.itemsPie.dispose();
+    this.$refs.itemsRadar && this.$refs.itemsRadar.dispose();
   },
 
   methods: {
@@ -911,15 +877,8 @@ export default {
     },
 
     adjustChart() {
-      const self = this;
-      self.$refs.itemsPie && self.$refs.itemsPie.resize();
-      self.$refs.itemsRadar && self.$refs.itemsRadar.resize();
-    },
-
-    handleSideBar(e) {
-      if (e.target === e.currentTarget || e.target === this) {
-        this.adjustChart();
-      }
+      this.$refs.itemsPie && this.$refs.itemsPie.resize();
+      this.$refs.itemsRadar && this.$refs.itemsRadar.resize();
     },
 
     emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeNameStr, storeTagStr) {

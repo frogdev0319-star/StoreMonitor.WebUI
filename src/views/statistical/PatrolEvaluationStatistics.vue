@@ -366,33 +366,16 @@
   </div>
 </template>
 <script>
-
-import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import LimitSelect from '@/components/LimitSelect';
 import ECharts from 'vue-echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/chart/map';
-import 'echarts/lib/chart/radar';
-import 'echarts/lib/chart/scatter';
-import 'echarts/lib/chart/effectScatter';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/polar';
-import 'echarts/lib/component/geo';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/title';
-import 'echarts/lib/component/visualMap';
-import 'echarts/lib/component/dataset';
-import 'echarts/map/js/world';
-import 'zrender/lib/svg/svg';
 import util from '../../common/util.js';
 import {
   getInspectStatsOverRegion,
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
+import resize from '@/components/mixins/resize';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -402,7 +385,7 @@ export default {
     LimitSelect,
     SearchComponent
   },
-
+  mixins: [resize],
   data() {
     return {
       htmlTitle: this.$t('overview.htmltopdfA'),
@@ -635,7 +618,6 @@ export default {
       regionOrder: { 'direction': 'asc', 'property': 'qualifiedRate' },
       storeFilter: { 'page': 0, 'size': 10 },
       storeOrder: { 'direction': 'asc', 'property': 'qualifiedRate' },
-      sidebarElm: null,
       fontFamily: 'Roboto, Microsoft YaHei',
       ispdf: false,
       regionMode: 2
@@ -658,20 +640,9 @@ export default {
     await this.initData();
   },
 
-  mounted() {
-    const self = this;
-    window.addEventListener('resize', self.adjustChart, false);
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
-  },
-
   beforeDestroy() {
-    const self = this;
-    window.removeEventListener('resize', self.adjustChart);
-    self.adjustChart = null;
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
-    self.$refs.itemsPie && self.$refs.itemsPie.dispose();
-    self.$refs.storeChart && self.$refs.storeChart.dispose();
+    this.$refs.itemsPie && this.$refs.itemsPie.dispose();
+    this.$refs.storeChart && this.$refs.storeChart.dispose();
   },
 
   methods: {
@@ -1417,24 +1388,12 @@ export default {
     },
 
     initData() {
-      const self = this;
-      self.params.filter = { page: 0, size: self.sizeNumStore };
+      this.params.filter = { page: 0, size: this.sizeNumStore };
     },
 
     adjustChart() {
-      const self = this;
-      if (self.$refs.itemsPie) {
-        self.$refs.itemsPie.resize();
-      }
-      if (self.$refs.storeChart) {
-        self.$refs.storeChart.resize();
-      }
-    },
-
-    handleSideBar(e) {
-      if (e.target === e.currentTarget || e.target === this) {
-        this.adjustChart();
-      }
+      this.$refs.itemsPie && this.$refs.itemsPie.resize();
+      this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
     emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode) {

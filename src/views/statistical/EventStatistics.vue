@@ -318,37 +318,21 @@
 
 <script>
 import ECharts from 'vue-echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/chart/pie';
-import 'echarts/lib/chart/map';
-import 'echarts/lib/chart/radar';
-import 'echarts/lib/chart/scatter';
-import 'echarts/lib/chart/effectScatter';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/polar';
-import 'echarts/lib/component/geo';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/title';
-import 'echarts/lib/component/visualMap';
-import 'echarts/lib/component/dataset';
-import 'echarts/map/js/world';
-import 'zrender/lib/svg/svg';
 import { mapGetters } from 'vuex';
 import util from '../../common/util.js';
 import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOverview';
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
+import resize from '@/components/mixins/resize'
 
 export default {
   name: 'EventStatistics',
-
   components: {
     'v-chart': ECharts,
     SearchComponent
   },
-
+  mixins: [resize],
   data() {
     return {
       ispdf: false,
@@ -357,14 +341,6 @@ export default {
       storeTagStr: '',
       storeDateValue: '',
       htmlTitle: this.$t('overview.htmltopdfD'),
-      dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
-      dateOpt: {
-        disabledDate: (time) => {
-          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
-        }
-      },
-      toolTipClass: 'page-login-toolTipClass',
-      showStoreInfo: false,
       eventKPIs: [
         {
           eventTitle: this.$t('overview.sumEvents'),
@@ -520,7 +496,6 @@ export default {
         this.$t('overview.storeMonitor')
       ],
       hasNoData: false,
-      sidebarElm: null,
       fontFamily: 'Roboto, Microsoft YaHei'
     };
   },
@@ -531,38 +506,19 @@ export default {
 
   watch: {
     async accountChanged(val) {
-      const self = this;
       if (val !== 0) {
-        self.initData();
+        this.initData();
       }
     }
   },
 
   async created() {
-    const self = this;
-    const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-    self.params.beginTs = start;
-    self.params.endTs = end;
-    self.params.timeMode = self.timeMode;
-    self.initDaysRange();
-    self.initData();
-  },
-
-  mounted() {
-    const self = this;
-    window.addEventListener('resize', self.adjustChart, false);
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
+    this.initData();
   },
 
   beforeDestroy() {
-    const self = this;
-    window.removeEventListener('resize', self.adjustChart);
-    self.adjustChart = null;
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
-    self.$refs.eventSourceRef && self.$refs.eventSourceRef.dispose();
-    self.$refs.storeEventRef && self.$refs.storeEventRef.dispose();
+    this.$refs.eventSourceRef && this.$refs.eventSourceRef.dispose();
+    this.$refs.storeEventRef && this.$refs.storeEventRef.dispose();
   },
 
   methods: {
@@ -750,13 +706,8 @@ export default {
     },
 
     adjustChart() {
-      const self = this;
-      if (self.$refs.eventSourceRef) {
-        self.$refs.eventSourceRef.resize();
-      }
-      if (self.$refs.storeEventRef) {
-        self.$refs.storeEventRef.resize();
-      }
+      this.$refs.eventSourceRef && this.$refs.eventSourceRef.resize();
+      this.$refs.storeEventRef && this.$refs.storeEventRef.resize();
     },
 
     export2Excel() {
@@ -1113,12 +1064,6 @@ export default {
       self.page = val;
       self.params.filter = { page: val - 1, size: self.sizeNum };
       self.getEventTableData();
-    },
-
-    handleSideBar(e) {
-      if (e.target === e.currentTarget || e.target === this) {
-        this.adjustChart();
-      }
     },
 
     emitSearch(searchParams, dateRangeList) {
