@@ -466,6 +466,8 @@ export default {
     'setMinScore': 'lowest',
     'setMaxScore': 'highest',
     'isCheckSuggest': 'Recommended value for inspection',
+    'isCheckAnnex':'Upload inspection attachment',//Sprint14
+    'AllowPhotos':'Live photos only (picture / video)',//Sprint14
     'PSCrule1': 'When combined with other tabs, the ',
     'PSCrule2': ' project score will participate in the evaluation of the total score calculation',
     'PSCrule3': 'Calculate the score of ignored items in',
@@ -507,8 +509,6 @@ export default {
     'sheetpassfail': 'Pass-Failed',
     'sheetscore': 'Score items',
     'sheetother': 'Other items',
-    'notAllowAdd': 'Adding is not allowed when the [Pass-Failed]  tab is combined with the [Others].',
-    'notallowdeletetips': 'Existing invalid tab combination on inspection table',
     'notallowA': ' [Pass-Failed] tab & [Score Items] tab',
     'notallowB': 'Single [Others] tab',
     'score': 'Score',

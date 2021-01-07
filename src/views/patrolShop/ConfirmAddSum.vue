@@ -475,9 +475,9 @@ export default {
             objItem.ts = new Date().getTime();
             objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
             if (inspect[i].type === 0 || inspect[i].type === 2) {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? -1 : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
             } else {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? -1 : inspect[i].inspectList[g].items[j].itemgetScore;
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
             }
 
             objItem.storeId = self.store.storeId;
@@ -581,6 +581,15 @@ export default {
       });
       self.uploadProgress = false;
     },
+
+    getFloat (value) {
+      let str = value.toString();
+      let strIndex = str.indexOf('.');
+      if (strIndex === -1){return str};
+      str = str.substring(0, strIndex + 2);
+      return str;
+    },
+    
     getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
@@ -680,7 +689,7 @@ export default {
         });
         if (p_item.type === 0) {
           p_item['tHeader'] = self.theaderPassFail;
-          if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.checkItem4) {
+          if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.dangerousOnFailedItem) {
             self.resultList[0].isShow = false;
             self.resultList[1].isShow = false;
             self.resultList[2].isActive = true;
@@ -694,67 +703,64 @@ export default {
       });
       let s_count = 0;
       if (inspect.length === 1 && inspect[0].type === 0) {
-        if (inspectSettings.radio === '-1') {
-          if(inspectSettings.checkItem2){
+        if (inspectSettings.hundredMarkType === '-1') {
+          if(inspectSettings.qualifiedForIgnoredWithType1){
             s_count = Math.round(PassFileXN);
           }else{
             s_count = Math.round(PassFileTotalScoreSystem);
           }
         } else {
-          if (inspectSettings.checkItem2) {
+          if (inspectSettings.qualifiedForIgnoredWithType1) {
             s_count = PassFileTotalScore===0 ? 0 : Math.round(PassFileXN / PassFileTotalScore * 100);
           } else {
             s_count = PassFileTotalScoreX===0 ? 0 : Math.round(PassFileXS / PassFileTotalScoreX * 100);
           }
         }
       } else {
-        if (inspectSettings.checkItem1) {
-          if (inspectSettings.radio === '-1') {
-            if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
+        if (inspectSettings.includedInTotalScoreWithType1) {
+          if (inspectSettings.hundredMarkType === '-1') {
+            if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
               s_count = Math.round(PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem);
-            } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+            } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
               s_count = Math.round(PassFileTotalScoreSystem + ScoreXN + OtherTotalScoreSystem);
-            } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
+            } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
               s_count = Math.round(PassFileXN + ScoreXN + OtherTotalScoreSystem);
             } else {
               s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
             }
           } else {
-            let total_a = 0,total_b = 0;
-            if (inspectSettings.checkItem2 && !inspectSettings.checkItem3) {
-              total_a = parseInt(PassFileTotalScore + ScoreTotalScoreX);
-              total_b = total_a===0 ? 0 : Math.round(((PassFileXN + ScoreTotalScoreSystem) / (PassFileTotalScore + ScoreTotalScoreX) * 100));
-              s_count = Math.round(total_b + otherGetscoreTotal);
-            } else if (!inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              total_a = parseInt(PassFileTotalScoreX + allScoreB);
-              total_b = total_a===0 ? 0 : Math.round(((PassFileXS + ScoreXN) / (PassFileTotalScoreX + allScoreB) * 100));
-              s_count = Math.round(total_b + otherGetscoreTotal);
-            } else if (inspectSettings.checkItem2 && inspectSettings.checkItem3) {
-              total_a = parseInt(PassFileTotalScore + allScoreB);
-              total_b = total_a===0 ? 0 : Math.round(((PassFileXN + ScoreXN) / (PassFileTotalScore + allScoreB) * 100));
-              s_count = Math.round(total_b + otherGetscoreTotal);
+            let total_a = 0,total_b = 0,total_c = 0;
+            if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
+              total_a = PassFileXN + ScoreTotalScoreSystem;
+              total_b = PassFileTotalScore + ScoreTotalScoreX;
+            } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+              total_a = PassFileXS + ScoreXN;
+              total_b = PassFileTotalScoreX + allScoreB;
+            } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+              total_a = PassFileXN + ScoreXN;
+              total_b = PassFileTotalScore + allScoreB;
             } else {
-              total_a = parseInt(PassFileTotalScoreX + ScoreTotalScoreX);
-              total_b = total_a===0 ? 0 : Math.round(((PassFileXS + ScoreTotalScoreSystem) / (PassFileTotalScoreX + ScoreTotalScoreX) * 100));
-              s_count = Math.round(total_b + otherGetscoreTotal);
+              total_a = PassFileXS + ScoreTotalScoreSystem;
+              total_b = PassFileTotalScoreX + ScoreTotalScoreX;
             }
+            total_c = total_a===0 || total_b===0 ? 0 : Math.round((total_a / total_b * 100));
+            s_count = Math.round(total_c + otherGetscoreTotal);
           }
         } else {
-          if (inspectSettings.radio === '-1') {
-            if (inspectSettings.checkItem3) {
+          if (inspectSettings.hundredMarkType === '-1') {
+            if (inspectSettings.qualifiedForIgnoredWithType2) {
               s_count = Math.round(ScoreXN + OtherTotalScoreSystem);
             } else {
               s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
             }
           } else {
             let total_a = 0;
-            if (inspectSettings.checkItem3) {
-              total_a = allScoreB===0 ? 0 : Math.round((ScoreXN / allScoreB * 100))
-              s_count = Math.round(total_a + otherGetscoreTotal);
+            if (inspectSettings.qualifiedForIgnoredWithType2) {
+              total_a = allScoreB===0 || ScoreXN===0 ? 0 : Math.round((ScoreXN / allScoreB * 100))
             } else {
-              total_a = ScoreTotalScoreX===0 ? 0 : Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100))
-              s_count = Math.round(total_a + otherGetscoreTotal);
+              total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100))
             }
+            s_count = Math.round(total_a + otherGetscoreTotal);
           }
         }
       }
@@ -764,7 +770,7 @@ export default {
           item.isActive = false;
         });
       }
-      self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : s_count);
+      self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(self.getFloat(s_count)));
       self.summary = inspect;
       eventList.forEach((item, index) => {
         const objFeedBack = {};

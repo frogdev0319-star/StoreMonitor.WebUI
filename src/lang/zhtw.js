@@ -281,6 +281,7 @@ export default {
     'sentFail': '提交失敗！',
     'copyFail': '已將不合格項抄送至',
     'return': '秒後自動返回遠端巡檢頁面！',
+    'returnStoreMonitor': '秒後自動返回門店監控頁面！',
     'storeName': '門店名稱：',
     'item': '項目',
     'ifpass': '是否合格',
@@ -471,6 +472,8 @@ export default {
     'setMinScore': '最低',
     'setMaxScore': '最高',
     'isCheckSuggest': '巡檢建議值',
+    'isCheckAnnex':'巡檢附件上傳',//Sprint14
+    'AllowPhotos':'僅允許現場拍照（圖片/視頻）',//Sprint14
     'patrolSuggest': '中存在不合格項時，巡檢結果為：立即督導',
     'PSCrule1': '與其他tab組合時，',
     'PSCrule2': '項目分值參與考評總分運算',
@@ -515,8 +518,6 @@ export default {
     'sheetpassfail': '合格率評估項',
     'sheetscore': '巡檢評分項',
     'sheetother': '附加評分項',
-    'notAllowAdd': '[Pass-Failed] 和 [Others]Tab無法組成有效的巡檢表，不允許新增！',
-    'notallowdeletetips': '存在無效的巡檢表Tab組合，不允許刪除！',
     'notallowA': '合格率評估項和附加評分項',
     'notallowB': '附加評分項',
     'score': '項目分值',

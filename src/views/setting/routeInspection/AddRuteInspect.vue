@@ -983,6 +983,26 @@ export default {
       self.ScoreOptionsTips1 = false;
     },
 
+    getFloat (value) {
+      let str = value.toString();
+      let strIndex = str.indexOf('.');
+      if (strIndex === -1){return str};
+      str = str.substring(0, strIndex + 2);
+      return str;
+    },
+
+    getUtilScore(val,type){ 
+      // type 0 : Nonnegative number , type 1 : negative
+        val = type===0 ? val.replace(/[^\d\.]/g,"") : val.replace(/[^-?\d\.]/g,"");  
+        val = val.replace(/\.{2,}/g,"."); 
+        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$","."); 
+        val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
+        if(!isNaN(val)&&val.indexOf(".")< 0 && val !=""){
+            val= parseFloat(val); 
+        } 
+        return val;
+    },
+
     confirmUpdateNape() {
       const self = this;
       if (self.ItemName.trim().length === 0) {
@@ -994,10 +1014,10 @@ export default {
           self.ItemSheetScore = itemScore = 10;
           qualifiedScore = null;
         } else {
-          if (parseInt(self.ItemSheetScore) > 50 || parseInt(self.ItemSheetScore) < 1) {
+          if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
             self.PFScoreTip = true;
           } else {
-            itemScore = parseInt(self.ItemSheetScore);
+            itemScore = parseFloat(self.getFloat(self.ItemSheetScore));
             qualifiedScore = null;
           }
         }
@@ -1007,22 +1027,22 @@ export default {
         }
         if(self.ItemTotalScore === ''){
           self.ItemTotalScoreTip0 = true;
-        }else if(parseInt(self.ItemTotalScore)>50 || parseInt(self.ItemTotalScore)<0){
+        }else if(parseFloat(self.ItemTotalScore)>50 || parseFloat(self.ItemTotalScore)<0){
           self.ItemTotalScoreTip1 = true;
         }else{
           if(self.ItemMinScore === ''){
-            itemScore = parseInt(self.ItemTotalScore);
-            qualifiedScore = parseInt(self.ItemTotalScore);
-          }else if(parseInt(self.ItemMinScore)>parseInt(self.ItemTotalScore) || parseInt(self.ItemMinScore) < -50){
+            itemScore = parseFloat(self.getFloat(self.ItemTotalScore));
+            qualifiedScore = parseFloat(self.getFloat(self.ItemTotalScore));
+          }else if(parseFloat(self.ItemMinScore)>parseFloat(self.ItemTotalScore) || parseFloat(self.ItemMinScore) < -50){
             self.ItemMinScoreTip = true;
           }else{
-            itemScore = parseInt(self.ItemTotalScore);
-            qualifiedScore = parseInt(self.ItemMinScore);
+            itemScore = parseFloat(self.getFloat(self.ItemTotalScore));
+            qualifiedScore = parseFloat(self.getFloat(self.ItemMinScore));
           }
           if(self.ItemScoreOption !== ''){
             self.ItemScoreOptions.forEach(item=>{
-              if(!isNaN(parseInt(item)) && parseInt(item)>=-50 && parseInt(item)<=parseInt(self.ItemTotalScore)){
-                selectAvailable.push(parseInt(item));
+              if(!isNaN(parseFloat(item)) && parseFloat(item)>=-50 && parseFloat(item)<=parseFloat(self.ItemTotalScore)){
+                selectAvailable.push(parseFloat(self.getFloat(item)));
               }
             })
           }
@@ -1030,10 +1050,10 @@ export default {
       } else if (self.activeSheetName == '2') {
         if (self.ItemSheetScore === '') {
           self.OtherScoreTipEmpty = true;
-        }else if(parseInt(self.ItemSheetScore) > 100 || parseInt(self.ItemSheetScore) < -100){
+        }else if(parseFloat(self.ItemSheetScore) > 100 || parseFloat(self.ItemSheetScore) < -100){
           self.OtherScoreTip = true;
         }else {
-          itemScore = parseInt(self.ItemSheetScore);
+          itemScore = parseFloat(self.getFloat(self.ItemSheetScore));
           qualifiedScore = null;
         }
       }
@@ -1370,9 +1390,9 @@ export default {
 
     napeTotalScoreChange(val){
       const self = this;
-      self.ItemTotalScore = val.replace(/[^\d]/g, '');
+      self.ItemTotalScore = self.getUtilScore(val,0);
       self.ItemTotalScoreTip0 = false;
-      if(parseInt(self.ItemTotalScore)<0 || parseInt(self.ItemTotalScore) >50){
+      if(parseFloat(self.ItemTotalScore)<0 || parseFloat(self.ItemTotalScore) >50){
         self.ItemTotalScoreTip1 = true;
       }else{
         self.ItemTotalScoreTip1 = false;
@@ -1381,7 +1401,8 @@ export default {
 
     napeMinScoreChange(val){
       const self = this;
-      if(parseInt(val)<-50 || parseInt(val) > parseInt(self.ItemTotalScore)){
+      self.ItemMinScore = self.getUtilScore(val,1);
+      if(parseFloat(self.ItemMinScore)<-50 || parseFloat(self.ItemMinScore) > parseFloat(self.ItemTotalScore)){
         self.ItemMinScoreTip = true;
       }else{
         self.ItemMinScoreTip = false;
@@ -1391,15 +1412,16 @@ export default {
     napeSheetScoreChange(val){
       const self = this;
       if(self.activeSheetName==='0'){
-        self.ItemSheetScore = val.replace(/[^\d]/g, '');
-        if(self.ItemSheetScore!=='' && (parseInt(self.ItemSheetScore)<1 || parseInt(self.ItemSheetScore)>50)){
+        self.ItemSheetScore = self.getUtilScore(val,0);
+        if(self.ItemSheetScore!=='' && (parseFloat(self.ItemSheetScore)<0.5 || parseFloat(self.ItemSheetScore)>50)){
           self.PFScoreTip=true;
         }else{
           self.PFScoreTip=false;
         }
       }else if(self.activeSheetName==='2'){
         self.OtherScoreTipEmpty = false;
-        if(parseInt(self.ItemSheetScore)<-100 || parseInt(self.ItemSheetScore)>100){
+        self.ItemSheetScore = self.getUtilScore(val,1);
+        if(parseFloat(self.ItemSheetScore)<-100 || parseFloat(self.ItemSheetScore)>100){
           self.OtherScoreTip=true;
         }else{
           self.OtherScoreTip=false;
@@ -1409,15 +1431,20 @@ export default {
 
     napeScoreOptionsChange(val){
       const self = this;
-      self.ItemScoreOptions = val.replace(/[^-?\d+/]/g, '').split('/');
+      self.ItemScoreOption = val.replace(/[^-?\d\.\/]/g,"");
+      self.ItemScoreOptions = self.ItemScoreOption.split('/');
       self.ScoreOptionsTips0 = false;
-      self.ItemScoreOptions.forEach(item=>{
-        if(!isNaN(parseInt(item)) && parseInt(item)>=-50 && parseInt(item)<=parseInt(self.ItemTotalScore)){
-          self.ScoreOptionsTips1 = false;
-        }else{
-          self.ScoreOptionsTips1 = true;
-        }
-      })
+      if(val===''){
+        self.ScoreOptionsTips1 = false;
+      }else{
+        self.ItemScoreOptions.forEach(item=>{
+          if(!isNaN(parseFloat(item)) && parseFloat(item)>=-50 && parseFloat(item)<=parseFloat(self.ItemTotalScore)){
+            self.ScoreOptionsTips1 = false;
+          }else{
+            self.ScoreOptionsTips1 = true;
+          }
+        })
+      }
     },
 
     napeNameChange(val) {

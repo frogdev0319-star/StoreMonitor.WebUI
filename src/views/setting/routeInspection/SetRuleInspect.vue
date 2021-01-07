@@ -11,13 +11,13 @@
     </el-col>
     <el-col :span="24" class="el-rute-content">
       <p class="rule-title">{{ $t('insSettingView.PatrolScoreCalculation') }}</p>
-      <p class="rule-item"><el-checkbox v-model="checkItem1">{{ $t('insSettingView.PSCrule1') }}Tab1
+      <p class="rule-item"><el-checkbox v-model="includedInTotalScoreWithType1">{{ $t('insSettingView.PSCrule1') }}Tab1
       （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}</el-checkbox></p>
-      <p class="rule-item"><el-checkbox v-model="checkItem2"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span></el-checkbox></p>
-      <p class="rule-item"><el-checkbox v-model="checkItem3"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab2（{{ $t('insSettingView.sheetscore') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span> </el-checkbox></p>
+      <p class="rule-item"><el-checkbox v-model="qualifiedForIgnoredWithType1"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span></el-checkbox></p>
+      <p class="rule-item"><el-checkbox v-model="qualifiedForIgnoredWithType2"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab2（{{ $t('insSettingView.sheetscore') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span> </el-checkbox></p>
       <p class="rule-score">{{ $t('insSettingView.CalculationMethod') }}：</p>
       <p class="rule-item">
-        <el-radio v-model="radio" label="0" class="radio">{{ $t('insSettingView.Proportional') }}</el-radio>
+        <el-radio v-model="hundredMarkType" label="0" class="radio">{{ $t('insSettingView.Proportional') }}</el-radio>
         <el-tooltip
           class="item"
           effect="dark"
@@ -25,7 +25,7 @@
           <div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
         </el-tooltip>
-        <el-radio v-model="radio" label="-1" class="radio" style="margin-left: calc(40/1920*100vw);">{{ $t('insSettingView.totalScore') }}</el-radio>
+        <el-radio v-model="hundredMarkType" label="-1" class="radio" style="margin-left: calc(40/1920*100vw);">{{ $t('insSettingView.totalScore') }}</el-radio>
         <el-tooltip
           class="item"
           effect="dark"
@@ -46,9 +46,17 @@
     <el-col :span="24" class="el-rute-content">
       <p class="rule-title">{{ $t('insSettingView.isCheckSuggest') }}</p>
       <p class="rule-item">
-        <el-checkbox v-model="checkItem4">
+        <el-checkbox v-model="dangerousOnFailedItem">
           <span v-if="lang!=='en'">Tab1（{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.patrolSuggest') }}</span>
           <span v-else>When there are unqualified items in Tab1 ({{ $t('insSettingView.sheetpassfail') }}), the inspection result is: Dangerous.</span>
+        </el-checkbox>
+      </p>
+    </el-col>
+    <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;">
+      <p class="rule-title">{{ $t('insSettingView.isCheckAnnex') }}</p>
+      <p class="rule-item">
+        <el-checkbox v-model="checkItem5">
+          <span>{{ $t('insSettingView.AllowPhotos') }}</span>
         </el-checkbox>
       </p>
     </el-col>
@@ -62,13 +70,14 @@ export default {
   name: 'SetRuleInspect',
   data() {
     return {
-      radio: '',
+      hundredMarkType: '',
       minScore: 0,
       maxScore: 100,
-      checkItem1: false,
-      checkItem2: false,
-      checkItem3: false,
-      checkItem4: false,
+      includedInTotalScoreWithType1: false,
+      qualifiedForIgnoredWithType1: false,
+      qualifiedForIgnoredWithType2: false,
+      dangerousOnFailedItem: false,
+      checkItem5: false,
       lang: this.$i18n.locale,
       ScoreMsg: false,
       inspectId: 0,
@@ -86,13 +95,14 @@ export default {
         const params = {
           inspectTagId: self.inspectId,
           ruleItems: [
-            { name: 'includedInTotalScoreWithType1', value: self.checkItem1 },
-            { name: 'qualifiedForIgnoredWithType1', value: self.checkItem2 },
-            { name: 'qualifiedForIgnoredWithType2', value: self.checkItem3 },
-            { name: 'hundredMarkType', value: parseInt(self.radio) },
-            { name: 'minScore', value: parseInt(self.minScore) },
-            { name: 'maxScore', value: parseInt(self.maxScore) },
-            { name: 'dangerousOnFailedItem', value: self.checkItem4 }
+            { name: 'includedInTotalScoreWithType1', value: self.includedInTotalScoreWithType1 },
+            { name: 'qualifiedForIgnoredWithType1', value: self.qualifiedForIgnoredWithType1 },
+            { name: 'qualifiedForIgnoredWithType2', value: self.qualifiedForIgnoredWithType2 },
+            { name: 'hundredMarkType', value: parseInt(self.hundredMarkType) },
+            { name: 'minScore', value: parseFloat(self.minScore) },
+            { name: 'maxScore', value: parseFloat(self.maxScore) },
+            { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
+            // { name: '现场拍照', value: self.checkItem5 },
           ]
         };
         const res = await self.updateInspectRule(params);
@@ -117,16 +127,16 @@ export default {
           res.data.forEach(item => {
             switch (item.name) {
               case 'includedInTotalScoreWithType1':
-                self.checkItem1 = item.value;
+                self.includedInTotalScoreWithType1 = item.value;
                 break;
               case 'qualifiedForIgnoredWithType1':
-                self.checkItem2 = item.value;
+                self.qualifiedForIgnoredWithType1 = item.value;
                 break;
               case 'qualifiedForIgnoredWithType2':
-                self.checkItem3 = item.value;
+                self.qualifiedForIgnoredWithType2 = item.value;
                 break;
               case 'hundredMarkType':
-                self.radio = item.value.toString();
+                self.hundredMarkType = item.value.toString();
                 break;
               case 'minScore':
                 self.minScore = item.value;
@@ -135,8 +145,11 @@ export default {
                 self.maxScore = item.value;
                 break;
               case 'dangerousOnFailedItem':
-                self.checkItem4 = item.value;
+                self.dangerousOnFailedItem = item.value;
                 break;
+              // case '现场拍照':
+              //   self.checkItem5 = item.value;
+              //   break;
               default:
                 break;
             }
@@ -166,22 +179,26 @@ export default {
     },
     inputChangeMax(val) {
       const self = this;
-      if (val.indexOf('-') !== -1) {
-        self.maxScore = '-' + val.replace(/[^\d]/g, '');
-      } else {
-        self.maxScore = val.replace(/[^\d]/g, '');
-      }
-      self.ScoreMsg = parseInt(self.minScore) > parseInt(self.maxScore);
+      self.maxScore = self.getUtilScore(val);
+      self.ScoreMsg = self.minScore > self.maxScore;
     },
     inputChangeMin(val) {
       const self = this;
-      if (val.indexOf('-') !== -1) {
-        self.minScore = '-' + val.replace(/[^\d]/g, '');
-      } else {
-        self.minScore = val.replace(/[^\d]/g, '');
-      }
-      self.ScoreMsg = parseInt(self.minScore) > parseInt(self.maxScore);
+      self.minScore = self.getUtilScore(val);
+      self.ScoreMsg = self.minScore > self.maxScore;
     },
+
+    getUtilScore(val){ 
+        val = val.replace(/[^-?\d\.]/g,"");  
+        val = val.replace(/\.{2,}/g,"."); 
+        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$","."); 
+        val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
+        if(!isNaN(val)&&val.indexOf(".")< 0 && val !=""){
+            val= parseFloat(val); 
+        } 
+        return val;
+    },
+
     notify(msg, type, time) {
       this.$message({
         message: msg,
