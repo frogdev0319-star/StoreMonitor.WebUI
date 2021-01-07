@@ -819,13 +819,13 @@ export default {
           const dataComments = comments.comment;
           const temp = [];
           self.curStatus = dataComments[0].status;
-          // 0 pending：handle、add
+          // 0 pending：handle、add、closed
           // 1 handled：add、closed、reject
           // 2 closed：
-          // 3 reject：handle、add
+          // 3 reject：handle、add、closed
           self.subBtnList.forEach(item => {
             if (self.curStatus === 0 || self.curStatus === 3) {
-              item.order === 0 || item.order === 2 ? item.isShow = true : item.isShow = false;
+              item.order === 0 || item.order === 1 || item.order === 2 ? item.isShow = true : item.isShow = false;
               item.order === 0 ? item.isActive = true : item.isActive = false;
             }
             if (self.curStatus === 1) {

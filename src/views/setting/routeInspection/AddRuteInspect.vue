@@ -103,29 +103,6 @@
             </div>
           </div>
         </el-scrollbar>
-        <!--<el-dialog-->
-          <!--v-if="showFailInfo"-->
-          <!--:title="$t('remotePatrol.prompt')"-->
-          <!--:visible.sync="showFailInfo"-->
-          <!--:append-to-body="true"-->
-          <!--:close-on-click-modal="false"-->
-          <!--width="510px"-->
-          <!--top="35vh"-->
-          <!--left="40vh">-->
-          <!--<div class="dialog-content" style="overflow:hidden;width:100%;">-->
-            <!--<hr style="border: 0.5px solid #dfe2e9;">-->
-            <!--<div style="margin:20px 20px 20px 26px;">-->
-              <!--<i class="el-icon-warning" style="font-size:25px;margin-right:10px;color:#FF9803;display: inline-block; vertical-align: middle;"/>-->
-              <!--<span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.notallowdeletetips') }}</span>-->
-              <!--<p style="padding-left:40px;color:#182752;">A.{{ $t('insSettingView.notallowA') }}</p>-->
-              <!--<p style="padding-left:40px;color:#182752;">B.{{ $t('insSettingView.notallowB') }}</p>-->
-            <!--</div>-->
-          <!--</div>-->
-          <!--<div slot="footer" class="dialog-footer">-->
-            <!--<el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">{{ $t('insSettingView.cancel') }}</el-button>-->
-            <!--<el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">{{ $t('insSettingView.confirm') }}</el-button>-->
-          <!--</div>-->
-        <!--</el-dialog>-->
       </div>
     </el-col>
     <el-col :span="17" class="el-rute-nape">
@@ -182,57 +159,115 @@
               @click="clickItem(index,item)">
               <div :style="activeSheetName=='1'?'flex:2;':'flex:2.8;'" class="nape-name-data">
                 <el-checkbox v-model="item.checked" class="item-checkbox"/>
-                <span v-if="!item.isClick">{{ item.napeNameShow }}</span>
-                <el-input v-if="item.isClick" v-model="item.napeName" :placeholder="$t('insSettingView.enterItemName')" size="mini" class="nape-input" @input="(val)=>napeNameChange(val, item)"/>
+                <span>{{ item.napeNameShow }}</span>
               </div>
               <div :style="activeSheetName=='1'?'flex:2;':'flex:4.2;'" class="nape-dep-data">
-                <span v-if="!item.isClick">{{ item.napeDep }}</span>
-                <el-input v-if="item.isClick" :autosize="{ minRows: 1}" v-model="item.napeDep" :placeholder="$t('insSettingView.description')" type="textarea" resize="none" size="mini" class="nape-input" @input="(val)=>napeDepChange(val, item)"/>
+                <span>{{ item.napeDep }}</span>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <span v-if="!item.isClick" style="position:relative;left:15%;">{{ item.Score_1 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-                <el-select v-if="item.isClick" v-model="item.Score_1" size="mini" class="FullScore-input" @change="selectFullScore($event,item)">
-                  <el-option v-for="item in fullScoreTemp" :key="item" :label="item" :value="item"/>
-                </el-select>
+                <span style="position:relative;left:15%;">{{ item.Score_1 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
               </div>
               <div v-if="activeSheetName=='1'" :style="item.isClick?'':'flex:1;'" class="nape-scores-handle">
-                <el-tooltip v-if="!item.isClick" class="item" effect="dark" placement="top">
+                <el-tooltip class="item" effect="dark" placement="top">
                   <div slot="content" style="max-width:120px;">{{ item.availableScoreStr }}</div>
-                  <span v-if="!item.isClick" style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                  <span style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
                 </el-tooltip>
-                <region-multi-select
-                  v-if="item.isClick"
-                  :options="availableScores"
-                  :placeholder="$t('insSettingView.selectPost')"
-                  :disabled="false"
-                  :input-size="`mini`"
-                  :selected="item.Score_4"
-                  :all="$t('remotePatrol.all')"
-                  @changeInput="changeScore4($event,item)"/>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <span v-if="!item.isClick">{{ item.Score_2 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-                <el-select v-if="item.isClick" v-model="item.Score_2" size="mini" class="critical-input">
-                  <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"/>
-                </el-select>
+                <span>{{ item.Score_2 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
               </div>
               <div v-if="activeSheetName!='1'" class="nape-scores-handle" style="flex:1;">
-                <span v-if="!item.isClick">{{ item.Score_3 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-                <el-input v-if="item.isClick" v-model="item.Score_3" size="mini" class="Itemscores-input" @input="editinputChange(item,index,activeSheetName)"/>
+                <span>{{ item.Score_3 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
               </div>
-              <div v-if="!item.isClick" class="nape-items-handle" style="flex:1;">
+              <div class="nape-items-handle" style="flex:1;">
                 <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;" @click="handleEdit(index,item)"/>
                 <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(index, item)"/>
               </div>
-              <div v-if="item.isClick" class="iconcontent" style="flex:1;">
-                <div class="iconlised" style="background-color:#f31d65" @click="confirmeditNape(index,item)">
-                  <i class="el-icon-check"/>
-                </div>
-                <div class="iconrised" @click="cancelEditNape(index,item)">
-                  <i class="el-icon-close"/>
-                </div>
-              </div>
             </div>
+            <el-dialog
+              v-if="showAddNape"
+              :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
+              :visible.sync="showAddNape"
+              :append-to-body="true"
+              :close-on-click-modal="false"
+              width="510px"
+              top="35vh"
+              left="40vh"
+              custom-class="addNape">
+              <div class="dialog-content" style="overflow:hidden;">
+                <hr style="border: 0.5px solid #dfe2e9;;">
+                <el-form class="NapeForm" label-position="top" size="mini">
+                  <el-form-item>
+                    <p class="score_item">
+                      <span class="sign">*</span>
+                      <span class="item_label">{{$t('insSettingView.inspectName')}}</span>
+                    </p>
+                    <el-input v-model="ItemName"
+                              :placeholder="$t('insSettingView.enterItemName')"
+                              @input="napeNameChange"></el-input>
+                    <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
+                    <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
+                  </el-form-item>
+                  <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
+                    <el-col :span="10">
+                      <el-form-item style="margin-bottom:0;">
+                        <p class="score_item">
+                          <span class="sign">*</span>
+                          <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
+                        </p>
+                        <el-input v-model.number="ItemTotalScore"
+                                  :placeholder="$t('insSettingView.enterScore')"
+                                  @input="napeTotalScoreChange"/>
+                        <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
+                        <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="12" :offset="2">
+                      <el-form-item :label="$t('insSettingView.sheetscore1')">
+                        <el-input v-model.number="ItemMinScore"
+                                  :placeholder="$t('insSettingView.enterScore')"
+                                  @input="napeMinScoreChange"/>
+                        <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
+                      </el-form-item>
+                    </el-col>
+                  </el-form-item>
+                  <el-form-item v-if="activeSheetName==='1'">
+                    <p class="score_item">
+                      <span class="sign">*</span>
+                      <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
+                      <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+                    </p>
+                    <el-input v-model="ItemScoreOption"
+                              :placeholder="$t('insSettingView.enterScore')"
+                              @input="napeScoreOptionsChange"></el-input>
+                    <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
+                    <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
+                  </el-form-item>
+                  <el-form-item v-if="activeSheetName!=='1'">
+                    <p class="score_item">
+                      <span v-if="activeSheetName==='2'" class="sign">*</span>
+                      <span class="item_label">{{$t('insSettingView.score')}}</span>
+                    </p>
+                    <el-input v-model.number="ItemSheetScore"
+                              :placeholder="$t('insSettingView.enterScore')"
+                              @input="napeSheetScoreChange"/>
+                    <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
+                    <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
+                    <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
+                  </el-form-item>
+                  <el-form-item :label="$t('insSettingView.inspectionDescp')">
+                    <el-input type="textarea" v-model="ItemDescription"
+                              :placeholder="$t('insSettingView.description')"
+                              @input="napeDepChange"></el-input>
+                    <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
+                  </el-form-item>
+                </el-form>
+              </div>
+              <div slot="footer" class="dialog-footer">
+                <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNape = false">{{ $t('insSettingView.cancel') }}</el-button>
+                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
+              </div>
+            </el-dialog>
             <el-dialog
               v-if="showDeleteItem"
               :title="$t('insSettingView.confirmDelete')"
@@ -278,48 +313,6 @@
                 <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteGroup">{{ $t('insSettingView.confirm') }}</el-button>
               </div>
             </el-dialog>
-            <div v-if="showAddNape" :class="'active-color'" class="nape-items-data">
-              <div :style="activeSheetName=='1'?'flex:2;':'flex:3;'" class="nape-name-data">
-                <el-checkbox v-model="newNapeChecked" class="item-checkbox"/>
-                <el-input v-model="newNapeName" :placeholder="$t('insSettingView.enterItemName')" size="mini" class="nape-input" @input="(val)=>napeNameChange(val, {})" @blur="notShowInputRuleTips('enterListName')"/>
-                <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
-              </div>
-              <div :style="activeSheetName=='1'?'flex:2;':'flex:4;'" class="nape-dep-data">
-                <el-input :autosize="{ minRows: 1}" v-model="newNapeDep" :placeholder="$t('insSettingView.description')" type="textarea" resize="none" size="mini" class="nape-input" @input="(val)=>napeDepChange(val, {})" @blur="notShowInputRuleTips('description')"/>
-                <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1.3;">
-                <el-select v-model="newScore" size="mini" class="FullScore-input" @change="selectFullScore($event)">
-                  <el-option v-for="item in 50" :key="item" :label="item" :value="item"/>
-                </el-select>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;max-width:110px;">
-                <region-multi-select
-                  :options="availableScores"
-                  :placeholder="$t('insSettingView.selectPost')"
-                  :disabled="false"
-                  :input-size="`mini`"
-                  :selected="selectAvailable"
-                  :all="$t('remotePatrol.all')"
-                  @changeInput="changeAvailable(arguments)"/>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <el-select v-model="newCritical" size="mini" class="critical-input">
-                  <el-option v-for="item in ScoreList" :key="item" :label="item" :value="item"/>
-                </el-select>
-              </div>
-              <div v-if="activeSheetName!='1'" class="nape-scores-handle" style="flex:1;">
-                <el-input v-model="newAddScore" size="mini" class="Itemscores-input" @input="inputChange($event,activeSheetName)"/>
-              </div>
-              <div class="iconcontent" style="flex:1;">
-                <div class="iconlised" style="background-color:#f31d65" @click="confirmaddNape">
-                  <i class="el-icon-check"/>
-                </div>
-                <div class="iconrised" @click="cancelAddNape">
-                  <i class="el-icon-close"/>
-                </div>
-              </div>
-            </div>
           </div>
         </el-scrollbar>
       </div>
@@ -342,15 +335,26 @@ export default {
   },
   data() {
     return {
-      newScore: 10,
-      newCritical: 1,
-      newAddScore: 0,
-      fullScoreTemp: [],
-      availableScores: [],
-      selectAvailable: [],
+      dialogTitle:'',
+      updateType:null,
+      ItemName:'',
+      ItemTotalScore:50,
+      ItemMinScore:50,
+      ItemSheetScore:0,
+      ItemScoreOptions:[],
+      ItemScoreOption:'',
+      ItemDescription:'',
+      PFScoreTip:false,
+      enterItemNameTip:false,
+      ItemMinScoreTip:false,
+      OtherScoreTip:false,
+      OtherScoreTipEmpty:false,
+      ItemTotalScoreTip0:false,
+      ItemTotalScoreTip1:false,
+      ScoreOptionsTips0:false,
+      ScoreOptionsTips1:false,
       firstLoad: true,
       groupTitle: this.$t('insSettingView.category'),
-      showFailInfo: false,
       tabName: '',
       ModelPost: [],
       ModelAddPost: [],
@@ -388,10 +392,6 @@ export default {
       tableData: [],
       noData: '',
       groupIds: [],
-      ScoreList: [],
-      Score_1: '',
-      Score_2: '',
-      Score_3: '',
       sheetName: [
         { id: '0', label: this.$t('insSettingView.sheetpassfail') },
         { id: '1', label: this.$t('insSettingView.sheetscore') },
@@ -711,10 +711,6 @@ export default {
      */
     addGroup() {
       const self = this;
-      if (self.typeTemp.length === 1 && self.typeTemp[0] === 0 && self.activeSheetName === '2') {
-        self.notify(self.$t('insSettingView.notAllowAdd'), 'warning', 3000);
-        return false;
-      }
       self.showAddGroup = true;
       self.groupNameInput = '';
       self.groupList.forEach(item => {
@@ -725,25 +721,6 @@ export default {
     changeSelect(val) {
       const self = this;
       self.ModelPost = Array.from(val)[0];
-    },
-    changeScore4(val, item) {
-      if (val[0] === '-1') {
-        item.Score_4 = val.slice(1);
-      } else {
-        item.Score_4 = val;
-      }
-    },
-    changeAvailable(val) {
-      const self = this;
-      // if (val[0] === '-1') {
-      //   self.selectAvailable = Array.from(val).slice(1);
-      // } else {
-      self.selectAvailable = Array.from(val)[0];
-      // }
-    },
-    changeAddSelect(val) {
-      const self = this;
-      self.ModelAddPost = Array.from(val)[0];
     },
 
     async confirmAddGroup() {
@@ -860,10 +837,6 @@ export default {
     async deleteGroup(index, item) {
       const self = this;
       if (self.groupList.length === 1) {
-        // if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && item.type === 1) {
-        //   self.showFailInfo = true;
-        //   return false;
-        // } else
         if (self.typeTemp.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
@@ -943,30 +916,10 @@ export default {
 
     addNape() {
       const self = this;
-      self.showAddNape = !self.showAddNape;
-      self.newAddScore = 0;
-      self.napeList.forEach((_item, _index) => {
-        _item.isClick = false;
-      });
-      self.newScore = 50;
-      self.newCritical = 1;
-      const arr = [];
-      for (var i = 0; i <= 50; i++) {
-        arr.push(i);
-      }
-      self.ScoreList = arr.slice(0, i + 1);
-      self.selectAvailable = arr.slice(0, i + 1);
-      const available = arr.slice(0, i + 1);
-      const availableScores = [];
-      available.forEach(item => {
-        const obj = {
-          label: item,
-          value: item,
-          disabled: false
-        };
-        availableScores.push(obj);
-      });
-      self.availableScores = availableScores;
+      self.showAddNape = true;
+      self.updateType = {type:0};
+      self.setDialogContent();
+      self.ItemSheetScore = self.activeSheetName === '0' ? 10 : 0;
     },
 
     deleteNape(item) {
@@ -981,12 +934,6 @@ export default {
         self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
-      // if (count === self.napeList.length && self.groupList.length === 1) {
-      //   if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
-      //     self.showFailInfo = true;
-      //     return false;
-      //   }
-      // }
       self.showDeleteItem = true;
       self.deleteItemFlag = 'G';
     },
@@ -1016,276 +963,202 @@ export default {
       }
     },
 
-    confirmeditNape(index, item) {
+    setDialogContent(){
       const self = this;
-      const temp = [];
-      if (item.napeName.trim().length == 0) {
-        self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
-        return false;
+      self.ItemName = '';
+      self.ItemTotalScore = 50;
+      self.ItemMinScore = 50;
+      self.ItemSheetScore = 0;
+      self.ItemScoreOptions = [];
+      self.ItemScoreOption = '';
+      self.ItemDescription = '';
+      self.PFScoreTip = false;
+      self.enterItemNameTip = false;
+      self.ItemMinScoreTip = false;
+      self.OtherScoreTip = false;
+      self.OtherScoreTipEmpty = false;
+      self.ItemTotalScoreTip0 = false;
+      self.ItemTotalScoreTip1 = false;
+      self.ScoreOptionsTips0 = false;
+      self.ScoreOptionsTips1 = false;
+    },
+
+    confirmUpdateNape() {
+      const self = this;
+      if (self.ItemName.trim().length === 0) {
+        self.enterItemNameTip = true;
       }
-      // if(validateInput(item.napeName)||validateInput(item.napeDep)){
-      //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-      //     return false;
-      // }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
-        if (typeof (item.Score_3) !== 'number' && item.Score_3.trim().length == 0) {
-          itemScore = 10;
+        if (self.ItemSheetScore === '') {
+          self.ItemSheetScore = itemScore = 10;
           qualifiedScore = null;
         } else {
-          if (item.Score_3 > 50 || item.Score_3 < 1) {
-            self.notify(self.$t('insSettingView.sheetscoreA'), 'warning', 3000);
-            return false;
+          if (parseInt(self.ItemSheetScore) > 50 || parseInt(self.ItemSheetScore) < 1) {
+            self.PFScoreTip = true;
           } else {
-            itemScore = item.Score_3;
+            itemScore = parseInt(self.ItemSheetScore);
             qualifiedScore = null;
           }
         }
-      } else if (self.activeSheetName == '1') {
-        itemScore = item.Score_1;
-        qualifiedScore = item.Score_2;
-        selectAvailable = item.Score_4[0] === '-1' ? item.Score_4.slice(1) : item.Score_4;
-        const availableScores = [];
-        for (let i = 0; i < item.Score_1 + 1; i++) {
-          availableScores.push(i);
+      } else if (self.activeSheetName === '1') {
+        if(self.ItemScoreOption === ''){
+          self.ScoreOptionsTips0 = true;
         }
-        selectAvailable.length === 0 ? selectAvailable = availableScores : null;
-        selectAvailable.sort(function(a, b) {
-          return a - b;
-        });
-        if (qualifiedScore > itemScore) {
-          self.notify(self.$t('insSettingView.excelMinScoreType'), 'warning', 3000);
-          return false;
-        } else if (selectAvailable[selectAvailable.length - 1] > itemScore) {
-          self.notify(self.$t('insSettingView.excelScoreItemType'), 'warning', 3000);
-          return false;
+        if(self.ItemTotalScore === ''){
+          self.ItemTotalScoreTip0 = true;
+        }else if(parseInt(self.ItemTotalScore)>50 || parseInt(self.ItemTotalScore)<0){
+          self.ItemTotalScoreTip1 = true;
+        }else{
+          if(self.ItemMinScore === ''){
+            itemScore = parseInt(self.ItemTotalScore);
+            qualifiedScore = parseInt(self.ItemTotalScore);
+          }else if(parseInt(self.ItemMinScore)>parseInt(self.ItemTotalScore) || parseInt(self.ItemMinScore) < -50){
+            self.ItemMinScoreTip = true;
+          }else{
+            itemScore = parseInt(self.ItemTotalScore);
+            qualifiedScore = parseInt(self.ItemMinScore);
+          }
+          if(self.ItemScoreOption !== ''){
+            self.ItemScoreOptions.forEach(item=>{
+              if(!isNaN(parseInt(item)) && parseInt(item)>=-50 && parseInt(item)<=parseInt(self.ItemTotalScore)){
+                selectAvailable.push(parseInt(item));
+              }
+            })
+          }
         }
       } else if (self.activeSheetName == '2') {
-        if (typeof (item.Score_3) !== 'number' && item.Score_3.trim().length == 0) {
-          self.notify(self.$t('insSettingView.ScoreEmpty'), 'warning', 3000);
-          return false;
-        }
-        if (item.Score_3 > 100 || item.Score_3 < -100) {
-          self.notify(self.$t('insSettingView.sheetscore2'), 'warning', 3000);
-          return false;
-        } else {
-          itemScore = item.Score_3;
+        if (self.ItemSheetScore === '') {
+          self.OtherScoreTipEmpty = true;
+        }else if(parseInt(self.ItemSheetScore) > 100 || parseInt(self.ItemSheetScore) < -100){
+          self.OtherScoreTip = true;
+        }else {
+          itemScore = parseInt(self.ItemSheetScore);
           qualifiedScore = null;
         }
       }
-      const obj = {
-        id: item.id,
-        subject: item.napeName,
-        description: item.napeDep,
-        itemScore: itemScore,
-        qualifiedScore: qualifiedScore,
-        availableScores: selectAvailable
-      };
-      temp.push(obj);
-      const params = {
-        'items': temp
-      };
-      inpectRESTful.updateInspectItem(params).then(res => {
-        const codeMsg = res.errMsg;
-        if (codeMsg != undefined && codeMsg == 'Success') {
-          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          item.isClick = false;
-          self.refreshData(self.groupIndex);
-        } else {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          return false;
-        }
-      }).catch(err => {
-        console.log('AddRuteInspect-confirmeditNape: ' + err);
-      });
-    },
-
-    cancelEditNape(index, item) {
-      const curEditItem = JSON.parse(sessionStorage.getItem('curEditItem'));
-      item.isClick = curEditItem.isClick;
-      item.napeDep = curEditItem.napeDep;
-      item.Score_1 = curEditItem.Score_1;
-      item.Score_2 = curEditItem.Score_2;
-      item.Score_3 = curEditItem.Score_3;
-      item.Score_4 = curEditItem.Score_4;
-      item.availableScoreStr = curEditItem.availableScoreStr;
-      item.napeName = curEditItem.napeNameShow;
-    },
-
-    confirmaddNape() {
-      const self = this;
-      const temp = [];
-      if (self.newNapeName.trim().length == 0) {
-        self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
+      if(self.enterItemNameTip || self.PFScoreTip || self.ItemTotalScoreTip0 || self.ItemTotalScoreTip1 ||
+          self.ItemMinScoreTip || self.OtherScoreTip || self.enterListNameRuletip || self.OtherScoreTipEmpty ||
+          self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
         return false;
       }
-      // if(validateInput(self.newNapeName)||validateInput(self.newNapeDep)){
-      //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-      //     return false;
-      // }
-      let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
-      if (self.activeSheetName == '0') {
-        if (typeof (self.newAddScore) !== 'number' && self.newAddScore.trim().length == 0) {
-          itemScore = 10;
-          qualifiedScore = null;
-        } else {
-          if (self.newAddScore > 50 || self.newAddScore < 1) {
-            self.notify(self.$t('insSettingView.sheetscoreA'), 'warning', 3000);
-            return false;
-          } else {
-            itemScore = self.newAddScore;
-            qualifiedScore = null;
-          }
-        }
-      } else if (self.activeSheetName == '1') {
-        if (self.newCritical > self.newScore) {
-          self.notify(self.$t('insSettingView.excelMinScoreType'), 'warning', 3000);
-          return false;
-        } else {
-          itemScore = self.newScore;
-          qualifiedScore = self.newCritical;
-          selectAvailable = self.selectAvailable[0] === '-1' ? self.selectAvailable.slice(1) : self.selectAvailable;
-          const availableScores = [];
-          for (let i = 0; i < self.newScore + 1; i++) {
-            availableScores.push(i);
-          }
-          selectAvailable.length === 0 ? selectAvailable = availableScores : null;
-          selectAvailable.sort(function(a, b) {
-            return a - b;
-          });
-          if (qualifiedScore > itemScore) {
-            self.notify(self.$t('insSettingView.excelMinScoreType'), 'warning', 3000);
-            return false;
-          } else if (selectAvailable[selectAvailable.length - 1] > itemScore) {
-            self.notify(self.$t('insSettingView.excelScoreItemType'), 'warning', 3000);
-            return false;
-          }
-        }
-      } else if (self.activeSheetName == '2') {
-        if (typeof (self.newAddScore) !== 'number' && self.newAddScore.trim().length == 0) {
-          self.notify(self.$t('insSettingView.ScoreEmpty'), 'warning', 3000);
-          return false;
-        }
-        if (self.newAddScore > 100 || self.newAddScore < -100) {
-          self.notify(self.$t('insSettingView.sheetscore2'), 'warning', 3000);
-          return false;
-        } else {
-          itemScore = self.newAddScore;
-          qualifiedScore = null;
-        }
+      if(self.updateType.type===0){
+        self.addItem(itemScore,qualifiedScore,selectAvailable);
+        
+      }else if(self.updateType.type===1){
+        self.editItem(itemScore,qualifiedScore,selectAvailable);
       }
+    },
+
+    addItem(itemScore,qualifiedScore,selectAvailable){
+      const self = this;
+      const temp = [];
       const objItem = {
-        subject: self.newNapeName.trim(),
-        description: self.newNapeDep.trim(),
-        itemScore: itemScore,
-        qualifiedScore: qualifiedScore,
-        availableScores: selectAvailable
-      };
-      temp.push(objItem);
-      const obj = {
-        groupId: self.curGroup.id,
-        items: temp
-      };
-      const tempParam = [];
-      tempParam.push(obj);
-      const params = {
-        'request': tempParam
-      };
-      inpectRESTful.addInspectItem(params).then((res) => {
-        const codeMsg = res.errMsg;
-        if (codeMsg != undefined && codeMsg == 'Success') {
-          const obj = {
-            napeName: self.newNapeName,
-            napeNameShow: `${self.napeList.length + 1}，${self.newNapeName}`,
-            napeDep: self.newNapeDep,
-            Score_1: self.newScore,
-            Score_2: self.newCritical,
-            Score_3: self.newAddScore,
-            isClick: false,
-            checked: false
-          };
-          self.napeList.push(obj);
-          self.newNapeName = '';
-          self.newNapeDep = '';
-          self.newAddScore = 0;
-          self.showAddNape = false;
-          self.refreshData(self.groupIndex);
-          self.groupList[self.groupIndex].groupNum++;
-          const data = res.data;
-          const storeList = self.bindStoreList;
-          const tempParams = [];
-          storeList.forEach(item => {
-            const obj = {
-              storeId: item,
-              itemIds: data
-            };
-            tempParams.push(obj);
-          });
-          if (tempParams.length !== 0) {
-            const paramsApply = {
-              storeList: tempParams
-            };
-            inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
-              const res = resApply;
+          subject: self.ItemName.trim(),
+          description: self.ItemDescription.trim(),
+          itemScore: itemScore,
+          qualifiedScore: qualifiedScore,
+          availableScores: selectAvailable
+        };
+        temp.push(objItem);
+        const obj = {
+          groupId: self.curGroup.id,
+          items: temp
+        };
+        const tempParam = [];
+        tempParam.push(obj);
+        const params = {
+          'request': tempParam
+        };
+        inpectRESTful.addInspectItem(params).then((res) => {
+          const codeMsg = res.errMsg;
+          if (codeMsg != undefined && codeMsg == 'Success') {
+            self.showAddNape = false;
+            self.refreshData(self.groupIndex);
+            self.groupList[self.groupIndex].groupNum++;
+            const data = res.data;
+            const storeList = self.bindStoreList;
+            const tempParams = [];
+            storeList.forEach(item => {
+              const obj = {
+                storeId: item,
+                itemIds: data
+              };
+              tempParams.push(obj);
             });
-          }
-          self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
-          setTimeout(function() {
-            if (self.tabName == '远程巡检') {
-              PubSub.publish('change-color', { showTag: true });
+            if (tempParams.length !== 0) {
+              const paramsApply = {
+                storeList: tempParams
+              };
+              inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
+                const res = resApply;
+              });
             }
-          }, 1000);
-        } else {
-          self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
-          return false;
-        }
-      }).catch(err => {
-        console.log('AddRuteInspect-confirmaddNape: ' + err);
-      });
+            self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
+            setTimeout(function() {
+              if (self.tabName == '远程巡检') {
+                PubSub.publish('change-color', { showTag: true });
+              }
+            }, 1000);
+          } else {
+            self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
+            return false;
+          }
+        }).catch(err => {
+          console.log('AddRuteInspect-confirmaddNape: ' + err);
+        });
     },
 
-    cancelAddNape() {
-      this.showAddNape = false;
+    editItem(itemScore,qualifiedScore,selectAvailable){
+      const self = this;
+      const temp = [];
+      const obj = {
+          id: self.updateType.id,
+          subject: self.ItemName.trim(),
+          description: self.ItemDescription.trim(),
+          itemScore: itemScore,
+          qualifiedScore: qualifiedScore,
+          availableScores: selectAvailable
+        };
+        temp.push(obj);
+        const params = {
+          'items': temp
+        };
+        inpectRESTful.updateInspectItem(params).then(res => {
+          const codeMsg = res.errMsg;
+          if (codeMsg != undefined && codeMsg == 'Success') {
+            self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+            self.showAddNape = false;
+            self.refreshData(self.groupIndex);
+          } else {
+            self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+            return false;
+          }
+        }).catch(err => {
+          console.log('AddRuteInspect-confirmeditNape: ' + err);
+        });
     },
 
     handleEdit(index, item) {
       const self = this;
-      self.napeDepTemp = item.napeDep;
-      sessionStorage.setItem('curEditItem', JSON.stringify(item));
-      item.isClick = true;
-      self.showAddNape = false;
-      const arr = [];
-      for (var i = 0; i <= 50; i++) {
-        arr.push(i);
-      }
-      self.fullScoreTemp = arr.slice(1, i + 1);
-      self.ScoreList = arr.slice(0, item.Score_1 + 1);
-      const available = arr.slice(0, item.Score_1 + 1);
-      const availableScores = [];
-      available.forEach(item => {
-        const obj = {
-          label: item,
-          value: item,
-          disabled: false
-        };
-        availableScores.push(obj);
-      });
-      self.availableScores = availableScores;
-      self.napeList.forEach((_item, _index) => {
-        if (index != _index) {
-          _item.isClick = false;
-        }
-      });
+      self.showAddNape = true;
+      self.updateType = {type:1,id:item.id};
+      self.setDialogContent();
+      self.ItemName = item.napeName;
+      self.ItemTotalScore = item.Score_1;
+      self.ItemMinScore = item.Score_2;
+      self.ItemSheetScore = item.Score_3;
+      let ItemScoreOption = '';
+      item.Score_4.forEach((_item,_index)=>{
+        let isuu = _index === item.Score_4.length - 1 ? '' : '/';
+        ItemScoreOption += _item + isuu;
+      })
+      self.ItemScoreOption = ItemScoreOption;
+      self.ItemDescription = item.napeDep;
     },
 
     handleDelete(index, item) {
       const self = this;
-      // if (self.napeList.length === 1 && self.groupList.length === 1) {
-      //   if ((self.typeTemp.length === 2 && !self.typeTemp.some(x => x === 0) || self.typeTemp.length === 3) && self.groupList[0].type === 1) {
-      //     self.showFailInfo = true;
-      //     return false;
-      //   }
-      // }
       self.showDeleteItem = true;
       self.deleteItemFlag = 'S';
       self.curItemId = item.id;
@@ -1437,25 +1310,11 @@ export default {
       const self = this;
       const temp = [];
       item.itemData.forEach((_item, index) => {
-        const availableScores = [];
-        for (let i = 0; i <= _item.itemScore; i++) {
-          const scoreObj = {
-            label: i,
-            value: i,
-            disabled: false
-          };
-          availableScores.push(scoreObj);
-        }
-        self.availableScores = availableScores;
         let availableScoreStr = '';
-        if (_item.availableScores.length !== 0) {
-          availableScoreStr = _item.availableScores.toString();
-        } else {
-          for (let i = 0; i < _item.itemScore + 1; i++) {
-            const isuu = i === _item.itemScore ? '' : '/';
-            availableScoreStr += i + isuu;
-          }
-        }
+        _item.availableScores.forEach((a_item,a_index)=>{
+          let isuu = a_index === _item.availableScores.length-1 ? '' : '/';
+          availableScoreStr += a_item + isuu;
+        })
         const obj = {
           id: _item.id,
           napeName: _item.subject,
@@ -1477,21 +1336,6 @@ export default {
     initData() {
       const self = this;
       const arr = [];
-      for (var i = 0; i <= 50; i++) {
-        arr.push(i);
-      }
-      self.ScoreList = arr.slice(0, i + 1);
-      const available = arr.slice(0, i + 1);
-      const availableScores = [];
-      available.forEach(item => {
-        const obj = {
-          label: item,
-          value: item,
-          disabled: false
-        };
-        availableScores.push(obj);
-      });
-      self.availableScores = availableScores;
       self.tabName = sessionStorage.getItem('GroupName');
       const itemSettingData = JSON.parse(sessionStorage.getItem('itemSettingData'));
       self.routeName = itemSettingData.routeName;
@@ -1524,79 +1368,84 @@ export default {
       }
     },
 
-    inputChange(val) {
+    napeTotalScoreChange(val){
       const self = this;
-      if (val.indexOf('-') !== -1) {
-        self.newAddScore = '-' + val.replace(/[^\d]/g, '');
-      } else {
-        self.newAddScore = val.replace(/[^\d]/g, '');
+      self.ItemTotalScore = val.replace(/[^\d]/g, '');
+      self.ItemTotalScoreTip0 = false;
+      if(parseInt(self.ItemTotalScore)<0 || parseInt(self.ItemTotalScore) >50){
+        self.ItemTotalScoreTip1 = true;
+      }else{
+        self.ItemTotalScoreTip1 = false;
       }
     },
 
-    editinputChange(item, index) {
-      if (item.Score_3.indexOf('-') !== -1) {
-        item.Score_3 = '-' + item.Score_3.replace(/[^\d]/g, '');
-      } else {
-        item.Score_3 = item.Score_3.replace(/[^\d]/g, '');
-      }
-    },
-
-    selectFullScore(val, item) {
+    napeMinScoreChange(val){
       const self = this;
-      const arr = [];
-      for (var i = 0; i <= 50; i++) {
-        arr.push(i);
-      }
-      self.ScoreList = arr.slice(0, val + 1);
-      const available = arr.slice(0, val + 1);
-      const availableScores = [];
-      available.forEach(item => {
-        const obj = {
-          label: item,
-          value: item,
-          disabled: false
-        };
-        availableScores.push(obj);
-      });
-      self.availableScores = availableScores;
-      if (item !== undefined) {
-        item.Score_4 = arr.slice(0, val + 1);
-        item.Score_2 = val;
-      } else {
-        self.selectAvailable = arr.slice(0, val + 1);
-        newCritical = val;
+      if(parseInt(val)<-50 || parseInt(val) > parseInt(self.ItemTotalScore)){
+        self.ItemMinScoreTip = true;
+      }else{
+        self.ItemMinScoreTip = false;
       }
     },
 
-    napeNameChange(val, item) {
+    napeSheetScoreChange(val){
+      const self = this;
+      if(self.activeSheetName==='0'){
+        self.ItemSheetScore = val.replace(/[^\d]/g, '');
+        if(self.ItemSheetScore!=='' && (parseInt(self.ItemSheetScore)<1 || parseInt(self.ItemSheetScore)>50)){
+          self.PFScoreTip=true;
+        }else{
+          self.PFScoreTip=false;
+        }
+      }else if(self.activeSheetName==='2'){
+        self.OtherScoreTipEmpty = false;
+        if(parseInt(self.ItemSheetScore)<-100 || parseInt(self.ItemSheetScore)>100){
+          self.OtherScoreTip=true;
+        }else{
+          self.OtherScoreTip=false;
+        }
+      }
+    },
+
+    napeScoreOptionsChange(val){
+      const self = this;
+      self.ItemScoreOptions = val.replace(/[^-?\d+/]/g, '').split('/');
+      self.ScoreOptionsTips0 = false;
+      self.ItemScoreOptions.forEach(item=>{
+        if(!isNaN(parseInt(item)) && parseInt(item)>=-50 && parseInt(item)<=parseInt(self.ItemTotalScore)){
+          self.ScoreOptionsTips1 = false;
+        }else{
+          self.ScoreOptionsTips1 = true;
+        }
+      })
+    },
+
+    napeNameChange(val) {
       const self = this;
       const comment = filterString.all(val, 100);
       const length = filterString.getContentLength(val);
-      if (Object.keys(item).length === 0) {
-        self.newNapeName = comment;
-      } else {
-        item.napeName = comment;
-      }
+      self.ItemName = comment;
       if (length > 100) {
-        this.enterListNameRuletip = true;
+        self.enterListNameRuletip = true;
       } else {
-        this.enterListNameRuletip = false;
+        if(length===0){
+          self.enterItemNameTip = true;
+        }else{
+          self.enterListNameRuletip = false;
+          self.enterItemNameTip = false;
+        }
       }
     },
 
-    napeDepChange(val, item) {
+    napeDepChange(val) {
       const self = this;
       const comment = filterString.all(val, 1200);
       const length = filterString.getContentLength(val);
-      if (Object.keys(item).length === 0) {
-        self.newNapeDep = comment;
-      } else {
-        item.napeDep = comment;
-      }
+      self.ItemDescription = comment;
       if (length > 1200) {
-        this.descriptionRuletip = true;
+        self.descriptionRuletip = true;
       } else {
-        this.descriptionRuletip = false;
+        self.descriptionRuletip = false;
       }
     },
 
@@ -1648,6 +1497,41 @@ export default {
     }
     #el-menuscrollbar /deep/ .el-scrollbar__thumb{
         width:0 !important;
+    }
+    .addNape{
+      .el-form-item /deep/ .el-dialog__footer{
+        margin-top: 20px;
+        line-height: 24px;
+      }
+      .el-form-item /deep/ .el-form-item__label{
+        padding:0;
+        font-size: 14px;
+        color:#424151;
+      }
+      .score_item{
+        margin:0;
+        .item_label{
+          font-size: 14px;
+          color:#424151;
+          margin-right:10px;
+        }
+        .item_des{
+          font-size: 12px;
+          color:#94a4b4;
+        }
+        .sign{
+          color:red;
+        }
+      }
+      .rules{
+          color: #F56C6C;
+          font-size: 12px;
+          line-height: 1;
+          padding-top: 4px;
+          position: absolute;
+          top: 100%;
+          left: 0;
+      }
     }
     .el-addrute{
         width: 100%;
@@ -2230,6 +2114,10 @@ export default {
 }
 .el-dialog__body{
     padding: 0px !important;
+}
+.addNape .el-dialog__body .dialog-content .NapeForm{
+  width: 90%;
+  margin: 0 auto;
 }
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
