@@ -456,10 +456,10 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'addTitleItem':'添加巡檢項',//Sprint14
-    'editTitleItem':'編輯巡檢項',//Sprint14
-    'enterScore':'請輸入分值',//Sprint14
-    'sheetscore3_des':'（評分選項間，用“/”隔開）',//Sprint14
+    'addTitleItem':'添加巡檢項',
+    'editTitleItem':'編輯巡檢項',
+    'enterScore':'請輸入分值',
+    'sheetscore3_des':'（分值間，用“/”隔開）',
     'rangeScoreTips': '考評總分最低值不得高於最高值',
     'ruleInspect': '巡檢規則設置',
     'PatrolScoreCalculation': '巡檢得分計算',

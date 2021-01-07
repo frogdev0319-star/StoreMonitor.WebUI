@@ -335,6 +335,7 @@ export default {
   },
   data() {
     return {
+      sheetTemp:[],
       dialogTitle:'',
       updateType:null,
       ItemName:'',
@@ -512,7 +513,7 @@ export default {
       const self = this;
       self.showAddGroup = false;
       self.showAddNape = false;
-      self.refreshData(0);
+      self.getGroupList(0);
     },
 
     clickGroupItem(index, item) {
@@ -1282,7 +1283,6 @@ export default {
       }
       const te_temp = [];
       const type_temp = [];
-      let sheetTemp = [];
       const obj = { passfail: [], score: [], other: [] };
       for (let i = 0; i < 3; i++) {
         const Typeindex = temp.filter(x => x.type === i);
@@ -1300,14 +1300,21 @@ export default {
           }
         }
       }
-      sheetTemp = obj;
-      self.activeSheetName = self.firstLoad ? te_temp[0][0].type.toString() : self.activeSheetName;
-      self.firstLoad = false;
+      self.sheetTemp = obj;
       self.allRoutedata = te_temp;
       self.typeTemp = type_temp;
-      self.groupList = self.activeSheetName === '0' ? sheetTemp.passfail : (self.activeSheetName === '1' ? sheetTemp.score : sheetTemp.other);
+      self.getGroupList(index);
+    },
+
+    getGroupList(index){
+      const self = this;
+      self.activeSheetName = self.firstLoad ? self.allRoutedata[0][0].type.toString() : self.activeSheetName;
+      self.firstLoad = false;
+      self.groupList = self.activeSheetName === '0' ? self.sheetTemp.passfail : (self.activeSheetName === '1' ? self.sheetTemp.score : self.sheetTemp.other);
       if (self.groupList.length !== 0) {
-        self.groupList[index].isClick = true;
+        self.groupList.forEach((_item,_index) => {
+           _index===index ? _item.isClick = true : _item.isClick = false;
+        })
         self.curGroup = self.groupList[index];
         self.groupIndex = index;
         if (self.lang === 'en') {

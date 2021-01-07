@@ -450,10 +450,10 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'addTitleItem':'Add Inspection Items',//Sprint14
-    'editTitleItem':'Edit Inspection Items',//Sprint14
-    'enterScore':'Please enter the score',//Sprint14
-    'sheetscore3_des':'(The scoring options are separated by '/')',//Sprint14
+    'addTitleItem':'Add Inspection Items',
+    'editTitleItem':'Edit Inspection Items',
+    'enterScore':'Please enter the score',
+    'sheetscore3_des':'(Separate numbers with "/")',
     'rangeScoreTips': 'The lowest value of the total score shall not be higher than the highest value',
     'ruleInspect': 'Rule Settings',
     'PatrolScoreCalculation': 'Inspection score calculation',
