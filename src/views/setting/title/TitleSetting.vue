@@ -584,6 +584,11 @@ export default {
             }
           });
         });
+        if(roleId === 2 || roleId === 3){
+          // handle event
+          self.roleNameList[2].children[0].checked = false;
+          self.roleNameList[2].children[0].disabled = false;
+        }
         if (roleId === 4) {
           self.roleNameList[1].children[0].checked = false;
           self.roleNameList[1].children[0].disabled = false;
