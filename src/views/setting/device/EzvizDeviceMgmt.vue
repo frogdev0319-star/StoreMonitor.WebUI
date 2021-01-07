@@ -719,7 +719,7 @@ export default {
         ]
       },
       showDeleteChannel: false,
-      deleteFromEzviz: false, // 是否从萤石云平台删除
+      deleteFromEzviz: false,
       isAddAgain: false,
       addChannelData: { name: '', channelId: '', pictureUrl: '', file: '' },
       channelRules: {
