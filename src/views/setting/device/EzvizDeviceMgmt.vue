@@ -2014,22 +2014,20 @@ export default {
 
     setErrorMsg(msg) {
       let displayedMsg = '';
-      if (msg.indexOf('exceeds the limit') !== -1) {
-        displayedMsg = this.$t('deviceView.moreThanAuthorizedDevices');
-      } else if (msg.indexOf('Device already existed') !== -1) {
-        displayedMsg = this.$t('deviceView.deviceExist');
-      } else if (msg.indexOf('Multiple accounts') !== -1) {
-        displayedMsg = this.$t('deviceView.multipleAccOnSameStore');
-      } else if (msg.indexOf('Ezviz access token') !== -1) {
-        displayedMsg = this.$t('deviceView.getAccessTokenError');
-      } else if (msg.indexOf('Duplicate device serial') !== -1) {
-        displayedMsg = this.$t('deviceView.duplicateSeriNum');
-      } else if (msg.indexOf('Store does not exist') !== -1) {
-        displayedMsg = this.$t('deviceView.storeNotExist');
-      } else if (msg.indexOf('No authority') !== -1) {
-        displayedMsg = this.$t('deviceView.noAuthorityForStore');
-      } else {
+      const msgMap = [
+        { return: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
+        { ret: 'deviceExist', match: ['Device already existed'] },
+        { ret: 'multipleAccOnSameStore', match: ['Multiple accounts'] },
+        { ret: 'getAccessTokenError', match: ['Ezviz access token'] },
+        { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
+        { ret: 'storeNotExist', match: ['Store does not exist'] },
+        { ret: 'noAuthorityForStore', match: ['No authority'] }
+      ];
+      const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
+      if (!result) {
         displayedMsg = this.isAddAgain ? this.$t('deviceView.editFail') : this.$t('deviceView.addFailed');
+      } else {
+        displayedMsg = this.$t(`deviceView.${result.ret}`);
       }
       this.notify(displayedMsg, 'warning', 3000);
       this.showAddNvrDialog = false;
