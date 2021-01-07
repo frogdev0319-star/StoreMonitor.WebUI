@@ -2356,7 +2356,7 @@ export default {
                 _item.isIgnore = true;
                 _item.inspectInput = '';
                 _item.sourceList = [];
-                if (inspectSettings.checkItem2 && _item.type === 0 || inspectSettings.checkItem3 && _item.type === 1) {
+                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
                 }
                 _item.itemgetScore = _item.manualIgnore ? '--' : null;
@@ -2374,7 +2374,7 @@ export default {
                   self.hasIgnoretemp[h_index].isIgnore = true;
                   self.hasIgnoretemp[h_index].inspectInput = '';
                   self.hasIgnoretemp[h_index].sourceList = [];
-                  if (inspectSettings.checkItem2 && h_item.type === 0 || inspectSettings.checkItem3 && h_item.type === 1) {
+                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
                   }
                   h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
@@ -2466,7 +2466,7 @@ export default {
                 _item.isIgnore = true;
                 _item.inspectInput = '';
                 _item.sourceList = [];
-                if (inspectSettings.checkItem2 && _item.type === 0 || inspectSettings.checkItem3 && _item.type === 1) {
+                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
                 }
                 _item.itemgetScore = _item.manualIgnore ? '--' : null;
@@ -2486,7 +2486,7 @@ export default {
                   self.hasIgnoretemp[h_index].isIgnore = true;
                   self.hasIgnoretemp[h_index].inspectInput = '';
                   self.hasIgnoretemp[h_index].sourceList = [];
-                  if (inspectSettings.checkItem2 && h_item.type === 0 || inspectSettings.checkItem3 && h_item.type === 1) {
+                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
                   }
                   h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
@@ -3227,16 +3227,16 @@ export default {
           res.data.inspectSettings.forEach(item => {
             switch (item.name) {
               case 'includedInTotalScoreWithType1':
-                inspectSettings.checkItem1 = item.value;
+                inspectSettings.includedInTotalScoreWithType1 = item.value;
                 break;
               case 'qualifiedForIgnoredWithType1':
-                inspectSettings.checkItem2 = item.value;
+                inspectSettings.qualifiedForIgnoredWithType1 = item.value;
                 break;
               case 'qualifiedForIgnoredWithType2':
-                inspectSettings.checkItem3 = item.value;
+                inspectSettings.qualifiedForIgnoredWithType2 = item.value;
                 break;
               case 'hundredMarkType':
-                inspectSettings.radio = item.value.toString();
+                inspectSettings.hundredMarkType = item.value.toString();
                 break;
               case 'minScore':
                 inspectSettings.minScore = item.value;
@@ -3245,7 +3245,7 @@ export default {
                 inspectSettings.maxScore = item.value;
                 break;
               case 'dangerousOnFailedItem':
-                inspectSettings.checkItem4 = item.value;
+                inspectSettings.dangerousOnFailedItem = item.value;
                 break;
               default:
                 break;

@@ -141,14 +141,14 @@
                     <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
                     <p class="title2">{{ _item.description }}</p>
                   </div>
-                  <div v-if="_item.grade === -1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                  <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
                   <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn">
                     {{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}
                   </div>
                   <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn">
                     {{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}
                   </div>
-                  <div v-if="item.groupType==1&&_item.grade!=-1" class="title-btn">
+                  <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" class="title-btn">
                     {{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}
                   </div>
                 </div>

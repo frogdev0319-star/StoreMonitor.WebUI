@@ -4,7 +4,7 @@
       <div class="icon-content">
         <img :src="isSuccess ? sucSrc:errSrc" class="suc-icon">
         <p :class="isSuccess ? 'sucInfo':'errInfo'">{{ retInfo }}</p>
-        <p v-if="isSuccess && lang !== 'en'" class="sucret-info">{{ curSecond }}{{ $t('remotePatrol.return') }}</p>
+        <p v-if="isSuccess && lang !== 'en'" class="sucret-info">{{ curSecond }}{{ $t('remotePatrol.returnStoreMonitor') }}</p>
         <p v-if="isSuccess && lang === 'en'" class="sucret-info">{{ $t('remotePatrol.return') }} {{ curSecond }}s!</p>
       </div>
     </div>

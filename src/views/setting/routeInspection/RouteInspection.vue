@@ -816,8 +816,8 @@ export default {
                 }
                 _obj.subject = _item.b;
                 _obj.description = description;
-                _obj.itemScore = itemScore;
-                _obj.qualifiedScore = qualifiedScore;
+                _obj.itemScore = parseFloat(self.getFloat(itemScore));
+                _obj.qualifiedScore = qualifiedScore===null ? null : parseFloat(self.getFloat(qualifiedScore));
                 _obj.availableScores = availableScores;
                 temp.push(_obj);
               });
@@ -1239,27 +1239,12 @@ export default {
 
           let indexArryPassFail = [], indexArryScore = [], indexArryOthers = [];
           let flaggroupLengthPassFail = false, flaggroupLengthScore = false, flaggroupLengthOthers = false;
-          let flaggroupRexPassFail = false, flaggroupRexScore = false, flaggroupRexOthers = false;
           let flagItemNamePassFail = false, flagItemNameScore = false, flagItemNameOthers = false;
-          let flagItemRexPassFail = false, flagItemRexScore = false, flagItemRexOthers = false;
           let flagItemLengthPassFail = false, flagItemLengthScore = false, flagItemLengthOthers = false;
-          // let flagDescNamePassFail = false,flagDescNameScore = false,flagDescNameOthers = false
           let flagDesLengthPassFail = false, flagDesLengthScore = false, flagDesLengthOthers = false;
           let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false, flagPassFailScoreType = false,flagScoreItemType = false;
           let flagTempError = false,flagScoreItemEmpty = false;
-          // sheet整合好的巡检表:outdata
-          // if ((outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others != undefined) || (outdata.PassFail != undefined && outdata.Score == undefined && outdata.Others != undefined)) {
-          //   _this.$refs.loadFile.value = '';
-          //   _this.$refs.loadFileEx.value = '';
-          //   let msg = '';
-          //   if (_this.lang == 'en') {
-          //     msg = _this.$t('insSettingView.OnlyOthers');
-          //   } else {
-          //     msg = '【Score】' + _this.$t('insSettingView.beforeImport');
-          //   }
-          //   _this.notify(msg, 'warning', 3000);
-          //   return false;
-          // }
+          // The sheet has been parsed : outdata
           outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? flagTempError = true : flagTempError = false;
           const arr = Object.entries(outdata);
           for (let i = 0; i < arr.length; i++) {
@@ -1271,7 +1256,7 @@ export default {
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthPassFail = true; }
                 if (item.c != undefined) {
-                  flagPassFailScoreType = !Number.isInteger(item.c) || parseInt(item.c) < 1 || parseInt(item.c) > 50;
+                  flagPassFailScoreType = isNaN(item.c) || parseFloat(item.c) < 0.5 || parseFloat(item.c) > 50;
                 } else {
                   item.c = 10;
                 }
@@ -1284,30 +1269,30 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
-                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(item.c) || parseInt(item.c) < 0 || parseInt(item.c) > 50) { // 项目满分值必填，取值范围为0~50整数
+                if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < 0 || parseFloat(item.c) > 50) { // 项目满分值必填，取值范围为0~50
                   flagFullScoreType = true;
                 }
                 if (item.d != undefined) {
-                  if (!Number.isInteger(item.d) || parseInt(item.d) < -50 || parseInt(item.d) > parseInt(item.c)) { // 最低分值选填，取值范围为-50~满分
+                  if (isNaN(item.d) || parseFloat(item.d) < -50 || parseFloat(item.d) > parseFloat(item.c)) { // 最低分值选填，取值范围为-50~满分
                     flagMinScoreType = true;
                   }
                 } else {
-                  item.d = item.c;
+                  item.d = parseFloat(item.c);
                 }
-                if (item.e != undefined || item.e.length !== 0) {
+                if (item.e != undefined) {
                   if (typeof item.e!=='number'&&item.e.indexOf('/') !== -1) {
                     const f_Score = item.e.split('/');
                     const scoreArr = [];
                     f_Score.forEach(f_item => {
-                      if (!isNaN(Number(f_item)) && parseInt(f_item) >= -50 && parseInt(f_item) <= item.c) {
-                          scoreArr.push(parseInt(f_item));
+                      if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= parseFloat(item.c)) {
+                          scoreArr.push(parseFloat(_this.getFloat(f_item)));
                       }
                     });
-                    scoreArr.length===0 ? flagScoreItemEmpty = true : item.e = scoreArr;
+                    scoreArr.length===0 ? flagScoreItemType = true : item.e = scoreArr;
                   } else {
-                    if (!isNaN(Number(item.e)) && parseInt(item.e) >= -50 && parseInt(item.e) <= item.c) {
+                    if (!isNaN(Number(item.e)) && parseFloat(item.e) >= -50 && parseFloat(item.e) <= parseFloat(item.c)) {
                       let a = [];
-                      a.push(parseInt(item.e));
+                      a.push(parseFloat(_this.getFloat(item.e)));
                       item.e = a;
                     } else {
                       flagScoreItemType = true
@@ -1325,7 +1310,7 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthOthers = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameOthers = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthOthers = true; }
-                if (item.c == undefined || item.c.length == 0 || !Number.isInteger(Math.abs(item.c)) || parseInt(item.c) < -100 || parseInt(item.c) > 100) { // 项目分值必填，字符类型为-100~+100整数
+                if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < -100 || parseFloat(item.c) > 100) { // 项目分值必填，字符类型为-100~+100
                   flagOtherScoreType = true;
                 }
                 if (item.d != undefined) {
@@ -1334,9 +1319,9 @@ export default {
               }
             });
           }
-          const showWarningIfo = flaggroupLengthPassFail || flaggroupRexPassFail || flagItemNamePassFail || flagItemLengthPassFail || flagItemRexPassFail || flagDesLengthPassFail ||
-                                         flaggroupLengthScore || flaggroupRexScore || flagItemNameScore || flagItemLengthScore || flagItemRexScore || flagDesLengthScore ||
-                                         flaggroupLengthOthers || flaggroupRexOthers || flagItemNameOthers || flagItemLengthOthers || flagItemRexOthers || flagDesLengthOthers ||
+          const showWarningIfo = flaggroupLengthPassFail || flagItemNamePassFail || flagItemLengthPassFail || flagDesLengthPassFail ||
+                                         flaggroupLengthScore || flagItemNameScore || flagItemLengthScore || flagDesLengthScore ||
+                                         flaggroupLengthOthers || flagItemNameOthers || flagItemLengthOthers || flagDesLengthOthers ||
                                          flagFullScoreType || flagMinScoreType || flagOtherScoreType || flagPassFailScoreType || flagTempError || flagScoreItemType || flagScoreItemEmpty;
           if (showWarningIfo) {
             _this.showFailInfo = true;
@@ -1353,14 +1338,6 @@ export default {
               const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.excelLongCategory');
               _this.FileInfo.push(flag);
             }
-            // if(flaggroupRexPassFail||flagItemRexPassFail||flaggroupRexScore||flagItemRexScore||flaggroupRexOthers||flagItemRexOthers){
-            //     let flagArr = []
-            //     if(flaggroupRexPassFail||flagItemRexPassFail){flagArr.push('PassFail')}
-            //     if(flaggroupRexScore||flagItemRexScore){flagArr.push('Score')}
-            //     if(flaggroupRexOthers||flagItemRexOthers){flagArr.push('Others')}
-            //     let flag = flagArr.toString() +' ' +  _this.$t('insSettingView.excelIllegalCategory')
-            //     _this.FileInfo.push(flag)
-            // }
             if (flagItemNamePassFail || flagItemNameScore || flagItemNameOthers) {
               const flagArr = [];
               if (flagItemNameScore) {
@@ -1445,6 +1422,8 @@ export default {
             }
           }
           if(arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length===0){
+            _this.$refs.loadFile.value = '';
+            _this.$refs.loadFileEx.value = '';
             _this.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
             return false;
           }
@@ -1464,6 +1443,14 @@ export default {
       } else {
         reader.readAsBinaryString(f);
       }
+    },
+
+    getFloat (value) {
+      let str = value.toString();
+      let strIndex = str.indexOf('.');
+      if (strIndex === -1){return str};
+      str = str.substring(0, strIndex + 2);
+      return str;
     },
 
     addTab(targetName) {
