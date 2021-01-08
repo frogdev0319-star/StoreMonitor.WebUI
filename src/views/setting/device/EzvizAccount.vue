@@ -679,6 +679,7 @@ export default {
       }
       self.accountTitle = this.$t('deviceView.updateAccount');
       self.errorAccessKey = '';
+      self.errorAccount = '';
       self.showAddAccount = true;
     },
 
