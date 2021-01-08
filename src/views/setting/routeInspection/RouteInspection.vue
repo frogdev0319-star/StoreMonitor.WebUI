@@ -1256,7 +1256,7 @@ export default {
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthPassFail = true; }
                 if (item.c != undefined) {
-                  flagPassFailScoreType = isNaN(item.c) || parseFloat(item.c) < 0.5 || parseFloat(item.c) > 50;
+                  if(isNaN(item.c) || parseFloat(item.c) < 0.5 || parseFloat(item.c) > 50){flagPassFailScoreType = true;};
                 } else {
                   item.c = 10;
                 }
@@ -1269,11 +1269,11 @@ export default {
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
                 if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
-                if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < 0 || parseFloat(item.c) > 50) { // 项目满分值必填，取值范围为0~50
+                if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < 0 || parseFloat(item.c) > 50) {
                   flagFullScoreType = true;
                 }
                 if (item.d != undefined) {
-                  if (isNaN(item.d) || parseFloat(item.d) < -50 || parseFloat(item.d) > parseFloat(item.c)) { // 最低分值选填，取值范围为-50~满分
+                  if (isNaN(item.d) || parseFloat(item.d) < -50 || parseFloat(item.d) > parseFloat(item.c)) {
                     flagMinScoreType = true;
                   }
                 } else {
