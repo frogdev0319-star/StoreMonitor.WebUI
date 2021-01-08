@@ -1338,10 +1338,17 @@ export default {
       const temp = [];
       item.itemData.forEach((_item, index) => {
         let availableScoreStr = '';
-        _item.availableScores.forEach((a_item,a_index)=>{
-          let isuu = a_index === _item.availableScores.length-1 ? '' : '/';
-          availableScoreStr += a_item + isuu;
-        })
+        if (_item.availableScores.length !== 0) {
+          _item.availableScores.forEach((x_item, x_index) => {
+            const isuu = x_index === _item.availableScores.length - 1 ? '' : '/';
+            availableScoreStr += x_item + isuu;
+          });
+        } else {
+          for (let i = 0; i < _item.itemScore + 1; i++) {
+            const isuu = i === _item.itemScore ? '' : '/';
+            availableScoreStr += i + isuu;
+          }
+        }
         const obj = {
           id: _item.id,
           napeName: _item.subject,

@@ -55,7 +55,7 @@
     <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;">
       <p class="rule-title">{{ $t('insSettingView.isCheckAnnex') }}</p>
       <p class="rule-item">
-        <el-checkbox v-model="checkItem5">
+        <el-checkbox v-model="onSitePhotoOnly">
           <span>{{ $t('insSettingView.AllowPhotos') }}</span>
         </el-checkbox>
       </p>
@@ -77,7 +77,7 @@ export default {
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
       dangerousOnFailedItem: false,
-      checkItem5: false,
+      onSitePhotoOnly: false,
       lang: this.$i18n.locale,
       ScoreMsg: false,
       inspectId: 0,
@@ -102,7 +102,7 @@ export default {
             { name: 'minScore', value: parseFloat(self.minScore) },
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
-            // { name: '现场拍照', value: self.checkItem5 },
+            { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
           ]
         };
         const res = await self.updateInspectRule(params);
@@ -147,9 +147,9 @@ export default {
               case 'dangerousOnFailedItem':
                 self.dangerousOnFailedItem = item.value;
                 break;
-              // case '现场拍照':
-              //   self.checkItem5 = item.value;
-              //   break;
+              case 'onSitePhotoOnly':
+                self.onSitePhotoOnly = item.value;
+                break;
               default:
                 break;
             }

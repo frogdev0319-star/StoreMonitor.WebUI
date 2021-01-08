@@ -478,8 +478,6 @@ export default {
     'PSCrule1': '与其他tab组合时，',
     'PSCrule2': '项目分值参与考评总分运算',
     'PSCrule3': '中忽略项目视同得分',
-    'OnlyOthers': '【巡检评分项】sheet页内容不能为空',
-    'beforeImport': 'sheet页内容不能为空',
     'Ratingitems': '评级项目',
     'Addscoreitems': '附加评分项目',
     'selecttitle': '请选择关联职务',
