@@ -29,8 +29,13 @@
             <div v-if="playBackState" class="iconrside">
               <div class="speed-content">
                 <span>{{ $t('remotePatrol.back') }}</span>
-                <el-select :value="curBack" :popper-class="popperClass" :popper-append-to-body="false"
-                           class="el-test" size="mini" placeholder="">
+                <el-select
+                  :value="curBack"
+                  :popper-class="popperClass"
+                  :popper-append-to-body="false"
+                  class="el-test"
+                  size="mini"
+                  placeholder="">
                   <el-option
                     v-for="(item) in backList"
                     :key="item.value"
@@ -44,8 +49,13 @@
             <div class="iconrside">
               <div class="speed-content">
                 <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
-                <el-select :value="proportion" :popper-class="popperClass" :popper-append-to-body="false"
-                           class="el-test" size="mini" placeholder="">
+                <el-select
+                  :value="proportion"
+                  :popper-class="popperClass"
+                  :popper-append-to-body="false"
+                  class="el-test"
+                  size="mini"
+                  placeholder="">
                   <el-option
                     v-for="(item,index) in proportionList"
                     :key="index"
@@ -66,8 +76,12 @@
           </div>
         </div>
         <div v-if="playBackState" class="progress-content">
-          <b-progress id="bprogress" :value="currentTimeValue" :max="durationTimeValue" class="mb-3 prog"
-                      height="0.2rem"/>
+          <b-progress
+            id="bprogress"
+            :value="currentTimeValue"
+            :max="durationTimeValue"
+            class="mb-3 prog"
+            height="0.2rem"/>
         </div>
         <transition name="fade">
           <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
@@ -103,8 +117,13 @@
               <div v-if="playBackState" class="iconrside">
                 <div class="speed-content">
                   <span>{{ $t('remotePatrol.back') }}</span>
-                  <el-select :value="curBack" :popper-class="popperClass" :popper-append-to-body="false"
-                             class="el-test" size="mini" placeholder="">
+                  <el-select
+                    :value="curBack"
+                    :popper-class="popperClass"
+                    :popper-append-to-body="false"
+                    class="el-test"
+                    size="mini"
+                    placeholder="">
                     <el-option
                       v-for="(item) in backList"
                       :key="item.value"
@@ -118,8 +137,13 @@
               <div class="iconrside">
                 <div class="speed-content">
                   <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
-                  <el-select :value="proportion" :popper-class="popperClass" :popper-append-to-body="false"
-                             class="el-test" size="mini" placeholder="">
+                  <el-select
+                    :value="proportion"
+                    :popper-class="popperClass"
+                    :popper-append-to-body="false"
+                    class="el-test"
+                    size="mini"
+                    placeholder="">
                     <el-option
                       v-for="(item,index) in proportionList"
                       :key="index"
@@ -139,8 +163,13 @@
             </div>
           </div>
           <div v-if="playBackState" class="progress-content">
-            <b-progress id="bprogress" :value="currentTimeValue" :max="durationTimeValue"
-                        class="mb-3 prog" height="0.2rem" style="margin-bottom:0px !important;"/>
+            <b-progress
+              id="bprogress"
+              :value="currentTimeValue"
+              :max="durationTimeValue"
+              class="mb-3 prog"
+              height="0.2rem"
+              style="margin-bottom:0px !important;"/>
           </div>
         </div>
 
@@ -252,8 +281,12 @@
         </div>
         <div class="event-content">
           <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-          <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged"
-                    @blur="notShowInputRuleTips('eventName')"/>
+          <el-input
+            v-model="eventName"
+            size="mini"
+            class="name-input"
+            @input="eventNameChanged"
+            @blur="notShowInputRuleTips('eventName')"/>
           <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
           <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
           <span class="event-title">{{ $t('remotePatrol.description') }}</span>
@@ -732,8 +765,8 @@ export default {
             }
           });
         }
-      }catch (err) {
-        console.log("EzvizVideo-checkIfEncry" + err);
+      } catch (err) {
+        console.log('EzvizVideo-checkIfEncry' + err);
       }
     },
 
@@ -1181,8 +1214,8 @@ export default {
         return;
       } else {
         const o = document.getElementById('videoContent');
-        const width = screen.width;
         const height = screen.height;
+        const width = self.setVideoWidth(height);
         const playerEle = self.$refs.myPlayer;
         playerEle.style.width = screen.width + 'px';
         playerEle.style.height = screen.height + 'px';
@@ -1618,9 +1651,8 @@ export default {
           self.videoPassword = '';
           self.showInputPassword = true;
         }
-      }
-      catch (err) {
-        console.log("EzvizVideo-verifyEnterPassword" + err);
+      } catch (err) {
+        console.log('EzvizVideo-verifyEnterPassword' + err);
       }
     },
 
@@ -1726,35 +1758,51 @@ export default {
         self.endTime = Number(self.$moment(self.startTs).add(5, 'm').format('YYYYMMDDHHmmss'));
         if (self.videoPassword.length > 0) {
           if (isGlobalWebsite) {
-            self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ezviz.com/' + self.channelInfo.ivsId
-              + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
+            self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ezviz.com/' + self.channelInfo.ivsId +
+              '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           } else {
-            self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId
-              + '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
+            self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId +
+              '/' + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           }
         } else {
           if (isGlobalWebsite) {
-            self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/'
-              + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
+            self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' +
+              self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           } else {
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/'
-              + self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' +
+              self.channelInfo.channelId + '.rec?begin=' + self.startTime + '&end=' + self.endTime;
           }
         }
       } else {
         if (self.videoPassword.length > 0) {
-          self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId
-            + '/' + self.channelInfo.channelId + '.live';
+          self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId +
+            '/' + self.channelInfo.channelId + '.live';
         } else {
           if (isGlobalWebsite) {
-            self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/'
-              + self.channelInfo.channelId + '.live';
+            self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' +
+              self.channelInfo.channelId + '.live';
           } else {
-            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/'
-              + self.channelInfo.channelId + '.live';
+            self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' +
+              self.channelInfo.channelId + '.live';
           }
         }
       }
+    },
+
+    setVideoWidth(height) {
+      let width = 0;
+      switch (this.proportion) {
+        case '4:3':
+          width = height * 4 / 3;
+          break;
+        case '16:9':
+          width = height * 16 / 9;
+          break;
+        default:
+          width = height * 4 / 3;
+          break;
+      }
+      return width;
     }
   }
 };
