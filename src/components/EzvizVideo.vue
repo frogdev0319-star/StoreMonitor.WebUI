@@ -1182,7 +1182,7 @@ export default {
       } else {
         const o = document.getElementById('videoContent');
         const width = screen.width;
-        const height = screen.height;
+        const height = self.setVideoWidth(width);
         const playerEle = self.$refs.myPlayer;
         playerEle.style.width = screen.width + 'px';
         playerEle.style.height = screen.height + 'px';
@@ -1755,6 +1755,22 @@ export default {
           }
         }
       }
+    },
+
+    setVideoWidth(height){
+      let width = 0;
+      switch (this.proportion) {
+        case '4:3':
+          width = height * 4 / 3;
+          break;
+        case '16:9':
+          width = height * 16 / 9;
+          break;
+        default:
+          width = height * 4 / 3;
+          break;
+      }
+      return width;
     }
   }
 };
