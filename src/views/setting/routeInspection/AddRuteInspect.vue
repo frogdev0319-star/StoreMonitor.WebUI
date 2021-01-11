@@ -998,7 +998,7 @@ export default {
         val = val.replace(/\.{2,}/g,"."); 
         val = val.replace(".","$#$").replace(/\./g,"").replace("$#$","."); 
         val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
-        if(!isNaN(val)&&val.indexOf(".")< 0 && val !=""){
+        if(val!=="-0" && !isNaN(val)&&val.indexOf(".")< 0 && val !=""){
             val= parseFloat(val); 
         } 
         return val;
@@ -1041,11 +1041,15 @@ export default {
             qualifiedScore = parseFloat(self.getFloat(self.ItemMinScore));
           }
           if(self.ItemScoreOption !== ''){
+            let unavailable = 0;
             self.ItemScoreOptions.forEach(item=>{
               if(!isNaN(parseFloat(item)) && parseFloat(item)>=-50 && parseFloat(item)<=parseFloat(self.ItemTotalScore)){
                 selectAvailable.push(parseFloat(self.getFloat(item)));
+              }else{
+                unavailable++;
               }
             })
+            self.ScoreOptionsTips1 = unavailable!==0 ? true : false;
           }
         }
       } else if (self.activeSheetName == '2') {
@@ -1410,6 +1414,9 @@ export default {
         self.ItemTotalScoreTip1 = true;
       }else{
         self.ItemTotalScoreTip1 = false;
+        if(self.ItemMinScoreTip && parseFloat(self.ItemTotalScore)>=parseFloat(self.ItemMinScore)){
+          self.ItemMinScoreTip = false;
+        }
       }
     },
 

@@ -188,14 +188,14 @@ export default {
       self.ScoreMsg = self.minScore > self.maxScore;
     },
 
-    getUtilScore(val){ 
-        val = val.replace(/[^-?\d\.]/g,"");  
-        val = val.replace(/\.{2,}/g,"."); 
-        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$","."); 
+    getUtilScore(val){
+        val = val.replace(/[^-?\d\.]/g,"");
+        val = val.replace(/\.{2,}/g,".");
+        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
         val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
-        if(!isNaN(val)&&val.indexOf(".")< 0 && val !=""){
-            val= parseFloat(val); 
-        } 
+        if(val!=="-0" && !isNaN(val) && val.indexOf(".")< 0 && val!=""){
+            val= parseFloat(val);
+        }
         return val;
     },
 

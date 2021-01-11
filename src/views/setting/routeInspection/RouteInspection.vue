@@ -1543,7 +1543,7 @@ export default {
                 obj[tHeader[5]] = item.groupName;
                 obj[tHeader[1]] = '';
                 obj[tHeader[2]] = '';
-                obj[tHeader[4]] = _item.qualifiedScore;
+                obj[tHeader[4]] = '';
                 obj[tHeader[7]] = '';
                 obj[tHeader[3]] = '';
                 sheet2data.push(obj);
