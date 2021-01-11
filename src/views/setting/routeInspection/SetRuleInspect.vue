@@ -180,12 +180,12 @@ export default {
     inputChangeMax(val) {
       const self = this;
       self.maxScore = self.getUtilScore(val);
-      self.ScoreMsg = self.minScore > self.maxScore;
+      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
     },
     inputChangeMin(val) {
       const self = this;
       self.minScore = self.getUtilScore(val);
-      self.ScoreMsg = self.minScore > self.maxScore;
+      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
     },
 
     getUtilScore(val){

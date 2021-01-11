@@ -2142,15 +2142,12 @@ export default {
           self.allIgnoreObj.dialogCosed = true;
           return false;
         }
+        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
+        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
+      }else{
+        self.hasIgnoretemp[index].checked = false;
+        self.hasIgnoretemp[index].disabled = false;
       }
-      sheetName.forEach(s_item => {
-        s_item.inspectList.forEach(item => {
-          item.items.forEach((_item, _index) => {
-            _item.checked = false;
-            _item.disabled = true;
-          });
-        });
-      });
       self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
@@ -4501,7 +4498,7 @@ export default {
                     }
                   .guide-lside{
                     top: 5px;
-                    right: 5%;
+                    right: 8%;
                   }
                 }
                 .inspect-content{
@@ -4777,7 +4774,7 @@ export default {
                             font-size: 12px;
                             width: 120px;
                             height: 25px;
-                            line-height: 24px;
+                            line-height: 23px;
                             border:1px solid #dcdcdc;
                             background-color: #f7f8fc;
                             display: inline-block;

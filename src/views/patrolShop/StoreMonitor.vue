@@ -319,7 +319,7 @@
           </div>
           <div class="lside-scrollbar">
             <el-scrollbar style="height: 100%" class="el-menuscrollbar">
-              <span class="event-title"><span class="is-required">*</span>{{ $t("remotePatrol.title") }}</span>
+              <span class="event-title"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</span>
               <el-input
                 :disabled="corEvent"
                 v-model="eventName"
@@ -332,8 +332,7 @@
               <span v-if="showEventNameInfo" class="error-class">{{
                 $t("remotePatrol.emptyTitle")}}</span>
               <span v-if="!corEvent" class="event-title">{{ $t("remotePatrol.description") }}</span>
-              <span v-else class="event-title"><span class="is-required">*</span>
-                {{ $t("remotePatrol.description") }}</span>
+              <span v-else class="event-title"><span class="is-required">* </span>{{ $t("remotePatrol.description") }}</span>
               <el-input
                 :autosize="{ minRows: 2, maxRows: 7 }"
                 v-model="eventDes"
@@ -368,7 +367,7 @@
                     >
                   </div>
                 </div>
-                <span>*{{ $t("remotePatrol.storeMaxAttach") }}</span>
+                <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
               </div>
             </el-scrollbar>
           </div>

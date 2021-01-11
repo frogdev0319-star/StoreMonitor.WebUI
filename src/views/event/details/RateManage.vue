@@ -4,7 +4,7 @@
       <div class="title-content">
         <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" >
         <span class="event-title">{{ event.eventTitle }}</span>
-        <span v-if="event.score!==-1" class="event-score">{{ $t('eventView.scores') }} {{ event.score }}</span>
+        <span v-if="event.score!==Math.pow(-2,31)" class="event-score">{{ $t('eventView.scores') }} {{ event.score }}</span>
         <el-button v-if="showWinpBtn" :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="el-submit"
                    type="primary" @click="submit">{{ $t('eventView.submit') }}</el-button>
       </div>
@@ -199,27 +199,29 @@
         </div>
       </div>
       <div v-show="showWinpBtn" :style="{'height':windowHeight*0.34+'px'}" class="submit-content">
-        <span class="dealInfo-label">{{ $t('eventView.events') }}</span>
-        <span>{{ $t('eventView.methods') }}</span><br>
-        <div class="btn-content">
-          <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
-            <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
-              {{ item.name }}
-            </span>
+        <el-scrollbar id="el-menuscrollbar" style="height:100%;">
+          <span class="dealInfo-label">{{ $t('eventView.events') }}</span>
+          <span>{{ $t('eventView.methods') }}</span><br>
+          <div class="btn-content">
+            <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
+              <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
+                {{ item.name }}
+              </span>
+            </div>
           </div>
-        </div>
-        <span style="display:block;"><span style="color:red;">*</span>{{ $t('eventView.addDetails') }}</span>
-        <el-input
-          :autosize="{ minRows: 2}"
-          v-model="eventDes"
-          :placeholder="$t('eventView.describe')"
-          size="mini"
-          class="des-input"
-          type="textarea"
-          resize="none"
-          @input="(val)=>ivsIdChange(val)"
-          @blur="notShowInputRuleTips"/>
-        <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+          <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
+          <el-input
+            :autosize="{ minRows: 2}"
+            v-model="eventDes"
+            :placeholder="$t('eventView.describe')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="(val)=>ivsIdChange(val)"
+            @blur="notShowInputRuleTips"/>
+          <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+        </el-scrollbar>
       </div>
     </el-col>
     <el-col :span="8" class="rside">
@@ -1437,6 +1439,7 @@ $h1:#292e36;
             text-align: left;
             font-size: 14px;
             margin-top: 15px;
+            padding-bottom:15px;
             padding-left: 25px;
             color: $black;
             width: 92%;

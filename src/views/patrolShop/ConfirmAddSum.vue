@@ -613,7 +613,7 @@ export default {
         let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
-          let totalScore = 0, totalGetscore = 0;
+          let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
           item.items.forEach(s_item => {
             if (s_item.isIgnore) {
               IgnoredArr.push(s_item);
@@ -647,6 +647,7 @@ export default {
               if (!s_item.isIgnore&&!s_item.manualIgnore) {
                 ScoreX += s_item.itemgetScore;
                 Score_totalScoreX += s_item.itemScore;
+                notAddIgnoretotalScore += s_item.itemScore;
               }else{
                 ScoreN += s_item.itemScore;
               }
@@ -658,7 +659,11 @@ export default {
           item['numOfQualified'] = QualifiedArr.length;
           item['numOfUnqualified'] = UnqualifiedArr.length;
           item['numIgnore'] = IgnoredArr.length;
-          item['itemScore'] = totalScore;
+          if(inspectSettings.qualifiedForIgnoredWithType2){
+            item['itemScore'] = totalScore;
+          }else{
+            item['itemScore'] = notAddIgnoretotalScore;
+          }
           item['itemgetScore'] = totalGetscore;
           if (p_item.type === 0) {
             PassFileTotalScoreSystem = PassFileTS;
@@ -668,7 +673,7 @@ export default {
             PassFileTotalScoreX = PassFile_totalScoreX;
           }
           if (p_item.type === 1) {
-            CurAddScoreB += item.itemScore;
+            CurAddScoreB += totalScore;
             allScoreB = CurAddScoreB;
             ScoreTotalScoreSystem = ScoreTS;
             ScoreXN = ScoreX + ScoreN;
