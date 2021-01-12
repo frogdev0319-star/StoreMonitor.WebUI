@@ -80,51 +80,17 @@
                 </div>
               </el-button>
             </div>
-            <div class="table">
-              <div class="el-table-panel">
-                <el-table
-                  :data="itemsTableData"
-                  :highlight-current-row="true"
-                  :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                  :header-cell-class-name="headerClass"
-                  :cell-class-name="cellClass"
-                  :row-class-name="rowClass"
-                  empty-text="无数据"
-                  align="left"
-                  stripe
-                  border
-                  style="width: 100%"
-                  size="mini"
-                  @sort-change="sortChange"
-                >
-                  <el-table-column
-                    v-for="(_item,_index) in itemsInfoData"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :sortable="_item.sortable"
-                    :min-width="lang !== 'en'? _item.width : _item.maxWidth"/>
-                  <div slot="empty">
-                    <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"/>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{ $t('overview.noData') }}</span>
-                    </div>
-                  </div>
-                </el-table>
-              </div>
-              <div class="toolbar pagination clearfix">
-                <el-pagination
-                  :page-sizes="[10, 20, 50, 100]"
-                  :current-page="page"
-                  :page-size="sizeNum"
-                  :total="total"
-                  background
-                  small
-                  layout="jumper,total, prev, pager, next,sizes"
-                  @size-change="sizeChange"
-                  @current-change="currentChange"/>
-              </div>
-            </div>
+            <table-pagination
+              ref="elTP"
+              :column-data="itemsInfoData"
+              :table-data="itemsTableData"
+              :total="total"
+              :highlight-current-row= "true"
+              :pagesize="sizeNum"
+              :current-page="page"
+              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"/>
           </el-col>
         </el-col>
       </el-col>
@@ -209,38 +175,19 @@
             </el-col>
           </el-col>
           <el-col :span="24" class="items-table">
-            <div class="table">
-              <div class="el-table-panel">
-                <el-table
-                  :data="PDFData"
-                  :highlight-current-row="true"
-                  :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                  :header-cell-class-name="headerClass"
-                  :cell-class-name="cellClass"
-                  :row-class-name="rowClass"
-                  empty-text="无数据"
-                  align="left"
-                  stripe
-                  border
-                  style="width: 100%"
-                  size="mini"
-                  @sort-change="sortChange"
-                >
-                  <el-table-column
-                    v-for="(_item,_index) in itemsInfoData"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :min-width="_item.pdfmaxWidth"/>
-                  <div slot="empty">
-                    <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"/>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{ $t('overview.noData') }}</span>
-                    </div>
-                  </div>
-                </el-table>
-              </div>
-            </div>
+            <table-pagination
+              ref="elTP"
+              :column-data="itemsInfoData"
+              :table-data="PDFData"
+              :total="total"
+              :highlight-current-row= "true"
+              :pagesize="sizeNum"
+              :current-page="page"
+              :can-sortable="false"
+              :show-pagination="false"
+              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"/>
           </el-col>
         </el-col>
       </el-col>
@@ -258,11 +205,13 @@ import resize from '@/components/mixins/resize';
 import {
   getInspectStatsItemOverviewV2
 } from '@/api/inspectOverview';
+import TablePagination from '../../components/TablePagination';
 
 export default {
   name: 'InspectItemStatistics',
 
   components: {
+    TablePagination,
     'v-chart': ECharts,
     SearchComponent
   },
@@ -456,50 +405,6 @@ export default {
           }
         }
       }, 1000);
-    },
-
-    sortChange(col) {
-      const self = this;
-      const order = col.order;
-      let prop = '';
-      let tempOrder = '';
-      if (order === 'ascending') {
-        self.order = self.params.order = {
-          'direction': 'asc',
-          'property': col.column.property === 'qualifiedRateStr' ? 'qualifiedRate' : col.column.property
-        };
-        prop = col.column.property;
-        tempOrder = 'asc';
-      } else if (order === 'descending') {
-        self.order = self.params.order = {
-          'direction': 'desc',
-          'property': col.column.property === 'qualifiedRateStr' ? 'qualifiedRate' : col.column.property
-        };
-        prop = col.column.property;
-        tempOrder = 'desc';
-      } else {
-        self.order = self.params.order = { 'direction': 'asc', 'property': 'qualifiedRate' };
-      }
-      self.params.filter = {
-        page: self.page - 1,
-        size: self.sizeNum
-      };
-      self.getInspectItemsTable();
-    },
-
-    sizeChange(val) {
-      const self = this;
-      self.sizeNum = val;
-      self.page = 1;
-      self.params.filter = { page: self.page - 1, size: val };
-      self.getInspectItemsTable();
-    },
-
-    currentChange(val) {
-      const self = this;
-      self.page = val;
-      self.params.filter = { page: val - 1, size: self.sizeNum };
-      self.getInspectItemsTable();
     },
 
     async searchData() {
@@ -882,12 +787,29 @@ export default {
     },
 
     emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeNameStr, storeTagStr) {
-      console.log(searchParams);
-      console.log(dateRangeList);
       this.params = searchParams;
       this.storePatrolLists = storePatrolLists;
-      console.log(this.params);
+      this.storeNameStr = storeNameStr;
+      this.storeTagStr = storeTagStr;
       this.searchData();
+    },
+
+    handlePageAndSizeChange(pageObj) {
+      console.log(pageObj);
+      const self = this;
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.getInspectItemsTable();
+    },
+
+    handleSortChange(order) {
+      this.order = this.params.order = order;
+      this.params.filter = {
+        page: this.page - 1,
+        size: this.sizeNum
+      };
+      this.getInspectItemsTable();
     }
   }
 };
