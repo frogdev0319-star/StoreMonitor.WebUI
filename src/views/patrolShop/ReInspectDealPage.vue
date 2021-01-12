@@ -156,7 +156,7 @@ export default {
 
     reTry() {
       const self = this;
-      self.$router.push({ name: 'confirmSum' });
+      self.$router.push({ name: 'confirmSum',params: self.$route.params.data.reLoadData});
     }
   }
 };

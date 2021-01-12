@@ -571,7 +571,8 @@ export default {
           };
         } else {
           routeData = {
-            isSuccess: false
+            isSuccess: false,
+            reLoadData: self.$route.params
           };
         }
         self.$router.push({ name: 'submitEvent', params: { data: routeData }});
@@ -580,14 +581,6 @@ export default {
         return false;
       });
       self.uploadProgress = false;
-    },
-
-    getFloat (value) {
-      let str = value.toString();
-      let strIndex = str.indexOf('.');
-      if (strIndex === -1){return str};
-      str = str.substring(0, strIndex + 2);
-      return str;
     },
     
     getRouteData() {
@@ -620,7 +613,7 @@ export default {
         let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
-          let totalScore = 0, totalGetscore = 0;
+          let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
           item.items.forEach(s_item => {
             if (s_item.isIgnore) {
               IgnoredArr.push(s_item);
@@ -654,6 +647,7 @@ export default {
               if (!s_item.isIgnore&&!s_item.manualIgnore) {
                 ScoreX += s_item.itemgetScore;
                 Score_totalScoreX += s_item.itemScore;
+                notAddIgnoretotalScore += s_item.itemScore;
               }else{
                 ScoreN += s_item.itemScore;
               }
@@ -665,7 +659,11 @@ export default {
           item['numOfQualified'] = QualifiedArr.length;
           item['numOfUnqualified'] = UnqualifiedArr.length;
           item['numIgnore'] = IgnoredArr.length;
-          item['itemScore'] = totalScore;
+          if(inspectSettings.qualifiedForIgnoredWithType2){
+            item['itemScore'] = totalScore;
+          }else{
+            item['itemScore'] = notAddIgnoretotalScore;
+          }
           item['itemgetScore'] = totalGetscore;
           if (p_item.type === 0) {
             PassFileTotalScoreSystem = PassFileTS;
@@ -675,7 +673,7 @@ export default {
             PassFileTotalScoreX = PassFile_totalScoreX;
           }
           if (p_item.type === 1) {
-            CurAddScoreB += item.itemScore;
+            CurAddScoreB += totalScore;
             allScoreB = CurAddScoreB;
             ScoreTotalScoreSystem = ScoreTS;
             ScoreXN = ScoreX + ScoreN;
@@ -705,28 +703,28 @@ export default {
       if (inspect.length === 1 && inspect[0].type === 0) {
         if (inspectSettings.hundredMarkType === '-1') {
           if(inspectSettings.qualifiedForIgnoredWithType1){
-            s_count = Math.round(PassFileXN);
+            s_count = PassFileXN;
           }else{
-            s_count = Math.round(PassFileTotalScoreSystem);
+            s_count = PassFileTotalScoreSystem;
           }
         } else {
           if (inspectSettings.qualifiedForIgnoredWithType1) {
-            s_count = PassFileTotalScore===0 ? 0 : Math.round(PassFileXN / PassFileTotalScore * 100);
+            s_count = PassFileTotalScore===0 ? 0 : PassFileXN / PassFileTotalScore * 100;
           } else {
-            s_count = PassFileTotalScoreX===0 ? 0 : Math.round(PassFileXS / PassFileTotalScoreX * 100);
+            s_count = PassFileTotalScoreX===0 ? 0 : PassFileXS / PassFileTotalScoreX * 100;
           }
         }
       } else {
         if (inspectSettings.includedInTotalScoreWithType1) {
           if (inspectSettings.hundredMarkType === '-1') {
             if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = Math.round(PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+              s_count = PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem;
             } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = Math.round(PassFileTotalScoreSystem + ScoreXN + OtherTotalScoreSystem);
+              s_count = PassFileTotalScoreSystem + ScoreXN + OtherTotalScoreSystem;
             } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = Math.round(PassFileXN + ScoreXN + OtherTotalScoreSystem);
+              s_count = PassFileXN + ScoreXN + OtherTotalScoreSystem;
             } else {
-              s_count = Math.round(PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem);
+              s_count = PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem;
             }
           } else {
             let total_a = 0,total_b = 0,total_c = 0;
@@ -743,24 +741,24 @@ export default {
               total_a = PassFileXS + ScoreTotalScoreSystem;
               total_b = PassFileTotalScoreX + ScoreTotalScoreX;
             }
-            total_c = total_a===0 || total_b===0 ? 0 : Math.round((total_a / total_b * 100));
-            s_count = Math.round(total_c + otherGetscoreTotal);
+            total_c = total_a===0 || total_b===0 ? 0 : (total_a / total_b * 100);
+            s_count = total_c + otherGetscoreTotal;
           }
         } else {
           if (inspectSettings.hundredMarkType === '-1') {
             if (inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = Math.round(ScoreXN + OtherTotalScoreSystem);
+              s_count = ScoreXN + OtherTotalScoreSystem;
             } else {
-              s_count = Math.round(ScoreTotalScoreSystem + OtherTotalScoreSystem);
+              s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
             }
           } else {
             let total_a = 0;
             if (inspectSettings.qualifiedForIgnoredWithType2) {
-              total_a = allScoreB===0 || ScoreXN===0 ? 0 : Math.round((ScoreXN / allScoreB * 100))
+              total_a = allScoreB===0 || ScoreXN===0 ? 0 : (ScoreXN / allScoreB * 100);
             } else {
-              total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : Math.round((ScoreTotalScoreSystem / ScoreTotalScoreX * 100))
+              total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
             }
-            s_count = Math.round(total_a + otherGetscoreTotal);
+            s_count = total_a + otherGetscoreTotal;
           }
         }
       }
@@ -770,7 +768,7 @@ export default {
           item.isActive = false;
         });
       }
-      self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(self.getFloat(s_count)));
+      self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
       self.summary = inspect;
       eventList.forEach((item, index) => {
         const objFeedBack = {};
@@ -1355,8 +1353,9 @@ $h1:#292e36;
                             cursor: pointer;
                             .start-icon{
                                 position: absolute;
-                                left: 35%;
-                                top: 30%;
+                                left: 50%;
+                                top: 50%;
+                                transform: translate(-50%,-50%);
                             }
                         .imgLittle{
                             min-width: 70px;
