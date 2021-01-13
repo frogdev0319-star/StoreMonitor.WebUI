@@ -70,86 +70,17 @@
             </div>
           </el-col>
           <el-col :span="24" class="event-table">
-            <div class="table">
-              <div class="event-content">
-                <el-table
-                  :data="eventTableData"
-                  :highlight-current-row="true"
-                  :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
-                  :header-cell-class-name="headerClass"
-                  :cell-class-name="cellClass"
-                  :row-class-name="rowClass"
-                  empty-text="无数据"
-                  align="left"
-                  stripe
-                  border
-                  style="width: 100%"
-                  size="mini"
-                  @sort-change="sortChange"
-                >
-                  <el-table-column
-                    v-for="(_item,_index) in eventInfoData"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :sortable="_item.sortable"
-                    :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
-                  <el-table-column
-                    :label="$t('overview.remotePatrol')"
-                    :min-width="lang!=='en'? 120 : 150"
-                    prop="remotePer"
-                    sortable="custom">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper remote">
-                        <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    :label="$t('overview.onsitePatrol')"
-                    :min-width="lang!=='en'? 120 : 150"
-                    prop="onsitePer"
-                    sortable="custom">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper onsite">
-                        <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    :label="$t('overview.storeMonitor')"
-                    :min-width="lang!=='en'? 120 : 150"
-                    prop="videoPer"
-                    sortable="custom">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper video">
-                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <div slot="empty">
-                    <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"/>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
-                        {{ $t('overview.noData') }}
-                      </span>
-                    </div>
-                  </div>
-                </el-table>
-              </div>
-              <div class="toolbar pagination clearfix">
-                <el-pagination
-                  :page-sizes="[10, 20, 50, 100]"
-                  :current-page="page"
-                  :page-size="sizeNum"
-                  :total="total"
-                  background
-                  small
-                  layout="jumper,total, prev, pager, next,sizes"
-                  @size-change="sizeChange"
-                  @current-change="currentChange"/>
-              </div>
-            </div>
+            <table-pagination
+              ref="elTP"
+              :column-data="eventInfoData"
+              :table-data="eventTableData"
+              :total="total"
+              :highlight-current-row= "true"
+              :pagesize="sizeNum"
+              :current-page="page"
+              :is-event = "true"
+              :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+              @handleChange="handleChangeData"/>
           </el-col>
         </el-row>
       </el-col>
@@ -309,6 +240,19 @@
                 </el-table>
               </div>
             </div>
+            <table-pagination
+              ref="elTP"
+              :column-data="eventInfoData"
+              :table-data="eventPDFData"
+              :total="total"
+              :highlight-current-row= "true"
+              :pagesize="sizeNum"
+              :current-page="page"
+              :can-sortable="false"
+              :show-pagination="false"
+              :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"/>
           </el-col>
         </el-row>
       </el-col>
@@ -324,13 +268,15 @@ import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOve
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize'
+import resize from '@/components/mixins/resize';
+import TablePagination from '@/components/TablePagination';
 
 export default {
   name: 'EventStatistics',
   components: {
     'v-chart': ECharts,
-    SearchComponent
+    SearchComponent,
+    TablePagination
   },
   mixins: [resize],
   data() {
@@ -739,7 +685,7 @@ export default {
     async searchData() {
       const self = this;
       self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      console.log(self.params.storeIds)
+      console.log(self.params.storeIds);
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
         self.total = 0;
@@ -1050,30 +996,11 @@ export default {
       self.getEventTableData();
     },
 
-    sizeChange(val) {
-      const self = this;
-      self.sizeNum = val;
-      // self.page=1;
-      self.page = 1;
-      self.params.filter = { page: self.page - 1, size: val };
-      self.getEventTableData();
-    },
-
-    currentChange(val) {
-      const self = this;
-      self.page = val;
-      self.params.filter = { page: val - 1, size: self.sizeNum };
-      self.getEventTableData();
-    },
-
     emitSearch(searchParams, dateRangeList) {
-      console.log(searchParams);
-      console.log(dateRangeList);
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
 
-      console.log(this.params);
       this.daysRangeList = dateRangeList;
       this.searchData();
     },
@@ -1090,7 +1017,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../assets/sass/stastical.scss";
-
   .el-overview-content {
     width: 100%;
     position: relative;

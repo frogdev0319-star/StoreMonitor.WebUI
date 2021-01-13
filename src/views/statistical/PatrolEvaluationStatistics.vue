@@ -74,48 +74,17 @@
             </div>
           </el-col>
           <div class="el-table-panel">
-            <el-table
-              ref="eltable"
-              :data="regionTableData"
-              :highlight-current-row="true"
-              :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
-              :header-cell-class-name="headerClass"
-              :cell-class-name="cellClass"
-              :row-class-name="rowClass"
-              empty-text="无数据"
-              align="left"
-              stripe
-              border
-              style="width: 100%"
-              size="mini"
-              @sort-change="regionSortChange"
-            >
-              <el-table-column
-                v-for="(_item,_index) in regionInfoData"
-                :key="_index"
-                :prop="_item.prop"
-                :label="_item.label"
-                :sortable="_item.sortable"
-                :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
-              <div slot="empty">
-                <div>
-                  <i class="iconfont icon-zhengque empty-data-icon"/>
-                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">{{ $t('overview.noData') }}</span>
-                </div>
-              </div>
-            </el-table>
-          </div>
-          <div class="toolbar pagination clearfix">
-            <el-pagination
-              :page-sizes="[10, 20, 50, 100]"
-              :current-page="pageRegion"
-              :page-size="sizeNumRegion"
+            <table-pagination
+              ref="elTP"
+              :column-data="regionInfoData"
+              :table-data="regionTableData"
               :total="totalRegion"
-              background
-              small
-              layout="jumper,total, prev, pager, next,sizes"
-              @size-change="regionSizeChange"
-              @current-change="regionCurrentChange"/>
+              :highlight-current-row= "true"
+              :pagesize="sizeNumRegion"
+              :current-page="pageRegion"
+              :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+              @handleChange="handleRegionPageAndSizeChange"
+              @sortChange="handleRegionSortChange"/>
           </div>
         </el-col>
 
@@ -141,51 +110,19 @@
           </el-col>
           <el-col :span="24">
             <div class="el-table-panel">
-              <el-table
-                :data="storeTableData"
-                :highlight-current-row="true"
+              <table-pagination
+                ref="elTP"
+                :column-data="storeInfoData"
+                :table-data="storeTableData"
+                :total="totalStore"
+                :highlight-current-row= "true"
+                :pagesize="sizeNumStore"
+                :current-page="pageStore"
                 :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
-                :header-cell-class-name="headerClass"
-                :cell-class-name="cellClass"
-                :row-class-name="rowClass"
-                empty-text="无数据"
-                align="left"
-                stripe
-                border
-                style="width: 100%"
-                size="mini"
-                @sort-change="storeSortChange"
-              >
-                <el-table-column
-                  v-for="(_item,_index) in storeInfoData"
-                  :key="_index"
-                  :prop="_item.prop"
-                  :label="_item.label"
-                  :sortable="_item.sortable"
-                  :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
-                <div slot="empty">
-                  <div>
-                    <i class="iconfont icon-zhengque empty-data-icon"/>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
-                      {{ $t('overview.noData') }}
-                    </span>
-                  </div>
-                </div>
-              </el-table>
+                @handleChange="handleStorePageAndSizeChange"
+                @sortChange="handleStoreSortChange"/>
             </div>
           </el-col>
-          <div class="toolbar pagination clearfix">
-            <el-pagination
-              :page-sizes="[10, 20, 50, 100]"
-              :current-page="pageStore"
-              :page-size="sizeNumStore"
-              :total="totalStore"
-              background
-              small
-              layout="jumper,total, prev, pager, next,sizes"
-              @size-change="storeSizeChange"
-              @current-change="storeCurrentChange"/>
-          </div>
         </el-col>
         <el-dialog
           v-if="ispdf"
@@ -279,38 +216,16 @@
             </div>
           </el-col>
           <div class="el-table-panel">
-            <el-table
-              ref="eltable"
-              :data="regionPDFData"
-              :highlight-current-row="true"
-              :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
-              :header-cell-class-name="headerClass"
-              :cell-class-name="cellClass"
-              :row-class-name="rowClass"
-              empty-text="无数据"
-              align="left"
-              stripe
-              border
-              style="width: 100%"
-              size="mini"
-              @sort-change="regionSortChange"
-            >
-              <el-table-column
-                v-for="(_item,_index) in regionInfoData"
-                :key="_index"
-                :prop="_item.prop"
-                :label="_item.label"
-                :sortable="_item.sortable"
-                :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth"/>
-              <div slot="empty">
-                <div>
-                  <i class="iconfont icon-zhengque empty-data-icon"/>
-                  <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
-                    {{ $t('overview.noData') }}
-                  </span>
-                </div>
-              </div>
-            </el-table>
+            <table-pagination
+              ref="elTP"
+              :column-data="regionInfoData"
+              :table-data="regionPDFData"
+              :highlight-current-row= "true"
+              :show-pagination="false"
+              :is-pdf-column="true"
+              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"/>
           </div>
 
         </el-col>
@@ -326,37 +241,16 @@
           </el-col>
           <el-col :span="24">
             <div class="el-table-panel">
-              <el-table
-                :data="storePDFData"
-                :highlight-current-row="true"
-                :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
-                :header-cell-class-name="headerClass"
-                :cell-class-name="cellClass"
-                :row-class-name="rowClass"
-                empty-text="无数据"
-                align="left"
-                stripe
-                border
-                style="width: 100%"
-                size="mini"
-                @sort-change="storeSortChange"
-              >
-                <el-table-column
-                  v-for="(_item,_index) in storeInfoData"
-                  :key="_index"
-                  :prop="_item.prop"
-                  :label="_item.label"
-                  :sortable="_item.sortable"
-                  :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth"/>
-                <div slot="empty">
-                  <div>
-                    <i class="iconfont icon-zhengque empty-data-icon"/>
-                    <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
-                      {{ $t('overview.noData') }}
-                    </span>
-                  </div>
-                </div>
-              </el-table>
+              <table-pagination
+                ref="elTP"
+                :column-data="storeInfoData"
+                :table-data="storePDFData"
+                :highlight-current-row= "true"
+                :show-pagination="false"
+                :is-pdf-column="true"
+                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+                @handleChange="handlePageAndSizeChange"
+                @sortChange="handleSortChange"/>
             </div>
           </el-col>
 
@@ -376,6 +270,7 @@ import {
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/resize';
+import TablePagination from '../../components/TablePagination';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -383,7 +278,8 @@ export default {
   components: {
     'v-chart': ECharts,
     LimitSelect,
-    SearchComponent
+    SearchComponent,
+    TablePagination
   },
   mixins: [resize],
   data() {
@@ -709,96 +605,6 @@ export default {
       }, 1000);
     },
 
-    regionSortChange(col) {
-      const self = this;
-      const column = col.column;
-      const order = col.order;
-      let prop = '';
-      let tempOrder = '';
-      if (order === 'ascending') {
-        self.regionOrder = {
-          'direction': 'asc',
-          'property': col.column.property === 'qualifiedRatePer' ? 'qualifiedRate' : col.column.property
-        };
-        prop = col.column.property;
-        tempOrder = 'asc';
-      } else if (order === 'descending') {
-        self.regionOrder = {
-          'direction': 'desc',
-          'property': col.column.property === 'qualifiedRatePer' ? 'qualifiedRate' : col.column.property
-        };
-        prop = col.column.property;
-        tempOrder = 'desc';
-      } else {
-        self.regionOrder = { 'direction': 'asc', 'property': 'qualifiedRate' };
-      }
-      self.regionFilter = {
-        page: self.pageRegion - 1,
-        size: self.sizeNumRegion
-      };
-      self.getInspectStatsOverviewOfRegionTable();
-    },
-
-    regionSizeChange(val) {
-      const self = this;
-      self.sizeNumRegion = val;
-      self.pageRegion = 1;
-      self.regionFilter = { page: self.pageRegion - 1, size: val };
-      self.getInspectStatsOverviewOfRegionTable();
-    },
-
-    regionCurrentChange(val) {
-      const self = this;
-      self.pageRegion = val;
-      self.regionFilter = { page: val - 1, size: self.sizeNumRegion };
-      self.getInspectStatsOverviewOfRegionTable();
-    },
-
-    storeSortChange(col) {
-      const self = this;
-      const column = col.column;
-      const order = col.order;
-      let prop = '';
-      let tempOrder = '';
-      if (order === 'ascending') {
-        self.storeOrder = {
-          'direction': 'asc',
-          'property': col.column.property === 'qualifiedRatePer' ? 'qualifiedRate' : col.column.property
-        };
-        prop = col.column.property;
-        tempOrder = 'asc';
-      } else if (order === 'descending') {
-        self.storeOrder = {
-          'direction': 'desc',
-          'property': col.column.property === 'qualifiedRatePer' ? 'qualifiedRate' : col.column.property
-        };
-        prop = col.column.property;
-        tempOrder = 'desc';
-      } else {
-        self.storeOrder = { 'direction': 'asc', 'property': 'qualifiedRate' };
-      }
-      self.storeFilter = {
-        page: self.pageStore - 1,
-        size: self.sizeNumStore
-      };
-      self.getInspectStatsOverviewOfStore();
-    },
-
-    storeSizeChange(val) {
-      const self = this;
-      self.sizeNumStore = val;
-      self.pageStore = 1;
-      self.storeFilter = { page: self.pageStore - 1, size: val };
-      self.getInspectStatsOverviewOfStore();
-    },
-
-    storeCurrentChange(val) {
-      const self = this;
-      self.pageStore = val;
-      self.storeFilter = { page: val - 1, size: self.sizeNumStore };
-      self.getInspectStatsOverviewOfStore();
-    },
-
     notify(msg, type, time) {
       this.$message({
         message: msg,
@@ -837,6 +643,7 @@ export default {
         params.filter = { 'page': 0, 'size': size };
         params.order = self.regionOrder;
         params.storeIds = self.params.storeIds;
+        params.regionMode = 3;
         const regionResult = await that.getInspectStatsOverviewWithRegion(params);
         let curData = [];
         if (regionResult.errCode === 0) {
@@ -1412,6 +1219,40 @@ export default {
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
       this.handleExportReport();
+    },
+
+    handleRegionPageAndSizeChange(pageObj) {
+      console.log(pageObj);
+      const self = this;
+      self.pageRegion = pageObj.page;
+      self.sizeNumRegion = pageObj.size;
+      self.regionFilter = { page: self.pageRegion - 1, size: self.sizeNumRegion };
+      self.getInspectStatsOverviewOfRegionTable();
+    },
+
+    handleRegionSortChange(order) {
+      this.regionOrder = order;
+      this.regionFilter = {
+        page: this.pageRegion - 1,
+        size: this.sizeNumRegion
+      };
+      this.getInspectStatsOverviewOfRegionTable();
+    },
+
+    handleStorePageAndSizeChange(pageObj) {
+      this.sizeNumStore = pageObj.size;
+      this.pageStore = pageObj.page;
+      this.storeFilter = { page: this.pageStore - 1, size: this.sizeNumStore };
+      this.getInspectStatsOverviewOfStore();
+    },
+
+    handleStoreSortChange(order) {
+      this.storeOrder = order;
+      this.storeFilter = {
+        page: this.pageStore - 1,
+        size: this.sizeNumStore
+      };
+      this.getInspectStatsOverviewOfStore();
     }
   }
 };
