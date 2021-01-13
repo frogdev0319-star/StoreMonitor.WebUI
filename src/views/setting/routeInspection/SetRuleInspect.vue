@@ -52,7 +52,7 @@
         </el-checkbox>
       </p>
     </el-col>
-    <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;">
+    <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;" v-if="mode===1">
       <p class="rule-title">{{ $t('insSettingView.isCheckAnnex') }}</p>
       <p class="rule-item">
         <el-checkbox v-model="onSitePhotoOnly">
@@ -81,7 +81,8 @@ export default {
       lang: this.$i18n.locale,
       ScoreMsg: false,
       inspectId: 0,
-      routeName: ''
+      routeName: '',
+      mode:0
     }
   },
   mounted() {
@@ -120,6 +121,7 @@ export default {
       const ruleData = JSON.parse(sessionStorage.getItem('ruleData'));
       self.inspectId = ruleData.inspectId;
       self.routeName = ruleData.routeName;
+      self.mode = ruleData.mode;
       const params = { inspectId: self.inspectId };
       try {
         const res = await self.getInspectRule(params);

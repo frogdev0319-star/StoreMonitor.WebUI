@@ -97,7 +97,7 @@ export default {
       activeName: '0',
       activePatrol: '0',
       isActive: 0,
-      activePatrolId: 0,
+      activePatrolId: null,
       paneLength: 0
     };
   },
@@ -123,7 +123,6 @@ export default {
   methods: {
     changePatrolType(val) {
       let self = this;
-      self.activePatrolId = 0;
       self.getTagList(val);
     },
 

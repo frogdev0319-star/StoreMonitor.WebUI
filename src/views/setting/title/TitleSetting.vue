@@ -746,11 +746,12 @@ export default {
   $black:#182752;
 
   .setting-container{
-    height: calc(100vh - 80px - 45px - calc(60/1920*100vw));
+    height: calc(100vh - 40px - calc(60/1920*100vw));
     display: flex;
     flex-direction: column;
     border: 1px solid $border;
     background-color: #fff;
+    padding-bottom: 20px;
     .basic-info{
       .title{
         height: 70px;

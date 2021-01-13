@@ -472,8 +472,8 @@ export default {
     'setMinScore': '最低',
     'setMaxScore': '最高',
     'isCheckSuggest': '巡检建议值',
-    'isCheckAnnex':'巡检附件上传',//Sprint14
-    'AllowPhotos':'仅允许现场拍照（图片/视频）',//Sprint14
+    'isCheckAnnex':'巡检附件上传',
+    'AllowPhotos':'仅允许现场拍照（图片/视频）',
     'patrolSuggest': '中存在不合格项时，巡检结果为：立即督导',
     'PSCrule1': '与其他tab组合时，',
     'PSCrule2': '项目分值参与考评总分运算',

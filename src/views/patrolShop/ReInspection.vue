@@ -442,15 +442,7 @@
                   <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
                 </div>
               </div>
-              <div v-else-if="showFeedBackInfo" class="item-content" style="height:299.84px;">
-                <div id="feedback-content">
-                  <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
-                  <span class="feedback-info">{{ $t('remotePatrol.methodII') }}</span>
-                </div>
-                <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70">
-                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
-              </div>
-              <div v-else class="item-content" style="height:299.84px;">
+              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content" style="height:299.84px;">
                 <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                   <div class="feedbacks-content">
                     <div v-for="(item,index) in eventList" :key="index" class="feedbacks-details">
@@ -476,6 +468,14 @@
                 <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
               </div>
             </el-scrollbar>
+            <div v-if="showFeedBackInfo&&showFeedBack" class="item-content" style="height:299.84px;">
+              <div id="feedback-content">
+                <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
+                <span class="feedback-info">{{ $t('remotePatrol.methodII') }}</span>
+              </div>
+              <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70">
+              <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
+            </div>
           </el-col>
         </el-row>
         <el-row v-if="showIgnoreItem" class="inspect-content" style="padding-left: calc(15/1920*100vw);">
@@ -622,7 +622,8 @@
               <i class="el-icon-arrow-down el-icon--right"/>
             </span>
             <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-              <el-dropdown-item v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
+              <el-dropdown-item v-if="PatrolList.length===0">{{$t('insSettingView.noData')}}</el-dropdown-item>
+              <el-dropdown-item v-else v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -3592,7 +3593,7 @@ export default {
     },
     itemDescriptionChanged(val, item) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.comment(val, 200);
       console.log(content);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
@@ -3604,7 +3605,7 @@ export default {
     },
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.all(val, 50);
+      const content = filterString.comment(val, 50);
       console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
@@ -3617,7 +3618,7 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.comment(val, 200);
       console.log(content);
       self.eventDes = content;
       const length = filterString.getContentLength(val);

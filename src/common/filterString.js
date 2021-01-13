@@ -40,6 +40,10 @@ export default {
     return (count != null) ? this.lengthFilter(emojiContent, count) : emojiContent;
   },
 
+  comment(content, count) {
+    return (count != null) ? this.lengthFilter(content, count) : content;
+  },
+
   getContentLength(content) {
     const length = content.replace(/[^\x00-\xff]/g, '**').length;
     return length;
