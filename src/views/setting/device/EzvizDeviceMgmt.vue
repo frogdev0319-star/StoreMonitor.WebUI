@@ -304,7 +304,7 @@
                           :label="numList.label"
                           :value="numList.value"
                           :disabled="numList.disabled"
-                        />channelNumList
+                        />
                       </el-select>
                       <el-select v-else v-model="addDeviceData.channelCount" size="mini">
                         <el-option

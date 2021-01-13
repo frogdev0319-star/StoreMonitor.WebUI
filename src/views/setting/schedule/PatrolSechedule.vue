@@ -123,6 +123,7 @@ export default {
   methods: {
     changePatrolType(val) {
       let self = this;
+      self.activePatrolId = null;
       self.getTagList(val);
     },
 

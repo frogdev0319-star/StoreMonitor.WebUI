@@ -2094,16 +2094,23 @@ export default {
         const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
         const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
         const hasIgnoretemp = [];
+        let count = 0, manualCount = 0;
         sheetName.forEach(s_item => {
+          count += s_item.count;
           s_item.inspectList.forEach(item => {
             item.items.forEach((_item, _index) => {
+              _item.manualIgnore ? manualCount++ : null;
               if (_item.inputCount == 0 && !_item.manualIgnore) {
                 hasIgnoretemp.push(_item);
               }
             });
           });
         });
-        hasIgnoretemp.length == 0 ? self.notShowAlert = true : null;
+        if (count !== manualCount) {
+          hasIgnoretemp.length == 0 ? self.notShowAlert = true : null;
+        }else{
+          self.notShowAlert = false;
+        }
         self.isDisabled = sheetName.some(item => item.Effective !== 0);
         self.isDisabled ? self.isShowWarn = true : self.isShowWarn = false;
       }
@@ -2115,6 +2122,7 @@ export default {
         self.hasIgnoretemp[self.curItemIndex].dealCount != 0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
       } else {
         self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
+        self.notShowAlert ? self.notShowAlert = false : null;
       }
     },
     cancelIgnoreInspect(val) {
@@ -2130,26 +2138,17 @@ export default {
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
       if (e == 0) {
-        let count = 0, manualCount = 1;
-        sheetName.forEach(s_item => {
-          count += s_item.count;
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              _item.manualIgnore ? manualCount++ : null;
-            });
-          });
-        });
-        if (count == manualCount) {
-          self.allIgnoreObj.dialogCosed = true;
-          return false;
-        }
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
       }else{
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
+      if(self.isEzviz && self.$refs.ezvizVideo !== undefined){
+        self.$refs.ezvizVideo.editCount++;
+      }else{
+        self.editCount++;
+      }
       self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId == -1) {
@@ -3173,7 +3172,6 @@ export default {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
       // }
-
       if ((!self.isEzviz && self.editCount != 0) ||
         (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
         (self.$store.getters.PatrolHistory != null)) {

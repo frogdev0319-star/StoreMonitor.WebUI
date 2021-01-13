@@ -475,9 +475,9 @@ export default {
             objItem.ts = new Date().getTime();
             objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
             if (inspect[i].type === 0 || inspect[i].type === 2) {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
             } else {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
             }
 
             objItem.storeId = self.store.storeId;
