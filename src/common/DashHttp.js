@@ -12,8 +12,6 @@ export default class DashHttp {
 
   static async putDash(url, data) {
     const httpUrl = this.DASH_HOST + url;
-    console.log(this.DASH_HOST);
-    console.log(httpUrl);
     const dashAxios = axios.create({
       baseURL: httpUrl,
       timeout: 30 * 1000
@@ -28,8 +26,6 @@ export default class DashHttp {
         data
       });
       this.awaitResult = response.data.result;
-      console.log(response.data.result);
-      console.log(this.awaitResult);
       return !response.data.result.ErrorCode;
     } catch (error) {
       this.awaitResult = null;
