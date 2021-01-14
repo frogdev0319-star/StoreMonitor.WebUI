@@ -672,6 +672,7 @@ import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
 import { getDashServerInfo } from '@/api/device.js';
 import DashHttp from '@/common/DashHttp.js';
+import Database from '@/common/Database.js';
 
 export default {
   name: 'ReInspection',
@@ -2144,7 +2145,7 @@ export default {
         }
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
-      }else{
+      } else {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
@@ -2337,7 +2338,7 @@ export default {
       const self = this;
       self.leaveObj.dialogCosed = false;
     },
-    noAllInspectDialog() {
+    async noAllInspectDialog() {
       const self = this;
       self.noAllInspectObj.dialogCosed = false;
       const temp = [];
@@ -2423,7 +2424,8 @@ export default {
         curItemIndex: self.curItemIndex
       };
       self.hasIgnoretemp = [];
-      const params = { data: obj, rule: inspectSettings };
+      const params = { _id: self.userId, data: obj, rule: inspectSettings };
+      await Database.addDataToDB(self.userId, params);
       self.$router.push({ name: 'confirmSum', params: params });
     },
     canceldNoAllInspect() {
@@ -2541,9 +2543,11 @@ export default {
         curItemIndex: self.curItemIndex
       };
       self.hasIgnoretemp = [];
-      const params = { data: obj, rule: inspectSettings };
+      const params = { _id: self.userId, data: obj, rule: inspectSettings };
+      await Database.addDataToDB(self.userId, params);
       self.$router.push({ name: 'confirmSum', params: params });
     },
+
     spreadContent() {
       const self = this;
       self.showSpread = true;
