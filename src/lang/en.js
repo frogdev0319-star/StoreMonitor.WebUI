@@ -466,8 +466,8 @@ export default {
     'setMinScore': 'lowest',
     'setMaxScore': 'highest',
     'isCheckSuggest': 'Recommended value for inspection',
-    'isCheckAnnex':'Upload inspection attachment',//Sprint14
-    'AllowPhotos':'Live photos only (picture / video)',//Sprint14
+    'isCheckAnnex':'Inspection attachments',
+    'AllowPhotos':'Supporting live photos only (picture / video)',
     'PSCrule1': 'When combined with other tabs, the ',
     'PSCrule2': ' project score will participate in the evaluation of the total score calculation',
     'PSCrule3': 'Calculate the score of ignored items in',

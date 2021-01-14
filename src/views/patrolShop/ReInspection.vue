@@ -442,15 +442,7 @@
                   <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
                 </div>
               </div>
-              <div v-else-if="showFeedBackInfo" class="item-content" style="height:299.84px;">
-                <div id="feedback-content">
-                  <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
-                  <span class="feedback-info">{{ $t('remotePatrol.methodII') }}</span>
-                </div>
-                <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70">
-                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
-              </div>
-              <div v-else class="item-content" style="height:299.84px;">
+              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content" style="height:299.84px;">
                 <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                   <div class="feedbacks-content">
                     <div v-for="(item,index) in eventList" :key="index" class="feedbacks-details">
@@ -476,6 +468,14 @@
                 <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
               </div>
             </el-scrollbar>
+            <div v-if="showFeedBackInfo&&showFeedBack" class="item-content" style="height:299.84px;">
+              <div id="feedback-content">
+                <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
+                <span class="feedback-info">{{ $t('remotePatrol.methodII') }}</span>
+              </div>
+              <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70">
+              <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
+            </div>
           </el-col>
         </el-row>
         <el-row v-if="showIgnoreItem" class="inspect-content" style="padding-left: calc(15/1920*100vw);">
@@ -622,7 +622,8 @@
               <i class="el-icon-arrow-down el-icon--right"/>
             </span>
             <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-              <el-dropdown-item v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
+              <el-dropdown-item v-if="PatrolList.length===0">{{$t('insSettingView.noData')}}</el-dropdown-item>
+              <el-dropdown-item v-else v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -2094,16 +2095,23 @@ export default {
         const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
         const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
         const hasIgnoretemp = [];
+        let count = 0, manualCount = 0;
         sheetName.forEach(s_item => {
+          count += s_item.count;
           s_item.inspectList.forEach(item => {
             item.items.forEach((_item, _index) => {
+              _item.manualIgnore ? manualCount++ : null;
               if (_item.inputCount == 0 && !_item.manualIgnore) {
                 hasIgnoretemp.push(_item);
               }
             });
           });
         });
-        hasIgnoretemp.length == 0 ? self.notShowAlert = true : null;
+        if (count !== manualCount) {
+          hasIgnoretemp.length == 0 ? self.notShowAlert = true : null;
+        }else{
+          self.notShowAlert = false;
+        }
         self.isDisabled = sheetName.some(item => item.Effective !== 0);
         self.isDisabled ? self.isShowWarn = true : self.isShowWarn = false;
       }
@@ -2115,6 +2123,7 @@ export default {
         self.hasIgnoretemp[self.curItemIndex].dealCount != 0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
       } else {
         self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
+        self.notShowAlert ? self.notShowAlert = false : null;
       }
     },
     cancelIgnoreInspect(val) {
@@ -2130,26 +2139,17 @@ export default {
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
       if (e == 0) {
-        let count = 0, manualCount = 1;
-        sheetName.forEach(s_item => {
-          count += s_item.count;
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              _item.manualIgnore ? manualCount++ : null;
-            });
-          });
-        });
-        if (count == manualCount) {
-          self.allIgnoreObj.dialogCosed = true;
-          return false;
-        }
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
       } else {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
+      if(self.isEzviz && self.$refs.ezvizVideo !== undefined){
+        self.$refs.ezvizVideo.editCount++;
+      }else{
+        self.editCount++;
+      }
       self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId == -1) {
@@ -3176,7 +3176,6 @@ export default {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
       // }
-
       if ((!self.isEzviz && self.editCount != 0) ||
         (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
         (self.$store.getters.PatrolHistory != null)) {
@@ -3596,7 +3595,7 @@ export default {
     },
     itemDescriptionChanged(val, item) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.comment(val, 200);
       console.log(content);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
@@ -3608,7 +3607,7 @@ export default {
     },
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.all(val, 50);
+      const content = filterString.comment(val, 50);
       console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
@@ -3621,7 +3620,7 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.comment(val, 200);
       console.log(content);
       self.eventDes = content;
       const length = filterString.getContentLength(val);

@@ -648,7 +648,7 @@ export default {
 
     setRule() {
       const self = this;
-      const params = { inspectId: self.routeData[0].inspectId, routeName: self.routeName };
+      const params = { inspectId: self.routeData[0].inspectId, routeName: self.routeName, mode: self.routeData[0].mode};
       sessionStorage.setItem('ruleData', JSON.stringify(params));
       self.$router.push({ name: 'setRule', params: params });
     },

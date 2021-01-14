@@ -1090,7 +1090,10 @@ export default {
 
     async getStoreByCity(data) {
       let self = this;
-      let bindStore = await self.getBindStore();
+      let bindStore = [];
+      if (self.isActivePatrol !== 'noInspect'){
+        bindStore = await self.getBindStore();
+      }
       let bindStoreId = await self.getBindStoreList();
       self.storeCount = bindStoreId.length;
       let cityList = [];
@@ -1127,7 +1130,7 @@ export default {
         let _tempDisCount = 0;
         item.store.forEach(_item => {
           let _obj = {};
-          if (bindStore.data.indexOf(_item.storeId) === -1) {
+          if (self.isActivePatrol !== 'noInspect' && bindStore.data.indexOf(_item.storeId) === -1) {
             _obj.disabled = true;
             _tempDisCount++;
           }
