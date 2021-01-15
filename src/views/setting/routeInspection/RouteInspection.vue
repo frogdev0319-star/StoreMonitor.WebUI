@@ -1200,10 +1200,10 @@ export default {
             sheet1 = XLSX.utils.sheet_to_json(wb.Sheets['Pass&Fail']);
             sheet1.forEach((_item, _index) => {
               const obj = {};
-              obj.a = _item.__EMPTY;
-              obj.b = _item.__EMPTY_1;
+              obj.a = _item.__EMPTY!==undefined ? _item.__EMPTY.trim() : _item.__EMPTY;
+              obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3;
+              obj.d = _item.__EMPTY_3!==undefined ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
               temp_sheet1.push(obj);
             });
             outdata.PassFail = temp_sheet1;
@@ -1213,12 +1213,12 @@ export default {
             sheet2 = XLSX.utils.sheet_to_json(wb.Sheets['Score']);
             sheet2.forEach((_item, _index) => {
               const obj = {};
-              obj.a = _item.__EMPTY;
-              obj.b = _item.__EMPTY_1;
+              obj.a = _item.__EMPTY!==undefined ? _item.__EMPTY.trim() : _item.__EMPTY;
+              obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
               obj.d = _item.__EMPTY_3;
-              obj.e = _item.__EMPTY_4;
-              obj.f = _item.__EMPTY_5;
+              obj.e = _item.__EMPTY_4!==undefined ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
+              obj.f = _item.__EMPTY_5!==undefined ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
               temp_sheet2.push(obj);
             });
             outdata.Score = temp_sheet2;
@@ -1228,15 +1228,14 @@ export default {
             sheet3 = XLSX.utils.sheet_to_json(wb.Sheets['Others']);
             sheet3.forEach((_item, _index) => {
               const obj = {};
-              obj.a = _item.__EMPTY;
-              obj.b = _item.__EMPTY_1;
+              obj.a = _item.__EMPTY!==undefined ? _item.__EMPTY.trim() : _item.__EMPTY;
+              obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3;
+              obj.d = _item.__EMPTY_3!==undefined ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
               temp_sheet3.push(obj);
             });
             outdata.Others = temp_sheet3;
           }
-
           let indexArryPassFail = [], indexArryScore = [], indexArryOthers = [];
           let flaggroupLengthPassFail = false, flaggroupLengthScore = false, flaggroupLengthOthers = false;
           let flagItemNamePassFail = false, flagItemNameScore = false, flagItemNameOthers = false;
