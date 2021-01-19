@@ -269,7 +269,7 @@ import {
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import TablePagination from '../../components/TablePagination';
 
 export default {

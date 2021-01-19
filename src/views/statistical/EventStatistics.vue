@@ -268,7 +268,7 @@ import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOve
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 
 export default {

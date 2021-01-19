@@ -200,7 +200,7 @@ import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
 import util from '../../common/util.js';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 
 import {
   getInspectStatsItemOverviewV2

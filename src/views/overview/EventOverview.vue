@@ -155,7 +155,7 @@ import util from '../../common/util.js';
 import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 
 export default {
   name: 'ExceptEvent',

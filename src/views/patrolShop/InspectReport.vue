@@ -314,7 +314,7 @@ import { getInspectReportInfo, getInspectReportDetail } from '../../api/inspect'
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 
 export default {
   name: 'InspectReport',

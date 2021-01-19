@@ -274,7 +274,7 @@ import {
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
 import { mapGetters } from 'vuex';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 
 export default {
   name: 'ExceptEvent',
