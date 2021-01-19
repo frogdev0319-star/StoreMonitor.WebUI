@@ -89,7 +89,7 @@
                     :label="_item.label"
                     :sortable="_item.sortable"
                     :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
-                  <el-table-column :label="$t('overview.detail')" :width="lang!=='en'? 100: 120" type="expand">
+                  <el-table-column :label="$t('overview.detail')" :width="lang!=='en'? 100: 130" type="expand">
                     <template slot-scope="props">
                       <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="patrolPlan">

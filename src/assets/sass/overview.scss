@@ -886,8 +886,8 @@ $ignored: #cad1db;
       }
       .store-events{
         height: auto;
-        @media screen and (max-width: 1536px){
-          width: 55%;
+        @media screen and (max-width: 1680px){
+          width: 51%;
         }
         .region-result{
           border-top: 1px solid $border;
@@ -972,8 +972,8 @@ $ignored: #cad1db;
 
       }
       .source-list{
-        @media screen and (max-width: 1536px){
-          width: 28%;
+        @media screen and (max-width: 1680px){
+          width: 32%;
         }
         .pct-content{
           height: 330px;
@@ -1049,7 +1049,7 @@ $ignored: #cad1db;
               @media screen and (max-width: 1920px){
                 padding: 0 calc(5/1920*100vw);
               }
-              @media screen and (max-width: 1660px){
+              @media screen and (max-width: 1785px){
                 padding: 0 calc(1/1920*100vw);
               }
             }

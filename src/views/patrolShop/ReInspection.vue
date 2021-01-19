@@ -4974,10 +4974,13 @@ export default {
                 .patrol-content{
                     padding: 0 30px;
                     .patrol-title{
-                        font-size:14px;
-                        color:#182752;
-                        font-weight: bold;
-                        margin:30px 0 20px 0;
+                      font-size:14px;
+                      color:#182752;
+                      font-weight: bold;
+                      margin:30px 0 20px 0;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
                     }
                 }
             }
