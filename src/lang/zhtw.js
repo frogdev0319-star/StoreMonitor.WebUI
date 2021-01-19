@@ -59,7 +59,14 @@ export default {
     'networkError': '網絡異常，請檢查網絡連接狀況！',
     'serverException': '服務器異常，請刷新後重試！',
     'noAuthority': '無操作權限！',
-    'loginAbnormal': '登錄信息異常，請重新登錄！'
+    'loginAbnormal': '登錄信息異常，請重新登錄！',
+    'dashDevice': 'Dash設備',
+    'ezvizDevice': '螢石設備',
+    'beseyeDevice': 'Beseye設備',
+    'dashDeviceMgt': '设备管理（Dash設備）',
+    'ezvizDeviceMgt': '设备管理（萤石設備）',
+    'beseyeDeviceMgt': '设备管理（Beseye設備）',
+    'deviceSetting': '設備配置'
   },
 
   'overview': {

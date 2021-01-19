@@ -59,7 +59,14 @@ export default {
     'networkError': '网络异常，请检查网络连接状况！',
     'serverException': '服务器异常，请刷新后重试！',
     'noAuthority': '无操作权限！',
-    'loginAbnormal': '登录信息异常，请重新登录！'
+    'loginAbnormal': '登录信息异常，请重新登录！',
+    'dashDevice': 'Dash设备',
+    'ezvizDevice': '萤石设备',
+    'beseyeDevice': 'Beseye设备',
+    'dashDeviceMgt': '设备管理（Dash设备）',
+    'ezvizDeviceMgt': '设备管理（萤石设备）',
+    'beseyeDeviceMgt': '设备管理（Beseye）',
+    'deviceSetting': '设备配置'
   },
 
   'overview': {

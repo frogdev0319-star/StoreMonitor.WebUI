@@ -58,7 +58,14 @@ export default {
     'networkError': 'Network error, please check network connection status!',
     'serverException': 'Server exception, please refresh and try again!',
     'noAuthority': 'No authority!',
-    'loginAbnormal': 'The login information is abnormal, please sign in again!'
+    'loginAbnormal': 'The login information is abnormal, please sign in again!',
+    'dashDevice': 'Dash',
+    'ezvizDevice': 'Ezviz',
+    'beseyeDevice': 'Beseye',
+    'dashDeviceMgt': 'Device Management (Dash)',
+    'ezvizDeviceMgt': 'Device Management (Ezviz)',
+    'beseyeDeviceMgt': 'Device Management (Beseye)',
+    'deviceSetting': 'Device Settings'
   },
 
   'overview': {
