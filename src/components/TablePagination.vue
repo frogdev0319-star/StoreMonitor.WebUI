@@ -8,6 +8,7 @@
       :header-cell-class-name="headerClass"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
+      :cell-style="ifSetCellStyle && setCellStyle"
       empty-text="无数据"
       align="left"
       stripe
@@ -24,6 +25,25 @@
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
         :min-width="lang !== 'en' ? _item.width : _item.maxWidth"/>
+      <el-table-column
+        v-if="tableOperation.label"
+        :min-width="tableOperation.minWidth"
+        :label="tableOperation.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <i
+            v-for="(item,index) in tableOperation.operation"
+            :key="index"
+            :type="item.type"
+            :class="item.icon"
+            class="iconfont"
+            size="mini"
+            @click="handleOperationButton(item.methods, scope.row, scope.$index)">
+            {{ item.label }}
+          </i>
+        </template>
+      </el-table-column>
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
@@ -49,7 +69,7 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.storeMonitor')"
-          :min-width="lang!=='en'? 120 : 150"
+          :min-width="lang !== 'en' ? 120 : 150"
           prop="videoPer"
           sortable="custom">
           <template slot-scope="scope">
@@ -59,6 +79,12 @@
           </template>
         </el-table-column>
       </template>
+      <div slot="empty">
+        <div>
+          <i class="iconfont icon-zhengque empty-data-icon"/>
+          <span :style="{'margin-left':'20px','font-size':'16px','color':'#=7d8cad'}">{{ noData }}</span>
+        </div>
+      </div>
     </el-table>
     <div v-if="showPagination" class="toolbar pagination clearfix">
       <el-pagination
@@ -106,7 +132,8 @@ export default {
     },
     defaultSort: {
       type: Object,
-      required: true
+      required: false,
+      default: () => {}
     },
     layout: {
       type: String,
@@ -127,20 +154,51 @@ export default {
     isEvent: {
       type: Boolean,
       default: false
+    },
+    tableOperation: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    headerClass: {
+      type: String,
+      default: 'header-class'
+    },
+    cellClass: {
+      type: String,
+      default: 'cell-class'
+    },
+    rowClass: {
+      type: String,
+      default: 'row-class'
+    },
+    ifSetCellStyle: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       currentRow: {},
-      headerClass: 'header-class',
-      cellClass: 'cell-class',
-      rowClass: 'row-class',
       lang: this.$i18n.locale,
-      order: {}
+      order: {},
+      noData: this.$t('deviceView.noData')
     };
   },
 
   methods: {
+    setCellStyle({ row, column, rowIndex, columnIndex }) {
+      console.log(row);
+      let obj = {};
+      if (columnIndex === 0) {
+        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      } else {
+        obj = { 'border-right': '1px solid #e3e9f4' };
+      }
+      return obj;
+    },
+
     rowClick(row) {
       this.currentRow = row;
     },
@@ -190,6 +248,10 @@ export default {
       }
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
       console.log(this.order);
+    },
+
+    handleOperationButton(methods, row, index) {
+      this.$emit('handleOperation', { method: methods, row: row, index: index });
     }
   }
 };
@@ -210,9 +272,24 @@ export default {
     margin-right: 0;
     height:13%;
   }
+  .iconfont{
+    cursor: pointer;
+    margin-right: 20px;
+    font-size: calc(24/1920*100vw);
+    color: #7d8cad;
+  }
+  .el-table--mini{
+    font-size: 14px;
+  }
 </style>
 
 <style>
   @import "../assets/css/pagination.css";
+  .account-header{
+    font-size: 14px;
+    color: #7d8cad;
+    height: 47px;
+    border: none;
+  }
 </style>
 
