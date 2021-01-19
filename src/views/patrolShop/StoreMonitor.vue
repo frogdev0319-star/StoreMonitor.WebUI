@@ -30,82 +30,6 @@
         </el-button>
       </div>
       <el-dialog
-        v-if="showSnapShotDialog"
-        :title="$t('remotePatrol.edit')"
-        :visible.sync="showSnapShotDialog"
-        :close-on-click-modal="false"
-        :width="860 * percentHeight + 'px'"
-        height="300px"
-        top="5%"
-      >
-        <div
-          class="canvas-content"
-          @mouseenter="showCancel"
-          @mouseleave="hiddenCancel"
-        >
-          <hr class="dialog-hr" >
-          <transition name="fade">
-            <div v-if="showPenBtn" id="iconR" class="icon-right">
-              <img :src="penBtnSrc" class="pen-btn" @click="showPenList" >
-              <transition name="fadepen">
-                <div v-if="showPen" class="pen-content">
-                  <div
-                    v-for="(item, index) in penList"
-                    :key="index"
-                    class="content"
-                  >
-                    <div :class="{ colorActive: item.showContent }" />
-                    <div
-                      :id="item.id"
-                      class="color"
-                      @click="checkPen(item, index)"
-                    />
-                  </div>
-                </div>
-              </transition>
-            </div>
-          </transition>
-          <canvas
-            id="icanvas"
-            :width="767 * percentHeight"
-            :height="431 * percentHeight"
-            @mousedown="mouseDownAction($event)"
-            @mousemove="mouseMoveAction($event)"
-            @mouseleave="mouseLeaveAction($event)"
-            @mouseup="mouseUpAction($event)"
-          />
-          <div
-            v-if="showCancelContent"
-            :style="{
-              width: 767 * percentHeight + 'px',
-              'margin-left': 47 * percentHeight + 'px',
-            }"
-            class="cancel-content"
-          >
-            <div class="content" @click="cancleEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px" >
-              <span>{{ $t("remotePatrol.clear") }}</span>
-            </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px" >
-              <span>{{ $t("remotePatrol.cancel") }}</span>
-            </div>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="cancelEdit">{{
-            $t("remotePatrol.cancel")}}</el-button>
-          <el-button
-            id="confirmBtn"
-            size="mini"
-            type="primary"
-            @click="confirmEdit"
-          >
-            {{ $t("remotePatrol.confirm") }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
         v-if="showOuter"
         :title="$t('remotePatrol.view')"
         :visible.sync="showOuter"
@@ -166,140 +90,35 @@
         @canceled="cancelVideoLoading"
       >>
       </dialog-vue>
-
-      <div v-if="!isEzviz">
-        <div id="videoContent" class="video-content" v-loading="isLoading"
-             element-loading-background="rgba(0, 0, 0, 0.8)">
-          <div v-if="showModelContent" class="video-model">
-            <span v-if="showControlInfo" id="channelName">
-              {{channel.channelName}}</span>
-            <div v-if="showControlInfo" class="icon-footer">
-              <div v-if="showStoreUp" class="iconlside">
-                <i class="iconfont iconplay" :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"
-                  @click="onPlay"
-                />
-              </div>
-              <div class="iconrside">
-                <div v-if="playBackState" class="speed-content">
-                  <span>{{ $t("remotePatrol.speed") }}</span>
-                  <el-select
-                    v-show="!fullScreen"
-                    v-model="curSpeed"
-                    :popper-class="popperClass"
-                    class="el-test"
-                    size="mini"
-                    @change="adjustSpeed"
-                  >
-                    <el-option
-                      v-for="item in speedList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                  <el-select
-                    v-show="fullScreen"
-                    v-model="curSpeed"
-                    :popper-class="popperClass"
-                    :popper-append-to-body="false"
-                    class="el-test"
-                    size="mini"
-                    @change="adjustSpeed"
-                  >
-                    <el-option
-                      v-for="item in speedList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                  <span>{{ $t("remotePatrol.back") }}</span>
-                  <el-select
-                    v-show="!fullScreen"
-                    :value="curBack"
-                    :popper-class="popperClass"
-                    class="el-test"
-                    size="mini"
-                    placeholder=" "
-                  >
-                    <el-option
-                      v-for="item in backList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                      @click.native="adjustProcess(item.value, item.label)"
-                    />
-                  </el-select>
-                  <el-select
-                    v-show="fullScreen"
-                    :value="curBack"
-                    :popper-class="popperClass"
-                    :popper-append-to-body="false"
-                    class="el-test"
-                    size="mini"
-                    placeholder=" "
-                  >
-                    <el-option
-                      v-for="item in backList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                      @click.native="adjustProcess(item.value, item.label)"
-                    />
-                  </el-select>
-                </div>
-                <div v-if="showStoreUp" class="screen-content">
-                  <i :class="fullScreen ? 'icon-tuichuquanping' : 'icon-quanping'" class="iconfont iconscreen"
-                    @click="controlScreen"
-                  />
-                </div>
-              </div>
-            </div>
-            <div v-if="playBackState" class="progress-content">
-              <b-progress
-                id="bprogress"
-                :value="currentTimeValue"
-                :max="durationTimeValue"
-                class="mb-3 el-prog"
-                height="0.2rem"
-                style="margin-bottom: 0px !important"
-              />
-            </div>
-
-            <div v-if="showCutContent" :class="lang === 'en' ? 'en-iconright' : 'iconright'">
-              <div class="paizhao-content" @click="cutPicture">
-                <i
-                  class="iconfont icon-xiangji iconpaizhao"
-                  style="font-size: 18px"
-                />
-                <span>{{ $t("remotePatrol.snapshot") }}</span>
-              </div>
-            </div>
-          </div>
-          <div v-else class="errorVideo-model">
-            <span>{{ errorText }}</span>
-          </div>
-          <video
-            id="previewVideo"
-            :controls="showControls"
-            height="83%"
-            width="90%"
-            prload
-            autoplay
-            class="video-js vjs-fill"
-            @waiting="onPlayerWaiting($event)"
-            @playing="onPlayerPlaying($event)"
-          />
-        </div>
-      </div>
+      <dash-video
+        v-if="videoPlatform === 0"
+        ref="dashVideo"
+        :store-id="store.storeId"
+        :channel-info="channel"
+        :is-history="playBackState"
+        :source-list-length="sourceList.length"
+        @confirmEzvizCanvas="editEzvizCanvas"
+      />
       <ezviz-video
-        v-else
+        v-else-if="videoPlatform === 1"
         ref="ezvizVideo"
         :store-id="store.storeId"
         :channel-info="channel"
         :source-list-length="sourceList.length"
         :is-store-monitor="true"
         :play-back="playBackState"
+        :cur-time="playBackTime"
+        @confirmEzvizCanvas="editEzvizCanvas"
+      />
+      <beseye-video
+        v-else
+        ref="beseyeVideo"
+        :store-id="store.storeId"
+        :channel-info="channel"
+        :source-list-length= "sourceList.length"
+        :is-store-monitor="true"
+        :play-back="playBackState"
+        :is-event="false"
         :cur-time="playBackTime"
         @confirmEzvizCanvas="editEzvizCanvas"
       />
@@ -330,7 +149,7 @@
               />
               <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{
-                $t("remotePatrol.emptyTitle")}}</span>
+              $t("remotePatrol.emptyTitle") }}</span>
               <span v-if="!corEvent" class="event-title">{{ $t("remotePatrol.description") }}</span>
               <span v-else class="event-title"><span class="is-required">* </span>{{ $t("remotePatrol.description") }}</span>
               <el-input
@@ -589,8 +408,10 @@ import filterString from '@/common/filterString.js';
 import { getCookie } from '@/common/auth';
 import { setTimeout } from 'timers';
 import EzvizVideo from '@/components/EzvizVideo.vue';
-import DashHttp from "../../common/DashHttp";
+import DashHttp from '../../common/DashHttp';
 import { getDashServerInfo } from '@/api/device.js';
+import BeseyeVideo from '@/components/BeseyeVideo.vue';
+import DashVideo from '@/components/DashVideo';
 
 export default {
   name: 'StoreMoinitor',
@@ -598,7 +419,9 @@ export default {
   components: {
     ChannelIconBtn,
     DialogVue,
-    EzvizVideo
+    EzvizVideo,
+    BeseyeVideo,
+    DashVideo
   },
 
   data() {
@@ -679,7 +502,6 @@ export default {
           label: '60s'
         }
       ],
-      fullScreen: false,
       curBack: '',
       showControls: false,
       showSpread: false,
@@ -699,24 +521,6 @@ export default {
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       checkImgSrc: '',
       showOuter: false,
-      showPenBtn: false,
-      penList: [
-        {
-          id: 'white',
-          showContent: false
-        },
-        {
-          id: 'red',
-          showContent: true
-        },
-        {
-          id: 'yellow',
-          showContent: false
-        }
-      ],
-      penChecked: 'red',
-      showPen: false,
-      showModel: true,
       X: 0,
       Y: 0,
       X1: 0,
@@ -750,7 +554,6 @@ export default {
 
       startTs: 0,
       protocal: 'DASH',
-      sessionId: '',
       channel: {},
       isPlayingFlag: -1,
       evBtns: [
@@ -880,15 +683,21 @@ export default {
     },
 
     isEzviz() {
-      let self = this;
+      const self = this;
       return self.$store.state.user.isEzviz;
+    },
+
+    videoPlatform() {
+      const self = this;
+      console.log(self.$store.state.user);
+      return self.$store.state.user.videoPlatform;
     }
 
   },
 
   watch: {
     accountChanged(val) {
-      let self = this;
+      const self = this;
       if (val !== 0) {
         self.changeBrand();
         window.setTimeout(function() {
@@ -898,7 +707,7 @@ export default {
     },
 
     realTimeSpeed(val) {
-      let self = this;
+      const self = this;
       if (val >= 300) {
         self.stopVideoPlay();
         self.stopTimer();
@@ -918,14 +727,14 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    let self = this;
+    const self = this;
     window.clearInterval(self.timeid);
     window.clearInterval(self.timerPlayReal);
     self.isPlayingFlag = -1;
     self.timerPlayReal = null;
     self.timeid = null;
     if (!self.isEzviz) {
-      self.stopVideoPlay();
+      // self.stopVideoPlay();
     } else {
       self.$refs.ezvizVideo.stopRealTime();
     }
@@ -941,7 +750,7 @@ export default {
   },
 
   async mounted() {
-    let self = this;
+    const self = this;
     self.isREC = false;
     document.addEventListener('mouseup', self.mouseUpAction, false);
     self.myDivHeight();
@@ -953,7 +762,7 @@ export default {
     window.onresize = function() {
       if (!self.checkFull()) {
         self.fullScreen = false;
-        let ele = document.getElementById('videoContent');
+        const ele = document.getElementById('videoContent');
         ele.style.width = 'auto';
         ele.style.height = 'auto';
       }
@@ -962,7 +771,7 @@ export default {
   },
 
   beforeDestroy() {
-    let self = this;
+    const self = this;
     document.removeEventListener('mouseup', self.mouseUpAction);
     window.removeEventListener('visibilitychange', self.visibilityChange);
     window.onresize = null;
@@ -972,26 +781,22 @@ export default {
 
   methods: {
     visibilityChange() {
-      let self = this;
+      const self = this;
       if (document.hidden) {
         if (self.playState && !self.playBackState) {
           self.stopVideoPlay();
           self.stopTimer();
         }
       } else {
-        if(!self.playBackState && this.currentState === 'loading'){
-          self.startVideo(self.channel.ivsId, self.channel.channelId, null)
+        if (!self.playBackState && this.currentState === 'loading') {
+          self.startVideo(self.channel.ivsId, self.channel.channelId, null);
         }
       }
     },
 
     changeBrand() {
-      let self = this;
+      const self = this;
       self.clearEvent();
-      if(!self.isEzviz){
-        self.stopVideoPlay();
-        //self.previewplayer && self.previewplayer.dispose();
-      }
       self.activeIndex = '0';
       self.accountId = localStorage.getItem('oss_bucket');
       self.hideLast = false;
@@ -1007,20 +812,20 @@ export default {
     },
 
     getUpLoadBucketInfo() {
-      let self = this;
+      const self = this;
       self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
       self.bucketImage = 'image' + '/' + util.getCurDate2Str();
     },
 
     getOssInfo() {
-      let self = this;
+      const self = this;
       self.accountId = localStorage.getItem('oss_bucket');
-      let userId = getCookie('UserId');
+      const userId = getCookie('UserId');
       self.userId = userId;
     },
 
     clearEvent() {
-      let self = this;
+      const self = this;
       self.eventName = '';
       self.eventDes = '';
       self.sourceList = [];
@@ -1029,7 +834,7 @@ export default {
     },
 
     getFaStoreList() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         getFavoriteList().then((res) => {
           resolve(res);
@@ -1038,8 +843,8 @@ export default {
     },
 
     getAllStoreList() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         filter: {
           page: 0,
           size: 2000
@@ -1053,11 +858,11 @@ export default {
     },
 
     async getStoreList() {
-      let self = this;
-      let getStoreTemp = (data) => {
-        let temp = [];
+      const self = this;
+      const getStoreTemp = (data) => {
+        const temp = [];
         data.forEach((item, index) => {
-          let obj = {};
+          const obj = {};
           if (self.store.storeId === item.storeId) {
             obj.isActive = true;
           } else {
@@ -1077,7 +882,7 @@ export default {
         case 0:
           data = await self.getFaStoreList();
           if (data.errCode === 0) {
-            let storeData = data.data;
+            const storeData = data.data;
             self.tabList[0].storeList = getStoreTemp(storeData);
           }
           break;
@@ -1103,11 +908,11 @@ export default {
      * add favorite or delete favorite
      */
     async getFaStoreData(storeData) {
-      let self = this;
-      let getStoreTemp = (data) => {
-        let temp = [];
+      const self = this;
+      const getStoreTemp = (data) => {
+        const temp = [];
         data.forEach((item, index) => {
-          let obj = {};
+          const obj = {};
           if (index === 0) {
             obj.isActive = true;
           } else {
@@ -1123,9 +928,9 @@ export default {
         return temp;
       };
       try {
-        let res = await self.getFaStoreList();
+        const res = await self.getFaStoreList();
         if (res.errCode === 0) {
-          let storeData = res.data;
+          const storeData = res.data;
           self.tabList[0].storeList = getStoreTemp(storeData);
           if (storeData.length === 0) {
             self.showStoreUp = false;
@@ -1135,7 +940,7 @@ export default {
             self.showChannelBtns = [];
             self.allChannelBtns = [];
           } else {
-            let obj = {};
+            const obj = {};
             obj.storeId = storeData[0].storeId;
             obj.storeName = storeData[0].name;
             obj.storeTitle = storeData[0].name;
@@ -1144,41 +949,40 @@ export default {
             obj.storeUpTitle = self.$t('remotePatrol.stared');
             self.store = obj;
             self.showStoreUp = true;
-            let curStoreId = storeData[0].storeId;
+            const curStoreId = storeData[0].storeId;
 
-            let storeObj = {
+            const storeObj = {
               storeId: curStoreId
             };
             self.saveStoreObj(storeObj);
             self.getChannelByStore(self.tabList[0].storeList[0]);
           }
         }
-      }
-      catch (err) {
-        console.log("StoreMonitor-getFaStoreData: " + err);
+      } catch (err) {
+        console.log('StoreMonitor-getFaStoreData: ' + err);
       }
     },
 
     async getInitStoreData(storeData) {
-      let self = this;
-      let getStore2Temp = (data) => {
-        let cityList = [];
+      const self = this;
+      const getStore2Temp = (data) => {
+        const cityList = [];
         data.forEach((item) => {
           if (cityList.map((x) => x.city).indexOf(item.city) === -1) {
-            let obj = {
+            const obj = {
               city: item.city,
               province: item.province
             };
             cityList.push(obj);
           }
         });
-        let storeListTemp = [];
+        const storeListTemp = [];
         for (let i = 0; i < cityList.length; i++) {
-          let temp = [];
-          let obj = {};
+          const temp = [];
+          const obj = {};
           for (let j = 0; j < data.length; j++) {
             if (cityList[i].city === data[j].city) {
-              let obj = {};
+              const obj = {};
               obj.isActive = false;
               obj.storeId = data[j].storeId;
               obj.name = data[j].name;
@@ -1198,9 +1002,9 @@ export default {
         return storeListTemp;
       };
       try {
-        let res = await self.getAllStoreList();
+        const res = await self.getAllStoreList();
         if (res.errCode === 0) {
-          let storeData = res.data.content;
+          const storeData = res.data.content;
           self.allInitStoreList = storeData;
           if (storeData.length === 0) {
             self.tabList[2].storeList = [];
@@ -1210,13 +1014,13 @@ export default {
             self.tempStoreList = getStore2Temp(storeData);
           }
         }
-      }catch (err) {
-        console.log("StoreMonitor-getInitStoreData: " + err);
+      } catch (err) {
+        console.log('StoreMonitor-getInitStoreData: ' + err);
       }
     },
 
-    addFavoriteStore(params){
-      let self = this;
+    addFavoriteStore(params) {
+      const self = this;
       addFavoriteStore(params).then((res) => {
         if (res.errCode === 0) {
           self.store.storeUp = true;
@@ -1243,12 +1047,12 @@ export default {
           });
         }
       }).catch(err => {
-        console.log("StoreMonitor-addFavoriteStore: " + err);
+        console.log('StoreMonitor-addFavoriteStore: ' + err);
       });
     },
 
-    deleteFavoriteStore(params){
-      let self = this;
+    deleteFavoriteStore(params) {
+      const self = this;
       deleteFavoriteStore(params).then((res) => {
         if (res.errCode === 0) {
           self.store.storeUp = false;
@@ -1275,15 +1079,15 @@ export default {
           });
         }
       }).catch(err => {
-        console.log("StoreMonitor-deleteFavoriteStore: " + err);
+        console.log('StoreMonitor-deleteFavoriteStore: ' + err);
       });
     },
 
     addStoreUp() {
-      let self = this;
-      let temp = [];
+      const self = this;
+      const temp = [];
       temp.push(self.store.storeId);
-      let params = {
+      const params = {
         storeIds: temp
       };
       if (!self.store.storeUp) {
@@ -1294,9 +1098,9 @@ export default {
     },
 
     getEventList() {
-      let self = this;
-      let date = new Date();
-      let params = {
+      const self = this;
+      const date = new Date();
+      const params = {
         beginTs: date.getTime() - 3600 * 24 * 30 * 1000 * 30,
         endTs: date.getTime(),
         clause: {
@@ -1315,16 +1119,16 @@ export default {
       };
       return new Promise((resolve) => {
         getEventList(params).then((res) => {
-          let data = res.data.content;
+          const data = res.data.content;
           resolve(data);
         });
-      }).catch(err =>{
-        console.log("StoreMonitor-getEventList: " + err);
+      }).catch(err => {
+        console.log('StoreMonitor-getEventList: ' + err);
       });
     },
 
     async clickEventBtn(item, index) {
-      let self = this;
+      const self = this;
       self.eventName = '';
       self.eventDes = '';
       self.curEvent = '';
@@ -1333,9 +1137,9 @@ export default {
         self.evBtns[0].isActive = false;
         let data = await self.getEventList();
         data = data.slice(0, 5);
-        let temp = [];
+        const temp = [];
         data.forEach((item) => {
-          let obj = {};
+          const obj = {};
           obj.id = item.id;
           obj.name = item.subject;
           obj.descrition = item.initialComment.description;
@@ -1351,7 +1155,7 @@ export default {
     },
 
     checkEvent(val) {
-      let self = this;
+      const self = this;
       self.eventList.forEach((item) => {
         if (item.id === val) {
           self.eventName = item.name;
@@ -1361,26 +1165,26 @@ export default {
     },
 
     getCurTime() {
-      let self = this;
-      let year = self.dateValue.getFullYear();
-      let month = self.dateValue.getMonth() + 1;
-      let day = self.dateValue.getDate();
-      let hours = self.curTime.getHours();
-      let min = self.curTime.getMinutes();
-      let second = self.curTime.getSeconds();
-      let date =
+      const self = this;
+      const year = self.dateValue.getFullYear();
+      const month = self.dateValue.getMonth() + 1;
+      const day = self.dateValue.getDate();
+      const hours = self.curTime.getHours();
+      const min = self.curTime.getMinutes();
+      const second = self.curTime.getSeconds();
+      const date =
         year + '-' + month + '-' + day + ' ' + hours + ':' + min + ':' + second;
-      let d = new Date(date);
+      const d = new Date(date);
       return d;
     },
 
     changeDate(val) {
-      let self = this;
+      const self = this;
       self.startTs = 0;
       self.showModelContent = true;
-      let d = self.getCurTime();
+      const d = self.getCurTime();
       self.curTime = d;
-      let dstr = Number(d.getTime().toString().substr(0, 10));
+      const dstr = Number(d.getTime().toString().substr(0, 10));
       self.startTs = dstr;
       self.playBackTime = Number(d.getTime().toString());
       self.currentTimeValue = 0;
@@ -1394,8 +1198,7 @@ export default {
         self.timeid = 0;
       }
       if (!self.isEzviz) {
-        self.startVideo(self.channel.ivsId, self.channel.channelId, self.startTs);
-        self.realTimeStartTs = self.startTs;
+        self.$refs.dashVideo.playHistoryVideo(self.startTs);
       } else {
         self.changeFlag = false;
         self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
@@ -1403,9 +1206,9 @@ export default {
     },
 
     getFileUrl(fileName) {
-      let self = this;
-      let bucketName = self.oss.ossBucketName;
-      let endpoint = self.oss.ossEndPoint;
+      const self = this;
+      const bucketName = self.oss.ossBucketName;
+      const endpoint = self.oss.ossEndPoint;
       if (self.oss.ossVendor === 2) {
         return `https://${endpoint}/${bucketName}/${fileName}`;
       } else {
@@ -1413,40 +1216,40 @@ export default {
       }
     },
 
-    uploadFileToAliyun(fileItem){
-      let self = this;
-      let OSS = require('ali-oss');
-      let client = new OSS({
-        region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.') ),
+    uploadFileToAliyun(fileItem) {
+      const self = this;
+      const OSS = require('ali-oss');
+      const client = new OSS({
+        region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
         accessKeyId: self.oss.ossAccessKeyId,
         accessKeySecret: self.oss.ossAccessKeySecret,
         bucket: self.oss.ossBucketName
       });
-      let name = fileItem.fileName;
+      const name = fileItem.fileName;
       return new Promise((resolve, reject) => {
         client.multipartUpload(name, fileItem.file, {
           progress: function * (percentage, cpt) {
             self.percentage = percentage;
           }
         })
-        .then((results) => {
-          let url = self.getFileUrl(results.name);
-          resolve(url);
-        })
-        .catch((err) => {
-          console.log("StoreMonitor-uploadFileToAliyun: " + err);
-        });
+          .then((results) => {
+            const url = self.getFileUrl(results.name);
+            resolve(url);
+          })
+          .catch((err) => {
+            console.log('StoreMonitor-uploadFileToAliyun: ' + err);
+          });
       });
     },
 
-    uploadFileToAzure(fileItem){
-      let self = this;
-      let url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-      let containerURL = new azblob.ContainerURL(
+    uploadFileToAzure(fileItem) {
+      const self = this;
+      const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+      const containerURL = new azblob.ContainerURL(
         url,
         azblob.StorageURL.newPipeline(new azblob.AnonymousCredential())
       );
-      let blockBlobURL = azblob.BlockBlobURL.fromContainerURL(
+      const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(
         containerURL,
         fileItem.fileName
       );
@@ -1456,18 +1259,18 @@ export default {
           fileItem.file,
           blockBlobURL
         )
-        .then((results) => {
-          let url = self.getFileUrl(fileItem.fileName);
-          resolve(url);
-        })
-        .catch((err) => {
-          console.log("StoreMonitor-uploadFileToAzure: " + err);
-        });
+          .then((results) => {
+            const url = self.getFileUrl(fileItem.fileName);
+            resolve(url);
+          })
+          .catch((err) => {
+            console.log('StoreMonitor-uploadFileToAzure: ' + err);
+          });
       });
     },
 
     async upLoadFile(fileItem) {
-      let self = this;
+      const self = this;
       self.percentage = 0;
       let url = '';
       if (self.oss.ossVendor == null) {
@@ -1482,7 +1285,7 @@ export default {
     },
 
     openOuter(item) {
-      let self = this;
+      const self = this;
       if (item != null) {
         self.showOuter = true;
         self.checkImgSrc = item.src;
@@ -1490,13 +1293,13 @@ export default {
     },
 
     deleteImg(item, index) {
-      let self = this;
+      const self = this;
       self.sourceList.splice(index, 1);
     },
 
-    getStorageInfo(){
-      let self = this;
-      let params = {};
+    getStorageInfo() {
+      const self = this;
+      const params = {};
       params.storeId = self.store.storeId;
       return new Promise((resolve, reject) => {
         getStorageInfo(params).then((res) => {
@@ -1507,20 +1310,20 @@ export default {
         }).catch(err => {
           reject(err);
         });
-      })
+      });
     },
 
-     async getAttachmentFileUrl(){
-      let tempFileUrl = [];
+    async getAttachmentFileUrl() {
+      const tempFileUrl = [];
       for (let i = 0; i < this.sourceList.length; i++) {
-        let obj = {};
+        const obj = {};
         if (this.sourceList[i].mediaType === 2) {
-          let url = await this.upLoadFile(this.sourceList[i]);
+          const url = await this.upLoadFile(this.sourceList[i]);
           obj.mediaType = 2;
           obj.url = url;
           obj.deviceId = this.channel.id;
         } else if (this.sourceList[i].mediaType === 1) {
-          let url = await this.upLoadFile(this.sourceList[i]);
+          const url = await this.upLoadFile(this.sourceList[i]);
           obj.mediaType = 1;
           obj.url = url;
           obj.deviceId = this.channel.id;
@@ -1531,31 +1334,31 @@ export default {
     },
 
     addEvent(tempFileUrl) {
-      let self = this;
-      let commentobj = {
+      const self = this;
+      const commentobj = {
         ts: new Date().getTime(),
         description: self.eventDes.trim(),
         attachment: tempFileUrl,
         status: 0
       };
-      let curTs = util.getCurDate2StrBySign('/');
-      let obj = {};
+      const curTs = util.getCurDate2StrBySign('/');
+      const obj = {};
       obj.ts = new Date().getTime();
       obj.subject = self.eventName.trim();
       obj.storeId = self.store.storeId;
       obj.deviceId = self.channel.id;
       obj.comment = commentobj;
-      let params = obj;
+      const params = obj;
       let isSuccess = false;
       addEvent(params).then((res) => {
         self.fullscreenLoading = false;
-        let notifiedTo = res.data.notifiedTo;
+        const notifiedTo = res.data.notifiedTo;
         if (res.errCode === 0) {
           isSuccess = true;
         } else {
           isSuccess = false;
         }
-        let routeData = {
+        const routeData = {
           flag: {
             addEventType: 'add',
             isSuccess: isSuccess
@@ -1582,16 +1385,16 @@ export default {
           params: { data: routeData }
         });
       }).catch(err => {
-        console.log("StoreMonitor-addEvent" + err);
+        console.log('StoreMonitor-addEvent' + err);
       });
     },
 
-    async addComment(tempFileUrl){
-      let self = this;
+    async addComment(tempFileUrl) {
+      const self = this;
       let isSuccess = false;
-      let eventIds = [];
+      const eventIds = [];
       eventIds.push(self.curEvent);
-      let obj = {
+      const obj = {
         eventIds: eventIds,
         comment: {
           ts: new Date().getTime(),
@@ -1600,8 +1403,8 @@ export default {
           status: 0
         }
       };
-      let curTs = util.getCurDate2StrBySign('/');
-      let params = obj;
+      const curTs = util.getCurDate2StrBySign('/');
+      const params = obj;
       addComment(params).then((res) => {
         self.fullscreenLoading = false;
         if (res.errCode === 0) {
@@ -1609,7 +1412,7 @@ export default {
         } else {
           isSuccess = false;
         }
-        let routeData = {
+        const routeData = {
           flag: {
             addEventType: 'cor',
             isSuccess: isSuccess
@@ -1635,12 +1438,12 @@ export default {
           params: { data: routeData }
         });
       }).catch(err => {
-        console.log("StoreMonitor-addComment" + err);
+        console.log('StoreMonitor-addComment' + err);
       });
     },
 
     async submit() {
-      let self = this;
+      const self = this;
       if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
         return false;
@@ -1650,7 +1453,7 @@ export default {
         return false;
       }
       await self.getStorageInfo();
-      let tempFileUrl = await self.getAttachmentFileUrl();
+      const tempFileUrl = await self.getAttachmentFileUrl();
       self.fullscreenLoading = true;
       if (self.evBtns[0].isActive) {
         self.addEvent(tempFileUrl);
@@ -1660,7 +1463,7 @@ export default {
     },
 
     cutPicture(...val) {
-      let self = this;
+      const self = this;
       self.showCancelContent = false;
       if (self.sourceList.length >= 10) {
         self.notify(self.$t('remotePatrol.storeMaxAttach'), 'warning', 3000);
@@ -1675,12 +1478,12 @@ export default {
         self.imageCanvasList = [];
         if (self.playBackState) {
           self.stopVideoPlay();
-          let video = document.getElementById('previewVideo');
+          const video = document.getElementById('previewVideo');
           self.cutDialogcurTime = video.player.currentTime();
         }
         self.videoEl = document.getElementById('previewVideo').children[0];
         self.canvasEl = document.getElementById('icanvas');
-        let ctx = self.canvasEl.getContext('2d');
+        const ctx = self.canvasEl.getContext('2d');
         ctx.drawImage(
           self.videoEl,
           0,
@@ -1688,61 +1491,23 @@ export default {
           767 * self.percentHeight,
           431 * self.percentHeight
         );
-        let oGrayImg = self.canvasEl.toDataURL('image/jpeg');
+        const oGrayImg = self.canvasEl.toDataURL('image/jpeg');
         self.imageCanvas.src = oGrayImg;
-        let imgObj = new Image();
+        const imgObj = new Image();
         imgObj.src = oGrayImg;
         self.imageCanvasList.push(imgObj);
       });
     },
 
-    showPenList() {
-      let self = this;
-      self.showPen = !self.showPen;
-      self.showCancelContent = false;
-    },
-
-    checkPen(item, index) {
-      let self = this;
-      item.showContent = true;
-      self.showCancelContent = false;
-      self.penList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.showContent = false;
-        }
-      });
-      self.penChecked = item.id;
-    },
-
-    mouseDownAction(e) {
-      let self = this;
-      self.isMouseDown = true;
-      self.X = e.offsetX;
-      self.Y = e.offsetY;
-      self.showPenBtn = false;
-      self.showCancelContent = false;
-    },
-
-    mouseMoveAction(e) {
-      let self = this;
-      if (self.isMouseDown) {
-        self.X1 = e.offsetX;
-        self.Y1 = e.offsetY;
-        self.showPenBtn = false;
-        self.drawLine(self.X, self.Y, self.X1, self.Y1);
-        self.flag++;
-      }
-    },
-
     mouseUpAction(e) {
-      let self = this;
+      const self = this;
       self.isMouseDown = false;
       // self.showCutModel=true;
       self.showPenBtn = true;
       self.showCancelContent = true;
 
       if (self.flag !== 0 && self.canvasEl !== '') {
-        let imgObj = new Image();
+        const imgObj = new Image();
         imgObj.src = self.canvasEl.toDataURL('image/jpeg');
         self.imageCanvasList.push(imgObj);
       }
@@ -1752,117 +1517,11 @@ export default {
       }
     },
 
-    mouseLeaveAction(e) {
-      let self = this;
-      self.isMouseDown = false;
-    },
-
-    showCancel() {
-      let self = this;
-      self.showCancelContent = true;
-      self.showPenBtn = true;
-    },
-
-    hiddenCancel() {
-      let self = this;
-      self.showCancelContent = false;
-      self.showPenBtn = false;
-    },
-
-    cancleEditCanvas() {
-      let self = this;
-      self.showCancelContent = false;
-      self.canvasEl = document.getElementById('icanvas');
-      let ctx = self.canvasEl.getContext('2d');
-      ctx.clearRect(0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
-      ctx.drawImage(
-        self.imageCanvas,
-        0,
-        0,
-        767 * self.percentHeight,
-        431 * self.percentHeight
-      );
-      self.imageCanvasList = [];
-    },
-
-    confirmEditCanvas() {
-      let self = this;
-      self.showCancelContent = false;
-      self.imageCanvasList.pop();
-      self.canvasEl = document.getElementById('icanvas');
-      let ctx = self.canvasEl.getContext('2d');
-      ctx.clearRect(0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
-      if (self.imageCanvasList.length === 0) {
-        ctx.drawImage(
-          self.imageCanvas,
-          0,
-          0,
-          767 * self.percentHeight,
-          431 * self.percentHeight
-        );
-      } else {
-        ctx.drawImage(
-          self.imageCanvasList[self.imageCanvasList.length - 1],
-          0,
-          0,
-          767 * self.percentHeight,
-          431 * self.percentHeight
-        );
-      }
-    },
-
-    drawLine(x, y, x1, y1) {
-      let self = this;
-      let ctx = self.canvasEl.getContext('2d');
-      if (self.flag) {
-        ctx.beginPath();
-      }
-      ctx.moveTo(x, y);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = self.penChecked;
-      ctx.lineTo(x1, y1);
-      ctx.stroke();
-      if (self.flag !== 0) {
-        self.X = self.X1;
-        self.Y = self.Y1;
-      }
-
-    },
-
-    cancelEdit() {
-      let self = this;
-      self.showSnapShotDialog = false;
-    },
-    confirmEdit() {
-      let self = this;
-      let img = new Image();
-      let obj = {};
-      obj.mediaType = 2;
-      obj.src = self.canvasEl.toDataURL('image/jpeg');
-      obj.height = '100px';
-      obj.width = '140px';
-      obj.fileName =
-        self.bucketImage +
-        '/' +
-        'event' +
-        '_' +
-        util.getCurTimeStr() +
-        '_' +
-        self.store.storeId +
-        '_' +
-        self.channel.channelId +
-        '.jpg';
-      obj.file = util.base64ToBlob(obj.src);
-      self.sourceList.push(obj);
-      self.showSnapShotDialog = false;
-      self.myDivHeight();
-    },
-
     async playVideo(url) {
-      let self = this;
+      const self = this;
       self.playState = true;
       self.showCutContent = true;
-      let video = document.getElementById('previewVideo');
+      const video = document.getElementById('previewVideo');
       this.previewplayer = videojs(video, { playbackRates: [0.5, 1, 1.5, 2] });
       this.previewplayer.src({
         src: url,
@@ -1872,20 +1531,20 @@ export default {
     },
 
     noBindDeviceDialog(val) {
-      let self = this;
+      const self = this;
       self.noBindDeviceObj.dialogCosed = false;
     },
 
     canceldNoBind(val) {
-      let self = this;
+      const self = this;
       self.noBindDeviceObj.dialogCosed = false;
     },
 
     stopVideo() {
-      let self = this;
+      const self = this;
       self.playState = false;
       self.showCutContent = false;
-      let video = document.getElementById('previewVideo');
+      const video = document.getElementById('previewVideo');
       self.previewplayer = videojs(video);
       self.previewplayer.pause();
       window.clearInterval(self.timeid);
@@ -1895,14 +1554,14 @@ export default {
     },
 
     async getProcess() {
-      let self = this;
-      let video = document.getElementById('previewVideo');
-      let curTime = video.player.currentTime();
-      let duration = 300;
+      const self = this;
+      const video = document.getElementById('previewVideo');
+      const curTime = video.player.currentTime();
+      const duration = 300;
       self.durationTimeValue = duration;
       self.currentTimeValue = curTime;
       self.realTimeStartTs++;
-      let getTimeStr = function(val) {
+      const getTimeStr = function(val) {
         let hour = 0;
         let minute = 0;
         let second = 0;
@@ -1928,8 +1587,8 @@ export default {
     },
 
     adjustSpeed(val) {
-      let self = this;
-      let video = document.getElementById('previewVideo');
+      const self = this;
+      const video = document.getElementById('previewVideo');
       switch (val) {
         case 0:
           video.player.playbackRate(0.25);
@@ -1951,17 +1610,17 @@ export default {
     },
 
     async adjustProcess(val, label) {
-      let self = this;
+      const self = this;
       self.curBack = label;
-      let video = document.getElementById('previewVideo');
-      let curTime = video.player.currentTime();
+      const video = document.getElementById('previewVideo');
+      const curTime = video.player.currentTime();
       switch (val) {
         case 0: {
           self.realTimeStartTs = self.realTimeStartTs - 10;
           if (curTime > 10) {
             video.player.currentTime(curTime - 10);
           } else {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs)
+            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs);
           }
           break;
         }
@@ -1970,28 +1629,28 @@ export default {
           if (curTime > 30) {
             video.player.currentTime(curTime - 30);
           } else {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs)
+            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs);
           }
           break;
         }
         case 2:
-          {
-            self.realTimeStartTs = self.realTimeStartTs - 60;
-            if (curTime > 60) {
-              video.player.currentTime(curTime - 60);
-            } else {
-              self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs)
-            }
-            break;
+        {
+          self.realTimeStartTs = self.realTimeStartTs - 60;
+          if (curTime > 60) {
+            video.player.currentTime(curTime - 60);
+          } else {
+            self.startVideo(self.channel.ivsId, self.channel.channelId, self.realTimeStartTs);
           }
-        default:{
+          break;
+        }
+        default: {
           break;
         }
       }
     },
 
     controlScreen() {
-      let self = this;
+      const self = this;
       if (!self.fullScreen) {
         self.fullWindowScreen();
         self.fullScreen = true;
@@ -2002,8 +1661,8 @@ export default {
     },
 
     fullWindowScreen(...val) {
-      let self = this;
-      let ele = document.getElementById('videoContent');
+      const self = this;
+      const ele = document.getElementById('videoContent');
       ele.style.width = '100%';
       ele.style.height = '100%';
       if (ele.requestFullscreen) {
@@ -2018,8 +1677,8 @@ export default {
     },
 
     exitFullscreen() {
-      let de = document;
-      let ele = document.getElementById('videoContent');
+      const de = document;
+      const ele = document.getElementById('videoContent');
       ele.style.width = 'auto';
       ele.style.height = 'auto';
       if (de.exitFullscreen) {
@@ -2032,26 +1691,26 @@ export default {
     },
 
     searchStore() {
-      let self = this;
-      let tempStoreList = self.tempStoreList;
-      let getStore2Temp = (data) => {
-        let cityList = [];
+      const self = this;
+      const tempStoreList = self.tempStoreList;
+      const getStore2Temp = (data) => {
+        const cityList = [];
         data.forEach((item) => {
           if (cityList.map((x) => x.city).indexOf(item.city) === -1) {
-            let obj = {
+            const obj = {
               city: item.city,
               province: item.province
             };
             cityList.push(obj);
           }
         });
-        let storeListTemp = [];
+        const storeListTemp = [];
         for (let i = 0; i < cityList.length; i++) {
-          let temp = [];
-          let obj = {};
+          const temp = [];
+          const obj = {};
           for (let j = 0; j < data.length; j++) {
             if (cityList[i].city === data[j].city) {
-              let obj = {};
+              const obj = {};
               if (self.store.storeId === data[j].storeId) {
                 obj.isActive = true;
               } else {
@@ -2074,9 +1733,9 @@ export default {
         }
         return storeListTemp;
       };
-      let temp = [];
-      let tempArray = [];
-      let tempStore = [];
+      const temp = [];
+      const tempArray = [];
+      const tempStore = [];
       tempStoreList.forEach((_item, _index) => {
         _item.storeList.forEach((itemDs, indexDs) => {
           temp.push(util.getPinyinList(itemDs.name));
@@ -2095,12 +1754,12 @@ export default {
     },
 
     handleClick() {
-      let self = this;
+      const self = this;
       self.getStoreList();
     },
 
     clearTheEventInfo() {
-      let self = this;
+      const self = this;
       self.evBtns[0].isActive = true;
       self.evBtns[1].isActive = false;
       self.eventName = '';
@@ -2111,11 +1770,11 @@ export default {
     },
 
     async changeStore(item, index, _item, _index) {
-      let self = this;
+      const self = this;
       _item.isActive = true;
       self.clearTheEventInfo();
       self.showModelContent = true;
-      let obj = {};
+      const obj = {};
       obj.storeId = _item.storeId;
       obj.storeName = _item.name;
       obj.storeTitle = _item.name;
@@ -2127,7 +1786,7 @@ export default {
         obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
       }
       self.store = obj;
-      let tabIndex = Number(self.activeIndex);
+      const tabIndex = Number(self.activeIndex);
       let curStoreId = '';
       if (tabIndex !== 2) {
         item.storeList.forEach((itemS, indexS) => {
@@ -2147,7 +1806,7 @@ export default {
           });
         });
       }
-      let storeObj = {
+      const storeObj = {
         storeId: curStoreId
       };
       self.saveStoreObj(storeObj);
@@ -2155,8 +1814,8 @@ export default {
     },
 
     saveStoreObj(storeObj) {
-      let self = this;
-      let key = 'recentStore_storeMonitor' + '_' + self.accountId + '_' + self.userId;
+      const self = this;
+      const key = 'recentStore_storeMonitor' + '_' + self.accountId + '_' + self.userId;
       let temp = [];
       if (
         localStorage.getItem(key) != null ||
@@ -2178,11 +1837,11 @@ export default {
     },
 
     getStoreObj() {
-      let self = this;
-      let key = 'recentStore_storeMonitor' + '_' + self.accountId + '_' + self.userId;
+      const self = this;
+      const key = 'recentStore_storeMonitor' + '_' + self.accountId + '_' + self.userId;
       let temp = [];
-      let tempArray = [];
-      if ( localStorage.getItem(key) != null || localStorage.getItem(key) != undefined ) {
+      const tempArray = [];
+      if (localStorage.getItem(key) != null || localStorage.getItem(key) != undefined) {
         temp = JSON.parse(localStorage.getItem(key));
       }
       let indexArray = [];
@@ -2201,7 +1860,7 @@ export default {
     },
 
     changeStoreDialog() {
-      let self = this;
+      const self = this;
       self.changeStoreObj.dialogCosed = false;
       if (self.curStoreItem.userId == null) {
         self.noStoreUser.dialogCosed = true;
@@ -2216,17 +1875,17 @@ export default {
     },
 
     canceldChangeStore() {
-      let self = this;
+      const self = this;
       self.changeStoreObj.dialogCosed = false;
     },
 
     cancelNoUser() {
-      let self = this;
+      const self = this;
       self.noStoreUser.dialogCosed = false;
     },
 
     noStoreUserDialog() {
-      let self = this;
+      const self = this;
       self.noStoreUser.dialogCosed = false;
       self.changeStore(
         self.curTabItem,
@@ -2237,7 +1896,7 @@ export default {
     },
 
     clickStore(item, index, _item, _index) {
-      let self = this;
+      const self = this;
       // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
@@ -2249,9 +1908,8 @@ export default {
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
       if (
-        (!self.isEzviz && (self.playState || self.eventName.length !== 0)) ||
-        (self.isEzviz &&
-          (self.$refs.ezvizVideo.playState || self.eventName.length !== 0))
+        (!self.isEzviz && (self.playState || self.eventName.length != 0)) || self.videoPlatform == 1 && (self.$refs.ezvizVideo.playState || self.eventName.length != 0) ||
+        (self.videoPlatform == 2 && (self.$refs.beseyeVideo.playState || self.eventName.length != 0))
       ) {
         self.changeStoreObj.dialogCosed = true;
       } else {
@@ -2265,23 +1923,29 @@ export default {
     },
 
     getChannelByStore(storeItem) {
-      let self = this;
-      let temp = [];
+      const self = this;
+      const temp = [];
       self.hideLast = false;
       self.hideNext = false;
       self.showCutContent = false;
-      if (!self.isEzviz) {
-        self.stopVideoPlay();
-      } else {
+      if (self.videoPlatform === 0) {
+        if (self.playState) {
+          self.stopRealTime();
+        }
+      } else if (self.videoPlatform === 1) {
         self.$refs.ezvizVideo.showError = false;
-        self.$refs.ezvizVideo.playBack &&
-          (self.$refs.ezvizVideo.startTs = self.playBackTime);
+        self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
         if (self.$refs.ezvizVideo.playState) {
           self.$refs.ezvizVideo.stopRealTime();
         }
+      } else {
+        if (self.$refs.beseyeVideo.playState) {
+          self.$refs.beseyeVideo.video2 && (self.$refs.beseyeVideo.video2.style.display = 'none');
+          self.$refs.beseyeVideo.stopPlay();
+        }
       }
       storeItem.device.forEach((item, index) => {
-        let obj = {};
+        const obj = {};
         obj.id = item.id;
         obj.name = item.name;
         obj.ivsId = item.ivsId;
@@ -2306,11 +1970,11 @@ export default {
     },
 
     getshowBtns(list) {
-      let self = this;
-      let width = document.getElementsByClassName('btn-content')[0]
+      const self = this;
+      const width = document.getElementsByClassName('btn-content')[0]
         .offsetWidth;
-      let detailsWidth = (window.innerWidth / 1440) * 15 + 60;
-      let count = parseInt(width / detailsWidth); // 当前容器最大可显示数量
+      const detailsWidth = (window.innerWidth / 1440) * 15 + 60;
+      const count = parseInt(width / detailsWidth); // 当前容器最大可显示数量
       if (count >= list.length) {
         self.showChannelBtns = list;
       } else {
@@ -2324,12 +1988,12 @@ export default {
     },
 
     changeChannel(item, index) {
-      let self = this;
+      const self = this;
       self.showModelContent = true;
       self.clearTheEventInfo();
       if (item.isonline) {
         item.isClick = true;
-        let obj = {
+        const obj = {
           id: item.id,
           ivsId: item.ivsId,
           channelId: item.channelId,
@@ -2345,12 +2009,11 @@ export default {
         }
       });
       if (!self.isEzviz) {
-        if(self.playBackState){
-          self.startVideo(self.channel.ivsId, self.channel.channelId, self.startTs)
-        }
-        else{
-          self.startVideo(self.channel.ivsId, self.channel.channelId, null)
-        }
+        // if (self.playBackState) {
+        //   self.$refs.dashVideo.playHistoryVideo(self.startTs);
+        // } else {
+        //   self.startVideo(self.channel.ivsId, self.channel.channelId, null);
+        // }
       } else {
         self.$refs.ezvizVideo.playBack &&
           (self.$refs.ezvizVideo.startTs = self.playBackTime);
@@ -2368,7 +2031,7 @@ export default {
     },
 
     getIndexById(id) {
-      let self = this;
+      const self = this;
       let curIndex = 0;
       self.channelBtns.forEach((item, index) => {
         if (item.id === id) {
@@ -2379,15 +2042,15 @@ export default {
     },
 
     lastBar() {
-      let self = this;
-      let width = document.getElementsByClassName('btn-content')[0]
+      const self = this;
+      const width = document.getElementsByClassName('btn-content')[0]
         .offsetWidth;
-      let detailsWidth = (window.innerWidth / 1440) * 15 + 60;
-      let count = parseInt(width / detailsWidth);
+      const detailsWidth = (window.innerWidth / 1440) * 15 + 60;
+      const count = parseInt(width / detailsWidth);
       if (count >= self.channelBtns.length) {
         return false;
       } else {
-        let index = self.getIndexById(self.showChannelBtns[0].id);
+        const index = self.getIndexById(self.showChannelBtns[0].id);
         self.showChannelBtns.unshift(self.channelBtns[index - 1]);
         self.showChannelBtns.pop();
         self.showChannelBtns.forEach((item, index) => {
@@ -2410,15 +2073,15 @@ export default {
     },
 
     nextBar() {
-      let self = this;
-      let width = document.getElementsByClassName('btn-content')[0]
+      const self = this;
+      const width = document.getElementsByClassName('btn-content')[0]
         .offsetWidth;
-      let detailsWidth = (window.innerWidth / 1440) * 15 + 60;
-      let count = parseInt(width / detailsWidth);
+      const detailsWidth = (window.innerWidth / 1440) * 15 + 60;
+      const count = parseInt(width / detailsWidth);
       if (count >= self.channelBtns.length) {
         return false;
       } else {
-        let index = self.getIndexById(self.showChannelBtns[count - 1].id);
+        const index = self.getIndexById(self.showChannelBtns[count - 1].id);
         self.showChannelBtns.push(self.channelBtns[index + 1]);
         self.showChannelBtns.shift();
         self.showChannelBtns.forEach((item, index) => {
@@ -2441,22 +2104,18 @@ export default {
     },
 
     changeChannelDialog() {
-      let self = this;
+      const self = this;
       self.changeChannelObj.dialogCosed = false;
       self.changeChannel(self.curChannelItem, self.curChannelIndex);
     },
 
     cancelchangeChannel() {
-      let self = this;
+      const self = this;
       self.changeChannelObj.dialogCosed = false;
     },
 
     clickBtn(item, index) {
-      let self = this;
-      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
+      const self = this;
       self.curChannelItem = item;
       self.curChannelIndex = index;
       if (self.eventName.trim().length !== 0) {
@@ -2467,7 +2126,7 @@ export default {
     },
 
     backCurDate() {
-      let self = this;
+      const self = this;
       self.dateValue = new Date();
       self.curTime = new Date();
       self.playBackState = false;
@@ -2477,7 +2136,7 @@ export default {
       self.realType = true;
       if (!self.isEzviz) {
         if (self.store.storeId != undefined) {
-          self.startVideo(self.channel.ivsId, self.channel.channelId, null)
+          self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
         }
       } else {
         self.playBackTime = 0;
@@ -2488,13 +2147,13 @@ export default {
     },
 
     myDivHeight() {
-      let self = this;
+      const self = this;
       if (self.corEvent) {
-        let divLeft = document.getElementsByClassName('el-event')[0]
+        const divLeft = document.getElementsByClassName('el-event')[0]
           .offsetHeight;
-        let divRight = document.getElementsByClassName('event-rside')[0]
+        const divRight = document.getElementsByClassName('event-rside')[0]
           .offsetHeight;
-        let height = divLeft > divRight ? divLeft : divRight;
+        const height = divLeft > divRight ? divLeft : divRight;
         document.getElementById('rightLine').style.height = height + 'px';
       }
     },
@@ -2516,8 +2175,8 @@ export default {
     },
 
     editEzvizCanvas(src) {
-      let self = this;
-      let obj = {};
+      const self = this;
+      const obj = {};
       obj.mediaType = 2;
       obj.src = src;
       obj.height = '100px';
@@ -2529,21 +2188,21 @@ export default {
     },
 
     videoLoadingDialog() {
-      let self = this;
+      const self = this;
       self.videoLoadingObj.dialogCosed = false;
     },
 
     cancelVideoLoading() {
-      let self = this;
+      const self = this;
       self.videoLoadingObj.dialogCosed = false;
     },
 
     eventNameChanged(val) {
-      let self = this;
-      let content = filterString.all(val, 50);
+      const self = this;
+      const content = filterString.all(val, 50);
       self.eventName = content;
       self.showEventNameInfo = false;
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 50) {
         this.eventNameRuletip = true;
       } else {
@@ -2552,11 +2211,11 @@ export default {
     },
 
     eventDesChanged(val) {
-      let self = this;
-      let content = filterString.all(val, 200);
+      const self = this;
+      const content = filterString.all(val, 200);
       self.eventDes = content;
       self.showEventDescInfo = false;
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 200) {
         this.eventDesRuletip = true;
       } else {
@@ -2583,19 +2242,18 @@ export default {
     },
 
     searchChannel() {
-      let self = this;
-      let tempChannelList = self.allChannelBtns;
-      let temp = [];
-      let tempArray = [];
-      let tempChannel = [];
+      const self = this;
+      const tempChannelList = self.allChannelBtns;
+      const temp = [];
+      const tempArray = [];
+      const tempChannel = [];
       tempChannelList.forEach((_item) => {
         temp.push(util.getPinyinList(_item.name));
         tempChannel.push(_item);
       });
       for (let i = 0; i < temp.length; i++) {
-        if ( temp[i][0].indexOf(self.serachChannelValue.trim()) !== -1
-            || temp[i][1].indexOf(self.serachChannelValue.trim()) !== -1)
-        {
+        if (temp[i][0].indexOf(self.serachChannelValue.trim()) !== -1 ||
+            temp[i][1].indexOf(self.serachChannelValue.trim()) !== -1) {
           tempArray.push(tempChannel[i]);
         }
       }
@@ -2618,8 +2276,7 @@ export default {
         } else {
           if (this.channel === null) {
             this.paused = true;
-          }
-          else{
+          } else {
             await this.startVideo(this.channel.ivsId, this.channel.channelId, null);
           }
         }
@@ -2640,7 +2297,7 @@ export default {
     async startVideo(IVSID, channelId, startTs) {
       try {
         if (IVSID === null || channelId === null) {
-          let error = this.$t('remotePatrol.dashServerError') + '5';
+          const error = this.$t('remotePatrol.dashServerError') + '5';
           this.currentState = 'blank';
           this.errorText = error;
           this.showError = true;
@@ -2654,15 +2311,15 @@ export default {
           }
           this.IVSID = IVSID;
           this.channelId = channelId.toString();
-          let self = this;
+          const self = this;
           if (startTs) {
-            if(await this.history(startTs) ){
+            if (await this.history(startTs)) {
               this.timeid = window.setInterval(function() {
                 self.getProcess();
               }, 1000);
             }
           } else {
-            if(await this.connectVideo()){
+            if (await this.connectVideo()) {
               this.startTimer();
             }
           }
@@ -2675,7 +2332,7 @@ export default {
       }
     },
 
-    startTimer(){
+    startTimer() {
       this.realTimeSpeed = 0;
       this.isLoading = false;
       this.timerPlayReal = window.setInterval(() => {
@@ -2683,7 +2340,7 @@ export default {
       }, 1000);
     },
 
-    stopTimer(){
+    stopTimer() {
       window.clearInterval(this.timerPlayReal);
       this.realTimeSpeed = 0;
 
@@ -2779,7 +2436,7 @@ export default {
         this.paused = false;
         this.errorText = '';
         this.isLoading = false;
-        this.playState
+        this.playState;
         return true;
       } else {
         let error = this.$t('remotePatrol.dashServerError');
@@ -2888,9 +2545,9 @@ export default {
           this.showError = true;
         }
       });
-    },
+    }
 
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -3256,6 +2913,7 @@ $h1: #292e36;
             width: 100%;
             .progress-bar {
               background-color: $red;
+              height: 100% !important;
             }
           }
           .currentTime {
@@ -3907,6 +3565,7 @@ $h1: #292e36;
 
 .el-prog .progress-bar {
   background-color: #fb4c5d;
+  height: 100%;
 }
 
 .el-test .el-input__inner {
