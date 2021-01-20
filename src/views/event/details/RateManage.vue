@@ -5,8 +5,12 @@
         <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" >
         <span class="event-title">{{ event.eventTitle }}</span>
         <span v-if="event.score!==Math.pow(-2,31)" class="event-score">{{ $t('eventView.scores') }} {{ event.score }}</span>
-        <el-button v-if="showWinpBtn" :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="el-submit"
-                   type="primary" @click="submit">{{ $t('eventView.submit') }}</el-button>
+        <el-button
+          v-if="showWinpBtn"
+          :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
+          class="el-submit"
+          type="primary"
+          @click="submit">{{ $t('eventView.submit') }}</el-button>
       </div>
       <el-dialog
         v-if="dialogFormVisible"
@@ -17,33 +21,13 @@
         top="12%"
         class="rate-video-dialog"
         @close="closeRealTime">
-        <div class="video-dialog-content" style="overflow:hidden;" @mousemove="showControlInfo=true"
-             @mouseleave="showControlInfo = false">
+        <div
+          class="video-dialog-content"
+          style="overflow:hidden;"
+          @mousemove="showControlInfo=true"
+          @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
-          <div v-if="!isEzviz" id="videoContent" class="video-content">
-            <div v-if="showControlInfo" id="channelName"><span>{{ curChannel.name }}</span></div>
-            <div v-if="showControlInfo" class="icon-footer">
-              <div class="iconlside">
-                <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
-                <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-              </div>
-              <div class="iconrside">
-                <div class="screen-content">
-                  <i
-                    :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                    class="iconfont iconscreen"
-                    @click="controlScreen"/>
-                </div>
-              </div>
-            </div>
-            <video
-              id="previewVideo"
-              :controls="false"
-              height="83%"
-              width="90%"
-              prload
-              class="video-js vjs-fill"/>
-          </div>
+          <dash-video v-if="!isEzviz" ref="dashVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
           <ezviz-video v-else ref="ezvizVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
         </div>
       </el-dialog>
@@ -120,15 +104,21 @@
         <div class="storeInfo-details">
           <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
             <dd><span :class="lang==='en'? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
-            <el-tooltip :popper-class="tooltipClass" :content="event.createor" effect="dark"
-                        placement="bottom-start">
+            <el-tooltip
+              :popper-class="tooltipClass"
+              :content="event.createor"
+              effect="dark"
+              placement="bottom-start">
               <span class="details-info">{{ event.createor }}</span>
             </el-tooltip>
           </div>
           <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
             <dd><span :class="lang==='en'? 'en-w3': 'w3'">{{ $t('eventView.solver') }}：</span></dd>
-            <el-tooltip :popper-class="tooltipClass" :content="event.assigneeName"
-                        effect="dark" placement="bottom-start">
+            <el-tooltip
+              :popper-class="tooltipClass"
+              :content="event.assigneeName"
+              effect="dark"
+              placement="bottom-start">
               <span class="details-info">{{ event.assigneeName }}</span>
             </el-tooltip>
           </div>
@@ -232,8 +222,9 @@
         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
           <div v-if="commentList.length !== 0" id="rightLine"/>
           <div v-for="(item,index) in commentList" :key="index" class="deal-details">
-            <div :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}"
-                 class="circle-content">
+            <div
+              :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}"
+              class="circle-content">
               <div class="circle"/>
             </div>
             <div class="deal-lside">
@@ -254,8 +245,11 @@
               </div>
               <pre v-if="item.description != null" class="description">{{ item.description }}</pre>
               <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
-                <div v-for="(_item,_index) in item.sourceList" :key="_index" :height="imgHeight+'px'"
-                     class="source-details">
+                <div
+                  v-for="(_item,_index) in item.sourceList"
+                  :key="_index"
+                  :height="imgHeight+'px'"
+                  class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
                     <img
                       :title="imgTitle"
@@ -293,10 +287,12 @@ import { getDeviceList } from '@/api/device';
 import EzvizVideo from '@/components/EzvizVideo.vue';
 import PermissionHelper from '../../../api/PermissionHelper';
 import filterString from '@/common/filterString';
+import DashVideo from '../../../components/DashVideo';
 
 export default {
   name: 'RateManage',
   components: {
+    DashVideo,
     AudioVue,
     EzvizVideo
   },
@@ -315,13 +311,10 @@ export default {
       isPlaying: false,
       audioSrc: '',
       showAudio: false,
-      videoSrc: '',
       curChannel: null,
       sourceList: [],
       commentList: [],
-      protocal: 'DASH',
       selGID: 0,
-      mpdurl: '',
       initialized: false,
       previewplayer: '',
       winpDes: '',
@@ -335,7 +328,6 @@ export default {
       showCheckVideo: false,
       showPhotoContent: false,
       deafultImg: 'this.src="' + require('../../../../static/img/picture_failed.png') + '"',
-      sessionId: '',
       eventDes: '',
       videoSrc: require('../../../../static/img/monitor.png'),
       inspectSrc: require('../../../../static/img/remote_patrol.png'),
@@ -343,9 +335,7 @@ export default {
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
       curStatus: null,
-      fullScreen: false,
       showControlInfo: true,
-      playState: false,
       lang: this.$i18n.locale,
       isEvent: true,
       channelInfo: {},
@@ -355,8 +345,6 @@ export default {
       showRelatedChannelFlag: false,
       relatedChannels: [],
       channelRadio: '',
-      timerPlayReal: null,
-      realTimeSpeed: 0,
       ivsIdRuletip: false,
       videosourceList: [],
       imgsourceList: [],
@@ -410,15 +398,6 @@ export default {
       return self.$store.state.user.isEzviz;
     }
   },
-  watch: {
-    realTimeSpeed(val) {
-      const self = this;
-      if (val >= 300) {
-        self.stopRealTime();
-        self.showControlInfo = false;
-      }
-    }
-  },
 
   mounted() {
     const self = this;
@@ -436,20 +415,6 @@ export default {
         });
       }, 0);
     });
-
-    window.onresize = function() {
-      if (!self.checkFull()) {
-        self.fullScreen = false;
-        var ele = document.getElementById('videoContent');
-        ele.style.width = 'auto';
-        ele.style.height = 'auto';
-      }
-    };
-  },
-
-  beforeDestroy() {
-    window.clearInterval(this.timeid);
-    window.onresize = null;
   },
 
   methods: {
@@ -467,15 +432,6 @@ export default {
 
     notShowInputRuleTips() {
       this.ivsIdRuletip = false;
-    },
-
-    async playVideo(url) {
-      const self = this;
-      self.playState = true;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      this.previewplayer.src({ src: url, type: this.protocal === 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
-      this.previewplayer.play();
     },
 
     stopCommentVideo() {
@@ -512,113 +468,12 @@ export default {
       self.bigImgSrc = src;
     },
 
-    async realTime() {
-      const self = this;
-      self.realTimeSpeed = 0;
-      const sessionId = await dashAPI.Online();
-      self.sessionId = sessionId;
-      const data = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.curChannel.ivsId,
-          channel: JSON.stringify(self.curChannel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      self.mpdurl = await dashAPI.RealTime(1, data); // 1 is start, 0 is stop
-      if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length !== 0) {
-        self.playVideo(self.mpdurl);
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = window.setInterval(() => {
-          self.realTimeSpeed = self.realTimeSpeed + 1;
-        }, 1000);
-      }
-    },
-
-    destroyVideo() {
-      const self = this;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      self.previewplayer.dispose();
-    },
-
-    stopVideo() {
-      const self = this;
-      self.previewplayer.pause();
-      self.playState = false;
-    },
-
     closeRealTime() {
       const self = this;
       if (!self.isEzviz) {
-        if (self.playState) {
-          self.stopRealTime();
-        }
-        self.previewplayer.dispose();
+        self.$refs.dashVideo.stopVideoPlay();
       } else {
         self.$refs.ezvizVideo.stopRealTime();
-      }
-    },
-
-    async stopRealTime() {
-      const self = this;
-      self.stopVideo();
-      const data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.curChannel.ivsId,
-          channel: JSON.stringify(self.curChannel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      const ret = await dashAPI.RealTime(0, data);
-      await dashAPI.Offline(self.sessionId);
-      self.realTimeSpeed = 0;
-      window.clearInterval(self.timerPlayReal);
-      self.timerPlayReal = null;
-    },
-
-    controlScreen() {
-      const self = this;
-      if (!self.fullScreen) {
-        self.fullWindowScreen();
-        self.fullScreen = true;
-      } else {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-    },
-
-    fullWindowScreen(...val) {
-      const self = this;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
-      if (ele.requestFullscreen) {
-        ele.requestFullscreen();
-      } else if (ele.mozRequestFullScreen) {
-        ele.mozRequestFullScreen();
-      } else if (ele.webkitRequestFullScreen) {
-        ele.webkitRequestFullScreen();
-      } else if (ele.msRequestFullscreen) {
-        ele.msRequestFullscreen();
-      }
-    },
-
-    exitFullscreen() {
-      var de = document;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = 'auto';
-      ele.style.height = 'auto';
-      if (de.exitFullscreen) {
-        de.exitFullscreen();
-      } else if (de.mozCancelFullScreen) {
-        de.mozCancelFullScreen();
-      } else if (de.webkitCancelFullScreen) {
-        de.webkitCancelFullScreen();
       }
     },
 
@@ -795,11 +650,14 @@ export default {
     checkVideo(item, index) {
       const self = this;
       self.dialogFormVisible = true;
+      self.channelInfo = self.curChannel;
       if (index != undefined) {
         self.curChannel = item;
       }
       if (!self.isEzviz) {
-        self.realTime();
+        self.$nextTick(() => {
+          self.$refs.dashVideo.onPlay();
+        })
       } else {
         self.channelInfo = self.curChannel;
       }
@@ -918,7 +776,7 @@ export default {
           self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
           return false;
         }
-      }).catch( err => {
+      }).catch(err => {
         console.log('EventDetail-addComment:' + err);
       });
     },
@@ -961,14 +819,6 @@ export default {
         status = self.curStatus;
       }
       self.addComment(status, description);
-    },
-
-    checkFull() {
-      var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
-      if (isFull == undefined) {
-        isFull = false;
-      }
-      return isFull;
     },
 
     notify(msg, type, time) {
@@ -1030,11 +880,12 @@ export default {
       self.curChannel = channel[0];
       self.dialogFormVisible = true;
       self.channelRadio = '';
+      self.channelInfo = {};
+      self.channelInfo = self.curChannel;
       if (!self.isEzviz) {
-        self.realTime();
-      } else {
-        self.channelInfo = {};
-        self.channelInfo = self.curChannel;
+        self.$nextTick(() => {
+          self.$refs.dashVideo.startVideo(self.channelInfo.ivsId, self.channelInfo.channelId, null);
+        })
       }
     }
 
