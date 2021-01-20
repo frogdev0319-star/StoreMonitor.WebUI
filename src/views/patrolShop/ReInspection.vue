@@ -14,73 +14,6 @@
         </el-button>
       </div>
       <el-dialog
-        v-if="showCutDialog"
-        :title="$t('remotePatrol.edit')"
-        :visible.sync="showCutDialog"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-          <hr class="dialog-hr">
-          <div v-if="showPenBtn" id="iconR" class="icon-right">
-            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-            <transition name="fadepen">
-              <div v-if="showPen" class="pen-content">
-                <div v-for="(item,index) in penList" :key="index" class="content">
-                  <div :class="{colorActive:item.showContent}"/>
-                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                </div>
-              </div>
-            </transition>
-          </div>
-          <canvas
-            id="icanvas"
-            :width="767*percentHeight"
-            :height="431*percentHeight"
-            @mousedown="mouseDownAction($event)"
-            @mousemove="mouseMoveAction($event)"/>
-          <div
-            v-if="showCancelContent"
-            :style="{'width':767*percentHeight+'px',
-                     'margin-left':47*percentHeight+'px'}"
-            class="cancel-content">
-            <div class="content" @click="cancelEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.clear') }}</span>
-            </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.cancel') }}</span>
-            </div>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="dialogCommentVideo"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="dialogCommentVideo"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content">
-          <hr class="dialog-hr">
-          <video
-            id="previewCutVideo"
-            :width="580*percentHeight"
-            :height="420*percentHeight"
-            :src="curVideoSrc"
-            prload
-            controls
-            autoplay/>
-        </div>
-      </el-dialog>
-      <el-dialog
         v-if="showOuter"
         :title="$t('remotePatrol.view')"
         :visible.sync="showOuter"
@@ -96,9 +29,9 @@
         </div>
       </el-dialog>
       <el-dialog
-        v-if="showFeedDialog1"
+        v-if="showAddTextFeedbackDialog"
         :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog1"
+        :visible.sync="showAddTextFeedbackDialog"
         :close-on-click-modal="false"
         :width="480*percentHeight+'px'"
         top="12%">
@@ -124,112 +57,8 @@
           </div>
         </div>
         <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog1 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack1">
-            {{ $t('remotePatrol.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showFeedDialog2"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog2"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-            <div v-if="showPenBtn" id="iconR" class="icon-right">
-              <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-              <transition name="fadepen">
-                <div v-if="showPen" class="pen-content">
-                  <div v-for="(item,index) in penList" :key="index" class="content">
-                    <div :class="{colorActive:item.showContent}"/>
-                    <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                  </div>
-                </div>
-              </transition>
-            </div>
-            <canvas
-              id="icanvas"
-              :width="520*percentHeight"
-              :height="340*percentHeight"
-              @mousedown="mouseDownAction($event)"
-              @mousemove="mouseMoveAction($event)"/>
-            <div
-              v-if="showCancelContent"
-              :style="{'width':520*percentHeight+'px',
-                       'margin-left':47*percentHeight+'px'}"
-              class="cancel-content">
-              <div class="content" @click="cancelEditCanvas">
-                <img :src="clearIconSrc" class="icon-clear" height="22px">
-                <span>{{ $t('remotePatrol.clear') }}</span>
-              </div>
-              <div class="content" @click="confirmEditCanvas">
-                <img :src="removeIconSrc" class="icon-clear" height="22px">
-                <span>{{ $t('remotePatrol.cancel') }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="event-content">
-            <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
-            <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
-            <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows: 7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              @input="eventDesChanged"
-              @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
-            {{ $t('remotePatrol.confirm') }}</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog
-        v-if="showFeedDialog3"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog3"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" style="text-align:center">
-            <video id="previewCutVideo" :width="520*percentHeight" :height="340*percentHeight" :src="feedBackVideoFileObj.src" prload controls autoplay/>
-          </div>
-          <div class="event-content">
-            <span class="event-title">{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" maxlength="10"/>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows:7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              maxlength="300"/>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog3 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack3">
+          <el-button id="cancelBtn" size="mini" @click="showAddTextFeedbackDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
+          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddTextFeedback">
             {{ $t('remotePatrol.confirm') }}
           </el-button>
         </div>
@@ -267,72 +96,26 @@
         </div>
       </div>
       <div v-else>
-        <div v-if="!isEzviz">
-          <div v-if="showError" class="errorVideo-model">
-            <span>{{ errorText }}</span>
-          </div>
-          <div
-            v-loading="isLoading"
-            v-else
-            id="videoContent"
-            element-loading-background="rgba(0, 0, 0, 0.8)"
-            class="video-content"
-            @mouseleave="hiddenModel"
-            @mouseenter="showModel"
-            @mousemove="showModel">
-            <div v-if="showGetVideo" class="getvideo-content">
-              <div class="btn-graph">
-                <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"/>
-              </div>
-              <canvas id="vcanvas" :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"/>
-            </div>
-            <span v-if="showInfoContent" id="channelName">{{ channel!=null?channel.channelName:'' }}</span>
-            <div v-if="showInfoContent" class="icon-footer" >
-              <div class="iconlside">
-                <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"class= "iconfont iconplay" @click="onPlay"/>
-              </div>
-              <div class="screen-content">
-                <i
-                  :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                  class="iconfont iconscreen"
-                  @click="controlScreen"/>
-                <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
-              </div>
-            </div>
-            <transition name="fade">
-              <div v-if="showModelContent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-                <span>{{ $t('remotePatrol.snapshot') }}</span>
-              </div>
-            </transition>
-            <video
-              v-if="showVideo"
-              id="previewVideo"
-              :controls="showControls"
-              :paused="paused"
-              :muted = "muted"
-              :src="uri"
-              height="83%"
-              width="90%"
-              prload
-              autoplay
-              class="video-js vjs-fill"
-              @waiting="onPlayerWaiting($event)"
-              @playing="onPlayerPlaying($event)"/>
-          </div>
-        </div>
+        <dash-video
+          v-if="videoPlatform === 0"
+          ref="dashVideo"
+          :store-id="store.storeId"
+          :channel-info="channel"
+          :source-list-length="sourceListLength"
+          :show-feed-back="showFeedBack"
+          @confirmEzvizCanvas="editEzvizCanvas"
+          @ezvizCutPictureFeedback="ezvizPictureFeedback"
+        />
         <ezviz-video
           v-else
           ref="ezvizVideo"
           :channel-info="channel"
           :source-list-length= "sourceListLength"
           :show-feed-back="showFeedBack"
-          :show-feed-dialog2="showFeedDialog2"
           :store-id="store.storeId"
           @confirmEzvizCanvas="editEzvizCanvas"
           @ezvizCutPictureFeedback="ezvizPictureFeedback"
-          @confirmEzvizVideoFeedback="ezvizVideoFeedback"
-          @emitEzvizVideo="confirmEzvizVideo" />
+        />
       </div>
       <div class="el-inspect">
         <div v-if="showGuide && sheetName.length > 0" class="guide-lside">
@@ -669,18 +452,22 @@ import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
 import { validateInput } from '@/common/validate';
-import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
 import { getDashServerInfo } from '@/api/device.js';
 import DashHttp from '@/common/DashHttp.js';
 import Database from '@/common/Database.js';
+import BeseyeVue from '../../components/BeseyeVideo';
+import DashVideo from '../../components/DashVideo';
+import EzvizVideo from '@/components/EzvizVideo';
 
 export default {
   name: 'ReInspection',
   components: {
+    BeseyeVue,
     DialogVue,
     ChannelIconBtn,
-    EzvizVideo
+    EzvizVideo,
+    DashVideo
   },
   data() {
     return {
@@ -697,20 +484,10 @@ export default {
       showPenBtn: true,
       showPen: false,
       showStoreUp: false,
-      store: {
-        storeName: '西安5店',
-        storeTitle: '西安5店远程巡检',
-        storeUp: false,
-        storeUptitle: this.$t('remotePatrol.clickToStar')
-      },
-      showFeedDialog1: false,
-      showFeedDialog2: false,
-      showFeedDialog3: false,
+      showAddTextFeedbackDialog: false,
       arrows1Src: require('../../../static/img/arrows_left.png'),
       arrows2Src: require('../../../static/img/arrows_right.png'),
       plusSrc: require('../../../static/img/add_icon.png'),
-      clearIconSrc: require('../../../static/img/clear.png'),
-      removeIconSrc: require('../../../static/img/cancel.png'),
       backicon: require('../../../static/img/back.png'),
       checkImgSrc: '',
       showOuter: false,
@@ -744,44 +521,6 @@ export default {
       showError: false,
       showVideo: true,
       showCancelContent: false,
-      speedList: [
-        {
-          value: 0,
-          label: '0.5 X'
-        },
-        {
-          value: 1,
-          label: '1 X'
-        },
-        {
-          value: 2,
-          label: '1.5 X'
-        },
-        {
-          value: 3,
-          label: '2 X'
-        }
-      ],
-      testSpeed: '1 X',
-      backList: [
-        {
-          value: 0,
-          label: '10s'
-        },
-        {
-          value: 1,
-          label: '20s'
-        },
-        {
-          value: 2,
-          label: '30s'
-        },
-        {
-          value: 3,
-          label: '40s'
-        }
-      ],
-      testBack: '10s',
       showSpread: false,
       tabList: [
         {
@@ -807,7 +546,6 @@ export default {
       userId: '',
       tempStoreList: [],
       allInitStoreList: [],
-      sessionId: '',
       inspectList: [],
       showFeedBack: false,
       curGroup: null,
@@ -837,7 +575,6 @@ export default {
       playState: false,
       editCount: 0,
       ignoreTemp: [],
-      fullScreen: false,
       appliedInspectList: [],
 
       changeBrandObj: {
@@ -951,34 +688,10 @@ export default {
       historyObj: null,
       beforepatrolstore: '',
       showIgnoreItem: false,
-      hasIgnoretemp: [],
-
-      uri: null,
-      play: true,
-      fullScreen: false,
-      paused: true,
-      muted: false,
-      currentState: 'blank', // 'blank','loading','play','inline'
-      error: '',
-      streamProtocol: 'DASH',
-      sessionId: null,
-      userName: null,
-      password: null,
-      IVSID: null,
-      channelId: null,
-      realType: true,
-      lastTime: null,
-      currentTime: null,
-      onEndflag: false
+      hasIgnoretemp: []
     };
   },
   computed: {
-    graphBtnWidth: function() {
-      return this.varyWindowHeight * 0.185;
-    },
-    btnFontSize: function() {
-      return this.varyWindowHeight * 0.022;
-    },
     percentHeight: function() {
       return this.varyWindowHeight / 758;
     },
@@ -987,13 +700,17 @@ export default {
     }),
     ...mapGetters(
       ['isEzviz']
-    )
+    ),
+    videoPlatform() {
+      const self = this;
+      return self.$store.state.user.videoPlatform;
+    }
   },
   watch: {
     accountChanged(val, oldVal) {
       console.log(val);
       const self = this;
-      if (val != 0) {
+      if (val !== 0) {
         self.changeBrand();
       }
     },
@@ -1008,8 +725,8 @@ export default {
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    const canLeave = (((!self.isEzviz) && self.editCount != 0)) ||
-              (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0);
+    const canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !=0
+      || self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !=0);
     if (canLeave && to.name != 'confirmSum') {
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
@@ -1034,8 +751,11 @@ export default {
           window.clearInterval(self.timerPlayReal);
           self.timerPlayReal = null;
         }
-        if (self.isEzviz && !self.showGuide) {
+        if(self.videoPlatform == 1 && !self.showGuide){
           self.$refs.ezvizVideo.stopRealTime();
+        }
+        if(self.videoPlatform == 2 && !self.showGuide){
+          self.$refs.beseyeVideo.stopPlay();
         }
         next();
       }).catch(() => {
@@ -1056,8 +776,11 @@ export default {
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
       }
-      if (self.isEzviz && !self.showGuide) {
+      if(self.videoPlatform == 1 && !self.showGuide){
         self.$refs.ezvizVideo.stopRealTime();
+      }
+      if(self.videoPlatform == 2 && !self.showGuide){
+        self.$refs.beseyeVideo.stopPlay();
       }
       next();
     }
@@ -1269,70 +992,26 @@ export default {
     },
     addFeedBack() {
       const self = this;
-      self.showFeedDialog1 = true;
+      self.showAddTextFeedbackDialog = true;
       self.eventName = '';
       self.eventDes = '';
       self.showEventNameInfo = false;
     },
-    confirmAddFeedBack3() {
-      const self = this;
-      let srcObj = null;
-      srcObj = self.feedBackVideoFileObj;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        self.notify(self.$t('remotePatrol.emptyTitle'), 'warning', 3000);
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog3 = false;
-      self.showFeedBackInfo = false;
-    },
-    confirmAddFeedBack2() {
-      const self = this;
-      let srcObj = null;
-      const src = self.canvasEl.toDataURL('image/jpeg');
-      srcObj = {
-        mediaType: 2,
-        src: src,
-        height: '100px',
-        width: '140px',
-        fileName: self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg',
-        file: util.base64ToBlob(src),
-        deviceId: self.channel.id
-      };
 
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-        self.showEventNameInfo = true;
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog2 = false;
-      self.showFeedBackInfo = false;
-    },
-    confirmAddFeedBack1() {
+    confirmAddTextFeedback() {
       const self = this;
       const obj = {
         eventName: self.eventName,
         eventDes: self.eventDes,
         sourceObj: null
       };
-      if (self.eventName.trim().length == 0) {
+      if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
         // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
         return false;
       }
       self.eventList.push(obj);
-      self.showFeedDialog1 = false;
+      self.showAddTextFeedbackDialog = false;
       self.showFeedBackInfo = false;
     },
     getIndexById(id) {
@@ -1416,204 +1095,6 @@ export default {
       });
     },
 
-    playCutVideo(item, index) {
-      const self = this;
-      self.dialogCommentVideo = true;
-      if (self.showFeedBack) {
-        self.curVideoSrc = item.sourceObj.src;
-      } else {
-        self.curVideoSrc = item.src;
-      }
-    },
-
-    cutPicture() {
-      const self = this;
-      console.log(self.curGroupIndex);
-      self.videoEl = document.getElementById('previewVideo').children[0];
-      self.imageCanvasList = [];
-      if (self.fullScreen) {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-      if (self.showFeedBack) {
-        self.showFeedDialog2 = true;
-        self.eventName = '';
-        self.eventDes = '';
-        self.showEventNameInfo = false;
-        this.$nextTick(() => {
-          self.canvasEl = document.getElementById('icanvas');
-          var ctx = self.canvasEl.getContext('2d');
-          ctx.drawImage(self.videoEl, 0, 0, 520 * self.percentHeight, 340 * self.percentHeight);
-          var oGrayImg = icanvas.toDataURL('image/jpeg');
-          self.imageCanvas.src = oGrayImg;
-          const imgObj = new Image();
-          imgObj.src = oGrayImg;
-          self.imageCanvasList.push(imgObj);
-        });
-      } else {
-        self.showCancelContent = false;
-        if (self.sourceListLength >= 10) {
-          self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
-          return false;
-        }
-        self.showCutDialog = true;
-        this.$nextTick(() => {
-          self.canvasEl = document.getElementById('icanvas');
-          var ctx = self.canvasEl.getContext('2d');
-          ctx.drawImage(self.videoEl, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
-          var oGrayImg = icanvas.toDataURL('image/jpeg');
-          self.imageCanvas.src = oGrayImg;
-          const imgObj = new Image();
-          imgObj.src = oGrayImg;
-          self.imageCanvasList.push(imgObj);
-        });
-      }
-    },
-    showPenList() {
-      const self = this;
-      self.showPen = !self.showPen;
-      self.showCancelContent = false;
-    },
-    checkPen(item, index) {
-      const self = this;
-      item.showContent = true;
-      self.penList.forEach((_item, _index) => {
-        if (index != _index) {
-          _item.showContent = false;
-        }
-      });
-      self.penChecked = item.id;
-    },
-    cancelEditCanvas() {
-      const self = this;
-      self.showCancelContent = false;
-      self.canvasEl = document.getElementById('icanvas');
-      var ctx = self.canvasEl.getContext('2d');
-      let vcanvas = null;
-      if (self.showFeedBack) {
-        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
-      } else {
-        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
-      }
-      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
-      ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
-      self.imageCanvasList = [];
-    },
-    confirmEditCanvas() {
-      const self = this;
-      self.showCancelContent = false;
-      self.imageCanvasList.pop();
-      self.canvasEl = document.getElementById('icanvas');
-      var ctx = self.canvasEl.getContext('2d');
-      let vcanvas = null;
-      if (self.showFeedBack) {
-        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
-      } else {
-        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
-      }
-      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
-      if (self.imageCanvasList.length == 0) {
-        ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
-      } else {
-        ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length - 1], 0, 0, vcanvas.width, vcanvas.height);
-      }
-    },
-    confirmEdit() {
-      const self = this;
-      self.sourceList = [];
-      const obj = {};
-      obj.mediaType = 2;
-      obj.src = self.canvasEl.toDataURL('image/jpeg');
-      obj.height = '100px';
-      obj.width = '140px';
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg';
-      obj.file = util.base64ToBlob(obj.src);
-      obj.deviceId = self.channel.id;
-      self.sourceList.push(obj);
-      self.showCutDialog = false;
-      console.log(self.curItemId);
-      const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
-      if (tempId != null) {
-        if (!self.showIgnoreItem) {
-          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-        } else {
-          self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
-        }
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-      if (!self.showIgnoreItem) {
-        self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-      } else {
-        self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
-      }
-      // if(tempId!=null){
-      //   self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-      // }
-      // else{
-      //     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
-      // }
-      // self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-    },
-    mouseDownAction(e) {
-      const self = this;
-      self.isMouseDown = true;
-      self.X = e.offsetX;
-      self.Y = e.offsetY;
-      self.showCutModel = false;
-      self.showPenBtn = false;
-      self.showCancelContent = false;
-    },
-    mouseMoveAction(e) {
-      const self = this;
-      if (self.isMouseDown) {
-        self.X1 = e.offsetX;
-        self.Y1 = e.offsetY;
-        self.drawLine(self.X, self.Y, self.X1, self.Y1);
-        self.showPenBtn = false;
-        self.flag++;
-      }
-    },
-    mouseUpAction(e) {
-      const self = this;
-      self.isMouseDown = false;
-      self.showCutModel = true;
-      self.showPenBtn = true;
-      self.showCancelContent = true;
-      if (self.flag != 0 && self.canvasEl != '') {
-        const imgObj = new Image();
-        imgObj.src = self.canvasEl.toDataURL('image/jpeg');
-        self.imageCanvasList.push(imgObj);
-      }
-      self.flag = 0;
-    },
-    drawLine(x, y, x1, y1) {
-      const self = this;
-      var ctx = self.canvasEl.getContext('2d');
-      if (self.flag) {
-        ctx.beginPath();
-      }
-      ctx.moveTo(x, y);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = self.penChecked;
-      ctx.lineTo(x1, y1);
-      ctx.stroke();
-      if (self.flag != 0) {
-        self.X = self.X1;
-        self.Y = self.Y1;
-      }
-    },
-    showCancel() {
-      const self = this;
-      self.showCancelContent = true;
-      self.showPenBtn = true;
-    },
-    hiddenCancel() {
-      const self = this;
-      self.showCancelContent = false;
-      self.showPenBtn = false;
-    },
     getFaStoreList() {
       return new Promise((resolve, reject) => {
         getFavoriteList().then(res => {
@@ -1622,6 +1103,7 @@ export default {
         });
       });
     },
+
     checkIgnoreScore(item, itemDS, e, index) {
       const self = this;
       item.manualIgnore = false;
@@ -1647,6 +1129,7 @@ export default {
       }
       item.dealCount = item.Effective = item.inputCount = 1;
     },
+
     checkScore(item, itemDS, e) {
       const self = this;
       console.log(item, itemDS);
@@ -2230,6 +1713,7 @@ export default {
       self.sourceListLength = item.sourceList.length;
       const obj = {};
       if (item.deviceId.length > 0) {
+        self.showGuide = false;
         const device = self.getDeviceById(item.deviceId);
         if (device.length > 0) {
           obj.id = device[0].id;
@@ -2258,7 +1742,9 @@ export default {
             }
           });
           if (!self.isEzviz) {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, null);
+            self.$nextTick(() => {
+              self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+            });
           } else {
             // Ezviz
             if (self.$refs.ezvizVideo != undefined) {
@@ -2556,349 +2042,7 @@ export default {
       const self = this;
       self.showSpread = false;
     },
-    async playVideo(url) {
-      const self = this;
-      console.log('playvideo enter!');
-      self.showModelContent = true;
-      // self.showInfoContent=true;
-      self.playState = true;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      this.previewplayer.src({ src: url, type: this.protocal == 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
-      this.previewplayer.play();
-      // setTimeout(() => {
-      //     self.showModelContent=true;
-      //     //self.showInfoContent=false;
-      // }, 3000);
-    },
-    destroyVideo() {
-      const self = this;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      self.previewplayer.dispose();
-    },
-    hiddenModel() {
-      const self = this;
-      // self.showModelContent=false;
-      // self.showInfoContent=false;
-    },
-    showModel() {
-      const self = this;
-      // self.showInfoContent=true;
-      // if(self.playState){
-      //     self.showModelContent=true;
-      // }
-    },
 
-    async onPlay() {
-      const paused = !this.paused;
-      this.showError = false;
-      this.errorText = '';
-      if (this.realType === true) {
-        if (paused) {
-          await this.stopVideo();
-          await this.disconnectVideo();
-          await this.offline();
-          this.paused = true;
-        } else {
-          if (this.channel === null) {
-            this.paused = true;
-          } else {
-            await this.startVideo(this.channel.ivsId, this.channel.channelId, null);
-          }
-        }
-      } else {
-        if (paused) {
-          this.paused = true;
-        } else {
-          if (this.onEndflag) {
-            this.startVideo(this.channel.ivsId, this.channel.channelId, this.lastTime);
-          } else {
-            this.paused = false;
-          }
-        }
-      }
-    },
-
-    async startVideo(IVSID, channelId, startTs) {
-      try {
-        if (IVSID === null || channelId === null) {
-          const error = this.$t('remotePatrol.dashServerError') + '5';
-          this.currentState = 'blank';
-          this.errorText = error;
-        } else {
-          this.isLoading = true;
-          if (!await this.stopVideoPlay()) {
-            return;
-          }
-          if (!await this.online()) {
-            return;
-          }
-          this.IVSID = IVSID;
-          this.channelId = channelId.toString();
-          if (startTs) {
-            await this.history(startTs);
-          } else {
-            if (await this.connectVideo()) {
-              this.startTimer();
-            }
-          }
-        }
-      } catch (e) {
-        if (e.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = e.message;
-        }
-      }
-    },
-
-    startTimer() {
-      this.realTimeSpeed = 0;
-      this.isLoading = false;
-      this.timerPlayReal = window.setInterval(() => {
-        console.log(this.realTimeSpeed);
-        this.realTimeSpeed = this.realTimeSpeed + 1;
-      }, 1000);
-    },
-
-    stopTimer() {
-      window.clearInterval(this.timerPlayReal);
-      this.realTimeSpeed = 0;
-    },
-
-    async stopVideoPlay() {
-      if (this.sessionId) {
-        const state = this.currentState;
-        this.currentState = 'loading';
-        if (state === 'play') {
-          this.stopVideo();
-          await this.disconnectVideo();
-        }
-        this.paused = true;
-        return await this.offline();
-      } else {
-        this.paused = true;
-        return true;
-      }
-    },
-
-    async online() {
-      const data = {};
-      const request = {};
-      request.username = this.userName;
-      request.password = this.password;
-      data.request = request;
-      this.currentState = 'loading';
-      if (await DashHttp.putDash('Authority/Online', data)) {
-        this.sessionId = DashHttp.getResult().SessionID;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank';
-        this.errorText = error;
-        this.showError = true;
-        return false;
-      }
-    },
-
-    async offline() {
-      if (this.sessionId != null) {
-        const data = {};
-        const request = {};
-        request.sessionID = this.sessionId;
-        data.request = request;
-        if (await DashHttp.putDash('Authority/Offline', data)) {
-          this.sessionId = null;
-          return true;
-        } else {
-          if (DashHttp.getResult() != null) {
-            const errorCode = DashHttp.getResult().ErrorCode;
-            if (errorCode === 3) {
-              this.sessionId = null;
-              return true;
-            } else {
-              const error = this.$t('remotePatrol.dashServerError') + errorCode;
-              return false;
-            }
-          } else {
-            return false;
-          }
-        }
-      } else {
-        return true;
-      }
-    },
-
-    async connectVideo() {
-      console.log('Connect Video--');
-      const data = {};
-      const request = {};
-      request.method = 'connection';
-      request.sessionID = this.sessionId;
-      request.streamingProtocol = this.streamProtocol;
-      request.withAudio = true;
-      request.streamType = 'SubStream';
-      request.IVSID = this.IVSID;
-      request.channel = this.channelId;
-      data.request = request;
-      this.realType = true;
-      if (await DashHttp.putDash('LiveStream', data)) {
-        const url = DashHttp.getResult().mpd;
-        this.uri = url;
-        console.log(this.uri);
-        this.playVideo(url);
-        this.currentState = 'play';
-        this.paused = false;
-        this.errorText = '';
-        this.isLoading = false;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-          this.isLoading = false;
-          return false;
-        }
-      }
-    },
-
-    async history(startTs) {
-      const data = {};
-      const request = {};
-      request.method = 'connection';
-      request.sessionID = this.sessionId;
-      request.streamingProtocol = this.streamProtocol;
-      request.withAudio = true;
-      request.transcodeResolution = 'D1';
-      request.IVSID = this.IVSID;
-      request.channel = this.channelId;
-      request.beginTime = startTs.toString();
-      request.endTime = (startTs + 300).toString();
-
-      data.request = request;
-      this.realType = false;
-      if (await DashHttp.putDash('PlaybackStream', data)) {
-        const url = DashHttp.getResult().mpd;
-        this.uri = url;
-        this.currentState = 'play';
-        this.paused = false;
-        this.errorText = '';
-        this.onEndflag = false;
-        this.lastTime = startTs + 300;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank',
-        this.paused = false,
-        this.errorText = error;
-        return false;
-      }
-    },
-
-    async disconnectVideo() {
-      if (this.sessionId != null) {
-        const data = {};
-        const request = {};
-        request.method = 'disconnection';
-        request.sessionID = this.sessionId;
-        request.IVSID = this.IVSID;
-        request.channel = this.channelId;
-        request.streamType = 'SubStream';
-        data.request = request;
-        const url = this.realType ? 'LiveStream' : 'PlaybackStream';
-        if (await DashHttp.putDash(url, data)) {
-          return true;
-        } else {
-          if (DashHttp.getResult() != null) {
-            const errorCode = DashHttp.getResult().ErrorCode;
-            if (errorCode === 3) {
-              return true;
-            } else {
-              if (errorCode !== 24) {
-                const error = this.$t('remotePatrol.dashServerError') + errorCode;
-              }
-              return false;
-            }
-          } else {
-            return false;
-          }
-        }
-      } else {
-        return true;
-      }
-    },
-
-    stopVideo() {
-      const self = this;
-      console.log('stop video');
-      self.showModelContent = false;
-      self.playState = false;
-      var video = document.getElementById('previewVideo');
-      self.previewplayer = videojs(video);
-      self.previewplayer.pause();
-      self.stopTimer();
-    },
-
-    controlScreen() {
-      const self = this;
-      if (!self.fullScreen) {
-        self.fullWindowScreen();
-        self.fullScreen = true;
-      } else {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-    },
-
-    fullWindowScreen(...val) {
-      console.log(val);
-      const self = this;
-      // self.showControls=true;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
-      if (ele.requestFullscreen) {
-        ele.requestFullscreen();
-      } else if (ele.mozRequestFullScreen) {
-        ele.mozRequestFullScreen();
-      } else if (ele.webkitRequestFullScreen) {
-        ele.webkitRequestFullScreen();
-      } else if (ele.msRequestFullscreen) {
-        ele.msRequestFullscreen();
-      }
-    },
-
-    exitFullscreen() {
-      var de = document;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = 'auto';
-      ele.style.height = 'auto';
-      if (de.exitFullscreen) {
-        de.exitFullscreen();
-      } else if (de.mozCancelFullScreen) {
-        de.mozCancelFullScreen();
-      } else if (de.webkitCancelFullScreen) {
-        de.webkitCancelFullScreen();
-      }
-    },
-
-    gonggeScreen() {
-      const self = this;
-      self.showgongge = true;
-    },
-    recoverScreen() {
-      const self = this;
-      self.showgongge = false;
-    },
     searchStore() {
       const self = this;
       console.log(self.tabList);
@@ -3460,13 +2604,6 @@ export default {
         }
       }
     },
-    checkFull() {
-      var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
-      if (isFull === undefined) {
-        isFull = false;
-      }
-      return isFull;
-    },
     notify(msg, type, time) {
       this.$message({
         message: msg,
@@ -3535,50 +2672,7 @@ export default {
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
-    /**
-       * handle ezviz video feedback
-       * @param obj
-       */
-    ezvizVideoFeedback(ezvizObj) {
-      console.log(ezvizObj);
-      const self = this;
-      const srcObj = {};
-      const tempSrcObj = ezvizObj.sourceObj;
-      srcObj.src = tempSrcObj.src;
-      srcObj.file = tempSrcObj.blob;
-      srcObj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      srcObj.mediaType = 1;
-      const videoObj = {
-        eventName: ezvizObj.eventName,
-        eventDes: ezvizObj.eventDes,
-        sourceObj: srcObj
-      };
-      self.eventList.push(videoObj);
-      self.showFeedBackInfo = false;
-    },
-    /**
-       * handle ezviz record video
-       */
-    confirmEzvizVideo(blob) {
-      const self = this;
-      const url = URL.createObjectURL(blob);
-      self.sourceList = [];
-      const obj = {};
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      obj.file = blob;
-      obj.mediaType = 1;
-      obj.src = url;
-      obj.height = '100px';
-      self.sourceList.push(obj);
-      console.log(self.curItemId);
-      const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
-      if (tempId != null) {
-        self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-    },
+
     getVideoAuthority() {
       const self = this;
       return new Promise((resolve, reject) => {
