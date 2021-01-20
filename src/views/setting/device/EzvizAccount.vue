@@ -42,7 +42,7 @@
                 </el-col>
                 <el-col :span="24">
                   <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
-                    <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;"/>
+                    <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;" type="password"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="24">
@@ -212,7 +212,7 @@
             size="mini">
             <el-col :span="24">
               <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
-                <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;"/>
+                <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;" type="password"/>
               </el-form-item>
             </el-col>
           </el-form>
