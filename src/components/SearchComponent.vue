@@ -849,10 +849,16 @@ export default {
         margin-right: calc(20/1920*100vw);
         font-size: calc(14/1920*100vw);
         margin-left: 0;
+        @media screen and (max-width: 1465px){
+          margin-right: 0px;
+        }
       }
     }
     .header-details:nth-child(1){
       padding-right: calc(60/1920*100vw);
+      @media screen and (max-width: 1360px){
+        padding-right: calc(20/1920*100vw);
+      }
     }
     .header-details:nth-child(2){
       padding-top:15px;

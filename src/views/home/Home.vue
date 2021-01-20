@@ -670,8 +670,8 @@ export default {
       box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
       min-width: 1000px ;
       .logo-width{
-        width:calc(330/1920*100vw);
-        min-width: 260px;
+        width:calc(350/1920*100vw);
+        min-width: 290px;
       }
       .logo-collapse-width{
         width:$collapseWidth;
@@ -684,8 +684,8 @@ export default {
         }
       }
       .logo-width.logo-mobile{
-        width:calc(330/1920*100vw);
-        min-width: 260px;
+        width:calc(350/1920*100vw);
+        min-width: 290px;
       }
       .logo{
         height: calc(80/1920*100vw);
@@ -1181,8 +1181,8 @@ export default {
       background-color:#f31d65 !important;
     }
     .aside-width{
-      width:calc(330/1920*100vw);
-      min-width: 260px;
+      width:calc(350/1920*100vw);
+      min-width: 290px;
       background-color: #222538;
       margin-top: -0.5px;
       transition: width .1s;
@@ -1191,8 +1191,8 @@ export default {
     .aside-width.mobile{
       position: fixed;
       z-index: 1000;
-      width:calc(330/1920*100vw);
-      min-width: 260px;
+      width:calc(350/1920*100vw);
+      min-width: 290px;
     }
     .aside-collapse-width{
       width:$collapseWidth;
@@ -1202,7 +1202,7 @@ export default {
       transition: width .1s;
     }
     .aside-collapse-width.mobile{
-      transform: translate(calc(-260px), 0);
+      transform: translate(calc(-290px), 0);
     }
     .sec-collapsed{
       margin-left:calc(100/1920*100vw);
@@ -1216,13 +1216,13 @@ export default {
       width: 100%;
     }
     .sec-uncoll{
-      margin-left:calc(330/1920*100vw);
+      margin-left:calc(350/1920*100vw);
       height: auto;
-      width:calc(100% - calc(330/1920*100vw));
-      min-width:calc(1000px - 260px);
-      @media screen and (max-width: 1512px){
-        margin-left:260px;
-        width:calc(100% - 260px);
+      width:calc(100% - calc(350/1920*100vw));
+      min-width:calc(1000px - 290px);
+      @media screen and (max-width: 1590px){
+        margin-left: 290px;
+        width:calc(100% - 290px);
       }
     }
     .sec-uncoll.mobile-sec{

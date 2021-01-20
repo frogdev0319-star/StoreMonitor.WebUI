@@ -336,7 +336,7 @@ export default {
           'pdfwidth': '12%',
           'pdfmaxWidth': '14%',
           'width': '160',
-          'maxWidth': '180'
+          'maxWidth': '190'
         },
         {
           'prop': 'numOfReport',
@@ -415,7 +415,7 @@ export default {
           'pdfwidth': '12%',
           'pdfmaxWidth': '14%',
           'width': '160',
-          'maxWidth': '180'
+          'maxWidth': '190'
         },
         {
           'prop': 'numOfReport',
