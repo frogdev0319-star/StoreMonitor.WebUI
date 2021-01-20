@@ -7,6 +7,7 @@
       v-loading="isLoading"
       v-else
       id="videoContent"
+      :style="isEvent ? {}: {'margin-bottom': 0}"
       element-loading-background="rgba(0, 0, 0, 0.8)"
       class="video-content">
       <span v-if="channelInfo != null" id="channelName">{{ channelInfo != null ? channelInfo.channelName : '' }}</span>
@@ -102,7 +103,7 @@
         />
       </div>
       <transition name="fade">
-        <div v-if="showSnapshotBtn" :class="lang === 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
+        <div v-if="showSnapshotBtn && !isEvent" :class="lang === 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
           <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
           <span>{{ $t('remotePatrol.snapshot') }}</span>
         </div>
@@ -170,12 +171,12 @@
         <div
           v-if="showCancelContent"
           :style="{
-              width: 767 * percentHeight + 'px',
-              'margin-left': 47 * percentHeight + 'px',
-            }"
+            width: 767 * percentHeight + 'px',
+            'margin-left': 47 * percentHeight + 'px',
+          }"
           class="cancel-content"
         >
-          <div class="content" @click="cancleEditCanvas">
+          <div class="content" @click="cancelEditCanvas">
             <img :src="clearIconSrc" class="icon-clear" height="22px" >
             <span>{{ $t("remotePatrol.clear") }}</span>
           </div>
@@ -187,7 +188,7 @@
       </div>
       <div slot="footer">
         <el-button id="cancelBtn" size="mini" @click="cancelEdit">{{
-          $t("remotePatrol.cancel") }}</el-button>
+        $t("remotePatrol.cancel") }}</el-button>
         <el-button
           id="confirmBtn"
           size="mini"
@@ -195,6 +196,85 @@
           @click="confirmEdit"
         >
           {{ $t("remotePatrol.confirm") }}
+        </el-button>
+      </div>
+    </el-dialog>
+    <!--feedback based on snapshot -->
+    <el-dialog
+      v-if="showSnapshotFeedbackDialog"
+      :title= "$t('remotePatrol.feedbacks')"
+      :visible.sync="showSnapshotFeedbackDialog"
+      :close-on-click-modal="false"
+      :width="860*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+          <div v-if="showPenBtn" id="iconR" class="icon-right">
+            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+            <transition name="fadepen">
+              <div v-if="showPen" class="pen-content">
+                <div v-for="(item,index) in penList" :key="index" class="content">
+                  <div :class="{colorActive:item.showContent}"/>
+                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+                </div>
+              </div>
+            </transition>
+          </div>
+          <canvas
+            id="icanvas"
+            :width="520*percentHeight"
+            :height="340*percentHeight"
+            @mousedown="mouseDownAction($event)"
+            @mouseup="mouseUpHandler"
+            @mousemove="mouseMoveAction($event)"
+            @mouseleave="mouseLeaveAction($event)"/>
+          <div
+            v-if="showCancelContent"
+            :style="{'width':520*percentHeight+'px',
+                     'margin-left':47*percentHeight+'px'}"
+            class="cancel-content">
+            <div class="content" @click="cancelEditCanvas">
+              <img :src="clearIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.clear') }}</span>
+            </div>
+            <div class="content" @click="confirmEditCanvas">
+              <img :src="removeIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.cancel') }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="event-content">
+          <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
+          <el-input
+            v-model="eventName"
+            size="mini"
+            class="name-input"
+            @input="eventNameChanged"
+            @blur="notShowInputRuleTips('eventName')"/>
+          <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+          <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
+          <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <el-input
+            :autosize="{ minRows: 4, maxRows:7}"
+            v-model="eventDes"
+            :placeholder="$t('remotePatrol.descPlaceholder')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="eventDesChanged"
+            @blur="notShowInputRuleTips('eventDes')"/>
+          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button id="cancelBtn" size="mini" @click="showSnapshotFeedbackDialog = false">
+          {{ $t('remotePatrol.cancel') }}
+        </el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmFeedBackOnSnapshot">
+          {{ $t('remotePatrol.confirm') }}
         </el-button>
       </div>
     </el-dialog>
@@ -206,12 +286,18 @@ import { mapGetters } from 'vuex';
 import videojs from '../../static/video.js';
 import DashHttp from '@/common/DashHttp.js';
 import { getDashServerInfo } from '@/api/device.js';
+import SnapshotCanvas from './SnapshotCanvas';
+import util from '@/common/util'
+import filterString from '../common/filterString';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'DashVideo',
+  components: { SnapshotCanvas },
   props: {
     channelInfo: {
-      type: Object
+      type: Object,
+      default: () => {}
     },
     curDeviceId: {
       type: Number,
@@ -222,20 +308,24 @@ export default {
       default: 0
     },
     showFeedBack: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     isEvent: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     isStoreMonitor: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     isHistory: {
       type: Boolean,
       default: false
     },
     curTime: {
-      type: Number
+      type: Number,
+      default: 0
     },
     storeId: {
       type: String,
@@ -475,6 +565,8 @@ export default {
       showGetVideo: false,
       showSnapshotBtn: false,
       previewplayer: null,
+      showSnapshotFeedbackDialog: false,
+      clickSnapshot: false,
 
       uri: null,
       play: true,
@@ -554,24 +646,22 @@ export default {
     }
   },
 
-  async mounted() {
+  async created() {
     window.addEventListener('resize', this.resizeFun, false);
-    window.addEventListener('visibilitychange', this.visibleChange, false);
+    window.addEventListener('visibilitychange', this.visibilityChange, false);
     this.getDashUrlInfo();
   },
 
   beforeDestroy() {
     const self = this;
-    console.log(self.playState);
     window.clearInterval(self.timerPlayReal);
     self.realTimeSpeed = 0;
-    if (self.playState) {
-
-    }
+    console.log('destory')
+    self.stopVideoPlay();
     window.removeEventListener('resize', self.resizeFun);
-    window.removeEventListener('visibilitychange', self.visibleChange);
+    window.removeEventListener('visibilitychange', self.visibilityChange);
     self.resizeFun = null;
-    self.visibleChange = null;
+    self.visibilityChange = null;
   },
 
   computed: {
@@ -598,20 +688,40 @@ export default {
   },
 
   methods: {
-    getDashUrlInfo() {
-      getDashServerInfo().then(result => {
-        const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
-        this.userName = result.data.loginId;
-        this.password = result.data.password;
-        const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-        DashHttp.setDashHost(url);
-      }).catch(error => {
-        if (error.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
+    visibilityChange() {
+      const self = this;
+      console.log('hide');
+      if (document.hidden) {
+        if (self.playState && !self.playBackState) {
+          self.stopVideoPlay();
+          self.stopTimer();
         }
-      });
+      } else {
+        console.log('show');
+        if (!self.playBackState && this.currentState === 'loading') {
+          self.startVideo(self.channelInfo.ivsId, self.channelInfo.channelId, null);
+        }
+      }
+    },
+
+    getDashUrlInfo() {
+      return new Promise((resolve, reject) => {
+        getDashServerInfo().then(result => {
+          const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
+          this.userName = result.data.loginId;
+          this.password = result.data.password;
+          const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
+          DashHttp.setDashHost(url);
+          resolve();
+        }).catch(error => {
+          if (error.message !== 'Network request failed') {
+            this.currentState = 'blank';
+            this.errorText = error;
+            this.showError = true;
+          }
+          reject(error);
+        });
+      })
     },
 
     async onPlay() {
@@ -653,6 +763,10 @@ export default {
           this.showError = true;
         } else {
           this.isLoading = true;
+          this.showError = false;
+          if (!this.userName) {
+            await this.getDashUrlInfo();
+          }
           if (!await this.stopVideoPlay()) {
             return;
           }
@@ -952,39 +1066,56 @@ export default {
 
     cutPicture(...val) {
       const self = this;
-      self.showCancelContent = false;
-      if (self.sourceList.length >= 10) {
-        self.notify(self.$t('remotePatrol.storeMaxAttach'), 'warning', 3000);
-        return false;
-      }
-      if (self.fullScreen) {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-      self.showSnapShotDialog = true;
-      this.$nextTick(() => {
-        self.imageCanvasList = [];
-        if (self.isHistory) {
-          self.stopVideoPlay();
-          const video = document.getElementById('dashVideo');
-          self.cutDialogcurTime = video.player.currentTime();
+      self.imageCanvasList = [];
+      self.videoEl = document.getElementById('dashVideo').children[0];
+      if (self.showFeedBack) {
+        self.showSnapshotFeedbackDialog = true;
+        self.eventName = '';
+        self.eventDes = '';
+        self.showEventNameInfo = false;
+        this.$nextTick(() => {
+          self.canvasEl = document.getElementById('icanvas');
+          var ctx = self.canvasEl.getContext('2d');
+          ctx.drawImage(self.videoEl, 0, 0, 520 * self.percentHeight, 340 * self.percentHeight);
+          var oGrayImg = icanvas.toDataURL('image/jpeg');
+          self.imageCanvas.src = oGrayImg;
+          const imgObj = new Image();
+          imgObj.src = oGrayImg;
+          self.imageCanvasList.push(imgObj);
+        });
+      }else{
+        self.showCancelContent = false;
+        if (self.sourceListLength >= 10) {
+          util.notify(self.$t('remotePatrol.storeMaxAttach'), 'warning', 3000);
+          return false;
         }
-        self.videoEl = document.getElementById('dashVideo').children[0];
-        self.canvasEl = document.getElementById('icanvas');
-        const ctx = self.canvasEl.getContext('2d');
-        ctx.drawImage(
-          self.videoEl,
-          0,
-          0,
-          767 * self.percentHeight,
-          431 * self.percentHeight
-        );
-        const oGrayImg = self.canvasEl.toDataURL('image/jpeg');
-        self.imageCanvas.src = oGrayImg;
-        const imgObj = new Image();
-        imgObj.src = oGrayImg;
-        self.imageCanvasList.push(imgObj);
-      });
+        if (self.fullScreen) {
+          self.exitFullscreen();
+          self.fullScreen = false;
+        }
+        self.showSnapShotDialog = true;
+        this.$nextTick(() => {
+          if (self.isHistory) {
+            self.stopVideoPlay();
+            const video = document.getElementById('dashVideo');
+            self.cutDialogcurTime = video.player.currentTime();
+          }
+          self.canvasEl = document.getElementById('icanvas');
+          const ctx = self.canvasEl.getContext('2d');
+          ctx.drawImage(
+            self.videoEl,
+            0,
+            0,
+            767 * self.percentHeight,
+            431 * self.percentHeight
+          );
+          const oGrayImg = self.canvasEl.toDataURL('image/jpeg');
+          self.imageCanvas.src = oGrayImg;
+          const imgObj = new Image();
+          imgObj.src = oGrayImg;
+          self.imageCanvasList.push(imgObj);
+        });
+      }
     },
 
     adjustSpeed(val) {
@@ -1050,7 +1181,7 @@ export default {
     },
 
     async getProcess() {
-      console.log('getProcess')
+      console.log('getProcess');
       const self = this;
       const video = document.getElementById('dashVideo');
       const curTime = video.player.currentTime();
@@ -1088,7 +1219,220 @@ export default {
       this.startTs = startTs;
       this.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, this.startTs);
       this.realTimeStartTs = this.startTs;
-    }
+    },
+
+    showPenList() {
+      const self = this;
+      self.showPen = !self.showPen;
+      self.showCancelContent = false;
+    },
+
+    checkPen(item, index) {
+      const self = this;
+      item.showContent = true;
+      self.showCancelContent = false;
+      self.penList.forEach((_item, _index) => {
+        if (index !== _index) {
+          _item.showContent = false;
+        }
+      });
+      self.penChecked = item.id;
+    },
+
+    mouseDownAction(e) {
+      const self = this;
+      self.isMouseDown = true;
+      self.X = e.offsetX;
+      self.Y = e.offsetY;
+      self.showPenBtn = false;
+      self.showCancelContent = false;
+    },
+
+    mouseMoveAction(e) {
+      const self = this;
+      if (self.isMouseDown) {
+        self.X1 = e.offsetX;
+        self.Y1 = e.offsetY;
+        self.showPenBtn = false;
+        self.drawLine(self.X, self.Y, self.X1, self.Y1);
+        self.flag++;
+      }
+    },
+
+    mouseUpAction(e) {
+      const self = this;
+      self.isMouseDown = false;
+      // self.showCutModel=true;
+      self.showPenBtn = true;
+      self.showCancelContent = true;
+
+      if (self.flag !== 0 && self.canvasEl !== '') {
+        const imgObj = new Image();
+        imgObj.src = self.canvasEl.toDataURL('image/jpeg');
+        self.imageCanvasList.push(imgObj);
+      }
+      self.flag = 0;
+      if (e.target.className === 'el-time-panel__btn confirm') {
+        self.changeDate();
+      }
+    },
+
+    mouseLeaveAction(e) {
+      const self = this;
+      self.isMouseDown = false;
+    },
+
+    mouseUpHandler(e) {
+      const self = this;
+      self.isMouseDown = false;
+      self.showCutModel = true;
+      self.showPenBtn = true;
+      self.showCancelContent = true;
+      if (self.flag !== 0 && self.canvasEl !== '') {
+        const imgObj = new Image();
+        imgObj.src = self.canvasEl.toDataURL('image/jpeg');
+        self.imageCanvasList.push(imgObj);
+      }
+      self.flag = 0;
+    },
+
+    eventNameChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 50);
+      console.log(content);
+      self.eventName = content;
+      self.showEventNameInfo = false;
+      const length = filterString.getContentLength(val);
+      if (length > 50) {
+        this.eventNameRuletip = true;
+      } else {
+        this.eventNameRuletip = false;
+      }
+    },
+
+    eventDesChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 200);
+      console.log(content);
+      self.eventDes = content;
+      const length = filterString.getContentLength(val);
+      if (length > 200) {
+        this.eventDesRuletip = true;
+      } else {
+        this.eventDesRuletip = false;
+      }
+    },
+
+    notShowInputRuleTips(e) {
+      if (e === 'eventName') {
+        this.eventNameRuletip = false;
+      } else if (e === 'eventDes') {
+        this.eventDesRuletip = false;
+      }
+    },
+
+    showCancel() {
+      const self = this;
+      self.showCancelContent = true;
+      self.showPenBtn = true;
+    },
+
+    hiddenCancel() {
+      const self = this;
+      self.showCancelContent = false;
+      self.showPenBtn = false;
+    },
+
+    cancelEditCanvas() {
+      const self = this;
+      self.showCancelContent = false;
+      self.canvasEl = document.getElementById('icanvas');
+      const ctx = self.canvasEl.getContext('2d');
+      ctx.clearRect(0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
+      ctx.drawImage(
+        self.imageCanvas,
+        0,
+        0,
+        767 * self.percentHeight,
+        431 * self.percentHeight
+      );
+      self.imageCanvasList = [];
+    },
+
+    confirmEditCanvas() {
+      const self = this;
+      self.showCancelContent = false;
+      self.imageCanvasList.pop();
+      self.canvasEl = document.getElementById('icanvas');
+      const ctx = self.canvasEl.getContext('2d');
+      ctx.clearRect(0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
+      if (self.imageCanvasList.length === 0) {
+        ctx.drawImage(
+          self.imageCanvas,
+          0,
+          0,
+          767 * self.percentHeight,
+          431 * self.percentHeight
+        );
+      } else {
+        ctx.drawImage(
+          self.imageCanvasList[self.imageCanvasList.length - 1],
+          0,
+          0,
+          767 * self.percentHeight,
+          431 * self.percentHeight
+        );
+      }
+    },
+
+    drawLine(x, y, x1, y1) {
+      const self = this;
+      const ctx = self.canvasEl.getContext('2d');
+      if (self.flag) {
+        ctx.beginPath();
+      }
+      ctx.moveTo(x, y);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = self.penChecked;
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+      if (self.flag !== 0) {
+        self.X = self.X1;
+        self.Y = self.Y1;
+      }
+    },
+
+    cancelEdit() {
+      const self = this;
+      self.showSnapShotDialog = false;
+    },
+
+    confirmEdit() {
+      const self = this;
+      self.showSnapShotDialog = false;
+      const src = self.canvasEl.toDataURL('image/jpeg');
+      self.$emit('confirmEzvizCanvas', src);
+    },
+
+    handleEmitCanvas(src) {
+      this.$emit('confirmEzvizCanvas', src);
+    },
+
+    confirmFeedBackOnSnapshot() {
+      const self = this;
+      const src = self.canvasEl.toDataURL('image/jpeg');
+      const obj = {
+        eventName: self.eventName,
+        eventDes: self.eventDes,
+        src: src
+      };
+      if (self.eventName.trim().length === 0) {
+        self.showEventNameInfo = true;
+        return false;
+      }
+      self.$emit('ezvizCutPictureFeedback', obj);
+      self.showSnapshotFeedbackDialog = false;
+    },
   }
 };
 </script>
@@ -1161,7 +1505,7 @@ export default {
     text-align: left;
   }
   .video-content{
-    height: 420px;
+    height: 420px !important;
     position: relative;
     margin:calc(25/1920*100vw);
     min-height: 420px;
