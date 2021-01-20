@@ -47,7 +47,7 @@
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
-          :min-width="lang!=='en'? 120 : 150"
+          :min-width="lang!=='en'? 120 : 160"
           prop="remotePer"
           sortable="custom">
           <template slot-scope="scope">
@@ -58,7 +58,7 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.onsitePatrol')"
-          :min-width="lang!=='en'? 120 : 150"
+          :min-width="lang!=='en'? 120 : 160"
           prop="onsitePer"
           sortable="custom">
           <template slot-scope="scope">
@@ -69,7 +69,7 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.storeMonitor')"
-          :min-width="lang !== 'en' ? 120 : 150"
+          :min-width="lang!=='en'? 120 : 160"
           prop="videoPer"
           sortable="custom">
           <template slot-scope="scope">
