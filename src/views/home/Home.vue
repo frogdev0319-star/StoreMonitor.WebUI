@@ -158,16 +158,18 @@
                       </template>
                       <el-menu-item
                         v-for="grandChild in child.children"
+                        v-show="!grandChild.hidden"
                         :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                         :index="grandChild.path"
                         :disabled="grandChild.isReadOnly"
                         :key="grandChild.path"
-                        class="submenu-item" >
+                        class="submenu-item">
                         <template>
                           <span :class="lang === 'en' ? 'third-child-span' : 'zh-third-child-span'">
                             {{ $t(`route.${grandChild.name}`) }}</span>
                         </template>
                       </el-menu-item>
+
                     </el-submenu>
                   </el-submenu>
                 </template>
@@ -208,7 +210,7 @@ import { mapGetters } from 'vuex';
 import { getUserInfo, getAccountList } from '@/api/login';
 import PubSub from 'pubsub-js';
 import { getCookie } from '@/common/auth';
-import Database from '@/common/Database'
+import Database from '@/common/Database';
 
 export default {
   name: 'Home',
@@ -354,6 +356,14 @@ export default {
           path = '/storemanage';
           break;
         }
+        case '/ezvizeDeviceSetting': {
+          path = '/ezvizDevice';
+          break;
+        }
+        case '/ezvizDevice1': {
+          path = '/ezvizDevice';
+          break;
+        }
         case '/titleSetting': {
           path = '/title';
           break;
@@ -375,18 +385,20 @@ export default {
     ]),
 
     brandDisabled() {
-      console.log(this.$route.matched);
       let disabled = true;
-      if (this.$route.matched.length === 2) {
-        disabled = false;
-      } else if (this.$route.matched.length === 3) {
-        if (this.$route.matched[1].path === '/schedule') {
+      switch (this.$route.matched.length) {
+        case 2: {
           disabled = false;
+          break;
+        }
+        case 3: {
+          const path = this.$route.matched[1].path;
+          disabled = this.setThreeChildrenCanChangeBrand(path);
+          break;
         }
       }
       return disabled;
     }
-
   },
 
   watch: {
@@ -410,10 +422,7 @@ export default {
   created() {
     const self = this;
     this.headUrl = './static/img/admin.png';
-    console.log(this.$route.matched);
     this.getBread();
-    console.log(this.$route.query);
-    const params = self.$route.query;
     PubSub.subscribe('change-color', (event, data) => {
       self.showTag = data.showTag;
     });
@@ -421,15 +430,14 @@ export default {
       if (data.changeStyle) {
         self.wapper = true;
       }
-    }),
+    });
     window.addEventListener('resize', this.$_isMobile);
     self.isMobile = self.$_isMobile();
+    this.getAccountList();
+    this.updateTitle();
   },
 
   mounted() {
-    this.getAccountList();
-    this.updateTitle();
-    console.log(this.$router.options.routes);
     if (this.$refs.fieldSelect != undefined) {
       this.$nextTick(function() {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
@@ -440,6 +448,23 @@ export default {
   },
 
   methods: {
+    setThreeChildrenCanChangeBrand(path) {
+      let disabled = true;
+      switch (path) {
+        case '/schedule':
+        case '/dashDevice':
+        case '/ezvizDevice':
+        case '/beseyeDevice': {
+          disabled = false;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      return disabled;
+    },
+
     handleClickOutside() {
       this.collapsed = true;
     },
@@ -477,25 +502,124 @@ export default {
     getBread() {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
-      const matched = this.$route.matched.filter(x => x.name);
-      if (matched.length > 2 && matched[1].name === 'scheduleManage') {
-        // patrol setting
-        switch (currentRoute) {
-          case '/pointCheck': {
-            matched[2].name = 'checkSchedule';
-            break;
-          }
-          case '/patrolSechedule': {
-            matched[2].name = 'patrolSecheduleManage';
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-        matched.splice(1, 1);
-      }
+      let matched = [];
+      matched = this.$route.matched.filter(x => x.name);
+      matched.length === 2 && this.setSecondLevelNavbarBread(matched, currentRoute);
+      matched.length > 2 && matched[1].name === 'scheduleManage' && this.setScheduleBread(matched, currentRoute);
+      matched.length > 2 && (matched[1].name === 'deviceManage' || matched[1].name === 'ezvizDeviceMgt') &&
+      this.setDeviceBread(matched, currentRoute);
+      console.log(matched);
       this.breadList = matched;
+    },
+
+    setScheduleBread(matched, currentRoute) {
+      // patrol setting
+      switch (currentRoute) {
+        case '/pointCheck': {
+          matched[2].name = 'checkSchedule';
+          break;
+        }
+        case '/patrolSechedule': {
+          matched[2].name = 'patrolSecheduleManage';
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      matched.splice(1, 1);
+    },
+
+    setDeviceBread(matched, currentRoute) {
+      // device setting
+      switch (currentRoute) {
+        case '/dashDevice': {
+          matched[2].name = 'dashDeviceMgt';
+          matched.splice(1, 1);
+          break;
+        }
+        case '/ezvizDevice': {
+          matched[2].name = 'ezvizDeviceMgt';
+          matched.splice(1, 1);
+          break;
+        }
+        case '/beseyeDevice': {
+          matched[2].name = 'beseyeDeviceMgt';
+          matched.splice(1, 1);
+          break;
+        }
+        case '/ezvizeDeviceSetting': {
+          matched[1].name = 'ezvizDeviceMgt';
+          matched[1].path = '/ezvizDevice';
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    setSecondLevelNavbarBread(matched, currentRoute) {
+      console.log(matched);
+      let parentBread = {};
+      switch (currentRoute) {
+        case '/storedetail': {
+          parentBread = {
+            path: '/storemanage',
+            name: 'storeManage'
+          };
+          break;
+        }
+        case '/titleSetting': {
+          parentBread = {
+            path: '/title',
+            name: 'titleManage'
+          };
+          break;
+        }
+        case '/addroute':
+        case '/setroute':
+        case '/bindroute': {
+          parentBread = {
+            path: '/routeinspection',
+            name: 'inspectSetting'
+          };
+          break;
+        }
+        case '/rate': {
+          parentBread = {
+            path: '/event',
+            name: 'eventManage'
+          };
+          break;
+        }
+        case '/reportdetails': {
+          parentBread = {
+            path: '/report',
+            name: 'reports'
+          };
+          break;
+        }
+        case '/storemonitor/submit': {
+          parentBread = {
+            path: '/storemonitor',
+            name: 'storeMonitor'
+          };
+          break;
+        }
+        case '/reinspect/confirmrein':
+        case '/reinspect/submit' : {
+          parentBread = {
+            path: '/reinspection',
+            name: 'remotePatrol'
+          };
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      Object.keys(parentBread).length > 0 && matched.splice(1, 0, parentBread);
     },
 
     getWindowSize() {
@@ -563,7 +687,6 @@ export default {
       const self = this;
       const userId = getCookie('UserId');
       getUserInfo().then(res => {
-        console.log(res);
         self.personList = res.data;
         res.data.forEach(item => {
           if (item.userId === userId) {
@@ -1422,6 +1545,9 @@ export default {
   .submenu-item{
     border-bottom: 1px solid #393b4c;
   }
+  /*.submenu-item:nth-child(n+4){*/
+    /*display: none;*/
+  /*}*/
   .el-menu .submenu-item:last-child{
     border-bottom: none;
   }

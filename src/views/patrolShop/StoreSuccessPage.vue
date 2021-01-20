@@ -158,9 +158,9 @@ export default {
         self.showLeader = false;
       }
       if (self.isSuccess) {
-        self.$route.matched[2].name = 'successSubmit';
+        self.$route.matched[1].name = 'successSubmit';
       } else {
-        self.$route.matched[2].name = 'failSubmit';
+        self.$route.matched[1].name = 'failSubmit';
       }
     },
 
