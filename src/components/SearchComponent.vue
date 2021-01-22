@@ -324,50 +324,6 @@ export default {
       });
     },
 
-    async getRegionInfo() {
-      const self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      const retData = await self.getStoreData(params);
-      const storeList = retData.data.content;
-      self.storeList = storeList;
-
-      const getCountry = storeList => {
-        const temp = [];
-        storeList.forEach(item => {
-          if (temp.map(x => x.value).indexOf(item.country) === -1) {
-            const obj = {
-              label: item.country,
-              value: item.country
-            };
-            temp.push(obj);
-          }
-        });
-        return temp;
-      };
-      const countryList = getCountry(storeList);
-      const tempStore = [];
-      storeList.forEach(item => {
-        const obj = {
-          storeId: item.storeId,
-          label: item.name,
-          value: item.name,
-          checked: false
-        };
-        tempStore.push(obj);
-      });
-      self.storeDataList = tempStore;
-      self.countryList[0] = {};
-      self.countryList[0].label = self.$t('remotePatrol.country');
-      self.countryList[0].countryList = countryList;
-      self.curCountry = countryList[0].label;
-      self.selectAllProAndCity(self.curCountry);
-    },
-
     async getCountryStore() {
       const self = this;
       const data = await self.getBriefStoreData();
@@ -392,7 +348,7 @@ export default {
         self.countryList[0].countryList = countryList;
         self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
         self.curCountry = countryList[0].value;
-        self.selectAllProAndCity(self.curCountry);
+        self.selectAllProAndCity(self.curCountry,true);
       }
     },
 
@@ -568,7 +524,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val);
+      self.selectAllProAndCity(val,false);
     },
 
     changeCity(val) {
@@ -624,7 +580,7 @@ export default {
       self.$refs.citySelect.input = '';
     },
 
-    async selectAllProAndCity(val) {
+    async selectAllProAndCity(val,isFirst) {
       const self = this;
       const storeList = self.storeList;
       const temp = [];
@@ -681,7 +637,7 @@ export default {
       self.curStore = storeArr;
       self.isInspectItem ? await self.getAllStoreList() : '';
       self.changeStoreNew(self.curStore);
-      await self.searchData();
+      isFirst ? await self.searchData() : null;
     },
 
     async searchData() {
