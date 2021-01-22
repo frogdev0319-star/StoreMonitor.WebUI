@@ -622,7 +622,7 @@
               <i class="el-icon-arrow-down el-icon--right"/>
             </span>
             <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-              <el-dropdown-item v-if="PatrolList.length===0">{{$t('insSettingView.noData')}}</el-dropdown-item>
+              <el-dropdown-item v-if="PatrolList.length===0">{{$t('overview.noData')}}</el-dropdown-item>
               <el-dropdown-item v-else v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -3172,13 +3172,15 @@ export default {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
       // }
-      if ((!self.isEzviz && self.editCount != 0) ||
-        (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
-        (self.$store.getters.PatrolHistory != null)) {
-        self.changeInspectObj.dialogCosed = true;
-        self.beforepatrolstore = val;
-      } else {
-        self.changeInspectList(val);
+      if(val!==undefined){
+        if ((!self.isEzviz && self.editCount != 0) ||
+          (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
+          (self.$store.getters.PatrolHistory != null)) {
+          self.changeInspectObj.dialogCosed = true;
+          self.beforepatrolstore = val;
+        } else {
+          self.changeInspectList(val);
+        }
       }
     },
     changeInspectList(val) {
