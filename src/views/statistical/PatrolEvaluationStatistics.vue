@@ -82,7 +82,7 @@
               :highlight-current-row= "true"
               :pagesize="sizeNumRegion"
               :current-page="pageRegion"
-              :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
               @handleChange="handleRegionPageAndSizeChange"
               @sortChange="handleRegionSortChange"/>
           </div>
@@ -118,7 +118,7 @@
                 :highlight-current-row= "true"
                 :pagesize="sizeNumStore"
                 :current-page="pageStore"
-                :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
                 @handleChange="handleStorePageAndSizeChange"
                 @sortChange="handleStoreSortChange"/>
             </div>
@@ -375,7 +375,7 @@ export default {
           'maxWidth': '160'
         },
         {
-          'prop': 'qualifiedRatePer',
+          'prop': 'qualifiedRateStr',
           'label': this.$t('overview.passRate'),
           'sortable': 'custom',
           'pdfwidth': '16%',
@@ -454,7 +454,7 @@ export default {
           'maxWidth': '160'
         },
         {
-          'prop': 'qualifiedRatePer',
+          'prop': 'qualifiedRateStr',
           'label': this.$t('overview.passRate'),
           'sortable': 'custom',
           'pdfwidth': '16%',
@@ -560,7 +560,7 @@ export default {
             const result = regionResult.data;
             if (result) {
               result.content.forEach(item => {
-                item.qualifiedRatePer = item.qualifiedRate + '%';
+                item.qualifiedRateStr = item.qualifiedRate + '%';
               });
               self.regionPDFData = result.content;
             }
@@ -584,7 +584,7 @@ export default {
             const result = storeResult.data;
             if (result) {
               result.content.forEach(item => {
-                item.qualifiedRatePer = item.qualifiedRate + '%';
+                item.qualifiedRateStr = item.qualifiedRate + '%';
               });
               self.storePDFData = result.content;
             }
@@ -634,7 +634,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportRegionHeader;
         const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRatePer', 'averageScore'];
+          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const size = self.totalRegion;
         const params = {};
@@ -650,7 +650,7 @@ export default {
           const result = regionResult.data;
           if (result) {
             result.content.forEach(item => {
-              item.qualifiedRatePer = item.qualifiedRate + '%';
+              item.qualifiedRateStr = item.qualifiedRate + '%';
             });
             curData = result.content;
           }
@@ -675,7 +675,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportDataHeader;
         const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRatePer', 'averageScore'];
+          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const size = self.totalStore;
         const params = {};
@@ -695,7 +695,7 @@ export default {
           const result = storeResult.data;
           if (result) {
             result.content.forEach(item => {
-              item.qualifiedRatePer = item.qualifiedRate + '%';
+              item.qualifiedRateStr = item.qualifiedRate + '%';
             });
             curData = result.content;
           }
@@ -988,7 +988,7 @@ export default {
         if (result) {
           self.totalRegion = result.totalElements;
           result.content.forEach(item => {
-            item.qualifiedRatePer = item.qualifiedRate + '%';
+            item.qualifiedRateStr = item.qualifiedRate + '%';
           });
           self.regionTableData = result.content;
         }
@@ -1014,7 +1014,7 @@ export default {
         const result = storeResult.data;
         if (result) {
           result.content.forEach(item => {
-            item.qualifiedRatePer = item.qualifiedRate + '%';
+            item.qualifiedRateStr = item.qualifiedRate + '%';
           });
           self.regionTableData = result.content;
         }
@@ -1040,7 +1040,7 @@ export default {
         if (result) {
           self.totalStore = result.totalElements;
           result.content.forEach(item => {
-            item.qualifiedRatePer = item.qualifiedRate + '%';
+            item.qualifiedRateStr = item.qualifiedRate + '%';
           });
           self.storeTableData = result.content;
         }

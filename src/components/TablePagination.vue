@@ -136,7 +136,7 @@ export default {
       cellClass: 'cell-class',
       rowClass: 'row-class',
       lang: this.$i18n.locale,
-      order: {}
+      order: {direction: '', property: ''}
     };
   },
 
