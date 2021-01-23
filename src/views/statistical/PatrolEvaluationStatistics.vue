@@ -643,7 +643,7 @@ export default {
         params.filter = { 'page': 0, 'size': size };
         params.order = self.regionOrder;
         params.storeIds = self.params.storeIds;
-        params.regionMode = 3;
+        params.regionMode = self.regionMode;
         const regionResult = await that.getInspectStatsOverviewWithRegion(params);
         let curData = [];
         if (regionResult.errCode === 0) {
