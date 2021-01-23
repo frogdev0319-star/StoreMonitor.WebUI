@@ -166,7 +166,7 @@ export default {
       const self = this;
       const order = col.order;
       if (!order) {
-        self.order = self.getOrderBasedOnDefaultSort();
+        self.getOrderBasedOnDefaultSort();
       } else {
         self.order.direction = order === 'ascending' ? 'asc' : 'desc';
         const property = col.column.property;
