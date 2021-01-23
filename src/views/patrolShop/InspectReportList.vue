@@ -680,7 +680,7 @@ export default {
           self.countryList[0].countryList = countryList;
           self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
           self.curCountry = countryList[0].value;
-          self.selectAllProAndCity(self.curCountry);
+          self.selectAllProAndCity(self.curCountry,true);
         }
       }
       catch (err) {
@@ -808,7 +808,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val);
+      self.selectAllProAndCity(val,false);
     },
 
     changeCountryss(val) {
@@ -943,7 +943,7 @@ export default {
       self.$refs.citySelect.input = '';
     },
 
-    selectAllProAndCity(val) {
+    selectAllProAndCity(val,isFirst) {
       let self = this;
       let storeList = self.storeList;
       let temp = [];
@@ -1001,7 +1001,7 @@ export default {
       });
       self.curStore = storeArr;
       self.changeStore(self.curStore);
-      self.getInitReportList(0);
+      isFirst ? self.getInitReportList(0) : null;
     },
 
     dateFocus() {
