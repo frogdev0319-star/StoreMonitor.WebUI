@@ -57,7 +57,7 @@
           prop="VideoStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper video">
-              <el-tag size="small" color="#fccc3f1a">{{ scope.row.numOfTotal !== 0 ? `${(scope.row.numOfVideo/scope.row.numOfTotal)/100 }%`: '0%' }}</el-tag>
+              <el-tag size="small" color="#fccc3f1a">{{ scope.row.VideoStr }}</el-tag>
             </div>
           </template>
         </el-table-column>
