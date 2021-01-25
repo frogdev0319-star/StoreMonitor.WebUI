@@ -80,7 +80,9 @@
               :current-page="page"
               :is-event = "true"
               :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
-              @handleChange="handleChangeData"/>
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"
+            />
           </el-col>
         </el-row>
       </el-col>
@@ -202,30 +204,30 @@
                   <el-table-column
                     :label="$t('overview.remotePatrol')"
                     :min-width="lang !== 'en' ? '8% ': '9%'"
-                    prop="remotePer">
+                    prop="RemoteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper remote">
-                        <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer }}</el-tag>
+                        <el-tag size="small" color="#f31d651a">{{ scope.row.RemoteStr }}</el-tag>
                       </div>
                     </template>
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.onsitePatrol')"
                     :min-width="lang !== 'en' ? '8%' : '9%'"
-                    prop="onsitePer">
+                    prop="OnsiteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper onsite">
-                        <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer }}</el-tag>
+                        <el-tag size="small" color="#fb804f1a">{{ scope.row.OnsiteStr }}</el-tag>
                       </div>
                     </template>
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.storeMonitor')"
                     :min-width="lang !== 'en' ? '8%' : '9%'"
-                    prop="videoPer">
+                    prop="VideoStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper video">
-                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer }}</el-tag>
+                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.VideoStr }}</el-tag>
                       </div>
                     </template>
                   </el-table-column>
@@ -240,19 +242,6 @@
                 </el-table>
               </div>
             </div>
-            <table-pagination
-              ref="elTP"
-              :column-data="eventInfoData"
-              :table-data="eventPDFData"
-              :total="total"
-              :highlight-current-row= "true"
-              :pagesize="sizeNum"
-              :current-page="page"
-              :can-sortable="false"
-              :show-pagination="false"
-              :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"/>
           </el-col>
         </el-row>
       </el-col>
@@ -669,7 +658,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportEventHeader;
         const filterVal = ['storeName', 'regionName', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
-          'numOfProcessed', 'numOfRejected', 'remotePer', 'onsitePer', 'videoPer'];
+          'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
         let curData = [];
         curData = that.allEventData;
         const data = that.formatJson(filterVal, curData);
@@ -740,6 +729,7 @@ export default {
 
     async getEventTableData() {
       const self = this;
+      self.params.timeMode = self.timeMode;
       const eventResult = await self.getEventTableDataInfo(self.params);
       const ignorePer = 0;
       const errCode = eventResult.errCode;
@@ -751,13 +741,13 @@ export default {
           content.forEach(item => {
             const numOfTotal = item.numOfTotal;
             if (numOfTotal === 0) {
-              item.remotePer = 0 + '%';
-              item.onsitePer = 0 + '%';
-              item.videoPer = 0 + '%';
+              item.RemoteStr = 0 + '%';
+              item.OnsiteStr = 0 + '%';
+              item.VideoStr = 0 + '%';
             } else {
-              item.remotePer = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-              item.onsitePer = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-              item.videoPer = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
             }
           });
           self.eventTableData = content;
@@ -795,13 +785,13 @@ export default {
               content.forEach(item => {
                 const numOfTotal = item.numOfTotal;
                 if (numOfTotal === 0) {
-                  item.remotePer = 0 + '%';
-                  item.onsitePer = 0 + '%';
-                  item.videoPer = 0 + '%';
+                  item.RemoteStr = 0 + '%';
+                  item.OnsiteStr = 0 + '%';
+                  item.VideoStr = 0 + '%';
                 } else {
-                  item.remotePer = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-                  item.onsitePer = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-                  item.videoPer = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+                  item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+                  item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+                  item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
                 }
               });
               self.allEventData = content;
@@ -954,11 +944,11 @@ export default {
       let tempOrder = '';
       if (order === 'ascending') {
         let property = '';
-        if (col.column.property === 'remotePer') {
+        if (col.column.property === 'RemoteStr') {
           property = 'numOfRemote';
-        } else if (col.column.property === 'onsitePer') {
+        } else if (col.column.property === 'OnsiteStr') {
           property = 'numOfOnsite';
-        } else if (col.column.property === 'videoPer') {
+        } else if (col.column.property === 'VideoStr') {
           property = 'numOfVideo';
         } else {
           property = col.column.property;
@@ -971,11 +961,11 @@ export default {
         tempOrder = 'asc';
       } else if (order === 'descending') {
         let property = '';
-        if (col.column.property === 'remotePer') {
+        if (col.column.property === 'RemoteStr') {
           property = 'numOfRemote';
-        } else if (col.column.property === 'onsitePer') {
+        } else if (col.column.property === 'OnsiteStr') {
           property = 'numOfOnsite';
-        } else if (col.column.property === 'videoPer') {
+        } else if (col.column.property === 'VideoStr') {
           property = 'numOfVideo';
         } else {
           property = col.column.property;
@@ -996,12 +986,13 @@ export default {
       self.getEventTableData();
     },
 
-    emitSearch(searchParams, dateRangeList) {
+    emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
+      regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
-
       this.daysRangeList = dateRangeList;
+      this.timeMode = timeMode;
       this.searchData();
     },
 
@@ -1009,6 +1000,24 @@ export default {
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
       this.handleDown();
+    },
+
+    handlePageAndSizeChange(pageObj) {
+      console.log(pageObj);
+      const self = this;
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.getEventTableData();
+    },
+
+    handleSortChange(order) {
+      this.order = this.params.order = order;
+      this.params.filter = {
+        page: this.page - 1,
+        size: this.sizeNum
+      };
+      this.getEventTableData();
     }
 
   }
