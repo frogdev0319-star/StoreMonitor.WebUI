@@ -674,7 +674,6 @@ export default {
     async searchData() {
       const self = this;
       self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      console.log(self.params.storeIds);
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
         self.total = 0;
@@ -1003,7 +1002,6 @@ export default {
     },
 
     handlePageAndSizeChange(pageObj) {
-      console.log(pageObj);
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size

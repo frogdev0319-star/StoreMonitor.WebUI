@@ -775,7 +775,6 @@ export default {
               sunOfExcellent += _item.numOfExcellent;
               sumOfQualified += _item.numOfQualified;
               sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
-              console.log(sumOfReports)
               if (sumOfReports === 0) {
                 percentRegion = 0;
               } else {
@@ -1176,7 +1175,6 @@ export default {
           sunOfExcellent += _item.numOfExcellent;
           sumOfQualified += _item.numOfQualified;
           sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
-          console.log(sumOfReports)
           if (sumOfReports === 0) {
             percentRegion = 0;
           } else {
@@ -1207,10 +1205,7 @@ export default {
     },
 
     emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
-      console.log(searchParams);
-      console.log(dateRangeList);
       this.params = searchParams;
-      console.log(this.params);
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
@@ -1226,7 +1221,6 @@ export default {
     },
 
     handleRegionPageAndSizeChange(pageObj) {
-      console.log(pageObj);
       const self = this;
       self.pageRegion = pageObj.page;
       self.sizeNumRegion = pageObj.size;

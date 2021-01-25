@@ -795,10 +795,9 @@ export default {
     },
 
     handlePageAndSizeChange(pageObj) {
-      console.log(pageObj);
       const self = this;
       self.page = pageObj.page;
-      self.sizeNum = pageObj.size
+      self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
       self.getInspectItemsTable();
     },
