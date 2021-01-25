@@ -681,7 +681,7 @@ export default {
         const params = {};
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        params.regionMode = 3;
+        params.regionMode = self.regionMode;
         params.storeIds = self.params.storeIds;
         params.filter = {
           'page': 0,
@@ -745,7 +745,8 @@ export default {
         if (regionResult.errCode === 0) {
           const result = regionResult.data;
           let sortedProviceOrCity = [];
-          sortedProviceOrCity = this.regionMode === 1 ? JSON.parse(JSON.stringify(self.curRegionI)) : JSON.parse(JSON.stringify(self.curRegionII));
+          sortedProviceOrCity = this.regionMode === 1 ? JSON.parse(JSON.stringify(self.curRegionI))
+            : JSON.parse(JSON.stringify(self.curRegionII));
           const filterResult = self.jsonArrayHasSpecifiedValue(sortedProviceOrCity, result);
           self.regionDataList = filterResult;
           const regionArray = [];
@@ -764,7 +765,7 @@ export default {
 
           const regionData1 = [];
           const regionData2 = [];
-          filterTwoResult.forEach((item, index) => {
+          filterTwoResult.forEach((item) => {
             const filterRegions = item.regions;
             filterRegions.forEach((_item, _index) => {
               let sumOfReports = 0;
@@ -773,7 +774,8 @@ export default {
               let percentRegion = 0;
               sunOfExcellent += _item.numOfExcellent;
               sumOfQualified += _item.numOfQualified;
-              sumOfReports += +_item.numOfQualified + _item.numOfDangerous;
+              sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
+              console.log(sumOfReports)
               if (sumOfReports === 0) {
                 percentRegion = 0;
               } else {
@@ -1173,7 +1175,8 @@ export default {
           let percentRegion = 0;
           sunOfExcellent += _item.numOfExcellent;
           sumOfQualified += _item.numOfQualified;
-          sumOfReports += _item.numOfQualified + _item.numOfDangerous;
+          sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
+          console.log(sumOfReports)
           if (sumOfReports === 0) {
             percentRegion = 0;
           } else {
@@ -1203,7 +1206,7 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode) {
+    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
       console.log(searchParams);
       console.log(dateRangeList);
       this.params = searchParams;
@@ -1212,6 +1215,7 @@ export default {
       this.curRegionI = regionI;
       this.curRegionII = regionII;
       this.regionMode = regionMode;
+      this.timeMode = timeMode;
       this.searchData();
     },
 
