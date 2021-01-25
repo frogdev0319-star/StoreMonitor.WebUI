@@ -645,7 +645,7 @@ export default {
       this.isPatrol ? this.getSelectCountryOrCity() : '';
       this.isInspectItem ? this.getInspectId() : '';
       this.$emit('emitSearch', this.params, this.daysRangeList, this.curRegionI, this.curRegionII,
-        this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr);
+        this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr, this.timeMode);
     },
 
     getSelectedStoreIds() {
