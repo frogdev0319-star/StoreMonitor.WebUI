@@ -27,34 +27,37 @@
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
-          :min-width="lang!=='en'? 120 : 160"
-          prop="remotePer"
-          sortable="custom">
+          :min-width="lang !== 'en'? 120 : 160"
+          :sortable="true"
+          :sort-method="(a, b) => sortHandle(a, b, 'RemoteStr')"
+          prop="RemoteStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper remote">
-              <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer }}</el-tag>
+              <el-tag size="small" color="#fccc3f1a">{{ scope.row.RemoteStr }}</el-tag>
             </div>
           </template>
         </el-table-column>
         <el-table-column
           :label="$t('overview.onsitePatrol')"
-          :min-width="lang!=='en'? 120 : 160"
-          prop="onsitePer"
-          sortable="custom">
+          :min-width="lang !== 'en' ? 120 : 160"
+          :sortable="true"
+          :sort-method="(a, b) => sortHandle(a, b, 'OnsiteStr')"
+          prop="OnsiteStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper onsite">
-              <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer }}</el-tag>
+              <el-tag size="small" color="#fccc3f1a">{{ scope.row.OnsiteStr }}</el-tag>
             </div>
           </template>
         </el-table-column>
         <el-table-column
           :label="$t('overview.storeMonitor')"
-          :min-width="lang!=='en'? 120 : 160"
-          prop="videoPer"
-          sortable="custom">
+          :min-width="lang !== 'en' ? 120 : 160"
+          :sortable="true"
+          :sort-method="(a, b) => sortHandle(a, b, 'VideoStr')"
+          prop="VideoStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper video">
-              <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer }}</el-tag>
+              <el-tag size="small" color="#fccc3f1a">{{ scope.row.numOfTotal !== 0 ? `${(scope.row.numOfVideo/scope.row.numOfTotal)/100 }%`: '0%' }}</el-tag>
             </div>
           </template>
         </el-table-column>
@@ -62,7 +65,7 @@
     </el-table>
     <div v-if="showPagination" class="toolbar pagination clearfix">
       <el-pagination
-        :current-page.sync="currentPage"
+        :current-page="currentPage"
         :page-sizes="[10, 20, 50, 100]"
         :page-size="pagesize"
         :total="total"
@@ -136,7 +139,7 @@ export default {
       cellClass: 'cell-class',
       rowClass: 'row-class',
       lang: this.$i18n.locale,
-      order: {direction: '', property: ''}
+      order: { direction: '', property: '' }
     };
   },
 
@@ -162,7 +165,6 @@ export default {
     },
 
     handleSortChange(col) {
-      console.log(col);
       const self = this;
       const order = col.order;
       if (!order) {
@@ -170,14 +172,20 @@ export default {
       } else {
         self.order.direction = order === 'ascending' ? 'asc' : 'desc';
         const property = col.column.property;
-        if (property.indexOf('Str') > -1) {
-          self.order.property = property.substr(0, property.indexOf('Str'));
+        if (!self.isEvent) {
+          if (property.indexOf('Str') > -1) {
+            self.order.property = property.substr(0, property.indexOf('Str'));
+          } else {
+            self.order.property = property;
+          }
+          this.$emit('sortChange', self.order);
         } else {
-          self.order.property = property;
+          if (property.indexOf('Str') === -1) {
+            self.order.property = property;
+            this.$emit('sortChange', self.order);
+          }
         }
       }
-      console.log(self.order);
-      this.$emit('sortChange', self.order);
     },
 
     getOrderBasedOnDefaultSort() {
@@ -189,8 +197,14 @@ export default {
         this.order.property = property;
       }
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
-      console.log(this.order);
+    },
+
+    sortHandle(obj1, obj2, column) {
+      const val1 = obj1[column].substr(0, obj1[column].length - 1);
+      const val2 = obj2[column].substr(0, obj2[column].length - 1);
+      return val1 - val2;
     }
+
   }
 };
 </script>
