@@ -194,6 +194,7 @@ export default {
         val = val.replace(/[^-?\d\.]/g,"");
         val = val.replace(/\.{2,}/g,".");
         val = val.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+        val = val.replace("-","$#$").replace(/\-/g,"").replace("$#$","-");
         val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
         if(val!=="-0" && !isNaN(val) && val.indexOf(".")< 0 && val!=""){
             val= parseFloat(val);
