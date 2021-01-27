@@ -1043,7 +1043,8 @@ export default {
           }
           if(self.ItemScoreOption !== ''){
             let unavailable = 0;
-            self.ItemScoreOptions.forEach(item=>{
+            const ItemScoreOptions = self.ItemScoreOption.split('/');
+            ItemScoreOptions.forEach(item=>{
               if(!isNaN(parseFloat(item)) && parseFloat(item)>=-50 && parseFloat(item)<=parseFloat(self.ItemTotalScore)){
                 selectAvailable.push(parseFloat(self.getFloat(item)));
               }else{
