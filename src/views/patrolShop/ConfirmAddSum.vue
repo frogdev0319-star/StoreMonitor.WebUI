@@ -664,7 +664,7 @@ export default {
           }else{
             item['itemScore'] = notAddIgnoretotalScore;
           }
-          item['itemgetScore'] = totalGetscore;
+          item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
           if (p_item.type === 0) {
             PassFileTotalScoreSystem = PassFileTS;
             PassFileXS = PassFileX;
