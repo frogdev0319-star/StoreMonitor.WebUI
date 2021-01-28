@@ -202,7 +202,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'code': 'store code',
+    'code': 'Store Code',
     'downloading':'Downloading...',
     'uploading': 'Uploading...',
     'storeTag': 'Tag',
