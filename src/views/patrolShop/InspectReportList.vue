@@ -198,7 +198,6 @@
             height="calc(500/1920*100vw)"
             style=""
             class="table-content"
-            @sort-change="sortChange"
             @row-click="clickReport"
           >
             <el-table-column
@@ -212,7 +211,7 @@
             <el-table-column
               :label="$t('eventView.operation')"
               prop="option"
-              min-width="150"
+              min-width="110"
               align="left">
               <template slot-scope="scope">
                 <i class="iconfont icon-gengduo"/>
@@ -300,22 +299,40 @@ export default {
       ],
       reportInfoTable: [
         {
+          prop: 'province',
+          label: this.$t('remotePatrol.regionI'),
+          sortable: false,
+          width: '120'
+        },
+        {
+          prop: 'city',
+          label: this.$t('remotePatrol.regionII'),
+          sortable: false,
+          width: '140'
+        },
+        {
           prop: 'storeName',
           label: this.$t('remotePatrol.patrolStore'),
           sortable: false,
-          width: '220'
+          width: '140'
+        },
+        {
+          prop: 'code',
+          label: this.$t('remotePatrol.code'),
+          sortable: false,
+          width: '120'
         },
         {
           prop: 'storeTag',
           label: this.$t('remotePatrol.storeTag'),
           sortable: false,
-          width: '180'
+          width: '115'
         },
         {
           prop: 'submitterName',
           label: this.$t('scheduleView.InspectPerson'),
           sortable: false,
-          width: '160'
+          width: '130'
         },
         {
           prop: 'tagName',
@@ -333,19 +350,19 @@ export default {
           prop: 'status',
           label: this.$t('remotePatrol.patrolResult'),
           sortable: false,
-          width: '150'
+          width: '100'
         },
         {
           prop: 'totalScore',
           label: this.$t('remotePatrol.patrolScore'),
           sortable: true,
-          width: '150'
+          width: '110'
         },
         {
           prop: 'datestr',
           label: this.$t('remotePatrol.patrolDate'),
           sortable: true,
-          width: '184'
+          width: '164'
         }
       ],
       curCountry: '',
@@ -359,7 +376,6 @@ export default {
       curStore: [],
       storeList: [],
       searchInput: '',
-      exportList: [],
       sizeNum: 12,
       defaultTime: [],
       dateValue: [],
@@ -400,6 +416,7 @@ export default {
       headerClass: 'report-header-class',
       exportReportHeader: [this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
+        this.$t('remotePatrol.code'),
         this.$t('remotePatrol.patrolStore'),
         this.$t('remotePatrol.storeTag'),
         this.$t('scheduleView.InspectPerson'),
@@ -500,10 +517,10 @@ export default {
       require.ensure([], async() => {
         let { export_json_to_excel } = require('@/excel/Export2Excel');
         let tHeader = that.exportReportHeader;
-        let filterVal = ['regionI', 'regionII', 'storeName', 'storeTag', 'submitterName', 'tagName',
+        let filterVal = ['province', 'city', 'code', 'storeName', 'storeTag', 'submitterName', 'tagName',
           'modeText', 'status', 'totalScore', 'datestr'];
         let curData = [];
-        curData = await that.getReportList(that.params, 1);
+        curData = await that.getReportList(that.params);
         let data = that.formatJson(filterVal, curData);
         let fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -524,7 +541,7 @@ export default {
       return obj;
     },
 
-    getReportList(params, e) {
+    getReportList(params) {
       let self = this;
       return new Promise((resolve) => {
         getInspectReportList(params).then(res => {
@@ -545,8 +562,7 @@ export default {
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
             reportObj.totalScore = item.totalScore;
-            reportObj.regionI = '区域一';
-            reportObj.regionII = '区域二';
+            reportObj.code = item.code!==null ? item.code : '--';
             if (item.mode === 0) {
               reportObj.modeText = self.$t('overview.remotePatrol');
             } else if (item.mode === 1) {
@@ -560,8 +576,8 @@ export default {
             reportObj.storeTag = storeTag;
             self.storeList.forEach(_item => {
               if (item.storeId === _item.storeId) {
-                reportObj.regionI = _item.province;
-                reportObj.regionII = _item.city;
+                reportObj.province = _item.province;
+                reportObj.city = _item.city;
               }
             });
             let statusAndIconObj = self.getIconSrc(item.status);
@@ -569,7 +585,7 @@ export default {
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
           });
-          e === 0 ? self.reportList = temp : self.exportList = temp;
+          self.reportList = temp;
           self.total = res.data.totalElements;
           if (self.reportList.length === 0) {
             self.noData = self.$t('deviceView.noData');
@@ -652,7 +668,7 @@ export default {
       self.params.filter = { page: 0, size: self.sizeNum };
       let storeIds = self.storeStr.split('，');
       self.params.clause = { storeId: storeIds };
-      self.getReportList(self.params, 0);
+      self.getReportList(self.params);
     },
 
     async getCountryStore() {
@@ -1041,14 +1057,14 @@ export default {
       let self = this;
       self.page = val;
       self.params.filter = { page: val - 1, size: self.sizeNum };
-      self.getReportList(self.params, 0);
+      self.getReportList(self.params);
     },
 
     sizeChange(val) {
       let self = this;
       self.sizeNum = val;
       self.params.filter = { page: 0, size: val };
-      self.getReportList(self.params, 0);
+      self.getReportList(self.params);
     },
 
     searchData() {
@@ -1080,7 +1096,7 @@ export default {
       }
 
       self.params.filter = { page: 0, size: self.sizeNum };
-      self.getReportList(self.params, 0);
+      self.getReportList(self.params);
     },
 
     checkSortType(typeId) {
@@ -1090,7 +1106,7 @@ export default {
         case 1: self.params.order = { direction: 'asc', property: 'status' }; break;
         case 2: self.params.order = { direction: 'asc', property: 'storeName' }; break;
       }
-      self.getReportList(self.params, 0);
+      self.getReportList(self.params);
     },
 
     clickReport(item, index) {

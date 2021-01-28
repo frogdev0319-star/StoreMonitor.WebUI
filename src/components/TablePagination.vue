@@ -23,7 +23,7 @@
         :prop="_item.prop"
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
-        :min-width="lang !== 'en' ? _item.width : _item.maxWidth"/>
+        :min-width="isexportPDF ? _item.pdfwidth : (lang !== 'en' ? _item.width : _item.maxWidth)"/>
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
@@ -128,6 +128,10 @@ export default {
       default: false
     },
     isEvent: {
+      type: Boolean,
+      default: false
+    },
+    isexportPDF: {
       type: Boolean,
       default: false
     }

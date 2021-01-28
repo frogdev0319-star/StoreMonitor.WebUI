@@ -146,7 +146,6 @@
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="160" sortable="custom"/>
               <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="160" sortable="custom"/>
               <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="120">
                 <template slot-scope="scope">
@@ -157,6 +156,10 @@
               </el-table-column>
               <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" width="120" sortable="custom"/>
               <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="140" sortable="custom"/>
+              <el-table-column :label="$t('remotePatrol.regionI')" prop="province" align="left" min-width="120"/>
+              <el-table-column :label="$t('remotePatrol.regionII')" prop="city" align="left" min-width="120"/>
+              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="140" sortable="custom"/>
+              <el-table-column :label="$t('remotePatrol.code')" prop="code" align="left" min-width="120"/>
               <el-table-column
                 :label="$t('eventView.operation')"
                 prop="option"
@@ -301,10 +304,13 @@ export default {
       exportDataList: [],
       exportDataHeader: [
         this.$t('eventView.name'),
-        this.$t('eventView.stores'),
         this.$t('overview.patrolLists'),
         this.$t('eventView.submitter'),
-        this.$t('eventView.submitTime')],
+        this.$t('eventView.submitTime'),
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('eventView.stores'),
+        this.$t('remotePatrol.code'),],
       windowHeight: window.innerHeight,
       userId: '',
       poperClass: 'date-picker-poper',
@@ -850,7 +856,10 @@ export default {
             sourceType: item.sourceType,
             attachment: attachment,
             initialComment: item.initialComment,
-            relatedDeviceIds: item.relatedDeviceIds
+            relatedDeviceIds: item.relatedDeviceIds,
+            province: item.province,
+            city: item.city,
+            code: item.code,
           };
           temp.push(obj);
         });
@@ -1017,6 +1026,9 @@ export default {
             obj.inspectTagName = item.inspectTagName;
             obj.assignerName = item.assignerName;
             obj.ts = util.getDateTime(item.ts);
+            obj.province = item.province;
+            obj.city = item.city;
+            obj.code = item.code;
             temp.push(obj);
           });
           resolve(temp);
@@ -1059,7 +1071,7 @@ export default {
           require.ensure([], async() => {
             let { export_json_to_excel } = require('@/excel/Export2Excel');
             let tHeader = that.exportDataHeader;
-            let filterVal = ['subject', 'storeName', 'inspectTagName', 'assignerName', 'ts'];
+            let filterVal = ['subject', 'inspectTagName', 'assignerName', 'ts','province','city','storeName','code'];
             let curData = await that.getExportData();
             let data = that.formatJson(filterVal, curData);
             export_json_to_excel(tHeader, data, that.getExportFileName());
