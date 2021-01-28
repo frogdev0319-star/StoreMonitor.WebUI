@@ -2671,6 +2671,7 @@ export default {
         if (e.message !== 'Network request failed') {
           this.currentState = 'blank';
           this.errorText = e.message;
+          this.isLoading = false;
         }
       }
     },
@@ -2726,6 +2727,7 @@ export default {
         this.currentState = 'blank';
         this.errorText = error;
         this.showError = true;
+        this.isLoading = false;
         this.showModelContent = false;
         return false;
       }
@@ -2785,13 +2787,13 @@ export default {
         let error = this.$t('remotePatrol.dashServerError');
         if (DashHttp.getResult() != null) {
           error += DashHttp.getResult().ErrorCode;
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-          this.showModelContent = false;
-          this.isLoading = false;
-          return false;
         }
+        this.currentState = 'blank';
+        this.errorText = error;
+        this.showError = true;
+        this.showModelContent = false;
+        this.isLoading = false;
+        return false;
       }
     },
 
@@ -2824,11 +2826,13 @@ export default {
         let error = this.$t('remotePatrol.dashServerError');
         if (DashHttp.getResult() != null) {
           error += DashHttp.getResult().ErrorCode;
-          this.currentState = 'blank';
-          this.paused = false;
-          this.errorText = error;
-          return false;
         }
+        this.currentState = 'blank';
+        this.paused = false;
+        this.errorText = error;
+        this.showError = true;
+        this.isLoading = false;
+        return false;
       }
     },
 
@@ -2886,6 +2890,7 @@ export default {
           this.currentState = 'blank';
           this.errorText = error;
           this.showError = true;
+          this.isLoading = false;
         }
       });
     },

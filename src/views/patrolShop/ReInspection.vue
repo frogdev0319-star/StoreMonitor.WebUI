@@ -696,12 +696,6 @@ export default {
       showPenBtn: true,
       showPen: false,
       showStoreUp: false,
-      store: {
-        storeName: '西安5店',
-        storeTitle: '西安5店远程巡检',
-        storeUp: false,
-        storeUptitle: this.$t('remotePatrol.clickToStar')
-      },
       showFeedDialog1: false,
       showFeedDialog2: false,
       showFeedDialog3: false,
@@ -806,7 +800,6 @@ export default {
       userId: '',
       tempStoreList: [],
       allInitStoreList: [],
-      sessionId: '',
       inspectList: [],
       showFeedBack: false,
       curGroup: null,
@@ -836,7 +829,6 @@ export default {
       playState: false,
       editCount: 0,
       ignoreTemp: [],
-      fullScreen: false,
       appliedInspectList: [],
 
       changeBrandObj: {
@@ -968,7 +960,8 @@ export default {
       realType: true,
       lastTime: null,
       currentTime: null,
-      onEndflag: false
+      onEndflag: false,
+      previewplayer: null
     };
   },
   computed: {
@@ -2623,6 +2616,7 @@ export default {
           this.currentState = 'blank';
           this.errorText = error;
         } else {
+          this.showError = false;
           this.isLoading = true;
           if (!await this.stopVideoPlay()) {
             return;
@@ -2644,6 +2638,8 @@ export default {
         if (e.message !== 'Network request failed') {
           this.currentState = 'blank';
           this.errorText = e.message;
+          this.showError = true;
+          this.isLoading = false;
         }
       }
     },
@@ -2696,6 +2692,8 @@ export default {
         this.currentState = 'blank';
         this.errorText = error;
         this.showError = true;
+        this.isLoading = false;
+        this.destroyVideo();
         return false;
       }
     },
@@ -2755,12 +2753,13 @@ export default {
         let error = this.$t('remotePatrol.dashServerError');
         if (DashHttp.getResult() != null) {
           error += DashHttp.getResult().ErrorCode;
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-          this.isLoading = false;
-          return false;
         }
+        this.currentState = 'blank';
+        this.errorText = error;
+        this.showError = true;
+        this.isLoading = false;
+        this.destroyVideo();
+        return false;
       }
     },
 
@@ -2793,9 +2792,11 @@ export default {
         if (DashHttp.getResult() != null) {
           error += DashHttp.getResult().ErrorCode;
         }
-        this.currentState = 'blank',
-        this.paused = false,
+        this.currentState = 'blank';
+        this.paused = false;
         this.errorText = error;
+        this.isLoading = false;
+        this.showError = true;
         return false;
       }
     },
@@ -4136,7 +4137,7 @@ export default {
                 }
             }
             .video-content{
-                height: auto;
+                height: 420px;
                 position: relative;
                 margin: calc(25/1920*100vw);
                 //@include point(min-width,500);
