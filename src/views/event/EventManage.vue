@@ -150,7 +150,7 @@
               <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="120">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
-                    <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="sourceType-icon">
+                    <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon">
                   </div>
                 </template>
               </el-table-column>
@@ -1187,9 +1187,13 @@ $h1:#292e36;
     /*overflow: hidden;*/
     .sourceType-icon{
         margin-right: calc(20/1920*100vw);
-        // position: relative;
         float: left;
-        //@include point(bottom,2);
+        height: 28px;
+        width: 24px;
+    }
+    .enclosure-icon{
+        margin-right: calc(8/1920*100vw);
+        float: left;
         height: 28px;
         width: 24px;
     }
