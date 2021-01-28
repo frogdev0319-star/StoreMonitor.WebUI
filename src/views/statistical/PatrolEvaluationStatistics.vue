@@ -153,6 +153,10 @@
           <span class="content-header">{{ storeTagStr }}</span>
         </p>
         <p>
+          <span>{{ $t('overview.patrolLists') }}：</span>
+          <span class="content-header">{{ storePatrolLists }}</span>
+        </p>
+        <p>
           <span>{{ $t('remotePatrol.time') }}：</span>
           <span class="content-header">{{ storeDateValue }}</span>
         </p>
@@ -243,6 +247,7 @@
             <div class="el-table-panel">
               <table-pagination
                 ref="elTP"
+                :isexportPDF="isexportPDF"
                 :column-data="storeInfoData"
                 :table-data="storePDFData"
                 :highlight-current-row= "true"
@@ -288,6 +293,7 @@ export default {
       isexportPDF: false,
       storeNameStr: '',
       storeTagStr: '',
+      storePatrolLists: '',
       curRegion: [],
       timeMode: 1,
       regionsList: [],
@@ -400,20 +406,42 @@ export default {
       sizeNumRegion: 10,
       storeInfoData: [
         {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'width': '150',
+          'maxWidth': '150'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'width': '150',
+          'maxWidth': '150'
+        },
+        {
           'prop': 'region',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'pdfwidth': '22%',
-          'pdfmaxWidth': '22%',
-          'width': '284',
-          'maxWidth': '284'
+          'pdfwidth': '15%',
+          'width': '150',
+          'maxWidth': '150'
+        },
+        {
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'width': '120',
+          'maxWidth': '120'
         },
         {
           'prop': 'cycleOfInspect',
           'label': this.$t('overview.advPatrolCycle'),
           'sortable': 'custom',
-          'pdfwidth': '12%',
-          'pdfmaxWidth': '14%',
+          'pdfwidth': '16%',
           'width': '160',
           'maxWidth': '190'
         },
@@ -421,55 +449,49 @@ export default {
           'prop': 'numOfReport',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
-          'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'pdfwidth': '14%',
+          'width': '150',
+          'maxWidth': '150'
         },
         {
           'prop': 'numOfQualified',
           'label': this.$t('overview.echartGood'),
           'sortable': 'custom',
           'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'width': '100',
+          'maxWidth': '100'
         },
         {
           'prop': 'numOfImproved',
           'label': this.$t('overview.improve'),
           'sortable': 'custom',
           'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'width': '110',
+          'maxWidth': '110'
         },
         {
           'prop': 'numOfDangerous',
           'label': this.$t('overview.danger'),
           'sortable': 'custom',
           'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'width': '130',
+          'maxWidth': '130'
         },
         {
           'prop': 'qualifiedRateStr',
           'label': this.$t('overview.passRate'),
           'sortable': 'custom',
-          'pdfwidth': '16%',
-          'pdfmaxWidth': '14%',
-          'width': '219',
-          'maxWidth': '180'
+          'pdfwidth': '12%',
+          'width': '140',
+          'maxWidth': '140'
         },
         {
           'prop': 'averageScore',
           'label': this.$t('overview.averageScore'),
           'sortable': 'custom',
-          'pdfwidth': '16%',
-          'pdfmaxWidth': '14%',
-          'width': '217',
-          'maxWidth': '180'
+          'pdfwidth': '12%',
+          'width': '110',
+          'maxWidth': '110'
         }
       ],
       storeTableData: [],
@@ -480,7 +502,10 @@ export default {
       curRegionArray: [],
       exportDataHeader:
       [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
         this.$t('overview.advPatrolCycle'),
         this.$t('overview.numOfEvaluations'),
         this.$t('overview.echartGood'),
@@ -555,6 +580,7 @@ export default {
           params.order = self.regionOrder;
           params.regionMode = self.regionMode;
           params.storeIds = self.params.storeIds;
+          params.inspectTagId = self.params.inspectId;
           const regionResult = await self.getInspectStatsOverviewWithRegion(params);
           if (regionResult.errCode === 0) {
             const result = regionResult.data;
@@ -573,6 +599,7 @@ export default {
           storeparams.endTs = self.params.endTs;
           storeparams.regionMode = 3;
           storeparams.storeIds = self.params.storeIds;
+          storeparams.inspectTagId = self.params.inspectId;
           storeparams.filter = {
             'page': 0,
             'size': storesize
@@ -644,6 +671,7 @@ export default {
         params.order = self.regionOrder;
         params.storeIds = self.params.storeIds;
         params.regionMode = self.regionMode;
+        params.inspectTagId = self.params.inspectId;
         const regionResult = await that.getInspectStatsOverviewWithRegion(params);
         let curData = [];
         if (regionResult.errCode === 0) {
@@ -674,7 +702,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportDataHeader;
-        const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
+        const filterVal = ['province', 'city', 'region', 'code', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
           'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const size = self.totalStore;
@@ -683,6 +711,7 @@ export default {
         params.endTs = self.params.endTs;
         params.regionMode = 3;
         params.storeIds = self.params.storeIds;
+        params.inspectTagId = self.params.inspectId;
         params.filter = {
           'page': 0,
           'size': size
@@ -701,7 +730,8 @@ export default {
           }
         }
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'Store' + '-' + util.getCurDateStr();
+        const name = self.params.inspectId==='' ? 'Store' : self.storePatrolLists;
+        const fileName = name + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -739,6 +769,7 @@ export default {
       params.endTs = self.params.endTs;
       params.region = this.regionMode;
       params.timeMode = self.timeMode;
+      params.inspectId = self.params.inspectId;
       try {
         const regionResult = await self.getInspectResultOverRegion(params);
         const option = self.getInspectLineOption();
@@ -983,6 +1014,7 @@ export default {
       params.endTs = self.params.endTs;
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
@@ -1010,6 +1042,7 @@ export default {
       params.order = self.regionOrder;
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
@@ -1035,6 +1068,7 @@ export default {
       params.storeIds = self.params.storeIds;
       params.filter = self.storeFilter;
       params.order = self.storeOrder;
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
@@ -1065,6 +1099,7 @@ export default {
       params.regionMode = self.regionMode;
 
       params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: self.totalRegion };
         const storeResult = await self.getInspectStatsOverviewWithRegion(params);
@@ -1211,10 +1246,12 @@ export default {
       this.curRegionII = regionII;
       this.regionMode = regionMode;
       this.timeMode = timeMode;
+      this.storePatrolLists = storePatrolLists;
       this.searchData();
     },
 
     exportPdf(storeNameStr, storeTagStr) {
+      this.isexportPDF = true;
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
       this.handleExportReport();

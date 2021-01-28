@@ -205,6 +205,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
+    'code': '分店代碼',
     'downloading':'正在下載中......',
     'uploading': '正在上傳中',
     'upload0': '共',

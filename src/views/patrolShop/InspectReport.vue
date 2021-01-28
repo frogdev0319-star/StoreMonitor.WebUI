@@ -557,6 +557,7 @@ export default {
         const temp = [];
         const feedtemp = [];
         // let gradetotal = []
+        data.groups.sort((a, b) => {return a.groupType - b.groupType; });
         data.groups.forEach((groupitem, groupindex) => {
           const obj = {
             items: []
@@ -595,6 +596,7 @@ export default {
           });
           temp.push(obj);
         });
+        debugger
         self.groups = temp;
         if (data.feedbacks.length === 0) {
           this.showFeedBacks = false;

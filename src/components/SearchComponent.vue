@@ -1,7 +1,7 @@
 <template>
   <el-col :span="24" class="statistics-header">
     <el-col :span="24" class="header-details">
-      <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
       <el-select
         v-model="curCountry"
         :placeholder="$t('remotePatrol.country')"
@@ -42,7 +42,7 @@
         :options="storeDataList"
         style="display: inline"
         @changeInput="handleStoreChange"/>
-      <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.selectStoreTag') }}</span>
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.selectStoreTag') }}</span>
       <multi-select
         ref="TagMultiSelect"
         :selected="curStoreTag"
@@ -52,8 +52,8 @@
         :options="storeTagList"
         style="display: inline;margin-left: calc(20/1920*100vw);"
         @changeInput="handleStoreTagChange"/>
-      <span v-if="isInspectItem">
-        <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
+      <span v-if="isInspectItem || isPatrol">
+        <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
         <el-select
           v-model="inspectList"
           :placeholder="$t('insSettingView.selectPost')"
@@ -70,7 +70,7 @@
     </el-col>
 
     <el-col :span="24" class="header-details">
-      <span :class="isInspectItem ? 'inspect-span' : 'normal-span'" >
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'" >
         {{ $t('remotePatrol.time') }}</span>
       <el-date-picker
         ref="datePicker"
@@ -304,8 +304,9 @@ export default {
         });
       });
       self.inspectTypeList = inspectList;
+      self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
       if (inspectList.length !== 0) {
-        self.inspectList = inspectList[0].id;
+        self.inspectList = self.inspectTypeList[0].id;
       } else {
         self.inspectList = '';
       }
@@ -370,7 +371,7 @@ export default {
       str = str.substr(0, str.length - 1);
       self.storeStr = str;
       self.filterStore();
-      self.isInspectItem ? self.getInspectList() : '';
+      self.isInspectItem || self.isPatrol ? self.getInspectList() : '';
     },
 
     handleProChange(arr) {
@@ -487,7 +488,11 @@ export default {
       });
       this.tagNameStr = this.tagNameStr.substr(0, this.tagNameStr.length - 1);
       this.filterStore();
-      this.isInspectItem ? this.getInspectList() : '';
+      this.isInspectItem || this.isPatrol ? this.getInspectList() : '';
+    },
+
+    changePatrol(){
+
     },
 
     filterStore() {
@@ -635,7 +640,7 @@ export default {
         storeArr.push(item.storeId);
       });
       self.curStore = storeArr;
-      self.isInspectItem ? await self.getAllStoreList() : '';
+      self.isInspectItem || self.isPatrol ? await self.getAllStoreList() : '';
       self.changeStoreNew(self.curStore);
       isFirst ? await self.searchData() : null;
     },
@@ -643,7 +648,7 @@ export default {
     async searchData() {
       this.getSelectedStoreIds();
       this.isPatrol ? this.getSelectCountryOrCity() : '';
-      this.isInspectItem ? this.getInspectId() : '';
+      this.isInspectItem || this.isPatrol ? this.getInspectId() : '';
       this.$emit('emitSearch', this.params, this.daysRangeList, this.curRegionI, this.curRegionII,
         this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr, this.timeMode);
     },
@@ -662,7 +667,7 @@ export default {
           this.params.inspectId = id;
           this.storePatrolLists = name;
         } else {
-          this.params.inspectId = this.inspectList;
+          this.params.inspectId = this.inspectList==='-1' ? '' : this.inspectList;
         }
       }
     },

@@ -200,7 +200,7 @@
       </el-dialog>
     </div>
     <div v-if="ispdf" class="item-container">
-      <el-col id="pdfDom" ref="printPDF" :span="24" class="items-content" style="padding:40px 20px;width:1150px;">
+      <el-col id="pdfDom" ref="printPDF" :span="24" class="items-content" style="padding:40px 0px;width:1130px;">
         <div :span="24" class="export-header">
           <p>
             <span>{{ $t('remotePatrol.time') }}：</span>

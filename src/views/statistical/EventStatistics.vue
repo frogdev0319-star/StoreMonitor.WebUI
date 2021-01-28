@@ -351,16 +351,32 @@ export default {
       eventPDFData: [],
       eventInfoData: [
         {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%'
+        },
+        {
           'prop': 'storeName',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'width': '290',
-          'maxWidth': '290',
-          'pdfwidth': '16%'
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%'
         },
         {
-          'prop': 'regionName',
-          'label': this.$t('overview.area'),
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
@@ -419,8 +435,10 @@ export default {
       cellClass: 'cell-class',
       rowClass: 'row-class',
       exportEventHeader: [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
-        this.$t('overview.area'),
+        this.$t('remotePatrol.code'),
         this.$t('overview.sumEvents'),
         this.$t('overview.numUnprocessEvents'),
         this.$t('overview.numProcessEvents'),
@@ -657,7 +675,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportEventHeader;
-        const filterVal = ['storeName', 'regionName', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
+        const filterVal = ['province', 'city','storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
         let curData = [];
         curData = that.allEventData;
