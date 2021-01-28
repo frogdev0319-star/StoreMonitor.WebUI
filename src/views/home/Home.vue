@@ -386,6 +386,7 @@ export default {
 
     brandDisabled() {
       let disabled = true;
+      console.log(this.$route.matched.length)
       switch (this.$route.matched.length) {
         case 2: {
           disabled = false;
@@ -452,9 +453,8 @@ export default {
       let disabled = true;
       switch (path) {
         case '/schedule':
-        case '/dashDevice':
-        case '/ezvizDevice':
-        case '/beseyeDevice': {
+        case '/device':
+        {
           disabled = false;
           break;
         }
