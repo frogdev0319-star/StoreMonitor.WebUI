@@ -681,7 +681,7 @@ export default {
         const params = {};
         params.beginTs = self.params.beginTs;
         params.endTs = self.params.endTs;
-        params.regionMode = self.regionMode;
+        params.regionMode = 3;
         params.storeIds = self.params.storeIds;
         params.filter = {
           'page': 0,
