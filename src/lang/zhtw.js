@@ -506,7 +506,7 @@ export default {
     'item': '個巡檢項目',
     'relationDuty': '關聯職務',
     'isExportPDF': '正在導出pdf',
-    'Inspector': '請選擇巡檢人',
+    'Inspector': '請選擇任務執行者',
     'inspectName': '巡檢項名稱',
     'inspectionDescp': '巡檢項目詳細說明',
     'sheetscore0': '項目總分值',
@@ -796,7 +796,7 @@ export default {
   // Schedule Management page language
   'scheduleView': {
     'noscheduleInspect': '請選擇排程關聯的巡檢表',
-    'emptyAssignedTo': '請選擇巡檢人',
+    'emptyAssignedTo': '請選擇任務執行者',
     'schedule': '排程',
     'scheduleName': '排程名稱',
     'scheduleNameRuletip': '最多可輸入30個字元',
@@ -868,7 +868,7 @@ export default {
     'dueDays': '執行時效',
     'today': '當天',
     'days': '天',
-    'InspectPerson': '巡檢人',
+    'InspectPerson': '任務執行者',
     'remotePatrol': '遠端巡檢',
     'onsitePatrol': '現場巡檢',
     'deleteSuss': '刪除成功！',
