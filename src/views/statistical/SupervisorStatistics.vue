@@ -1125,7 +1125,7 @@ export default {
       .header-mul-select{
         display: inline-block;
         .mul-label{
-          font-size: calc(16/1920*100vw);
+          font-size: calc(14/1920*100vw);
           margin-right: calc(20/1920*100vw);
           margin-left: calc(20/1920*100vw);
           color: $black;
@@ -1156,7 +1156,7 @@ export default {
           color: $tab;
         }
         span{
-          font-size: calc(16/1920*100vw);
+          font-size: calc(14/1920*100vw);
           margin-right: calc(20/1920*100vw);
           margin-left: calc(20/1920*100vw);
           color: $black;
