@@ -49,7 +49,7 @@ export const deleteEzivzDevice = data => {
 
 export const getEzvizAccessToken = params => {
   return request({
-    url: `${version}/ezviz/token`,
+    url: `v2.0/ezviz/token`,
     method: 'get',
     params
   });
@@ -132,7 +132,7 @@ export async function getIsEncrypt(data) {
     });
   });
   return ret;
-};
+}
 
 function getUpdatePasswordMsg(code) {
   const lang = i18n.locale;
@@ -439,3 +439,11 @@ export const deleteEzvizAccount = params => {
     params
   });
 };
+
+export const getAvailableDevices = params => {
+  return request({
+    url: `${version}/ezviz/device/unused/list`,
+    method: 'get',
+    params
+  });
+}
