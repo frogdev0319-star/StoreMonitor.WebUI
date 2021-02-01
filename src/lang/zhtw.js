@@ -66,7 +66,9 @@ export default {
     'dashDeviceMgt': '设备管理（Dash設備）',
     'ezvizDeviceMgt': '设备管理（萤石設備）',
     'beseyeDeviceMgt': '设备管理（Beseye設備）',
-    'deviceSetting': '設備配置'
+    'deviceSetting': '設備配置',
+    'storeViuAccountDeviceSetting': 'StoreVue賬號設備配置',
+    'userAccountDeviceSetting': '客戶螢石賬號設備配置'
   },
 
   'overview': {
@@ -212,7 +214,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'downloading':'正在下載中......',
+    'downloading': '正在下載中......',
     'uploading': '正在上傳中',
     'upload0': '共',
     'upload1': '個附件，已上傳',
@@ -463,10 +465,10 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'addTitleItem':'添加巡檢項',
-    'editTitleItem':'編輯巡檢項',
-    'enterScore':'請輸入分值',
-    'sheetscore3_des':'（分值間，用“/”隔開）',
+    'addTitleItem': '添加巡檢項',
+    'editTitleItem': '編輯巡檢項',
+    'enterScore': '請輸入分值',
+    'sheetscore3_des': '（分值間，用“/”隔開）',
     'rangeScoreTips': '考評總分最低值不得高於最高值',
     'ruleInspect': '巡檢規則設置',
     'PatrolScoreCalculation': '巡檢得分計算',
@@ -479,8 +481,8 @@ export default {
     'setMinScore': '最低',
     'setMaxScore': '最高',
     'isCheckSuggest': '巡檢建議值',
-    'isCheckAnnex':'巡檢附件上傳',
-    'AllowPhotos':'僅允許現場拍照（圖片/視頻）',
+    'isCheckAnnex': '巡檢附件上傳',
+    'AllowPhotos': '僅允許現場拍照（圖片/視頻）',
     'patrolSuggest': '中存在不合格項時，巡檢結果為：立即督導',
     'PSCrule1': '與其他tab組合時，',
     'PSCrule2': '項目分值參與考評總分運算',
@@ -650,7 +652,7 @@ export default {
     'addSuccess': '添加成功',
     'addFailed': '添加失敗',
     'addChannel': '新增通道',
-    'devChannelNum': '設備通道號',
+    'devChannelNum': '通道號',
     'imgTypeInfo': '上傳圖片只能是 JPEG/JPG/PNG 格式！',
     'imgSizeInfo': '上傳圖片大小不能超過 60KB!',
     'inputSerialNum': '請輸入設備序列號',
@@ -766,7 +768,22 @@ export default {
     'getAccessTokenError': '獲取AccessToken失敗',
     'duplicateSeriNum': '重復的設備序列號',
     'storeNotExist': '門店不存在',
-    'noAuthorityForStore': '對門店無操作權限'
+    'noAuthorityForStore': '對門店無操作權限',
+    'accountType': '賬號類型',
+    'hasAddedDevice': '已增加設備數',
+    'deleteDevice': '刪除設備',
+    'emptyDeleteDevice': '請選擇要刪除的設備',
+    'confirmDeleteDevice': '確認刪除該設備？',
+    'confirmDeleteDevices': '確認刪除已勾選設備？',
+    'deviceDetail': '設備詳情',
+    'availableDevice': '賬號中可選擇添加的設備',
+    'deviceSeriNum': '設備SN',
+    'enableStatus': '啟用狀態',
+    'addAvailableDevice': '添加可用設備',
+    'addMainAccountDevice': '添加主賬號設備',
+    'addSharedDevice': '添加他人分享設備',
+    'illegalSeriNum': '序列號不合法',
+    'selectBoundStore': '請選擇所屬門店'
   },
 
   // Store Management page language

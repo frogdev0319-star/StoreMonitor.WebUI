@@ -65,7 +65,9 @@ export default {
     'dashDeviceMgt': 'Device Management (Dash)',
     'ezvizDeviceMgt': 'Device Management (Ezviz)',
     'beseyeDeviceMgt': 'Device Management (Beseye)',
-    'deviceSetting': 'Device Settings'
+    'deviceSetting': 'Device Settings',
+    'storeViuAccountDeviceSetting': 'Device Settings of StoreVue Account',
+    'userAccountDeviceSetting': 'Device Settings of User Ezviz Account'
   },
 
   'overview': {
@@ -352,7 +354,7 @@ export default {
     'eventTitle': 'Title',
     'eventStatus': 'Status',
     'untreated': 'pending',
-    'getAccessTokenError': 'Failed to get AccessToken',
+    'getAccessTokenError': 'Failed to get Access Token',
     'partolError': 'Invalid device, please contact administrator',
     'accessTokenError': 'Busy device, please try again later',
     'noHistoryVideo': 'No video during playback time',
@@ -756,7 +758,22 @@ export default {
     'getAccessTokenError': 'Cannot get Ezviz access token',
     'duplicateSeriNum': 'Duplicate device serial number',
     'storeNotExist': 'Store does not exist',
-    'noAuthorityForStore': 'No authority for the specified store'
+    'noAuthorityForStore': 'No authority for the specified store',
+    'accountType': 'Account Type',
+    'hasAddedDevice': 'Added Device',
+    'deleteDevice': 'Delete Device',
+    'emptyDeleteDevice': 'Please select device to delete',
+    'confirmDeleteDevice': 'Confirm to delete the device',
+    'confirmDeleteDevices': 'Confirm to delete devices',
+    'deviceDetail': 'Device Details',
+    'availableDevice': 'Devices That Can Be Added to the Account',
+    'deviceSeriNum': 'Device SN',
+    'enableStatus': 'Enable Status',
+    'addAvailableDevice': 'Add Available Device',
+    'addMainAccountDevice': 'Add Device of Main Account',
+    'addSharedDevice': 'Add Shared Device',
+    'illegalSeriNum': 'Illegal serial number',
+    'selectBoundStore': 'Please Select Store'
   },
 
   // Store Management page language
