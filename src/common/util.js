@@ -1,7 +1,6 @@
-import { format } from 'url';
 import ConvertPinyin from '@/common/getpinyin';
 import i18n from '@/lang/index';
-import moment from 'moment';
+import { message } from '@/common/singleton-message';
 
 export default {
   getOneHourTime(para) {
@@ -826,6 +825,7 @@ export default {
     }
     return seats[idx] / digits;
   },
+
   groupArrayOnSize(array, size) {
     const length = array.length;
     if (!length || !size || size < 1) {
@@ -840,6 +840,14 @@ export default {
     }
     console.log(result);
     return result;
+  },
+
+  notify(msg, type, time) {
+    message({
+      message: msg,
+      type: type,
+      duration: time
+    });
   }
 };
 class indexedDB {
@@ -887,6 +895,5 @@ class indexedDB {
       };
     });
   }
-
 }
 export { indexedDB };
